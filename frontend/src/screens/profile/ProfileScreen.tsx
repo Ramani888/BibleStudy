@@ -1,0 +1,197 @@
+import React from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+
+import { MenuItem } from './components/MenuItem';
+import { Avatar, Badge, Divider, Typography } from '../../components/ui';
+import { useAuthStore } from '../../store';
+import { formatBytes } from '../../utils/formatters';
+import { colors, layout, spacing } from '../../theme';
+import type { ProfileStackParamList } from '../../navigation/types';
+import type { Plan } from '../../types';
+
+type ProfileNav = NativeStackNavigationProp<ProfileStackParamList>;
+
+const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
+  FREE: 'neutral',
+  STARTER: 'info',
+  PRO: 'primary',
+};
+
+export function ProfileScreen() {
+  const navigation = useNavigation<ProfileNav>();
+  const user = useAuthStore(s => s.user);
+  const logout = useAuthStore(s => s.logout);
+
+  const storagePercent = user
+    ? Math.round((user.storageUsed / user.storageLimit) * 100)
+    : 0;
+
+  return (
+    <SafeAreaView style={styles.safe}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Avatar + Name ── */}
+        <View style={styles.hero}>
+          <Avatar
+            uri={user?.profileImage}
+            name={user?.name}
+            size="lg"
+            style={styles.avatar}
+          />
+          <Typography preset="h3" align="center">{user?.name}</Typography>
+          <Typography preset="body" color={colors.textSecondary} align="center">
+            {user?.email}
+          </Typography>
+          <View style={styles.badgeRow}>
+            <Badge
+              label={user?.plan ?? 'FREE'}
+              variant={PLAN_VARIANT[user?.plan ?? 'FREE']}
+            />
+            {!user?.emailVerified && (
+              <Badge label="Unverified" variant="warning" />
+            )}
+          </View>
+          {user?.bio ? (
+            <Typography
+              preset="bodySm"
+              color={colors.textSecondary}
+              align="center"
+              style={styles.bio}
+            >
+              {user.bio}
+            </Typography>
+          ) : null}
+          {user?.church ? (
+            <Typography preset="caption" color={colors.textDisabled} align="center">
+              ⛪ {user.church}
+            </Typography>
+          ) : null}
+        </View>
+
+        {/* ── Stats row ── */}
+        <View style={styles.statsRow}>
+          <View style={styles.statBox}>
+            <Typography preset="h3" color={colors.primary}>
+              {user?.creditBalance ?? 0}
+            </Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Credits</Typography>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Typography preset="h3">{storagePercent}%</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>
+              Storage used
+            </Typography>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Typography preset="h3">
+              {formatBytes(user?.storageUsed ?? 0)}
+            </Typography>
+            <Typography preset="caption" color={colors.textSecondary}>
+              of {formatBytes(user?.storageLimit ?? 0)}
+            </Typography>
+          </View>
+        </View>
+
+        {/* ── Account menu ── */}
+        <View style={styles.section}>
+          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
+            ACCOUNT
+          </Typography>
+          <MenuItem emoji="👤" label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
+          <Divider marginV={0} />
+          <MenuItem emoji="🔒" label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
+          <Divider marginV={0} />
+          <MenuItem
+            emoji="✦"
+            label="My Credits"
+            value={`${user?.creditBalance ?? 0} credits`}
+            onPress={() => navigation.navigate('Credits')}
+          />
+        </View>
+
+        {/* ── App menu ── */}
+        <View style={styles.section}>
+          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
+            APP
+          </Typography>
+          <MenuItem emoji="⚙️" label="Settings" onPress={() => navigation.navigate('Settings')} />
+        </View>
+
+        {/* ── Danger zone ── */}
+        <View style={styles.section}>
+          <MenuItem
+            emoji="🚪"
+            label="Sign Out"
+            destructive={false}
+            showChevron={false}
+            onPress={logout}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
+  scroll: { paddingBottom: spacing[12] },
+
+  // Hero
+  hero: {
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing[8],
+    paddingBottom: spacing[6],
+    gap: spacing[2],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  avatar: { marginBottom: spacing[2] },
+  badgeRow: { flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] },
+  bio: { paddingHorizontal: spacing[8], marginTop: spacing[1] },
+
+  // Stats
+  statsRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.background,
+    marginTop: spacing[3],
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+  },
+  statBox: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: spacing[4],
+    gap: spacing[0.5],
+  },
+  statDivider: {
+    width: 1,
+    backgroundColor: colors.border,
+    marginVertical: spacing[3],
+  },
+
+  // Menu sections
+  section: {
+    backgroundColor: colors.background,
+    marginTop: spacing[3],
+    paddingHorizontal: layout.screenPaddingH,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+  },
+  sectionLabel: {
+    paddingTop: spacing[3],
+    paddingBottom: spacing[1],
+    letterSpacing: 1,
+    fontSize: 11,
+  },
+});
