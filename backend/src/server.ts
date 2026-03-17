@@ -1,4 +1,10 @@
 import './config/env'; // Load and validate env vars first
+
+// BigInt serialization support — Prisma returns storageUsed/storageLimit as BigInt
+(BigInt.prototype as unknown as { toJSON: () => string }).toJSON = function () {
+  return this.toString();
+};
+
 import app from './app';
 import { connectDB, disconnectDB } from './config/db';
 import { env } from './config/env';

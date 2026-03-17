@@ -11,6 +11,9 @@ export function generateOTP(): string {
 export function storeOTP(email: string, otp: string): void {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
   otpStore.set(email, { otp, expiresAt });
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`[DEV] OTP for ${email}: ${otp}`);
+  }
 }
 
 export function verifyOTP(email: string, otp: string): boolean {
