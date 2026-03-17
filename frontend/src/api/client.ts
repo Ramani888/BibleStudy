@@ -57,9 +57,8 @@ apiClient.interceptors.response.use(
 
       const { data } = await axios.post(`${BASE_URL}/auth/refresh`, { refreshToken });
       const newAccessToken: string = data.data.accessToken;
-      const newRefreshToken: string = data.data.refreshToken;
 
-      await storage.setTokens(newAccessToken, newRefreshToken);
+      await storage.setAccessToken(newAccessToken);
 
       // Update store without importing it (avoids circular deps)
       original.headers.Authorization = `Bearer ${newAccessToken}`;

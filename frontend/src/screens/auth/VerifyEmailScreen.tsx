@@ -43,11 +43,11 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
   const handleResend = async () => {
     setResending(true);
     try {
-      await authApi.forgotPassword({ email });
+      await authApi.resendVerification({ email });
       Toast.show({
         type: 'success',
         text1: 'Code resent',
-        text2: 'Check your inbox for a new code.',
+        text2: 'Check your inbox for a new verification code.',
       });
     } catch (err) {
       Toast.show({

@@ -9,6 +9,7 @@ import {
   LoginDto,
   RefreshDto,
   LogoutDto,
+  ResendVerificationDto,
   ForgotPasswordDto,
   ResetPasswordDto,
 } from './auth.dto';
@@ -17,6 +18,7 @@ const router = Router();
 
 router.post('/register', authRateLimit, validate(RegisterDto), authController.register);
 router.post('/verify-email', authRateLimit, validate(VerifyEmailDto), authController.verifyEmail);
+router.post('/resend-verification', authRateLimit, validate(ResendVerificationDto), authController.resendVerification);
 router.post('/login', authRateLimit, validate(LoginDto), authController.login);
 router.post('/refresh', validate(RefreshDto), authController.refreshToken);
 router.post('/logout', authMiddleware, validate(LogoutDto), authController.logout);

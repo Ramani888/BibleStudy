@@ -37,7 +37,39 @@ function parseDuration(duration: string): number {
 
 export async function register(dto: RegisterDtoType) {
   const existingUser = await prisma.user.findUnique({ where: { email: dto.email } });
+
   if (existingUser) {
+    // If account exists but email is unverified, update credentials and resend OTP
+    if (!existingUser.emailVerified) {
+      const hashedPassword = await bcrypt.hash(dto.password, 12);
+      const updated = await prisma.user.update({
+        where: { email: dto.email },
+        data: { name: dto.name, password: hashedPassword },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profileImage: true,
+          bio: true,
+          church: true,
+          creditBalance: true,
+          plan: true,
+          emailVerified: true,
+          createdAt: true,
+        },
+      });
+
+      const otp = generateOTP();
+      storeOTP(dto.email, otp);
+      try {
+        await sendVerificationEmail(dto.email, otp);
+      } catch (emailError) {
+        console.error('Failed to send verification email:', emailError);
+      }
+
+      return updated;
+    }
+
     throw new Error('Email already registered');
   }
 
@@ -75,6 +107,30 @@ export async function register(dto: RegisterDtoType) {
   return user;
 }
 
+export async function resendVerification(email: string) {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    // Return success to prevent email enumeration
+    return { message: 'If that email exists and is unverified, a new code has been sent' };
+  }
+
+  if (user.emailVerified) {
+    throw new Error('Email is already verified');
+  }
+
+  const otp = generateOTP();
+  storeOTP(email, otp);
+
+  try {
+    await sendVerificationEmail(email, otp);
+  } catch (emailError) {
+    console.error('Failed to send verification email:', emailError);
+  }
+
+  return { message: 'If that email exists and is unverified, a new code has been sent' };
+}
+
 export async function verifyEmail(dto: VerifyEmailDtoType) {
   const user = await prisma.user.findUnique({ where: { email: dto.email } });
   if (!user) {
@@ -95,7 +151,22 @@ export async function verifyEmail(dto: VerifyEmailDtoType) {
     data: { emailVerified: true },
   });
 
-  return { message: 'Email verified successfully' };
+  // Auto-login after verification so frontend doesn't need a separate login step
+  const accessToken = generateAccessToken(user.id);
+  const refreshToken = generateRefreshToken(user.id);
+
+  const expiresAt = new Date(Date.now() + parseDuration(env.JWT_REFRESH_EXPIRES));
+  await prisma.refreshToken.create({
+    data: { userId: user.id, token: refreshToken, expiresAt },
+  });
+
+  const { password: _password, ...userWithoutPassword } = user;
+
+  return {
+    accessToken,
+    refreshToken,
+    user: { ...userWithoutPassword, emailVerified: true },
+  };
 }
 
 export async function login(dto: LoginDtoType) {

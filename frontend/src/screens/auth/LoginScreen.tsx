@@ -2,6 +2,7 @@ import React, { useRef } from 'react';
 import { Pressable, TextInput } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import Toast from 'react-native-toast-message';
 
 import { AuthLayout } from './components/AuthLayout';
@@ -20,6 +21,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   const {
     control,
     handleSubmit,
+    getValues,
     formState: { isSubmitting },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -31,6 +33,16 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
       await login(data);
       // RootNavigator auto-switches to AppNavigator on isAuthenticated = true
     } catch (err) {
+      // If email is not verified, guide the user to the verification screen
+      if (axios.isAxiosError(err) && err.response?.data?.error?.code === 'EMAIL_NOT_VERIFIED') {
+        Toast.show({
+          type: 'info',
+          text1: 'Email not verified',
+          text2: 'Redirecting you to verify your email…',
+        });
+        navigation.navigate('VerifyEmail', { email: getValues('email') });
+        return;
+      }
       Toast.show({
         type: 'error',
         text1: 'Login failed',

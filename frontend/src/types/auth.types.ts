@@ -23,6 +23,10 @@ export interface RefreshPayload {
   refreshToken: string;
 }
 
+export interface ResendVerificationPayload {
+  email: string;
+}
+
 export interface ForgotPasswordPayload {
   email: string;
 }

@@ -63,17 +63,15 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   verifyEmail: async (payload: VerifyEmailPayload) => {
-    const tokens = await authApi.verifyEmail(payload);
-    await storage.setTokens(tokens.accessToken, tokens.refreshToken);
-    const user = await authApi.me();
-    set({ accessToken: tokens.accessToken, user, isAuthenticated: true });
+    const result = await authApi.verifyEmail(payload);
+    await storage.setTokens(result.accessToken, result.refreshToken);
+    set({ accessToken: result.accessToken, user: result.user, isAuthenticated: true });
   },
 
   login: async (payload: LoginPayload) => {
-    const tokens = await authApi.login(payload);
-    await storage.setTokens(tokens.accessToken, tokens.refreshToken);
-    const user = await authApi.me();
-    set({ accessToken: tokens.accessToken, user, isAuthenticated: true });
+    const result = await authApi.login(payload);
+    await storage.setTokens(result.accessToken, result.refreshToken);
+    set({ accessToken: result.accessToken, user: result.user, isAuthenticated: true });
   },
 
   logout: async () => {

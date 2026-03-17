@@ -27,7 +27,7 @@ export async function verifyEmail(req: Request, res: Response): Promise<void> {
   try {
     const dto = req.body as VerifyEmailDtoType;
     const result = await authService.verifyEmail(dto);
-    sendSuccess(res, result, result.message);
+    sendSuccess(res, result, 'Email verified successfully');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Email verification failed';
     sendError(res, message, 400, 'VERIFICATION_ERROR');
@@ -41,9 +41,11 @@ export async function login(req: Request, res: Response): Promise<void> {
     sendSuccess(res, result, 'Login successful');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Login failed';
-    const statusCode =
-      message === 'Please verify your email before logging in' ? 403 : 401;
-    sendError(res, message, statusCode, 'LOGIN_ERROR');
+    if (message === 'Please verify your email before logging in') {
+      sendError(res, message, 403, 'EMAIL_NOT_VERIFIED');
+    } else {
+      sendError(res, message, 401, 'LOGIN_ERROR');
+    }
   }
 }
 
@@ -66,6 +68,17 @@ export async function logout(req: Request, res: Response): Promise<void> {
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Logout failed';
     sendError(res, message, 400, 'LOGOUT_ERROR');
+  }
+}
+
+export async function resendVerification(req: Request, res: Response): Promise<void> {
+  try {
+    const { email } = req.body as { email: string };
+    const result = await authService.resendVerification(email);
+    sendSuccess(res, result, result.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Request failed';
+    sendError(res, message, 400, 'RESEND_VERIFICATION_ERROR');
   }
 }
 

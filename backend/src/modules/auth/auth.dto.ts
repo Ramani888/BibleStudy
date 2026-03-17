@@ -28,6 +28,10 @@ export const LogoutDto = z.object({
   refreshToken: z.string().min(1, 'Refresh token is required'),
 });
 
+export const ResendVerificationDto = z.object({
+  email: z.string().email('Invalid email address'),
+});
+
 export const ForgotPasswordDto = z.object({
   email: z.string().email('Invalid email address'),
 });
@@ -47,5 +51,6 @@ export type VerifyEmailDtoType = z.infer<typeof VerifyEmailDto>;
 export type LoginDtoType = z.infer<typeof LoginDto>;
 export type RefreshDtoType = z.infer<typeof RefreshDto>;
 export type LogoutDtoType = z.infer<typeof LogoutDto>;
+export type ResendVerificationDtoType = z.infer<typeof ResendVerificationDto>;
 export type ForgotPasswordDtoType = z.infer<typeof ForgotPasswordDto>;
 export type ResetPasswordDtoType = z.infer<typeof ResetPasswordDto>;
