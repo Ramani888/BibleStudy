@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import { FlatList } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -27,7 +26,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         <Typography preset="bodySm" color={colors.textSecondary}>
           {sets.length} {sets.length === 1 ? 'set' : 'sets'}
         </Typography>
-        <Pressable onPress={() => navigation.navigate('CreateSet', { folderId })}>
+        <Pressable onPress={() => navigation.navigate('CreateSet', { folderId })} hitSlop={8}>
           <Typography preset="label" color={colors.primary}>+ New Set</Typography>
         </Pressable>
       </View>
@@ -82,10 +81,18 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
             destructive: true,
             onPress: () =>
               selectedSet &&
-              deleteSet(selectedSet.id, {
-                onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
-                onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-              }),
+              Alert.alert('Delete Set', 'This cannot be undone.', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Delete',
+                  style: 'destructive',
+                  onPress: () =>
+                    deleteSet(selectedSet.id, {
+                      onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
+                      onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+                    }),
+                },
+              ]),
           },
         ]}
       />

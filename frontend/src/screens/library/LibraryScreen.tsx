@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -44,10 +45,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     sets.filter(s => s.folderId === folderId).length;
 
   const handleDeleteSet = (id: string) => {
-    deleteSet(id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
-      onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-    });
+    Alert.alert('Delete Set', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () =>
+          deleteSet(id, {
+            onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
+            onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
+          }),
+      },
+    ]);
   };
 
   const handleCloneSet = (id: string) => {
@@ -58,10 +67,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   const handleDeleteFolder = (id: string) => {
-    deleteFolder(id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Folder deleted' }),
-      onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-    });
+    Alert.alert('Delete Folder', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () =>
+          deleteFolder(id, {
+            onSuccess: () => Toast.show({ type: 'success', text1: 'Folder deleted' }),
+            onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
+          }),
+      },
+    ]);
   };
 
   const handleCreateFolder = () => {
@@ -81,7 +98,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {/* ── Header ── */}
       <View style={styles.header}>
         <Typography preset="h2">Library</Typography>
-        <Pressable onPress={() => navigation.navigate('PublicSets')}>
+        <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
           <Typography preset="label" color={colors.primary}>Browse Public</Typography>
         </Pressable>
       </View>
@@ -110,7 +127,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         {/* ── Folders ── */}
         <View style={styles.sectionHeader}>
           <Typography preset="h4">Folders</Typography>
-          <Pressable onPress={() => setNewFolderModalOpen(true)}>
+          <Pressable onPress={() => setNewFolderModalOpen(true)} hitSlop={8}>
             <Typography preset="label" color={colors.primary}>+ New</Typography>
           </Pressable>
         </View>
@@ -139,7 +156,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         {/* ── Sets ── */}
         <View style={styles.sectionHeader}>
           <Typography preset="h4">My Sets</Typography>
-          <Pressable onPress={() => navigation.navigate('CreateSet', {})}>
+          <Pressable onPress={() => navigation.navigate('CreateSet', {})} hitSlop={8}>
             <Typography preset="label" color={colors.primary}>+ New</Typography>
           </Pressable>
         </View>

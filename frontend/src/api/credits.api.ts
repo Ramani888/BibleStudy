@@ -7,11 +7,22 @@ interface TransactionParams {
   type?: TransactionType;
 }
 
-interface PaginatedTransactions {
-  transactions: CreditTransaction[];
+interface Pagination {
   total: number;
   page: number;
   limit: number;
+  pages: number;
+}
+
+interface PaginatedTransactions {
+  transactions: CreditTransaction[];
+  pagination: Pagination;
+}
+
+interface DailyLoginResult {
+  balance: number;
+  transaction: CreditTransaction;
+  message: string;
 }
 
 export const creditsApi = {
@@ -22,5 +33,5 @@ export const creditsApi = {
     apiGet<PaginatedTransactions>('/credits/transactions', params),
 
   claimDailyLogin: () =>
-    apiPost<{ credited: number; newBalance: number }>('/credits/daily-login'),
+    apiPost<DailyLoginResult>('/credits/daily-login'),
 };

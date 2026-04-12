@@ -56,6 +56,12 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
     reset();
   };
 
+  const onSubmitAndExit = async (data: SingleForm) => {
+    await createCard({ setId, ...data });
+    Toast.show({ type: 'success', text1: 'Card added!' });
+    onSaved();
+  };
+
   return (
     <View style={styles.formGap}>
       <FormField
@@ -87,7 +93,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         />
         <Button
           label="Done"
-          onPress={() => { handleSubmit(onSubmit)(); onSaved(); }}
+          onPress={handleSubmit(onSubmitAndExit)}
           loading={isSubmitting}
           style={styles.flex}
         />

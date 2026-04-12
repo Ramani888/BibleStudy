@@ -21,7 +21,7 @@ export function useAIChatHistory() {
     initialPageParam: 1,
     getNextPageParam: (last, all) => {
       const loaded = all.reduce((sum, p) => sum + p.chats.length, 0);
-      return loaded < last.total ? all.length + 1 : undefined;
+      return loaded < last.pagination.total ? all.length + 1 : undefined;
     },
   });
 }

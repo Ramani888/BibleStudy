@@ -72,8 +72,8 @@ function DailyLoginButton() {
       onSuccess: data => {
         Toast.show({
           type: 'success',
-          text1: `+${data.credited} credit claimed!`,
-          text2: `Your balance is now ${data.newBalance}`,
+          text1: `+${data.transaction.amount} credit claimed!`,
+          text2: `Your balance is now ${data.balance}`,
         });
       },
       onError: err => {

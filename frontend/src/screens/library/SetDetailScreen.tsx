@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -20,10 +20,18 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: deleteCard } = useDeleteCard(setId);
 
   const handleDelete = (cardId: string) => {
-    deleteCard(cardId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Card deleted' }),
-      onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-    });
+    Alert.alert('Delete Card', 'This cannot be undone.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: () =>
+          deleteCard(cardId, {
+            onSuccess: () => Toast.show({ type: 'success', text1: 'Card deleted' }),
+            onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+          }),
+      },
+    ]);
   };
 
   if (isError) {
@@ -37,7 +45,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         <Typography preset="bodySm" color={colors.textSecondary}>
           {cards.length} {cards.length === 1 ? 'card' : 'cards'}
         </Typography>
-        <Pressable onPress={() => navigation.navigate('CreateCard', { setId })}>
+        <Pressable onPress={() => navigation.navigate('CreateCard', { setId })} hitSlop={8}>
           <Typography preset="label" color={colors.primary}>+ Add Cards</Typography>
         </Pressable>
       </View>

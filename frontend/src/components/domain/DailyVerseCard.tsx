@@ -37,20 +37,13 @@ export function DailyVerseCard({ verse, loading }: DailyVerseCardProps) {
       </View>
 
       <Typography preset="bodyLg" color={colors.textPrimary} style={styles.verseText}>
-        "{verse.verse}"
+        "{verse.text}"
       </Typography>
 
       <Typography preset="label" color={colors.primaryDark} style={styles.reference}>
         — {verse.reference}
       </Typography>
 
-      {verse.reflection && (
-        <View style={styles.reflectionWrap}>
-          <Typography preset="bodySm" color={colors.textSecondary}>
-            {verse.reflection}
-          </Typography>
-        </View>
-      )}
     </View>
   );
 }
@@ -86,10 +79,5 @@ const styles = StyleSheet.create({
   },
   reference: {
     fontSize: 13,
-  },
-  reflectionWrap: {
-    borderTopWidth: 1,
-    borderTopColor: colors.primaryLight,
-    paddingTop: spacing[3],
   },
 });

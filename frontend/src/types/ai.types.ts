@@ -1,7 +1,9 @@
 export interface DailyVerse {
-  verse: string;
   reference: string;
-  reflection?: string;
+  text: string;
+  book: string;
+  chapter: number;
+  verse: number;
 }
 
 export interface AIChatPayload {
@@ -18,7 +20,9 @@ export interface AIChat {
 }
 
 export interface AIChatResponse {
+  id: string;
+  question: string;
   answer: string;
   creditsUsed: number;
-  remainingCredits: number;
+  createdAt: string;
 }

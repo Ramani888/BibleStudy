@@ -6,11 +6,16 @@ interface ChatHistoryParams {
   limit?: number;
 }
 
-interface PaginatedChats {
-  chats: AIChat[];
+interface Pagination {
   total: number;
   page: number;
   limit: number;
+  pages: number;
+}
+
+interface PaginatedChats {
+  chats: AIChat[];
+  pagination: Pagination;
 }
 
 export const aiApi = {

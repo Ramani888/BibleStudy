@@ -37,11 +37,11 @@ function BalanceCard() {
 
   const handleClaim = () => {
     claim(undefined, {
-      onSuccess: (res: { credited: number; newBalance: number }) =>
+      onSuccess: res =>
         Toast.show({
           type: 'success',
-          text1: `+${res.credited} credit claimed!`,
-          text2: `Balance: ${res.newBalance}`,
+          text1: `+${res.transaction.amount} credit claimed!`,
+          text2: `Balance: ${res.balance}`,
         }),
       onError: (err: unknown) =>
         Toast.show({
