@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Pressable,
   ScrollView,
@@ -7,11 +7,18 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, {
+  Extrapolation,
   FadeIn,
   FadeOut,
+  interpolate,
+  runOnJS,
   SlideInRight,
   SlideOutLeft,
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
 } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import Toast from 'react-native-toast-message';
@@ -26,7 +33,9 @@ import type { AppTabParamList } from '../../navigation/types';
 
 type StudyNav = BottomTabNavigationProp<AppTabParamList>;
 
-// ─── Difficulty button ────────────────────────────────────────────────────────
+const SWIPE_THRESHOLD = 80;
+
+// ─── Difficulty button config ─────────────────────────────────────────────────
 const DIFF_CONFIG: { difficulty: Difficulty; label: string; emoji: string; color: string; bg: string }[] = [
   { difficulty: 'HARD',   label: 'Hard',   emoji: '😓', color: colors.error,   bg: colors.errorSurface   },
   { difficulty: 'MEDIUM', label: 'Medium', emoji: '🤔', color: colors.warning, bg: colors.warningSurface },
@@ -113,6 +122,22 @@ export function StudyScreen({ route }: { route?: { params?: { setId?: string; se
   const currentCard = cards[currentIndex];
   const progress = cards.length > 0 ? currentIndex / cards.length : 0;
 
+  // ── Swipe gesture shared values ──
+  const swipeX = useSharedValue(0);
+  const swipeY = useSharedValue(0);
+  const isRevealedSV = useSharedValue(false);
+
+  // Keep isRevealedSV in sync with JS state for worklet access
+  useEffect(() => {
+    isRevealedSV.value = isRevealed;
+  }, [isRevealed, isRevealedSV]);
+
+  // Reset swipe position when card advances
+  useEffect(() => {
+    swipeX.value = 0;
+    swipeY.value = 0;
+  }, [currentIndex, swipeX, swipeY]);
+
   const handleDifficulty = useCallback(
     (difficulty: Difficulty) => {
       if (!currentCard) return;
@@ -138,6 +163,61 @@ export function StudyScreen({ route }: { route?: { params?: { setId?: string; se
     },
     [currentCard, currentIndex, cards.length, recordStudy],
   );
+
+  // ── Pan gesture — active only after card is flipped ──
+  const panGesture = Gesture.Pan()
+    .onUpdate(e => {
+      if (!isRevealedSV.value) return;
+      swipeX.value = e.translationX;
+      swipeY.value = e.translationY;
+    })
+    .onEnd(e => {
+      if (!isRevealedSV.value) {
+        swipeX.value = withSpring(0);
+        swipeY.value = withSpring(0);
+        return;
+      }
+      if (e.translationX > SWIPE_THRESHOLD) {
+        // Swipe right → EASY: reset immediately so new card appears at rest
+        swipeX.value = 0;
+        swipeY.value = 0;
+        runOnJS(handleDifficulty)('EASY');
+      } else if (e.translationX < -SWIPE_THRESHOLD) {
+        // Swipe left → HARD
+        swipeX.value = 0;
+        swipeY.value = 0;
+        runOnJS(handleDifficulty)('HARD');
+      } else {
+        // Below threshold — snap back
+        swipeX.value = withSpring(0);
+        swipeY.value = withSpring(0);
+      }
+    });
+
+  // ── Animated styles ──
+  const cardSwipeStyle = useAnimatedStyle(() => {
+    const rotate = interpolate(
+      swipeX.value,
+      [-150, 0, 150],
+      [-12, 0, 12],
+      Extrapolation.CLAMP,
+    );
+    return {
+      transform: [
+        { translateX: swipeX.value },
+        { translateY: swipeY.value * 0.25 },
+        { rotate: `${rotate}deg` },
+      ],
+    };
+  });
+
+  const easyLabelStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(swipeX.value, [0, SWIPE_THRESHOLD], [0, 1], Extrapolation.CLAMP),
+  }));
+
+  const hardLabelStyle = useAnimatedStyle(() => ({
+    opacity: interpolate(swipeX.value, [-SWIPE_THRESHOLD, 0], [1, 0], Extrapolation.CLAMP),
+  }));
 
   const handleRestart = () => {
     setCurrentIndex(0);
@@ -215,19 +295,44 @@ export function StudyScreen({ route }: { route?: { params?: { setId?: string; se
         showsVerticalScrollIndicator={false}
         scrollEnabled={false}
       >
-        {/* ── Card ── */}
-        <Animated.View
-          key={currentCard.id}
-          entering={SlideInRight.duration(300)}
-          exiting={SlideOutLeft.duration(200)}
-        >
-          <FlashCard
-            question={currentCard.question}
-            answer={currentCard.answer}
-            isBlurred={currentCard.isBlurred}
-            onFlip={revealed => setIsRevealed(revealed)}
-          />
-        </Animated.View>
+        {/* ── Card with swipe gesture ── */}
+        <GestureDetector gesture={panGesture}>
+          <Animated.View style={cardSwipeStyle}>
+            <Animated.View
+              key={currentCard.id}
+              entering={SlideInRight.duration(300)}
+              exiting={SlideOutLeft.duration(200)}
+            >
+              <FlashCard
+                question={currentCard.question}
+                answer={currentCard.answer}
+                isBlurred={currentCard.isBlurred}
+                onFlip={revealed => setIsRevealed(revealed)}
+              />
+            </Animated.View>
+
+            {/* Swipe grade labels — appear when dragging after flip */}
+            {isRevealed && (
+              <>
+                <Animated.View style={[styles.swipeLabel, styles.swipeLabelEasy, easyLabelStyle]}>
+                  <Typography preset="label" color={colors.textOnPrimary}>EASY ✓</Typography>
+                </Animated.View>
+                <Animated.View style={[styles.swipeLabel, styles.swipeLabelHard, hardLabelStyle]}>
+                  <Typography preset="label" color={colors.textOnPrimary}>HARD ✗</Typography>
+                </Animated.View>
+              </>
+            )}
+          </Animated.View>
+        </GestureDetector>
+
+        {/* First-card swipe hint */}
+        {currentIndex === 0 && !isRevealed && (
+          <Animated.View entering={FadeIn.duration(600)} style={styles.swipeHint}>
+            <Typography preset="caption" color={colors.textDisabled} align="center">
+              Flip · then swipe right for Easy, left for Hard
+            </Typography>
+          </Animated.View>
+        )}
 
         <Spacer size={spacing[8]} />
 
@@ -287,6 +392,27 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPaddingH,
     paddingBottom: spacing[10],
   },
+
+  // Swipe labels
+  swipeLabel: {
+    position: 'absolute',
+    top: spacing[4],
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2],
+    borderRadius: 8,
+    zIndex: 10,
+  },
+  swipeLabelEasy: {
+    right: spacing[4],
+    backgroundColor: colors.success,
+  },
+  swipeLabelHard: {
+    left: spacing[4],
+    backgroundColor: colors.error,
+  },
+
+  // First-card hint
+  swipeHint: { marginTop: spacing[3] },
 
   // Difficulty
   rateLabel: { letterSpacing: 0.3 },
