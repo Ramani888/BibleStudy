@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as authService from './auth.service';
+import * as usersService from '../users/users.service';
 import { sendSuccess, sendError } from '../../utils/response';
 import {
   RegisterDtoType,
@@ -107,7 +108,7 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
 export async function getMe(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;
-    const user = await authService.getMe(userId);
+    const user = await usersService.getProfile(userId);
     sendSuccess(res, user, 'Profile retrieved successfully');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get profile';

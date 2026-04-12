@@ -20,6 +20,7 @@ import { useAuthStore } from '../../store';
 import { useUpdateProfile } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
+import type { ProfileScreenProps } from '../../navigation/types';
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').trim(),
@@ -28,7 +29,7 @@ const schema = z.object({
 });
 type EditProfileForm = z.infer<typeof schema>;
 
-export function EditProfileScreen({ navigation }: any) {
+export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
   const user = useAuthStore(s => s.user);
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const bioRef = useRef<TextInput>(null);

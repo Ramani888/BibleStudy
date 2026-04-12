@@ -1,30 +1,29 @@
 import nodemailer from 'nodemailer';
 import { env } from '../config/env';
-
-// In-memory OTP store (can be replaced with Redis in production)
-const otpStore = new Map<string, { otp: string; expiresAt: Date }>();
+import { prisma } from '../config/db';
 
 export function generateOTP(): string {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
-export function storeOTP(email: string, otp: string): void {
+export async function storeOTP(email: string, otp: string): Promise<void> {
   const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-  otpStore.set(email, { otp, expiresAt });
+  // Delete any existing OTP for this email before creating a new one
+  await prisma.otpToken.deleteMany({ where: { email } });
+  await prisma.otpToken.create({ data: { email, otp, expiresAt } });
   if (process.env.NODE_ENV !== 'production') {
     console.log(`[DEV] OTP for ${email}: ${otp}`);
   }
 }
 
-export function verifyOTP(email: string, otp: string): boolean {
-  const stored = otpStore.get(email);
+export async function verifyOTP(email: string, otp: string): Promise<boolean> {
+  const stored = await prisma.otpToken.findFirst({
+    where: { email, expiresAt: { gt: new Date() } },
+    orderBy: { createdAt: 'desc' },
+  });
   if (!stored) return false;
-  if (new Date() > stored.expiresAt) {
-    otpStore.delete(email);
-    return false;
-  }
   if (stored.otp !== otp) return false;
-  otpStore.delete(email);
+  await prisma.otpToken.deleteMany({ where: { email } });
   return true;
 }
 

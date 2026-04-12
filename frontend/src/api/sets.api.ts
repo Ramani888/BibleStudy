@@ -10,11 +10,16 @@ interface PublicSetsParams {
   limit?: number;
 }
 
-interface PaginatedSets {
-  sets: StudySet[];
+interface Pagination {
   total: number;
   page: number;
   limit: number;
+  pages: number;
+}
+
+interface PaginatedSets {
+  sets: StudySet[];
+  pagination: Pagination;
 }
 
 export const setsApi = {

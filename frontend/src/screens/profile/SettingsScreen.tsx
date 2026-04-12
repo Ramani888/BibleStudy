@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -44,7 +44,17 @@ export function SettingsScreen() {
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
             ACCOUNT
           </Typography>
-          <MenuItem emoji="🚪" label="Sign Out" showChevron={false} onPress={logout} />
+          <MenuItem
+            emoji="🚪"
+            label="Sign Out"
+            showChevron={false}
+            onPress={() =>
+              Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Sign Out', style: 'destructive', onPress: logout },
+              ])
+            }
+          />
           <Divider marginV={0} />
           <MenuItem
             emoji="🗑"

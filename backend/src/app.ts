@@ -16,9 +16,17 @@ import creditsRoutes from './modules/credits/credits.routes';
 const app = express();
 
 // CORS
+// React Native mobile apps do not send an Origin header (not a browser).
+// Allow those unconditionally. Optionally restrict browser-origin requests
+// to CLIENT_URL when set (useful for a future web front-end).
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true); // mobile / curl / server-to-server
+      if (env.CLIENT_URL && origin === env.CLIENT_URL) return callback(null, true);
+      if (env.NODE_ENV === 'development') return callback(null, true);
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

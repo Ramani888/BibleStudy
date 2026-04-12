@@ -22,18 +22,22 @@ import type { AppTabParamList } from '../../navigation/types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
+// Tabs that can be navigated to without required params from the home screen.
+// StudyTab intentionally excluded — it requires a setId (pick a set from Library first).
+type ParamlessTab = 'HomeTab' | 'LibraryTab' | 'AITab' | 'ProfileTab';
+
 // ─── Quick action item ────────────────────────────────────────────────────────
 interface QuickAction {
   label: string;
   emoji: string;
-  tab: keyof AppTabParamList;
+  tab: ParamlessTab;
   color: string;
   bg: string;
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
   { label: 'Library', emoji: '◫', tab: 'LibraryTab', color: colors.info, bg: colors.infoSurface },
-  { label: 'Study', emoji: '◈', tab: 'StudyTab', color: colors.success, bg: colors.successSurface },
+  { label: 'Study', emoji: '◈', tab: 'LibraryTab', color: colors.success, bg: colors.successSurface },
   { label: 'AI Chat', emoji: '◎', tab: 'AITab', color: colors.primary, bg: colors.primarySurface },
   { label: 'Profile', emoji: '◉', tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
 ];
@@ -49,7 +53,7 @@ function QuickActionGrid() {
             styles.actionItem,
             { backgroundColor: action.bg, opacity: pressed ? 0.75 : 1 },
           ]}
-          onPress={() => navigation.navigate(action.tab as any)}
+          onPress={() => navigation.navigate(action.tab)}
         >
           <Typography style={[styles.actionEmoji, { color: action.color }]}>
             {action.emoji}
@@ -213,7 +217,7 @@ export function HomeScreen() {
                   navigation.navigate('LibraryTab', {
                     screen: 'SetDetail',
                     params: { setId: set.id, setTitle: set.title },
-                  } as any)
+                  })
                 }
               />
             ))

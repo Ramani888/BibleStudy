@@ -12,9 +12,6 @@ dist/
 .env.local
 .env.*.local
 
-# Prisma migrations (keep schema)
-prisma/migrations/
-
 # Logs
 logs/
 *.log

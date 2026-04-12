@@ -17,7 +17,7 @@ export async function getTransactions(req: Request, res: Response): Promise<void
   try {
     const userId = req.user!.id;
     const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const result = await creditsService.getTransactions(userId, page, limit);
     sendSuccess(res, result, 'Transactions retrieved successfully');
   } catch (error) {

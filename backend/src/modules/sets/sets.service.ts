@@ -123,12 +123,15 @@ export async function getPublicSets(page = 1, limit = 20) {
 
 export async function cloneSet(userId: string, setId: string) {
   const originalSet = await prisma.set.findFirst({
-    where: { id: setId, visibility: 'PUBLIC' },
+    where: {
+      id: setId,
+      OR: [{ visibility: 'PUBLIC' }, { userId }],
+    },
     include: { cards: true },
   });
 
   if (!originalSet) {
-    throw new Error('Set not found or is not public');
+    throw new Error('Set not found');
   }
 
   const clonedSet = await prisma.set.create({

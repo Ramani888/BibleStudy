@@ -1,6 +1,6 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
-import type { CompositeScreenProps } from '@react-navigation/native';
+import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
 export type AuthStackParamList = {
@@ -41,7 +41,7 @@ export type ProfileStackParamList = {
 // ─── Bottom Tabs ──────────────────────────────────────────────────────────────
 export type AppTabParamList = {
   HomeTab: undefined;
-  LibraryTab: undefined;
+  LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
   StudyTab: { setId: string; setTitle: string } | undefined;
   AITab: undefined;
   ProfileTab: undefined;

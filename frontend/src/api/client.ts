@@ -2,7 +2,7 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
 
-const BASE_URL = Config.API_BASE_URL ?? 'http://10.0.2.2:3001/api/v1';
+const BASE_URL = Config.API_BASE_URL ?? 'http://10.0.2.2:3010/api/v1';
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

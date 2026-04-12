@@ -60,7 +60,7 @@ export async function register(dto: RegisterDtoType) {
       });
 
       const otp = generateOTP();
-      storeOTP(dto.email, otp);
+      await storeOTP(dto.email, otp);
       try {
         await sendVerificationEmail(dto.email, otp);
       } catch (emailError) {
@@ -96,7 +96,7 @@ export async function register(dto: RegisterDtoType) {
   });
 
   const otp = generateOTP();
-  storeOTP(dto.email, otp);
+  await storeOTP(dto.email, otp);
 
   try {
     await sendVerificationEmail(dto.email, otp);
@@ -120,7 +120,7 @@ export async function resendVerification(email: string) {
   }
 
   const otp = generateOTP();
-  storeOTP(email, otp);
+  await storeOTP(email, otp);
 
   try {
     await sendVerificationEmail(email, otp);
@@ -141,7 +141,7 @@ export async function verifyEmail(dto: VerifyEmailDtoType) {
     throw new Error('Email already verified');
   }
 
-  const isValid = verifyOTP(dto.email, dto.otp);
+  const isValid = await verifyOTP(dto.email, dto.otp);
   if (!isValid) {
     throw new Error('Invalid or expired OTP');
   }
@@ -240,7 +240,7 @@ export async function forgotPassword(email: string) {
   }
 
   const otp = generateOTP();
-  storeOTP(email, otp);
+  await storeOTP(email, otp);
 
   try {
     await sendPasswordResetEmail(email, otp);
@@ -257,7 +257,7 @@ export async function resetPassword(dto: ResetPasswordDtoType) {
     throw new Error('Invalid or expired OTP');
   }
 
-  const isValid = verifyOTP(dto.email, dto.otp);
+  const isValid = await verifyOTP(dto.email, dto.otp);
   if (!isValid) {
     throw new Error('Invalid or expired OTP');
   }
@@ -275,29 +275,3 @@ export async function resetPassword(dto: ResetPasswordDtoType) {
   return { message: 'Password reset successfully' };
 }
 
-export async function getMe(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profileImage: true,
-      bio: true,
-      church: true,
-      creditBalance: true,
-      storageUsed: true,
-      storageLimit: true,
-      plan: true,
-      emailVerified: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-  if (!user) {
-    throw new Error('User not found');
-  }
-
-  return user;
-}

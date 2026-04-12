@@ -1,26 +1,31 @@
-import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import React from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import { useQuery } from '@tanstack/react-query';
 
 import { SetCard } from '../../components/domain';
 import { EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
 import { Spacer, Typography } from '../../components/ui';
-import { setsApi } from '../../api';
-import { useCloneSet } from '../../hooks';
+import { usePublicSets, useCloneSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'>) {
-  const [page] = useState(1);
   const { mutate: cloneSet } = useCloneSet();
 
-  const { data, isLoading, isError, refetch } = useQuery({
-    queryKey: ['public-sets', page],
-    queryFn: () => setsApi.getPublic({ page, limit: 20 }),
-  });
+  const {
+    data,
+    isLoading,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = usePublicSets();
+
+  const sets = data?.pages.flatMap(p => p.sets) ?? [];
+  const total = data?.pages[0]?.pagination.total ?? 0;
 
   if (isError) return <ErrorState message="Could not load public sets." onRetry={refetch} />;
 
@@ -28,17 +33,19 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
     <SafeAreaView style={styles.safe} edges={['bottom']}>
       <View style={styles.header}>
         <Typography preset="bodySm" color={colors.textSecondary}>
-          {data?.total ?? 0} public sets available
+          {total} public {total === 1 ? 'set' : 'sets'} available
         </Typography>
       </View>
 
       <FlatList
-        data={isLoading ? [] : (data?.sets ?? [])}
+        data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshing={isLoading}
         onRefresh={refetch}
+        onEndReached={() => hasNextPage && fetchNextPage()}
+        onEndReachedThreshold={0.3}
         ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
         ListEmptyComponent={
           !isLoading ? (
@@ -50,6 +57,13 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
               <SetCardSkeleton />
             </>
           )
+        }
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={styles.footerLoader}>
+              <ActivityIndicator color={colors.primary} size="small" />
+            </View>
+          ) : null
         }
         renderItem={({ item }) => (
           <SetCard
@@ -80,5 +94,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
+  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
 });

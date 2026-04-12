@@ -1,8 +1,9 @@
 import './config/env'; // Load and validate env vars first
 
-// BigInt serialization support — Prisma returns storageUsed/storageLimit as BigInt
-(BigInt.prototype as unknown as { toJSON: () => string }).toJSON = function () {
-  return this.toString();
+// BigInt serialization support — Prisma returns storageUsed/storageLimit as BigInt.
+// Serialize as Number so the frontend User type (storageUsed: number) matches.
+(BigInt.prototype as unknown as { toJSON: () => number }).toJSON = function () {
+  return Number(this);
 };
 
 import app from './app';

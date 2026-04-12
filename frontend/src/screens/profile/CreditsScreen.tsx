@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -82,9 +82,17 @@ function BalanceCard() {
 }
 
 export function CreditsScreen() {
-  const [page] = useState(1);
-  const { data, isLoading, refetch, isFetching } = useCreditTransactions(page, 30);
-  const transactions = data?.transactions ?? [];
+  const {
+    data,
+    isLoading,
+    refetch,
+    isFetching,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useCreditTransactions();
+
+  const transactions = data?.pages.flatMap(p => p.transactions) ?? [];
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -93,8 +101,10 @@ export function CreditsScreen() {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isFetching}
+        refreshing={isFetching && !isFetchingNextPage}
         onRefresh={refetch}
+        onEndReached={() => hasNextPage && fetchNextPage()}
+        onEndReachedThreshold={0.3}
         ListHeaderComponent={
           <>
             <BalanceCard />
@@ -115,6 +125,13 @@ export function CreditsScreen() {
               <ActivityIndicator color={colors.primary} />
             </View>
           )
+        }
+        ListFooterComponent={
+          isFetchingNextPage ? (
+            <View style={styles.footerLoader}>
+              <ActivityIndicator color={colors.primary} size="small" />
+            </View>
+          ) : null
         }
         renderItem={({ item }) => {
           const cfg = TYPE_CONFIG[item.type];
@@ -162,4 +179,5 @@ const styles = StyleSheet.create({
   txAmount: { minWidth: 48, textAlign: 'right' },
   emptyState: { minHeight: 160 },
   loadingWrap: { paddingTop: spacing[10], alignItems: 'center' },
+  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
 });
