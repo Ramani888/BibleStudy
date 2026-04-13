@@ -116,6 +116,16 @@ export function ProfileScreen() {
           />
         </View>
 
+        {/* ── Community menu ── */}
+        <View style={styles.section}>
+          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
+            COMMUNITY
+          </Typography>
+          <MenuItem emoji="👥" label="Friends" onPress={() => navigation.navigate('Friends')} />
+          <Divider marginV={0} />
+          <MenuItem emoji="🏛️" label="My Groups" onPress={() => navigation.navigate('Groups')} />
+        </View>
+
         {/* ── App menu ── */}
         <View style={styles.section}>
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>

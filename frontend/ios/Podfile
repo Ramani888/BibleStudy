@@ -14,6 +14,9 @@ if linkage != nil
   use_frameworks! :linkage => linkage.to_sym
 end
 
+# Required for Firebase Swift pods when building as static libraries
+use_modular_headers!
+
 target 'frontend' do
   config = use_native_modules!
 

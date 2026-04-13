@@ -21,18 +21,34 @@ model User {
   storageLimit    BigInt          @default(209715200)
   plan            Plan            @default(FREE)
   emailVerified   Boolean         @default(false)
+  locationLat     Float?
+  locationLng     Float?
+  locationName    String?
+  locationPrivacy LocationPrivacy @default(OFF)
+  lastLocationAt  DateTime?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
-  refreshTokens      RefreshToken[]
-  deviceTokens       DeviceToken[]
-  folders            Folder[]
-  sets               Set[]
-  cards              Card[]
-  notes              Note[]
-  files              File[]
-  aiChats            AIChat[]
-  creditTransactions CreditTransaction[]
+  refreshTokens           RefreshToken[]
+  deviceTokens            DeviceToken[]
+  folders                 Folder[]
+  sets                    Set[]
+  cards                   Card[]
+  notes                   Note[]
+  files                   File[]
+  aiChats                 AIChat[]
+  creditTransactions      CreditTransaction[]
+  sentFriendRequests      FriendRequest[]       @relation("SentRequests")
+  receivedFriendRequests  FriendRequest[]       @relation("ReceivedRequests")
+  friendships             Friendship[]          @relation("UserFriendships")
+  friendOf                Friendship[]          @relation("FriendOf")
+  blockedUsers            Block[]               @relation("Blocker")
+  blockedBy               Block[]               @relation("Blocked")
+  ownedGroups             Group[]
+  groupMemberships        GroupMember[]
+  hostedGatherings        Gathering[]
+  gatheringParticipations GatheringParticipant[]
+  activities              Activity[]
 }
 
 model RefreshToken {
@@ -181,6 +197,121 @@ model OtpToken {
   @@index([email])
 }
 
+model FriendRequest {
+  id         String              @id @default(uuid())
+  senderId   String
+  receiverId String
+  status     FriendRequestStatus @default(PENDING)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  sender     User                @relation("SentRequests",     fields: [senderId],   references: [id], onDelete: Cascade)
+  receiver   User                @relation("ReceivedRequests", fields: [receiverId], references: [id], onDelete: Cascade)
+
+  @@unique([senderId, receiverId])
+  @@index([senderId])
+  @@index([receiverId])
+}
+
+model Friendship {
+  id        String   @id @default(uuid())
+  userId    String
+  friendId  String
+  createdAt DateTime @default(now())
+  user      User     @relation("UserFriendships", fields: [userId],   references: [id], onDelete: Cascade)
+  friend    User     @relation("FriendOf",        fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, friendId])
+  @@index([userId])
+  @@index([friendId])
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedId])
+  @@index([blockerId])
+}
+
+model Group {
+  id          String        @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  visibility  Visibility    @default(PRIVATE)
+  inviteCode  String        @unique @default(uuid())
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  owner       User          @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  members     GroupMember[]
+  gatherings  Gathering[]
+
+  @@index([ownerId])
+  @@index([inviteCode])
+}
+
+model GroupMember {
+  groupId  String
+  userId   String
+  role     GroupRole @default(MEMBER)
+  joinedAt DateTime  @default(now())
+  group    Group     @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user     User      @relation(fields: [userId],  references: [id], onDelete: Cascade)
+
+  @@id([groupId, userId])
+  @@index([userId])
+}
+
+model Gathering {
+  id           String                 @id @default(uuid())
+  title        String
+  description  String?
+  hostId       String
+  groupId      String?
+  date         DateTime
+  locationName String?
+  locationLat  Float?
+  locationLng  Float?
+  meetingLink  String?
+  visibility   Visibility             @default(FRIENDS)
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  host         User                   @relation(fields: [hostId],  references: [id], onDelete: Cascade)
+  group        Group?                 @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  participants GatheringParticipant[]
+
+  @@index([hostId])
+  @@index([groupId])
+  @@index([date])
+}
+
+model GatheringParticipant {
+  gatheringId String
+  userId      String
+  status      ParticipantStatus @default(GOING)
+  joinedAt    DateTime          @default(now())
+  gathering   Gathering         @relation(fields: [gatheringId], references: [id], onDelete: Cascade)
+  user        User              @relation(fields: [userId],      references: [id], onDelete: Cascade)
+
+  @@id([gatheringId, userId])
+  @@index([userId])
+}
+
+model Activity {
+  id          String       @id @default(uuid())
+  userId      String
+  type        ActivityType
+  referenceId String?
+  createdAt   DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
 enum Plan {
   FREE
   STARTER
@@ -220,4 +351,37 @@ enum TransactionType {
   REWARD
   PURCHASE
   BONUS
+}
+
+enum FriendRequestStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum GroupRole {
+  ADMIN
+  MEMBER
+}
+
+enum ParticipantStatus {
+  GOING
+  MAYBE
+  NOT_GOING
+}
+
+enum LocationPrivacy {
+  OFF
+  FRIENDS
+  SELECTED
+  EVERYONE
+}
+
+enum ActivityType {
+  ADDED_FRIEND
+  JOINED_GROUP
+  JOINED_GATHERING
+  CREATED_SET
+  STUDIED_CARDS
+  CREATED_NOTE
 }

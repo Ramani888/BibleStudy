@@ -20,6 +20,11 @@ const envSchema = z.object({
   CLIENT_URL: z.string().optional().default(''),
   PORT: z.string().transform(Number).default('3001'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+
+  // Firebase (optional — push notifications disabled when absent)
+  FIREBASE_PROJECT_ID: z.string().optional().default(''),
+  FIREBASE_PRIVATE_KEY: z.string().optional().default(''),
+  FIREBASE_CLIENT_EMAIL: z.string().optional().default(''),
 });
 
 const parsed = envSchema.safeParse(process.env);

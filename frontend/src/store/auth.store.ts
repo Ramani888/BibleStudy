@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { authApi } from '../api/auth.api';
 import { storage } from '../utils/storage';
+import { removeDeviceToken } from '../utils/notifications';
 import type { User } from '../types';
 import type {
   LoginPayload,
@@ -76,6 +77,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   logout: async () => {
     try {
+      await removeDeviceToken();
       await authApi.logout();
     } finally {
       await storage.clearTokens();

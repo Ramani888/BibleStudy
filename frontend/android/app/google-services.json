@@ -1,0 +1,30 @@
+{
+  "_comment": "PLACEHOLDER — Replace with your real google-services.json from Firebase Console. Download from: https://console.firebase.google.com → Project Settings → Android app → Download. Until replaced, push notifications will not function but the app will still build and run.",
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "biblestudypro-placeholder",
+    "storage_bucket": "biblestudypro-placeholder.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "android_client_info": {
+          "package_name": "com.frontend"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "REPLACE_WITH_YOUR_API_KEY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

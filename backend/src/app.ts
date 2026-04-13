@@ -12,6 +12,11 @@ import setsRoutes from './modules/sets/sets.routes';
 import cardsRoutes from './modules/cards/cards.routes';
 import aiRoutes from './modules/ai/ai.routes';
 import creditsRoutes from './modules/credits/credits.routes';
+import friendsRoutes from './modules/friends/friends.routes';
+import groupsRoutes from './modules/groups/groups.routes';
+import gatheringsRoutes from './modules/gatherings/gatherings.routes';
+import mapRoutes from './modules/map/map.routes';
+import activitiesRoutes from './modules/activities/activities.routes';
 
 const app = express();
 
@@ -51,13 +56,18 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // API routes
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/users', usersRoutes);
-app.use('/api/v1/folders', foldersRoutes);
-app.use('/api/v1/sets', setsRoutes);
-app.use('/api/v1/cards', cardsRoutes);
-app.use('/api/v1/ai', aiRoutes);
-app.use('/api/v1/credits', creditsRoutes);
+app.use('/api/v1/auth',        authRoutes);
+app.use('/api/v1/users',       usersRoutes);
+app.use('/api/v1/folders',     foldersRoutes);
+app.use('/api/v1/sets',        setsRoutes);
+app.use('/api/v1/cards',       cardsRoutes);
+app.use('/api/v1/ai',          aiRoutes);
+app.use('/api/v1/credits',     creditsRoutes);
+app.use('/api/v1/friends',     friendsRoutes);
+app.use('/api/v1/groups',      groupsRoutes);
+app.use('/api/v1/gatherings',  gatheringsRoutes);
+app.use('/api/v1/map',         mapRoutes);
+app.use('/api/v1/activities',  activitiesRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

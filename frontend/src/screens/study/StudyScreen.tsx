@@ -20,7 +20,6 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import Toast from 'react-native-toast-message';
 
 import { FlashCard } from '../../components/domain';
@@ -29,9 +28,9 @@ import { useCards, useRecordStudy } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
-import type { AppTabParamList } from '../../navigation/types';
+import type { LibraryScreenProps } from '../../navigation/types';
 
-type StudyNav = BottomTabNavigationProp<AppTabParamList>;
+type Props = LibraryScreenProps<'Study'>;
 
 const SWIPE_THRESHOLD = 80;
 
@@ -84,7 +83,7 @@ function CompletionScreen({ total, results, onRestart, onExit }: CompletionProps
 
 // ─── No set selected state ────────────────────────────────────────────────────
 function NoSetSelected() {
-  const navigation = useNavigation<StudyNav>();
+  const navigation = useNavigation<Props['navigation']>();
   return (
     <View style={styles.noSetWrap}>
       <Typography style={styles.noSetEmoji}>📚</Typography>
@@ -103,9 +102,8 @@ function NoSetSelected() {
 }
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
-export function StudyScreen({ route }: { route?: { params?: { setId?: string; setTitle?: string } } }) {
-  const params = route?.params;
-  const setId = params?.setId;
+export function StudyScreen({ route, navigation }: Props) {
+  const setId = route.params.setId;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -116,8 +114,8 @@ export function StudyScreen({ route }: { route?: { params?: { setId?: string; se
     HARD: 0,
   });
 
-  const { data: cards = [], isLoading } = useCards(setId ?? '');
-  const { mutate: recordStudy } = useRecordStudy(setId ?? '');
+  const { data: cards = [], isLoading } = useCards(setId);
+  const { mutate: recordStudy } = useRecordStudy(setId);
 
   const currentCard = cards[currentIndex];
   const progress = cards.length > 0 ? currentIndex / cards.length : 0;
@@ -225,8 +223,6 @@ export function StudyScreen({ route }: { route?: { params?: { setId?: string; se
     setIsComplete(false);
     setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
   };
-
-  const navigation = useNavigation<StudyNav>();
 
   // ── No set selected ──
   if (!setId) {

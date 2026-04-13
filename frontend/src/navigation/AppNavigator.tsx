@@ -6,8 +6,8 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import type { AppTabParamList } from './types';
 import { colors, fontSizes, fontWeights, layout, spacing } from '../theme';
 import { HomeScreen } from '../screens/home/HomeScreen';
-import { StudyScreen } from '../screens/study/StudyScreen';
 import { LibraryNavigator } from './LibraryNavigator';
+import { MapNavigator } from './MapNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 
@@ -16,7 +16,7 @@ const Tab = createBottomTabNavigator<AppTabParamList>();
 const TAB_ICONS: Record<string, { active: string; inactive: string }> = {
   HomeTab:    { active: 'home',          inactive: 'home-outline'          },
   LibraryTab: { active: 'library',       inactive: 'library-outline'       },
-  StudyTab:   { active: 'school',        inactive: 'school-outline'        },
+  MapTab:     { active: 'map',           inactive: 'map-outline'           },
   AITab:      { active: 'chatbubbles',   inactive: 'chatbubbles-outline'   },
   ProfileTab: { active: 'person-circle', inactive: 'person-circle-outline' },
 };
@@ -39,7 +39,7 @@ export function AppNavigator() {
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
       <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
-      <Tab.Screen name="StudyTab"   component={StudyScreen}      options={{ title: 'Study'   }} />
+      <Tab.Screen name="MapTab"     component={MapNavigator}     options={{ title: 'Map'     }} />
       <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
       <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile' }} />
     </Tab.Navigator>

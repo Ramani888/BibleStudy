@@ -16,5 +16,16 @@ export const ChangePasswordDto = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
-export type UpdateProfileDtoType = z.infer<typeof UpdateProfileDto>;
+export const DeviceTokenDto = z.object({
+  token:    z.string().min(1, 'Token is required'),
+  platform: z.enum(['IOS', 'ANDROID']),
+});
+
+export const RemoveTokenDto = z.object({
+  token: z.string().min(1, 'Token is required'),
+});
+
+export type UpdateProfileDtoType  = z.infer<typeof UpdateProfileDto>;
 export type ChangePasswordDtoType = z.infer<typeof ChangePasswordDto>;
+export type DeviceTokenDtoType    = z.infer<typeof DeviceTokenDto>;
+export type RemoveTokenDtoType    = z.infer<typeof RemoveTokenDto>;

@@ -16,9 +16,12 @@ import { Avatar, Spacer, Typography } from '../../components/ui';
 import { SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
 import { useDailyVerse, useSets, useClaimDailyLogin } from '../../hooks';
+import { useFriendsActivityFeed } from '../../hooks/useActivities';
 import { getErrorMessage } from '../../api';
+import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
 import type { AppTabParamList } from '../../navigation/types';
+import type { Activity, ActivityType } from '../../types/activities.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
@@ -103,6 +106,38 @@ function DailyLoginButton() {
   );
 }
 
+// ─── Activity label ────────────────────────────────────────────────────────────
+function activityLabel(type: ActivityType): string {
+  switch (type) {
+    case 'ADDED_FRIEND':    return 'made a new friend';
+    case 'JOINED_GROUP':    return 'joined a group';
+    case 'JOINED_GATHERING':return 'joined a gathering';
+    case 'CREATED_SET':     return 'created a study set';
+    case 'STUDIED_CARDS':   return 'studied some flashcards';
+    case 'CREATED_NOTE':    return 'created a note';
+  }
+}
+
+// ─── Activity item ─────────────────────────────────────────────────────────────
+function ActivityItem({ item }: { item: Activity }) {
+  return (
+    <View style={styles.activityItem}>
+      <View style={styles.activityDot} />
+      <View style={styles.activityContent}>
+        <Typography preset="bodySm">
+          <Typography preset="bodySm" style={styles.activityName}>
+            {item.user.name}
+          </Typography>
+          {' '}{activityLabel(item.type)}
+        </Typography>
+        <Typography preset="caption" color={colors.textDisabled}>
+          {formatDate(item.createdAt)}
+        </Typography>
+      </View>
+    </View>
+  );
+}
+
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export function HomeScreen() {
   const user = useAuthStore(s => s.user);
@@ -110,13 +145,15 @@ export function HomeScreen() {
 
   const { data: verse, isLoading: verseLoading, refetch: refetchVerse } = useDailyVerse();
   const { data: sets, isLoading: setsLoading, refetch: refetchSets } = useSets();
+  const { data: activityData, refetch: refetchActivities } = useFriendsActivityFeed();
 
   const recentSets = sets?.slice(0, 3) ?? [];
+  const recentActivities = activityData?.pages[0]?.activities.slice(0, 5) ?? [];
   const refreshing = verseLoading || setsLoading;
 
   const onRefresh = useCallback(async () => {
-    await Promise.all([refetchVerse(), refetchSets()]);
-  }, [refetchVerse, refetchSets]);
+    await Promise.all([refetchVerse(), refetchSets(), refetchActivities()]);
+  }, [refetchVerse, refetchSets, refetchActivities]);
 
   const greeting = () => {
     const h = new Date().getHours();
@@ -224,6 +261,26 @@ export function HomeScreen() {
           )}
         </View>
 
+        {/* ── Community Activity ── */}
+        {recentActivities.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <View style={styles.sectionHeader}>
+              <Typography preset="h4">Community Activity</Typography>
+              <Pressable onPress={() => navigation.navigate('ProfileTab')}>
+                <Typography preset="label" color={colors.primary}>
+                  Friends
+                </Typography>
+              </Pressable>
+            </View>
+            <View style={styles.activityList}>
+              {recentActivities.map(activity => (
+                <ActivityItem key={activity.id} item={activity} />
+              ))}
+            </View>
+          </>
+        )}
+
         <Spacer size={spacing[8]} />
       </ScrollView>
     </SafeAreaView>
@@ -283,6 +340,34 @@ const styles = StyleSheet.create({
 
   // Sets
   setsList: { gap: spacing[3] },
+
+  // Activity feed
+  activityList: {
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    gap: spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  activityDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.primary,
+    marginTop: 5,
+    flexShrink: 0,
+  },
+  activityContent: { flex: 1, gap: spacing[0.5] },
+  activityName: { fontWeight: '600' as const },
   emptyWrap: {
     padding: spacing[6],
     alignItems: 'center',

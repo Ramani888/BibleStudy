@@ -21,6 +21,7 @@ export type LibraryStackParamList = {
   CreateCard: { setId: string };
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
+  Study: { setId: string; setTitle: string };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
@@ -36,13 +37,33 @@ export type ProfileStackParamList = {
   ChangePassword: undefined;
   Credits: undefined;
   Settings: undefined;
+  // Friends
+  Friends: undefined;
+  FriendRequests: undefined;
+  SearchUsers: undefined;
+  UserProfile: { userId: string };
+  BlockedUsers: undefined;
+  // Groups
+  Groups: undefined;
+  GroupDetail: { groupId: string };
+  CreateGroup: undefined;
+  EditGroup: { groupId: string };
+  JoinGroup: undefined;
+};
+
+// ─── Map Stack ────────────────────────────────────────────────────────────────
+export type MapStackParamList = {
+  Map: undefined;
+  GatheringDetail: { gatheringId: string };
+  CreateGathering: { groupId?: string } | undefined;
+  EditGathering: { gatheringId: string };
 };
 
 // ─── Bottom Tabs ──────────────────────────────────────────────────────────────
 export type AppTabParamList = {
   HomeTab: undefined;
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
-  StudyTab: { setId: string; setTitle: string } | undefined;
+  MapTab: undefined;
   AITab: undefined;
   ProfileTab: undefined;
 };
@@ -66,5 +87,11 @@ export type AIScreenProps<T extends keyof AIStackParamList> =
 export type ProfileScreenProps<T extends keyof ProfileStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<ProfileStackParamList, T>,
+    BottomTabScreenProps<AppTabParamList>
+  >;
+
+export type MapScreenProps<T extends keyof MapStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<MapStackParamList, T>,
     BottomTabScreenProps<AppTabParamList>
   >;

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import * as usersService from './users.service';
 import { sendSuccess, sendError } from '../../utils/response';
-import { UpdateProfileDtoType, ChangePasswordDtoType } from './users.dto';
+import { UpdateProfileDtoType, ChangePasswordDtoType, DeviceTokenDtoType, RemoveTokenDtoType } from './users.dto';
 
 export async function getProfile(req: Request, res: Response): Promise<void> {
   try {
@@ -47,5 +47,29 @@ export async function deleteAccount(req: Request, res: Response): Promise<void> 
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to delete account';
     sendError(res, message, 400, 'DELETE_ERROR');
+  }
+}
+
+export async function registerDeviceToken(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { token, platform } = req.body as DeviceTokenDtoType;
+    const result = await usersService.registerDeviceToken(userId, token, platform);
+    sendSuccess(res, result, result.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to register device token';
+    sendError(res, message, 400, 'TOKEN_ERROR');
+  }
+}
+
+export async function removeDeviceToken(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { token } = req.body as RemoveTokenDtoType;
+    const result = await usersService.removeDeviceToken(userId, token);
+    sendSuccess(res, result, result.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to remove device token';
+    sendError(res, message, 400, 'TOKEN_ERROR');
   }
 }

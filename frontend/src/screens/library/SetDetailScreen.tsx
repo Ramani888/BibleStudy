@@ -96,7 +96,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           <Button
             label={`Study ${cards.length} Cards`}
             onPress={() =>
-              navigation.navigate('StudyTab', { setId, setTitle } as any)
+              navigation.navigate('Study', { setId, setTitle })
             }
             fullWidth
           />

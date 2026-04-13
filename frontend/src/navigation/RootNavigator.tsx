@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { useAuthStore } from '../store';
 import { colors } from '../theme';
+import { registerDeviceToken, onTokenRefresh, setupForegroundHandler } from '../utils/notifications';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
@@ -25,6 +26,7 @@ export function RootNavigator() {
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const notificationsSetUp = useRef(false);
 
   useEffect(() => {
     AsyncStorage.getItem(ONBOARDING_KEY).then(val => {
@@ -32,6 +34,22 @@ export function RootNavigator() {
       setOnboardingChecked(true);
     });
   }, []);
+
+  // Register device token and set up FCM listeners when user is authenticated
+  useEffect(() => {
+    if (!isAuthenticated || notificationsSetUp.current) return;
+    notificationsSetUp.current = true;
+
+    registerDeviceToken();
+    const unsubRefresh = onTokenRefresh();
+    const unsubForeground = setupForegroundHandler();
+
+    return () => {
+      unsubRefresh();
+      unsubForeground();
+      notificationsSetUp.current = false;
+    };
+  }, [isAuthenticated]);
 
   // Wait for both auth hydration and onboarding check
   if (!isInitialized || !onboardingChecked) {

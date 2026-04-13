@@ -86,3 +86,17 @@ export async function deleteAccount(userId: string) {
   await prisma.user.delete({ where: { id: userId } });
   return { message: 'Account deleted successfully' };
 }
+
+export async function registerDeviceToken(userId: string, token: string, platform: 'IOS' | 'ANDROID') {
+  await prisma.deviceToken.upsert({
+    where:  { token },
+    create: { userId, token, platform },
+    update: { userId },
+  });
+  return { message: 'Device token registered' };
+}
+
+export async function removeDeviceToken(userId: string, token: string) {
+  await prisma.deviceToken.deleteMany({ where: { userId, token } });
+  return { message: 'Device token removed' };
+}
