@@ -10,6 +10,7 @@ router.use(authMiddleware);
 
 router.post('/',                          validate(CreateGroupDto), groupsController.createGroup);
 router.get('/',                           groupsController.listMyGroups);
+router.get('/public',                     groupsController.listPublicGroups);
 router.get('/:id',                        groupsController.getGroup);
 router.put('/:id',                        validate(UpdateGroupDto), groupsController.updateGroup);
 router.delete('/:id',                     groupsController.deleteGroup);

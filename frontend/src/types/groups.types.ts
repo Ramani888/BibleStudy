@@ -5,6 +5,7 @@ export interface Group {
   name: string;
   description: string | null;
   ownerId: string;
+  owner?: UserProfile;
   visibility: 'PRIVATE' | 'PUBLIC' | 'FRIENDS';
   inviteCode: string;
   createdAt: string;

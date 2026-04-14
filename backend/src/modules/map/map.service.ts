@@ -27,7 +27,8 @@ export async function getFriendsLocations(userId: string) {
   const friends = await prisma.user.findMany({
     where: {
       id: { in: friendIds },
-      locationPrivacy: { not: LocationPrivacy.OFF },
+      // SELECTED currently behaves as FRIENDS. Needs future SelectedLocationUser join table.
+      locationPrivacy: { in: [LocationPrivacy.FRIENDS, LocationPrivacy.SELECTED, LocationPrivacy.EVERYONE] },
       locationLat: { not: null },
       locationLng: { not: null },
     },
@@ -45,8 +46,8 @@ export async function getFriendsLocations(userId: string) {
   return friends;
 }
 
-export async function getNearbyGatherings(lat: number, lng: number, radiusKm = 50) {
-  return getNearby(lat, lng, radiusKm);
+export async function getNearbyGatherings(userId: string, lat: number, lng: number, radiusKm = 50) {
+  return getNearby(userId, lat, lng, radiusKm);
 }
 
 export async function updatePrivacy(userId: string, dto: PrivacyDtoType) {

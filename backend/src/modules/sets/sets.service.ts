@@ -1,4 +1,5 @@
 import { prisma } from '../../config/db';
+import { logActivity } from '../../utils/activity';
 import { CreateSetDtoType, UpdateSetDtoType } from './sets.dto';
 
 export async function createSet(userId: string, dto: CreateSetDtoType) {
@@ -19,6 +20,8 @@ export async function createSet(userId: string, dto: CreateSetDtoType) {
       layout: dto.layout ?? 'DEFAULT',
     },
   });
+
+  await logActivity(userId, 'CREATED_SET', set.id);
 
   return set;
 }

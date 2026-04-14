@@ -13,10 +13,12 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
+import { ErrorState } from '../../components/feedback/ErrorState';
 import {
   useFriendRequests,
   useAcceptFriendRequest,
   useRejectFriendRequest,
+  useCancelFriendRequest,
 } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import type { FriendRequest } from '../../types/friends.types';
@@ -26,9 +28,10 @@ type Tab = 'incoming' | 'outgoing';
 
 export function FriendRequestsScreen(_props: Props) {
   const [tab, setTab] = useState<Tab>('incoming');
-  const { data: requests = [], isLoading, refetch } = useFriendRequests(tab);
+  const { data: requests = [], isLoading, isFetching, error, refetch } = useFriendRequests(tab);
   const accept = useAcceptFriendRequest();
   const reject = useRejectFriendRequest();
+  const cancel = useCancelFriendRequest();
 
   const handleAccept = (requestId: string) => {
     accept.mutate(requestId, {
@@ -68,11 +71,21 @@ export function FriendRequestsScreen(_props: Props) {
           </View>
         )}
         {tab === 'outgoing' && (
-          <Typography preset="caption" color={colors.textSecondary}>Pending</Typography>
+          <Pressable
+            style={[styles.btn, styles.rejectBtn]}
+            onPress={() => cancel.mutate(item.id, {
+              onSuccess: () => Toast.show({ type: 'info', text1: 'Request cancelled' }),
+              onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
+            })}
+          >
+            <Icon name="close" size={18} color={colors.textOnPrimary} />
+          </Pressable>
         )}
       </View>
     );
   };
+
+  if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
@@ -100,7 +113,7 @@ export function FriendRequestsScreen(_props: Props) {
         data={requests}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isLoading}
+        refreshing={isFetching}
         onRefresh={refetch}
         contentContainerStyle={requests.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={

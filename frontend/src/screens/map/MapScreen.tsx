@@ -63,7 +63,7 @@ export function MapScreen({ navigation }: Props) {
   }, []);
 
   const handleCreateGathering = () => {
-    navigation.navigate('CreateGathering', undefined);
+    navigation.navigate('CreateGathering', {});
   };
 
   if (!locationReady) {
@@ -100,7 +100,7 @@ export function MapScreen({ navigation }: Props) {
               coordinate={{ latitude: gathering.locationLat, longitude: gathering.locationLng }}
               title={gathering.title}
               description={gathering.locationName ?? undefined}
-              pinColor={colors.primary}
+              pinColor={colors.info}
               onCalloutPress={() => navigation.navigate('GatheringDetail', { gatheringId: gathering.id })}
             />
           ) : null

@@ -3,6 +3,19 @@ import * as groupsService from './groups.service';
 import { sendSuccess, sendError } from '../../utils/response';
 import { CreateGroupDtoType, UpdateGroupDtoType, UpdateRoleDtoType } from './groups.dto';
 
+export async function listPublicGroups(req: Request, res: Response): Promise<void> {
+  try {
+    const search = req.query.search as string | undefined;
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = Math.min(parseInt(req.query.limit as string) || 20, 50);
+    const result = await groupsService.listPublicGroups({ search, page, limit });
+    sendSuccess(res, result, 'Public groups retrieved successfully');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to list public groups';
+    sendError(res, message, 400, 'LIST_ERROR');
+  }
+}
+
 export async function createGroup(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;

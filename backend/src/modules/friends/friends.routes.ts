@@ -15,6 +15,7 @@ router.get('/', friendsController.listFriends);
 router.post('/request', validate(SendRequestDto), friendsController.sendRequest);
 router.put('/request/:requestId/accept', friendsController.acceptRequest);
 router.put('/request/:requestId/reject', friendsController.rejectRequest);
+router.delete('/request/:requestId', friendsController.cancelRequest);
 router.post('/block/:userId', friendsController.blockUser);
 router.delete('/block/:userId', friendsController.unblockUser);
 router.delete('/:friendId', friendsController.removeFriend);

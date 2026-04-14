@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
@@ -136,11 +137,12 @@ export async function leaveGroup(userId: string, groupId: string) {
   const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
   if (!member) throw new Error('Not a member of this group');
 
-  if (group.ownerId === userId) {
+  // Prevent leaving if this user is the last admin and group has other members
+  if (member.role === 'ADMIN') {
     const adminCount = await prisma.groupMember.count({ where: { groupId, role: 'ADMIN' } });
     const memberCount = await prisma.groupMember.count({ where: { groupId } });
     if (memberCount > 1 && adminCount === 1) {
-      throw new Error('Transfer ownership before leaving');
+      throw new Error('You are the last admin — promote another member before leaving');
     }
   }
 
@@ -190,13 +192,37 @@ export async function regenerateInviteCode(userId: string, groupId: string) {
   const group = await prisma.group.findFirst({ where: { id: groupId, ownerId: userId } });
   if (!group) throw new Error('Group not found or not authorized');
 
-  const newCode = crypto.randomUUID();
+  const newCode = randomUUID();
   const updated = await prisma.group.update({
     where: { id: groupId },
     data: { inviteCode: newCode },
   });
 
   return { inviteCode: updated.inviteCode };
+}
+
+export async function listPublicGroups(params?: { search?: string; page?: number; limit?: number }) {
+  const page = params?.page ?? 1;
+  const limit = Math.min(params?.limit ?? 20, 50);
+  const skip = (page - 1) * limit;
+
+  const where: Record<string, unknown> = { visibility: 'PUBLIC' };
+  if (params?.search?.trim()) {
+    where.name = { contains: params.search.trim(), mode: 'insensitive' };
+  }
+
+  const [groups, total] = await Promise.all([
+    prisma.group.findMany({
+      where,
+      include: { _count: { select: { members: true, gatherings: true } } },
+      orderBy: { updatedAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.group.count({ where }),
+  ]);
+
+  return { groups, pagination: { total, page, limit, pages: Math.ceil(total / limit) } };
 }
 
 export async function notifyGroupMembers(

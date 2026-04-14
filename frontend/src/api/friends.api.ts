@@ -12,6 +12,7 @@ const friendsApi = {
   unblock:       (userId: string)                      => apiDelete<{ message: string }>(`/friends/block/${userId}`),
   listBlocked:   ()                                    => apiGet<BlockedUser[]>('/friends/blocked'),
   searchUsers:   (q: string)                           => apiGet<UserProfile[]>('/friends/search', { q }),
+  cancelRequest: (requestId: string)                   => apiDelete<{ message: string }>(`/friends/request/${requestId}`),
 };
 
 export { friendsApi };

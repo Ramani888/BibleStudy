@@ -14,6 +14,8 @@ const groupsApi = {
   removeMember:     (groupId: string, userId: string) =>
     apiDelete<{ message: string }>(`/groups/${groupId}/members/${userId}`),
   regenerateInvite: (id: string)                      => apiPost<{ inviteCode: string }>(`/groups/${id}/regenerate-invite`),
+  listPublic:       (params?: { search?: string; page?: number }) =>
+    apiGet<{ groups: Group[]; pagination: { total: number; page: number; limit: number; pages: number } }>('/groups/public', params),
 };
 
 export { groupsApi };

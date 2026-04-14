@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Pressable,
   StyleSheet,
@@ -21,8 +22,14 @@ type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
   const [query, setQuery] = useState('');
-  const { data: users = [], isFetching } = useSearchUsers(query);
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const { data: users = [], isFetching } = useSearchUsers(debouncedQuery);
   const sendRequest = useSendFriendRequest();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), 300);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   const handleAdd = (user: UserProfile) => {
     sendRequest.mutate(user.id, {
@@ -63,13 +70,16 @@ export function SearchUsersScreen({ navigation }: Props) {
           autoFocus
         />
       </View>
+      {isFetching && debouncedQuery.length > 1 && (
+        <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
+      )}
       <FlatList
         data={users}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          query.length > 1 && !isFetching ? (
+          debouncedQuery.length > 1 && !isFetching ? (
             <View style={styles.empty}>
               <Typography preset="body" color={colors.textSecondary}>No users found</Typography>
             </View>
@@ -101,5 +111,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addBtn: { padding: spacing[1] },
+  loader: { paddingVertical: spacing[2] },
   empty: { padding: layout.screenPaddingH, alignItems: 'center' },
 });

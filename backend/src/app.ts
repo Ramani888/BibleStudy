@@ -17,6 +17,7 @@ import groupsRoutes from './modules/groups/groups.routes';
 import gatheringsRoutes from './modules/gatherings/gatherings.routes';
 import mapRoutes from './modules/map/map.routes';
 import activitiesRoutes from './modules/activities/activities.routes';
+import notificationsRoutes from './modules/notifications/notifications.routes';
 
 const app = express();
 
@@ -67,7 +68,8 @@ app.use('/api/v1/friends',     friendsRoutes);
 app.use('/api/v1/groups',      groupsRoutes);
 app.use('/api/v1/gatherings',  gatheringsRoutes);
 app.use('/api/v1/map',         mapRoutes);
-app.use('/api/v1/activities',  activitiesRoutes);
+app.use('/api/v1/activities',      activitiesRoutes);
+app.use('/api/v1/notifications',   notificationsRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

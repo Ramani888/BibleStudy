@@ -8,7 +8,8 @@ import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
-import { SetCardSkeleton } from '../../components/feedback';
+import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
+import { ErrorState } from '../../components/feedback/ErrorState';
 import { getErrorMessage } from '../../api/client';
 import { useGroup, useUpdateGroup, useRegenerateInviteCode } from '../../hooks/useGroups';
 
@@ -16,7 +17,7 @@ type Props = ProfileScreenProps<'EditGroup'>;
 
 export function EditGroupScreen({ route, navigation }: Props) {
   const { groupId } = route.params;
-  const { data: group, isLoading } = useGroup(groupId);
+  const { data: group, isLoading, error, refetch } = useGroup(groupId);
   const updateGroup = useUpdateGroup();
   const regenerateInvite = useRegenerateInviteCode();
 
@@ -51,7 +52,8 @@ export function EditGroupScreen({ route, navigation }: Props) {
     });
   };
 
-  if (isLoading) return <SetCardSkeleton />;
+  if (isLoading) return <LoadingOverlay visible />;
+  if (error) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>

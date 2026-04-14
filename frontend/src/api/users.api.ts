@@ -1,5 +1,7 @@
 import { apiDelete, apiGet, apiPut } from './client';
 import type { ChangePasswordPayload, UpdateProfilePayload, User } from '../types';
+import type { UserPublicProfile } from '../types/user.types';
+
 
 export const usersApi = {
   getProfile: () =>
@@ -13,4 +15,7 @@ export const usersApi = {
 
   deleteAccount: () =>
     apiDelete('/users/account'),
+
+  getUserById: (userId: string) =>
+    apiGet<UserPublicProfile>(`/users/${userId}`),
 };

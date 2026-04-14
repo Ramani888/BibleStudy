@@ -27,3 +27,15 @@ export interface ChangePasswordPayload {
   currentPassword: string;
   newPassword: string;
 }
+
+export interface UserPublicProfile {
+  id: string;
+  name: string;
+  profileImage: string | null;
+  bio: string | null;
+  church: string | null;
+  createdAt: string;
+  isFriend: boolean;
+  pendingRequest: { id: string; direction: 'incoming' | 'outgoing' } | null;
+  mutualFriendsCount: number;
+}

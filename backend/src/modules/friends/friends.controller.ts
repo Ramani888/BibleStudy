@@ -52,6 +52,19 @@ export async function acceptRequest(req: Request, res: Response): Promise<void> 
   }
 }
 
+export async function cancelRequest(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { requestId } = req.params;
+    const result = await friendsService.cancelRequest(userId, requestId);
+    sendSuccess(res, result, result.message);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to cancel request';
+    const statusCode = message === 'Friend request not found' ? 404 : 400;
+    sendError(res, message, statusCode, 'CANCEL_ERROR');
+  }
+}
+
 export async function rejectRequest(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;

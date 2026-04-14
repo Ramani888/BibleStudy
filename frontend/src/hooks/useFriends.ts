@@ -70,6 +70,14 @@ export function useBlockUser() {
   });
 }
 
+export function useCancelFriendRequest() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (requestId: string) => friendsApi.cancelRequest(requestId),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+  });
+}
+
 export function useUnblockUser() {
   const qc = useQueryClient();
   return useMutation({

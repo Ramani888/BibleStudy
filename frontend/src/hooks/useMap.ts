@@ -5,6 +5,7 @@ export function useFriendsLocations() {
   return useQuery({
     queryKey: ['map', 'friends'],
     queryFn: mapApi.getFriendsLocations,
+    staleTime: 30_000,
   });
 }
 

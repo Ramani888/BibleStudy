@@ -37,7 +37,8 @@ export async function getNearbyGatherings(req: Request, res: Response): Promise<
       return;
     }
 
-    const gatherings = await mapService.getNearbyGatherings(lat, lng, radius);
+    const userId = req.user!.id;
+    const gatherings = await mapService.getNearbyGatherings(userId, lat, lng, radius);
     sendSuccess(res, gatherings, 'Nearby gatherings retrieved');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get nearby gatherings';

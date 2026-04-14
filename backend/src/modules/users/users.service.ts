@@ -87,6 +87,65 @@ export async function deleteAccount(userId: string) {
   return { message: 'Account deleted successfully' };
 }
 
+export async function getUserById(targetId: string, requesterId: string) {
+  // Check blocked in both directions
+  const block = await prisma.block.findFirst({
+    where: {
+      OR: [
+        { blockerId: requesterId, blockedId: targetId },
+        { blockerId: targetId, blockedId: requesterId },
+      ],
+    },
+  });
+  if (block) throw new Error('User not found');
+
+  const user = await prisma.user.findUnique({
+    where: { id: targetId },
+    select: {
+      id: true,
+      name: true,
+      profileImage: true,
+      bio: true,
+      church: true,
+      createdAt: true,
+    },
+  });
+  if (!user) throw new Error('User not found');
+
+  // Friendship status
+  const friendship = await prisma.friendship.findFirst({
+    where: { userId: requesterId, friendId: targetId },
+  });
+
+  // Pending request in either direction
+  const pendingRequest = await prisma.friendRequest.findFirst({
+    where: {
+      status: 'PENDING',
+      OR: [
+        { senderId: requesterId, receiverId: targetId },
+        { senderId: targetId, receiverId: requesterId },
+      ],
+    },
+  });
+
+  // Mutual friends count
+  const [requesterFriends, targetFriends] = await Promise.all([
+    prisma.friendship.findMany({ where: { userId: requesterId }, select: { friendId: true } }),
+    prisma.friendship.findMany({ where: { userId: targetId }, select: { friendId: true } }),
+  ]);
+  const requesterFriendIds = new Set(requesterFriends.map(f => f.friendId));
+  const mutualFriendsCount = targetFriends.filter(f => requesterFriendIds.has(f.friendId)).length;
+
+  return {
+    ...user,
+    isFriend: !!friendship,
+    pendingRequest: pendingRequest
+      ? { id: pendingRequest.id, direction: pendingRequest.senderId === requesterId ? 'outgoing' as const : 'incoming' as const }
+      : null,
+    mutualFriendsCount,
+  };
+}
+
 export async function registerDeviceToken(userId: string, token: string, platform: 'IOS' | 'ANDROID') {
   await prisma.deviceToken.upsert({
     where:  { token },

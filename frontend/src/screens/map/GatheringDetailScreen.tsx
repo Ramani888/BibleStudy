@@ -3,6 +3,7 @@ import {
   Alert,
   Linking,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   View,
@@ -14,9 +15,9 @@ import type { MapScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
-import { SetCardSkeleton } from '../../components/feedback';
+import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
-import { useGathering, useRsvp, useCancelGathering } from '../../hooks/useGatherings';
+import { useGathering, useRsvp, useCancelGathering, useLeaveGathering } from '../../hooks/useGatherings';
 import { useAuthStore } from '../../store/auth.store';
 
 type Props = MapScreenProps<'GatheringDetail'>;
@@ -26,9 +27,10 @@ const STATUS_LABELS = { GOING: 'Going', MAYBE: 'Maybe', NOT_GOING: "Can't Go" } 
 export function GatheringDetailScreen({ route, navigation }: Props) {
   const { gatheringId } = route.params;
   const { user } = useAuthStore();
-  const { data: gathering, isLoading, error } = useGathering(gatheringId);
+  const { data: gathering, isLoading, isFetching, error, refetch } = useGathering(gatheringId);
   const rsvp = useRsvp();
   const cancelGathering = useCancelGathering();
+  const leaveGathering = useLeaveGathering();
 
   const myRsvp = gathering?.participants?.find(p => p.userId === user?.id);
   const isHost = gathering?.hostId === user?.id;
@@ -52,14 +54,17 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
     ]);
   };
 
-  if (isLoading) return <SetCardSkeleton />;
-  if (error || !gathering) return <ErrorState message="Could not load gathering" onRetry={() => {}} />;
+  if (isLoading) return <LoadingOverlay visible />;
+  if (error || !gathering) return <ErrorState message="Could not load gathering" onRetry={refetch} />;
 
   const date = new Date(gathering.date);
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+      >
         <Typography preset="h2">{gathering.title}</Typography>
 
         {gathering.description ? (
@@ -131,6 +136,23 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
                 </Pressable>
               ))}
             </View>
+            {myRsvp && (
+              <Button
+                label="Leave Gathering"
+                variant="outline"
+                onPress={() => {
+                  Alert.alert('Leave Gathering', 'You will be removed from participants.', [
+                    { text: 'Stay', style: 'cancel' },
+                    {
+                      text: 'Leave',
+                      style: 'destructive',
+                      onPress: () => leaveGathering.mutate(gatheringId, { onSuccess: () => navigation.goBack() }),
+                    },
+                  ]);
+                }}
+                style={styles.leaveButton}
+              />
+            )}
           </View>
         )}
 
@@ -206,6 +228,10 @@ const styles = StyleSheet.create({
   rsvpButtonActive: {
     backgroundColor: colors.primary,
     borderColor: colors.primary,
+  },
+  leaveButton: {
+    borderColor: colors.error,
+    marginTop: spacing[2],
   },
   hostActions: {
     gap: spacing[2],

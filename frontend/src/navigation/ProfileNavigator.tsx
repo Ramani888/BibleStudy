@@ -17,6 +17,8 @@ import { GroupDetailScreen } from '../screens/profile/GroupDetailScreen';
 import { CreateGroupScreen } from '../screens/profile/CreateGroupScreen';
 import { EditGroupScreen } from '../screens/profile/EditGroupScreen';
 import { JoinGroupScreen } from '../screens/profile/JoinGroupScreen';
+import { PublicGroupsScreen } from '../screens/profile/PublicGroupsScreen';
+import { NotificationsScreen } from '../screens/profile/NotificationsScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -54,6 +56,9 @@ export function ProfileNavigator() {
       <Stack.Screen name="CreateGroup"     component={CreateGroupScreen}     options={{ title: 'New Group', presentation: 'modal' }} />
       <Stack.Screen name="EditGroup"       component={EditGroupScreen}       options={{ title: 'Edit Group', presentation: 'modal' }} />
       <Stack.Screen name="JoinGroup"       component={JoinGroupScreen}       options={{ title: 'Join Group', presentation: 'modal' }} />
+      <Stack.Screen name="PublicGroups"    component={PublicGroupsScreen}    options={{ title: 'Discover Groups'  }} />
+      {/* Notifications */}
+      <Stack.Screen name="Notifications"   component={NotificationsScreen}   options={{ title: 'Notifications'    }} />
     </Stack.Navigator>
   );
 }

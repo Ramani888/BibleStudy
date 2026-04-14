@@ -4,10 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import Toast from 'react-native-toast-message';
 import { MenuItem } from './components/MenuItem';
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
+import { useUpdateMapPrivacy } from '../../hooks/useMap';
 import { formatBytes } from '../../utils/formatters';
+import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
 import type { ProfileStackParamList } from '../../navigation/types';
 import type { Plan } from '../../types';
@@ -24,6 +27,25 @@ export function ProfileScreen() {
   const navigation = useNavigation<ProfileNav>();
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
+  const updatePrivacy = useUpdateMapPrivacy();
+
+  const handleLocationPrivacy = () => {
+    const options: Array<{ text: string; value: 'OFF' | 'FRIENDS' | 'EVERYONE' }> = [
+      { text: 'Off', value: 'OFF' },
+      { text: 'Friends Only', value: 'FRIENDS' },
+      { text: 'Everyone', value: 'EVERYONE' },
+    ];
+    Alert.alert('Location Privacy', 'Who can see your location on the map?', [
+      ...options.map(opt => ({
+        text: opt.text,
+        onPress: () => updatePrivacy.mutate(opt.value, {
+          onSuccess: () => Toast.show({ type: 'success', text1: `Privacy set to ${opt.text}` }),
+          onError: (e: unknown) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
+        }),
+      })),
+      { text: 'Cancel', style: 'cancel' as const },
+    ]);
+  };
 
   const storagePercent = user
     ? Math.round((user.storageUsed / user.storageLimit) * 100)
@@ -124,6 +146,10 @@ export function ProfileScreen() {
           <MenuItem emoji="👥" label="Friends" onPress={() => navigation.navigate('Friends')} />
           <Divider marginV={0} />
           <MenuItem emoji="🏛️" label="My Groups" onPress={() => navigation.navigate('Groups')} />
+          <Divider marginV={0} />
+          <MenuItem emoji="🔔" label="Notifications" onPress={() => navigation.navigate('Notifications')} />
+          <Divider marginV={0} />
+          <MenuItem emoji="📍" label="Location Privacy" onPress={handleLocationPrivacy} />
         </View>
 
         {/* ── App menu ── */}

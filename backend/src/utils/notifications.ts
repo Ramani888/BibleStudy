@@ -39,17 +39,47 @@ export async function sendPushToUser(
   data?: Record<string, string>
 ): Promise<void> {
   try {
+    // Persist in-app notification regardless of push config
+    await prisma.notification.create({
+      data: {
+        userId,
+        title,
+        body,
+        type: data?.type ?? 'general',
+        referenceId: data?.id ?? null,
+      },
+    });
+
     const messaging = await getMessaging();
     if (!messaging) return; // Firebase not configured
 
     const tokens = await prisma.deviceToken.findMany({ where: { userId } });
     if (!tokens.length) return;
 
-    await messaging.sendEachForMulticast({
+    const response = await messaging.sendEachForMulticast({
       tokens: tokens.map(t => t.token),
       notification: { title, body },
       data,
     });
+
+    // Clean up stale/invalid device tokens
+    const staleTokens: string[] = [];
+    response.responses.forEach((res, idx) => {
+      if (!res.success) {
+        const code = res.error?.code;
+        if (
+          code === 'messaging/registration-token-not-registered' ||
+          code === 'messaging/invalid-registration-token'
+        ) {
+          staleTokens.push(tokens[idx].token);
+        }
+      }
+    });
+    if (staleTokens.length > 0) {
+      await prisma.deviceToken.deleteMany({
+        where: { token: { in: staleTokens }, userId },
+      });
+    }
   } catch (err) {
     // Push notification failures are non-critical — log but don't rethrow
     console.error('Push notification error:', err);

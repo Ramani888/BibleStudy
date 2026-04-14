@@ -12,13 +12,14 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
+import { ErrorState } from '../../components/feedback/ErrorState';
 import { useGroups } from '../../hooks/useGroups';
 import type { Group } from '../../types/groups.types';
 
 type Props = ProfileScreenProps<'Groups'>;
 
 export function GroupsScreen({ navigation }: Props) {
-  const { data: groups = [], isLoading, refetch } = useGroups();
+  const { data: groups = [], isLoading, isFetching, error, refetch } = useGroups();
 
   const renderItem = ({ item }: { item: Group }) => (
     <Pressable
@@ -38,9 +39,15 @@ export function GroupsScreen({ navigation }: Props) {
     </Pressable>
   );
 
+  if (error) return <ErrorState message="Could not load groups" onRetry={refetch} />;
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.header}>
+        <Pressable style={styles.joinBtn} onPress={() => navigation.navigate('PublicGroups')}>
+          <Icon name="compass-outline" size={18} color={colors.primary} />
+          <Typography preset="label" color={colors.primary}>Discover</Typography>
+        </Pressable>
         <Pressable style={styles.joinBtn} onPress={() => navigation.navigate('JoinGroup')}>
           <Icon name="link-outline" size={18} color={colors.primary} />
           <Typography preset="label" color={colors.primary}>Join via Code</Typography>
@@ -51,7 +58,7 @@ export function GroupsScreen({ navigation }: Props) {
         data={groups}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isLoading}
+        refreshing={isFetching}
         onRefresh={refetch}
         contentContainerStyle={groups.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={

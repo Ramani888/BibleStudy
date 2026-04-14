@@ -41,7 +41,8 @@ export async function getNearby(req: Request, res: Response): Promise<void> {
       return;
     }
 
-    const gatherings = await gatheringsService.getNearby(lat, lng, radius);
+    const userId = req.user!.id;
+    const gatherings = await gatheringsService.getNearby(userId, lat, lng, radius);
     sendSuccess(res, gatherings, 'Nearby gatherings retrieved');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to get nearby gatherings';
@@ -116,8 +117,9 @@ export async function leaveGathering(req: Request, res: Response): Promise<void>
 
 export async function listParticipants(req: Request, res: Response): Promise<void> {
   try {
+    const userId = req.user!.id;
     const { id } = req.params;
-    const participants = await gatheringsService.listParticipants(id);
+    const participants = await gatheringsService.listParticipants(userId, id);
     sendSuccess(res, participants, 'Participants retrieved successfully');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to list participants';

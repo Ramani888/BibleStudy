@@ -23,10 +23,12 @@ export {
   useSendFriendRequest,
   useAcceptFriendRequest,
   useRejectFriendRequest,
+  useCancelFriendRequest,
   useRemoveFriend,
   useBlockUser,
   useUnblockUser,
 } from './useFriends';
+export { useUser } from './useUser';
 export {
   useGroups,
   useGroup,
@@ -38,6 +40,7 @@ export {
   useUpdateMemberRole,
   useRemoveMember,
   useRegenerateInviteCode,
+  usePublicGroups,
 } from './useGroups';
 export {
   useGatherings,
@@ -52,3 +55,9 @@ export {
 } from './useGatherings';
 export { useFriendsLocations, useUpdateLocation, useUpdateMapPrivacy } from './useMap';
 export { useMyActivityFeed, useFriendsActivityFeed } from './useActivities';
+export {
+  useNotifications,
+  useMarkNotificationRead,
+  useMarkAllNotificationsRead,
+  useDeleteNotification,
+} from './useNotifications';

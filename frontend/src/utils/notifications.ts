@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
+import Toast from 'react-native-toast-message';
 import { apiPost, apiClient } from '../api/client';
 
 /**
@@ -67,11 +68,41 @@ export function onTokenRefresh(): () => void {
  * This handler ensures they still appear.
  */
 export function setupForegroundHandler(): () => void {
-  return messaging().onMessage(async (_remoteMessage) => {
-    // react-native-toast-message or in-app UI can be shown here.
-    // The notification is already displayed natively on iOS via
-    // AppDelegate's userNotificationCenter willPresent handler.
-    // On Android, heads-up notifications show automatically for
-    // high-priority messages sent from the backend.
+  return messaging().onMessage(async (remoteMessage) => {
+    const { notification } = remoteMessage;
+    if (notification) {
+      Toast.show({
+        type: 'info',
+        text1: notification.title ?? 'Notification',
+        text2: notification.body ?? '',
+      });
+    }
   });
+}
+
+/**
+ * Handle navigation from a notification tap.
+ * Parses the data payload and navigates to the appropriate screen.
+ */
+export function handleNotificationNavigation(
+  data: Record<string, string> | undefined,
+  navigate: (screen: string, params: object) => void
+): void {
+  if (!data?.type) return;
+  switch (data.type) {
+    case 'friend_request':
+    case 'friend_accepted':
+      navigate('ProfileTab', { screen: 'Friends' });
+      break;
+    case 'group':
+      navigate('ProfileTab', { screen: 'GroupDetail', params: { groupId: data.id } });
+      break;
+    case 'gathering':
+    case 'gathering_rsvp':
+      navigate('MapTab', { screen: 'GatheringDetail', params: { gatheringId: data.id } });
+      break;
+    default:
+      navigate('ProfileTab', { screen: 'Notifications' });
+      break;
+  }
 }

@@ -9,6 +9,7 @@ import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
+import { ErrorState } from '../../components/feedback/ErrorState';
 import { useBlockedUsers, useUnblockUser } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import type { BlockedUser } from '../../types/friends.types';
@@ -16,7 +17,7 @@ import type { BlockedUser } from '../../types/friends.types';
 type Props = ProfileScreenProps<'BlockedUsers'>;
 
 export function BlockedUsersScreen(_props: Props) {
-  const { data: blocked = [], isLoading, refetch } = useBlockedUsers();
+  const { data: blocked = [], isLoading, isFetching, error, refetch } = useBlockedUsers();
   const unblock = useUnblockUser();
 
   const handleUnblock = (userId: string, name: string) => {
@@ -41,13 +42,15 @@ export function BlockedUsersScreen(_props: Props) {
     </View>
   );
 
+  if (error) return <ErrorState message="Could not load blocked users" onRetry={refetch} />;
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <FlatList
         data={blocked}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isLoading}
+        refreshing={isFetching}
         onRefresh={refetch}
         contentContainerStyle={blocked.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={

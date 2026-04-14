@@ -14,6 +14,7 @@ import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
+import { ErrorState } from '../../components/feedback/ErrorState';
 import { useFriends, useRemoveFriend } from '../../hooks/useFriends';
 import type { Friendship } from '../../types/friends.types';
 import { getErrorMessage } from '../../api/client';
@@ -21,7 +22,7 @@ import { getErrorMessage } from '../../api/client';
 type Props = ProfileScreenProps<'Friends'>;
 
 export function FriendsScreen({ navigation }: Props) {
-  const { data: friends = [], isLoading, refetch } = useFriends();
+  const { data: friends = [], isLoading, isFetching, error, refetch } = useFriends();
   const removeFriend = useRemoveFriend();
 
   const handleRemove = (friendId: string, name: string) => {
@@ -51,6 +52,8 @@ export function FriendsScreen({ navigation }: Props) {
     </Pressable>
   );
 
+  if (error) return <ErrorState message="Could not load friends" onRetry={refetch} />;
+
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.actions}>
@@ -72,7 +75,7 @@ export function FriendsScreen({ navigation }: Props) {
         data={friends}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isLoading}
+        refreshing={isFetching}
         onRefresh={refetch}
         contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={

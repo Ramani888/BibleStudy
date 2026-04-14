@@ -66,7 +66,10 @@ export function useRsvp() {
   return useMutation({
     mutationFn: ({ id, status }: { id: string; status: 'GOING' | 'MAYBE' | 'NOT_GOING' }) =>
       gatheringsApi.rsvp(id, status),
-    onSuccess: (_data, { id }) => qc.invalidateQueries({ queryKey: ['gatherings', 'detail', id] }),
+    onSuccess: (_data, { id }) => {
+      qc.invalidateQueries({ queryKey: ['gatherings', 'detail', id] });
+      qc.invalidateQueries({ queryKey: ['gatherings', 'list'] });
+    },
   });
 }
 

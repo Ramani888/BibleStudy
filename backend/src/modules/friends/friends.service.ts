@@ -113,6 +113,16 @@ export async function acceptRequest(userId: string, requestId: string) {
   return { message: 'Friend request accepted' };
 }
 
+export async function cancelRequest(userId: string, requestId: string) {
+  const request = await prisma.friendRequest.findFirst({
+    where: { id: requestId, senderId: userId, status: 'PENDING' },
+  });
+  if (!request) throw new Error('Friend request not found');
+
+  await prisma.friendRequest.delete({ where: { id: requestId } });
+  return { message: 'Friend request cancelled' };
+}
+
 export async function rejectRequest(userId: string, requestId: string) {
   const request = await prisma.friendRequest.findFirst({
     where: { id: requestId, receiverId: userId, status: 'PENDING' },

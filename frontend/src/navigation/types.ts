@@ -49,13 +49,17 @@ export type ProfileStackParamList = {
   CreateGroup: undefined;
   EditGroup: { groupId: string };
   JoinGroup: undefined;
+  // Public groups
+  PublicGroups: undefined;
+  // Notifications
+  Notifications: undefined;
 };
 
 // ─── Map Stack ────────────────────────────────────────────────────────────────
 export type MapStackParamList = {
   Map: undefined;
   GatheringDetail: { gatheringId: string };
-  CreateGathering: { groupId?: string } | undefined;
+  CreateGathering: { groupId?: string };
   EditGathering: { gatheringId: string };
 };
 
@@ -63,7 +67,7 @@ export type MapStackParamList = {
 export type AppTabParamList = {
   HomeTab: undefined;
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
-  MapTab: undefined;
+  MapTab: NavigatorScreenParams<MapStackParamList> | undefined;
   AITab: undefined;
   ProfileTab: undefined;
 };

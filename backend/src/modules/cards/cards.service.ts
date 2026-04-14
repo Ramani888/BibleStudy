@@ -1,5 +1,6 @@
 import { Difficulty } from '@prisma/client';
 import { prisma } from '../../config/db';
+import { logActivity } from '../../utils/activity';
 import {
   CreateCardDtoType,
   BulkCreateCardsDtoType,
@@ -168,6 +169,8 @@ export async function recordStudyResult(userId: string, cardId: string, dto: Stu
       nextReviewAt,
     },
   });
+
+  await logActivity(userId, 'STUDIED_CARDS', card.setId);
 
   return updated;
 }

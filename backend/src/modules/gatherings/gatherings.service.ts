@@ -126,12 +126,21 @@ export async function listGatherings(
   return { gatherings, pagination: { total, page, limit, pages: Math.ceil(total / limit) } };
 }
 
-export async function getNearby(lat: number, lng: number, radiusKm = 50) {
+export async function getNearby(userId: string, lat: number, lng: number, radiusKm = 50) {
   const gatherings = await prisma.gathering.findMany({
     where: {
       locationLat: { not: null },
       locationLng: { not: null },
       date: { gte: new Date() },
+      OR: [
+        { hostId: userId },
+        { participants: { some: { userId } } },
+        { visibility: 'PUBLIC' },
+        {
+          visibility: 'FRIENDS',
+          host: { friendOf: { some: { userId } } },
+        },
+      ],
     },
     include: {
       host: { select: hostSelect },
@@ -160,6 +169,22 @@ export async function getGathering(userId: string, gatheringId: string) {
   });
 
   if (!gathering) throw new Error('Gathering not found');
+
+  // Visibility check — only allow access if user is host, participant, or visibility permits
+  const isHost = gathering.hostId === userId;
+  const isParticipant = gathering.participants.some(p => p.userId === userId);
+  if (!isHost && !isParticipant) {
+    if (gathering.visibility === 'PRIVATE') {
+      throw new Error('Gathering not found');
+    }
+    if (gathering.visibility === 'FRIENDS') {
+      const friendship = await prisma.friendship.findFirst({
+        where: { userId, friendId: gathering.hostId },
+      });
+      if (!friendship) throw new Error('Gathering not found');
+    }
+  }
+
   return gathering;
 }
 
@@ -247,9 +272,9 @@ export async function leaveGathering(userId: string, gatheringId: string) {
   return { message: 'Left gathering' };
 }
 
-export async function listParticipants(gatheringId: string) {
-  const gathering = await prisma.gathering.findUnique({ where: { id: gatheringId } });
-  if (!gathering) throw new Error('Gathering not found');
+export async function listParticipants(userId: string, gatheringId: string) {
+  // Reuse getGathering to validate visibility access
+  await getGathering(userId, gatheringId);
 
   return prisma.gatheringParticipant.findMany({
     where: { gatheringId },

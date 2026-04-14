@@ -3,6 +3,7 @@ import {
   Alert,
   FlatList,
   Pressable,
+  RefreshControl,
   ScrollView,
   Share,
   StyleSheet,
@@ -16,9 +17,9 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
-import { SetCardSkeleton } from '../../components/feedback';
+import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
-import { useGroup, useLeaveGroup, useDeleteGroup } from '../../hooks/useGroups';
+import { useGroup, useLeaveGroup, useDeleteGroup, useUpdateMemberRole, useRemoveMember } from '../../hooks/useGroups';
 import { useAuthStore } from '../../store/auth.store';
 import { getErrorMessage } from '../../api/client';
 import type { GroupMember } from '../../types/groups.types';
@@ -28,9 +29,11 @@ type Props = ProfileScreenProps<'GroupDetail'>;
 export function GroupDetailScreen({ route, navigation }: Props) {
   const { groupId } = route.params;
   const { user } = useAuthStore();
-  const { data: group, isLoading, error } = useGroup(groupId);
+  const { data: group, isLoading, isFetching, error, refetch } = useGroup(groupId);
   const leaveGroup = useLeaveGroup();
   const deleteGroup = useDeleteGroup();
+  const updateRole = useUpdateMemberRole();
+  const removeMember = useRemoveMember();
 
   const myMembership = group?.members?.find(m => m.userId === user?.id);
   const isAdmin = myMembership?.role === 'ADMIN';
@@ -73,26 +76,76 @@ export function GroupDetailScreen({ route, navigation }: Props) {
     ]);
   };
 
-  if (isLoading) return <SetCardSkeleton />;
-  if (error || !group) return <ErrorState message="Could not load group" onRetry={() => {}} />;
+  if (isLoading) return <LoadingOverlay visible />;
+  if (error || !group) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
-  const renderMember = ({ item }: { item: GroupMember }) => (
-    <View style={styles.memberRow}>
-      <View style={styles.avatar}>
-        <Icon name="person" size={18} color={colors.textSecondary} />
-      </View>
-      <Typography preset="body" style={styles.flex}>{item.user.name}</Typography>
-      {item.role === 'ADMIN' && (
-        <View style={styles.adminBadge}>
-          <Typography preset="caption" color={colors.primary}>Admin</Typography>
+  const handleToggleRole = (member: GroupMember) => {
+    const newRole = member.role === 'ADMIN' ? 'MEMBER' : 'ADMIN';
+    Alert.alert(
+      `${newRole === 'ADMIN' ? 'Promote' : 'Demote'} ${member.user.name}?`,
+      `Change role to ${newRole.toLowerCase()}.`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Confirm',
+          onPress: () => updateRole.mutate(
+            { groupId, userId: member.userId, role: newRole },
+            { onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }) },
+          ),
+        },
+      ],
+    );
+  };
+
+  const handleRemoveMember = (member: GroupMember) => {
+    Alert.alert(`Remove ${member.user.name}?`, 'They can rejoin with the invite code.', [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Remove',
+        style: 'destructive',
+        onPress: () => removeMember.mutate(
+          { groupId, userId: member.userId },
+          { onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }) },
+        ),
+      },
+    ]);
+  };
+
+  const renderMember = ({ item }: { item: GroupMember }) => {
+    const isMemberOwner = item.userId === group?.ownerId;
+    const canManage = isAdmin && !isMemberOwner && item.userId !== user?.id;
+
+    return (
+      <View style={styles.memberRow}>
+        <View style={styles.avatar}>
+          <Icon name="person" size={18} color={colors.textSecondary} />
         </View>
-      )}
-    </View>
-  );
+        <Typography preset="body" style={styles.flex}>{item.user.name}</Typography>
+        {item.role === 'ADMIN' && (
+          <View style={styles.adminBadge}>
+            <Typography preset="caption" color={colors.primary}>Admin</Typography>
+          </View>
+        )}
+        {canManage && (
+          <View style={styles.memberActions}>
+            <Pressable onPress={() => handleToggleRole(item)} hitSlop={8}>
+              <Icon name="swap-horizontal-outline" size={18} color={colors.textSecondary} />
+            </Pressable>
+            <Pressable onPress={() => handleRemoveMember(item)} hitSlop={8}>
+              <Icon name="person-remove-outline" size={18} color={colors.error} />
+            </Pressable>
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+      >
         <Typography preset="h2">{group.name}</Typography>
         {group.description ? (
           <Typography preset="body" color={colors.textSecondary}>{group.description}</Typography>
@@ -190,6 +243,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     backgroundColor: colors.primarySurface,
   },
+  memberActions: { flexDirection: 'row', gap: spacing[2] },
   dangerZone: { marginTop: spacing[4] },
   leaveBtn: { borderColor: colors.error },
 });

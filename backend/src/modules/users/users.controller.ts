@@ -50,6 +50,19 @@ export async function deleteAccount(req: Request, res: Response): Promise<void> 
   }
 }
 
+export async function getUserById(req: Request, res: Response): Promise<void> {
+  try {
+    const requesterId = req.user!.id;
+    const { id } = req.params;
+    const user = await usersService.getUserById(id, requesterId);
+    sendSuccess(res, user, 'User retrieved successfully');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to get user';
+    const statusCode = message === 'User not found' ? 404 : 400;
+    sendError(res, message, statusCode, 'NOT_FOUND');
+  }
+}
+
 export async function registerDeviceToken(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;

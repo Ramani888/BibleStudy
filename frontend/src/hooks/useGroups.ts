@@ -79,6 +79,13 @@ export function useRemoveMember() {
   });
 }
 
+export function usePublicGroups(search?: string) {
+  return useQuery({
+    queryKey: ['groups', 'public', search],
+    queryFn: () => groupsApi.listPublic({ search }),
+  });
+}
+
 export function useRegenerateInviteCode() {
   const qc = useQueryClient();
   return useMutation({
