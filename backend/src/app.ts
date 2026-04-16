@@ -1,6 +1,7 @@
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { env } from './config/env';
+import { prisma } from './config/db';
 import { generalRateLimit } from './middlewares/rateLimit.middleware';
 import { sendError } from './utils/response';
 
@@ -20,6 +21,10 @@ import activitiesRoutes from './modules/activities/activities.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 
 const app = express();
+
+// Trust the first reverse proxy (Caddy/Nginx) so req.ip reflects the real client IP.
+// Required for rate limiting to work correctly behind a proxy.
+app.set('trust proxy', 1);
 
 // CORS
 // React Native mobile apps do not send an Origin header (not a browser).
@@ -46,14 +51,24 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Global rate limit
 app.use(generalRateLimit);
 
-// Health check
-app.get('/health', (_req: Request, res: Response) => {
-  res.json({
-    success: true,
-    message: 'BibleStudy Pro API is running',
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-  });
+// Health check (verifies DB connectivity)
+app.get('/health', async (_req: Request, res: Response) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`;
+    res.json({
+      success: true,
+      message: 'BibleStudy Pro API is running',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+    });
+  } catch {
+    res.status(503).json({
+      success: false,
+      message: 'Database connection failed',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+    });
+  }
 });
 
 // API routes
