@@ -1,7 +1,7 @@
 # Graph Report - BibleStudy  (2026-04-28)
 
 ## Corpus Check
-- 210 files · ~53,046 words
+- 210 files · ~53,334 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -45,8 +45,8 @@
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
 - `getMe()` --calls--> `sendError()`  [INFERRED]
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
-- `onSubmit()` --calls--> `register()`  [INFERRED]
-  frontend\src\screens\auth\RegisterScreen.tsx → backend\src\modules\auth\auth.service.ts
+- `register()` --calls--> `onSubmit()`  [INFERRED]
+  backend\src\modules\auth\auth.service.ts → frontend\src\screens\auth\RegisterScreen.tsx
 - `recordStudyResult()` --calls--> `logActivity()`  [INFERRED]
   backend\src\modules\cards\cards.service.ts → backend\src\utils\activity.ts
 
