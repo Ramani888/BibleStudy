@@ -1,0 +1,104 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+build/
+backend/dist/
+frontend/android/build/
+frontend/android/.gradle/
+frontend/android/app/build/
+frontend/android/app/release/
+frontend/ios/build/
+frontend/ios/Pods/
+frontend/ios/DerivedData/
+frontend/ios/*.xcarchive/
+
+# Generated / minified assets
+*.min.js
+*.min.css
+*.bundle
+*.bundle.js
+*.jsbundle
+
+# React Native cache
+.expo/
+.metro/
+__pycache__/
+*.pyc
+
+# Binary / non-code assets (app images, fonts, etc.)
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.svg
+*.ico
+*.ttf
+*.otf
+*.woff
+*.woff2
+*.eot
+*.mp4
+*.mp3
+*.wav
+*.mov
+*.avi
+*.mkv
+
+# Office / binary docs
+*.docx
+*.xlsx
+*.pptx
+*.xls
+*.ppt
+*.doc
+
+# Secrets and certificates
+.env
+.env.*
+!.env.example
+*.pem
+*.keystore
+*.p8
+*.p12
+*.jks
+*.mobileprovision
+*.der
+*.cer
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Prisma generated
+backend/node_modules/.prisma/
+
+# Graphify transient outputs (committed: graph.json, graph.html, GRAPH_REPORT.md)
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/cost.json
+
+# code-review-graph internal store
+.code-review-graph/

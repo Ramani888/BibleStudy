@@ -19,3 +19,10 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+# Added by code-review-graph
+.code-review-graph/
+
+# Graphify transient outputs (graph.json / graph.html / GRAPH_REPORT.md are committed)
+graphify-out/cache/
+graphify-out/manifest.json
+graphify-out/cost.json

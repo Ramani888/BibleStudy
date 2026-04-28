@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "code-review-graph": {
-      "command": "uvx",
+      "command": "C:\\Users\\raman\\AppData\\Roaming\\Python\\Python311\\Scripts\\code-review-graph.exe",
       "args": [
-        "code-review-graph",
         "serve"
       ],
       "type": "stdio"
