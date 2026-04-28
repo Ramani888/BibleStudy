@@ -1,12 +1,12 @@
 # Graph Report - BibleStudy  (2026-04-28)
 
 ## Corpus Check
-- 210 files · ~55,446 words
+- 210 files · ~55,765 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 581 nodes · 618 edges · 15 communities detected
-- Extraction: 62% EXTRACTED · 38% INFERRED · 0% AMBIGUOUS · INFERRED: 234 edges (avg confidence: 0.8)
+- 585 nodes · 627 edges · 15 communities detected
+- Extraction: 62% EXTRACTED · 38% INFERRED · 0% AMBIGUOUS · INFERRED: 238 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -27,16 +27,16 @@
 - [[_COMMUNITY_Community 28|Community 28]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `sendError()` - 85 edges
-2. `sendSuccess()` - 84 edges
+1. `sendError()` - 87 edges
+2. `sendSuccess()` - 86 edges
 3. `logActivity()` - 8 edges
 4. `AppDelegate` - 8 edges
 5. `LibraryScreen()` - 7 edges
 6. `register()` - 5 edges
 7. `verifyEmail()` - 5 edges
-8. `sendPushToUser()` - 5 edges
-9. `ReactNativeDelegate` - 5 edges
-10. `getErrorMessage()` - 5 edges
+8. `verifySetOwnership()` - 5 edges
+9. `sendPushToUser()` - 5 edges
+10. `ReactNativeDelegate` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `authMiddleware()` --calls--> `sendError()`  [INFERRED]
@@ -45,16 +45,16 @@
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
 - `getMe()` --calls--> `sendError()`  [INFERRED]
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
-- `register()` --calls--> `onSubmit()`  [INFERRED]
-  backend\src\modules\auth\auth.service.ts → frontend\src\screens\auth\RegisterScreen.tsx
 - `recordStudyResult()` --calls--> `logActivity()`  [INFERRED]
   backend\src\modules\cards\cards.service.ts → backend\src\utils\activity.ts
+- `sendRequest()` --calls--> `sendPushToUser()`  [INFERRED]
+  backend\src\modules\friends\friends.service.ts → backend\src\utils\notifications.ts
 
 ## Communities
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
-Nodes (84): getFriendsFeed(), getMyFeed(), askQuestion(), getChatHistory(), getDailyVerse(), forgotPassword(), login(), logout() (+76 more)
+Nodes (86): getFriendsFeed(), getMyFeed(), askQuestion(), getChatHistory(), getDailyVerse(), forgotPassword(), login(), logout() (+78 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.05
@@ -65,28 +65,28 @@ Cohesion: 0.08
 Nodes (13): useCreateFolder(), useDeleteFolder(), useFolders(), useCloneSet(), useCreateSet(), useDeleteSet(), useSet(), useSets() (+5 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.15
-Nodes (19): forgotPassword(), login(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword(), verifyEmail() (+11 more)
+Cohesion: 0.14
+Nodes (20): forgotPassword(), login(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword(), verifyEmail() (+12 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.1
-Nodes (8): apiPost(), getErrorMessage(), getMe(), onSubmit(), handleSave(), onSubmit(), getProfile(), updateProfile()
+Nodes (8): getErrorMessage(), getMe(), updateCard(), handleSave(), onSubmit(), onSubmit(), getProfile(), updateProfile()
 
 ### Community 5 - "Community 5"
-Cohesion: 0.14
-Nodes (11): AppDelegate, ReactNativeDelegate, MessagingDelegate, RCTDefaultReactNativeFactoryDelegate, UIApplicationDelegate, UIResponder, UNUserNotificationCenterDelegate, onTokenRefresh() (+3 more)
+Cohesion: 0.13
+Nodes (12): apiPost(), AppDelegate, ReactNativeDelegate, MessagingDelegate, RCTDefaultReactNativeFactoryDelegate, UIApplicationDelegate, UIResponder, UNUserNotificationCenterDelegate (+4 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.17
-Nodes (10): bulkCreateCards(), calculateNextReviewAt(), createCard(), listCardsBySet(), recordStudyResult(), updateCard(), verifySetOwnership(), onSubmit() (+2 more)
+Cohesion: 0.14
+Nodes (6): useBlockedUsers(), useSearchUsers(), useSendFriendRequest(), useUnblockUser(), BlockedUsersScreen(), SearchUsersScreen()
 
 ### Community 7 - "Community 7"
 Cohesion: 0.12
 Nodes (4): useCreateGroup(), useJoinGroup(), CreateGroupScreen(), JoinGroupScreen()
 
 ### Community 8 - "Community 8"
-Cohesion: 0.14
-Nodes (6): useBlockedUsers(), useSearchUsers(), useSendFriendRequest(), useUnblockUser(), BlockedUsersScreen(), SearchUsersScreen()
+Cohesion: 0.19
+Nodes (9): bulkCreateCards(), calculateNextReviewAt(), createCard(), listCardsBySet(), moveCard(), recordStudyResult(), verifySetOwnership(), onSubmit() (+1 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.22
@@ -127,14 +127,14 @@ Nodes (1): MainApplication
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getErrorMessage()` connect `Community 4` to `Community 6`?**
-  _High betweenness centrality (0.099) - this node is a cross-community bridge._
-- **Why does `logActivity()` connect `Community 1` to `Community 2`, `Community 6`?**
-  _High betweenness centrality (0.082) - this node is a cross-community bridge._
-- **Are the 84 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `getMyFeed()`) actually correct?**
-  _`sendError()` has 84 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 83 inferred relationships involving `sendSuccess()` (e.g. with `getMyFeed()` and `getFriendsFeed()`) actually correct?**
-  _`sendSuccess()` has 83 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `getErrorMessage()` connect `Community 4` to `Community 3`?**
+  _High betweenness centrality (0.101) - this node is a cross-community bridge._
+- **Why does `logActivity()` connect `Community 1` to `Community 8`, `Community 2`?**
+  _High betweenness centrality (0.083) - this node is a cross-community bridge._
+- **Are the 86 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `getMyFeed()`) actually correct?**
+  _`sendError()` has 86 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 85 inferred relationships involving `sendSuccess()` (e.g. with `getMyFeed()` and `getFriendsFeed()`) actually correct?**
+  _`sendSuccess()` has 85 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 7 inferred relationships involving `logActivity()` (e.g. with `recordStudyResult()` and `acceptRequest()`) actually correct?**
   _`logActivity()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 6 inferred relationships involving `LibraryScreen()` (e.g. with `useFolders()` and `useSets()`) actually correct?**

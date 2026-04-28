@@ -493,7 +493,7 @@
       "label": "createCard()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "id": "cards_cards_controller_createcard",
       "community": 0,
       "norm_label": "createcard()"
@@ -502,7 +502,7 @@
       "label": "bulkCreateCards()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "id": "cards_cards_controller_bulkcreatecards",
       "community": 0,
       "norm_label": "bulkcreatecards()"
@@ -511,7 +511,7 @@
       "label": "listCardsBySet()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L36",
+      "source_location": "L37",
       "id": "cards_cards_controller_listcardsbyset",
       "community": 0,
       "norm_label": "listcardsbyset()"
@@ -520,7 +520,7 @@
       "label": "getCardById()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L49",
+      "source_location": "L50",
       "id": "cards_cards_controller_getcardbyid",
       "community": 0,
       "norm_label": "getcardbyid()"
@@ -529,7 +529,7 @@
       "label": "updateCard()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L62",
+      "source_location": "L63",
       "id": "cards_cards_controller_updatecard",
       "community": 0,
       "norm_label": "updatecard()"
@@ -538,16 +538,34 @@
       "label": "deleteCard()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L76",
+      "source_location": "L77",
       "id": "cards_cards_controller_deletecard",
       "community": 0,
       "norm_label": "deletecard()"
     },
     {
+      "label": "copyCard()",
+      "file_type": "code",
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L90",
+      "id": "cards_cards_controller_copycard",
+      "community": 0,
+      "norm_label": "copycard()"
+    },
+    {
+      "label": "moveCard()",
+      "file_type": "code",
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L103",
+      "id": "cards_cards_controller_movecard",
+      "community": 0,
+      "norm_label": "movecard()"
+    },
+    {
       "label": "reorderCards()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L89",
+      "source_location": "L117",
       "id": "cards_cards_controller_reordercards",
       "community": 0,
       "norm_label": "reordercards()"
@@ -556,7 +574,7 @@
       "label": "recordStudyResult()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L101",
+      "source_location": "L129",
       "id": "cards_cards_controller_recordstudyresult",
       "community": 0,
       "norm_label": "recordstudyresult()"
@@ -585,7 +603,7 @@
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
       "source_location": "L1",
       "id": "backend_src_modules_cards_cards_service_ts",
-      "community": 6,
+      "community": 8,
       "norm_label": "cards.service.ts"
     },
     {
@@ -594,7 +612,7 @@
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
       "source_location": "L12",
       "id": "cards_cards_service_calculatenextreviewat",
-      "community": 6,
+      "community": 8,
       "norm_label": "calculatenextreviewat()"
     },
     {
@@ -603,7 +621,7 @@
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
       "source_location": "L26",
       "id": "cards_cards_service_verifysetownership",
-      "community": 6,
+      "community": 8,
       "norm_label": "verifysetownership()"
     },
     {
@@ -612,70 +630,88 @@
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
       "source_location": "L34",
       "id": "cards_cards_service_createcard",
-      "community": 6,
+      "community": 8,
       "norm_label": "createcard()"
     },
     {
       "label": "bulkCreateCards()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L53",
+      "source_location": "L54",
       "id": "cards_cards_service_bulkcreatecards",
-      "community": 6,
+      "community": 8,
       "norm_label": "bulkcreatecards()"
     },
     {
       "label": "listCardsBySet()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L79",
+      "source_location": "L81",
       "id": "cards_cards_service_listcardsbyset",
-      "community": 6,
+      "community": 8,
       "norm_label": "listcardsbyset()"
     },
     {
       "label": "getCardById()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L90",
+      "source_location": "L92",
       "id": "cards_cards_service_getcardbyid",
-      "community": 6,
+      "community": 8,
       "norm_label": "getcardbyid()"
     },
     {
       "label": "updateCard()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L102",
+      "source_location": "L104",
       "id": "cards_cards_service_updatecard",
-      "community": 6,
+      "community": 4,
       "norm_label": "updatecard()"
     },
     {
       "label": "deleteCard()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L123",
+      "source_location": "L126",
       "id": "cards_cards_service_deletecard",
-      "community": 6,
+      "community": 8,
       "norm_label": "deletecard()"
+    },
+    {
+      "label": "copyCard()",
+      "file_type": "code",
+      "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
+      "source_location": "L137",
+      "id": "cards_cards_service_copycard",
+      "community": 8,
+      "norm_label": "copycard()"
+    },
+    {
+      "label": "moveCard()",
+      "file_type": "code",
+      "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
+      "source_location": "L163",
+      "id": "cards_cards_service_movecard",
+      "community": 8,
+      "norm_label": "movecard()"
     },
     {
       "label": "reorderCards()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L134",
+      "source_location": "L185",
       "id": "cards_cards_service_reordercards",
-      "community": 6,
+      "community": 8,
       "norm_label": "reordercards()"
     },
     {
       "label": "recordStudyResult()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L156",
+      "source_location": "L207",
       "id": "cards_cards_service_recordstudyresult",
-      "community": 6,
+      "community": 8,
       "norm_label": "recordstudyresult()"
     },
     {
@@ -862,7 +898,7 @@
       "label": "listFolders()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "id": "folders_folders_service_listfolders",
       "community": 13,
       "norm_label": "listfolders()"
@@ -871,7 +907,7 @@
       "label": "getFolderById()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L56",
+      "source_location": "L38",
       "id": "folders_folders_service_getfolderbyid",
       "community": 13,
       "norm_label": "getfolderbyid()"
@@ -880,7 +916,7 @@
       "label": "updateFolder()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L73",
+      "source_location": "L53",
       "id": "folders_folders_service_updatefolder",
       "community": 13,
       "norm_label": "updatefolder()"
@@ -889,7 +925,7 @@
       "label": "deleteFolder()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L101",
+      "source_location": "L82",
       "id": "folders_folders_service_deletefolder",
       "community": 13,
       "norm_label": "deletefolder()"
@@ -1906,7 +1942,7 @@
       "label": "listSets()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L29",
+      "source_location": "L30",
       "id": "sets_sets_service_listsets",
       "community": 2,
       "norm_label": "listsets()"
@@ -1915,7 +1951,7 @@
       "label": "getSetById()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "id": "sets_sets_service_getsetbyid",
       "community": 2,
       "norm_label": "getsetbyid()"
@@ -1924,7 +1960,7 @@
       "label": "updateSet()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L61",
+      "source_location": "L62",
       "id": "sets_sets_service_updateset",
       "community": 2,
       "norm_label": "updateset()"
@@ -1933,7 +1969,7 @@
       "label": "deleteSet()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L88",
+      "source_location": "L90",
       "id": "sets_sets_service_deleteset",
       "community": 2,
       "norm_label": "deleteset()"
@@ -1942,7 +1978,7 @@
       "label": "getPublicSets()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L99",
+      "source_location": "L101",
       "id": "sets_sets_service_getpublicsets",
       "community": 2,
       "norm_label": "getpublicsets()"
@@ -1951,7 +1987,7 @@
       "label": "cloneSet()",
       "file_type": "code",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L127",
+      "source_location": "L129",
       "id": "sets_sets_service_cloneset",
       "community": 2,
       "norm_label": "cloneset()"
@@ -2610,7 +2646,7 @@
       "source_file": "frontend\\src\\api\\client.ts",
       "source_location": "L85",
       "id": "api_client_apipost",
-      "community": 4,
+      "community": 5,
       "norm_label": "apipost()"
     },
     {
@@ -3384,7 +3420,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L1",
       "id": "frontend_src_hooks_usefriends_ts",
-      "community": 8,
+      "community": 6,
       "norm_label": "usefriends.ts"
     },
     {
@@ -3393,7 +3429,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L4",
       "id": "hooks_usefriends_usefriends",
-      "community": 8,
+      "community": 6,
       "norm_label": "usefriends()"
     },
     {
@@ -3402,7 +3438,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L11",
       "id": "hooks_usefriends_usefriendrequests",
-      "community": 8,
+      "community": 6,
       "norm_label": "usefriendrequests()"
     },
     {
@@ -3411,7 +3447,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L18",
       "id": "hooks_usefriends_usesearchusers",
-      "community": 8,
+      "community": 6,
       "norm_label": "usesearchusers()"
     },
     {
@@ -3420,7 +3456,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L26",
       "id": "hooks_usefriends_useblockedusers",
-      "community": 8,
+      "community": 6,
       "norm_label": "useblockedusers()"
     },
     {
@@ -3429,7 +3465,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L33",
       "id": "hooks_usefriends_usesendfriendrequest",
-      "community": 8,
+      "community": 6,
       "norm_label": "usesendfriendrequest()"
     },
     {
@@ -3438,7 +3474,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L41",
       "id": "hooks_usefriends_useacceptfriendrequest",
-      "community": 8,
+      "community": 6,
       "norm_label": "useacceptfriendrequest()"
     },
     {
@@ -3447,7 +3483,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L49",
       "id": "hooks_usefriends_userejectfriendrequest",
-      "community": 8,
+      "community": 6,
       "norm_label": "userejectfriendrequest()"
     },
     {
@@ -3456,7 +3492,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L57",
       "id": "hooks_usefriends_useremovefriend",
-      "community": 8,
+      "community": 6,
       "norm_label": "useremovefriend()"
     },
     {
@@ -3465,7 +3501,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L65",
       "id": "hooks_usefriends_useblockuser",
-      "community": 8,
+      "community": 6,
       "norm_label": "useblockuser()"
     },
     {
@@ -3474,7 +3510,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L73",
       "id": "hooks_usefriends_usecancelfriendrequest",
-      "community": 8,
+      "community": 6,
       "norm_label": "usecancelfriendrequest()"
     },
     {
@@ -3483,7 +3519,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L81",
       "id": "hooks_usefriends_useunblockuser",
-      "community": 8,
+      "community": 6,
       "norm_label": "useunblockuser()"
     },
     {
@@ -4068,7 +4104,7 @@
       "source_file": "frontend\\src\\screens\\auth\\RegisterScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_auth_registerscreen_tsx",
-      "community": 4,
+      "community": 3,
       "norm_label": "registerscreen.tsx"
     },
     {
@@ -4077,7 +4113,7 @@
       "source_file": "frontend\\src\\screens\\auth\\RegisterScreen.tsx",
       "source_location": "L31",
       "id": "auth_registerscreen_onsubmit",
-      "community": 4,
+      "community": 3,
       "norm_label": "onsubmit()"
     },
     {
@@ -4176,7 +4212,7 @@
       "source_file": "frontend\\src\\screens\\library\\CreateCardScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_library_createcardscreen_tsx",
-      "community": 6,
+      "community": 8,
       "norm_label": "createcardscreen.tsx"
     },
     {
@@ -4185,7 +4221,7 @@
       "source_file": "frontend\\src\\screens\\library\\CreateCardScreen.tsx",
       "source_location": "L53",
       "id": "library_createcardscreen_onsubmit",
-      "community": 6,
+      "community": 8,
       "norm_label": "onsubmit()"
     },
     {
@@ -4194,7 +4230,7 @@
       "source_file": "frontend\\src\\screens\\library\\CreateCardScreen.tsx",
       "source_location": "L59",
       "id": "library_createcardscreen_onsubmitandexit",
-      "community": 6,
+      "community": 8,
       "norm_label": "onsubmitandexit()"
     },
     {
@@ -4221,7 +4257,7 @@
       "source_file": "frontend\\src\\screens\\library\\EditCardScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_library_editcardscreen_tsx",
-      "community": 6,
+      "community": 4,
       "norm_label": "editcardscreen.tsx"
     },
     {
@@ -4230,7 +4266,7 @@
       "source_file": "frontend\\src\\screens\\library\\EditCardScreen.tsx",
       "source_location": "L62",
       "id": "library_editcardscreen_onsubmit",
-      "community": 6,
+      "community": 4,
       "norm_label": "onsubmit()"
     },
     {
@@ -4491,7 +4527,7 @@
       "source_file": "frontend\\src\\screens\\profile\\BlockedUsersScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_blockedusersscreen_tsx",
-      "community": 8,
+      "community": 6,
       "norm_label": "blockedusersscreen.tsx"
     },
     {
@@ -4500,7 +4536,7 @@
       "source_file": "frontend\\src\\screens\\profile\\BlockedUsersScreen.tsx",
       "source_location": "L19",
       "id": "profile_blockedusersscreen_blockedusersscreen",
-      "community": 8,
+      "community": 6,
       "norm_label": "blockedusersscreen()"
     },
     {
@@ -4779,7 +4815,7 @@
       "source_file": "frontend\\src\\screens\\profile\\SearchUsersScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_searchusersscreen_tsx",
-      "community": 8,
+      "community": 6,
       "norm_label": "searchusersscreen.tsx"
     },
     {
@@ -4788,7 +4824,7 @@
       "source_file": "frontend\\src\\screens\\profile\\SearchUsersScreen.tsx",
       "source_location": "L23",
       "id": "profile_searchusersscreen_searchusersscreen",
-      "community": 8,
+      "community": 6,
       "norm_label": "searchusersscreen()"
     },
     {
@@ -6258,7 +6294,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L12",
+      "source_location": "L13",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_createcard",
@@ -6270,7 +6306,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_bulkcreatecards",
@@ -6282,7 +6318,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L36",
+      "source_location": "L37",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_listcardsbyset",
@@ -6294,7 +6330,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L49",
+      "source_location": "L50",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_getcardbyid",
@@ -6306,7 +6342,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L62",
+      "source_location": "L63",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_updatecard",
@@ -6318,7 +6354,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L76",
+      "source_location": "L77",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_deletecard",
@@ -6330,7 +6366,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L89",
+      "source_location": "L90",
+      "weight": 1.0,
+      "_src": "backend_src_modules_cards_cards_controller_ts",
+      "_tgt": "cards_cards_controller_copycard",
+      "source": "backend_src_modules_cards_cards_controller_ts",
+      "target": "cards_cards_controller_copycard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L103",
+      "weight": 1.0,
+      "_src": "backend_src_modules_cards_cards_controller_ts",
+      "_tgt": "cards_cards_controller_movecard",
+      "source": "backend_src_modules_cards_cards_controller_ts",
+      "target": "cards_cards_controller_movecard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L117",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_reordercards",
@@ -6342,7 +6402,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
-      "source_location": "L101",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_controller_ts",
       "_tgt": "cards_cards_controller_recordstudyresult",
@@ -6499,6 +6559,54 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L95",
+      "weight": 1.0,
+      "_src": "cards_cards_controller_copycard",
+      "_tgt": "utils_response_sendsuccess",
+      "source": "cards_cards_controller_copycard",
+      "target": "utils_response_sendsuccess"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L99",
+      "weight": 1.0,
+      "_src": "cards_cards_controller_copycard",
+      "_tgt": "utils_response_senderror",
+      "source": "cards_cards_controller_copycard",
+      "target": "utils_response_senderror"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L109",
+      "weight": 1.0,
+      "_src": "cards_cards_controller_movecard",
+      "_tgt": "utils_response_sendsuccess",
+      "source": "cards_cards_controller_movecard",
+      "target": "utils_response_sendsuccess"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "_src": "cards_cards_controller_movecard",
+      "_tgt": "utils_response_senderror",
+      "source": "cards_cards_controller_movecard",
+      "target": "utils_response_senderror"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "backend\\src\\modules\\cards\\cards.controller.ts",
       "source_location": "L94",
       "weight": 1.0,
       "_src": "cards_cards_controller_reordercards",
@@ -6582,7 +6690,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L53",
+      "source_location": "L54",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_bulkcreatecards",
@@ -6594,7 +6702,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L79",
+      "source_location": "L81",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_listcardsbyset",
@@ -6606,7 +6714,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L90",
+      "source_location": "L92",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_getcardbyid",
@@ -6618,7 +6726,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L102",
+      "source_location": "L104",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_updatecard",
@@ -6630,7 +6738,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L123",
+      "source_location": "L126",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_deletecard",
@@ -6642,7 +6750,31 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L134",
+      "source_location": "L137",
+      "weight": 1.0,
+      "_src": "backend_src_modules_cards_cards_service_ts",
+      "_tgt": "cards_cards_service_copycard",
+      "source": "backend_src_modules_cards_cards_service_ts",
+      "target": "cards_cards_service_copycard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
+      "source_location": "L163",
+      "weight": 1.0,
+      "_src": "backend_src_modules_cards_cards_service_ts",
+      "_tgt": "cards_cards_service_movecard",
+      "source": "backend_src_modules_cards_cards_service_ts",
+      "target": "cards_cards_service_movecard",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
+      "source_location": "L185",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_reordercards",
@@ -6654,7 +6786,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L156",
+      "source_location": "L207",
       "weight": 1.0,
       "_src": "backend_src_modules_cards_cards_service_ts",
       "_tgt": "cards_cards_service_recordstudyresult",
@@ -6666,7 +6798,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L162",
+      "source_location": "L213",
       "weight": 1.0,
       "_src": "cards_cards_service_recordstudyresult",
       "_tgt": "cards_cards_service_calculatenextreviewat",
@@ -6690,7 +6822,7 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L54",
+      "source_location": "L55",
       "weight": 1.0,
       "_src": "cards_cards_service_bulkcreatecards",
       "_tgt": "cards_cards_service_verifysetownership",
@@ -6702,12 +6834,24 @@
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
-      "source_location": "L80",
+      "source_location": "L82",
       "weight": 1.0,
       "_src": "cards_cards_service_listcardsbyset",
       "_tgt": "cards_cards_service_verifysetownership",
       "source": "cards_cards_service_verifysetownership",
       "target": "cards_cards_service_listcardsbyset",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "backend\\src\\modules\\cards\\cards.service.ts",
+      "source_location": "L167",
+      "weight": 1.0,
+      "_src": "cards_cards_service_movecard",
+      "_tgt": "cards_cards_service_verifysetownership",
+      "source": "cards_cards_service_verifysetownership",
+      "target": "cards_cards_service_movecard",
       "confidence_score": 1.0
     },
     {
@@ -7098,7 +7242,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L25",
+      "source_location": "L26",
       "weight": 1.0,
       "_src": "backend_src_modules_folders_folders_service_ts",
       "_tgt": "folders_folders_service_listfolders",
@@ -7110,7 +7254,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L56",
+      "source_location": "L38",
       "weight": 1.0,
       "_src": "backend_src_modules_folders_folders_service_ts",
       "_tgt": "folders_folders_service_getfolderbyid",
@@ -7122,7 +7266,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L73",
+      "source_location": "L53",
       "weight": 1.0,
       "_src": "backend_src_modules_folders_folders_service_ts",
       "_tgt": "folders_folders_service_updatefolder",
@@ -7134,7 +7278,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\folders\\folders.service.ts",
-      "source_location": "L101",
+      "source_location": "L82",
       "weight": 1.0,
       "_src": "backend_src_modules_folders_folders_service_ts",
       "_tgt": "folders_folders_service_deletefolder",
@@ -9426,7 +9570,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L29",
+      "source_location": "L30",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_listsets",
@@ -9438,7 +9582,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L44",
+      "source_location": "L45",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_getsetbyid",
@@ -9450,7 +9594,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L61",
+      "source_location": "L62",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_updateset",
@@ -9462,7 +9606,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L88",
+      "source_location": "L90",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_deleteset",
@@ -9474,7 +9618,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L99",
+      "source_location": "L101",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_getpublicsets",
@@ -9486,7 +9630,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend\\src\\modules\\sets\\sets.service.ts",
-      "source_location": "L127",
+      "source_location": "L129",
       "weight": 1.0,
       "_src": "backend_src_modules_sets_sets_service_ts",
       "_tgt": "sets_sets_service_cloneset",
