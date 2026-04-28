@@ -78,6 +78,7 @@ model DeviceToken {
 model Folder {
   id        String   @id @default(uuid())
   name      String
+  color     String?
   userId    String
   parentId  String?
   createdAt DateTime @default(now())
@@ -94,6 +95,7 @@ model Set {
   id          String     @id @default(uuid())
   title       String
   description String?
+  color       String?
   folderId    String?
   userId      String
   visibility  Visibility @default(PRIVATE)
@@ -114,6 +116,7 @@ model Card {
   setId         String
   question      String
   answer        String
+  note          String?
   imageId       String?
   order         Int        @default(0)
   isBlurred     Boolean    @default(false)
