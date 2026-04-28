@@ -4,6 +4,7 @@ export const CreateCardDto = z.object({
   setId: z.string().uuid('Invalid set ID'),
   question: z.string().min(1, 'Question is required'),
   answer: z.string().min(1, 'Answer is required'),
+  note: z.string().max(2000).optional(),
   imageId: z.string().optional(),
   order: z.number().int().min(0).optional(),
   isBlurred: z.boolean().optional(),
@@ -17,6 +18,7 @@ export const BulkCreateCardsDto = z.object({
       z.object({
         question: z.string().min(1, 'Question is required'),
         answer: z.string().min(1, 'Answer is required'),
+        note: z.string().max(2000).optional(),
         imageId: z.string().optional(),
         order: z.number().int().min(0).optional(),
         isBlurred: z.boolean().optional(),
@@ -30,6 +32,7 @@ export const BulkCreateCardsDto = z.object({
 export const UpdateCardDto = z.object({
   question: z.string().min(1).optional(),
   answer: z.string().min(1).optional(),
+  note: z.string().max(2000).nullable().optional(),
   imageId: z.string().nullable().optional(),
   order: z.number().int().min(0).optional(),
   isBlurred: z.boolean().optional(),
@@ -44,8 +47,13 @@ export const StudyCardDto = z.object({
   difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
 });
 
+export const MoveCardDto = z.object({
+  targetSetId: z.string().uuid('Invalid target set ID'),
+});
+
 export type CreateCardDtoType = z.infer<typeof CreateCardDto>;
 export type BulkCreateCardsDtoType = z.infer<typeof BulkCreateCardsDto>;
 export type UpdateCardDtoType = z.infer<typeof UpdateCardDto>;
 export type ReorderCardsDtoType = z.infer<typeof ReorderCardsDto>;
 export type StudyCardDtoType = z.infer<typeof StudyCardDto>;
+export type MoveCardDtoType = z.infer<typeof MoveCardDto>;

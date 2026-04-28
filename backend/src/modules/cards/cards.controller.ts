@@ -7,6 +7,7 @@ import {
   UpdateCardDtoType,
   ReorderCardsDtoType,
   StudyCardDtoType,
+  MoveCardDtoType,
 } from './cards.dto';
 
 export async function createCard(req: Request, res: Response): Promise<void> {
@@ -83,6 +84,33 @@ export async function deleteCard(req: Request, res: Response): Promise<void> {
     const message = error instanceof Error ? error.message : 'Failed to delete card';
     const statusCode = message === 'Card not found' ? 404 : 400;
     sendError(res, message, statusCode, 'DELETE_ERROR');
+  }
+}
+
+export async function copyCard(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { id } = req.params;
+    const card = await cardsService.copyCard(userId, id);
+    sendSuccess(res, card, 'Card copied successfully', 201);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to copy card';
+    const statusCode = message === 'Card not found' ? 404 : 400;
+    sendError(res, message, statusCode, 'COPY_ERROR');
+  }
+}
+
+export async function moveCard(req: Request, res: Response): Promise<void> {
+  try {
+    const userId = req.user!.id;
+    const { id } = req.params;
+    const dto = req.body as MoveCardDtoType;
+    const card = await cardsService.moveCard(userId, id, dto.targetSetId);
+    sendSuccess(res, card, 'Card moved successfully');
+  } catch (error) {
+    const message = error instanceof Error ? error.message : 'Failed to move card';
+    const statusCode = message === 'Card not found' ? 404 : 400;
+    sendError(res, message, statusCode, 'MOVE_ERROR');
   }
 }
 

@@ -16,6 +16,7 @@ export async function createFolder(userId: string, dto: CreateFolderDtoType) {
       name: dto.name,
       userId,
       parentId: dto.parentId ?? null,
+      color: dto.color ?? null,
     },
   });
 
@@ -26,40 +27,19 @@ export async function listFolders(userId: string) {
   const folders = await prisma.folder.findMany({
     where: { userId },
     include: {
-      sets: {
-        select: { id: true, title: true },
-      },
+      sets: { select: { id: true, title: true } },
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  // Build nested structure
-  const folderMap = new Map<string, typeof folders[0] & { children: unknown[] }>();
-  const rootFolders: (typeof folders[0] & { children: unknown[] })[] = [];
-
-  folders.forEach((folder) => {
-    folderMap.set(folder.id, { ...folder, children: [] });
-  });
-
-  folders.forEach((folder) => {
-    const enriched = folderMap.get(folder.id)!;
-    if (folder.parentId && folderMap.has(folder.parentId)) {
-      folderMap.get(folder.parentId)!.children.push(enriched);
-    } else {
-      rootFolders.push(enriched);
-    }
-  });
-
-  return rootFolders;
+  return folders;
 }
 
 export async function getFolderById(userId: string, folderId: string) {
   const folder = await prisma.folder.findFirst({
     where: { id: folderId, userId },
     include: {
-      sets: true,
-      notes: true,
-      files: true,
+      sets: { orderBy: { updatedAt: 'desc' } },
     },
   });
 
@@ -92,6 +72,7 @@ export async function updateFolder(userId: string, folderId: string, dto: Update
     data: {
       ...(dto.name !== undefined && { name: dto.name }),
       ...(dto.parentId !== undefined && { parentId: dto.parentId }),
+      ...(dto.color !== undefined && { color: dto.color }),
     },
   });
 

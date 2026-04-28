@@ -8,6 +8,7 @@ import {
   UpdateCardDto,
   ReorderCardsDto,
   StudyCardDto,
+  MoveCardDto,
 } from './cards.dto';
 
 const router = Router();
@@ -22,5 +23,7 @@ router.get('/:id', cardsController.getCardById);
 router.put('/:id', validate(UpdateCardDto), cardsController.updateCard);
 router.delete('/:id', cardsController.deleteCard);
 router.post('/:id/study', validate(StudyCardDto), cardsController.recordStudyResult);
+router.post('/:id/copy', cardsController.copyCard);
+router.patch('/:id/move', validate(MoveCardDto), cardsController.moveCard);
 
 export default router;

@@ -18,6 +18,7 @@ export async function createSet(userId: string, dto: CreateSetDtoType) {
       userId,
       visibility: dto.visibility ?? 'PRIVATE',
       layout: dto.layout ?? 'DEFAULT',
+      color: dto.color ?? null,
     },
   });
 
@@ -79,6 +80,7 @@ export async function updateSet(userId: string, setId: string, dto: UpdateSetDto
       ...(dto.folderId !== undefined && { folderId: dto.folderId }),
       ...(dto.visibility !== undefined && { visibility: dto.visibility }),
       ...(dto.layout !== undefined && { layout: dto.layout }),
+      ...(dto.color !== undefined && { color: dto.color }),
     },
   });
 
@@ -144,10 +146,12 @@ export async function cloneSet(userId: string, setId: string) {
       userId,
       visibility: 'PRIVATE',
       layout: originalSet.layout,
+      color: originalSet.color,
       cards: {
         create: originalSet.cards.map((card) => ({
           question: card.question,
           answer: card.answer,
+          note: card.note,
           imageId: card.imageId,
           order: card.order,
           difficulty: card.difficulty,

@@ -6,6 +6,7 @@ export const CreateSetDto = z.object({
   folderId: z.string().uuid().optional(),
   visibility: z.enum(['PRIVATE', 'PUBLIC', 'FRIENDS']).optional(),
   layout: z.enum(['DEFAULT', 'MINIMAL', 'DETAILED']).optional(),
+  color: z.string().max(7).optional(),
 });
 
 export const UpdateSetDto = z.object({
@@ -14,6 +15,7 @@ export const UpdateSetDto = z.object({
   folderId: z.string().uuid().nullable().optional(),
   visibility: z.enum(['PRIVATE', 'PUBLIC', 'FRIENDS']).optional(),
   layout: z.enum(['DEFAULT', 'MINIMAL', 'DETAILED']).optional(),
+  color: z.string().max(7).nullable().optional(),
 });
 
 export type CreateSetDtoType = z.infer<typeof CreateSetDto>;

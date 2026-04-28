@@ -39,6 +39,7 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
       setId: dto.setId,
       question: dto.question,
       answer: dto.answer,
+      note: dto.note ?? null,
       imageId: dto.imageId ?? null,
       order: dto.order ?? 0,
       isBlurred: dto.isBlurred ?? false,
@@ -63,6 +64,7 @@ export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoTyp
           setId: dto.setId,
           question: card.question,
           answer: card.answer,
+          note: card.note ?? null,
           imageId: card.imageId ?? null,
           order: card.order ?? existingCount + index,
           isBlurred: card.isBlurred ?? false,
@@ -112,6 +114,7 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
       ...(dto.answer !== undefined && { answer: dto.answer }),
       ...(dto.imageId !== undefined && { imageId: dto.imageId }),
       ...(dto.order !== undefined && { order: dto.order }),
+      ...(dto.note !== undefined && { note: dto.note }),
       ...(dto.isBlurred !== undefined && { isBlurred: dto.isBlurred }),
       ...(dto.difficulty !== undefined && { difficulty: dto.difficulty }),
     },
@@ -129,6 +132,54 @@ export async function deleteCard(userId: string, cardId: string) {
   await prisma.card.delete({ where: { id: cardId } });
 
   return { message: 'Card deleted successfully' };
+}
+
+export async function copyCard(userId: string, cardId: string) {
+  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
+  if (!card) throw new Error('Card not found');
+
+  const maxOrder = await prisma.card.aggregate({
+    where: { setId: card.setId },
+    _max: { order: true },
+  });
+
+  const copy = await prisma.card.create({
+    data: {
+      setId: card.setId,
+      question: card.question,
+      answer: card.answer,
+      note: card.note,
+      imageId: card.imageId,
+      order: (maxOrder._max.order ?? 0) + 1,
+      isBlurred: card.isBlurred,
+      difficulty: card.difficulty,
+      userId,
+    },
+  });
+
+  return copy;
+}
+
+export async function moveCard(userId: string, cardId: string, targetSetId: string) {
+  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
+  if (!card) throw new Error('Card not found');
+
+  await verifySetOwnership(userId, targetSetId);
+
+  const maxOrder = await prisma.card.aggregate({
+    where: { setId: targetSetId },
+    _max: { order: true },
+  });
+
+  const updated = await prisma.card.update({
+    where: { id: cardId },
+    data: {
+      setId: targetSetId,
+      order: (maxOrder._max.order ?? 0) + 1,
+    },
+  });
+
+  return updated;
 }
 
 export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
