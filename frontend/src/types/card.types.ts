@@ -6,6 +6,7 @@ export interface Card {
   userId: string | null;
   question: string;
   answer: string;
+  note: string | null;
   imageId: string | null;
   order: number;
   isBlurred: boolean;
@@ -20,6 +21,7 @@ export interface CreateCardPayload {
   setId: string;
   question: string;
   answer: string;
+  note?: string;
   imageId?: string;
   isBlurred?: boolean;
   difficulty?: Difficulty;
@@ -27,15 +29,20 @@ export interface CreateCardPayload {
 
 export interface BulkCreateCardPayload {
   setId: string;
-  cards: Array<{ question: string; answer: string }>;
+  cards: Array<{ question: string; answer: string; note?: string }>;
 }
 
 export interface UpdateCardPayload {
   question?: string;
   answer?: string;
+  note?: string | null;
   imageId?: string | null;
   isBlurred?: boolean;
   difficulty?: Difficulty;
+}
+
+export interface MoveCardPayload {
+  targetSetId: string;
 }
 
 export interface ReorderCardsPayload {

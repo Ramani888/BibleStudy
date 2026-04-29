@@ -1,8 +1,9 @@
-import { apiDelete, apiGet, apiPost, apiPut } from './client';
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from './client';
 import type {
   BulkCreateCardPayload,
   Card,
   CreateCardPayload,
+  MoveCardPayload,
   ReorderCardsPayload,
   StudyResultPayload,
   UpdateCardPayload,
@@ -32,4 +33,10 @@ export const cardsApi = {
 
   recordStudy: (id: string, payload: StudyResultPayload) =>
     apiPost<Card>(`/cards/${id}/study`, payload),
+
+  copy: (id: string) =>
+    apiPost<Card>(`/cards/${id}/copy`),
+
+  move: (id: string, payload: MoveCardPayload) =>
+    apiPatch<Card>(`/cards/${id}/move`, payload),
 };

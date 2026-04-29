@@ -5,6 +5,7 @@ export interface StudySet {
   id: string;
   title: string;
   description: string | null;
+  color: string | null;
   userId: string;
   folderId: string | null;
   visibility: Visibility;
@@ -20,6 +21,7 @@ export interface CreateSetPayload {
   folderId?: string;
   visibility?: Visibility;
   layout?: CardLayout;
+  color?: string;
 }
 
 export interface UpdateSetPayload {
@@ -28,4 +30,5 @@ export interface UpdateSetPayload {
   folderId?: string | null;
   visibility?: Visibility;
   layout?: CardLayout;
+  color?: string | null;
 }
