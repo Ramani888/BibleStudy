@@ -8,6 +8,8 @@ export {
   useBulkCreateCards,
   useUpdateCard,
   useDeleteCard,
+  useCopyCard,
+  useMoveCard,
   useReorderCards,
   useRecordStudy,
 } from './useCards';

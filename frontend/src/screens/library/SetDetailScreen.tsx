@@ -4,9 +4,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { DifficultyBadge } from '../../components/domain';
-import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
+import { ActionSheet, AppModal, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Card, Divider, Spacer, Typography } from '../../components/ui';
-import { useCards, useDeleteCard } from '../../hooks';
+import { useCards, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -15,9 +15,41 @@ import type { Card as CardType } from '../../types';
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
   const { setId, setTitle } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
+  const [movePickerOpen, setMovePickerOpen] = useState(false);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
-  const { mutate: deleteCard } = useDeleteCard(setId);
+  const { data: allSets = [] } = useSets();
+  const { mutate: deleteCard }  = useDeleteCard(setId);
+  const { mutate: copyCard }    = useCopyCard(setId);
+  const { mutate: moveCard }    = useMoveCard(setId);
+  const { mutate: updateCard }  = useUpdateCard(setId);
+
+  const handleCopyCard = (id: string) => {
+    copyCard(id, {
+      onSuccess: () => Toast.show({ type: 'success', text1: 'Card copied' }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Copy failed', text2: getErrorMessage(err) }),
+    });
+  };
+
+  const handleBlurToggle = (card: CardType) => {
+    updateCard({ id: card.id, payload: { isBlurred: !card.isBlurred } }, {
+      onSuccess: () =>
+        Toast.show({ type: 'success', text1: card.isBlurred ? 'Card unblurred' : 'Card blurred' }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+    });
+  };
+
+  const handleMoveCard = (targetSetId: string) => {
+    if (!selectedCard) return;
+    moveCard({ id: selectedCard.id, payload: { targetSetId } }, {
+      onSuccess: () => {
+        setMovePickerOpen(false);
+        setSelectedCard(null);
+        Toast.show({ type: 'success', text1: 'Card moved' });
+      },
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Move failed', text2: getErrorMessage(err) }),
+    });
+  };
 
   const handleDelete = (cardId: string) => {
     Alert.alert('Delete Card', 'This cannot be undone.', [
@@ -85,6 +117,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               <Typography preset="body" color={colors.textSecondary} style={styles.answer}>
                 {item.answer}
               </Typography>
+              {item.note ? (
+                <>
+                  <Divider marginV={spacing[2]} />
+                  <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
+                  <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
+                    {item.note}
+                  </Typography>
+                </>
+              ) : null}
             </Card>
           </Pressable>
         )}
@@ -116,12 +157,48 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               navigation.navigate('EditCard', { cardId: selectedCard.id, setId }),
           },
           {
+            label: '📋 Copy',
+            onPress: () => selectedCard && handleCopyCard(selectedCard.id),
+          },
+          {
+            label: '➡️ Move to Set',
+            onPress: () => setMovePickerOpen(true),
+          },
+          {
+            label: selectedCard?.isBlurred ? '👁 Unblur Card' : '🙈 Blur Card',
+            onPress: () => selectedCard && handleBlurToggle(selectedCard),
+          },
+          {
             label: '🗑 Delete',
             destructive: true,
             onPress: () => selectedCard && handleDelete(selectedCard.id),
           },
         ]}
       />
+
+      {/* ── Move to set picker ── */}
+      <AppModal
+        visible={movePickerOpen}
+        title="Move to Set"
+        onClose={() => setMovePickerOpen(false)}
+      >
+        {allSets.filter(s => s.id !== setId).length === 0 ? (
+          <Typography preset="bodySm" color={colors.textSecondary}>
+            No other sets available
+          </Typography>
+        ) : (
+          allSets
+            .filter(s => s.id !== setId)
+            .map(s => (
+              <React.Fragment key={s.id}>
+                <Pressable style={styles.setOption} onPress={() => handleMoveCard(s.id)}>
+                  <Typography preset="body">{s.title}</Typography>
+                </Pressable>
+                <Divider marginV={spacing[1]} />
+              </React.Fragment>
+            ))
+        )}
+      </AppModal>
     </SafeAreaView>
   );
 }
@@ -149,6 +226,8 @@ const styles = StyleSheet.create({
   },
   question: { fontWeight: '500' },
   answer: { lineHeight: 22 },
+  note: { lineHeight: 20 },
+  setOption: { paddingVertical: spacing[3] },
   studyBtn: {
     position: 'absolute',
     bottom: spacing[6],
