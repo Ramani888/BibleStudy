@@ -1,11 +1,11 @@
-# Graph Report - BibleStudy  (2026-04-28)
+# Graph Report - BibleStudy  (2026-04-29)
 
 ## Corpus Check
-- 210 files · ~55,765 words
+- 211 files · ~56,172 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 585 nodes · 627 edges · 15 communities detected
+- 590 nodes · 631 edges · 15 communities detected
 - Extraction: 62% EXTRACTED · 38% INFERRED · 0% AMBIGUOUS · INFERRED: 238 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -45,10 +45,10 @@
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
 - `getMe()` --calls--> `sendError()`  [INFERRED]
   backend\src\modules\auth\auth.controller.ts → backend\src\utils\response.ts
+- `register()` --calls--> `onSubmit()`  [INFERRED]
+  backend\src\modules\auth\auth.service.ts → frontend\src\screens\auth\RegisterScreen.tsx
 - `recordStudyResult()` --calls--> `logActivity()`  [INFERRED]
   backend\src\modules\cards\cards.service.ts → backend\src\utils\activity.ts
-- `sendRequest()` --calls--> `sendPushToUser()`  [INFERRED]
-  backend\src\modules\friends\friends.service.ts → backend\src\utils\notifications.ts
 
 ## Communities
 
@@ -65,31 +65,31 @@ Cohesion: 0.08
 Nodes (13): useCreateFolder(), useDeleteFolder(), useFolders(), useCloneSet(), useCreateSet(), useDeleteSet(), useSet(), useSets() (+5 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.14
-Nodes (20): forgotPassword(), login(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword(), verifyEmail() (+12 more)
+Cohesion: 0.15
+Nodes (19): forgotPassword(), login(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword(), verifyEmail() (+11 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.1
-Nodes (8): getErrorMessage(), getMe(), updateCard(), handleSave(), onSubmit(), onSubmit(), getProfile(), updateProfile()
+Cohesion: 0.09
+Nodes (8): apiPost(), getErrorMessage(), getMe(), onSubmit(), handleSave(), onSubmit(), getProfile(), updateProfile()
 
 ### Community 5 - "Community 5"
-Cohesion: 0.13
-Nodes (12): apiPost(), AppDelegate, ReactNativeDelegate, MessagingDelegate, RCTDefaultReactNativeFactoryDelegate, UIApplicationDelegate, UIResponder, UNUserNotificationCenterDelegate (+4 more)
+Cohesion: 0.14
+Nodes (11): AppDelegate, ReactNativeDelegate, MessagingDelegate, RCTDefaultReactNativeFactoryDelegate, UIApplicationDelegate, UIResponder, UNUserNotificationCenterDelegate, onTokenRefresh() (+3 more)
 
 ### Community 6 - "Community 6"
+Cohesion: 0.15
+Nodes (11): bulkCreateCards(), calculateNextReviewAt(), createCard(), listCardsBySet(), moveCard(), recordStudyResult(), updateCard(), verifySetOwnership() (+3 more)
+
+### Community 7 - "Community 7"
 Cohesion: 0.14
 Nodes (6): useBlockedUsers(), useSearchUsers(), useSendFriendRequest(), useUnblockUser(), BlockedUsersScreen(), SearchUsersScreen()
 
-### Community 7 - "Community 7"
+### Community 8 - "Community 8"
 Cohesion: 0.12
 Nodes (4): useCreateGroup(), useJoinGroup(), CreateGroupScreen(), JoinGroupScreen()
 
-### Community 8 - "Community 8"
-Cohesion: 0.19
-Nodes (9): bulkCreateCards(), calculateNextReviewAt(), createCard(), listCardsBySet(), moveCard(), recordStudyResult(), verifySetOwnership(), onSubmit() (+1 more)
-
 ### Community 9 - "Community 9"
-Cohesion: 0.22
+Cohesion: 0.18
 Nodes (3): useCards(), useDeleteCard(), SetDetailScreen()
 
 ### Community 10 - "Community 10"
@@ -127,10 +127,10 @@ Nodes (1): MainApplication
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getErrorMessage()` connect `Community 4` to `Community 3`?**
-  _High betweenness centrality (0.101) - this node is a cross-community bridge._
-- **Why does `logActivity()` connect `Community 1` to `Community 8`, `Community 2`?**
-  _High betweenness centrality (0.083) - this node is a cross-community bridge._
+- **Why does `getErrorMessage()` connect `Community 4` to `Community 6`?**
+  _High betweenness centrality (0.100) - this node is a cross-community bridge._
+- **Why does `logActivity()` connect `Community 1` to `Community 2`, `Community 6`?**
+  _High betweenness centrality (0.082) - this node is a cross-community bridge._
 - **Are the 86 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `getMyFeed()`) actually correct?**
   _`sendError()` has 86 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 85 inferred relationships involving `sendSuccess()` (e.g. with `getMyFeed()` and `getFriendsFeed()`) actually correct?**
