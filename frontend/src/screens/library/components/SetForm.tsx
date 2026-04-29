@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 
 import { FormField } from '../../../components/forms';
-import { Button, Badge, Typography, Divider } from '../../../components/ui';
+import { Button, Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
 import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
@@ -15,7 +15,7 @@ import type { Visibility, CardLayout, StudySet } from '../../../types';
 
 interface SetFormProps {
   defaultValues?: Partial<StudySet>;
-  onSubmit: (data: CreateSetFormData & { visibility: Visibility; layout: CardLayout; folderId?: string }) => Promise<void>;
+  onSubmit: (data: CreateSetFormData & { visibility: Visibility; layout: CardLayout; folderId?: string; color?: string | null }) => Promise<void>;
   submitLabel?: string;
 }
 
@@ -35,6 +35,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
   const [layout, setLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
   const [folderId, setFolderId] = useState<string | undefined>(defaultValues?.folderId ?? undefined);
+  const [selectedColor, setSelectedColor] = useState<string | null>(defaultValues?.color ?? null);
   const [folderPickerOpen, setFolderPickerOpen] = useState(false);
 
   const { data: folders = [] } = useFolders();
@@ -51,7 +52,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
 
   const handleSave = async (data: CreateSetFormData) => {
     try {
-      await onSubmit({ ...data, visibility, layout, folderId });
+      await onSubmit({ ...data, visibility, layout, folderId, color: selectedColor });
     } catch (err) {
       Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
     }
@@ -87,6 +88,14 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
           </Typography>
           <Typography preset="body" color={colors.textSecondary}>›</Typography>
         </Pressable>
+      </View>
+
+      {/* Color */}
+      <View>
+        <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
+          Color
+        </Typography>
+        <ColorPicker value={selectedColor} onChange={setSelectedColor} />
       </View>
 
       {/* Visibility */}
