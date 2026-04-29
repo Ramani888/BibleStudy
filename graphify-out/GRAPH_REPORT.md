@@ -1,12 +1,12 @@
 # Graph Report - BibleStudy  (2026-04-29)
 
 ## Corpus Check
-- 211 files · ~56,512 words
+- 211 files · ~56,656 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 590 nodes · 635 edges · 15 communities detected
-- Extraction: 62% EXTRACTED · 38% INFERRED · 0% AMBIGUOUS · INFERRED: 242 edges (avg confidence: 0.8)
+- 590 nodes · 636 edges · 15 communities detected
+- Extraction: 62% EXTRACTED · 38% INFERRED · 0% AMBIGUOUS · INFERRED: 243 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -31,7 +31,7 @@
 2. `sendSuccess()` - 86 edges
 3. `logActivity()` - 8 edges
 4. `AppDelegate` - 8 edges
-5. `LibraryScreen()` - 7 edges
+5. `LibraryScreen()` - 8 edges
 6. `SetDetailScreen()` - 7 edges
 7. `register()` - 5 edges
 8. `verifyEmail()` - 5 edges
@@ -61,8 +61,8 @@ Cohesion: 0.05
 Nodes (13): acceptRequest(), sendRequest(), createGathering(), getGathering(), getNearby(), listParticipants(), rsvp(), createGroup() (+5 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.08
-Nodes (13): useCreateFolder(), useDeleteFolder(), useFolders(), useCloneSet(), useCreateSet(), useDeleteSet(), useSet(), useSets() (+5 more)
+Cohesion: 0.09
+Nodes (14): useCreateFolder(), useDeleteFolder(), useFolders(), useUpdateFolder(), useCloneSet(), useCreateSet(), useDeleteSet(), useSet() (+6 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.15
@@ -137,7 +137,7 @@ _Questions this graph is uniquely positioned to answer:_
   _`sendSuccess()` has 85 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 7 inferred relationships involving `logActivity()` (e.g. with `recordStudyResult()` and `acceptRequest()`) actually correct?**
   _`logActivity()` has 7 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 6 inferred relationships involving `LibraryScreen()` (e.g. with `useFolders()` and `useSets()`) actually correct?**
-  _`LibraryScreen()` has 6 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 7 inferred relationships involving `LibraryScreen()` (e.g. with `useFolders()` and `useSets()`) actually correct?**
+  _`LibraryScreen()` has 7 INFERRED edges - model-reasoned connections that need verification._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._

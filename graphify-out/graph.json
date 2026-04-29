@@ -11106,8 +11106,8 @@
       "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
       "source_location": "L25",
       "weight": 1.0,
-      "_src": "library_setdetailscreen_setdetailscreen",
-      "_tgt": "hooks_usecards_useupdatecard",
+      "_src": "hooks_usecards_useupdatecard",
+      "_tgt": "library_setdetailscreen_setdetailscreen",
       "source": "hooks_usecards_useupdatecard",
       "target": "library_setdetailscreen_setdetailscreen"
     },
@@ -11130,8 +11130,8 @@
       "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
       "source_location": "L23",
       "weight": 1.0,
-      "_src": "library_setdetailscreen_setdetailscreen",
-      "_tgt": "hooks_usecards_usecopycard",
+      "_src": "hooks_usecards_usecopycard",
+      "_tgt": "library_setdetailscreen_setdetailscreen",
       "source": "hooks_usecards_usecopycard",
       "target": "library_setdetailscreen_setdetailscreen"
     },
@@ -11142,8 +11142,8 @@
       "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
       "source_location": "L24",
       "weight": 1.0,
-      "_src": "library_setdetailscreen_setdetailscreen",
-      "_tgt": "hooks_usecards_usemovecard",
+      "_src": "hooks_usecards_usemovecard",
+      "_tgt": "library_setdetailscreen_setdetailscreen",
       "source": "hooks_usecards_usemovecard",
       "target": "library_setdetailscreen_setdetailscreen"
     },
@@ -11289,6 +11289,18 @@
       "_src": "hooks_usefolders_usecreatefolder",
       "_tgt": "library_libraryscreen_libraryscreen",
       "source": "hooks_usefolders_usecreatefolder",
+      "target": "library_libraryscreen_libraryscreen"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend\\src\\screens\\library\\LibraryScreen.tsx",
+      "source_location": "L40",
+      "weight": 1.0,
+      "_src": "library_libraryscreen_libraryscreen",
+      "_tgt": "hooks_usefolders_useupdatefolder",
+      "source": "hooks_usefolders_useupdatefolder",
       "target": "library_libraryscreen_libraryscreen"
     },
     {
@@ -11982,8 +11994,8 @@
       "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
       "source_location": "L21",
       "weight": 1.0,
-      "_src": "library_setdetailscreen_setdetailscreen",
-      "_tgt": "hooks_usesets_usesets",
+      "_src": "hooks_usesets_usesets",
+      "_tgt": "library_setdetailscreen_setdetailscreen",
       "source": "hooks_usesets_usesets",
       "target": "library_setdetailscreen_setdetailscreen"
     },
