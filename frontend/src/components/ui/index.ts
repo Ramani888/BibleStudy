@@ -7,3 +7,4 @@ export { Avatar } from './Avatar';
 export { Divider } from './Divider';
 export { Spacer } from './Spacer';
 export { ProgressBar } from './ProgressBar';
+export { ColorPicker, PRESET_COLORS } from './ColorPicker';
