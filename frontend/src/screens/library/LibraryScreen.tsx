@@ -13,7 +13,7 @@ import Toast from 'react-native-toast-message';
 import { FolderCard, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, EmptyState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
-import { useFolders, useSets, useDeleteSet, useCloneSet, useCreateFolder, useDeleteFolder } from '../../hooks';
+import { useFolders, useSets, useDeleteSet, useCloneSet, useCreateFolder, useDeleteFolder, useUpdateFolder } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -27,6 +27,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [newFolderName, setNewFolderName] = useState('');
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
+  const [editFolderName, setEditFolderName] = useState('');
+  const [editFolderColor, setEditFolderColor] = useState<string | null>(null);
 
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
@@ -34,6 +37,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const { mutate: cloneSet } = useCloneSet();
   const { mutate: createFolder, isPending: creatingFolder } = useCreateFolder();
   const { mutate: deleteFolder } = useDeleteFolder();
+  const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder(selectedFolder?.id ?? '');
 
   const refreshing = foldersLoading || setsLoading;
 
@@ -80,6 +84,24 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           }),
       },
     ]);
+  };
+
+  const handleCloseEditFolderModal = () => {
+    setEditFolderModalOpen(false);
+    setEditFolderName('');
+    setEditFolderColor(null);
+    setSelectedFolder(null);
+  };
+
+  const handleEditFolder = () => {
+    if (!editFolderName.trim() || !selectedFolder) return;
+    updateFolder({ name: editFolderName.trim(), color: editFolderColor }, {
+      onSuccess: () => {
+        handleCloseEditFolderModal();
+        Toast.show({ type: 'success', text1: 'Folder updated' });
+      },
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Update failed', text2: getErrorMessage(err) }),
+    });
   };
 
   const handleCreateFolder = () => {
@@ -247,6 +269,15 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={() => setSelectedFolder(null)}
         actions={[
           {
+            label: '✏️ Edit',
+            onPress: () => {
+              if (!selectedFolder) return;
+              setEditFolderName(selectedFolder.name);
+              setEditFolderColor(selectedFolder.color);
+              setEditFolderModalOpen(true);
+            },
+          },
+          {
             label: '🗑 Delete Folder',
             destructive: true,
             onPress: () => selectedFolder && handleDeleteFolder(selectedFolder.id),
@@ -278,6 +309,32 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           label="Create Folder"
           onPress={handleCreateFolder}
           loading={creatingFolder}
+          fullWidth
+        />
+      </AppModal>
+      {/* ── Edit folder modal ── */}
+      <AppModal
+        visible={editFolderModalOpen}
+        title="Edit Folder"
+        onClose={handleCloseEditFolderModal}
+      >
+        <Input
+          label="Folder name"
+          value={editFolderName}
+          onChangeText={setEditFolderName}
+          autoCapitalize="words"
+          returnKeyType="done"
+          onSubmitEditing={handleEditFolder}
+        />
+        <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
+          Color
+        </Typography>
+        <ColorPicker value={editFolderColor} onChange={setEditFolderColor} />
+        <Divider />
+        <Button
+          label="Save Changes"
+          onPress={handleEditFolder}
+          loading={updatingFolder}
           fullWidth
         />
       </AppModal>
