@@ -3357,7 +3357,7 @@
       "source_file": "frontend\\src\\hooks\\useCredits.ts",
       "source_location": "L1",
       "id": "frontend_src_hooks_usecredits_ts",
-      "community": 10,
+      "community": 11,
       "norm_label": "usecredits.ts"
     },
     {
@@ -3366,7 +3366,7 @@
       "source_file": "frontend\\src\\hooks\\useCredits.ts",
       "source_location": "L4",
       "id": "hooks_usecredits_usecreditbalance",
-      "community": 10,
+      "community": 11,
       "norm_label": "usecreditbalance()"
     },
     {
@@ -3375,7 +3375,7 @@
       "source_file": "frontend\\src\\hooks\\useCredits.ts",
       "source_location": "L11",
       "id": "hooks_usecredits_usecredittransactions",
-      "community": 10,
+      "community": 11,
       "norm_label": "usecredittransactions()"
     },
     {
@@ -3384,7 +3384,7 @@
       "source_file": "frontend\\src\\hooks\\useCredits.ts",
       "source_location": "L24",
       "id": "hooks_usecredits_useclaimdailylogin",
-      "community": 10,
+      "community": 11,
       "norm_label": "useclaimdailylogin()"
     },
     {
@@ -3465,7 +3465,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L1",
       "id": "frontend_src_hooks_usefriends_ts",
-      "community": 7,
+      "community": 8,
       "norm_label": "usefriends.ts"
     },
     {
@@ -3474,7 +3474,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L4",
       "id": "hooks_usefriends_usefriends",
-      "community": 7,
+      "community": 8,
       "norm_label": "usefriends()"
     },
     {
@@ -3483,7 +3483,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L11",
       "id": "hooks_usefriends_usefriendrequests",
-      "community": 7,
+      "community": 8,
       "norm_label": "usefriendrequests()"
     },
     {
@@ -3492,7 +3492,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L18",
       "id": "hooks_usefriends_usesearchusers",
-      "community": 7,
+      "community": 8,
       "norm_label": "usesearchusers()"
     },
     {
@@ -3501,7 +3501,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L26",
       "id": "hooks_usefriends_useblockedusers",
-      "community": 7,
+      "community": 8,
       "norm_label": "useblockedusers()"
     },
     {
@@ -3510,7 +3510,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L33",
       "id": "hooks_usefriends_usesendfriendrequest",
-      "community": 7,
+      "community": 8,
       "norm_label": "usesendfriendrequest()"
     },
     {
@@ -3519,7 +3519,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L41",
       "id": "hooks_usefriends_useacceptfriendrequest",
-      "community": 7,
+      "community": 8,
       "norm_label": "useacceptfriendrequest()"
     },
     {
@@ -3528,7 +3528,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L49",
       "id": "hooks_usefriends_userejectfriendrequest",
-      "community": 7,
+      "community": 8,
       "norm_label": "userejectfriendrequest()"
     },
     {
@@ -3537,7 +3537,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L57",
       "id": "hooks_usefriends_useremovefriend",
-      "community": 7,
+      "community": 8,
       "norm_label": "useremovefriend()"
     },
     {
@@ -3546,7 +3546,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L65",
       "id": "hooks_usefriends_useblockuser",
-      "community": 7,
+      "community": 8,
       "norm_label": "useblockuser()"
     },
     {
@@ -3555,7 +3555,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L73",
       "id": "hooks_usefriends_usecancelfriendrequest",
-      "community": 7,
+      "community": 8,
       "norm_label": "usecancelfriendrequest()"
     },
     {
@@ -3564,7 +3564,7 @@
       "source_file": "frontend\\src\\hooks\\useFriends.ts",
       "source_location": "L81",
       "id": "hooks_usefriends_useunblockuser",
-      "community": 7,
+      "community": 8,
       "norm_label": "useunblockuser()"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L1",
       "id": "frontend_src_hooks_usegatherings_ts",
-      "community": 11,
+      "community": 10,
       "norm_label": "usegatherings.ts"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L5",
       "id": "hooks_usegatherings_usegatherings",
-      "community": 11,
+      "community": 10,
       "norm_label": "usegatherings()"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L12",
       "id": "hooks_usegatherings_usegathering",
-      "community": 11,
+      "community": 10,
       "norm_label": "usegathering()"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L20",
       "id": "hooks_usegatherings_usenearbygatherings",
-      "community": 11,
+      "community": 10,
       "norm_label": "usenearbygatherings()"
     },
     {
@@ -3609,7 +3609,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L28",
       "id": "hooks_usegatherings_useparticipants",
-      "community": 11,
+      "community": 10,
       "norm_label": "useparticipants()"
     },
     {
@@ -3618,7 +3618,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L36",
       "id": "hooks_usegatherings_usecreategathering",
-      "community": 11,
+      "community": 10,
       "norm_label": "usecreategathering()"
     },
     {
@@ -3627,7 +3627,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L44",
       "id": "hooks_usegatherings_useupdategathering",
-      "community": 11,
+      "community": 10,
       "norm_label": "useupdategathering()"
     },
     {
@@ -3636,7 +3636,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L56",
       "id": "hooks_usegatherings_usecancelgathering",
-      "community": 11,
+      "community": 10,
       "norm_label": "usecancelgathering()"
     },
     {
@@ -3645,7 +3645,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L64",
       "id": "hooks_usegatherings_usersvp",
-      "community": 11,
+      "community": 10,
       "norm_label": "usersvp()"
     },
     {
@@ -3654,7 +3654,7 @@
       "source_file": "frontend\\src\\hooks\\useGatherings.ts",
       "source_location": "L76",
       "id": "hooks_usegatherings_useleavegathering",
-      "community": 11,
+      "community": 10,
       "norm_label": "useleavegathering()"
     },
     {
@@ -3663,7 +3663,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L1",
       "id": "frontend_src_hooks_usegroups_ts",
-      "community": 8,
+      "community": 7,
       "norm_label": "usegroups.ts"
     },
     {
@@ -3672,7 +3672,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L5",
       "id": "hooks_usegroups_usegroups",
-      "community": 8,
+      "community": 7,
       "norm_label": "usegroups()"
     },
     {
@@ -3681,7 +3681,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L12",
       "id": "hooks_usegroups_usegroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "usegroup()"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L20",
       "id": "hooks_usegroups_usecreategroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "usecreategroup()"
     },
     {
@@ -3699,7 +3699,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L28",
       "id": "hooks_usegroups_useupdategroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "useupdategroup()"
     },
     {
@@ -3708,7 +3708,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L40",
       "id": "hooks_usegroups_usedeletegroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "usedeletegroup()"
     },
     {
@@ -3717,7 +3717,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L48",
       "id": "hooks_usegroups_usejoingroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "usejoingroup()"
     },
     {
@@ -3726,7 +3726,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L56",
       "id": "hooks_usegroups_useleavegroup",
-      "community": 8,
+      "community": 7,
       "norm_label": "useleavegroup()"
     },
     {
@@ -3735,7 +3735,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L64",
       "id": "hooks_usegroups_useupdatememberrole",
-      "community": 8,
+      "community": 7,
       "norm_label": "useupdatememberrole()"
     },
     {
@@ -3744,7 +3744,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L73",
       "id": "hooks_usegroups_useremovemember",
-      "community": 8,
+      "community": 7,
       "norm_label": "useremovemember()"
     },
     {
@@ -3753,7 +3753,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L82",
       "id": "hooks_usegroups_usepublicgroups",
-      "community": 8,
+      "community": 7,
       "norm_label": "usepublicgroups()"
     },
     {
@@ -3762,7 +3762,7 @@
       "source_file": "frontend\\src\\hooks\\useGroups.ts",
       "source_location": "L89",
       "id": "hooks_usegroups_useregenerateinvitecode",
-      "community": 8,
+      "community": 7,
       "norm_label": "useregenerateinvitecode()"
     },
     {
@@ -4203,7 +4203,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_home_homescreen_tsx",
-      "community": 10,
+      "community": 11,
       "norm_label": "homescreen.tsx"
     },
     {
@@ -4212,7 +4212,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L48",
       "id": "home_homescreen_quickactiongrid",
-      "community": 10,
+      "community": 11,
       "norm_label": "quickactiongrid()"
     },
     {
@@ -4221,7 +4221,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L74",
       "id": "home_homescreen_dailyloginbutton",
-      "community": 10,
+      "community": 11,
       "norm_label": "dailyloginbutton()"
     },
     {
@@ -4230,7 +4230,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L110",
       "id": "home_homescreen_activitylabel",
-      "community": 10,
+      "community": 11,
       "norm_label": "activitylabel()"
     },
     {
@@ -4239,7 +4239,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L122",
       "id": "home_homescreen_activityitem",
-      "community": 10,
+      "community": 11,
       "norm_label": "activityitem()"
     },
     {
@@ -4248,7 +4248,7 @@
       "source_file": "frontend\\src\\screens\\home\\HomeScreen.tsx",
       "source_location": "L158",
       "id": "home_homescreen_greeting",
-      "community": 10,
+      "community": 11,
       "norm_label": "greeting()"
     },
     {
@@ -4572,7 +4572,7 @@
       "source_file": "frontend\\src\\screens\\profile\\BlockedUsersScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_blockedusersscreen_tsx",
-      "community": 7,
+      "community": 8,
       "norm_label": "blockedusersscreen.tsx"
     },
     {
@@ -4581,7 +4581,7 @@
       "source_file": "frontend\\src\\screens\\profile\\BlockedUsersScreen.tsx",
       "source_location": "L19",
       "id": "profile_blockedusersscreen_blockedusersscreen",
-      "community": 7,
+      "community": 8,
       "norm_label": "blockedusersscreen()"
     },
     {
@@ -4590,7 +4590,7 @@
       "source_file": "frontend\\src\\screens\\profile\\CreateGroupScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_creategroupscreen_tsx",
-      "community": 8,
+      "community": 7,
       "norm_label": "creategroupscreen.tsx"
     },
     {
@@ -4599,7 +4599,7 @@
       "source_file": "frontend\\src\\screens\\profile\\CreateGroupScreen.tsx",
       "source_location": "L23",
       "id": "profile_creategroupscreen_creategroupscreen",
-      "community": 8,
+      "community": 7,
       "norm_label": "creategroupscreen()"
     },
     {
@@ -4788,7 +4788,7 @@
       "source_file": "frontend\\src\\screens\\profile\\JoinGroupScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_joingroupscreen_tsx",
-      "community": 8,
+      "community": 7,
       "norm_label": "joingroupscreen.tsx"
     },
     {
@@ -4797,7 +4797,7 @@
       "source_file": "frontend\\src\\screens\\profile\\JoinGroupScreen.tsx",
       "source_location": "L21",
       "id": "profile_joingroupscreen_joingroupscreen",
-      "community": 8,
+      "community": 7,
       "norm_label": "joingroupscreen()"
     },
     {
@@ -4860,7 +4860,7 @@
       "source_file": "frontend\\src\\screens\\profile\\SearchUsersScreen.tsx",
       "source_location": "L1",
       "id": "frontend_src_screens_profile_searchusersscreen_tsx",
-      "community": 7,
+      "community": 8,
       "norm_label": "searchusersscreen.tsx"
     },
     {
@@ -4869,7 +4869,7 @@
       "source_file": "frontend\\src\\screens\\profile\\SearchUsersScreen.tsx",
       "source_location": "L23",
       "id": "profile_searchusersscreen_searchusersscreen",
-      "community": 7,
+      "community": 8,
       "norm_label": "searchusersscreen()"
     },
     {
@@ -11104,11 +11104,47 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
+      "source_location": "L25",
+      "weight": 1.0,
+      "_src": "library_setdetailscreen_setdetailscreen",
+      "_tgt": "hooks_usecards_useupdatecard",
+      "source": "hooks_usecards_useupdatecard",
+      "target": "library_setdetailscreen_setdetailscreen"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
       "source_location": "L20",
       "weight": 1.0,
       "_src": "hooks_usecards_usedeletecard",
       "_tgt": "library_setdetailscreen_setdetailscreen",
       "source": "hooks_usecards_usedeletecard",
+      "target": "library_setdetailscreen_setdetailscreen"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_src": "library_setdetailscreen_setdetailscreen",
+      "_tgt": "hooks_usecards_usecopycard",
+      "source": "hooks_usecards_usecopycard",
+      "target": "library_setdetailscreen_setdetailscreen"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
+      "source_location": "L24",
+      "weight": 1.0,
+      "_src": "library_setdetailscreen_setdetailscreen",
+      "_tgt": "hooks_usecards_usemovecard",
+      "source": "hooks_usecards_usemovecard",
       "target": "library_setdetailscreen_setdetailscreen"
     },
     {
@@ -11938,6 +11974,18 @@
       "_tgt": "library_libraryscreen_libraryscreen",
       "source": "hooks_usesets_usesets",
       "target": "library_libraryscreen_libraryscreen"
+    },
+    {
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "frontend\\src\\screens\\library\\SetDetailScreen.tsx",
+      "source_location": "L21",
+      "weight": 1.0,
+      "_src": "library_setdetailscreen_setdetailscreen",
+      "_tgt": "hooks_usesets_usesets",
+      "source": "hooks_usesets_usesets",
+      "target": "library_setdetailscreen_setdetailscreen"
     },
     {
       "relation": "calls",
