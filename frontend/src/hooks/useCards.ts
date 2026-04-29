@@ -3,6 +3,7 @@ import { cardsApi } from '../api';
 import type {
   BulkCreateCardPayload,
   CreateCardPayload,
+  MoveCardPayload,
   ReorderCardsPayload,
   StudyResultPayload,
   UpdateCardPayload,
@@ -46,6 +47,26 @@ export function useDeleteCard(setId: string) {
   return useMutation({
     mutationFn: (id: string) => cardsApi.delete(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
+  });
+}
+
+export function useCopyCard(setId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => cardsApi.copy(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
+  });
+}
+
+export function useMoveCard(setId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: MoveCardPayload }) =>
+      cardsApi.move(id, payload),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['cards', vars.payload.targetSetId] });
+    },
   });
 }
 
