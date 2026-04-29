@@ -12,8 +12,11 @@ interface SetCardProps {
   onLongPress?: () => void;
 }
 
+const DEFAULT_COLOR = colors.gray300;
+
 export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
   const cardCount = set._count?.cards ?? 0;
+  const barColor = set.color ?? DEFAULT_COLOR;
 
   return (
     <Pressable
@@ -21,41 +24,44 @@ export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
       onPress={onPress}
       onLongPress={onLongPress}
     >
-      {/* Top row: title + visibility badge */}
-      <View style={styles.topRow}>
-        <Typography preset="h4" style={styles.title} numberOfLines={1}>
-          {set.title}
-        </Typography>
-        {set.visibility !== 'PRIVATE' && (
-          <Badge
-            label={set.visibility === 'PUBLIC' ? 'Public' : 'Friends'}
-            variant={set.visibility === 'PUBLIC' ? 'info' : 'success'}
-          />
-        )}
-      </View>
+      <View style={[styles.colorBar, { backgroundColor: barColor }]} />
+      <View style={styles.content}>
+        {/* Top row: title + visibility badge */}
+        <View style={styles.topRow}>
+          <Typography preset="h4" style={styles.title} numberOfLines={1}>
+            {set.title}
+          </Typography>
+          {set.visibility !== 'PRIVATE' && (
+            <Badge
+              label={set.visibility === 'PUBLIC' ? 'Public' : 'Friends'}
+              variant={set.visibility === 'PUBLIC' ? 'info' : 'success'}
+            />
+          )}
+        </View>
 
-      {/* Description */}
-      {set.description ? (
-        <Typography
-          preset="bodySm"
-          color={colors.textSecondary}
-          numberOfLines={2}
-          style={styles.description}
-        >
-          {set.description}
-        </Typography>
-      ) : null}
+        {/* Description */}
+        {set.description ? (
+          <Typography
+            preset="bodySm"
+            color={colors.textSecondary}
+            numberOfLines={2}
+            style={styles.description}
+          >
+            {set.description}
+          </Typography>
+        ) : null}
 
-      {/* Bottom row: card count + date */}
-      <View style={styles.bottomRow}>
-        <View style={styles.countPill}>
-          <Typography preset="caption" color={colors.primary}>
-            {cardCount} {cardCount === 1 ? 'card' : 'cards'}
+        {/* Bottom row: card count + date */}
+        <View style={styles.bottomRow}>
+          <View style={styles.countPill}>
+            <Typography preset="caption" color={colors.primary}>
+              {cardCount} {cardCount === 1 ? 'card' : 'cards'}
+            </Typography>
+          </View>
+          <Typography preset="caption" color={colors.textDisabled}>
+            {formatDate(set.updatedAt)}
           </Typography>
         </View>
-        <Typography preset="caption" color={colors.textDisabled}>
-          {formatDate(set.updatedAt)}
-        </Typography>
       </View>
     </Pressable>
   );
@@ -63,13 +69,22 @@ export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
 
 const styles = StyleSheet.create({
   card: {
+    flexDirection: 'row',
     backgroundColor: colors.background,
     borderRadius: 16,
-    padding: spacing[4],
     borderWidth: 1,
     borderColor: colors.border,
-    gap: spacing[2],
+    overflow: 'hidden',
     ...shadows.sm,
+  },
+  colorBar: {
+    width: 4,
+    alignSelf: 'stretch',
+  },
+  content: {
+    flex: 1,
+    padding: spacing[4],
+    gap: spacing[2],
   },
   topRow: {
     flexDirection: 'row',
