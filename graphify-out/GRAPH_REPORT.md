@@ -1,7 +1,7 @@
 # Graph Report - BibleStudy  (2026-04-29)
 
 ## Corpus Check
-- 211 files · ~56,172 words
+- 211 files · ~56,209 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
