@@ -12,7 +12,7 @@ import Toast from 'react-native-toast-message';
 
 import { FolderCard, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, EmptyState, SetCardSkeleton } from '../../components/feedback';
-import { Button, Divider, Input, Spacer, Typography } from '../../components/ui';
+import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
 import { useFolders, useSets, useDeleteSet, useCloneSet, useCreateFolder, useDeleteFolder } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -26,6 +26,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
@@ -83,9 +84,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const handleCreateFolder = () => {
     if (!newFolderName.trim()) return;
-    createFolder({ name: newFolderName.trim() }, {
+    createFolder({ name: newFolderName.trim(), color: selectedColor ?? undefined }, {
       onSuccess: () => {
         setNewFolderName('');
+        setSelectedColor(null);
         setNewFolderModalOpen(false);
         Toast.show({ type: 'success', text1: 'Folder created' });
       },
@@ -137,8 +139,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             No folders yet — tap + New to create one
           </Typography>
         ) : (
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.folderRow}
-            contentContainerStyle={styles.folderRowContent}>
+          <View style={styles.folderList}>
             {folders.map(folder => (
               <FolderCard
                 key={folder.id}
@@ -148,7 +149,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
                 onLongPress={() => setSelectedFolder(folder)}
               />
             ))}
-          </ScrollView>
+          </View>
         )}
 
         <Spacer size={spacing[6]} />
@@ -257,7 +258,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <AppModal
         visible={newFolderModalOpen}
         title="New Folder"
-        onClose={() => setNewFolderModalOpen(false)}
+        onClose={() => { setNewFolderModalOpen(false); setNewFolderName(''); setSelectedColor(null); }}
       >
         <Input
           label="Folder name"
@@ -268,6 +269,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           returnKeyType="done"
           onSubmitEditing={handleCreateFolder}
         />
+        <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
+          Color
+        </Typography>
+        <ColorPicker value={selectedColor} onChange={setSelectedColor} />
         <Divider />
         <Button
           label="Create Folder"
@@ -303,8 +308,8 @@ const styles = StyleSheet.create({
     marginBottom: spacing[3],
   },
   emptyHint: { marginBottom: spacing[3] },
-  folderRow: { marginHorizontal: -layout.screenPaddingH },
-  folderRowContent: { gap: spacing[3], paddingHorizontal: layout.screenPaddingH },
+  colorLabel: { marginBottom: spacing[2] },
+  folderList: { gap: spacing[3] },
   setsList: { gap: spacing[3] },
   emptyState: { minHeight: 200 },
   fab: {
