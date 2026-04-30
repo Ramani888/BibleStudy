@@ -160,6 +160,8 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
 // ─── Bulk card form ───────────────────────────────────────────────────────────
 function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }) {
   const { mutateAsync: bulkCreate } = useBulkCreateCards();
+  const questionRefs = useRef<(TextInput | null)[]>([]);
+  const answerRefs   = useRef<(TextInput | null)[]>([]);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<BulkForm>({
     resolver: zodResolver(bulkSchema),
@@ -196,12 +198,22 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
             control={control}
             placeholder="Question"
             autoCapitalize="sentences"
+            returnKeyType="next"
+            inputRef={ref => { questionRefs.current[i] = ref; }}
+            onSubmitEditing={() => answerRefs.current[i]?.focus()}
           />
           <FormField
             name={`pairs.${i}.answer`}
             control={control}
             placeholder="Answer"
             autoCapitalize="sentences"
+            returnKeyType={i < fields.length - 1 ? 'next' : 'done'}
+            inputRef={ref => { answerRefs.current[i] = ref; }}
+            onSubmitEditing={() => {
+              if (i < fields.length - 1) {
+                questionRefs.current[i + 1]?.focus();
+              }
+            }}
           />
           {i < fields.length - 1 && <Divider />}
         </View>
