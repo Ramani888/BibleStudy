@@ -3,12 +3,11 @@ import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import { DifficultyBadge } from '../../components/domain';
 import { ActionSheet, AppModal, EmptyState, ErrorState } from '../../components/feedback';
-import { Button, Card, Divider, Spacer, Typography } from '../../components/ui';
+import { Button, Divider, Typography } from '../../components/ui';
 import { useCards, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { colors, layout, shadows, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
@@ -16,13 +15,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { setId, setTitle } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
+  const [noteCard, setNoteCard] = useState<CardType | null>(null);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
-  const { mutate: deleteCard }  = useDeleteCard(setId);
-  const { mutate: copyCard }    = useCopyCard(setId);
-  const { mutate: moveCard }    = useMoveCard(setId);
-  const { mutate: updateCard }  = useUpdateCard(setId);
+  const { mutate: deleteCard } = useDeleteCard(setId);
+  const { mutate: copyCard }   = useCopyCard(setId);
+  const { mutate: moveCard }   = useMoveCard(setId);
+  const { mutate: updateCard } = useUpdateCard(setId);
 
   const handleCopyCard = (id: string) => {
     copyCard(id, {
@@ -89,7 +89,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         showsVerticalScrollIndicator={false}
         refreshing={isLoading}
         onRefresh={refetch}
-        ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           !isLoading ? (
             <EmptyState
@@ -101,48 +101,51 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ) : null
         }
         renderItem={({ item }) => (
-          <Pressable onLongPress={() => setSelectedCard(item)}>
-            <Card style={styles.cardItem}>
-              <View style={styles.cardTop}>
-                <Typography preset="label" color={colors.textSecondary}>
-                  Q
-                </Typography>
-                <DifficultyBadge difficulty={item.difficulty} />
-              </View>
+          <View style={styles.cardItem}>
+            {/* Question section — gray background */}
+            <View style={styles.questionSection}>
               <Typography preset="body" style={styles.question}>
                 {item.question}
               </Typography>
-              <Divider marginV={spacing[3]} />
-              <Typography preset="label" color={colors.textSecondary}>A</Typography>
-              <Typography preset="body" color={colors.textSecondary} style={styles.answer}>
-                {item.answer}
-              </Typography>
-              {item.note ? (
+              <View style={styles.cardActions}>
+                <Pressable onPress={() => setNoteCard(item)} hitSlop={6} style={styles.iconBtn}>
+                  <Typography style={styles.iconText}>ℹ️</Typography>
+                </Pressable>
+                <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
+                  <Typography style={styles.iconText}>{item.isBlurred ? '🙈' : '👁️'}</Typography>
+                </Pressable>
+                <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
+                  <Typography style={styles.iconText}>⋮</Typography>
+                </Pressable>
+              </View>
+            </View>
+
+            {/* Answer section — white background */}
+            <View style={styles.answerSection}>
+              {item.isBlurred ? (
+                <View style={styles.blurOverlay}>
+                  <Typography preset="bodySm" color={colors.textDisabled}>Tap 👁 to reveal answer</Typography>
+                </View>
+              ) : (
                 <>
-                  <Divider marginV={spacing[2]} />
-                  <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
-                  <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
-                    {item.note}
+                  <Typography preset="body" color={colors.textSecondary} style={styles.answer}>
+                    {item.answer}
                   </Typography>
+                  {item.note ? (
+                    <>
+                      <Divider marginV={spacing[2]} />
+                      <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
+                      <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
+                        {item.note}
+                      </Typography>
+                    </>
+                  ) : null}
                 </>
-              ) : null}
-            </Card>
-          </Pressable>
+              )}
+            </View>
+          </View>
         )}
       />
-
-      {/* ── Study FAB ── */}
-      {cards.length > 0 && (
-        <View style={styles.studyBtn}>
-          <Button
-            label={`Study ${cards.length} Cards`}
-            onPress={() =>
-              navigation.navigate('Study', { setId, setTitle })
-            }
-            fullWidth
-          />
-        </View>
-      )}
 
       {/* ── Card action sheet ── */}
       <ActionSheet
@@ -163,10 +166,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           {
             label: '➡️ Move to Set',
             onPress: () => setMovePickerOpen(true),
-          },
-          {
-            label: selectedCard?.isBlurred ? '👁 Unblur Card' : '🙈 Blur Card',
-            onPress: () => selectedCard && handleBlurToggle(selectedCard),
           },
           {
             label: '🗑 Delete',
@@ -199,6 +198,30 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             ))
         )}
       </AppModal>
+
+      {/* ── Note popup ── */}
+      <AppModal
+        visible={!!noteCard}
+        title="Note"
+        onClose={() => setNoteCard(null)}
+      >
+        {noteCard?.note ? (
+          <Typography preset="body">{noteCard.note}</Typography>
+        ) : (
+          <Typography preset="bodySm" color={colors.textSecondary}>No note on this card.</Typography>
+        )}
+        <Divider />
+        <Button
+          label="Edit Card"
+          variant="secondary"
+          onPress={() => {
+            const c = noteCard;
+            setNoteCard(null);
+            if (c) navigation.navigate('EditCard', { cardId: c.id, setId });
+          }}
+          fullWidth
+        />
+      </AppModal>
     </SafeAreaView>
   );
 }
@@ -216,22 +239,33 @@ const styles = StyleSheet.create({
   },
   list: {
     padding: layout.screenPaddingH,
-    paddingBottom: spacing[24],
+    paddingBottom: spacing[8],
   },
-  cardItem: { gap: spacing[2] },
-  cardTop: {
+  separator: { height: spacing[3] },
+  cardItem: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  questionSection: {
+    backgroundColor: colors.backgroundSecondary,
+    padding: spacing[4],
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    gap: spacing[3],
   },
-  question: { fontWeight: '500' },
+  question: { flex: 1, fontWeight: '500', lineHeight: 22 },
+  cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  iconBtn: { padding: spacing[1] },
+  iconText: { fontSize: 18, lineHeight: 22 },
+  answerSection: {
+    backgroundColor: colors.background,
+    padding: spacing[4],
+  },
   answer: { lineHeight: 22 },
   note: { lineHeight: 20 },
+  blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
   setOption: { paddingVertical: spacing[3] },
-  studyBtn: {
-    position: 'absolute',
-    bottom: spacing[6],
-    left: layout.screenPaddingH,
-    right: layout.screenPaddingH,
-  },
 });
