@@ -44,6 +44,7 @@ type Tab = 'single' | 'bulk';
 function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }) {
   const answerRef = useRef<TextInput>(null);
   const { mutateAsync: createCard } = useCreateCard();
+  const [note, setNote] = useState('');
 
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<SingleForm>({
     resolver: zodResolver(singleSchema),
@@ -51,13 +52,14 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
   });
 
   const onSubmit = async (data: SingleForm) => {
-    await createCard({ setId, ...data });
+    await createCard({ setId, ...data, note: note.trim() || undefined });
     Toast.show({ type: 'success', text1: 'Card added!', text2: 'Add another or go back' });
+    setNote('');
     reset();
   };
 
   const onSubmitAndExit = async (data: SingleForm) => {
-    await createCard({ setId, ...data });
+    await createCard({ setId, ...data, note: note.trim() || undefined });
     Toast.show({ type: 'success', text1: 'Card added!' });
     onSaved();
   };
@@ -83,6 +85,21 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
       />
+      <View>
+        <Typography preset="label" color={colors.textSecondary} style={styles.noteLabel}>
+          Note (optional)
+        </Typography>
+        <TextInput
+          style={styles.noteInput}
+          placeholder="Add a hint or note…"
+          value={note}
+          onChangeText={setNote}
+          multiline
+          numberOfLines={3}
+          placeholderTextColor={colors.textDisabled}
+          autoCapitalize="sentences"
+        />
+      </View>
       <View style={styles.btnRow}>
         <Button
           label="Add & Continue"
@@ -236,6 +253,18 @@ const styles = StyleSheet.create({
   scroll: { padding: layout.screenPaddingH },
   formGap: { gap: spacing[4] },
   btnRow: { flexDirection: 'row', gap: spacing[3] },
+  noteLabel: { marginBottom: spacing[2] },
+  noteInput: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundSecondary,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    minHeight: 80,
+    color: colors.textPrimary,
+    textAlignVertical: 'top',
+  },
   bulkPair: { gap: spacing[3] },
   bulkPairHeader: {
     flexDirection: 'row',

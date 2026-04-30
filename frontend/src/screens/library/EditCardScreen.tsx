@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,7 +13,6 @@ import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
 import type { LibraryScreenProps } from '../../navigation/types';
-import { Pressable } from 'react-native';
 
 const schema = z.object({
   question: z.string().min(1, 'Question is required').trim(),
@@ -39,11 +38,17 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   const { mutateAsync: updateCard } = useUpdateCard(setId);
   const answerRef = useRef<any>(null);
   const [difficulty, setDifficulty] = React.useState<Difficulty>('MEDIUM');
+  const [note, setNote] = React.useState('');
+  const [isBlurred, setIsBlurred] = React.useState(false);
 
   const card = cards?.find(c => c.id === cardId);
 
   React.useEffect(() => {
-    if (card) setDifficulty(card.difficulty);
+    if (card) {
+      setDifficulty(card.difficulty);
+      setNote(card.note ?? '');
+      setIsBlurred(card.isBlurred);
+    }
   }, [card]);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<EditCardForm>({
@@ -61,7 +66,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   const onSubmit = async (data: EditCardForm) => {
     try {
-      await updateCard({ id: cardId, payload: { ...data, difficulty } });
+      await updateCard({ id: cardId, payload: { ...data, difficulty, note: note.trim() || null, isBlurred } });
       Toast.show({ type: 'success', text1: 'Card updated!' });
       navigation.goBack();
     } catch (err) {
@@ -124,6 +129,41 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
             </View>
           </View>
 
+          {/* Note */}
+          <View>
+            <Typography preset="label" color={colors.textSecondary} style={styles.label}>
+              Note (optional)
+            </Typography>
+            <TextInput
+              style={styles.noteInput}
+              placeholder="Add a hint or note…"
+              value={note}
+              onChangeText={setNote}
+              multiline
+              numberOfLines={3}
+              placeholderTextColor={colors.textDisabled}
+              autoCapitalize="sentences"
+            />
+          </View>
+
+          {/* Blur toggle */}
+          <View>
+            <Typography preset="label" color={colors.textSecondary} style={styles.label}>
+              Blur answer in study mode
+            </Typography>
+            <Pressable
+              style={[styles.blurChip, isBlurred && styles.blurChipActive]}
+              onPress={() => setIsBlurred(b => !b)}
+            >
+              <Typography
+                preset="label"
+                color={isBlurred ? colors.primary : colors.textSecondary}
+              >
+                {isBlurred ? '🙈 Answer blurred' : '👁 Answer visible'}
+              </Typography>
+            </Pressable>
+          </View>
+
           <Button
             label="Save Changes"
             onPress={handleSubmit(onSubmit)}
@@ -149,5 +189,29 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     paddingVertical: spacing[3],
     alignItems: 'center',
+  },
+  noteInput: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundSecondary,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    minHeight: 80,
+    color: colors.textPrimary,
+    textAlignVertical: 'top',
+  },
+  blurChip: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundSecondary,
+    paddingVertical: spacing[3],
+    paddingHorizontal: spacing[4],
+    alignItems: 'center',
+  },
+  blurChipActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySurface,
   },
 });
