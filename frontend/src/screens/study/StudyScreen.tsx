@@ -378,6 +378,16 @@ export function StudyScreen({ route, navigation }: Props) {
           </Animated.View>
         </GestureDetector>
 
+        {/* Note reveal after flip */}
+        {isRevealed && currentCard.note && (
+          <Animated.View entering={FadeIn.duration(300)} style={styles.noteSection}>
+            <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
+            <Typography preset="bodySm" color={colors.textSecondary} style={styles.noteText}>
+              {currentCard.note}
+            </Typography>
+          </Animated.View>
+        )}
+
         {/* First-card swipe hint */}
         {currentIndex === 0 && !isRevealed && (
           <Animated.View entering={FadeIn.duration(600)} style={styles.swipeHint}>
@@ -473,6 +483,18 @@ const styles = StyleSheet.create({
 
   // First-card hint
   swipeHint: { marginTop: spacing[3] },
+
+  // Note panel
+  noteSection: {
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: spacing[4],
+    marginTop: spacing[3],
+    gap: spacing[1],
+  },
+  noteText: { lineHeight: 20 },
 
   // Skip
   skipBtn: { alignSelf: 'center', marginTop: spacing[2], paddingVertical: spacing[2] },
