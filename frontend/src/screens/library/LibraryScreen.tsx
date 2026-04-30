@@ -288,6 +288,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={() => setSelectedSet(null)}
         actions={[
           {
+            label: '📖 Study Set',
+            onPress: () =>
+              selectedSet &&
+              navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title }),
+          },
+          {
             label: '➕ Create Card',
             onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
           },
