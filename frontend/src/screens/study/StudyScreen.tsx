@@ -403,6 +403,15 @@ export function StudyScreen({ route, navigation }: Props) {
       {/* ── Progress bar ── */}
       <ProgressBar progress={progress} style={styles.progress} />
 
+      {/* ── Running session stats ── */}
+      {(results.EASY + results.MEDIUM + results.HARD) > 0 && (
+        <View style={styles.sessionStats}>
+          <Typography preset="caption" color={colors.success}>✓ {results.EASY}</Typography>
+          <Typography preset="caption" color={colors.warning}>~ {results.MEDIUM}</Typography>
+          <Typography preset="caption" color={colors.error}>✗ {results.HARD}</Typography>
+        </View>
+      )}
+
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -603,6 +612,20 @@ const styles = StyleSheet.create({
   // Header title / right cluster
   headerTitle: { flex: 1, textAlign: 'center', marginHorizontal: spacing[2] },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
+
+  // Running stats
+  sessionStats: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing[6],
+    paddingVertical: spacing[2],
+    marginHorizontal: layout.screenPaddingH,
+    marginBottom: spacing[2],
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
 
   // Set picker
   pickerWrap: { padding: layout.screenPaddingH, gap: spacing[3] },
