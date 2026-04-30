@@ -16,6 +16,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
+  const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
@@ -77,8 +78,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         <Typography preset="bodySm" color={colors.textSecondary}>
           {cards.length} {cards.length === 1 ? 'card' : 'cards'}
         </Typography>
-        <Pressable onPress={() => navigation.navigate('CreateCard', { setId })} hitSlop={8}>
-          <Typography preset="label" color={colors.primary}>+ Add Cards</Typography>
+        <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
+          <Typography style={styles.menuIcon}>⋮</Typography>
         </Pressable>
       </View>
 
@@ -199,6 +200,23 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         )}
       </AppModal>
 
+      {/* ── Header menu ── */}
+      <ActionSheet
+        visible={headerMenuOpen}
+        title={setTitle}
+        onClose={() => setHeaderMenuOpen(false)}
+        actions={[
+          {
+            label: '➕ Create Card',
+            onPress: () => navigation.navigate('CreateCard', { setId }),
+          },
+          {
+            label: '✏️ Edit Set',
+            onPress: () => navigation.navigate('EditSet', { setId }),
+          },
+        ]}
+      />
+
       {/* ── Note popup ── */}
       <AppModal
         visible={!!noteCard}
@@ -268,4 +286,6 @@ const styles = StyleSheet.create({
   note: { lineHeight: 20 },
   blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
   setOption: { paddingVertical: spacing[3] },
+  menuBtn: { paddingHorizontal: spacing[2] },
+  menuIcon: { fontSize: 22, color: colors.textSecondary, lineHeight: 26 },
 });
