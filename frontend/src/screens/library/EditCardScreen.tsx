@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
@@ -10,7 +10,7 @@ import { FormField } from '../../components/forms';
 import { Button, Typography } from '../../components/ui';
 import { useCards, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { colors, layout, shadows, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
 import type { LibraryScreenProps } from '../../navigation/types';
 
@@ -56,6 +56,9 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
     values: card ? { question: card.question, answer: card.answer } : undefined,
   });
 
+  const questionValue = useWatch({ control, name: 'question' });
+  const answerValue   = useWatch({ control, name: 'answer' });
+
   if (isLoading || !card) {
     return (
       <View style={styles.loading}>
@@ -85,6 +88,28 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
+          {/* ── Live preview ── */}
+          <View style={styles.preview}>
+            <View style={styles.previewTop}>
+              <Typography
+                preset="body"
+                color={questionValue ? colors.textPrimary : colors.textDisabled}
+                style={styles.previewText}
+              >
+                {questionValue || 'Front (question)'}
+              </Typography>
+            </View>
+            <View style={styles.previewBottom}>
+              <Typography
+                preset="body"
+                color={answerValue ? colors.textSecondary : colors.textDisabled}
+                style={styles.previewText}
+              >
+                {answerValue || 'Back (answer)'}
+              </Typography>
+            </View>
+          </View>
+
           <FormField
             name="question"
             control={control}
@@ -214,4 +239,26 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     backgroundColor: colors.primarySurface,
   },
+  preview: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  previewTop: {
+    backgroundColor: colors.backgroundSecondary,
+    padding: spacing[4],
+    minHeight: 72,
+    justifyContent: 'center',
+  },
+  previewBottom: {
+    backgroundColor: colors.background,
+    padding: spacing[4],
+    minHeight: 56,
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  previewText: { lineHeight: 22 },
 });
