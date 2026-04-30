@@ -31,6 +31,7 @@ type Tab = 'sets' | 'folders';
 
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [search, setSearch] = useState('');
+  const [searchVisible, setSearchVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('sets');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
@@ -52,9 +53,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const refreshing = foldersLoading || setsLoading;
 
+  const toggleSearch = () => {
+    if (searchVisible) setSearch('');
+    setSearchVisible(v => !v);
+  };
+
   const filteredSets = search.trim()
     ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
     : sets;
+
+  const filteredFolders = search.trim()
+    ? folders.filter(f => f.name.toLowerCase().includes(search.toLowerCase()))
+    : folders;
 
   const setCountByFolder = (folderId: string) =>
     sets.filter(s => s.folderId === folderId).length;
@@ -136,9 +146,14 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {/* ── Header ── */}
       <View style={styles.header}>
         <Typography preset="h2">Library</Typography>
-        <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
-          <Typography preset="label" color={colors.primary}>Browse Public</Typography>
-        </Pressable>
+        <View style={styles.headerActions}>
+          <Pressable onPress={toggleSearch} hitSlop={8}>
+            <Typography preset="label" color={searchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
+            <Typography preset="label" color={colors.primary}>Browse Public</Typography>
+          </Pressable>
+        </View>
       </View>
 
       {/* ── Tab toggle ── */}
@@ -159,14 +174,15 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         ))}
       </View>
 
-      {/* ── Search (SETS tab only) ── */}
-      {activeTab === 'sets' && (
+      {/* ── Search ── */}
+      {searchVisible && (
         <View style={styles.searchWrap}>
           <Input
-            placeholder="Search sets…"
+            placeholder={activeTab === 'sets' ? 'Search sets…' : 'Search folders…'}
             value={search}
             onChangeText={setSearch}
             containerStyle={styles.searchInput}
+            autoFocus
           />
         </View>
       )}
@@ -211,15 +227,15 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             </View>
           )
         ) : (
-          folders.length === 0 ? (
+          filteredFolders.length === 0 ? (
             <EmptyState
-              title="No folders yet"
-              subtitle="Tap Create Folder to organise your sets"
+              title={search ? 'No results' : 'No folders yet'}
+              subtitle={search ? `No folders match "${search}"` : 'Tap Create Folder to organise your sets'}
               style={styles.emptyState}
             />
           ) : (
             <View style={styles.list}>
-              {folders.map(folder => (
+              {filteredFolders.map(folder => (
                 <FolderCard
                   key={folder.id}
                   folder={folder}
@@ -388,6 +404,7 @@ const styles = StyleSheet.create({
     paddingTop: spacing[4],
     paddingBottom: spacing[2],
   },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
   tabs: {
     flexDirection: 'row',
     borderBottomWidth: 1,
