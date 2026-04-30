@@ -28,11 +28,13 @@ import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
 
 type Tab = 'sets' | 'folders';
+type SortOrder = 'newest' | 'alpha' | 'cards';
 
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [search, setSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>('sets');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
@@ -58,9 +60,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     setSearchVisible(v => !v);
   };
 
+  const cycleSortOrder = () =>
+    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
+
   const filteredSets = search.trim()
     ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
     : sets;
+
+  const sortedSets = [...filteredSets].sort((a, b) => {
+    if (sortOrder === 'alpha') return a.title.localeCompare(b.title);
+    if (sortOrder === 'cards') return (b._count?.cards ?? 0) - (a._count?.cards ?? 0);
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
 
   const filteredFolders = search.trim()
     ? folders.filter(f => f.name.toLowerCase().includes(search.toLowerCase()))
@@ -150,6 +161,13 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           <Pressable onPress={toggleSearch} hitSlop={8}>
             <Typography preset="label" color={searchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
           </Pressable>
+          {activeTab === 'sets' && (
+            <Pressable onPress={cycleSortOrder} hitSlop={8}>
+              <Typography preset="caption" color={colors.primary}>
+                {sortOrder === 'newest' ? '⇅ Recent' : sortOrder === 'alpha' ? '⇅ A–Z' : '⇅ Cards'}
+              </Typography>
+            </Pressable>
+          )}
           <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
             <Typography preset="label" color={colors.primary}>Browse Public</Typography>
           </Pressable>
@@ -206,7 +224,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
               <SetCardSkeleton />
               <SetCardSkeleton />
             </>
-          ) : filteredSets.length === 0 ? (
+          ) : sortedSets.length === 0 ? (
             <EmptyState
               title={search ? 'No results' : 'No sets yet'}
               subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
@@ -216,7 +234,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             />
           ) : (
             <View style={styles.list}>
-              {filteredSets.map(set => (
+              {sortedSets.map(set => (
                 <SetCard
                   key={set.id}
                   set={set}
