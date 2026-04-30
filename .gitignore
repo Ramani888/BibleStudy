@@ -26,3 +26,7 @@ Thumbs.db
 graphify-out/cache/
 graphify-out/manifest.json
 graphify-out/cost.json
+
+# Android release keystore — never commit this
+frontend/android/app/*.keystore
+!frontend/android/app/debug.keystore

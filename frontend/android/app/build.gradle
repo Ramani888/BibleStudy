@@ -107,11 +107,14 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            manifestPlaceholders = [usesCleartextTraffic: true]
         }
         release {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            // Allow HTTP until HTTPS/domain is set up — change to false once TLS is configured
+            manifestPlaceholders = [usesCleartextTraffic: true]
         }
     }
 }
