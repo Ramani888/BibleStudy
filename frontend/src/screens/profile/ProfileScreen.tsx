@@ -8,8 +8,8 @@ import Toast from 'react-native-toast-message';
 import { MenuItem } from './components/MenuItem';
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
+import { useSets } from '../../hooks';
 import { useUpdateMapPrivacy } from '../../hooks/useMap';
-import { formatBytes } from '../../utils/formatters';
 import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
 import type { ProfileStackParamList } from '../../navigation/types';
@@ -47,9 +47,8 @@ export function ProfileScreen() {
     ]);
   };
 
-  const storagePercent = user
-    ? Math.round((user.storageUsed / user.storageLimit) * 100)
-    : 0;
+  const { data: sets = [] } = useSets();
+  const totalCards = sets.reduce((sum, s) => sum + (s._count?.cards ?? 0), 0);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -105,19 +104,13 @@ export function ProfileScreen() {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Typography preset="h3">{storagePercent}%</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>
-              Storage used
-            </Typography>
+            <Typography preset="h3" color={colors.primary}>{sets.length}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Sets</Typography>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Typography preset="h3">
-              {formatBytes(user?.storageUsed ?? 0)}
-            </Typography>
-            <Typography preset="caption" color={colors.textSecondary}>
-              of {formatBytes(user?.storageLimit ?? 0)}
-            </Typography>
+            <Typography preset="h3" color={colors.primary}>{totalCards}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
           </View>
         </View>
 
