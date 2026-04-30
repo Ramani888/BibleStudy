@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  FlatList,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -22,9 +23,10 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
-import { FlashCard } from '../../components/domain';
+import { FlashCard, SetCard } from '../../components/domain';
+import { SetCardSkeleton } from '../../components/feedback';
 import { Button, ProgressBar, Spacer, Typography } from '../../components/ui';
-import { useCards, useRecordStudy } from '../../hooks';
+import { useCards, useRecordStudy, useSets } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
@@ -81,29 +83,58 @@ function CompletionScreen({ total, results, onRestart, onExit }: CompletionProps
   );
 }
 
-// ─── No set selected state ────────────────────────────────────────────────────
-function NoSetSelected() {
+// ─── Set picker (shown when no set is active) ─────────────────────────────────
+function SetPicker() {
   const navigation = useNavigation<Props['navigation']>();
+  const { data: sets = [], isLoading } = useSets();
+
+  if (isLoading) {
+    return (
+      <View style={styles.pickerWrap}>
+        <SetCardSkeleton />
+        <SetCardSkeleton />
+        <SetCardSkeleton />
+      </View>
+    );
+  }
+
+  if (sets.length === 0) {
+    return (
+      <View style={styles.noSetWrap}>
+        <Typography style={styles.noSetEmoji}>📚</Typography>
+        <Typography preset="h3" align="center">No Sets Yet</Typography>
+        <Typography preset="body" color={colors.textSecondary} align="center" style={styles.noSetSub}>
+          Create a set in the Library to start studying.
+        </Typography>
+        <Spacer size={spacing[6]} />
+        <Button label="Go to Library" onPress={() => navigation.navigate('LibraryTab')} variant="outline" />
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.noSetWrap}>
-      <Typography style={styles.noSetEmoji}>📚</Typography>
-      <Typography preset="h3" align="center">Choose a Set to Study</Typography>
-      <Typography preset="body" color={colors.textSecondary} align="center" style={styles.noSetSub}>
-        Open a study set from the Library and tap the Study button.
-      </Typography>
-      <Spacer size={spacing[6]} />
-      <Button
-        label="Go to Library"
-        onPress={() => navigation.navigate('LibraryTab')}
-        variant="outline"
-      />
-    </View>
+    <FlatList
+      data={sets}
+      keyExtractor={item => item.id}
+      contentContainerStyle={styles.pickerList}
+      showsVerticalScrollIndicator={false}
+      ListHeaderComponent={
+        <Typography preset="h4" style={styles.pickerHeader}>Choose a Set to Study</Typography>
+      }
+      ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
+      renderItem={({ item }) => (
+        <SetCard
+          set={item}
+          onPress={() => navigation.navigate('Study', { setId: item.id, setTitle: item.title })}
+        />
+      )}
+    />
   );
 }
 
 // ─── Main screen ──────────────────────────────────────────────────────────────
 export function StudyScreen({ route, navigation }: Props) {
-  const setId = route.params.setId;
+  const { setId, setTitle } = route.params;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -228,7 +259,7 @@ export function StudyScreen({ route, navigation }: Props) {
   if (!setId) {
     return (
       <SafeAreaView style={styles.safe}>
-        <NoSetSelected />
+        <SetPicker />
       </SafeAreaView>
     );
   }
@@ -278,6 +309,11 @@ export function StudyScreen({ route, navigation }: Props) {
         <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
           <Typography preset="label" color={colors.primary}>✕ Exit</Typography>
         </Pressable>
+        {setTitle ? (
+          <Typography preset="label" color={colors.textPrimary} numberOfLines={1} style={styles.headerTitle}>
+            {setTitle}
+          </Typography>
+        ) : null}
         <Typography preset="label" color={colors.textSecondary}>
           {currentIndex + 1} / {cards.length}
         </Typography>
@@ -450,6 +486,14 @@ const styles = StyleSheet.create({
     gap: spacing[3],
     marginTop: spacing[2],
   },
+
+  // Header title
+  headerTitle: { flex: 1, textAlign: 'center', marginHorizontal: spacing[2] },
+
+  // Set picker
+  pickerWrap: { padding: layout.screenPaddingH, gap: spacing[3] },
+  pickerList: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+  pickerHeader: { marginBottom: spacing[3] },
 
   // No set / Loading / Empty
   noSetWrap: {
