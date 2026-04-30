@@ -23,7 +23,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: deleteCard } = useDeleteCard(setId);
   const { mutate: copyCard }   = useCopyCard(setId);
   const { mutate: moveCard }   = useMoveCard(setId);
-  const { mutate: updateCard } = useUpdateCard(setId);
+  const { mutate: updateCard, mutateAsync: updateCardAsync } = useUpdateCard(setId);
 
   const handleCopyCard = (id: string) => {
     copyCard(id, {
@@ -38,6 +38,21 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         Toast.show({ type: 'success', text1: card.isBlurred ? 'Card unblurred' : 'Card blurred' }),
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
+  };
+
+  const allBlurred = cards.length > 0 && cards.every(c => c.isBlurred);
+
+  const handleBlurAll = async (blur: boolean) => {
+    const toUpdate = cards.filter(c => c.isBlurred !== blur);
+    if (toUpdate.length === 0) return;
+    try {
+      await Promise.all(
+        toUpdate.map(c => updateCardAsync({ id: c.id, payload: { isBlurred: blur } })),
+      );
+      Toast.show({ type: 'success', text1: blur ? 'All cards blurred' : 'All cards unblurred' });
+    } catch {
+      Toast.show({ type: 'error', text1: 'Error', text2: 'Could not update all cards' });
+    }
   };
 
   const handleMoveCard = (targetSetId: string) => {
@@ -213,6 +228,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           {
             label: '✏️ Edit Set',
             onPress: () => navigation.navigate('EditSet', { setId }),
+          },
+          {
+            label: allBlurred ? '👁 Unblur All' : '🙈 Blur All',
+            onPress: () => handleBlurAll(!allBlurred),
           },
         ]}
       />
