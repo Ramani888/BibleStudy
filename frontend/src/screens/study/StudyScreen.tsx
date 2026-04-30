@@ -47,11 +47,12 @@ const DIFF_CONFIG: { difficulty: Difficulty; label: string; emoji: string; color
 interface CompletionProps {
   total: number;
   results: Record<Difficulty, number>;
+  skippedCount: number;
   onRestart: () => void;
   onExit: () => void;
 }
 
-function CompletionScreen({ total, results, onRestart, onExit }: CompletionProps) {
+function CompletionScreen({ total, results, skippedCount, onRestart, onExit }: CompletionProps) {
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.completionWrap}>
       <Typography style={styles.completionEmoji}>🎉</Typography>
@@ -73,6 +74,12 @@ function CompletionScreen({ total, results, onRestart, onExit }: CompletionProps
           <Typography preset="h3" color={colors.error}>{results.HARD}</Typography>
           <Typography preset="caption" color={colors.error}>Hard</Typography>
         </View>
+        {skippedCount > 0 && (
+          <View style={[styles.statBox, { backgroundColor: colors.backgroundSecondary }]}>
+            <Typography preset="h3" color={colors.textSecondary}>{skippedCount}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Skipped</Typography>
+          </View>
+        )}
       </View>
 
       <View style={styles.completionBtns}>
@@ -139,6 +146,7 @@ export function StudyScreen({ route, navigation }: Props) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+  const [skippedCount, setSkippedCount] = useState(0);
   const [results, setResults] = useState<Record<Difficulty, number>>({
     EASY: 0,
     MEDIUM: 0,
@@ -248,10 +256,22 @@ export function StudyScreen({ route, navigation }: Props) {
     opacity: interpolate(swipeX.value, [-SWIPE_THRESHOLD, 0], [1, 0], Extrapolation.CLAMP),
   }));
 
+  const handleSkip = useCallback(() => {
+    setSkippedCount(prev => prev + 1);
+    const next = currentIndex + 1;
+    if (next >= cards.length) {
+      setIsComplete(true);
+    } else {
+      setIsRevealed(false);
+      setCurrentIndex(next);
+    }
+  }, [currentIndex, cards.length]);
+
   const handleRestart = () => {
     setCurrentIndex(0);
     setIsRevealed(false);
     setIsComplete(false);
+    setSkippedCount(0);
     setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
   };
 
@@ -295,6 +315,7 @@ export function StudyScreen({ route, navigation }: Props) {
         <CompletionScreen
           total={cards.length}
           results={results}
+          skippedCount={skippedCount}
           onRestart={handleRestart}
           onExit={() => navigation.navigate('LibraryTab')}
         />
@@ -367,6 +388,13 @@ export function StudyScreen({ route, navigation }: Props) {
         )}
 
         <Spacer size={spacing[8]} />
+
+        {/* ── Skip button (before flip only) ── */}
+        {!isRevealed && (
+          <Pressable onPress={handleSkip} hitSlop={12} style={styles.skipBtn}>
+            <Typography preset="label" color={colors.textDisabled}>Skip →</Typography>
+          </Pressable>
+        )}
 
         {/* ── Difficulty buttons (appear after flip) ── */}
         {isRevealed ? (
@@ -445,6 +473,9 @@ const styles = StyleSheet.create({
 
   // First-card hint
   swipeHint: { marginTop: spacing[3] },
+
+  // Skip
+  skipBtn: { alignSelf: 'center', marginTop: spacing[2], paddingVertical: spacing[2] },
 
   // Difficulty
   rateLabel: { letterSpacing: 0.3 },
