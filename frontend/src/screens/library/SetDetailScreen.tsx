@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { ActionSheet, AppModal, EmptyState, ErrorState } from '../../components/feedback';
-import { Button, Divider, Typography } from '../../components/ui';
+import { Button, Divider, Input, Typography } from '../../components/ui';
 import { useCards, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
@@ -20,6 +20,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [layout, setLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
+  const [cardSearch, setCardSearch] = useState('');
+  const [cardSearchVisible, setCardSearchVisible] = useState(false);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
@@ -27,6 +29,19 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: copyCard }   = useCopyCard(setId);
   const { mutate: moveCard }   = useMoveCard(setId);
   const { mutate: updateCard, mutateAsync: updateCardAsync } = useUpdateCard(setId);
+
+  const toggleCardSearch = () => {
+    if (cardSearchVisible) setCardSearch('');
+    setCardSearchVisible(v => !v);
+  };
+
+  const filteredCards = cardSearch.trim()
+    ? cards.filter(
+        c =>
+          c.question.toLowerCase().includes(cardSearch.toLowerCase()) ||
+          c.answer.toLowerCase().includes(cardSearch.toLowerCase()),
+      )
+    : cards;
 
   const handleCopyCard = (id: string) => {
     copyCard(id, {
@@ -112,14 +127,30 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         <Typography preset="bodySm" color={colors.textSecondary}>
           {cards.length} {cards.length === 1 ? 'card' : 'cards'}
         </Typography>
-        <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
-          <Typography style={styles.menuIcon}>⋮</Typography>
-        </Pressable>
+        <View style={styles.statsBarActions}>
+          <Pressable onPress={toggleCardSearch} hitSlop={8}>
+            <Typography preset="label" color={cardSearchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+          </Pressable>
+          <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
+            <Typography style={styles.menuIcon}>⋮</Typography>
+          </Pressable>
+        </View>
       </View>
+      {cardSearchVisible && (
+        <View style={styles.searchWrap}>
+          <Input
+            placeholder="Search cards…"
+            value={cardSearch}
+            onChangeText={setCardSearch}
+            containerStyle={styles.searchInput}
+            autoFocus
+          />
+        </View>
+      )}
 
       <FlatList
         key={layout}
-        data={cards}
+        data={filteredCards}
         keyExtractor={item => item.id}
         numColumns={layout === 'grid' ? 2 : 1}
         columnWrapperStyle={layout === 'grid' ? styles.gridRow : undefined}
@@ -131,10 +162,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         ListEmptyComponent={
           !isLoading ? (
             <EmptyState
-              title="No cards yet"
-              subtitle="Add cards to start studying this set"
-              ctaLabel="Add Cards"
-              onCta={() => navigation.navigate('CreateCard', { setId })}
+              title={cardSearch ? 'No results' : 'No cards yet'}
+              subtitle={cardSearch ? `No cards match "${cardSearch}"` : 'Add cards to start studying this set'}
+              ctaLabel={cardSearch ? undefined : 'Add Cards'}
+              onCta={cardSearch ? undefined : () => navigation.navigate('CreateCard', { setId })}
             />
           ) : null
         }
@@ -341,8 +372,11 @@ const styles = StyleSheet.create({
   note: { lineHeight: 20 },
   blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
   setOption: { paddingVertical: spacing[3] },
+  statsBarActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
   menuBtn: { paddingHorizontal: spacing[2] },
   menuIcon: { fontSize: 22, color: colors.textSecondary, lineHeight: 26 },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
+  searchInput: { marginBottom: 0 },
   gridRow: { gap: spacing[3] },
   cardItemGrid: { flex: 1 },
   questionSectionGrid: { padding: spacing[3] },
