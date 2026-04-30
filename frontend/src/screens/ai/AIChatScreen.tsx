@@ -1,7 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
+  Alert,
   FlatList,
   Pressable,
+  Share,
   StyleSheet,
   View,
 } from 'react-native';
@@ -99,6 +101,14 @@ export function AIChatScreen() {
     [creditBalance, sendMessage],
   );
 
+  const handleClearChat = () => {
+    if (messages.length === 0) return;
+    Alert.alert('New Conversation', 'Clear the current chat and start fresh?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Clear', style: 'destructive', onPress: () => setMessages([]) },
+    ]);
+  };
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* ── Header ── */}
@@ -116,6 +126,9 @@ export function AIChatScreen() {
         </View>
         <View style={styles.headerRight}>
           <CreditBadge balance={creditBalance} />
+          <Pressable onPress={handleClearChat} hitSlop={8}>
+            <Typography preset="label" color={messages.length > 0 ? colors.textSecondary : colors.textDisabled}>🗑</Typography>
+          </Pressable>
           <Pressable onPress={() => navigation.navigate('ChatHistory')} hitSlop={8}>
             <Typography preset="label" color={colors.primary}>History</Typography>
           </Pressable>
@@ -154,13 +167,21 @@ export function AIChatScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <ChatBubble
-            role={item.role}
-            text={item.text}
-            creditsUsed={item.creditsUsed}
-            userName={user?.name}
-            userImage={user?.profileImage}
-          />
+          <Pressable
+            onLongPress={() => {
+              if (item.text !== '__typing__') {
+                Share.share({ message: item.text });
+              }
+            }}
+          >
+            <ChatBubble
+              role={item.role}
+              text={item.text}
+              creditsUsed={item.creditsUsed}
+              userName={user?.name}
+              userImage={user?.profileImage}
+            />
+          </Pressable>
         )}
       />
 
