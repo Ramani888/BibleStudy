@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Pressable,
   RefreshControl,
@@ -13,7 +13,7 @@ import Toast from 'react-native-toast-message';
 
 import { DailyVerseCard, SetCard, CreditBadge } from '../../components/domain';
 import { Avatar, Spacer, Typography } from '../../components/ui';
-import { SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
 import { useDailyVerse, useSets, useClaimDailyLogin } from '../../hooks';
 import { useFriendsActivityFeed } from '../../hooks/useActivities';
@@ -22,6 +22,7 @@ import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
 import type { AppTabParamList } from '../../navigation/types';
 import type { Activity, ActivityType } from '../../types/activities.types';
+import type { StudySet } from '../../types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
@@ -140,6 +141,7 @@ function ActivityItem({ item }: { item: Activity }) {
 export function HomeScreen() {
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
+  const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 
   const { data: verse, isLoading: verseLoading, refetch: refetchVerse } = useDailyVerse();
   const { data: sets, isLoading: setsLoading, refetch: refetchSets } = useSets();
@@ -268,6 +270,7 @@ export function HomeScreen() {
                     params: { setId: set.id, setTitle: set.title },
                   })
                 }
+                onMenuPress={() => setSelectedSet(set)}
               />
             ))
           )}
@@ -295,6 +298,32 @@ export function HomeScreen() {
 
         <Spacer size={spacing[8]} />
       </ScrollView>
+
+      <ActionSheet
+        visible={!!selectedSet}
+        title={selectedSet?.title}
+        onClose={() => setSelectedSet(null)}
+        actions={[
+          {
+            label: '📖 Study Set',
+            onPress: () =>
+              selectedSet &&
+              navigation.navigate('LibraryTab', {
+                screen: 'Study',
+                params: { setId: selectedSet.id, setTitle: selectedSet.title },
+              }),
+          },
+          {
+            label: '📋 View Cards',
+            onPress: () =>
+              selectedSet &&
+              navigation.navigate('LibraryTab', {
+                screen: 'SetDetail',
+                params: { setId: selectedSet.id, setTitle: selectedSet.title },
+              }),
+          },
+        ]}
+      />
     </SafeAreaView>
   );
 }
