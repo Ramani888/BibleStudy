@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -18,6 +18,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
   const [layout, setLayout] = useState<'list' | 'grid'>('list');
+  const [noteText, setNoteText] = useState('');
+  const [savingNote, setSavingNote] = useState(false);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
@@ -65,6 +67,22 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         Toast.show({ type: 'success', text1: 'Card moved' });
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Move failed', text2: getErrorMessage(err) }),
+    });
+  };
+
+  const handleSaveNote = () => {
+    if (!noteCard) return;
+    setSavingNote(true);
+    updateCard({ id: noteCard.id, payload: { note: noteText.trim() || null } }, {
+      onSuccess: () => {
+        setSavingNote(false);
+        setNoteCard(null);
+        Toast.show({ type: 'success', text1: 'Note saved' });
+      },
+      onError: (err: unknown) => {
+        setSavingNote(false);
+        Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+      },
     });
   };
 
@@ -128,7 +146,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
                 {item.question}
               </Typography>
               <View style={styles.cardActions}>
-                <Pressable onPress={() => setNoteCard(item)} hitSlop={6} style={styles.iconBtn}>
+                <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
                   <Typography style={styles.iconText}>ℹ️</Typography>
                 </Pressable>
                 <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
@@ -250,12 +268,18 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title="Note"
         onClose={() => setNoteCard(null)}
       >
-        {noteCard?.note ? (
-          <Typography preset="body">{noteCard.note}</Typography>
-        ) : (
-          <Typography preset="bodySm" color={colors.textSecondary}>No note on this card.</Typography>
-        )}
+        <TextInput
+          style={styles.notePopupInput}
+          placeholder="Add a note…"
+          value={noteText}
+          onChangeText={setNoteText}
+          multiline
+          numberOfLines={3}
+          placeholderTextColor={colors.textDisabled}
+          autoCapitalize="sentences"
+        />
         <Divider />
+        <Button label="Save Note" onPress={handleSaveNote} loading={savingNote} fullWidth />
         <Button
           label="Edit Card"
           variant="secondary"
@@ -319,4 +343,15 @@ const styles = StyleSheet.create({
   cardItemGrid: { flex: 1 },
   questionSectionGrid: { padding: spacing[3] },
   answerSectionGrid: { padding: spacing[3] },
+  notePopupInput: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    borderColor: colors.border,
+    backgroundColor: colors.backgroundSecondary,
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+    minHeight: 80,
+    color: colors.textPrimary,
+    textAlignVertical: 'top',
+  },
 });
