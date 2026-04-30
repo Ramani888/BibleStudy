@@ -25,8 +25,6 @@ import type { Activity, ActivityType } from '../../types/activities.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
-// Tabs that can be navigated to without required params from the home screen.
-// StudyTab intentionally excluded — it requires a setId (pick a set from Library first).
 type ParamlessTab = 'HomeTab' | 'LibraryTab' | 'AITab' | 'ProfileTab';
 
 // ─── Quick action item ────────────────────────────────────────────────────────
@@ -39,10 +37,10 @@ interface QuickAction {
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Library', emoji: '◫', tab: 'LibraryTab', color: colors.info, bg: colors.infoSurface },
-  { label: 'Study', emoji: '◈', tab: 'LibraryTab', color: colors.success, bg: colors.successSurface },
-  { label: 'AI Chat', emoji: '◎', tab: 'AITab', color: colors.primary, bg: colors.primarySurface },
-  { label: 'Profile', emoji: '◉', tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
+  { label: 'Library', emoji: '📚', tab: 'LibraryTab', color: colors.info,    bg: colors.infoSurface    },
+  { label: 'Study',   emoji: '🎓', tab: 'LibraryTab', color: colors.success, bg: colors.successSurface },
+  { label: 'AI Chat', emoji: '🤖', tab: 'AITab',      color: colors.primary, bg: colors.primarySurface },
+  { label: 'Profile', emoji: '👤', tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
 ];
 
 function QuickActionGrid() {
@@ -149,6 +147,7 @@ export function HomeScreen() {
 
   const recentSets = sets?.slice(0, 3) ?? [];
   const recentActivities = activityData?.pages[0]?.activities.slice(0, 5) ?? [];
+  const totalCards = sets?.reduce((sum, s) => sum + (s._count?.cards ?? 0), 0) ?? 0;
   const refreshing = verseLoading || setsLoading;
 
   const onRefresh = useCallback(async () => {
@@ -190,6 +189,19 @@ export function HomeScreen() {
             <Pressable onPress={() => navigation.navigate('ProfileTab')}>
               <Avatar uri={user?.profileImage} name={user?.name} size="sm" />
             </Pressable>
+          </View>
+        </View>
+
+        {/* ── Stats ── */}
+        <View style={styles.statsRow}>
+          <View style={styles.statItem}>
+            <Typography preset="h3" color={colors.primary}>{sets?.length ?? 0}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Sets</Typography>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statItem}>
+            <Typography preset="h3" color={colors.primary}>{totalCards}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
           </View>
         </View>
 
@@ -337,6 +349,18 @@ const styles = StyleSheet.create({
     fontSize: 28,
     lineHeight: 36,
   },
+
+  // Stats row
+  statsRow: {
+    flexDirection: 'row',
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: spacing[5],
+  },
+  statItem: { flex: 1, alignItems: 'center', paddingVertical: spacing[3] },
+  statDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[2] },
 
   // Sets
   setsList: { gap: spacing[3] },
