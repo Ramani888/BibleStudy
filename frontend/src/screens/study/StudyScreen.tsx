@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -147,6 +147,8 @@ export function StudyScreen({ route, navigation }: Props) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [skippedCount, setSkippedCount] = useState(0);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [shuffleOrder, setShuffleOrder] = useState<number[]>([]);
   const [results, setResults] = useState<Record<Difficulty, number>>({
     EASY: 0,
     MEDIUM: 0,
@@ -156,8 +158,13 @@ export function StudyScreen({ route, navigation }: Props) {
   const { data: cards = [], isLoading } = useCards(setId);
   const { mutate: recordStudy } = useRecordStudy(setId);
 
-  const currentCard = cards[currentIndex];
-  const progress = cards.length > 0 ? currentIndex / cards.length : 0;
+  const displayCards = useMemo(() => {
+    if (!isShuffled || shuffleOrder.length !== cards.length) return cards;
+    return shuffleOrder.map(i => cards[i]);
+  }, [cards, isShuffled, shuffleOrder]);
+
+  const currentCard = displayCards[currentIndex];
+  const progress = displayCards.length > 0 ? currentIndex / displayCards.length : 0;
 
   // ── Swipe gesture shared values ──
   const swipeX = useSharedValue(0);
@@ -191,14 +198,14 @@ export function StudyScreen({ route, navigation }: Props) {
       setResults(prev => ({ ...prev, [difficulty]: prev[difficulty] + 1 }));
 
       const next = currentIndex + 1;
-      if (next >= cards.length) {
+      if (next >= displayCards.length) {
         setIsComplete(true);
       } else {
         setIsRevealed(false);
         setCurrentIndex(next);
       }
     },
-    [currentCard, currentIndex, cards.length, recordStudy],
+    [currentCard, currentIndex, displayCards.length, recordStudy],
   );
 
   // ── Pan gesture — active only after card is flipped ──
@@ -256,18 +263,34 @@ export function StudyScreen({ route, navigation }: Props) {
     opacity: interpolate(swipeX.value, [-SWIPE_THRESHOLD, 0], [1, 0], Extrapolation.CLAMP),
   }));
 
+  const toggleShuffle = () => {
+    if (!isShuffled) {
+      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
+      setShuffleOrder(order);
+      setIsShuffled(true);
+    } else {
+      setIsShuffled(false);
+    }
+    setCurrentIndex(0);
+    setIsRevealed(false);
+  };
+
   const handleSkip = useCallback(() => {
     setSkippedCount(prev => prev + 1);
     const next = currentIndex + 1;
-    if (next >= cards.length) {
+    if (next >= displayCards.length) {
       setIsComplete(true);
     } else {
       setIsRevealed(false);
       setCurrentIndex(next);
     }
-  }, [currentIndex, cards.length]);
+  }, [currentIndex, displayCards.length]);
 
   const handleRestart = () => {
+    if (isShuffled) {
+      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
+      setShuffleOrder(order);
+    }
     setCurrentIndex(0);
     setIsRevealed(false);
     setIsComplete(false);
@@ -313,7 +336,7 @@ export function StudyScreen({ route, navigation }: Props) {
     return (
       <SafeAreaView style={styles.safe}>
         <CompletionScreen
-          total={cards.length}
+          total={displayCards.length}
           results={results}
           skippedCount={skippedCount}
           onRestart={handleRestart}
@@ -335,9 +358,14 @@ export function StudyScreen({ route, navigation }: Props) {
             {setTitle}
           </Typography>
         ) : null}
-        <Typography preset="label" color={colors.textSecondary}>
-          {currentIndex + 1} / {cards.length}
-        </Typography>
+        <View style={styles.headerRight}>
+          <Pressable onPress={toggleShuffle} hitSlop={12}>
+            <Typography preset="label" color={isShuffled ? colors.primary : colors.textDisabled}>🔀</Typography>
+          </Pressable>
+          <Typography preset="label" color={colors.textSecondary}>
+            {currentIndex + 1} / {displayCards.length}
+          </Typography>
+        </View>
       </View>
 
       {/* ── Progress bar ── */}
@@ -540,8 +568,9 @@ const styles = StyleSheet.create({
     marginTop: spacing[2],
   },
 
-  // Header title
+  // Header title / right cluster
   headerTitle: { flex: 1, textAlign: 'center', marginHorizontal: spacing[2] },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
 
   // Set picker
   pickerWrap: { padding: layout.screenPaddingH, gap: spacing[3] },
