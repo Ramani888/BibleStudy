@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Alert, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -29,6 +29,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: copyCard }   = useCopyCard(setId);
   const { mutate: moveCard }   = useMoveCard(setId);
   const { mutate: updateCard, mutateAsync: updateCardAsync } = useUpdateCard(setId);
+
+  const handleShare = async () => {
+    const cardList = filteredCards
+      .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
+      .join('\n\n');
+    const divider = '─'.repeat(Math.min(setTitle.length, 40));
+    await Share.share({ message: `${setTitle}\n${divider}\n\n${cardList}` });
+  };
 
   const toggleCardSearch = () => {
     if (cardSearchVisible) setCardSearch('');
@@ -131,6 +139,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           <Pressable onPress={toggleCardSearch} hitSlop={8}>
             <Typography preset="label" color={cardSearchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
           </Pressable>
+          {cards.length > 0 && (
+            <Pressable onPress={handleShare} hitSlop={8}>
+              <Typography preset="label" color={colors.textSecondary}>📤</Typography>
+            </Pressable>
+          )}
           <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
             <Typography style={styles.menuIcon}>⋮</Typography>
           </Pressable>
