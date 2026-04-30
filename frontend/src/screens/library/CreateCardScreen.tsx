@@ -45,6 +45,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
   const answerRef = useRef<TextInput>(null);
   const { mutateAsync: createCard } = useCreateCard();
   const [note, setNote] = useState('');
+  const [noteExpanded, setNoteExpanded] = useState(false);
 
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<SingleForm>({
     resolver: zodResolver(singleSchema),
@@ -55,6 +56,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
     await createCard({ setId, ...data, note: note.trim() || undefined });
     Toast.show({ type: 'success', text1: 'Card added!', text2: 'Add another or go back' });
     setNote('');
+    setNoteExpanded(false);
     reset();
   };
 
@@ -85,21 +87,32 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
       />
-      <View>
-        <Typography preset="label" color={colors.textSecondary} style={styles.noteLabel}>
-          Note (optional)
-        </Typography>
-        <TextInput
-          style={styles.noteInput}
-          placeholder="Add a hint or note…"
-          value={note}
-          onChangeText={setNote}
-          multiline
-          numberOfLines={3}
-          placeholderTextColor={colors.textDisabled}
-          autoCapitalize="sentences"
-        />
-      </View>
+      {noteExpanded ? (
+        <View>
+          <View style={styles.noteLabelRow}>
+            <Typography preset="label" color={colors.textSecondary}>
+              Note (optional)
+            </Typography>
+            <Pressable onPress={() => { setNoteExpanded(false); setNote(''); }} hitSlop={8}>
+              <Typography preset="caption" color={colors.textSecondary}>Remove</Typography>
+            </Pressable>
+          </View>
+          <TextInput
+            style={styles.noteInput}
+            placeholder="Add a hint or note…"
+            value={note}
+            onChangeText={setNote}
+            multiline
+            numberOfLines={3}
+            placeholderTextColor={colors.textDisabled}
+            autoCapitalize="sentences"
+          />
+        </View>
+      ) : (
+        <Pressable style={styles.addNoteBtn} onPress={() => setNoteExpanded(true)}>
+          <Typography preset="label" color={colors.textSecondary}>+ Add Note</Typography>
+        </Pressable>
+      )}
       <View style={styles.btnRow}>
         <Button
           label="Add & Continue"
@@ -253,7 +266,20 @@ const styles = StyleSheet.create({
   scroll: { padding: layout.screenPaddingH },
   formGap: { gap: spacing[4] },
   btnRow: { flexDirection: 'row', gap: spacing[3] },
-  noteLabel: { marginBottom: spacing[2] },
+  noteLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing[2],
+  },
+  addNoteBtn: {
+    borderWidth: 1.5,
+    borderRadius: 12,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    paddingVertical: spacing[3],
+    alignItems: 'center',
+  },
   noteInput: {
     borderWidth: 1.5,
     borderRadius: 12,

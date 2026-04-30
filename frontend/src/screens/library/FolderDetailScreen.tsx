@@ -6,7 +6,7 @@ import Toast from 'react-native-toast-message';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState } from '../../components/feedback';
 import { Spacer, Typography } from '../../components/ui';
-import { useSets, useDeleteSet, useCloneSet } from '../../hooks';
+import { useSets, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -18,7 +18,6 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   const { data: sets = [], isLoading, refetch } = useSets(folderId);
   const { mutate: deleteSet } = useDeleteSet();
-  const { mutate: cloneSet } = useCloneSet();
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -53,7 +52,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
           <SetCard
             set={item}
             onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
-            onLongPress={() => setSelectedSet(item)}
+            onMenuPress={() => setSelectedSet(item)}
           />
         )}
       />
@@ -64,17 +63,12 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '✏️ Edit',
-            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
+            label: '➕ Create Card',
+            onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
           },
           {
-            label: '📋 Clone',
-            onPress: () =>
-              selectedSet &&
-              cloneSet(selectedSet.id, {
-                onSuccess: () => Toast.show({ type: 'success', text1: 'Set cloned' }),
-                onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-              }),
+            label: '✏️ Edit',
+            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
           },
           {
             label: '🗑 Delete',
