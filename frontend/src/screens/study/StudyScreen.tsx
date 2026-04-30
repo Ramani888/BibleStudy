@@ -54,6 +54,12 @@ interface CompletionProps {
 }
 
 function CompletionScreen({ total, results, skippedCount, onRestart, onRetryHard, onExit }: CompletionProps) {
+  const rated = results.EASY + results.MEDIUM + results.HARD;
+  const score = rated > 0
+    ? Math.round((results.EASY + results.MEDIUM * 0.5) / rated * 100)
+    : 0;
+  const scoreColor = score >= 80 ? colors.success : score >= 50 ? colors.warning : colors.error;
+
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.completionWrap}>
       <Typography style={styles.completionEmoji}>🎉</Typography>
@@ -61,6 +67,13 @@ function CompletionScreen({ total, results, skippedCount, onRestart, onRetryHard
       <Typography preset="body" color={colors.textSecondary} align="center" style={styles.completionSub}>
         You reviewed {total} cards
       </Typography>
+
+      {rated > 0 && (
+        <View style={styles.scoreWrap}>
+          <Typography style={[styles.scoreNumber, { color: scoreColor }]}>{score}%</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>score</Typography>
+        </View>
+      )}
 
       <View style={styles.statsGrid}>
         <View style={[styles.statBox, { backgroundColor: colors.successSurface }]}>
@@ -591,6 +604,8 @@ const styles = StyleSheet.create({
   },
   completionEmoji: { fontSize: 56, lineHeight: 68 },
   completionSub: { marginTop: -spacing[2] },
+  scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
+  scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
   statsGrid: {
     flexDirection: 'row',
     gap: spacing[3],
