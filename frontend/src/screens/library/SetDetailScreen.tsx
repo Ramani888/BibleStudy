@@ -17,6 +17,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
+  const [layout, setLayout] = useState<'list' | 'grid'>('list');
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
@@ -99,8 +100,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       </View>
 
       <FlatList
+        key={layout}
         data={cards}
         keyExtractor={item => item.id}
+        numColumns={layout === 'grid' ? 2 : 1}
+        columnWrapperStyle={layout === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshing={isLoading}
@@ -117,10 +121,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ) : null
         }
         renderItem={({ item }) => (
-          <View style={styles.cardItem}>
+          <View style={[styles.cardItem, layout === 'grid' && styles.cardItemGrid]}>
             {/* Question section — gray background */}
-            <View style={styles.questionSection}>
-              <Typography preset="body" style={styles.question}>
+            <View style={[styles.questionSection, layout === 'grid' && styles.questionSectionGrid]}>
+              <Typography preset="body" style={styles.question} numberOfLines={layout === 'grid' ? 3 : undefined}>
                 {item.question}
               </Typography>
               <View style={styles.cardActions}>
@@ -137,17 +141,17 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             </View>
 
             {/* Answer section — white background */}
-            <View style={styles.answerSection}>
+            <View style={[styles.answerSection, layout === 'grid' && styles.answerSectionGrid]}>
               {item.isBlurred ? (
                 <View style={styles.blurOverlay}>
                   <Typography preset="bodySm" color={colors.textDisabled}>Tap 👁 to reveal answer</Typography>
                 </View>
               ) : (
                 <>
-                  <Typography preset="body" color={colors.textSecondary} style={styles.answer}>
+                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={layout === 'grid' ? 2 : undefined}>
                     {item.answer}
                   </Typography>
-                  {item.note ? (
+                  {item.note && layout === 'list' ? (
                     <>
                       <Divider marginV={spacing[2]} />
                       <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
@@ -233,6 +237,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             label: allBlurred ? '👁 Unblur All' : '🙈 Blur All',
             onPress: () => handleBlurAll(!allBlurred),
           },
+          {
+            label: layout === 'grid' ? '☰ List View' : '⊞ Grid View',
+            onPress: () => setLayout(l => l === 'list' ? 'grid' : 'list'),
+          },
         ]}
       />
 
@@ -307,4 +315,8 @@ const styles = StyleSheet.create({
   setOption: { paddingVertical: spacing[3] },
   menuBtn: { paddingHorizontal: spacing[2] },
   menuIcon: { fontSize: 22, color: colors.textSecondary, lineHeight: 26 },
+  gridRow: { gap: spacing[3] },
+  cardItemGrid: { flex: 1 },
+  questionSectionGrid: { padding: spacing[3] },
+  answerSectionGrid: { padding: spacing[3] },
 });
