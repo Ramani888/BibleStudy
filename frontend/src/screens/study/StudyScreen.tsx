@@ -49,10 +49,11 @@ interface CompletionProps {
   results: Record<Difficulty, number>;
   skippedCount: number;
   onRestart: () => void;
+  onRetryHard?: () => void;
   onExit: () => void;
 }
 
-function CompletionScreen({ total, results, skippedCount, onRestart, onExit }: CompletionProps) {
+function CompletionScreen({ total, results, skippedCount, onRestart, onRetryHard, onExit }: CompletionProps) {
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.completionWrap}>
       <Typography style={styles.completionEmoji}>🎉</Typography>
@@ -82,6 +83,14 @@ function CompletionScreen({ total, results, skippedCount, onRestart, onExit }: C
         )}
       </View>
 
+      {results.HARD > 0 && onRetryHard && (
+        <Button
+          label={`Retry Hard (${results.HARD})`}
+          variant="outline"
+          onPress={onRetryHard}
+          fullWidth
+        />
+      )}
       <View style={styles.completionBtns}>
         <Button label="Study Again" onPress={onRestart} variant="secondary" style={styles.flex} />
         <Button label="Done" onPress={onExit} style={styles.flex} />
@@ -149,6 +158,9 @@ export function StudyScreen({ route, navigation }: Props) {
   const [skippedCount, setSkippedCount] = useState(0);
   const [isShuffled, setIsShuffled] = useState(false);
   const [shuffleOrder, setShuffleOrder] = useState<number[]>([]);
+  const [hardCards, setHardCards] = useState<typeof cards>([]);
+  const [isRetryMode, setIsRetryMode] = useState(false);
+  const [retryCards, setRetryCards] = useState<typeof cards>([]);
   const [results, setResults] = useState<Record<Difficulty, number>>({
     EASY: 0,
     MEDIUM: 0,
@@ -159,9 +171,10 @@ export function StudyScreen({ route, navigation }: Props) {
   const { mutate: recordStudy } = useRecordStudy(setId);
 
   const displayCards = useMemo(() => {
+    if (isRetryMode) return retryCards;
     if (!isShuffled || shuffleOrder.length !== cards.length) return cards;
     return shuffleOrder.map(i => cards[i]);
-  }, [cards, isShuffled, shuffleOrder]);
+  }, [cards, retryCards, isRetryMode, isShuffled, shuffleOrder]);
 
   const currentCard = displayCards[currentIndex];
   const progress = displayCards.length > 0 ? currentIndex / displayCards.length : 0;
@@ -194,6 +207,10 @@ export function StudyScreen({ route, navigation }: Props) {
             Toast.show({ type: 'error', text1: 'Could not save', text2: getErrorMessage(err) }),
         },
       );
+
+      if (difficulty === 'HARD') {
+        setHardCards(prev => [...prev, currentCard]);
+      }
 
       setResults(prev => ({ ...prev, [difficulty]: prev[difficulty] + 1 }));
 
@@ -286,11 +303,25 @@ export function StudyScreen({ route, navigation }: Props) {
     }
   }, [currentIndex, displayCards.length]);
 
+  const handleRetryHard = () => {
+    setRetryCards(hardCards);
+    setIsRetryMode(true);
+    setHardCards([]);
+    setCurrentIndex(0);
+    setIsRevealed(false);
+    setIsComplete(false);
+    setSkippedCount(0);
+    setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
+  };
+
   const handleRestart = () => {
     if (isShuffled) {
       const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
       setShuffleOrder(order);
     }
+    setIsRetryMode(false);
+    setRetryCards([]);
+    setHardCards([]);
     setCurrentIndex(0);
     setIsRevealed(false);
     setIsComplete(false);
@@ -340,6 +371,7 @@ export function StudyScreen({ route, navigation }: Props) {
           results={results}
           skippedCount={skippedCount}
           onRestart={handleRestart}
+          onRetryHard={hardCards.length > 0 ? handleRetryHard : undefined}
           onExit={() => navigation.navigate('LibraryTab')}
         />
       </SafeAreaView>
