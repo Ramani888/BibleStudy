@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
@@ -17,7 +17,7 @@ import Toast from 'react-native-toast-message';
 import { FormField } from '../../components/forms';
 import { Button, Divider, Spacer, Typography } from '../../components/ui';
 import { useCreateCard, useBulkCreateCards } from '../../hooks';
-import { colors, layout, spacing } from '../../theme';
+import { colors, layout, shadows, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 // ─── Single card schema ───────────────────────────────────────────────────────
@@ -52,6 +52,9 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
     defaultValues: { question: '', answer: '' },
   });
 
+  const questionValue = useWatch({ control, name: 'question' });
+  const answerValue   = useWatch({ control, name: 'answer' });
+
   const onSubmit = async (data: SingleForm) => {
     await createCard({ setId, ...data, note: note.trim() || undefined });
     Toast.show({ type: 'success', text1: 'Card added!', text2: 'Add another or go back' });
@@ -68,6 +71,28 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
 
   return (
     <View style={styles.formGap}>
+      {/* ── Live preview ── */}
+      <View style={styles.preview}>
+        <View style={styles.previewTop}>
+          <Typography
+            preset="body"
+            color={questionValue ? colors.textPrimary : colors.textDisabled}
+            style={styles.previewText}
+          >
+            {questionValue || 'Front (question)'}
+          </Typography>
+        </View>
+        <View style={styles.previewBottom}>
+          <Typography
+            preset="body"
+            color={answerValue ? colors.textSecondary : colors.textDisabled}
+            style={styles.previewText}
+          >
+            {answerValue || 'Back (answer)'}
+          </Typography>
+        </View>
+      </View>
+
       <FormField
         name="question"
         control={control}
@@ -291,6 +316,28 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlignVertical: 'top',
   },
+  preview: {
+    borderRadius: 16,
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...shadows.sm,
+  },
+  previewTop: {
+    backgroundColor: colors.backgroundSecondary,
+    padding: spacing[4],
+    minHeight: 72,
+    justifyContent: 'center',
+  },
+  previewBottom: {
+    backgroundColor: colors.background,
+    padding: spacing[4],
+    minHeight: 56,
+    justifyContent: 'center',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  previewText: { lineHeight: 22 },
   bulkPair: { gap: spacing[3] },
   bulkPairHeader: {
     flexDirection: 'row',
