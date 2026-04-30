@@ -36,7 +36,7 @@ app.use(
       if (!origin) return callback(null, true); // mobile / curl / server-to-server
       if (env.CLIENT_URL && origin === env.CLIENT_URL) return callback(null, true);
       if (env.NODE_ENV === 'development') return callback(null, true);
-      callback(new Error(`Origin ${origin} not allowed by CORS`));
+      callback(null, false);
     },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
