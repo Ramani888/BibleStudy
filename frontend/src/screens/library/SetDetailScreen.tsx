@@ -244,6 +244,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
           {
+            label: '📖 Study Set',
+            onPress: () => navigation.navigate('Study', { setId, setTitle }),
+          },
+          {
             label: '➕ Create Card',
             onPress: () => navigation.navigate('CreateCard', { setId }),
           },
