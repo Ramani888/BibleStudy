@@ -13,28 +13,39 @@ import Toast from 'react-native-toast-message';
 import { FolderCard, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, EmptyState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
-import { useFolders, useSets, useDeleteSet, useCloneSet, useCreateFolder, useDeleteFolder, useUpdateFolder } from '../../hooks';
+import {
+  useFolders,
+  useSets,
+  useDeleteSet,
+  useUpdateSet,
+  useCreateFolder,
+  useDeleteFolder,
+  useUpdateFolder,
+} from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
 
+type Tab = 'sets' | 'folders';
+
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [search, setSearch] = useState('');
+  const [activeTab, setActiveTab] = useState<Tab>('sets');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
-  const [createMenuOpen, setCreateMenuOpen] = useState(false);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
   const [editFolderName, setEditFolderName] = useState('');
   const [editFolderColor, setEditFolderColor] = useState<string | null>(null);
+  const [assignFolderOpen, setAssignFolderOpen] = useState(false);
 
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
   const { mutate: deleteSet } = useDeleteSet();
-  const { mutate: cloneSet } = useCloneSet();
+  const { mutate: updateSet } = useUpdateSet(selectedSet?.id ?? '');
   const { mutate: createFolder, isPending: creatingFolder } = useCreateFolder();
   const { mutate: deleteFolder } = useDeleteFolder();
   const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder(selectedFolder?.id ?? '');
@@ -45,7 +56,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
     : sets;
 
-  // Count sets per folder
   const setCountByFolder = (folderId: string) =>
     sets.filter(s => s.folderId === folderId).length;
 
@@ -64,10 +74,14 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     ]);
   };
 
-  const handleCloneSet = (id: string) => {
-    cloneSet(id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Set cloned' }),
-      onError: err => Toast.show({ type: 'error', text1: 'Clone failed', text2: getErrorMessage(err) }),
+  const handleAssignFolder = (folderId: string | null) => {
+    updateSet({ folderId }, {
+      onSuccess: () => {
+        setAssignFolderOpen(false);
+        setSelectedSet(null);
+        Toast.show({ type: 'success', text1: folderId ? 'Moved to folder' : 'Removed from folder' });
+      },
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
   };
 
@@ -127,16 +141,37 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         </Pressable>
       </View>
 
-      {/* ── Search ── */}
-      <View style={styles.searchWrap}>
-        <Input
-          placeholder="Search sets…"
-          value={search}
-          onChangeText={setSearch}
-          containerStyle={styles.searchInput}
-        />
+      {/* ── Tab toggle ── */}
+      <View style={styles.tabs}>
+        {(['sets', 'folders'] as Tab[]).map(tab => (
+          <Pressable
+            key={tab}
+            style={[styles.tab, activeTab === tab && styles.tabActive]}
+            onPress={() => setActiveTab(tab)}
+          >
+            <Typography
+              preset="label"
+              color={activeTab === tab ? colors.primary : colors.textSecondary}
+            >
+              {tab === 'sets' ? 'SETS' : 'FOLDERS'}
+            </Typography>
+          </Pressable>
+        ))}
       </View>
 
+      {/* ── Search (SETS tab only) ── */}
+      {activeTab === 'sets' && (
+        <View style={styles.searchWrap}>
+          <Input
+            placeholder="Search sets…"
+            value={search}
+            onChangeText={setSearch}
+            containerStyle={styles.searchInput}
+          />
+        </View>
+      )}
+
+      {/* ── Content ── */}
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -148,93 +183,69 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           />
         }
       >
-        {/* ── Folders ── */}
-        <View style={styles.sectionHeader}>
-          <Typography preset="h4">Folders</Typography>
-          <Pressable onPress={() => setNewFolderModalOpen(true)} hitSlop={8}>
-            <Typography preset="label" color={colors.primary}>+ New</Typography>
-          </Pressable>
-        </View>
-
-        {folders.length === 0 ? (
-          <Typography preset="bodySm" color={colors.textSecondary} style={styles.emptyHint}>
-            No folders yet — tap + New to create one
-          </Typography>
+        {activeTab === 'sets' ? (
+          setsLoading ? (
+            <>
+              <SetCardSkeleton />
+              <SetCardSkeleton />
+              <SetCardSkeleton />
+            </>
+          ) : filteredSets.length === 0 ? (
+            <EmptyState
+              title={search ? 'No results' : 'No sets yet'}
+              subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
+              ctaLabel={search ? undefined : 'Create Set'}
+              onCta={search ? undefined : () => navigation.navigate('CreateSet', {})}
+              style={styles.emptyState}
+            />
+          ) : (
+            <View style={styles.list}>
+              {filteredSets.map(set => (
+                <SetCard
+                  key={set.id}
+                  set={set}
+                  onPress={() => navigation.navigate('SetDetail', { setId: set.id, setTitle: set.title })}
+                  onMenuPress={() => setSelectedSet(set)}
+                />
+              ))}
+            </View>
+          )
         ) : (
-          <View style={styles.folderList}>
-            {folders.map(folder => (
-              <FolderCard
-                key={folder.id}
-                folder={folder}
-                setCount={setCountByFolder(folder.id)}
-                onPress={() => navigation.navigate('FolderDetail', { folderId: folder.id, folderName: folder.name })}
-                onLongPress={() => setSelectedFolder(folder)}
-              />
-            ))}
-          </View>
+          folders.length === 0 ? (
+            <EmptyState
+              title="No folders yet"
+              subtitle="Tap Create Folder to organise your sets"
+              style={styles.emptyState}
+            />
+          ) : (
+            <View style={styles.list}>
+              {folders.map(folder => (
+                <FolderCard
+                  key={folder.id}
+                  folder={folder}
+                  setCount={setCountByFolder(folder.id)}
+                  onPress={() => navigation.navigate('FolderDetail', { folderId: folder.id, folderName: folder.name })}
+                  onMenuPress={() => setSelectedFolder(folder)}
+                />
+              ))}
+            </View>
+          )
         )}
-
-        <Spacer size={spacing[6]} />
-
-        {/* ── Sets ── */}
-        <View style={styles.sectionHeader}>
-          <Typography preset="h4">My Sets</Typography>
-          <Pressable onPress={() => navigation.navigate('CreateSet', {})} hitSlop={8}>
-            <Typography preset="label" color={colors.primary}>+ New</Typography>
-          </Pressable>
-        </View>
-
-        {setsLoading ? (
-          <>
-            <SetCardSkeleton />
-            <SetCardSkeleton />
-            <SetCardSkeleton />
-          </>
-        ) : filteredSets.length === 0 ? (
-          <EmptyState
-            title={search ? 'No results' : 'No sets yet'}
-            subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
-            ctaLabel={search ? undefined : 'Create Set'}
-            onCta={search ? undefined : () => navigation.navigate('CreateSet', {})}
-            style={styles.emptyState}
-          />
-        ) : (
-          <View style={styles.setsList}>
-            {filteredSets.map(set => (
-              <SetCard
-                key={set.id}
-                set={set}
-                onPress={() => navigation.navigate('SetDetail', { setId: set.id, setTitle: set.title })}
-                onLongPress={() => setSelectedSet(set)}
-              />
-            ))}
-          </View>
-        )}
-
-        <Spacer size={spacing[24]} />
+        <Spacer size={spacing[8]} />
       </ScrollView>
 
-      {/* ── FAB ── */}
-      <Pressable style={styles.fab} onPress={() => setCreateMenuOpen(true)}>
-        <Typography style={styles.fabIcon}>+</Typography>
-      </Pressable>
-
-      {/* ── Create menu ── */}
-      <ActionSheet
-        visible={createMenuOpen}
-        title="Create"
-        onClose={() => setCreateMenuOpen(false)}
-        actions={[
-          {
-            label: '📚 New Study Set',
-            onPress: () => navigation.navigate('CreateSet', {}),
-          },
-          {
-            label: '📁 New Folder',
-            onPress: () => setNewFolderModalOpen(true),
-          },
-        ]}
-      />
+      {/* ── Bottom CTA ── */}
+      <View style={styles.bottomCta}>
+        <Button
+          label={activeTab === 'sets' ? 'Create Set' : 'Create Folder'}
+          onPress={() =>
+            activeTab === 'sets'
+              ? navigation.navigate('CreateSet', {})
+              : setNewFolderModalOpen(true)
+          }
+          fullWidth
+        />
+      </View>
 
       {/* ── Set actions sheet ── */}
       <ActionSheet
@@ -243,16 +254,16 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '✏️ Edit',
-            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
-          },
-          {
-            label: '➕ Add Cards',
+            label: '➕ Create Card',
             onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
           },
           {
-            label: '📋 Clone',
-            onPress: () => selectedSet && handleCloneSet(selectedSet.id),
+            label: '📁 Assign Folder',
+            onPress: () => setAssignFolderOpen(true),
+          },
+          {
+            label: '✏️ Edit',
+            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
           },
           {
             label: '🗑 Delete',
@@ -268,6 +279,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         title={selectedFolder?.name}
         onClose={() => setSelectedFolder(null)}
         actions={[
+          {
+            label: '➕ Create Set',
+            onPress: () => selectedFolder && navigation.navigate('CreateSet', { folderId: selectedFolder.id }),
+          },
           {
             label: '✏️ Edit',
             onPress: () => {
@@ -312,6 +327,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           fullWidth
         />
       </AppModal>
+
       {/* ── Edit folder modal ── */}
       <AppModal
         visible={editFolderModalOpen}
@@ -338,6 +354,26 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           fullWidth
         />
       </AppModal>
+
+      {/* ── Assign Folder modal ── */}
+      <AppModal
+        visible={assignFolderOpen}
+        title="Move to Folder"
+        onClose={() => setAssignFolderOpen(false)}
+      >
+        <Pressable style={styles.setOption} onPress={() => handleAssignFolder(null)}>
+          <Typography preset="body" color={colors.textSecondary}>No Folder</Typography>
+        </Pressable>
+        <Divider marginV={spacing[1]} />
+        {folders.map(f => (
+          <React.Fragment key={f.id}>
+            <Pressable style={styles.setOption} onPress={() => handleAssignFolder(f.id)}>
+              <Typography preset="body">{f.name}</Typography>
+            </Pressable>
+            <Divider marginV={spacing[1]} />
+          </React.Fragment>
+        ))}
+      </AppModal>
     </SafeAreaView>
   );
 }
@@ -352,38 +388,34 @@ const styles = StyleSheet.create({
     paddingTop: spacing[4],
     paddingBottom: spacing[2],
   },
+  tabs: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: spacing[3],
+    alignItems: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: colors.transparent,
+  },
+  tabActive: { borderBottomColor: colors.primary },
   searchWrap: {
     paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: spacing[3],
+    paddingTop: spacing[3],
   },
   searchInput: { marginBottom: 0 },
-  scroll: { paddingHorizontal: layout.screenPaddingH },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing[3],
-  },
-  emptyHint: { marginBottom: spacing[3] },
-  colorLabel: { marginBottom: spacing[2] },
-  folderList: { gap: spacing[3] },
-  setsList: { gap: spacing[3] },
+  scroll: { padding: layout.screenPaddingH },
+  list: { gap: spacing[3] },
   emptyState: { minHeight: 200 },
-  fab: {
-    position: 'absolute',
-    bottom: spacing[6],
-    right: spacing[6],
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 6,
-    shadowColor: colors.primary,
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+  colorLabel: { marginBottom: spacing[2] },
+  bottomCta: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing[4],
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    backgroundColor: colors.background,
   },
-  fabIcon: { fontSize: 28, color: colors.textOnPrimary, lineHeight: 32 },
+  setOption: { paddingVertical: spacing[3] },
 });

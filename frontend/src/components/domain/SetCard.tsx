@@ -10,11 +10,12 @@ interface SetCardProps {
   set: StudySet;
   onPress: () => void;
   onLongPress?: () => void;
+  onMenuPress?: () => void;
 }
 
 const DEFAULT_COLOR = colors.gray300;
 
-export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
+export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps) {
   const cardCount = set._count?.cards ?? 0;
   const barColor = set.color ?? DEFAULT_COLOR;
 
@@ -26,7 +27,7 @@ export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
     >
       <View style={[styles.colorBar, { backgroundColor: barColor }]} />
       <View style={styles.content}>
-        {/* Top row: title + visibility badge */}
+        {/* Top row: title + visibility badge + menu */}
         <View style={styles.topRow}>
           <Typography preset="h4" style={styles.title} numberOfLines={1}>
             {set.title}
@@ -63,6 +64,11 @@ export function SetCard({ set, onPress, onLongPress }: SetCardProps) {
           </Typography>
         </View>
       </View>
+      {onMenuPress && (
+        <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
+          <Typography style={styles.menuIcon} color={colors.textDisabled}>⋮</Typography>
+        </Pressable>
+      )}
     </Pressable>
   );
 }
@@ -111,4 +117,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[2.5],
     paddingVertical: spacing[0.5],
   },
+  menuBtn: {
+    paddingHorizontal: spacing[3],
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuIcon: { fontSize: 20, lineHeight: 24 },
 });

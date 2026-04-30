@@ -9,11 +9,12 @@ interface FolderCardProps {
   setCount?: number;
   onPress: () => void;
   onLongPress?: () => void;
+  onMenuPress?: () => void;
 }
 
 const DEFAULT_COLOR = colors.gray300;
 
-export function FolderCard({ folder, setCount = 0, onPress, onLongPress }: FolderCardProps) {
+export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuPress }: FolderCardProps) {
   const barColor = folder.color ?? DEFAULT_COLOR;
 
   return (
@@ -32,7 +33,9 @@ export function FolderCard({ folder, setCount = 0, onPress, onLongPress }: Folde
       <Typography preset="caption" color={colors.textSecondary} style={styles.count}>
         {setCount} {setCount === 1 ? 'set' : 'sets'}
       </Typography>
-      <Typography style={styles.chevron} color={colors.textDisabled}>›</Typography>
+      <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
+        <Typography style={styles.menuIcon} color={colors.textDisabled}>⋮</Typography>
+      </Pressable>
     </Pressable>
   );
 }
@@ -64,5 +67,11 @@ const styles = StyleSheet.create({
   icon: { fontSize: 18 },
   name: { flex: 1 },
   count: { flexShrink: 0 },
-  chevron: { fontSize: 18, paddingRight: spacing[3] },
+  menuBtn: {
+    paddingHorizontal: spacing[3],
+    alignSelf: 'stretch',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  menuIcon: { fontSize: 20, lineHeight: 24 },
 });
