@@ -17,6 +17,7 @@ interface AppModalProps extends Pick<ModalProps, 'visible' | 'animationType'> {
   onClose?: () => void;
   children: React.ReactNode;
   contentStyle?: ViewStyle;
+  wrapperStyle?: ViewStyle;
 }
 
 export function AppModal({
@@ -26,6 +27,7 @@ export function AppModal({
   onClose,
   children,
   contentStyle,
+  wrapperStyle,
 }: AppModalProps) {
   return (
     <RNModal
@@ -35,7 +37,7 @@ export function AppModal({
       onRequestClose={onClose}
     >
       <KeyboardAvoidingView
-        style={styles.wrapper}
+        style={[styles.wrapper, wrapperStyle]}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
         <Pressable style={styles.backdrop} onPress={onClose} />

@@ -7,11 +7,12 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import { MenuItem } from './components/MenuItem';
+import { ConfirmDialog } from '../../components/feedback';
 
 const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useSets } from '../../hooks';
+import { useSets, useConfirmDialog } from '../../hooks';
 import { useUpdateMapPrivacy } from '../../hooks/useMap';
 import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
@@ -31,6 +32,7 @@ export function ProfileScreen() {
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
   const updatePrivacy = useUpdateMapPrivacy();
+  const { show: showConfirm, dialogProps } = useConfirmDialog();
 
   const handleLocationPrivacy = () => {
     const options: Array<{ text: string; value: 'OFF' | 'FRIENDS' | 'EVERYONE' }> = [
@@ -165,14 +167,19 @@ export function ProfileScreen() {
             destructive={false}
             showChevron={false}
             onPress={() =>
-              Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
-                { text: 'Cancel', style: 'cancel' },
-                { text: 'Sign Out', style: 'destructive', onPress: logout },
-              ])
+              showConfirm({
+                title: 'Sign Out',
+                message: 'Are you sure you want to sign out?',
+                confirmLabel: 'Sign Out',
+                variant: 'danger',
+                onConfirm: logout,
+              })
             }
           />
         </View>
       </ScrollView>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

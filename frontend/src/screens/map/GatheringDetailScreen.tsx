@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   Linking,
   Pressable,
   RefreshControl,
@@ -17,7 +16,9 @@ import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { ConfirmDialog } from '../../components/feedback';
 import { useGathering, useRsvp, useCancelGathering, useLeaveGathering } from '../../hooks/useGatherings';
+import { useConfirmDialog } from '../../hooks';
 import { useAuthStore } from '../../store/auth.store';
 
 type Props = MapScreenProps<'GatheringDetail'>;
@@ -31,6 +32,10 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
   const rsvp = useRsvp();
   const cancelGathering = useCancelGathering();
   const leaveGathering = useLeaveGathering();
+  const { show, dialogProps } = useConfirmDialog();
+
+  if (isLoading) return <LoadingOverlay visible />;
+  if (error || !gathering) return <ErrorState message="Could not load gathering" onRetry={refetch} />;
 
   const myRsvp = gathering?.participants?.find(p => p.userId === user?.id);
   const isHost = gathering?.hostId === user?.id;
@@ -40,22 +45,30 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
   };
 
   const handleCancel = () => {
-    Alert.alert('Cancel Gathering', 'This will cancel the gathering for all participants.', [
-      { text: 'Keep', style: 'cancel' },
-      {
-        text: 'Cancel Gathering',
-        style: 'destructive',
-        onPress: () => {
-          cancelGathering.mutate(gatheringId, {
-            onSuccess: () => navigation.goBack(),
-          });
-        },
+    show({
+      title: 'Cancel Gathering',
+      message: 'This will cancel the gathering for all participants.',
+      confirmLabel: 'Cancel Gathering',
+      variant: 'danger',
+      onConfirm: async () => {
+        await cancelGathering.mutateAsync(gatheringId);
+        navigation.goBack();
       },
-    ]);
+    });
   };
 
-  if (isLoading) return <LoadingOverlay visible />;
-  if (error || !gathering) return <ErrorState message="Could not load gathering" onRetry={refetch} />;
+  const handleLeave = () => {
+    show({
+      title: 'Leave Gathering',
+      message: 'You will be removed from participants.',
+      confirmLabel: 'Leave',
+      variant: 'danger',
+      onConfirm: async () => {
+        await leaveGathering.mutateAsync(gatheringId);
+        navigation.goBack();
+      },
+    });
+  };
 
   const date = new Date(gathering.date);
 
@@ -140,16 +153,7 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
               <Button
                 label="Leave Gathering"
                 variant="outline"
-                onPress={() => {
-                  Alert.alert('Leave Gathering', 'You will be removed from participants.', [
-                    { text: 'Stay', style: 'cancel' },
-                    {
-                      text: 'Leave',
-                      style: 'destructive',
-                      onPress: () => leaveGathering.mutate(gatheringId, { onSuccess: () => navigation.goBack() }),
-                    },
-                  ]);
-                }}
+                onPress={handleLeave}
                 style={styles.leaveButton}
               />
             )}
@@ -188,6 +192,8 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
           </View>
         )}
       </ScrollView>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

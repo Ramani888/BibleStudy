@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Alert,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -12,11 +11,12 @@ import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FolderCard, SetCard } from '../../components/domain';
-import { ActionSheet, AppModal, EmptyState, SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 import {
+  useConfirmDialog,
   useFolders,
   useSets,
   useDeleteSet,
@@ -50,10 +50,11 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
-  const { mutate: deleteSet } = useDeleteSet();
+  const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { mutate: updateSet } = useUpdateSet(selectedSet?.id ?? '');
+  const { show, dialogProps } = useConfirmDialog();
   const { mutate: createFolder, isPending: creatingFolder } = useCreateFolder();
-  const { mutate: deleteFolder } = useDeleteFolder();
+  const { mutateAsync: deleteFolderAsync } = useDeleteFolder();
   const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder(selectedFolder?.id ?? '');
 
   const refreshing = foldersLoading || setsLoading;
@@ -84,18 +85,20 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     sets.filter(s => s.folderId === folderId).length;
 
   const handleDeleteSet = (id: string) => {
-    Alert.alert('Delete Set', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () =>
-          deleteSet(id, {
-            onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
-            onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-          }),
+    show({
+      title: 'Delete Set',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteSetAsync(id);
+          Toast.show({ type: 'success', text1: 'Set deleted' });
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+        }
       },
-    ]);
+    });
   };
 
   const handleAssignFolder = (folderId: string | null) => {
@@ -110,18 +113,20 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   const handleDeleteFolder = (id: string) => {
-    Alert.alert('Delete Folder', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () =>
-          deleteFolder(id, {
-            onSuccess: () => Toast.show({ type: 'success', text1: 'Folder deleted' }),
-            onError: err => Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-          }),
+    show({
+      title: 'Delete Folder',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteFolderAsync(id);
+          Toast.show({ type: 'success', text1: 'Folder deleted' });
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+        }
       },
-    ]);
+    });
   };
 
   const handleCloseEditFolderModal = () => {
@@ -426,6 +431,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           </React.Fragment>
         ))}
       </AppModal>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

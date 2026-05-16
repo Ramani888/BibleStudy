@@ -1,15 +1,16 @@
 import React from 'react';
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import { ConfirmDialog } from '../../components/feedback';
 import { SetForm } from './components/SetForm';
 import { Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 import { colors, layout, spacing } from '../../theme';
-import { useSet, useUpdateSet, useDeleteSet } from '../../hooks';
+import { useConfirmDialog, useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import type { LibraryScreenProps } from '../../navigation/types';
 
@@ -17,29 +18,25 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   const { setId } = route.params;
   const { data: set, isLoading } = useSet(setId);
   const { mutateAsync: updateSet } = useUpdateSet(setId);
-  const { mutate: deleteSet } = useDeleteSet();
+  const { mutateAsync: deleteSetAsync } = useDeleteSet();
+  const { show, dialogProps } = useConfirmDialog();
 
   const handleDelete = () => {
-    Alert.alert(
-      'Delete Set',
-      'All cards in this set will also be deleted. This cannot be undone.',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () =>
-            deleteSet(setId, {
-              onSuccess: () => {
-                Toast.show({ type: 'success', text1: 'Set deleted' });
-                navigation.navigate('Library');
-              },
-              onError: err =>
-                Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-            }),
-        },
-      ],
-    );
+    show({
+      title: 'Delete Set',
+      message: 'All cards in this set will also be deleted. This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteSetAsync(setId);
+          Toast.show({ type: 'success', text1: 'Set deleted' });
+          navigation.navigate('Library');
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+        }
+      },
+    });
   };
 
   if (isLoading || !set) {
@@ -73,6 +70,8 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
           </Pressable>
         </View>
       </ScrollView>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

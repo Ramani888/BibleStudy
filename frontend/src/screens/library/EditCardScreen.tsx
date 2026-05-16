@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,11 +7,12 @@ import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import { ConfirmDialog } from '../../components/feedback';
 import { FormField } from '../../components/forms';
 import { Button, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
-import { useCards, useDeleteCard, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useDeleteCard, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
@@ -39,25 +40,25 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   const { cardId, setId } = route.params;
   const { data: cards, isLoading } = useCards(setId);
   const { mutateAsync: updateCard } = useUpdateCard(setId);
-  const { mutate: deleteCard } = useDeleteCard(setId);
+  const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
+  const { show, dialogProps } = useConfirmDialog();
 
   const handleDelete = () => {
-    Alert.alert('Delete Card', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () =>
-          deleteCard(cardId, {
-            onSuccess: () => {
-              Toast.show({ type: 'success', text1: 'Card deleted' });
-              navigation.goBack();
-            },
-            onError: err =>
-              Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) }),
-          }),
+    show({
+      title: 'Delete Card',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteCardAsync(cardId);
+          Toast.show({ type: 'success', text1: 'Card deleted' });
+          navigation.goBack();
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+        }
       },
-    ]);
+    });
   };
   const answerRef = useRef<any>(null);
   const [difficulty, setDifficulty] = React.useState<Difficulty>('MEDIUM');
@@ -230,6 +231,8 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Alert, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
+import { FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ActionSheet, AppModal, EmptyState, ErrorState } from '../../components/feedback';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Divider, Input, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
-import { useCards, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -28,7 +28,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
-  const { mutate: deleteCard } = useDeleteCard(setId);
+  const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
+  const { show, dialogProps } = useConfirmDialog();
   const { mutate: copyCard }   = useCopyCard(setId);
   const { mutate: moveCard }   = useMoveCard(setId);
   const { mutate: updateCard, mutateAsync: updateCardAsync } = useUpdateCard(setId);
@@ -113,18 +114,20 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   };
 
   const handleDelete = (cardId: string) => {
-    Alert.alert('Delete Card', 'This cannot be undone.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () =>
-          deleteCard(cardId, {
-            onSuccess: () => Toast.show({ type: 'success', text1: 'Card deleted' }),
-            onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-          }),
+    show({
+      title: 'Delete Card',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteCardAsync(cardId);
+          Toast.show({ type: 'success', text1: 'Card deleted' });
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+        }
       },
-    ]);
+    });
   };
 
   if (isError) {
@@ -351,6 +354,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           fullWidth
         />
       </AppModal>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

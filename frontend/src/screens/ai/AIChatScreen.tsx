@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Pressable,
   Share,
@@ -15,13 +14,14 @@ import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { ChatBubble } from '../../components/domain';
 import { CreditBadge } from '../../components/domain';
+import { ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 const EMPTY_ICON_SIZE = 48;
 import { ChatInput } from './components/ChatInput';
 import { useAuthStore } from '../../store';
-import { useAIChat } from '../../hooks';
+import { useAIChat, useConfirmDialog } from '../../hooks';
 import { useCreditBalance } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -49,6 +49,7 @@ export function AIChatScreen() {
   const navigation = useNavigation<AINav>();
   const [messages, setMessages] = useState<Message[]>([]);
   const listRef = useRef<FlatList>(null);
+  const { show, dialogProps } = useConfirmDialog();
 
   const { mutate: sendMessage, isPending } = useAIChat();
   const { data: creditData } = useCreditBalance();
@@ -107,10 +108,13 @@ export function AIChatScreen() {
 
   const handleClearChat = () => {
     if (messages.length === 0) return;
-    Alert.alert('New Conversation', 'Clear the current chat and start fresh?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', style: 'destructive', onPress: () => setMessages([]) },
-    ]);
+    show({
+      title: 'New Conversation',
+      message: 'Clear the current chat and start fresh?',
+      confirmLabel: 'Clear',
+      variant: 'danger',
+      onConfirm: () => setMessages([]),
+    });
   };
 
   return (
@@ -196,6 +200,8 @@ export function AIChatScreen() {
         disabled={isPending}
         creditBalance={creditBalance}
       />
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

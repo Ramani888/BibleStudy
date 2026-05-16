@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  Alert,
   FlatList,
   Pressable,
   RefreshControl,
@@ -19,7 +18,9 @@ import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { ConfirmDialog } from '../../components/feedback';
 import { useGroup, useLeaveGroup, useDeleteGroup, useUpdateMemberRole, useRemoveMember } from '../../hooks/useGroups';
+import { useConfirmDialog } from '../../hooks';
 import { useAuthStore } from '../../store/auth.store';
 import { getErrorMessage } from '../../api/client';
 import type { GroupMember } from '../../types/groups.types';
@@ -34,6 +35,10 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   const deleteGroup = useDeleteGroup();
   const updateRole = useUpdateMemberRole();
   const removeMember = useRemoveMember();
+  const { show, dialogProps } = useConfirmDialog();
+
+  if (isLoading) return <LoadingOverlay visible />;
+  if (error || !group) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
   const myMembership = group?.members?.find(m => m.userId === user?.id);
   const isAdmin = myMembership?.role === 'ADMIN';
@@ -45,70 +50,70 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   };
 
   const handleLeave = () => {
-    Alert.alert('Leave Group', 'Are you sure you want to leave this group?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Leave',
-        style: 'destructive',
-        onPress: () => {
-          leaveGroup.mutate(groupId, {
-            onSuccess: () => navigation.goBack(),
-            onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-          });
-        },
+    show({
+      title: 'Leave Group',
+      message: 'Are you sure you want to leave this group?',
+      confirmLabel: 'Leave',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await leaveGroup.mutateAsync(groupId);
+          navigation.goBack();
+        } catch (e) {
+          Toast.show({ type: 'error', text1: getErrorMessage(e) });
+        }
       },
-    ]);
+    });
   };
 
   const handleDelete = () => {
-    Alert.alert('Delete Group', 'This will permanently delete the group and all its data.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: () => {
-          deleteGroup.mutate(groupId, {
-            onSuccess: () => navigation.goBack(),
-            onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-          });
-        },
+    show({
+      title: 'Delete Group',
+      message: 'This will permanently delete the group and all its data.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteGroup.mutateAsync(groupId);
+          navigation.goBack();
+        } catch (e) {
+          Toast.show({ type: 'error', text1: getErrorMessage(e) });
+        }
       },
-    ]);
+    });
   };
-
-  if (isLoading) return <LoadingOverlay visible />;
-  if (error || !group) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
   const handleToggleRole = (member: GroupMember) => {
     const newRole = member.role === 'ADMIN' ? 'MEMBER' : 'ADMIN';
-    Alert.alert(
-      `${newRole === 'ADMIN' ? 'Promote' : 'Demote'} ${member.user.name}?`,
-      `Change role to ${newRole.toLowerCase()}.`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Confirm',
-          onPress: () => updateRole.mutate(
-            { groupId, userId: member.userId, role: newRole },
-            { onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }) },
-          ),
-        },
-      ],
-    );
+    show({
+      title: `${newRole === 'ADMIN' ? 'Promote' : 'Demote'} ${member.user.name}?`,
+      message: `Change role to ${newRole.toLowerCase()}.`,
+      confirmLabel: 'Confirm',
+      variant: 'default',
+      onConfirm: async () => {
+        try {
+          await updateRole.mutateAsync({ groupId, userId: member.userId, role: newRole });
+        } catch (e) {
+          Toast.show({ type: 'error', text1: getErrorMessage(e) });
+        }
+      },
+    });
   };
 
   const handleRemoveMember = (member: GroupMember) => {
-    Alert.alert(`Remove ${member.user.name}?`, 'They can rejoin with the invite code.', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Remove',
-        style: 'destructive',
-        onPress: () => removeMember.mutate(
-          { groupId, userId: member.userId },
-          { onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }) },
-        ),
+    show({
+      title: `Remove ${member.user.name}?`,
+      message: 'They can rejoin with the invite code.',
+      confirmLabel: 'Remove',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await removeMember.mutateAsync({ groupId, userId: member.userId });
+        } catch (e) {
+          Toast.show({ type: 'error', text1: getErrorMessage(e) });
+        }
       },
-    ]);
+    });
   };
 
   const renderMember = ({ item }: { item: GroupMember }) => {
@@ -201,6 +206,8 @@ export function GroupDetailScreen({ route, navigation }: Props) {
           )}
         </View>
       </ScrollView>
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

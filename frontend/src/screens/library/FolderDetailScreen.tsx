@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SetCard } from '../../components/domain';
-import { ActionSheet, EmptyState } from '../../components/feedback';
+import { ActionSheet, ConfirmDialog, EmptyState } from '../../components/feedback';
 import { Input, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
-import { useFolders, useSets, useDeleteSet } from '../../hooks';
+import { useConfirmDialog, useFolders, useSets, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -23,7 +23,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   const { data: folders = [] } = useFolders();
   const { data: sets = [], isLoading, refetch } = useSets(folderId);
-  const { mutate: deleteSet } = useDeleteSet();
+  const { mutateAsync: deleteSetAsync } = useDeleteSet();
+  const { show, dialogProps } = useConfirmDialog();
 
   const folderColor = folders.find(f => f.id === folderId)?.color ?? null;
 
@@ -118,23 +119,28 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
             label: 'Delete',
             iconName: 'trash-outline',
             destructive: true,
-            onPress: () =>
-              selectedSet &&
-              Alert.alert('Delete Set', 'This cannot be undone.', [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Delete',
-                  style: 'destructive',
-                  onPress: () =>
-                    deleteSet(selectedSet.id, {
-                      onSuccess: () => Toast.show({ type: 'success', text1: 'Set deleted' }),
-                      onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-                    }),
+            onPress: () => {
+              if (!selectedSet) return;
+              show({
+                title: 'Delete Set',
+                message: 'This cannot be undone.',
+                confirmLabel: 'Delete',
+                variant: 'danger',
+                onConfirm: async () => {
+                  try {
+                    await deleteSetAsync(selectedSet.id);
+                    Toast.show({ type: 'success', text1: 'Set deleted' });
+                  } catch (err) {
+                    Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+                  }
                 },
-              ]),
+              });
+            },
           },
         ]}
       />
+
+      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }

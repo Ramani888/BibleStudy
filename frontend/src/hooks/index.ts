@@ -14,6 +14,7 @@ export {
   useRecordStudy,
 } from './useCards';
 export { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from './useCredits';
+export { useConfirmDialog } from './useConfirmDialog';
 export { useUpdateProfile, useChangePassword, useDeleteAccount } from './useProfile';
 
 // Phase 2 — Community
