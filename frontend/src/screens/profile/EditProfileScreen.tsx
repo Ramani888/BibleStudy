@@ -9,6 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useHeaderHeight } from '@react-navigation/elements';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -31,6 +32,7 @@ type EditProfileForm = z.infer<typeof schema>;
 
 export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
   const user = useAuthStore(s => s.user);
+  const headerHeight = useHeaderHeight();
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const bioRef = useRef<TextInput>(null);
   const churchRef = useRef<TextInput>(null);
@@ -59,11 +61,12 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+    <KeyboardAvoidingView
+      style={styles.flex}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+    >
+      <SafeAreaView style={styles.safe} edges={['bottom']}>
         <ScrollView
           contentContainerStyle={styles.scroll}
           keyboardShouldPersistTaps="handled"
@@ -120,8 +123,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             />
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
