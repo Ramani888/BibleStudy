@@ -76,6 +76,10 @@ function DailyLoginButton() {
   const handleClaim = () => {
     mutate(undefined, {
       onSuccess: data => {
+        const current = useAuthStore.getState().user;
+        if (current) {
+          useAuthStore.getState().updateUser({ ...current, creditBalance: data.balance });
+        }
         Toast.show({
           type: 'success',
           text1: `+${data.transaction.amount} credit claimed!`,

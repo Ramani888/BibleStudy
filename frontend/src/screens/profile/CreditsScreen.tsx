@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState } from '../../components/feedback';
 import { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from '../../hooks';
+import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
@@ -37,12 +38,17 @@ function BalanceCard() {
 
   const handleClaim = () => {
     claim(undefined, {
-      onSuccess: res =>
+      onSuccess: res => {
+        const current = useAuthStore.getState().user;
+        if (current) {
+          useAuthStore.getState().updateUser({ ...current, creditBalance: res.balance });
+        }
         Toast.show({
           type: 'success',
           text1: `+${res.transaction.amount} credit claimed!`,
           text2: `Balance: ${res.balance}`,
-        }),
+        });
+      },
       onError: (err: unknown) =>
         Toast.show({
           type: 'error',
