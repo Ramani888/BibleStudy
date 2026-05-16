@@ -25,6 +25,7 @@ import {
   useSendFriendRequest,
 } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
+import { formatDateOnly } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
 
 type Props = ProfileScreenProps<'UserProfile'>;
@@ -104,10 +105,7 @@ export function UserProfileScreen({ route }: Props) {
     });
   };
 
-  const memberSince = new Date(user.createdAt).toLocaleDateString('en-US', {
-    month: 'long',
-    year: 'numeric',
-  });
+  const memberSince = formatDateOnly(user.createdAt);
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>

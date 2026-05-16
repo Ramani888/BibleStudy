@@ -9,6 +9,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import type { ProfileScreenProps } from '../../navigation/types';
+import { formatDateTime } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
@@ -51,7 +52,6 @@ export function NotificationsScreen(_props: Props) {
   };
 
   const renderItem = useCallback(({ item }: { item: Notification }) => {
-    const date = new Date(item.createdAt);
     return (
       <Pressable
         style={[styles.notificationRow, !item.read && styles.unread]}
@@ -70,7 +70,7 @@ export function NotificationsScreen(_props: Props) {
             {item.body}
           </Typography>
           <Typography preset="caption" color={colors.textDisabled}>
-            {date.toLocaleDateString()} at {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {formatDateTime(item.createdAt)}
           </Typography>
         </View>
         <Pressable onPress={() => deleteNotification.mutate(item.id)} hitSlop={8}>

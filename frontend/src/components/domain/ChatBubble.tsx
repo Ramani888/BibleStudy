@@ -15,6 +15,7 @@ interface ChatBubbleProps {
   creditsUsed?: number;
   userName?: string;
   userImage?: string | null;
+  isTyping?: boolean;
 }
 
 // Animated dots for the thinking indicator
@@ -48,9 +49,8 @@ function TypingDots() {
   );
 }
 
-export function ChatBubble({ role, text, creditsUsed, userName, userImage }: ChatBubbleProps) {
+export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyping = false }: ChatBubbleProps) {
   const isUser = role === 'user';
-  const isTyping = text === '__typing__'; // sentinel set by AIChatScreen.TYPING_INDICATOR
 
   return (
     <View style={[styles.row, isUser ? styles.rowUser : styles.rowAI]}>

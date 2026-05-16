@@ -24,6 +24,31 @@ export function formatBytes(bytes: number): string {
 }
 
 /**
+ * Formats a date string as a readable date + time string.
+ * e.g. "May 16, 2026 at 3:45 PM"
+ */
+export function formatDateTime(dateString: string | Date): string {
+  const date = new Date(dateString);
+  return (
+    date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
+    ' at ' +
+    date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+  );
+}
+
+/**
+ * Formats a date string as date only (no time).
+ * e.g. "May 16, 2026"
+ */
+export function formatDateOnly(dateString: string | Date): string {
+  return new Date(dateString).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
+
+/**
  * Truncate a string to maxLength and append ellipsis.
  */
 export function truncate(str: string, maxLength: number): string {

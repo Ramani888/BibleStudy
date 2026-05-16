@@ -128,6 +128,7 @@ export function AIChatScreen({ navigation }: AIScreenProps<'AIChat'>) {
         creditsUsed={item.creditsUsed}
         userName={user?.name}
         userImage={user?.profileImage}
+        isTyping={item.text === TYPING_INDICATOR}
       />
     </Pressable>
   ), [user]);

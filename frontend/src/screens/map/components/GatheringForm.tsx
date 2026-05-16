@@ -7,11 +7,14 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
+import { useForm, Controller } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Geolocation from '@react-native-community/geolocation';
 import Toast from 'react-native-toast-message';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import { gatheringSchema } from '../../../utils/validators';
 import { colors, layout, spacing } from '../../../theme';
 import { Typography } from '../../../components/ui/Typography';
 import { Input } from '../../../components/ui/Input';
@@ -45,8 +48,8 @@ const VISIBILITY_OPTIONS: { value: Visibility; label: string; desc: string }[] =
   { value: 'FRIENDS', label: 'Friends', desc: 'Friends only' },
 ];
 
-function formatDate(date: Date): string {
-  return date.toLocaleString(undefined, {
+function formatPickerDate(isoString: string): string {
+  return new Date(isoString).toLocaleString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -60,28 +63,36 @@ export function GatheringForm({
   onSubmit,
   submitLabel = 'Create Gathering',
 }: GatheringFormProps) {
-  const [title, setTitle] = useState(defaultValues?.title ?? '');
-  const [description, setDescription] = useState(defaultValues?.description ?? '');
-  const [date, setDate] = useState<Date | null>(
-    defaultValues?.date ? new Date(defaultValues.date) : null,
-  );
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
-  const [locationName, setLocationName] = useState(defaultValues?.locationName ?? '');
-  const [locationLat, setLocationLat] = useState<number | null>(
-    defaultValues?.locationLat ?? null,
-  );
-  const [locationLng, setLocationLng] = useState<number | null>(
-    defaultValues?.locationLng ?? null,
-  );
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
-  const [meetingLink, setMeetingLink] = useState(defaultValues?.meetingLink ?? '');
-  const [visibility, setVisibility] = useState<Visibility>(
-    defaultValues?.visibility ?? 'PUBLIC',
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<GatheringFormValues>({
+    resolver: zodResolver(gatheringSchema),
+    defaultValues: {
+      title: defaultValues?.title ?? '',
+      description: defaultValues?.description ?? '',
+      date: defaultValues?.date ?? '',
+      locationName: defaultValues?.locationName ?? '',
+      locationLat: defaultValues?.locationLat ?? undefined,
+      locationLng: defaultValues?.locationLng ?? undefined,
+      meetingLink: defaultValues?.meetingLink ?? '',
+      visibility: (defaultValues?.visibility as Visibility) ?? 'PUBLIC',
+    },
+  });
+
+  const dateValue = watch('date');
+  const locationLat = watch('locationLat');
+  const locationLng = watch('locationLng');
+  const visibility = watch('visibility');
 
   const handleConfirmDate = (selectedDate: Date) => {
-    setDate(selectedDate);
+    setValue('date', selectedDate.toISOString(), { shouldValidate: true });
     setDatePickerVisible(false);
   };
 
@@ -89,46 +100,17 @@ export function GatheringForm({
     setIsFetchingLocation(true);
     Geolocation.getCurrentPosition(
       position => {
-        setLocationLat(position.coords.latitude);
-        setLocationLng(position.coords.longitude);
+        setValue('locationLat', position.coords.latitude);
+        setValue('locationLng', position.coords.longitude);
         setIsFetchingLocation(false);
         Toast.show({ type: 'success', text1: 'Location captured' });
       },
-      error => {
+      err => {
         setIsFetchingLocation(false);
-        Toast.show({ type: 'error', text1: 'Could not get location', text2: error.message });
+        Toast.show({ type: 'error', text1: 'Could not get location', text2: err.message });
       },
       { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
     );
-  };
-
-  const handleSubmit = async () => {
-    if (!title.trim()) {
-      Toast.show({ type: 'error', text1: 'Title is required' });
-      return;
-    }
-    if (!date) {
-      Toast.show({ type: 'error', text1: 'Date is required' });
-      return;
-    }
-
-    const values: GatheringFormValues = {
-      title: title.trim(),
-      description: description.trim() || undefined,
-      date: date.toISOString(),
-      locationName: locationName.trim() || undefined,
-      locationLat: locationLat ?? undefined,
-      locationLng: locationLng ?? undefined,
-      meetingLink: meetingLink.trim() || undefined,
-      visibility,
-    };
-
-    setIsSubmitting(true);
-    try {
-      await onSubmit(values);
-    } finally {
-      setIsSubmitting(false);
-    }
   };
 
   return (
@@ -142,21 +124,36 @@ export function GatheringForm({
       >
         <View style={styles.form}>
           {/* Title */}
-          <Input
-            label="Title *"
-            value={title}
-            onChangeText={setTitle}
-            placeholder="Sunday Bible Study"
+          <Controller
+            name="title"
+            control={control}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <Input
+                label="Title *"
+                value={value}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="Sunday Bible Study"
+                error={errors.title?.message}
+              />
+            )}
           />
 
           {/* Description */}
-          <Input
-            label="Description"
-            value={description}
-            onChangeText={setDescription}
-            placeholder="What is this gathering about?"
-            multiline
-            numberOfLines={3}
+          <Controller
+            name="description"
+            control={control}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <Input
+                label="Description"
+                value={value ?? ''}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="What is this gathering about?"
+                multiline
+                numberOfLines={3}
+              />
+            )}
           />
 
           {/* Date picker */}
@@ -168,17 +165,23 @@ export function GatheringForm({
               style={({ pressed }) => [
                 styles.datePicker,
                 pressed && styles.datePickerPressed,
+                !!errors.date && styles.datePickerError,
               ]}
               onPress={() => setDatePickerVisible(true)}
             >
               <Typography
                 preset="body"
-                color={date ? colors.textPrimary : colors.textDisabled}
+                color={dateValue ? colors.textPrimary : colors.textDisabled}
               >
-                {date ? formatDate(date) : 'Select date and time'}
+                {dateValue ? formatPickerDate(dateValue) : 'Select date and time'}
               </Typography>
               <Icon name="chevron-forward" size={CHEVRON_SIZE} color={colors.textSecondary} />
             </Pressable>
+            {errors.date && (
+              <Typography preset="caption" color={colors.error} style={styles.errorText}>
+                {errors.date.message}
+              </Typography>
+            )}
           </View>
 
           {/* Visibility */}
@@ -194,7 +197,7 @@ export function GatheringForm({
                     styles.optionChip,
                     visibility === opt.value && styles.optionChipActive,
                   ]}
-                  onPress={() => setVisibility(opt.value)}
+                  onPress={() => setValue('visibility', opt.value)}
                 >
                   <Typography
                     preset="label"
@@ -204,9 +207,7 @@ export function GatheringForm({
                   </Typography>
                   <Typography
                     preset="caption"
-                    color={
-                      visibility === opt.value ? colors.primaryDark : colors.textDisabled
-                    }
+                    color={visibility === opt.value ? colors.primaryDark : colors.textDisabled}
                   >
                     {opt.desc}
                   </Typography>
@@ -216,11 +217,18 @@ export function GatheringForm({
           </View>
 
           {/* Location name */}
-          <Input
-            label="Location Name"
-            value={locationName}
-            onChangeText={setLocationName}
-            placeholder="123 Church St, City"
+          <Controller
+            name="locationName"
+            control={control}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <Input
+                label="Location Name"
+                value={value ?? ''}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="123 Church St, City"
+              />
+            )}
           />
 
           {/* Use current location button */}
@@ -229,7 +237,7 @@ export function GatheringForm({
               label={
                 isFetchingLocation
                   ? 'Getting location...'
-                  : locationLat !== null
+                  : locationLat !== undefined
                   ? 'Location captured — tap to update'
                   : 'Use Current Location'
               }
@@ -239,7 +247,7 @@ export function GatheringForm({
               disabled={isFetchingLocation}
               loading={isFetchingLocation}
             />
-            {locationLat !== null && locationLng !== null && (
+            {locationLat !== undefined && locationLng !== undefined && (
               <View style={styles.coordRow}>
                 <Typography preset="caption" color={colors.textSecondary}>
                   {`Lat: ${locationLat.toFixed(5)}, Lng: ${locationLng.toFixed(5)}`}
@@ -249,19 +257,26 @@ export function GatheringForm({
           </View>
 
           {/* Meeting link */}
-          <Input
-            label="Meeting Link"
-            value={meetingLink}
-            onChangeText={setMeetingLink}
-            placeholder="https://zoom.us/j/..."
-            autoCapitalize="none"
-            keyboardType="url"
+          <Controller
+            name="meetingLink"
+            control={control}
+            render={({ field: { value, onChange, onBlur } }) => (
+              <Input
+                label="Meeting Link"
+                value={value ?? ''}
+                onChangeText={onChange}
+                onBlur={onBlur}
+                placeholder="https://zoom.us/j/..."
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+            )}
           />
         </View>
 
         <Button
           label={submitLabel}
-          onPress={handleSubmit}
+          onPress={handleSubmit(onSubmit)}
           loading={isSubmitting}
           fullWidth
         />
@@ -271,7 +286,7 @@ export function GatheringForm({
         isVisible={isDatePickerVisible}
         mode="datetime"
         minimumDate={new Date()}
-        date={date ?? new Date()}
+        date={dateValue ? new Date(dateValue) : new Date()}
         onConfirm={handleConfirmDate}
         onCancel={() => setDatePickerVisible(false)}
       />
@@ -288,6 +303,7 @@ const styles = StyleSheet.create({
   },
   form: { gap: spacing[4] },
   fieldLabel: { marginBottom: spacing[1.5] },
+  errorText: { marginTop: spacing[1] },
   datePicker: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -302,6 +318,9 @@ const styles = StyleSheet.create({
   datePickerPressed: {
     borderColor: colors.borderFocus,
     backgroundColor: colors.primarySurface,
+  },
+  datePickerError: {
+    borderColor: colors.error,
   },
   optionRow: { flexDirection: 'row', gap: spacing[2] },
   optionChip: {

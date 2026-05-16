@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import Toast from 'react-native-toast-message';
+import { formatDateTime } from '../../utils/formatters';
 import type { MapScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
@@ -80,8 +81,6 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
     });
   };
 
-  const date = new Date(gathering.date);
-
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <ScrollView
@@ -100,7 +99,7 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
         <View style={styles.row}>
           <Icon name="calendar-outline" size={18} color={colors.textSecondary} />
           <Typography preset="body" color={colors.textSecondary}>
-            {date.toLocaleDateString()} at {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            {formatDateTime(gathering.date)}
           </Typography>
         </View>
 
