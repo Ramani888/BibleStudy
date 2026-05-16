@@ -66,7 +66,10 @@ export function useBlockUser() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) => friendsApi.block(userId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['friends'] });
+      qc.invalidateQueries({ queryKey: ['friends', 'blocked'] });
+    },
   });
 }
 

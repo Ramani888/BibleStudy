@@ -4,9 +4,6 @@ import type { UserPublicProfile } from '../types/user.types';
 
 
 export const usersApi = {
-  getProfile: () =>
-    apiGet<User>('/users/profile'),
-
   updateProfile: (payload: UpdateProfilePayload) =>
     apiPut<User>('/users/profile', payload),
 

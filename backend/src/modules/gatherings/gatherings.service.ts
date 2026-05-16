@@ -1,6 +1,7 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
+import type { Prisma } from '@prisma/client';
 import { CreateGatheringDtoType, UpdateGatheringDtoType, RsvpDtoType } from './gatherings.dto';
 
 const hostSelect = {
@@ -9,6 +10,13 @@ const hostSelect = {
   profileImage: true,
   bio: true,
   church: true,
+} as const;
+
+const participantInclude = {
+  participants: {
+    include: { user: { select: hostSelect } },
+    orderBy: { joinedAt: 'asc' as const },
+  },
 } as const;
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
@@ -74,7 +82,7 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
     where: { id: gathering.id },
     include: {
       host: { select: hostSelect },
-      participants: { include: { user: { select: hostSelect } }, orderBy: { joinedAt: 'asc' } },
+      ...participantInclude,
       _count: { select: { participants: true } },
     },
   });
@@ -88,7 +96,7 @@ export async function listGatherings(
   const limit = Math.min(params.limit ?? 20, 50);
   const skip = (page - 1) * limit;
 
-  const where: Record<string, unknown> = {
+  const where: Prisma.GatheringWhereInput = {
     OR: [
       { hostId: userId },
       { participants: { some: { userId } } },
@@ -164,10 +172,7 @@ export async function getGathering(userId: string, gatheringId: string) {
     where: { id: gatheringId },
     include: {
       host: { select: hostSelect },
-      participants: {
-        include: { user: { select: hostSelect } },
-        orderBy: { joinedAt: 'asc' },
-      },
+      ...participantInclude,
       _count: { select: { participants: true } },
     },
   });
@@ -210,7 +215,7 @@ export async function updateGathering(userId: string, gatheringId: string, dto: 
     },
     include: {
       host: { select: hostSelect },
-      participants: { include: { user: { select: hostSelect } }, orderBy: { joinedAt: 'asc' } },
+      ...participantInclude,
       _count: { select: { participants: true } },
     },
   });

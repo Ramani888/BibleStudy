@@ -1,3 +1,8 @@
+export interface FolderSetSummary {
+  id: string;
+  title: string;
+}
+
 export interface Folder {
   id: string;
   name: string;
@@ -6,6 +11,7 @@ export interface Folder {
   parentId: string | null;
   createdAt: string;
   updatedAt: string;
+  sets?: FolderSetSummary[];
 }
 
 export interface CreateFolderPayload {

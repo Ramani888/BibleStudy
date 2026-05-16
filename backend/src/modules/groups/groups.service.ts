@@ -1,4 +1,5 @@
 import { randomUUID } from 'crypto';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
@@ -11,6 +12,12 @@ const memberUserSelect = {
   bio: true,
   church: true,
 } as const;
+
+async function verifyGroupAdmin(groupId: string, userId: string) {
+  const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
+  if (!member || member.role !== 'ADMIN') throw new Error('Not authorized');
+  return member;
+}
 
 /** Standard include shape so every group response is consistent */
 const groupInclude = {
@@ -74,8 +81,7 @@ export async function getGroup(userId: string, groupId: string) {
 }
 
 export async function updateGroup(userId: string, groupId: string, dto: UpdateGroupDtoType) {
-  const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
-  if (!member || member.role !== 'ADMIN') throw new Error('Not authorized');
+  await verifyGroupAdmin(groupId, userId);
 
   return prisma.group.update({
     where: { id: groupId },
@@ -156,8 +162,7 @@ export async function updateMemberRole(
   targetUserId: string,
   dto: UpdateRoleDtoType
 ) {
-  const requester = await prisma.groupMember.findFirst({ where: { groupId, userId: requesterId } });
-  if (!requester || requester.role !== 'ADMIN') throw new Error('Not authorized');
+  await verifyGroupAdmin(groupId, requesterId);
 
   const target = await prisma.groupMember.findFirst({ where: { groupId, userId: targetUserId } });
   if (!target) throw new Error('Member not found');
@@ -175,8 +180,7 @@ export async function updateMemberRole(
 }
 
 export async function removeMember(requesterId: string, groupId: string, targetUserId: string) {
-  const requester = await prisma.groupMember.findFirst({ where: { groupId, userId: requesterId } });
-  if (!requester || requester.role !== 'ADMIN') throw new Error('Not authorized');
+  await verifyGroupAdmin(groupId, requesterId);
 
   const group = await prisma.group.findUnique({ where: { id: groupId } });
   if (group?.ownerId === targetUserId) throw new Error('Cannot remove the group owner');
@@ -206,7 +210,7 @@ export async function listPublicGroups(params?: { search?: string; page?: number
   const limit = Math.min(params?.limit ?? 20, 50);
   const skip = (page - 1) * limit;
 
-  const where: Record<string, unknown> = { visibility: 'PUBLIC' };
+  const where: Prisma.GroupWhereInput = { visibility: 'PUBLIC' };
   if (params?.search?.trim()) {
     where.name = { contains: params.search.trim(), mode: 'insensitive' };
   }

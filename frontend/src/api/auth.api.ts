@@ -4,7 +4,6 @@ import type {
   AuthTokens,
   ForgotPasswordPayload,
   LoginPayload,
-  RefreshPayload,
   RegisterPayload,
   ResendVerificationPayload,
   ResetPasswordPayload,
@@ -24,9 +23,6 @@ export const authApi = {
 
   login: (payload: LoginPayload) =>
     apiPost<AuthTokens & { user: User }>('/auth/login', payload),
-
-  refresh: (payload: RefreshPayload) =>
-    apiPost<{ accessToken: string }>('/auth/refresh', payload),
 
   logout: async () => {
     const refreshToken = await storage.getRefreshToken();

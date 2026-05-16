@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-  FlatList,
   Pressable,
   RefreshControl,
   ScrollView,
@@ -189,12 +188,11 @@ export function GroupDetailScreen({ route, navigation }: Props) {
 
         {/* Members list */}
         <Typography preset="label" style={styles.sectionTitle}>Members</Typography>
-        <FlatList
-          data={group.members}
-          keyExtractor={item => item.userId}
-          renderItem={renderMember}
-          scrollEnabled={false}
-        />
+        {group.members?.map(member => (
+          <React.Fragment key={member.userId}>
+            {renderMember({ item: member })}
+          </React.Fragment>
+        ))}
 
         {/* Leave / Delete */}
         <View style={styles.dangerZone}>

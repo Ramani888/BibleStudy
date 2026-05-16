@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import {
+  FlatList,
   Pressable,
   RefreshControl,
-  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -215,67 +215,78 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       )}
 
       {/* ── Content ── */}
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={() => { refetchFolders(); refetchSets(); }}
-            tintColor={colors.primary}
-          />
-        }
-      >
-        {activeTab === 'sets' ? (
-          setsLoading ? (
-            <>
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-            </>
-          ) : sortedSets.length === 0 ? (
-            <EmptyState
-              title={search ? 'No results' : 'No sets yet'}
-              subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
-              ctaLabel={search ? undefined : 'Create Set'}
-              onCta={search ? undefined : () => navigation.navigate('CreateSet', {})}
-              style={styles.emptyState}
+      {activeTab === 'sets' ? (
+        <FlatList
+          data={setsLoading ? [] : sortedSets}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ListFooterComponent={<Spacer size={spacing[8]} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => { refetchFolders(); refetchSets(); }}
+              tintColor={colors.primary}
             />
-          ) : (
-            <View style={styles.list}>
-              {sortedSets.map(set => (
-                <SetCard
-                  key={set.id}
-                  set={set}
-                  onPress={() => navigation.navigate('SetDetail', { setId: set.id, setTitle: set.title })}
-                  onMenuPress={() => setSelectedSet(set)}
-                />
-              ))}
-            </View>
-          )
-        ) : (
-          filteredFolders.length === 0 ? (
+          }
+          renderItem={({ item }) => (
+            <SetCard
+              set={item}
+              onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
+              onMenuPress={() => setSelectedSet(item)}
+            />
+          )}
+          ListEmptyComponent={
+            setsLoading ? (
+              <>
+                <SetCardSkeleton />
+                <SetCardSkeleton />
+                <SetCardSkeleton />
+              </>
+            ) : (
+              <EmptyState
+                title={search ? 'No results' : 'No sets yet'}
+                subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
+                ctaLabel={search ? undefined : 'Create Set'}
+                onCta={search ? undefined : () => navigation.navigate('CreateSet', {})}
+                style={styles.emptyState}
+              />
+            )
+          }
+        />
+      ) : (
+        <FlatList
+          data={filteredFolders}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.scroll}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ListFooterComponent={<Spacer size={spacing[8]} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={() => { refetchFolders(); refetchSets(); }}
+              tintColor={colors.primary}
+            />
+          }
+          renderItem={({ item }) => (
+            <FolderCard
+              folder={item}
+              setCount={setCountByFolder(item.id)}
+              onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name })}
+              onMenuPress={() => setSelectedFolder(item)}
+            />
+          )}
+          ListEmptyComponent={
             <EmptyState
               title={search ? 'No results' : 'No folders yet'}
               subtitle={search ? `No folders match "${search}"` : 'Tap Create Folder to organise your sets'}
               style={styles.emptyState}
             />
-          ) : (
-            <View style={styles.list}>
-              {filteredFolders.map(folder => (
-                <FolderCard
-                  key={folder.id}
-                  folder={folder}
-                  setCount={setCountByFolder(folder.id)}
-                  onPress={() => navigation.navigate('FolderDetail', { folderId: folder.id, folderName: folder.name })}
-                  onMenuPress={() => setSelectedFolder(folder)}
-                />
-              ))}
-            </View>
-          )
-        )}
-        <Spacer size={spacing[8]} />
-      </ScrollView>
+          }
+        />
+      )}
 
       {/* ── Bottom CTA ── */}
       <View style={styles.bottomCta}>
@@ -468,6 +479,7 @@ const styles = StyleSheet.create({
   searchInput: { marginBottom: 0 },
   scroll: { padding: layout.screenPaddingH },
   list: { gap: spacing[3] },
+  separator: { height: spacing[3] },
   emptyState: { minHeight: 200 },
   colorLabel: { marginBottom: spacing[2] },
   bottomCta: {

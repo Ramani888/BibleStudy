@@ -22,9 +22,6 @@ export const cardsApi = {
   listBySet: (setId: string) =>
     apiGet<Card[]>(`/cards/set/${setId}`),
 
-  getById: (id: string) =>
-    apiGet<Card>(`/cards/${id}`),
-
   update: (id: string, payload: UpdateCardPayload) =>
     apiPut<Card>(`/cards/${id}`, payload),
 

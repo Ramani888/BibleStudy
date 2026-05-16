@@ -7,8 +7,6 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -25,9 +23,7 @@ import { useAIChat, useConfirmDialog } from '../../hooks';
 import { useCreditBalance } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
-import type { AIStackParamList } from '../../navigation/types';
-
-type AINav = NativeStackNavigationProp<AIStackParamList>;
+import type { AIScreenProps } from '../../navigation/types';
 
 interface Message {
   id: string;
@@ -44,9 +40,8 @@ const SUGGESTIONS = [
   'Who were the twelve apostles?',
 ];
 
-export function AIChatScreen() {
+export function AIChatScreen({ navigation }: AIScreenProps<'AIChat'>) {
   const user = useAuthStore(s => s.user);
-  const navigation = useNavigation<AINav>();
   const [messages, setMessages] = useState<Message[]>([]);
   const listRef = useRef<FlatList>(null);
   const { show, dialogProps } = useConfirmDialog();
@@ -117,6 +112,24 @@ export function AIChatScreen() {
     });
   };
 
+  const renderItem = useCallback(({ item }: { item: Message }) => (
+    <Pressable
+      onLongPress={() => {
+        if (item.text !== '__typing__') {
+          Share.share({ message: item.text });
+        }
+      }}
+    >
+      <ChatBubble
+        role={item.role}
+        text={item.text}
+        creditsUsed={item.creditsUsed}
+        userName={user?.name}
+        userImage={user?.profileImage}
+      />
+    </Pressable>
+  ), [user]);
+
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       {/* ── Header ── */}
@@ -175,23 +188,7 @@ export function AIChatScreen() {
             </View>
           </View>
         }
-        renderItem={({ item }) => (
-          <Pressable
-            onLongPress={() => {
-              if (item.text !== '__typing__') {
-                Share.share({ message: item.text });
-              }
-            }}
-          >
-            <ChatBubble
-              role={item.role}
-              text={item.text}
-              creditsUsed={item.creditsUsed}
-              userName={user?.name}
-              userImage={user?.profileImage}
-            />
-          </Pressable>
-        )}
+        renderItem={renderItem}
       />
 
       {/* ── Input ── */}

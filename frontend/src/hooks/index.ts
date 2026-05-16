@@ -49,7 +49,6 @@ export {
   useGatherings,
   useGathering,
   useNearbyGatherings,
-  useParticipants,
   useCreateGathering,
   useUpdateGathering,
   useCancelGathering,
@@ -57,7 +56,7 @@ export {
   useLeaveGathering,
 } from './useGatherings';
 export { useFriendsLocations, useUpdateLocation, useUpdateMapPrivacy } from './useMap';
-export { useMyActivityFeed, useFriendsActivityFeed } from './useActivities';
+export { useFriendsActivityFeed } from './useActivities';
 export {
   useNotifications,
   useMarkNotificationRead,

@@ -1,8 +1,6 @@
 import React from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -16,10 +14,8 @@ import { useSets, useConfirmDialog, useCreditBalance } from '../../hooks';
 import { useUpdateMapPrivacy } from '../../hooks/useMap';
 import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
-import type { ProfileStackParamList } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import type { Plan } from '../../types';
-
-type ProfileNav = NativeStackNavigationProp<ProfileStackParamList>;
 
 const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
   FREE: 'neutral',
@@ -27,8 +23,7 @@ const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
   PRO: 'primary',
 };
 
-export function ProfileScreen() {
-  const navigation = useNavigation<ProfileNav>();
+export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
   const updatePrivacy = useUpdateMapPrivacy();

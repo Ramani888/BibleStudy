@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   FlatList,
   Pressable,
@@ -21,7 +21,7 @@ type Props = ProfileScreenProps<'Groups'>;
 export function GroupsScreen({ navigation }: Props) {
   const { data: groups = [], isLoading, isFetching, error, refetch } = useGroups();
 
-  const renderItem = ({ item }: { item: Group }) => (
+  const renderItem = useCallback(({ item }: { item: Group }) => (
     <Pressable
       style={styles.groupRow}
       onPress={() => navigation.navigate('GroupDetail', { groupId: item.id })}
@@ -37,7 +37,7 @@ export function GroupsScreen({ navigation }: Props) {
       </View>
       <Icon name="chevron-forward" size={20} color={colors.textSecondary} />
     </Pressable>
-  );
+  ), [navigation]);
 
   if (error) return <ErrorState message="Could not load groups" onRetry={refetch} />;
 

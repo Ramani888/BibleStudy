@@ -1,4 +1,4 @@
-import React, { forwardRef } from 'react';
+import React from 'react';
 import { TextInput, TextInputProps } from 'react-native';
 import { Controller, ControllerProps, FieldValues, Path } from 'react-hook-form';
 import { Input } from '../ui/Input';
@@ -57,8 +57,3 @@ export function FormField<T extends FieldValues>({
     />
   );
 }
-
-// Re-export for convenience when you need a standalone ref-able Input
-export const RefInput = forwardRef<TextInput, React.ComponentProps<typeof Input>>(
-  (props, ref) => <Input ref={ref} {...props} />,
-);

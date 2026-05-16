@@ -31,6 +31,12 @@ async function verifySetOwnership(userId: string, setId: string) {
   return set;
 }
 
+async function verifyCardOwnership(cardId: string, userId: string) {
+  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
+  if (!card) throw new Error('Card not found or not authorized');
+  return card;
+}
+
 export async function createCard(userId: string, dto: CreateCardDtoType) {
   await verifySetOwnership(userId, dto.setId);
 
@@ -90,22 +96,11 @@ export async function listCardsBySet(userId: string, setId: string) {
 }
 
 export async function getCardById(userId: string, cardId: string) {
-  const card = await prisma.card.findFirst({
-    where: { id: cardId, userId },
-  });
-
-  if (!card) {
-    throw new Error('Card not found');
-  }
-
-  return card;
+  return verifyCardOwnership(cardId, userId);
 }
 
 export async function updateCard(userId: string, cardId: string, dto: UpdateCardDtoType) {
-  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) {
-    throw new Error('Card not found');
-  }
+  await verifyCardOwnership(cardId, userId);
 
   const updated = await prisma.card.update({
     where: { id: cardId },
@@ -124,10 +119,7 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
 }
 
 export async function deleteCard(userId: string, cardId: string) {
-  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) {
-    throw new Error('Card not found');
-  }
+  await verifyCardOwnership(cardId, userId);
 
   await prisma.card.delete({ where: { id: cardId } });
 
@@ -135,8 +127,7 @@ export async function deleteCard(userId: string, cardId: string) {
 }
 
 export async function copyCard(userId: string, cardId: string) {
-  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) throw new Error('Card not found');
+  const card = await verifyCardOwnership(cardId, userId);
 
   const maxOrder = await prisma.card.aggregate({
     where: { setId: card.setId },
@@ -161,9 +152,7 @@ export async function copyCard(userId: string, cardId: string) {
 }
 
 export async function moveCard(userId: string, cardId: string, targetSetId: string) {
-  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) throw new Error('Card not found');
-
+  await verifyCardOwnership(cardId, userId);
   await verifySetOwnership(userId, targetSetId);
 
   const maxOrder = await prisma.card.aggregate({
@@ -205,10 +194,7 @@ export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
 }
 
 export async function recordStudyResult(userId: string, cardId: string, dto: StudyCardDtoType) {
-  const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) {
-    throw new Error('Card not found');
-  }
+  const card = await verifyCardOwnership(cardId, userId);
 
   const nextReviewAt = calculateNextReviewAt(dto.difficulty);
 

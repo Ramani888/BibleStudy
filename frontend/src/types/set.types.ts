@@ -1,4 +1,5 @@
-export type Visibility = 'PRIVATE' | 'PUBLIC' | 'FRIENDS';
+import type { Visibility } from './common.types';
+export type { Visibility };
 export type CardLayout = 'DEFAULT' | 'MINIMAL' | 'DETAILED';
 
 export interface StudySet {
@@ -13,6 +14,7 @@ export interface StudySet {
   createdAt: string;
   updatedAt: string;
   _count?: { cards: number };
+  user?: { id: string; name: string; profileImage?: string };
 }
 
 export interface CreateSetPayload {

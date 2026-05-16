@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useForm, useWatch } from 'react-hook-form';
@@ -60,10 +60,10 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
       },
     });
   };
-  const answerRef = useRef<any>(null);
-  const [difficulty, setDifficulty] = React.useState<Difficulty>('MEDIUM');
-  const [note, setNote] = React.useState('');
-  const [isBlurred, setIsBlurred] = React.useState(false);
+  const answerRef = useRef<TextInput>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
+  const [note, setNote] = useState('');
+  const [isBlurred, setIsBlurred] = useState(false);
 
   const card = cards?.find(c => c.id === cardId);
 

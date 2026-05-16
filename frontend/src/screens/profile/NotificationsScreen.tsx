@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   FlatList,
   Pressable,
@@ -39,7 +39,7 @@ export function NotificationsScreen(_props: Props) {
     }
   };
 
-  const renderItem = ({ item }: { item: Notification }) => {
+  const renderItem = useCallback(({ item }: { item: Notification }) => {
     const date = new Date(item.createdAt);
     return (
       <Pressable
@@ -67,7 +67,7 @@ export function NotificationsScreen(_props: Props) {
         </Pressable>
       </Pressable>
     );
-  };
+  }, [markRead, deleteNotification]);
 
   if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
 

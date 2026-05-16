@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
-import { EmptyState } from '../../components/feedback';
+import { EmptyState, ErrorState } from '../../components/feedback';
 import { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from '../../hooks';
 
 const BALANCE_ICON_SIZE = 32;
@@ -93,6 +93,8 @@ export function CreditsScreen() {
   const {
     data,
     isLoading,
+    isError,
+    error,
     refetch,
     isFetching,
     fetchNextPage,
@@ -122,7 +124,9 @@ export function CreditsScreen() {
         }
         ItemSeparatorComponent={() => <Divider marginV={0} />}
         ListEmptyComponent={
-          !isLoading ? (
+          isError ? (
+            <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
+          ) : !isLoading ? (
             <EmptyState
               title="No transactions yet"
               subtitle="Credits you earn or use will appear here"

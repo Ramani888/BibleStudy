@@ -1,4 +1,5 @@
 import type { UserProfile } from './friends.types';
+import type { Visibility } from './common.types';
 
 export interface Gathering {
   id: string;
@@ -11,7 +12,7 @@ export interface Gathering {
   locationLat: number | null;
   locationLng: number | null;
   meetingLink: string | null;
-  visibility: 'PRIVATE' | 'PUBLIC' | 'FRIENDS';
+  visibility: Visibility;
   createdAt: string;
   updatedAt: string;
   host: UserProfile;

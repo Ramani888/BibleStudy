@@ -20,7 +20,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
-  const [layout, setLayout] = useState<'list' | 'grid'>('list');
+  const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
   const [cardSearch, setCardSearch] = useState('');
@@ -168,11 +168,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       )}
 
       <FlatList
-        key={layout}
+        key={cardLayout}
         data={filteredCards}
         keyExtractor={item => item.id}
-        numColumns={layout === 'grid' ? 2 : 1}
-        columnWrapperStyle={layout === 'grid' ? styles.gridRow : undefined}
+        numColumns={cardLayout === 'grid' ? 2 : 1}
+        columnWrapperStyle={cardLayout === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshing={isLoading}
@@ -189,10 +189,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ) : null
         }
         renderItem={({ item }) => (
-          <View style={[styles.cardItem, layout === 'grid' && styles.cardItemGrid]}>
+          <View style={[styles.cardItem, cardLayout === 'grid' && styles.cardItemGrid]}>
             {/* Question section — gray background */}
-            <View style={[styles.questionSection, layout === 'grid' && styles.questionSectionGrid]}>
-              <Typography preset="body" style={styles.question} numberOfLines={layout === 'grid' ? 3 : undefined}>
+            <View style={[styles.questionSection, cardLayout === 'grid' && styles.questionSectionGrid]}>
+              <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
                 {item.question}
               </Typography>
               <View style={styles.cardActions}>
@@ -209,17 +209,17 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             </View>
 
             {/* Answer section — white background */}
-            <View style={[styles.answerSection, layout === 'grid' && styles.answerSectionGrid]}>
+            <View style={[styles.answerSection, cardLayout === 'grid' && styles.answerSectionGrid]}>
               {item.isBlurred ? (
                 <View style={styles.blurOverlay}>
                   <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
                 </View>
               ) : (
                 <>
-                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={layout === 'grid' ? 2 : undefined}>
+                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
                     {item.answer}
                   </Typography>
-                  {item.note && layout === 'list' ? (
+                  {item.note && cardLayout === 'list' ? (
                     <>
                       <Divider marginV={spacing[2]} />
                       <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
@@ -318,9 +318,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             onPress: () => handleBlurAll(!allBlurred),
           },
           {
-            label: layout === 'grid' ? 'List View' : 'Grid View',
-            iconName: layout === 'grid' ? 'list-outline' : 'grid-outline',
-            onPress: () => setLayout(l => l === 'list' ? 'grid' : 'list'),
+            label: cardLayout === 'grid' ? 'List View' : 'Grid View',
+            iconName: cardLayout === 'grid' ? 'list-outline' : 'grid-outline',
+            onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list'),
           },
         ]}
       />

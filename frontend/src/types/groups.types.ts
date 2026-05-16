@@ -1,4 +1,5 @@
 import type { UserProfile } from './friends.types';
+import type { Visibility } from './common.types';
 
 export interface Group {
   id: string;
@@ -6,7 +7,7 @@ export interface Group {
   description: string | null;
   ownerId: string;
   owner?: UserProfile;
-  visibility: 'PRIVATE' | 'PUBLIC' | 'FRIENDS';
+  visibility: Visibility;
   inviteCode: string;
   createdAt: string;
   updatedAt: string;

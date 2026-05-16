@@ -25,13 +25,6 @@ export function useNearbyGatherings(lat: number | null, lng: number | null) {
   });
 }
 
-export function useParticipants(gatheringId: string) {
-  return useQuery({
-    queryKey: ['gatherings', 'detail', gatheringId, 'participants'],
-    queryFn: () => gatheringsApi.participants(gatheringId),
-    enabled: !!gatheringId,
-  });
-}
 
 export function useCreateGathering() {
   const qc = useQueryClient();

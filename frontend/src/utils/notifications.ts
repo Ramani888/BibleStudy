@@ -1,7 +1,7 @@
 import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import Toast from 'react-native-toast-message';
-import { apiPost, apiClient } from '../api/client';
+import { apiPost, apiDelete } from '../api/client';
 
 /**
  * Request push notification permission, obtain the FCM device token,
@@ -39,7 +39,7 @@ export async function removeDeviceToken(): Promise<void> {
   try {
     const token = await messaging().getToken();
     if (!token) return;
-    await apiClient.delete('/users/device-token', { data: { token } });
+    await apiDelete('/users/device-token');
   } catch {
     // Non-critical — token will expire naturally
   }

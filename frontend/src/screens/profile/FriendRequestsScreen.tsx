@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -47,7 +47,7 @@ export function FriendRequestsScreen(_props: Props) {
     });
   };
 
-  const renderItem = ({ item }: { item: FriendRequest }) => {
+  const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
       <View style={styles.requestRow}>
@@ -83,7 +83,7 @@ export function FriendRequestsScreen(_props: Props) {
         )}
       </View>
     );
-  };
+  }, [tab, handleAccept, handleReject, cancel]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
