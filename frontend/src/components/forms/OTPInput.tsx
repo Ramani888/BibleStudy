@@ -4,6 +4,8 @@ import { colors, fontSizes, fontWeights, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const OTP_LENGTH = 6;
+const OTP_BOX_WIDTH = 48;
+const OTP_BOX_HEIGHT = 56;
 
 interface OTPInputProps {
   value: string;
@@ -84,8 +86,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   box: {
-    width: 48,
-    height: 56,
+    width: OTP_BOX_WIDTH,
+    height: OTP_BOX_HEIGHT,
     borderRadius: 12,
     borderWidth: 1.5,
     borderColor: colors.border,

@@ -81,6 +81,13 @@ export async function getChatHistory(userId: string, page = 1, limit = 20) {
   const [chats, total] = await Promise.all([
     prisma.aIChat.findMany({
       where: { userId },
+      select: {
+        id: true,
+        question: true,
+        answer: true,
+        creditsUsed: true,
+        createdAt: true,
+      },
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit,

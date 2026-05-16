@@ -14,7 +14,7 @@ router.put('/profile', validate(UpdateProfileDto), usersController.updateProfile
 router.put('/change-password', validate(ChangePasswordDto), usersController.changePassword);
 router.delete('/account', usersController.deleteAccount);
 router.post('/device-token', validate(DeviceTokenDto), usersController.registerDeviceToken);
-router.delete('/device-token', validate(RemoveTokenDto), usersController.removeDeviceToken);
+router.post('/device-token/remove', validate(RemoveTokenDto), usersController.removeDeviceToken);
 router.get('/:id', usersController.getUserById);
 
 export default router;

@@ -1,13 +1,13 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, shadows, spacing } from '../../theme';
+import { Badge } from '../ui/Badge';
 import { Typography } from '../ui/Typography';
+import { formatDate } from '../../utils/formatters';
+import { colors, fontSizes, shadows, spacing } from '../../theme';
+import type { StudySet } from '../../types';
 
 const MENU_ICON_SIZE = 20;
-import { Badge } from '../ui/Badge';
-import { formatDate } from '../../utils/formatters';
-import type { StudySet } from '../../types';
 
 interface SetCardProps {
   set: StudySet;
@@ -103,7 +103,7 @@ const styles = StyleSheet.create({
   },
   title: {
     flex: 1,
-    fontSize: 16,
+    fontSize: fontSizes.md,
   },
   description: {
     lineHeight: 20,

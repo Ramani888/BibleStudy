@@ -5,7 +5,7 @@ import { Typography } from './Typography';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
 
-interface AvatarProps {
+export interface AvatarProps {
   uri?: string | null;
   name?: string;
   size?: AvatarSize;

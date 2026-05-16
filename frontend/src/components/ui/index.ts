@@ -1,9 +1,12 @@
 export { Typography } from './Typography';
+export type { TypographyProps } from './Typography';
 export { Button } from './Button';
 export { Input } from './Input';
 export { Card, PressableCard } from './Card';
 export { Badge } from './Badge';
+export type { BadgeProps } from './Badge';
 export { Avatar } from './Avatar';
+export type { AvatarProps } from './Avatar';
 export { Divider } from './Divider';
 export { Spacer } from './Spacer';
 export { ProgressBar } from './ProgressBar';

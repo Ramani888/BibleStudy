@@ -24,6 +24,7 @@ const fontFamily = Platform.select({
 export const fontFamilies = fontFamily;
 
 export const fontSizes = {
+  xs2: 10,
   xs: 11,
   sm: 13,
   md: 15,

@@ -32,6 +32,8 @@ interface Message {
   creditsUsed?: number;
 }
 
+const TYPING_INDICATOR = '__typing__' as const;
+
 // ─── Suggested starter questions ─────────────────────────────────────────────
 const SUGGESTIONS = [
   'What does the Gospel of John teach about eternal life?',
@@ -73,7 +75,7 @@ export function AIChatScreen({ navigation }: AIScreenProps<'AIChat'>) {
       setMessages(prev => [
         ...prev,
         { id: userMsgId, role: 'user', text: question, creditsUsed: 1 },
-        { id: `${userMsgId}_typing`, role: 'ai', text: '__typing__' },
+        { id: `${userMsgId}_typing`, role: 'ai', text: TYPING_INDICATOR },
       ]);
 
       sendMessage(
@@ -115,7 +117,7 @@ export function AIChatScreen({ navigation }: AIScreenProps<'AIChat'>) {
   const renderItem = useCallback(({ item }: { item: Message }) => (
     <Pressable
       onLongPress={() => {
-        if (item.text !== '__typing__') {
+        if (item.text !== TYPING_INDICATOR) {
           Share.share({ message: item.text });
         }
       }}

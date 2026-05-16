@@ -50,7 +50,7 @@ function TypingDots() {
 
 export function ChatBubble({ role, text, creditsUsed, userName, userImage }: ChatBubbleProps) {
   const isUser = role === 'user';
-  const isTyping = text === '__typing__';
+  const isTyping = text === '__typing__'; // sentinel set by AIChatScreen.TYPING_INDICATOR
 
   return (
     <View style={[styles.row, isUser ? styles.rowUser : styles.rowAI]}>
@@ -74,7 +74,7 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage }: Cha
           </Typography>
         )}
         {isUser && creditsUsed !== undefined && (
-          <Typography preset="caption" color="rgba(255,255,255,0.65)" style={styles.credit}>
+          <Typography preset="caption" color={colors.textOnPrimaryMuted} style={styles.credit}>
             −{creditsUsed} credit
           </Typography>
         )}

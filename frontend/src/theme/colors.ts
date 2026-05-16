@@ -93,6 +93,9 @@ export const colors = {
 
   // Misc
   overlay: 'rgba(0, 0, 0, 0.5)',
+  backgroundOverlay: 'rgba(255, 255, 255, 0.9)',
+  textOnPrimaryMuted: 'rgba(255, 255, 255, 0.65)',
+  shadow: '#000000',
   transparent: 'transparent',
 
   // Expose palette for one-off use

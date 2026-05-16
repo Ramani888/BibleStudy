@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
-import { colors } from '../../theme';
+import { colors, spacing } from '../../theme';
 
 interface LoadingOverlayProps {
   visible: boolean;
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
   box: {
     backgroundColor: colors.backgroundCard,
     borderRadius: 16,
-    padding: 32,
+    padding: spacing[8],
   },
 });

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { colors, layout, spacing } from '../../../theme';
+import { colors, fontSizes, layout, spacing } from '../../../theme';
 
 interface MenuSectionProps {
   label: string;
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
     paddingTop: spacing[3],
     paddingBottom: spacing[1],
     letterSpacing: 1,
-    fontSize: 11,
+    fontSize: fontSizes.xs,
   },
 });

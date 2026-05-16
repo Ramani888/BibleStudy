@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TextProps, TextStyle } from 'react-native';
 import { colors, textPresets, TextPreset } from '../../theme';
 
-interface TypographyProps extends TextProps {
+export interface TypographyProps extends TextProps {
   preset?: TextPreset;
   color?: string;
   align?: TextStyle['textAlign'];

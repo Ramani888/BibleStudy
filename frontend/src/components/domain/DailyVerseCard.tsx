@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { colors, fontSizes, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 import { Skeleton } from '../feedback/SkeletonLoader';
 import type { DailyVerse } from '../../types';
@@ -71,13 +71,13 @@ const styles = StyleSheet.create({
   label: {
     textTransform: 'uppercase',
     letterSpacing: 1,
-    fontSize: 11,
+    fontSize: fontSizes.xs,
   },
   verseText: {
     lineHeight: 26,
     fontStyle: 'italic',
   },
   reference: {
-    fontSize: 13,
+    fontSize: fontSizes.sm,
   },
 });

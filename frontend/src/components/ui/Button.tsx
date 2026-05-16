@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { colors, layout, shadows } from '../../theme';
+import { colors, layout, shadows, spacing } from '../../theme';
 import { Typography } from './Typography';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: spacing[5],
   },
   fullWidth: {
     width: '100%',

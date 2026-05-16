@@ -5,6 +5,7 @@ import { colors, layout, shadows, ShadowKey, spacing } from '../../theme';
 interface CardProps extends ViewProps {
   children: React.ReactNode;
   shadow?: ShadowKey;
+  /** Pass a value from the spacing scale: spacing[N] */
   padding?: number;
   style?: ViewStyle;
 }
@@ -12,6 +13,7 @@ interface CardProps extends ViewProps {
 interface PressableCardProps extends Omit<PressableProps, 'style'> {
   children: React.ReactNode;
   shadow?: ShadowKey;
+  /** Pass a value from the spacing scale: spacing[N] */
   padding?: number;
   style?: ViewStyle;
 }

@@ -24,6 +24,17 @@ import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
 
+function getNotificationIcon(type: Notification['type']): string {
+  switch (type) {
+    case 'friend_request':   return 'person-add-outline';
+    case 'friend_accepted':  return 'people-outline';
+    case 'group':            return 'people-circle-outline';
+    case 'gathering':        return 'calendar-outline';
+    case 'gathering_rsvp':   return 'alarm-outline';
+    case 'system':           return 'notifications-outline';
+  }
+}
+
 export function NotificationsScreen(_props: Props) {
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
@@ -104,21 +115,6 @@ export function NotificationsScreen(_props: Props) {
       />
     </SafeAreaView>
   );
-}
-
-function getNotificationIcon(type: string): string {
-  switch (type) {
-    case 'friend_request':
-    case 'friend_accepted':
-      return 'person-add-outline';
-    case 'group':
-      return 'people-outline';
-    case 'gathering':
-    case 'gathering_rsvp':
-      return 'calendar-outline';
-    default:
-      return 'notifications-outline';
-  }
 }
 
 const styles = StyleSheet.create({

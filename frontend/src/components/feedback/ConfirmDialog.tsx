@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppModal } from './Modal';
 import { Button, Divider, Typography } from '../ui';
-import { colors, spacing } from '../../theme';
+import { colors, fontSizes, lineHeights, spacing } from '../../theme';
 
 export interface ConfirmDialogProps {
   visible: boolean;
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     paddingBottom: spacing[5],
   },
   title: { marginBottom: spacing[2] },
-  message: { marginBottom: spacing[4], lineHeight: 22 },
+  message: { marginBottom: spacing[4], lineHeight: fontSizes.md * lineHeights.normal },
   btnRow: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[2] },
   btn: { flex: 1 },
 });

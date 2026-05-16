@@ -10,6 +10,8 @@ import Animated, {
 import { colors, shadows, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 
+const FLASH_CARD_HEIGHT = 320;
+
 interface FlashCardProps {
   question: string;
   answer: string;
@@ -91,7 +93,7 @@ export function FlashCard({ question, answer, isBlurred, onFlip }: FlashCardProp
 
 const styles = StyleSheet.create({
   container: {
-    height: 320,
+    height: FLASH_CARD_HEIGHT,
     width: '100%',
   },
   face: {

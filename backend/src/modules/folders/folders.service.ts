@@ -40,7 +40,10 @@ export async function getFolderById(userId: string, folderId: string) {
   const folder = await prisma.folder.findFirst({
     where: { id: folderId, userId },
     include: {
-      sets: { orderBy: { updatedAt: 'desc' } },
+      sets: {
+        include: { _count: { select: { cards: true } } },
+        orderBy: { updatedAt: 'desc' },
+      },
     },
   });
 

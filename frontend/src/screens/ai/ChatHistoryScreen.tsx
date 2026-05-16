@@ -16,7 +16,7 @@ import { Card, Divider, Spacer, Typography } from '../../components/ui';
 const BADGE_ICON_SIZE = 12;
 import { useAIChatHistory } from '../../hooks';
 import { formatDate } from '../../utils/formatters';
-import { colors, layout, spacing } from '../../theme';
+import { colors, fontSizes, layout, spacing } from '../../theme';
 import type { AIChat } from '../../types';
 
 interface HistoryItemProps {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 1,
   },
-  qLabel: { fontWeight: '700', fontSize: 10 },
+  qLabel: { fontWeight: '700', fontSize: fontSizes.xs2 },
   flex: { flex: 1 },
 
   // Footer

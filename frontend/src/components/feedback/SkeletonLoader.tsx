@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors } from '../../theme';
+import { colors, spacing } from '../../theme';
 
 interface SkeletonProps {
   width?: number | string;
@@ -50,9 +50,9 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.backgroundCard,
     borderRadius: 16,
-    padding: 16,
+    padding: spacing[4],
     borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 12,
+    marginBottom: spacing[3],
   },
 });

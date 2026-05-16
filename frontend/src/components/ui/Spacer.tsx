@@ -2,6 +2,7 @@ import React from 'react';
 import { View } from 'react-native';
 
 interface SpacerProps {
+  /** Pass a value from the spacing scale: spacing[N] */
   size: number;
   horizontal?: boolean;
 }

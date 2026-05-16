@@ -5,7 +5,7 @@ import { Typography } from './Typography';
 
 type BadgeVariant = 'primary' | 'success' | 'error' | 'warning' | 'info' | 'neutral';
 
-interface BadgeProps {
+export interface BadgeProps {
   label: string;
   variant?: BadgeVariant;
   style?: ViewStyle;

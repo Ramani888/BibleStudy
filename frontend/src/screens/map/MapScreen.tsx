@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: layout.screenPaddingH,
     paddingBottom: spacing[2],
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: colors.backgroundOverlay,
   },
   headerTitle: {
     color: colors.textPrimary,
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#000',
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.25,
     shadowRadius: 4,
@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: layout.tabBarHeight + spacing[4],
     left: spacing[4],
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    backgroundColor: colors.backgroundOverlay,
     borderRadius: 8,
     padding: spacing[2],
     gap: spacing[1],

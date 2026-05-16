@@ -16,7 +16,7 @@ import { useCreditBalance, useCreditTransactions } from '../../hooks';
 const BALANCE_ICON_SIZE = 32;
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
-import { colors, layout, spacing } from '../../theme';
+import { colors, fontSizes, layout, spacing } from '../../theme';
 import type { TransactionType } from '../../types';
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
   balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
-  balanceLabel: { letterSpacing: 1, fontSize: 11 },
+  balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
   historyTitle: { marginBottom: spacing[2] },
   txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing[3], gap: spacing[3] },
