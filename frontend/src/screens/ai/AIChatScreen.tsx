@@ -12,9 +12,13 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { ChatBubble } from '../../components/domain';
 import { CreditBadge } from '../../components/domain';
 import { Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
+const EMPTY_ICON_SIZE = 48;
 import { ChatInput } from './components/ChatInput';
 import { useAuthStore } from '../../store';
 import { useAIChat } from '../../hooks';
@@ -115,7 +119,7 @@ export function AIChatScreen() {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.aiBadge}>
-            <Typography style={styles.aiBadgeIcon}>✦</Typography>
+            <Icon name="sparkles" size={ICON_SIZE} color={colors.primary} />
           </View>
           <View>
             <Typography preset="h4">AI Bible Assistant</Typography>
@@ -127,9 +131,10 @@ export function AIChatScreen() {
         <View style={styles.headerRight}>
           <CreditBadge balance={creditBalance} />
           <Pressable onPress={handleClearChat} hitSlop={8}>
-            <Typography preset="label" color={messages.length > 0 ? colors.textSecondary : colors.textDisabled}>🗑</Typography>
+            <Icon name="trash-outline" size={ICON_SIZE} color={messages.length > 0 ? colors.textSecondary : colors.textDisabled} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('ChatHistory')} hitSlop={8}>
+          <Pressable onPress={() => navigation.navigate('ChatHistory')} hitSlop={8} style={styles.historyBtn}>
+            <Icon name="time-outline" size={ICON_SIZE} color={colors.primary} />
             <Typography preset="label" color={colors.primary}>History</Typography>
           </Pressable>
         </View>
@@ -144,7 +149,7 @@ export function AIChatScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Typography style={styles.emptyEmoji}>✦</Typography>
+            <Icon name="sparkles" size={EMPTY_ICON_SIZE} color={colors.primaryLight} />
             <Typography preset="h4" align="center">Ask anything about the Bible</Typography>
             <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
               Theology, history, verses, devotional insights — I'm here to help.
@@ -226,7 +231,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  aiBadgeIcon: { fontSize: 18, color: colors.textOnPrimary },
+  historyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Messages
   list: {
@@ -241,12 +246,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: spacing[8],
     gap: spacing[3],
-  },
-  emptyEmoji: {
-    fontSize: 48,
-    color: colors.primary,
-    lineHeight: 60,
-    marginBottom: spacing[2],
   },
   emptySub: { paddingHorizontal: spacing[4] },
   suggestions: {

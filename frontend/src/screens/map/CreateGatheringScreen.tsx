@@ -15,8 +15,11 @@ import Toast from 'react-native-toast-message';
 
 import type { MapScreenProps } from '../../navigation/types';
 import type { CreateGatheringPayload } from '../../types/gatherings.types';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
+
+const CHEVRON_SIZE = 18;
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { getErrorMessage } from '../../api/client';
@@ -161,9 +164,7 @@ export function CreateGatheringScreen({ route, navigation }: Props) {
                 >
                   {date ? formatDate(date) : 'Select date and time'}
                 </Typography>
-                <Typography preset="body" color={colors.textSecondary}>
-                  {'›'}
-                </Typography>
+                <Icon name="chevron-forward" size={CHEVRON_SIZE} color={colors.textSecondary} />
               </Pressable>
             </View>
 

@@ -3,9 +3,12 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
 import { Input, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { usePublicSets, useCloneSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -49,7 +52,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
           {total} public {total === 1 ? 'set' : 'sets'} available
         </Typography>
         <Pressable onPress={toggleSearch} hitSlop={8}>
-          <Typography preset="label" color={searchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+          <Icon name="search-outline" size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
         </Pressable>
       </View>
       {searchVisible && (
@@ -107,7 +110,8 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '📋 Clone to Library',
+            label: 'Clone to Library',
+            iconName: 'copy-outline',
             onPress: () =>
               selectedSet &&
               cloneSet(selectedSet.id, {

@@ -7,8 +7,11 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, layout, spacing } from '../../../theme';
 import { Typography } from '../../../components/ui';
+
+const LOGO_ICON_SIZE = 28;
 
 interface AuthLayoutProps {
   title: string;
@@ -21,9 +24,7 @@ function BrandLogo() {
   return (
     <View style={styles.logoWrap}>
       <View style={styles.logoMark}>
-        <Typography preset="h3" color={colors.textOnPrimary} align="center">
-          ✦
-        </Typography>
+        <Icon name="sparkles" size={LOGO_ICON_SIZE} color={colors.textOnPrimary} />
       </View>
       <Typography preset="h4" color={colors.primary} style={styles.logoText}>
         BibleStudy Pro

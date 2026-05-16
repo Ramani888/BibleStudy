@@ -9,8 +9,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { EmptyState, ErrorState } from '../../components/feedback';
 import { Card, Divider, Spacer, Typography } from '../../components/ui';
+
+const BADGE_ICON_SIZE = 12;
 import { useAIChatHistory } from '../../hooks';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
@@ -42,7 +45,7 @@ function HistoryItem({ chat }: HistoryItemProps) {
             <Divider marginV={spacing[3]} />
             <View style={styles.answerRow}>
               <View style={styles.aBadge}>
-                <Typography preset="caption" color={colors.success} style={styles.qLabel}>✦</Typography>
+                <Icon name="sparkles" size={BADGE_ICON_SIZE} color={colors.primary} />
               </View>
               <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
                 {chat.answer}

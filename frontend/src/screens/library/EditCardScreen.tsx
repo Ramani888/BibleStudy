@@ -6,8 +6,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { FormField } from '../../components/forms';
 import { Button, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { useCards, useDeleteCard, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
@@ -200,12 +203,16 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
               style={[styles.blurChip, isBlurred && styles.blurChipActive]}
               onPress={() => setIsBlurred(b => !b)}
             >
-              <Typography
-                preset="label"
-                color={isBlurred ? colors.primary : colors.textSecondary}
-              >
-                {isBlurred ? '🙈 Answer blurred' : '👁 Answer visible'}
-              </Typography>
+              <View style={styles.blurChipRow}>
+                <Icon
+                  name={isBlurred ? 'eye-off-outline' : 'eye-outline'}
+                  size={ICON_SIZE}
+                  color={isBlurred ? colors.primary : colors.textSecondary}
+                />
+                <Typography preset="label" color={isBlurred ? colors.primary : colors.textSecondary}>
+                  {isBlurred ? 'Answer blurred' : 'Answer visible'}
+                </Typography>
+              </View>
             </Pressable>
           </View>
 
@@ -216,10 +223,9 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
             fullWidth
           />
           <View style={styles.deleteSection}>
-            <Pressable onPress={handleDelete} hitSlop={8}>
-              <Typography preset="label" color={colors.error} align="center">
-                🗑 Delete Card
-              </Typography>
+            <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
+              <Icon name="trash-outline" size={ICON_SIZE} color={colors.error} />
+              <Typography preset="label" color={colors.error}>Delete Card</Typography>
             </Pressable>
           </View>
         </ScrollView>
@@ -294,4 +300,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
+  deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  blurChipRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
 });

@@ -1,7 +1,10 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, shadows, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
+
+const MENU_ICON_SIZE = 20;
 import { Badge } from '../ui/Badge';
 import { formatDate } from '../../utils/formatters';
 import type { StudySet } from '../../types';
@@ -66,7 +69,7 @@ export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps
       </View>
       {onMenuPress && (
         <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
-          <Typography style={styles.menuIcon} color={colors.textDisabled}>⋮</Typography>
+          <Icon name="ellipsis-vertical" size={MENU_ICON_SIZE} color={colors.textDisabled} />
         </Pressable>
       )}
     </Pressable>
@@ -123,5 +126,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuIcon: { fontSize: 20, lineHeight: 24 },
 });

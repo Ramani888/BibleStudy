@@ -8,8 +8,12 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, fontSizes, spacing } from '../../../theme';
 import { Typography } from '../../../components/ui';
+
+const SEND_ICON_SIZE = 20;
+const CREDIT_ICON_SIZE = 12;
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -36,13 +40,17 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
     >
       <View style={[styles.container, { paddingBottom: insets.bottom + spacing[2] }]}>
-        {/* Credit indicator */}
         {creditBalance !== undefined && (
           <View style={styles.creditRow}>
+            <Icon
+              name="star"
+              size={CREDIT_ICON_SIZE}
+              color={creditBalance > 0 ? colors.textSecondary : colors.error}
+            />
             <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.error}>
               {creditBalance > 0
-                ? `✦ ${creditBalance} credits remaining`
-                : '✦ No credits — claim your daily credit first'}
+                ? `${creditBalance} credits remaining`
+                : 'No credits — claim your daily credit first'}
             </Typography>
           </View>
         )}
@@ -66,12 +74,11 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
             disabled={!canSend}
             hitSlop={8}
           >
-            <Typography
-              style={styles.sendIcon}
+            <Icon
+              name="arrow-up"
+              size={SEND_ICON_SIZE}
               color={canSend ? colors.textOnPrimary : colors.textDisabled}
-            >
-              ↑
-            </Typography>
+            />
           </Pressable>
         </View>
       </View>
@@ -89,7 +96,10 @@ const styles = StyleSheet.create({
     gap: spacing[2],
   },
   creditRow: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing[1],
   },
   inputRow: {
     flexDirection: 'row',
@@ -124,9 +134,5 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: {
     backgroundColor: colors.gray200,
-  },
-  sendIcon: {
-    fontSize: 20,
-    fontWeight: '700',
   },
 });

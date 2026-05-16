@@ -1,8 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 import { Avatar } from '../ui/Avatar';
+
+const AI_BADGE_ICON_SIZE = 14;
 
 type Role = 'user' | 'ai';
 
@@ -54,7 +57,7 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage }: Cha
       {/* Avatar — only for AI */}
       {!isUser && (
         <View style={styles.aiBadge}>
-          <Typography style={styles.aiBadgeIcon}>✦</Typography>
+          <Icon name="sparkles" size={AI_BADGE_ICON_SIZE} color={colors.textOnPrimary} />
         </View>
       )}
 
@@ -124,7 +127,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  aiBadgeIcon: { fontSize: 14, color: colors.textOnPrimary },
   userAvatar: { marginBottom: 2 },
 });
 

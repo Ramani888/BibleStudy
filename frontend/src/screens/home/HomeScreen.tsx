@@ -11,8 +11,13 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { DailyVerseCard, SetCard, CreditBadge } from '../../components/domain';
 import { Avatar, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
+const QUICK_ACTION_ICON_SIZE = 28;
+const CLAIM_ICON_SIZE = 16;
 import { ActionSheet, SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
 import { useDailyVerse, useSets, useClaimDailyLogin } from '../../hooks';
@@ -31,17 +36,17 @@ type ParamlessTab = 'HomeTab' | 'LibraryTab' | 'AITab' | 'ProfileTab';
 // ─── Quick action item ────────────────────────────────────────────────────────
 interface QuickAction {
   label: string;
-  emoji: string;
+  iconName: string;
   tab: ParamlessTab;
   color: string;
   bg: string;
 }
 
 const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Library', emoji: '📚', tab: 'LibraryTab', color: colors.info,    bg: colors.infoSurface    },
-  { label: 'Study',   emoji: '🎓', tab: 'LibraryTab', color: colors.success, bg: colors.successSurface },
-  { label: 'AI Chat', emoji: '🤖', tab: 'AITab',      color: colors.primary, bg: colors.primarySurface },
-  { label: 'Profile', emoji: '👤', tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
+  { label: 'Library', iconName: 'library-outline',     tab: 'LibraryTab', color: colors.info,    bg: colors.infoSurface    },
+  { label: 'Study',   iconName: 'book-outline',         tab: 'LibraryTab', color: colors.success, bg: colors.successSurface },
+  { label: 'AI Chat', iconName: 'chatbubbles-outline',  tab: 'AITab',      color: colors.primary, bg: colors.primarySurface },
+  { label: 'Profile', iconName: 'person-outline',       tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
 ];
 
 function QuickActionGrid() {
@@ -57,9 +62,7 @@ function QuickActionGrid() {
           ]}
           onPress={() => navigation.navigate(action.tab)}
         >
-          <Typography style={[styles.actionEmoji, { color: action.color }]}>
-            {action.emoji}
-          </Typography>
+          <Icon name={action.iconName} size={QUICK_ACTION_ICON_SIZE} color={action.color} />
           <Typography preset="label" color={action.color}>
             {action.label}
           </Typography>
@@ -102,9 +105,12 @@ function DailyLoginButton() {
       onPress={handleClaim}
       disabled={isPending}
     >
-      <Typography preset="label" color={colors.primary}>
-        {isPending ? 'Claiming…' : '✦ Claim daily credit'}
-      </Typography>
+      <View style={styles.claimBtnContent}>
+        {!isPending && <Icon name="star-outline" size={CLAIM_ICON_SIZE} color={colors.primary} />}
+        <Typography preset="label" color={colors.primary}>
+          {isPending ? 'Claiming…' : 'Claim daily credit'}
+        </Typography>
+      </View>
     </Pressable>
   );
 }
@@ -187,7 +193,7 @@ export function HomeScreen() {
               {greeting()},
             </Typography>
             <Typography preset="h3" numberOfLines={1}>
-              {user?.name?.split(' ')[0] ?? 'Friend'} 👋
+              {user?.name?.split(' ')[0] ?? 'Friend'}
             </Typography>
           </View>
           <View style={styles.headerRight}>
@@ -258,9 +264,10 @@ export function HomeScreen() {
                 style={styles.createBtn}
                 onPress={() => navigation.navigate('LibraryTab')}
               >
-                <Typography preset="label" color={colors.primary}>
-                  + New Set
-                </Typography>
+                <View style={styles.createBtnContent}>
+                  <Icon name="add" size={ICON_SIZE} color={colors.primary} />
+                  <Typography preset="label" color={colors.primary}>New Set</Typography>
+                </View>
               </Pressable>
             </View>
           ) : (
@@ -309,7 +316,8 @@ export function HomeScreen() {
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '📖 Study Set',
+            label: 'Study Set',
+            iconName: 'book-outline',
             onPress: () =>
               selectedSet &&
               navigation.navigate('LibraryTab', {
@@ -318,7 +326,8 @@ export function HomeScreen() {
               }),
           },
           {
-            label: '📋 View Cards',
+            label: 'View Cards',
+            iconName: 'copy-outline',
             onPress: () =>
               selectedSet &&
               navigation.navigate('LibraryTab', {
@@ -378,10 +387,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing[2],
   },
-  actionEmoji: {
-    fontSize: 28,
-    lineHeight: 36,
-  },
+  claimBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  createBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Stats row
   statsRow: {

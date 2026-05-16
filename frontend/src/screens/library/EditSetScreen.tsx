@@ -3,8 +3,11 @@ import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, View } fro
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { SetForm } from './components/SetForm';
 import { Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { colors, layout, spacing } from '../../theme';
 import { useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
@@ -64,10 +67,9 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
           }}
         />
         <View style={styles.deleteSection}>
-          <Pressable onPress={handleDelete} hitSlop={8}>
-            <Typography preset="label" color={colors.error} align="center">
-              🗑 Delete Set
-            </Typography>
+          <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
+            <Icon name="trash-outline" size={ICON_SIZE} color={colors.error} />
+            <Typography preset="label" color={colors.error}>Delete Set</Typography>
           </Pressable>
         </View>
       </ScrollView>
@@ -86,4 +88,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
   },
+  deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
 });

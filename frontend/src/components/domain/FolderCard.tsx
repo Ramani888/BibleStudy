@@ -1,20 +1,22 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, shadows, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 import type { Folder } from '../../types';
 
-interface FolderCardProps {
+const FOLDER_ICON_SIZE = 20;
+const MENU_ICON_SIZE = 20;
+
+const DEFAULT_COLOR = colors.gray300;
+
+export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuPress }: {
   folder: Folder;
   setCount?: number;
   onPress: () => void;
   onLongPress?: () => void;
   onMenuPress?: () => void;
-}
-
-const DEFAULT_COLOR = colors.gray300;
-
-export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuPress }: FolderCardProps) {
+}) {
   const barColor = folder.color ?? DEFAULT_COLOR;
 
   return (
@@ -25,7 +27,7 @@ export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuP
     >
       <View style={[styles.colorBar, { backgroundColor: barColor }]} />
       <View style={styles.iconWrap}>
-        <Typography style={styles.icon}>📁</Typography>
+        <Icon name="folder" size={FOLDER_ICON_SIZE} color={colors.textSecondary} />
       </View>
       <Typography preset="label" numberOfLines={1} style={styles.name}>
         {folder.name}
@@ -34,7 +36,7 @@ export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuP
         {setCount} {setCount === 1 ? 'set' : 'sets'}
       </Typography>
       <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
-        <Typography style={styles.menuIcon} color={colors.textDisabled}>⋮</Typography>
+        <Icon name="ellipsis-vertical" size={MENU_ICON_SIZE} color={colors.textDisabled} />
       </Pressable>
     </Pressable>
   );
@@ -64,7 +66,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  icon: { fontSize: 18 },
   name: { flex: 1 },
   count: { flexShrink: 0 },
   menuBtn: {
@@ -73,5 +74,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  menuIcon: { fontSize: 20, lineHeight: 24 },
 });

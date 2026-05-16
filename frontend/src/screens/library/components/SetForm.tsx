@@ -4,8 +4,11 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { FormField } from '../../../components/forms';
 import { Button, Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
+
+const ICON_SIZE = 18;
 import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
@@ -86,7 +89,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
           <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
             {selectedFolder ? selectedFolder.name : 'No folder'}
           </Typography>
-          <Typography preset="body" color={colors.textSecondary}>›</Typography>
+          <Icon name="chevron-forward" size={ICON_SIZE} color={colors.textSecondary} />
         </Pressable>
       </View>
 
@@ -176,9 +179,12 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
               style={styles.folderOption}
               onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
             >
-              <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
-                📁 {folder.name}
-              </Typography>
+              <View style={styles.folderRow}>
+                <Icon name="folder-outline" size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
+                <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
+                  {folder.name}
+                </Typography>
+              </View>
               {folderId === folder.id && <Badge label="Selected" variant="primary" />}
             </Pressable>
             <Divider marginV={spacing[1]} />
@@ -233,4 +239,5 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing[3],
   },
+  folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
 });

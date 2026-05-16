@@ -14,8 +14,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { FormField } from '../../components/forms';
 import { Button, Divider, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { useCreateCard, useBulkCreateCards } from '../../hooks';
 import { colors, layout, shadows, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -135,7 +138,10 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         </View>
       ) : (
         <Pressable style={styles.addNoteBtn} onPress={() => setNoteExpanded(true)}>
-          <Typography preset="label" color={colors.textSecondary}>+ Add Note</Typography>
+          <View style={styles.addNoteBtnContent}>
+            <Icon name="add-circle-outline" size={ICON_SIZE} color={colors.textSecondary} />
+            <Typography preset="label" color={colors.textSecondary}>Add Note</Typography>
+          </View>
         </Pressable>
       )}
       <View style={styles.btnRow}>
@@ -220,7 +226,7 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
       ))}
 
       <Button
-        label="+ Add Another Card"
+        label="Add Another Card"
         variant="outline"
         onPress={() => append({ question: '', answer: '' })}
         fullWidth
@@ -350,6 +356,7 @@ const styles = StyleSheet.create({
     borderTopColor: colors.border,
   },
   previewText: { lineHeight: 22 },
+  addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
   bulkPair: { gap: spacing[3] },
   bulkPairHeader: {
     flexDirection: 'row',

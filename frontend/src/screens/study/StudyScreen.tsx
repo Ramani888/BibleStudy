@@ -23,9 +23,12 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { FlashCard, SetCard } from '../../components/domain';
 import { SetCardSkeleton } from '../../components/feedback';
 import { Button, ProgressBar, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { useCards, useRecordStudy, useSets } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -37,10 +40,14 @@ type Props = LibraryScreenProps<'Study'>;
 const SWIPE_THRESHOLD = 80;
 
 // ─── Difficulty button config ─────────────────────────────────────────────────
-const DIFF_CONFIG: { difficulty: Difficulty; label: string; emoji: string; color: string; bg: string }[] = [
-  { difficulty: 'HARD',   label: 'Hard',   emoji: '😓', color: colors.error,   bg: colors.errorSurface   },
-  { difficulty: 'MEDIUM', label: 'Medium', emoji: '🤔', color: colors.warning, bg: colors.warningSurface },
-  { difficulty: 'EASY',   label: 'Easy',   emoji: '😊', color: colors.success, bg: colors.successSurface },
+const DIFF_ICON_SIZE = 24;
+const COMPLETION_ICON_SIZE = 56;
+const STAT_ICON_SIZE = 14;
+
+const DIFF_CONFIG: { difficulty: Difficulty; label: string; iconName: string; color: string; bg: string }[] = [
+  { difficulty: 'HARD',   label: 'Hard',   iconName: 'sad-outline',          color: colors.error,   bg: colors.errorSurface   },
+  { difficulty: 'MEDIUM', label: 'Medium', iconName: 'help-circle-outline',  color: colors.warning, bg: colors.warningSurface },
+  { difficulty: 'EASY',   label: 'Easy',   iconName: 'happy-outline',        color: colors.success, bg: colors.successSurface },
 ];
 
 // ─── Completion screen ────────────────────────────────────────────────────────
@@ -62,7 +69,7 @@ function CompletionScreen({ total, results, skippedCount, onRestart, onRetryHard
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.completionWrap}>
-      <Typography style={styles.completionEmoji}>🎉</Typography>
+      <Icon name="trophy-outline" size={COMPLETION_ICON_SIZE} color={colors.warning} />
       <Typography preset="h2" align="center">Session Complete!</Typography>
       <Typography preset="body" color={colors.textSecondary} align="center" style={styles.completionSub}>
         You reviewed {total} cards
@@ -130,7 +137,7 @@ function SetPicker() {
   if (sets.length === 0) {
     return (
       <View style={styles.noSetWrap}>
-        <Typography style={styles.noSetEmoji}>📚</Typography>
+        <Icon name="library-outline" size={COMPLETION_ICON_SIZE} color={colors.textDisabled} />
         <Typography preset="h3" align="center">No Sets Yet</Typography>
         <Typography preset="body" color={colors.textSecondary} align="center" style={styles.noSetSub}>
           Create a set in the Library to start studying.
@@ -395,8 +402,9 @@ export function StudyScreen({ route, navigation }: Props) {
     <SafeAreaView style={styles.safe}>
       {/* ── Header ── */}
       <View style={styles.header}>
-        <Pressable onPress={() => navigation.goBack()} hitSlop={12}>
-          <Typography preset="label" color={colors.primary}>✕ Exit</Typography>
+        <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.exitBtn}>
+          <Icon name="close" size={ICON_SIZE} color={colors.primary} />
+          <Typography preset="label" color={colors.primary}>Exit</Typography>
         </Pressable>
         {setTitle ? (
           <Typography preset="label" color={colors.textPrimary} numberOfLines={1} style={styles.headerTitle}>
@@ -405,7 +413,7 @@ export function StudyScreen({ route, navigation }: Props) {
         ) : null}
         <View style={styles.headerRight}>
           <Pressable onPress={toggleShuffle} hitSlop={12}>
-            <Typography preset="label" color={isShuffled ? colors.primary : colors.textDisabled}>🔀</Typography>
+            <Icon name="shuffle-outline" size={ICON_SIZE} color={isShuffled ? colors.primary : colors.textDisabled} />
           </Pressable>
           <Typography preset="label" color={colors.textSecondary}>
             {currentIndex + 1} / {displayCards.length}
@@ -419,9 +427,18 @@ export function StudyScreen({ route, navigation }: Props) {
       {/* ── Running session stats ── */}
       {(results.EASY + results.MEDIUM + results.HARD) > 0 && (
         <View style={styles.sessionStats}>
-          <Typography preset="caption" color={colors.success}>✓ {results.EASY}</Typography>
-          <Typography preset="caption" color={colors.warning}>~ {results.MEDIUM}</Typography>
-          <Typography preset="caption" color={colors.error}>✗ {results.HARD}</Typography>
+          <View style={styles.statItem}>
+            <Icon name="checkmark" size={STAT_ICON_SIZE} color={colors.success} />
+            <Typography preset="caption" color={colors.success}>{results.EASY}</Typography>
+          </View>
+          <View style={styles.statItem}>
+            <Icon name="remove" size={STAT_ICON_SIZE} color={colors.warning} />
+            <Typography preset="caption" color={colors.warning}>{results.MEDIUM}</Typography>
+          </View>
+          <View style={styles.statItem}>
+            <Icon name="close" size={STAT_ICON_SIZE} color={colors.error} />
+            <Typography preset="caption" color={colors.error}>{results.HARD}</Typography>
+          </View>
         </View>
       )}
 
@@ -450,10 +467,10 @@ export function StudyScreen({ route, navigation }: Props) {
             {isRevealed && (
               <>
                 <Animated.View style={[styles.swipeLabel, styles.swipeLabelEasy, easyLabelStyle]}>
-                  <Typography preset="label" color={colors.textOnPrimary}>EASY ✓</Typography>
+                  <Typography preset="label" color={colors.textOnPrimary}>EASY</Typography>
                 </Animated.View>
                 <Animated.View style={[styles.swipeLabel, styles.swipeLabelHard, hardLabelStyle]}>
-                  <Typography preset="label" color={colors.textOnPrimary}>HARD ✗</Typography>
+                  <Typography preset="label" color={colors.textOnPrimary}>HARD</Typography>
                 </Animated.View>
               </>
             )}
@@ -484,7 +501,8 @@ export function StudyScreen({ route, navigation }: Props) {
         {/* ── Skip button (before flip only) ── */}
         {!isRevealed && (
           <Pressable onPress={handleSkip} hitSlop={12} style={styles.skipBtn}>
-            <Typography preset="label" color={colors.textDisabled}>Skip →</Typography>
+            <Typography preset="label" color={colors.textDisabled}>Skip</Typography>
+            <Icon name="arrow-forward" size={ICON_SIZE} color={colors.textDisabled} />
           </Pressable>
         )}
 
@@ -496,7 +514,7 @@ export function StudyScreen({ route, navigation }: Props) {
             </Typography>
             <Spacer size={spacing[3]} />
             <View style={styles.diffRow}>
-              {DIFF_CONFIG.map(({ difficulty, label, emoji, color, bg }) => (
+              {DIFF_CONFIG.map(({ difficulty, label, iconName, color, bg }) => (
                 <Pressable
                   key={difficulty}
                   style={({ pressed }) => [
@@ -505,7 +523,7 @@ export function StudyScreen({ route, navigation }: Props) {
                   ]}
                   onPress={() => handleDifficulty(difficulty)}
                 >
-                  <Typography style={styles.diffEmoji}>{emoji}</Typography>
+                  <Icon name={iconName} size={DIFF_ICON_SIZE} color={color} />
                   <Typography preset="label" color={color}>{label}</Typography>
                 </Pressable>
               ))}
@@ -579,7 +597,8 @@ const styles = StyleSheet.create({
   noteText: { lineHeight: 20 },
 
   // Skip
-  skipBtn: { alignSelf: 'center', marginTop: spacing[2], paddingVertical: spacing[2] },
+  skipBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1], alignSelf: 'center', marginTop: spacing[2], paddingVertical: spacing[2] },
+  exitBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Difficulty
   rateLabel: { letterSpacing: 0.3 },
@@ -592,7 +611,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing[1.5],
   },
-  diffEmoji: { fontSize: 24, lineHeight: 30 },
+  statItem: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Completion
   completionWrap: {
@@ -602,7 +621,6 @@ const styles = StyleSheet.create({
     padding: layout.screenPaddingH,
     gap: spacing[4],
   },
-  completionEmoji: { fontSize: 56, lineHeight: 68 },
   completionSub: { marginTop: -spacing[2] },
   scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
   scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
@@ -654,7 +672,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: layout.screenPaddingH,
   },
-  noSetEmoji: { fontSize: 56, lineHeight: 68, marginBottom: spacing[2] },
   noSetSub: { marginTop: spacing[2] },
   centerWrap: {
     flex: 1,

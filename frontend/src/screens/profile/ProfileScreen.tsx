@@ -4,8 +4,11 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 import { MenuItem } from './components/MenuItem';
+
+const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { useSets } from '../../hooks';
@@ -88,9 +91,10 @@ export function ProfileScreen() {
             </Typography>
           ) : null}
           {user?.church ? (
-            <Typography preset="caption" color={colors.textDisabled} align="center">
-              ⛪ {user.church}
-            </Typography>
+            <View style={styles.churchRow}>
+              <Icon name="business-outline" size={CHURCH_ICON_SIZE} color={colors.textDisabled} />
+              <Typography preset="caption" color={colors.textDisabled}>{user.church}</Typography>
+            </View>
           ) : null}
         </View>
 
@@ -119,12 +123,12 @@ export function ProfileScreen() {
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
             ACCOUNT
           </Typography>
-          <MenuItem emoji="👤" label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
+          <MenuItem iconName="person-outline" label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
           <Divider marginV={0} />
-          <MenuItem emoji="🔒" label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
+          <MenuItem iconName="lock-closed-outline" label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
           <Divider marginV={0} />
           <MenuItem
-            emoji="✦"
+            iconName="star-outline"
             label="My Credits"
             value={`${user?.creditBalance ?? 0} credits`}
             onPress={() => navigation.navigate('Credits')}
@@ -136,13 +140,13 @@ export function ProfileScreen() {
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
             COMMUNITY
           </Typography>
-          <MenuItem emoji="👥" label="Friends" onPress={() => navigation.navigate('Friends')} />
+          <MenuItem iconName="people-outline" label="Friends" onPress={() => navigation.navigate('Friends')} />
           <Divider marginV={0} />
-          <MenuItem emoji="🏛️" label="My Groups" onPress={() => navigation.navigate('Groups')} />
+          <MenuItem iconName="people-circle-outline" label="My Groups" onPress={() => navigation.navigate('Groups')} />
           <Divider marginV={0} />
-          <MenuItem emoji="🔔" label="Notifications" onPress={() => navigation.navigate('Notifications')} />
+          <MenuItem iconName="notifications-outline" label="Notifications" onPress={() => navigation.navigate('Notifications')} />
           <Divider marginV={0} />
-          <MenuItem emoji="📍" label="Location Privacy" onPress={handleLocationPrivacy} />
+          <MenuItem iconName="location-outline" label="Location Privacy" onPress={handleLocationPrivacy} />
         </View>
 
         {/* ── App menu ── */}
@@ -150,13 +154,13 @@ export function ProfileScreen() {
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
             APP
           </Typography>
-          <MenuItem emoji="⚙️" label="Settings" onPress={() => navigation.navigate('Settings')} />
+          <MenuItem iconName="settings-outline" label="Settings" onPress={() => navigation.navigate('Settings')} />
         </View>
 
         {/* ── Danger zone ── */}
         <View style={styles.section}>
           <MenuItem
-            emoji="🚪"
+            iconName="log-out-outline"
             label="Sign Out"
             destructive={false}
             showChevron={false}
@@ -191,6 +195,7 @@ const styles = StyleSheet.create({
   avatar: { marginBottom: spacing[2] },
   badgeRow: { flexDirection: 'row', gap: spacing[2], marginTop: spacing[1] },
   bio: { paddingHorizontal: spacing[8], marginTop: spacing[1] },
+  churchRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Stats
   statsRow: {

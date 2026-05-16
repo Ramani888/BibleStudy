@@ -45,7 +45,7 @@ export function SettingsScreen() {
             ACCOUNT
           </Typography>
           <MenuItem
-            emoji="🚪"
+            iconName="log-out-outline"
             label="Sign Out"
             showChevron={false}
             onPress={() =>
@@ -57,7 +57,7 @@ export function SettingsScreen() {
           />
           <Divider marginV={0} />
           <MenuItem
-            emoji="🗑"
+            iconName="trash-outline"
             label="Delete Account"
             destructive
             showChevron={false}
@@ -70,9 +70,9 @@ export function SettingsScreen() {
           <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
             APP INFO
           </Typography>
-          <MenuItem emoji="📖" label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
+          <MenuItem iconName="book-outline" label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
           <Divider marginV={0} />
-          <MenuItem emoji="✦" label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
+          <MenuItem iconName="star-outline" label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
         </View>
       </ScrollView>
 

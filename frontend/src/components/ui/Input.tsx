@@ -7,8 +7,11 @@ import {
   View,
   ViewStyle,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, layout, spacing, textPresets } from '../../theme';
 import { Typography } from './Typography';
+
+const EYE_SIZE = 20;
 
 interface InputProps extends TextInputProps {
   label?: string;
@@ -69,9 +72,11 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
             onPress={() => setSecure(s => !s)}
             hitSlop={8}
           >
-            <Typography preset="label" color={colors.textSecondary}>
-              {secure ? 'Show' : 'Hide'}
-            </Typography>
+            <Icon
+              name={secure ? 'eye-outline' : 'eye-off-outline'}
+              size={EYE_SIZE}
+              color={colors.textSecondary}
+            />
           </Pressable>
         ) : rightIcon ? (
           <View style={styles.iconRight}>{rightIcon}</View>

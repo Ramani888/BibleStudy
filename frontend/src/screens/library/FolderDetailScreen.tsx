@@ -3,9 +3,12 @@ import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState } from '../../components/feedback';
 import { Input, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { useFolders, useSets, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -42,10 +45,11 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         </Typography>
         <View style={styles.headerActions}>
           <Pressable onPress={toggleSearch} hitSlop={8}>
-            <Typography preset="label" color={searchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+            <Icon name="search-outline" size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('CreateSet', { folderId })} hitSlop={8}>
-            <Typography preset="label" color={colors.primary}>+ New Set</Typography>
+          <Pressable onPress={() => navigation.navigate('CreateSet', { folderId })} hitSlop={8} style={styles.newSetBtn}>
+            <Icon name="add" size={ICON_SIZE} color={colors.primary} />
+            <Typography preset="label" color={colors.primary}>New Set</Typography>
           </Pressable>
         </View>
       </View>
@@ -94,21 +98,25 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '📖 Study Set',
+            label: 'Study Set',
+            iconName: 'book-outline',
             onPress: () =>
               selectedSet &&
               navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title }),
           },
           {
-            label: '➕ Create Card',
+            label: 'Create Card',
+            iconName: 'add-circle-outline',
             onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
           },
           {
-            label: '✏️ Edit',
+            label: 'Edit',
+            iconName: 'pencil-outline',
             onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
           },
           {
-            label: '🗑 Delete',
+            label: 'Delete',
+            iconName: 'trash-outline',
             destructive: true,
             onPress: () =>
               selectedSet &&
@@ -147,4 +155,5 @@ const styles = StyleSheet.create({
   searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
   searchInput: { marginBottom: 0 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+  newSetBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 });

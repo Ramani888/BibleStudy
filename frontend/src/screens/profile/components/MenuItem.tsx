@@ -1,10 +1,14 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, spacing } from '../../../theme';
 import { Typography } from '../../../components/ui';
 
+const ICON_SIZE = 20;
+const CHEVRON_SIZE = 18;
+
 interface MenuItemProps {
-  emoji: string;
+  iconName: string;
   label: string;
   value?: string;
   destructive?: boolean;
@@ -13,7 +17,7 @@ interface MenuItemProps {
 }
 
 export function MenuItem({
-  emoji,
+  iconName,
   label,
   value,
   destructive = false,
@@ -21,6 +25,7 @@ export function MenuItem({
   showChevron = true,
 }: MenuItemProps) {
   const labelColor = destructive ? colors.error : colors.textPrimary;
+  const iconColor = destructive ? colors.error : colors.textSecondary;
 
   return (
     <Pressable
@@ -28,7 +33,7 @@ export function MenuItem({
       onPress={onPress}
     >
       <View style={[styles.iconWrap, destructive && styles.iconWrapDestructive]}>
-        <Typography style={styles.emoji}>{emoji}</Typography>
+        <Icon name={iconName} size={ICON_SIZE} color={iconColor} />
       </View>
       <Typography preset="body" color={labelColor} style={styles.label}>
         {label}
@@ -39,7 +44,7 @@ export function MenuItem({
         </Typography>
       ) : null}
       {showChevron && (
-        <Typography preset="body" color={colors.textDisabled}>›</Typography>
+        <Icon name="chevron-forward" size={CHEVRON_SIZE} color={colors.textDisabled} />
       )}
     </Pressable>
   );
@@ -63,6 +68,5 @@ const styles = StyleSheet.create({
   iconWrapDestructive: {
     backgroundColor: colors.errorSurface,
   },
-  emoji: { fontSize: 18 },
   label: { flex: 1 },
 });

@@ -1,7 +1,9 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { colors, spacing } from '../../theme';
-import { Typography } from './Typography';
+
+const CHECK_SIZE = 16;
 
 export const PRESET_COLORS = [
   '#7C3AED', '#3B82F6', '#0D9488', '#16A34A',
@@ -26,7 +28,7 @@ export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorP
           hitSlop={4}
         >
           {value === color && (
-            <Typography style={styles.check}>✓</Typography>
+            <Icon name="checkmark" size={CHECK_SIZE} color={colors.textInverse} />
           )}
         </Pressable>
       ))}
@@ -50,11 +52,5 @@ const styles = StyleSheet.create({
   swatchSelected: {
     borderWidth: 2,
     borderColor: colors.background,
-  },
-  check: {
-    color: colors.textInverse,
-    fontSize: 16,
-    lineHeight: 20,
-    fontWeight: '700',
   },
 });

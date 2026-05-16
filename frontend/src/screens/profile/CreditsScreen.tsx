@@ -9,10 +9,14 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState } from '../../components/feedback';
 import { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from '../../hooks';
 import { useAuthStore } from '../../store';
+
+const BALANCE_ICON_SIZE = 32;
+const CLAIM_ICON_SIZE = 16;
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
@@ -67,7 +71,7 @@ function BalanceCard() {
         <ActivityIndicator color={colors.primary} />
       ) : (
         <View style={styles.balanceRow}>
-          <Typography style={styles.balanceEmoji}>✦</Typography>
+          <Icon name="star" size={BALANCE_ICON_SIZE} color={colors.primary} />
           <Typography preset="h1" color={colors.primary}>
             {data?.balance ?? 0}
           </Typography>
@@ -79,9 +83,12 @@ function BalanceCard() {
         onPress={handleClaim}
         disabled={isPending}
       >
-        <Typography preset="label" color={colors.primary}>
-          {isPending ? 'Claiming…' : '✦ Claim daily credit (+1)'}
-        </Typography>
+        <View style={styles.claimBtnContent}>
+          {!isPending && <Icon name="star-outline" size={CLAIM_ICON_SIZE} color={colors.primary} />}
+          <Typography preset="label" color={colors.primary}>
+            {isPending ? 'Claiming…' : 'Claim daily credit (+1)'}
+          </Typography>
+        </View>
       </Pressable>
     </Card>
   );
@@ -169,7 +176,7 @@ const styles = StyleSheet.create({
   balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
   balanceLabel: { letterSpacing: 1, fontSize: 11 },
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
-  balanceEmoji: { fontSize: 32, color: colors.primary, lineHeight: 44 },
+  claimBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
   claimBtn: {
     borderWidth: 1.5,
     borderColor: colors.primaryLight,

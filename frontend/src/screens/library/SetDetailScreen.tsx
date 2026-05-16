@@ -3,8 +3,11 @@ import { Alert, FlatList, Pressable, Share, StyleSheet, TextInput, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { ActionSheet, AppModal, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Divider, Input, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import { useCards, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
@@ -137,15 +140,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         </Typography>
         <View style={styles.statsBarActions}>
           <Pressable onPress={toggleCardSearch} hitSlop={8}>
-            <Typography preset="label" color={cardSearchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+            <Icon name="search-outline" size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
           </Pressable>
           {cards.length > 0 && (
             <Pressable onPress={handleShare} hitSlop={8}>
-              <Typography preset="label" color={colors.textSecondary}>📤</Typography>
+              <Icon name="share-social-outline" size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
           )}
           <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
-            <Typography style={styles.menuIcon}>⋮</Typography>
+            <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
         </View>
       </View>
@@ -191,13 +194,13 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               </Typography>
               <View style={styles.cardActions}>
                 <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
-                  <Typography style={styles.iconText}>ℹ️</Typography>
+                  <Icon name="information-circle-outline" size={ICON_SIZE} color={colors.textDisabled} />
                 </Pressable>
                 <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
-                  <Typography style={styles.iconText}>{item.isBlurred ? '🙈' : '👁️'}</Typography>
+                  <Icon name={item.isBlurred ? 'eye-off-outline' : 'eye-outline'} size={ICON_SIZE} color={colors.textDisabled} />
                 </Pressable>
                 <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
-                  <Typography style={styles.iconText}>⋮</Typography>
+                  <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textDisabled} />
                 </Pressable>
               </View>
             </View>
@@ -206,7 +209,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             <View style={[styles.answerSection, layout === 'grid' && styles.answerSectionGrid]}>
               {item.isBlurred ? (
                 <View style={styles.blurOverlay}>
-                  <Typography preset="bodySm" color={colors.textDisabled}>Tap 👁 to reveal answer</Typography>
+                  <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
                 </View>
               ) : (
                 <>
@@ -236,21 +239,25 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onClose={() => setSelectedCard(null)}
         actions={[
           {
-            label: '✏️ Edit',
+            label: 'Edit',
+            iconName: 'pencil-outline',
             onPress: () =>
               selectedCard &&
               navigation.navigate('EditCard', { cardId: selectedCard.id, setId }),
           },
           {
-            label: '📋 Copy',
+            label: 'Copy',
+            iconName: 'copy-outline',
             onPress: () => selectedCard && handleCopyCard(selectedCard.id),
           },
           {
-            label: '➡️ Move to Set',
+            label: 'Move to Set',
+            iconName: 'arrow-forward-outline',
             onPress: () => setMovePickerOpen(true),
           },
           {
-            label: '🗑 Delete',
+            label: 'Delete',
+            iconName: 'trash-outline',
             destructive: true,
             onPress: () => selectedCard && handleDelete(selectedCard.id),
           },
@@ -288,23 +295,28 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
           {
-            label: '📖 Study Set',
+            label: 'Study Set',
+            iconName: 'book-outline',
             onPress: () => navigation.navigate('Study', { setId, setTitle }),
           },
           {
-            label: '➕ Create Card',
+            label: 'Create Card',
+            iconName: 'add-circle-outline',
             onPress: () => navigation.navigate('CreateCard', { setId }),
           },
           {
-            label: '✏️ Edit Set',
+            label: 'Edit Set',
+            iconName: 'pencil-outline',
             onPress: () => navigation.navigate('EditSet', { setId }),
           },
           {
-            label: allBlurred ? '👁 Unblur All' : '🙈 Blur All',
+            label: allBlurred ? 'Unblur All' : 'Blur All',
+            iconName: allBlurred ? 'eye-outline' : 'eye-off-outline',
             onPress: () => handleBlurAll(!allBlurred),
           },
           {
-            label: layout === 'grid' ? '☰ List View' : '⊞ Grid View',
+            label: layout === 'grid' ? 'List View' : 'Grid View',
+            iconName: layout === 'grid' ? 'list-outline' : 'grid-outline',
             onPress: () => setLayout(l => l === 'list' ? 'grid' : 'list'),
           },
         ]}
@@ -376,7 +388,6 @@ const styles = StyleSheet.create({
   question: { flex: 1, fontWeight: '500', lineHeight: 22 },
   cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
   iconBtn: { padding: spacing[1] },
-  iconText: { fontSize: 18, lineHeight: 22 },
   answerSection: {
     backgroundColor: colors.background,
     padding: spacing[4],
@@ -387,7 +398,6 @@ const styles = StyleSheet.create({
   setOption: { paddingVertical: spacing[3] },
   statsBarActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
   menuBtn: { paddingHorizontal: spacing[2] },
-  menuIcon: { fontSize: 22, color: colors.textSecondary, lineHeight: 26 },
   searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
   searchInput: { marginBottom: 0 },
   gridRow: { gap: spacing[3] },

@@ -10,9 +10,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import Icon from 'react-native-vector-icons/Ionicons';
 import { FolderCard, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, EmptyState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
+
+const ICON_SIZE = 20;
 import {
   useFolders,
   useSets,
@@ -159,12 +162,13 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         <Typography preset="h2">Library</Typography>
         <View style={styles.headerActions}>
           <Pressable onPress={toggleSearch} hitSlop={8}>
-            <Typography preset="label" color={searchVisible ? colors.primary : colors.textSecondary}>🔍</Typography>
+            <Icon name="search-outline" size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
           </Pressable>
           {activeTab === 'sets' && (
-            <Pressable onPress={cycleSortOrder} hitSlop={8}>
+            <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn}>
+              <Icon name="swap-vertical-outline" size={ICON_SIZE} color={colors.primary} />
               <Typography preset="caption" color={colors.primary}>
-                {sortOrder === 'newest' ? '⇅ Recent' : sortOrder === 'alpha' ? '⇅ A–Z' : '⇅ Cards'}
+                {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : 'Cards'}
               </Typography>
             </Pressable>
           )}
@@ -288,25 +292,30 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={() => setSelectedSet(null)}
         actions={[
           {
-            label: '📖 Study Set',
+            label: 'Study Set',
+            iconName: 'book-outline',
             onPress: () =>
               selectedSet &&
               navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title }),
           },
           {
-            label: '➕ Create Card',
+            label: 'Create Card',
+            iconName: 'add-circle-outline',
             onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
           },
           {
-            label: '📁 Assign Folder',
+            label: 'Assign Folder',
+            iconName: 'folder-outline',
             onPress: () => setAssignFolderOpen(true),
           },
           {
-            label: '✏️ Edit',
+            label: 'Edit',
+            iconName: 'pencil-outline',
             onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
           },
           {
-            label: '🗑 Delete',
+            label: 'Delete',
+            iconName: 'trash-outline',
             destructive: true,
             onPress: () => selectedSet && handleDeleteSet(selectedSet.id),
           },
@@ -320,11 +329,13 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={() => setSelectedFolder(null)}
         actions={[
           {
-            label: '➕ Create Set',
+            label: 'Create Set',
+            iconName: 'add-circle-outline',
             onPress: () => selectedFolder && navigation.navigate('CreateSet', { folderId: selectedFolder.id }),
           },
           {
-            label: '✏️ Edit',
+            label: 'Edit',
+            iconName: 'pencil-outline',
             onPress: () => {
               if (!selectedFolder) return;
               setEditFolderName(selectedFolder.name);
@@ -333,7 +344,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             },
           },
           {
-            label: '🗑 Delete Folder',
+            label: 'Delete Folder',
+            iconName: 'trash-outline',
             destructive: true,
             onPress: () => selectedFolder && handleDeleteFolder(selectedFolder.id),
           },
@@ -459,4 +471,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   setOption: { paddingVertical: spacing[3] },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 });
