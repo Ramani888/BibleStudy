@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Pressable, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -27,7 +27,7 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     defaultValues: { otp: '' },
   });
 
-  const onSubmit = async (data: VerifyEmailFormData) => {
+  const onSubmit = useCallback(async (data: VerifyEmailFormData) => {
     try {
       await verifyEmail({ email, otp: data.otp });
       // RootNavigator auto-switches to AppNavigator
@@ -38,9 +38,9 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
         text2: getErrorMessage(err),
       });
     }
-  };
+  }, [email, verifyEmail]);
 
-  const handleResend = async () => {
+  const handleResend = useCallback(async () => {
     setResending(true);
     try {
       await authApi.resendVerification({ email });
@@ -58,30 +58,33 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     } finally {
       setResending(false);
     }
-  };
+  }, [email]);
+
+  const subtitle = useMemo(() => `We sent a 6-digit code to\n${email}`, [email]);
+
+  const footer = useMemo(
+    () => (
+      <>
+        <Pressable onPress={handleResend} disabled={resending}>
+          <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
+            {resending ? 'Sending…' : 'Resend code'}
+          </Typography>
+        </Pressable>
+        <Pressable onPress={() => navigation.navigate('Login')}>
+          <Typography preset="body" color={colors.textSecondary}>
+            Back to{' '}
+            <Typography preset="body" color={colors.primary}>
+              Sign in
+            </Typography>
+          </Typography>
+        </Pressable>
+      </>
+    ),
+    [handleResend, resending, navigation],
+  );
 
   return (
-    <AuthLayout
-      title="Check your email"
-      subtitle={`We sent a 6-digit code to\n${email}`}
-      footer={
-        <>
-          <Pressable onPress={handleResend} disabled={resending}>
-            <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
-              {resending ? 'Sending…' : 'Resend code'}
-            </Typography>
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('Login')}>
-            <Typography preset="body" color={colors.textSecondary}>
-              Back to{' '}
-              <Typography preset="body" color={colors.primary}>
-                Sign in
-              </Typography>
-            </Typography>
-          </Pressable>
-        </>
-      }
-    >
+    <AuthLayout title="Check your email" subtitle={subtitle} footer={footer}>
       <View style={{ gap: spacing[2] }}>
         <Typography preset="label" color={colors.textSecondary}>
           Verification code

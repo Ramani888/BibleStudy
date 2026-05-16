@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { Pressable, TextInput, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +28,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
     defaultValues: { otp: '', newPassword: '', confirmPassword: '' },
   });
 
-  const onSubmit = async (data: ResetPasswordFormData) => {
+  const onSubmit = useCallback(async (data: ResetPasswordFormData) => {
     try {
       await resetPassword({ email, otp: data.otp, newPassword: data.newPassword });
       Toast.show({
@@ -44,9 +44,9 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         text2: getErrorMessage(err),
       });
     }
-  };
+  }, [email, resetPassword, navigation]);
 
-  const handleResend = async () => {
+  const handleResend = useCallback(async () => {
     setResending(true);
     try {
       await authApi.forgotPassword({ email });
@@ -56,20 +56,26 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
     } finally {
       setResending(false);
     }
-  };
+  }, [email]);
+
+  const subtitle = useMemo(
+    () => `Enter the code sent to ${email} and choose a new password`,
+    [email],
+  );
+
+  const footer = useMemo(
+    () => (
+      <Pressable onPress={handleResend} disabled={resending}>
+        <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
+          {resending ? 'Sending…' : 'Resend code'}
+        </Typography>
+      </Pressable>
+    ),
+    [handleResend, resending],
+  );
 
   return (
-    <AuthLayout
-      title="New password"
-      subtitle={`Enter the code sent to ${email} and choose a new password`}
-      footer={
-        <Pressable onPress={handleResend} disabled={resending}>
-          <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
-            {resending ? 'Sending…' : 'Resend code'}
-          </Typography>
-        </Pressable>
-      }
-    >
+    <AuthLayout title="New password" subtitle={subtitle} footer={footer}>
       <View style={{ gap: spacing[2] }}>
         <Typography preset="label" color={colors.textSecondary}>
           Verification code
