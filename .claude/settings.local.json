@@ -85,7 +85,18 @@
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code} — time: %{time_total}s\" http://46.225.189.44/health)",
       "Bash(curl -s -o /dev/null -w \"HTTP %{http_code}\" http://46.225.189.44/api/v1/auth/login -X POST -H \"Content-Type: application/json\" -d '{\"email\":\"test@test.com\",\"password\":\"test\"}')",
       "Bash(~/bin/hcloud.exe firewall *)",
-      "Bash(./gradlew clean *)"
+      "Bash(./gradlew clean *)",
+      "Bash(npx kill-port *)",
+      "Bash(powershell.exe *)",
+      "Bash(Get-ChildItem -Path \"src\\\\screens\", \"src\\\\components\" -Filter \"*.tsx\" -Recurse)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Sort-Object)",
+      "Bash(npm uninstall *)",
+      "Bash(del *)",
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(echo \"BACKEND_EXIT:$?\")",
+      "Bash(echo \"FRONTEND_EXIT:$?\")",
+      "Bash(echo \"PRISMA_EXIT:$?\")"
     ]
   },
   "enableAllProjectMcpServers": true,
