@@ -11,6 +11,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, Region } from 'react-native-maps';
 import Geolocation from '@react-native-community/geolocation';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import Toast from 'react-native-toast-message';
 import type { MapScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
@@ -53,8 +54,8 @@ export function MapScreen({ navigation }: Props) {
         setLocationReady(true);
         updateLocation.mutate({ lat: coords.latitude, lng: coords.longitude });
       },
-      (error) => {
-        console.warn('Geolocation error:', error);
+      () => {
+        Toast.show({ type: 'error', text1: 'Could not get your location' });
         setLocationReady(true);
       },
       { enableHighAccuracy: false, timeout: 10000 }

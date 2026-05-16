@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { mapApi } from '../api/map.api';
 
 export function useFriendsLocations() {
@@ -17,10 +17,8 @@ export function useUpdateLocation() {
 }
 
 export function useUpdateMapPrivacy() {
-  const qc = useQueryClient();
   return useMutation({
     mutationFn: (privacy: 'OFF' | 'FRIENDS' | 'SELECTED' | 'EVERYONE') =>
       mapApi.updatePrivacy(privacy),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['profile'] }),
   });
 }

@@ -20,7 +20,7 @@ const QUICK_ACTION_ICON_SIZE = 28;
 const CLAIM_ICON_SIZE = 16;
 import { ActionSheet, SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
-import { useDailyVerse, useSets, useClaimDailyLogin } from '../../hooks';
+import { useDailyVerse, useSets, useClaimDailyLogin, useCreditBalance } from '../../hooks';
 import { useFriendsActivityFeed } from '../../hooks/useActivities';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
@@ -78,17 +78,6 @@ function DailyLoginButton() {
 
   const handleClaim = () => {
     mutate(undefined, {
-      onSuccess: data => {
-        const current = useAuthStore.getState().user;
-        if (current) {
-          useAuthStore.getState().updateUser({ ...current, creditBalance: data.balance });
-        }
-        Toast.show({
-          type: 'success',
-          text1: `+${data.transaction.amount} credit claimed!`,
-          text2: `Your balance is now ${data.balance}`,
-        });
-      },
       onError: err => {
         Toast.show({
           type: 'error',
@@ -156,6 +145,7 @@ export function HomeScreen() {
   const { data: verse, isLoading: verseLoading, refetch: refetchVerse } = useDailyVerse();
   const { data: sets, isLoading: setsLoading, refetch: refetchSets } = useSets();
   const { data: activityData, refetch: refetchActivities } = useFriendsActivityFeed();
+  const { data: creditData } = useCreditBalance();
 
   const recentSets = sets?.slice(0, 3) ?? [];
   const recentActivities = activityData?.pages[0]?.activities.slice(0, 5) ?? [];
@@ -197,7 +187,7 @@ export function HomeScreen() {
             </Typography>
           </View>
           <View style={styles.headerRight}>
-            <CreditBadge balance={user?.creditBalance ?? 0} />
+            <CreditBadge balance={creditData?.balance ?? 0} />
             <Pressable onPress={() => navigation.navigate('ProfileTab')}>
               <Avatar uri={user?.profileImage} name={user?.name} size="sm" />
             </Pressable>

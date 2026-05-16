@@ -1,22 +1,14 @@
 import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { aiApi } from '../api';
-import { useAuthStore } from '../store';
 import type { AIChatPayload } from '../types';
 
 export function useAIChat() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: AIChatPayload) => aiApi.chat(payload),
-    onSuccess: data => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['ai-history'] });
       qc.invalidateQueries({ queryKey: ['credits'] });
-      const current = useAuthStore.getState().user;
-      if (current) {
-        useAuthStore.getState().updateUser({
-          ...current,
-          creditBalance: Math.max(0, (current.creditBalance ?? 0) - data.creditsUsed),
-        });
-      }
     },
   });
 }

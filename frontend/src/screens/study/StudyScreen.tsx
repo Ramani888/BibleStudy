@@ -25,7 +25,7 @@ import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FlashCard, SetCard } from '../../components/domain';
-import { SetCardSkeleton } from '../../components/feedback';
+import { ErrorState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ProgressBar, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
@@ -187,7 +187,7 @@ export function StudyScreen({ route, navigation }: Props) {
     HARD: 0,
   });
 
-  const { data: cards = [], isLoading } = useCards(setId);
+  const { data: cards = [], isLoading, isError, error, refetch } = useCards(setId);
   const { mutate: recordStudy } = useRecordStudy(setId);
 
   const displayCards = useMemo(() => {
@@ -367,6 +367,11 @@ export function StudyScreen({ route, navigation }: Props) {
         </View>
       </SafeAreaView>
     );
+  }
+
+  // ── Error ──
+  if (isError) {
+    return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
   }
 
   // ── Empty ──

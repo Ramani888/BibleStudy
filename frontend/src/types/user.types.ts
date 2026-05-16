@@ -7,7 +7,6 @@ export interface User {
   profileImage: string | null;
   bio: string | null;
   church: string | null;
-  creditBalance: number;
   storageUsed: number;
   storageLimit: number;
   plan: Plan;

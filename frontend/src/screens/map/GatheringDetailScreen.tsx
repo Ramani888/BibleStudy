@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
+import Toast from 'react-native-toast-message';
 import type { MapScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
@@ -18,6 +19,7 @@ import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { useGathering, useRsvp, useCancelGathering, useLeaveGathering } from '../../hooks/useGatherings';
+import { getErrorMessage } from '../../api/client';
 import { useConfirmDialog } from '../../hooks';
 import { useAuthStore } from '../../store/auth.store';
 
@@ -51,8 +53,12 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Cancel Gathering',
       variant: 'danger',
       onConfirm: async () => {
-        await cancelGathering.mutateAsync(gatheringId);
-        navigation.goBack();
+        try {
+          await cancelGathering.mutateAsync(gatheringId);
+          navigation.goBack();
+        } catch (err) {
+          Toast.show({ type: 'error', text1: getErrorMessage(err) });
+        }
       },
     });
   };
@@ -64,8 +70,12 @@ export function GatheringDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Leave',
       variant: 'danger',
       onConfirm: async () => {
-        await leaveGathering.mutateAsync(gatheringId);
-        navigation.goBack();
+        try {
+          await leaveGathering.mutateAsync(gatheringId);
+          navigation.goBack();
+        } catch (err) {
+          Toast.show({ type: 'error', text1: getErrorMessage(err) });
+        }
       },
     });
   };

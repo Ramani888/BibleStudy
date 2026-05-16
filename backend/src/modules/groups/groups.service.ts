@@ -68,7 +68,7 @@ export async function getGroup(userId: string, groupId: string) {
         include: { user: { select: memberUserSelect } },
         orderBy: { joinedAt: 'asc' },
       },
-      _count: { select: { gatherings: true } },
+      _count: { select: { members: true, gatherings: true } },
     },
   });
 }

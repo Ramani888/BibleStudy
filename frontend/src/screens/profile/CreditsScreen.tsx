@@ -13,7 +13,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState } from '../../components/feedback';
 import { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from '../../hooks';
-import { useAuthStore } from '../../store';
 
 const BALANCE_ICON_SIZE = 32;
 const CLAIM_ICON_SIZE = 16;
@@ -43,10 +42,6 @@ function BalanceCard() {
   const handleClaim = () => {
     claim(undefined, {
       onSuccess: res => {
-        const current = useAuthStore.getState().user;
-        if (current) {
-          useAuthStore.getState().updateUser({ ...current, creditBalance: res.balance });
-        }
         Toast.show({
           type: 'success',
           text1: `+${res.transaction.amount} credit claimed!`,

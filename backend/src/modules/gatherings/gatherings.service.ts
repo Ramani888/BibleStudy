@@ -127,10 +127,14 @@ export async function listGatherings(
 }
 
 export async function getNearby(userId: string, lat: number, lng: number, radiusKm = 50) {
+  const R = 6371;
+  const latDelta = (radiusKm / R) * (180 / Math.PI);
+  const lngDelta = latDelta / Math.cos((lat * Math.PI) / 180);
+
   const gatherings = await prisma.gathering.findMany({
     where: {
-      locationLat: { not: null },
-      locationLng: { not: null },
+      locationLat: { gte: lat - latDelta, lte: lat + latDelta },
+      locationLng: { gte: lng - lngDelta, lte: lng + lngDelta },
       date: { gte: new Date() },
       OR: [
         { hostId: userId },

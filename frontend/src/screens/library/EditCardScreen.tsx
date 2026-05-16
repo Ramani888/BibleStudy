@@ -7,7 +7,7 @@ import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ConfirmDialog } from '../../components/feedback';
+import { ConfirmDialog, ErrorState } from '../../components/feedback';
 import { FormField } from '../../components/forms';
 import { Button, Typography } from '../../components/ui';
 
@@ -38,7 +38,7 @@ const DIFF_BG: Record<Difficulty, string> = {
 
 export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCard'>) {
   const { cardId, setId } = route.params;
-  const { data: cards, isLoading } = useCards(setId);
+  const { data: cards, isLoading, isError, error, refetch } = useCards(setId);
   const { mutateAsync: updateCard } = useUpdateCard(setId);
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
@@ -83,13 +83,15 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   const questionValue = useWatch({ control, name: 'question' });
   const answerValue   = useWatch({ control, name: 'answer' });
 
-  if (isLoading || !card) {
+  if (isLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );
   }
+  if (isError) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
+  if (!card) return <ErrorState message="Card not found" />;
 
   const onSubmit = async (data: EditCardForm) => {
     try {

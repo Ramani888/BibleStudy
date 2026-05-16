@@ -34,8 +34,6 @@ model User {
   folders                 Folder[]
   sets                    Set[]
   cards                   Card[]
-  notes                   Note[]
-  files                   File[]
   aiChats                 AIChat[]
   creditTransactions      CreditTransaction[]
   sentFriendRequests      FriendRequest[]       @relation("SentRequests")
@@ -84,11 +82,12 @@ model Folder {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parent    Folder?  @relation("FolderChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Folder[] @relation("FolderChildren")
   sets      Set[]
-  notes     Note[]
-  files     File[]
 
   @@index([userId])
+  @@index([parentId])
 }
 
 model Set {
@@ -131,39 +130,6 @@ model Card {
 
   @@index([setId])
   @@index([userId])
-}
-
-model Note {
-  id             String   @id @default(uuid())
-  title          String
-  content        String
-  userId         String
-  folderId       String?
-  verseReference String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  folder         Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([folderId])
-}
-
-model File {
-  id        String   @id @default(uuid())
-  userId    String
-  type      FileType
-  url       String
-  publicId  String
-  size      BigInt
-  folderId  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  folder    Folder?  @relation(fields: [folderId], references: [id], onDelete: SetNull)
-
-  @@index([userId])
-  @@index([folderId])
 }
 
 model CreditTransaction {
@@ -239,6 +205,7 @@ model Block {
 
   @@unique([blockerId, blockedId])
   @@index([blockerId])
+  @@index([blockedId])
 }
 
 model Group {
@@ -358,11 +325,6 @@ enum Difficulty {
   EASY
   MEDIUM
   HARD
-}
-
-enum FileType {
-  IMAGE
-  PDF
 }
 
 enum TransactionType {

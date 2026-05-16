@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useHeaderHeight } from '@react-navigation/elements';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -19,7 +20,7 @@ import { getErrorMessage } from '../../api';
 import { changePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
 import { colors, layout, spacing } from '../../theme';
 
-export function ChangePasswordScreen({ navigation }: any) {
+export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
   const headerHeight = useHeaderHeight();
   const { mutateAsync: changePassword } = useChangePassword();
   const newRef = useRef<TextInput>(null);

@@ -1,6 +1,5 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { creditsApi } from '../api';
-import { useAuthStore } from '../store';
 
 export function useCreditBalance() {
   return useQuery({
@@ -26,12 +25,8 @@ export function useClaimDailyLogin() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: creditsApi.claimDailyLogin,
-    onSuccess: res => {
+    onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['credits'] });
-      const current = useAuthStore.getState().user;
-      if (current) {
-        useAuthStore.getState().updateUser({ ...current, creditBalance: res.balance });
-      }
     },
   });
 }

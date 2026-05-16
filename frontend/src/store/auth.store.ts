@@ -13,7 +13,6 @@ import type {
 
 interface AuthState {
   user: User | null;
-  accessToken: string | null;
   isAuthenticated: boolean;
   isInitialized: boolean;
 
@@ -26,13 +25,11 @@ interface AuthState {
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   updateUser: (user: User) => void;
-  setTokensAndUser: (accessToken: string, refreshToken: string, user: User) => Promise<void>;
   reset: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  accessToken: null,
   isAuthenticated: false,
   isInitialized: false,
 
@@ -50,7 +47,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Token exists — fetch current user to confirm it is still valid
       const user = await authApi.me();
-      set({ accessToken: token, user, isAuthenticated: true, isInitialized: true });
+      set({ user, isAuthenticated: true, isInitialized: true });
     } catch {
       // Token expired or invalid — clear and show auth screens
       await storage.clearTokens();
@@ -66,13 +63,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   verifyEmail: async (payload: VerifyEmailPayload) => {
     const result = await authApi.verifyEmail(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
-    set({ accessToken: result.accessToken, user: result.user, isAuthenticated: true });
+    set({ user: result.user, isAuthenticated: true });
   },
 
   login: async (payload: LoginPayload) => {
     const result = await authApi.login(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
-    set({ accessToken: result.accessToken, user: result.user, isAuthenticated: true });
+    set({ user: result.user, isAuthenticated: true });
   },
 
   logout: async () => {
@@ -95,11 +92,5 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   updateUser: (user: User) => set({ user }),
 
-  setTokensAndUser: async (accessToken: string, refreshToken: string, user: User) => {
-    await storage.setTokens(accessToken, refreshToken);
-    set({ accessToken, user, isAuthenticated: true });
-  },
-
-  reset: () =>
-    set({ user: null, accessToken: null, isAuthenticated: false }),
+  reset: () => set({ user: null, isAuthenticated: false }),
 }));

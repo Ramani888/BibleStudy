@@ -53,7 +53,7 @@ export function AIChatScreen() {
 
   const { mutate: sendMessage, isPending } = useAIChat();
   const { data: creditData } = useCreditBalance();
-  const creditBalance = creditData?.balance ?? user?.creditBalance ?? 0;
+  const creditBalance = creditData?.balance ?? 0;
 
   // Scroll to bottom whenever messages change
   useEffect(() => {

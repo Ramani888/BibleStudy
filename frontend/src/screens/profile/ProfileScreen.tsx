@@ -12,7 +12,7 @@ import { ConfirmDialog } from '../../components/feedback';
 const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useSets, useConfirmDialog } from '../../hooks';
+import { useSets, useConfirmDialog, useCreditBalance } from '../../hooks';
 import { useUpdateMapPrivacy } from '../../hooks/useMap';
 import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
@@ -53,6 +53,7 @@ export function ProfileScreen() {
   };
 
   const { data: sets = [] } = useSets();
+  const { data: creditData } = useCreditBalance();
   const totalCards = sets.reduce((sum, s) => sum + (s._count?.cards ?? 0), 0);
 
   return (
@@ -104,7 +105,7 @@ export function ProfileScreen() {
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
             <Typography preset="h3" color={colors.primary}>
-              {user?.creditBalance ?? 0}
+              {creditData?.balance ?? 0}
             </Typography>
             <Typography preset="caption" color={colors.textSecondary}>Credits</Typography>
           </View>
@@ -132,7 +133,7 @@ export function ProfileScreen() {
           <MenuItem
             iconName="star-outline"
             label="My Credits"
-            value={`${user?.creditBalance ?? 0} credits`}
+            value={`${creditData?.balance ?? 0} credits`}
             onPress={() => navigation.navigate('Credits')}
           />
         </View>
