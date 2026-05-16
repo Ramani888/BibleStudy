@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { AskQuestionDtoType } from './ai.dto';
+import { AppError, NotFoundError, PaymentRequiredError } from '../../utils/errors';
 
 const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
@@ -23,11 +24,11 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   if (user.creditBalance < 1) {
-    throw new Error('Insufficient credits. Please earn more credits to use AI chat.');
+    throw new PaymentRequiredError('Insufficient credits. Please earn more credits to use AI chat.');
   }
 
   // Call Anthropic API
@@ -102,7 +103,7 @@ export async function getDailyVerse() {
   try {
     const response = await fetch('https://bible-api.com/data/web/random');
     if (!response.ok) {
-      throw new Error('API request failed');
+      throw new AppError('Bible API request failed', 502, 'EXTERNAL_API_ERROR');
     }
     const data = await response.json() as {
       random_verse?: {

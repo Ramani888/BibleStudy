@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import { prisma } from '../../config/db';
 import { UpdateProfileDtoType, ChangePasswordDtoType } from './users.dto';
+import { NotFoundError, UnauthorizedError } from '../../utils/errors';
 
 export async function getProfile(userId: string) {
   const user = await prisma.user.findUnique({
@@ -23,7 +24,7 @@ export async function getProfile(userId: string) {
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   return user;
@@ -61,12 +62,12 @@ export async function updateProfile(userId: string, dto: UpdateProfileDtoType) {
 export async function changePassword(userId: string, dto: ChangePasswordDtoType) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
   if (!isPasswordValid) {
-    throw new Error('Current password is incorrect');
+    throw new UnauthorizedError('Current password is incorrect');
   }
 
   const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
@@ -97,7 +98,7 @@ export async function getUserById(targetId: string, requesterId: string) {
       ],
     },
   });
-  if (block) throw new Error('User not found');
+  if (block) throw new NotFoundError('User not found');
 
   const user = await prisma.user.findUnique({
     where: { id: targetId },
@@ -110,7 +111,7 @@ export async function getUserById(targetId: string, requesterId: string) {
       createdAt: true,
     },
   });
-  if (!user) throw new Error('User not found');
+  if (!user) throw new NotFoundError('User not found');
 
   // Friendship status
   const friendship = await prisma.friendship.findFirst({

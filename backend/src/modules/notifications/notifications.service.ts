@@ -1,4 +1,5 @@
 import { prisma } from '../../config/db';
+import { NotFoundError } from '../../utils/errors';
 
 export async function listNotifications(userId: string, page = 1, limit = 20) {
   const skip = (page - 1) * limit;
@@ -25,7 +26,7 @@ export async function markAsRead(userId: string, notificationId: string) {
   const notification = await prisma.notification.findFirst({
     where: { id: notificationId, userId },
   });
-  if (!notification) throw new Error('Notification not found');
+  if (!notification) throw new NotFoundError('Notification not found');
 
   await prisma.notification.update({
     where: { id: notificationId },
@@ -48,7 +49,7 @@ export async function deleteNotification(userId: string, notificationId: string)
   const notification = await prisma.notification.findFirst({
     where: { id: notificationId, userId },
   });
-  if (!notification) throw new Error('Notification not found');
+  if (!notification) throw new NotFoundError('Notification not found');
 
   await prisma.notification.delete({ where: { id: notificationId } });
 

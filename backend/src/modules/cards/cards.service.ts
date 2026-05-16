@@ -8,6 +8,7 @@ import {
   ReorderCardsDtoType,
   StudyCardDtoType,
 } from './cards.dto';
+import { NotFoundError } from '../../utils/errors';
 
 function calculateNextReviewAt(difficulty: Difficulty): Date {
   const now = new Date();
@@ -26,14 +27,14 @@ function calculateNextReviewAt(difficulty: Difficulty): Date {
 async function verifySetOwnership(userId: string, setId: string) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {
-    throw new Error('Set not found');
+    throw new NotFoundError('Set not found');
   }
   return set;
 }
 
 async function verifyCardOwnership(cardId: string, userId: string) {
   const card = await prisma.card.findFirst({ where: { id: cardId, userId } });
-  if (!card) throw new Error('Card not found or not authorized');
+  if (!card) throw new NotFoundError('Card not found or not authorized');
   return card;
 }
 
@@ -178,7 +179,7 @@ export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
   });
 
   if (cards.length !== dto.cardIds.length) {
-    throw new Error('One or more cards not found');
+    throw new NotFoundError('One or more cards not found');
   }
 
   const updates = dto.cardIds.map((cardId, index) =>

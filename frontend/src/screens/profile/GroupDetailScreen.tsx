@@ -13,6 +13,7 @@ import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
+import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
@@ -121,9 +122,7 @@ export function GroupDetailScreen({ route, navigation }: Props) {
 
     return (
       <View style={styles.memberRow}>
-        <View style={styles.avatar}>
-          <Icon name="person" size={18} color={colors.textSecondary} />
-        </View>
+        <Avatar uri={item.user.profileImage ?? null} name={item.user.name ?? ''} size="sm" />
         <Typography preset="body" style={styles.flex}>{item.user.name}</Typography>
         {item.role === 'ADMIN' && (
           <View style={styles.adminBadge}>
@@ -233,14 +232,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     gap: spacing[3],
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   adminBadge: {
     paddingHorizontal: spacing[2],

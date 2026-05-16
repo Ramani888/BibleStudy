@@ -1,15 +1,16 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
-import { Divider, Typography } from '../../components/ui';
+import { Divider } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { useDeleteAccount, useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { colors, spacing } from '../../theme';
 
 const APP_VERSION = '1.0.0';
 
@@ -54,10 +55,7 @@ export function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Account ── */}
-        <View style={styles.section}>
-          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
-            ACCOUNT
-          </Typography>
+        <MenuSection label="ACCOUNT">
           <MenuItem
             iconName="log-out-outline"
             label="Sign Out"
@@ -72,17 +70,14 @@ export function SettingsScreen() {
             showChevron={false}
             onPress={handleDeleteAccount}
           />
-        </View>
+        </MenuSection>
 
         {/* ── App info ── */}
-        <View style={styles.section}>
-          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
-            APP INFO
-          </Typography>
+        <MenuSection label="APP INFO">
           <MenuItem iconName="book-outline" label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
           <Divider marginV={0} />
           <MenuItem iconName="star-outline" label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
-        </View>
+        </MenuSection>
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
@@ -93,18 +88,4 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
   scroll: { paddingBottom: spacing[12] },
-  section: {
-    backgroundColor: colors.background,
-    marginTop: spacing[3],
-    paddingHorizontal: layout.screenPaddingH,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-  },
-  sectionLabel: {
-    paddingTop: spacing[3],
-    paddingBottom: spacing[1],
-    letterSpacing: 1,
-    fontSize: 11,
-  },
 });

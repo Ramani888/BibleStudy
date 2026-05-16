@@ -4,13 +4,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
+import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
 
 const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useSets, useConfirmDialog, useCreditBalance } from '../../hooks';
+import { useSetStats, useConfirmDialog, useCreditBalance } from '../../hooks';
 import { useUpdateMapPrivacy } from '../../hooks/useMap';
 import { getErrorMessage } from '../../api/client';
 import { colors, layout, spacing } from '../../theme';
@@ -47,9 +48,8 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
     ]);
   };
 
-  const { data: sets = [] } = useSets();
+  const { data: stats } = useSetStats();
   const { data: creditData } = useCreditBalance();
-  const totalCards = sets.reduce((sum, s) => sum + (s._count?.cards ?? 0), 0);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -106,21 +106,18 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Typography preset="h3" color={colors.primary}>{sets.length}</Typography>
+            <Typography preset="h3" color={colors.primary}>{stats?.totalSets ?? 0}</Typography>
             <Typography preset="caption" color={colors.textSecondary}>Sets</Typography>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statBox}>
-            <Typography preset="h3" color={colors.primary}>{totalCards}</Typography>
+            <Typography preset="h3" color={colors.primary}>{stats?.totalCards ?? 0}</Typography>
             <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
           </View>
         </View>
 
         {/* ── Account menu ── */}
-        <View style={styles.section}>
-          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
-            ACCOUNT
-          </Typography>
+        <MenuSection label="ACCOUNT">
           <MenuItem iconName="person-outline" label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
           <Divider marginV={0} />
           <MenuItem iconName="lock-closed-outline" label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
@@ -131,13 +128,10 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             value={`${creditData?.balance ?? 0} credits`}
             onPress={() => navigation.navigate('Credits')}
           />
-        </View>
+        </MenuSection>
 
         {/* ── Community menu ── */}
-        <View style={styles.section}>
-          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
-            COMMUNITY
-          </Typography>
+        <MenuSection label="COMMUNITY">
           <MenuItem iconName="people-outline" label="Friends" onPress={() => navigation.navigate('Friends')} />
           <Divider marginV={0} />
           <MenuItem iconName="people-circle-outline" label="My Groups" onPress={() => navigation.navigate('Groups')} />
@@ -145,18 +139,15 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           <MenuItem iconName="notifications-outline" label="Notifications" onPress={() => navigation.navigate('Notifications')} />
           <Divider marginV={0} />
           <MenuItem iconName="location-outline" label="Location Privacy" onPress={handleLocationPrivacy} />
-        </View>
+        </MenuSection>
 
         {/* ── App menu ── */}
-        <View style={styles.section}>
-          <Typography preset="label" color={colors.textDisabled} style={styles.sectionLabel}>
-            APP
-          </Typography>
+        <MenuSection label="APP">
           <MenuItem iconName="settings-outline" label="Settings" onPress={() => navigation.navigate('Settings')} />
-        </View>
+        </MenuSection>
 
         {/* ── Danger zone ── */}
-        <View style={styles.section}>
+        <MenuSection label="">
           <MenuItem
             iconName="log-out-outline"
             label="Sign Out"
@@ -172,7 +163,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
               })
             }
           />
-        </View>
+        </MenuSection>
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
@@ -221,19 +212,4 @@ const styles = StyleSheet.create({
     marginVertical: spacing[3],
   },
 
-  // Menu sections
-  section: {
-    backgroundColor: colors.background,
-    marginTop: spacing[3],
-    paddingHorizontal: layout.screenPaddingH,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    borderColor: colors.border,
-  },
-  sectionLabel: {
-    paddingTop: spacing[3],
-    paddingBottom: spacing[1],
-    letterSpacing: 1,
-    fontSize: 11,
-  },
 });

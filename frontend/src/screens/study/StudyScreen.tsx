@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect } from 'react';
 import {
   FlatList,
   Pressable,
@@ -21,18 +21,16 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
-
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FlashCard, SetCard } from '../../components/domain';
 import { ErrorState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ProgressBar, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
-import { useCards, useRecordStudy, useSets } from '../../hooks';
+import { useCards, useSets, useStudySession } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
-import type { Difficulty } from '../../types';
+import type { Difficulty } from '../../types'; // still needed for DIFF_CONFIG type annotation
 import type { LibraryScreenProps } from '../../navigation/types';
 
 type Props = LibraryScreenProps<'Study'>;
@@ -172,32 +170,26 @@ function SetPicker() {
 export function StudyScreen({ route, navigation }: Props) {
   const { setId, setTitle } = route.params;
 
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isRevealed, setIsRevealed] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
-  const [skippedCount, setSkippedCount] = useState(0);
-  const [isShuffled, setIsShuffled] = useState(false);
-  const [shuffleOrder, setShuffleOrder] = useState<number[]>([]);
-  const [hardCards, setHardCards] = useState<typeof cards>([]);
-  const [isRetryMode, setIsRetryMode] = useState(false);
-  const [retryCards, setRetryCards] = useState<typeof cards>([]);
-  const [results, setResults] = useState<Record<Difficulty, number>>({
-    EASY: 0,
-    MEDIUM: 0,
-    HARD: 0,
-  });
-
   const { data: cards = [], isLoading, isError, error, refetch } = useCards(setId);
-  const { mutate: recordStudy } = useRecordStudy(setId);
 
-  const displayCards = useMemo(() => {
-    if (isRetryMode) return retryCards;
-    if (!isShuffled || shuffleOrder.length !== cards.length) return cards;
-    return shuffleOrder.map(i => cards[i]);
-  }, [cards, retryCards, isRetryMode, isShuffled, shuffleOrder]);
-
-  const currentCard = displayCards[currentIndex];
-  const progress = displayCards.length > 0 ? currentIndex / displayCards.length : 0;
+  const {
+    currentCard,
+    currentIndex,
+    isRevealed,
+    isComplete,
+    isShuffled,
+    progress,
+    results,
+    skippedCount,
+    hardCards,
+    displayCards,
+    handleFlip,
+    handleDifficulty,
+    handleSkip,
+    toggleShuffle,
+    handleRestart,
+    handleRetryHard,
+  } = useStudySession(cards, setId);
 
   // ── Swipe gesture shared values ──
   const swipeX = useSharedValue(0);
@@ -214,36 +206,6 @@ export function StudyScreen({ route, navigation }: Props) {
     swipeX.value = 0;
     swipeY.value = 0;
   }, [currentIndex, swipeX, swipeY]);
-
-  const handleDifficulty = useCallback(
-    (difficulty: Difficulty) => {
-      if (!currentCard) return;
-
-      // Record in backend (fire and forget — don't block UX)
-      recordStudy(
-        { id: currentCard.id, payload: { difficulty } },
-        {
-          onError: err =>
-            Toast.show({ type: 'error', text1: 'Could not save', text2: getErrorMessage(err) }),
-        },
-      );
-
-      if (difficulty === 'HARD') {
-        setHardCards(prev => [...prev, currentCard]);
-      }
-
-      setResults(prev => ({ ...prev, [difficulty]: prev[difficulty] + 1 }));
-
-      const next = currentIndex + 1;
-      if (next >= displayCards.length) {
-        setIsComplete(true);
-      } else {
-        setIsRevealed(false);
-        setCurrentIndex(next);
-      }
-    },
-    [currentCard, currentIndex, displayCards.length, recordStudy],
-  );
 
   // ── Pan gesture — active only after card is flipped ──
   const panGesture = Gesture.Pan()
@@ -299,55 +261,6 @@ export function StudyScreen({ route, navigation }: Props) {
   const hardLabelStyle = useAnimatedStyle(() => ({
     opacity: interpolate(swipeX.value, [-SWIPE_THRESHOLD, 0], [1, 0], Extrapolation.CLAMP),
   }));
-
-  const toggleShuffle = () => {
-    if (!isShuffled) {
-      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
-      setShuffleOrder(order);
-      setIsShuffled(true);
-    } else {
-      setIsShuffled(false);
-    }
-    setCurrentIndex(0);
-    setIsRevealed(false);
-  };
-
-  const handleSkip = useCallback(() => {
-    setSkippedCount(prev => prev + 1);
-    const next = currentIndex + 1;
-    if (next >= displayCards.length) {
-      setIsComplete(true);
-    } else {
-      setIsRevealed(false);
-      setCurrentIndex(next);
-    }
-  }, [currentIndex, displayCards.length]);
-
-  const handleRetryHard = () => {
-    setRetryCards(hardCards);
-    setIsRetryMode(true);
-    setHardCards([]);
-    setCurrentIndex(0);
-    setIsRevealed(false);
-    setIsComplete(false);
-    setSkippedCount(0);
-    setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
-  };
-
-  const handleRestart = () => {
-    if (isShuffled) {
-      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
-      setShuffleOrder(order);
-    }
-    setIsRetryMode(false);
-    setRetryCards([]);
-    setHardCards([]);
-    setCurrentIndex(0);
-    setIsRevealed(false);
-    setIsComplete(false);
-    setSkippedCount(0);
-    setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
-  };
 
   // ── No set selected ──
   if (!setId) {
@@ -464,7 +377,7 @@ export function StudyScreen({ route, navigation }: Props) {
                 question={currentCard.question}
                 answer={currentCard.answer}
                 isBlurred={currentCard.isBlurred}
-                onFlip={revealed => setIsRevealed(revealed)}
+                onFlip={handleFlip}
               />
             </Animated.View>
 

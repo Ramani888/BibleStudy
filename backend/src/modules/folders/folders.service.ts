@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { CreateFolderDtoType, UpdateFolderDtoType } from './folders.dto';
+import { NotFoundError, ValidationError } from '../../utils/errors';
 
 export async function createFolder(userId: string, dto: CreateFolderDtoType) {
   if (dto.parentId) {
@@ -7,7 +8,7 @@ export async function createFolder(userId: string, dto: CreateFolderDtoType) {
       where: { id: dto.parentId, userId },
     });
     if (!parent) {
-      throw new Error('Parent folder not found');
+      throw new NotFoundError('Parent folder not found');
     }
   }
 
@@ -44,7 +45,7 @@ export async function getFolderById(userId: string, folderId: string) {
   });
 
   if (!folder) {
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   return folder;
@@ -53,17 +54,17 @@ export async function getFolderById(userId: string, folderId: string) {
 export async function updateFolder(userId: string, folderId: string, dto: UpdateFolderDtoType) {
   const folder = await prisma.folder.findFirst({ where: { id: folderId, userId } });
   if (!folder) {
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   if (dto.parentId !== undefined && dto.parentId !== null) {
     // Prevent setting folder as its own parent
     if (dto.parentId === folderId) {
-      throw new Error('A folder cannot be its own parent');
+      throw new ValidationError('A folder cannot be its own parent');
     }
     const parent = await prisma.folder.findFirst({ where: { id: dto.parentId, userId } });
     if (!parent) {
-      throw new Error('Parent folder not found');
+      throw new NotFoundError('Parent folder not found');
     }
   }
 
@@ -82,7 +83,7 @@ export async function updateFolder(userId: string, folderId: string, dto: Update
 export async function deleteFolder(userId: string, folderId: string) {
   const folder = await prisma.folder.findFirst({ where: { id: folderId, userId } });
   if (!folder) {
-    throw new Error('Folder not found');
+    throw new NotFoundError('Folder not found');
   }
 
   await prisma.folder.delete({ where: { id: folderId } });

@@ -4,6 +4,7 @@ import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
 import { CreateGroupDtoType, UpdateGroupDtoType, UpdateRoleDtoType } from './groups.dto';
+import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '../../utils/errors';
 
 const memberUserSelect = {
   id: true,
@@ -15,7 +16,7 @@ const memberUserSelect = {
 
 async function verifyGroupAdmin(groupId: string, userId: string) {
   const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
-  if (!member || member.role !== 'ADMIN') throw new Error('Not authorized');
+  if (!member || member.role !== 'ADMIN') throw new ForbiddenError('Not authorized');
   return member;
 }
 
@@ -66,7 +67,7 @@ export async function listMyGroups(userId: string) {
 
 export async function getGroup(userId: string, groupId: string) {
   const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
-  if (!member) throw new Error('Group not found');
+  if (!member) throw new NotFoundError('Group not found');
 
   return prisma.group.findUnique({
     where: { id: groupId },
@@ -96,7 +97,7 @@ export async function updateGroup(userId: string, groupId: string, dto: UpdateGr
 
 export async function deleteGroup(userId: string, groupId: string) {
   const group = await prisma.group.findFirst({ where: { id: groupId, ownerId: userId } });
-  if (!group) throw new Error('Group not found or not authorized');
+  if (!group) throw new NotFoundError('Group not found or not authorized');
 
   await prisma.group.delete({ where: { id: groupId } });
   return { message: 'Group deleted successfully' };
@@ -104,10 +105,10 @@ export async function deleteGroup(userId: string, groupId: string) {
 
 export async function joinGroup(userId: string, inviteCode: string) {
   const group = await prisma.group.findUnique({ where: { inviteCode } });
-  if (!group) throw new Error('Invalid invite code');
+  if (!group) throw new NotFoundError('Invalid invite code');
 
   const existing = await prisma.groupMember.findFirst({ where: { groupId: group.id, userId } });
-  if (existing) throw new Error('Already a member of this group');
+  if (existing) throw new ConflictError('Already a member of this group');
 
   await prisma.groupMember.create({
     data: { groupId: group.id, userId, role: 'MEMBER' },
@@ -138,17 +139,17 @@ export async function joinGroup(userId: string, inviteCode: string) {
 
 export async function leaveGroup(userId: string, groupId: string) {
   const group = await prisma.group.findUnique({ where: { id: groupId } });
-  if (!group) throw new Error('Group not found');
+  if (!group) throw new NotFoundError('Group not found');
 
   const member = await prisma.groupMember.findFirst({ where: { groupId, userId } });
-  if (!member) throw new Error('Not a member of this group');
+  if (!member) throw new ForbiddenError('Not a member of this group');
 
   // Prevent leaving if this user is the last admin and group has other members
   if (member.role === 'ADMIN') {
     const adminCount = await prisma.groupMember.count({ where: { groupId, role: 'ADMIN' } });
     const memberCount = await prisma.groupMember.count({ where: { groupId } });
     if (memberCount > 1 && adminCount === 1) {
-      throw new Error('You are the last admin — promote another member before leaving');
+      throw new ValidationError('You are the last admin — promote another member before leaving');
     }
   }
 
@@ -165,11 +166,11 @@ export async function updateMemberRole(
   await verifyGroupAdmin(groupId, requesterId);
 
   const target = await prisma.groupMember.findFirst({ where: { groupId, userId: targetUserId } });
-  if (!target) throw new Error('Member not found');
+  if (!target) throw new NotFoundError('Member not found');
 
   const group = await prisma.group.findUnique({ where: { id: groupId } });
   if (group?.ownerId === targetUserId && dto.role === 'MEMBER') {
-    throw new Error('Cannot demote the group owner');
+    throw new ValidationError('Cannot demote the group owner');
   }
 
   return prisma.groupMember.update({
@@ -183,10 +184,10 @@ export async function removeMember(requesterId: string, groupId: string, targetU
   await verifyGroupAdmin(groupId, requesterId);
 
   const group = await prisma.group.findUnique({ where: { id: groupId } });
-  if (group?.ownerId === targetUserId) throw new Error('Cannot remove the group owner');
+  if (group?.ownerId === targetUserId) throw new ValidationError('Cannot remove the group owner');
 
   const target = await prisma.groupMember.findFirst({ where: { groupId, userId: targetUserId } });
-  if (!target) throw new Error('Member not found');
+  if (!target) throw new NotFoundError('Member not found');
 
   await prisma.groupMember.delete({ where: { groupId_userId: { groupId, userId: targetUserId } } });
   return { message: 'Member removed' };
@@ -194,7 +195,7 @@ export async function removeMember(requesterId: string, groupId: string, targetU
 
 export async function regenerateInviteCode(userId: string, groupId: string) {
   const group = await prisma.group.findFirst({ where: { id: groupId, ownerId: userId } });
-  if (!group) throw new Error('Group not found or not authorized');
+  if (!group) throw new NotFoundError('Group not found or not authorized');
 
   const newCode = randomUUID();
   const updated = await prisma.group.update({

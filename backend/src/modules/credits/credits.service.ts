@@ -1,4 +1,5 @@
 import { prisma } from '../../config/db';
+import { NotFoundError, ConflictError } from '../../utils/errors';
 
 export async function getBalance(userId: string) {
   const user = await prisma.user.findUnique({
@@ -7,7 +8,7 @@ export async function getBalance(userId: string) {
   });
 
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   return { balance: user.creditBalance };
@@ -57,7 +58,7 @@ export async function claimDailyLogin(userId: string) {
   });
 
   if (rewardToday) {
-    throw new Error('Daily login reward already claimed today');
+    throw new ConflictError('Daily login reward already claimed today');
   }
 
   const [updatedUser, transaction] = await prisma.$transaction([

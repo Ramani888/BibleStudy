@@ -9,20 +9,16 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import Toast from 'react-native-toast-message';
-
 import Icon from 'react-native-vector-icons/Ionicons';
-import { DailyVerseCard, SetCard, CreditBadge } from '../../components/domain';
+import { ClaimCreditButton, DailyVerseCard, SetActionSheet, SetCard, CreditBadge } from '../../components/domain';
 import { Avatar, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 const QUICK_ACTION_ICON_SIZE = 28;
-const CLAIM_ICON_SIZE = 16;
-import { ActionSheet, SetCardSkeleton } from '../../components/feedback';
+import { SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
-import { useDailyVerse, useSets, useClaimDailyLogin, useCreditBalance } from '../../hooks';
+import { useDailyVerse, useSets, useCreditBalance } from '../../hooks';
 import { useFriendsActivityFeed } from '../../hooks/useActivities';
-import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
 import type { AppTabParamList } from '../../navigation/types';
@@ -69,38 +65,6 @@ function QuickActionGrid() {
         </Pressable>
       ))}
     </View>
-  );
-}
-
-// ─── Daily login claim button ─────────────────────────────────────────────────
-function DailyLoginButton() {
-  const { mutate, isPending } = useClaimDailyLogin();
-
-  const handleClaim = () => {
-    mutate(undefined, {
-      onError: err => {
-        Toast.show({
-          type: 'error',
-          text1: 'Already claimed today',
-          text2: getErrorMessage(err),
-        });
-      },
-    });
-  };
-
-  return (
-    <Pressable
-      style={({ pressed }) => [styles.claimBtn, { opacity: pressed || isPending ? 0.65 : 1 }]}
-      onPress={handleClaim}
-      disabled={isPending}
-    >
-      <View style={styles.claimBtnContent}>
-        {!isPending && <Icon name="star-outline" size={CLAIM_ICON_SIZE} color={colors.primary} />}
-        <Typography preset="label" color={colors.primary}>
-          {isPending ? 'Claiming…' : 'Claim daily credit'}
-        </Typography>
-      </View>
-    </Pressable>
   );
 }
 
@@ -208,7 +172,7 @@ export function HomeScreen() {
         </View>
 
         {/* ── Daily Login ── */}
-        <DailyLoginButton />
+        <ClaimCreditButton />
 
         <Spacer size={spacing[5]} />
 
@@ -300,32 +264,32 @@ export function HomeScreen() {
         <Spacer size={spacing[8]} />
       </ScrollView>
 
-      <ActionSheet
+      <SetActionSheet
+        set={selectedSet}
         visible={!!selectedSet}
-        title={selectedSet?.title}
         onClose={() => setSelectedSet(null)}
-        actions={[
-          {
-            label: 'Study Set',
-            iconName: 'book-outline',
-            onPress: () =>
-              selectedSet &&
-              navigation.navigate('LibraryTab', {
-                screen: 'Study',
-                params: { setId: selectedSet.id, setTitle: selectedSet.title },
-              }),
-          },
-          {
-            label: 'View Cards',
-            iconName: 'copy-outline',
-            onPress: () =>
-              selectedSet &&
-              navigation.navigate('LibraryTab', {
-                screen: 'SetDetail',
-                params: { setId: selectedSet.id, setTitle: selectedSet.title },
-              }),
-          },
-        ]}
+        onStudy={() =>
+          selectedSet &&
+          navigation.navigate('LibraryTab', {
+            screen: 'Study',
+            params: { setId: selectedSet.id, setTitle: selectedSet.title },
+          })
+        }
+        onCreateCard={() =>
+          selectedSet &&
+          navigation.navigate('LibraryTab', {
+            screen: 'CreateCard',
+            params: { setId: selectedSet.id },
+          })
+        }
+        onEdit={() =>
+          selectedSet &&
+          navigation.navigate('LibraryTab', {
+            screen: 'EditSet',
+            params: { setId: selectedSet.id },
+          })
+        }
+        onDelete={() => setSelectedSet(null)}
       />
     </SafeAreaView>
   );
@@ -344,16 +308,6 @@ const styles = StyleSheet.create({
   },
   greetingCol: { flex: 1, marginRight: spacing[3] },
   headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-
-  // Daily login
-  claimBtn: {
-    borderWidth: 1,
-    borderColor: colors.primaryLight,
-    borderRadius: 12,
-    paddingVertical: spacing[2.5],
-    alignItems: 'center',
-    backgroundColor: colors.primarySurface,
-  },
 
   // Section
   sectionTitle: { marginBottom: spacing[3] },
@@ -377,7 +331,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing[2],
   },
-  claimBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
   createBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
   // Stats row

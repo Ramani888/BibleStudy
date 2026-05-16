@@ -1,11 +1,11 @@
 import React from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
+import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -29,9 +29,7 @@ export function BlockedUsersScreen(_props: Props) {
 
   const renderItem = ({ item }: { item: BlockedUser }) => (
     <View style={styles.row}>
-      <View style={styles.avatar}>
-        <Icon name="person" size={20} color={colors.textSecondary} />
-      </View>
+      <Avatar uri={item.blocked.profileImage ?? null} name={item.blocked.name ?? ''} size="sm" />
       <Typography preset="body" style={styles.name}>{item.blocked.name}</Typography>
       <Button
         label="Unblock"
@@ -72,14 +70,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     gap: spacing[3],
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   name: { flex: 1 },
   unblockBtn: { paddingHorizontal: spacing[3] },

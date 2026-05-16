@@ -1,141 +1,80 @@
 import { Request, Response } from 'express';
 import * as cardsService from './cards.service';
 import { sendSuccess, sendError } from '../../utils/response';
-import {
-  CreateCardDtoType,
-  BulkCreateCardsDtoType,
-  UpdateCardDtoType,
-  ReorderCardsDtoType,
-  StudyCardDtoType,
-  MoveCardDtoType,
-} from './cards.dto';
+import { AppError } from '../../utils/errors';
+
+function handleError(res: Response, error: unknown, fallback = 'Operation failed'): void {
+  if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+  const message = error instanceof Error ? error.message : fallback;
+  sendError(res, message, 500, 'INTERNAL_ERROR');
+}
 
 export async function createCard(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const dto = req.body as CreateCardDtoType;
-    const card = await cardsService.createCard(userId, dto);
+    const card = await cardsService.createCard(req.user!.id, req.body);
     sendSuccess(res, card, 'Card created successfully', 201);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create card';
-    sendError(res, message, 400, 'CREATE_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to create card'); }
 }
 
 export async function bulkCreateCards(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const dto = req.body as BulkCreateCardsDtoType;
-    const cards = await cardsService.bulkCreateCards(userId, dto);
+    const cards = await cardsService.bulkCreateCards(req.user!.id, req.body);
     sendSuccess(res, cards, `${cards.length} cards created successfully`, 201);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to create cards';
-    sendError(res, message, 400, 'CREATE_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to create cards'); }
 }
 
 export async function listCardsBySet(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { setId } = req.params;
-    const cards = await cardsService.listCardsBySet(userId, setId);
+    const cards = await cardsService.listCardsBySet(req.user!.id, req.params.setId);
     sendSuccess(res, cards, 'Cards retrieved successfully');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to list cards';
-    const statusCode = message === 'Set not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'LIST_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to list cards'); }
 }
 
 export async function getCardById(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const card = await cardsService.getCardById(userId, id);
+    const card = await cardsService.getCardById(req.user!.id, req.params.id);
     sendSuccess(res, card, 'Card retrieved successfully');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to get card';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'NOT_FOUND');
-  }
+  } catch (error) { handleError(res, error, 'Failed to get card'); }
 }
 
 export async function updateCard(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const dto = req.body as UpdateCardDtoType;
-    const card = await cardsService.updateCard(userId, id, dto);
+    const card = await cardsService.updateCard(req.user!.id, req.params.id, req.body);
     sendSuccess(res, card, 'Card updated successfully');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to update card';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'UPDATE_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to update card'); }
 }
 
 export async function deleteCard(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const result = await cardsService.deleteCard(userId, id);
+    const result = await cardsService.deleteCard(req.user!.id, req.params.id);
     sendSuccess(res, result, result.message);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to delete card';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'DELETE_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to delete card'); }
 }
 
 export async function copyCard(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const card = await cardsService.copyCard(userId, id);
+    const card = await cardsService.copyCard(req.user!.id, req.params.id);
     sendSuccess(res, card, 'Card copied successfully', 201);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to copy card';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'COPY_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to copy card'); }
 }
 
 export async function moveCard(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const dto = req.body as MoveCardDtoType;
-    const card = await cardsService.moveCard(userId, id, dto.targetSetId);
+    const card = await cardsService.moveCard(req.user!.id, req.params.id, req.body.targetSetId);
     sendSuccess(res, card, 'Card moved successfully');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to move card';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'MOVE_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to move card'); }
 }
 
 export async function reorderCards(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const dto = req.body as ReorderCardsDtoType;
-    const result = await cardsService.reorderCards(userId, dto);
+    const result = await cardsService.reorderCards(req.user!.id, req.body);
     sendSuccess(res, result, result.message);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to reorder cards';
-    sendError(res, message, 400, 'REORDER_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to reorder cards'); }
 }
 
 export async function recordStudyResult(req: Request, res: Response): Promise<void> {
   try {
-    const userId = req.user!.id;
-    const { id } = req.params;
-    const dto = req.body as StudyCardDtoType;
-    const card = await cardsService.recordStudyResult(userId, id, dto);
+    const card = await cardsService.recordStudyResult(req.user!.id, req.params.id, req.body);
     sendSuccess(res, card, 'Study result recorded');
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to record study result';
-    const statusCode = message === 'Card not found' ? 404 : 400;
-    sendError(res, message, statusCode, 'STUDY_ERROR');
-  }
+  } catch (error) { handleError(res, error, 'Failed to record study result'); }
 }

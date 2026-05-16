@@ -4,6 +4,7 @@ import { env } from './config/env';
 import { prisma } from './config/db';
 import { generalRateLimit } from './middlewares/rateLimit.middleware';
 import { sendError } from './utils/response';
+import { AppError } from './utils/errors';
 
 // Route imports
 import authRoutes from './modules/auth/auth.routes';
@@ -94,6 +95,10 @@ app.use((_req: Request, res: Response) => {
 // Global error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  if (err instanceof AppError) {
+    sendError(res, err.message, err.statusCode, err.code);
+    return;
+  }
   console.error('Unhandled error:', err);
   sendError(
     res,

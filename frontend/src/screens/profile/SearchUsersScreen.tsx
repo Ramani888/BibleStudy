@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
+import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
 import { useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
@@ -44,9 +45,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         style={styles.userInfo}
         onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
       >
-        <View style={styles.avatar}>
-          <Icon name="person" size={20} color={colors.textSecondary} />
-        </View>
+        <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
         <View>
           <Typography preset="body">{item.name}</Typography>
           {item.church ? (
@@ -102,14 +101,6 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   userInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   addBtn: { padding: spacing[1] },
   loader: { paddingVertical: spacing[2] },
   empty: { padding: layout.screenPaddingH, alignItems: 'center' },

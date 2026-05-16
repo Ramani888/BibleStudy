@@ -19,6 +19,7 @@ import {
   ResetPasswordDtoType,
 } from './auth.dto';
 import { env } from '../../config/env';
+import { NotFoundError, UnauthorizedError, ForbiddenError, ConflictError, ValidationError } from '../../utils/errors';
 
 function parseDuration(duration: string): number {
   const unit = duration.slice(-1);
@@ -70,7 +71,7 @@ export async function register(dto: RegisterDtoType) {
       return updated;
     }
 
-    throw new Error('Email already registered');
+    throw new ConflictError('Email already registered');
   }
 
   const hashedPassword = await bcrypt.hash(dto.password, 12);
@@ -116,7 +117,7 @@ export async function resendVerification(email: string) {
   }
 
   if (user.emailVerified) {
-    throw new Error('Email is already verified');
+    throw new ConflictError('Email is already verified');
   }
 
   const otp = generateOTP();
@@ -134,16 +135,16 @@ export async function resendVerification(email: string) {
 export async function verifyEmail(dto: VerifyEmailDtoType) {
   const user = await prisma.user.findUnique({ where: { email: dto.email } });
   if (!user) {
-    throw new Error('User not found');
+    throw new NotFoundError('User not found');
   }
 
   if (user.emailVerified) {
-    throw new Error('Email already verified');
+    throw new ConflictError('Email already verified');
   }
 
   const isValid = await verifyOTP(dto.email, dto.otp);
   if (!isValid) {
-    throw new Error('Invalid or expired OTP');
+    throw new ValidationError('Invalid or expired OTP');
   }
 
   await prisma.user.update({
@@ -172,16 +173,16 @@ export async function verifyEmail(dto: VerifyEmailDtoType) {
 export async function login(dto: LoginDtoType) {
   const user = await prisma.user.findUnique({ where: { email: dto.email } });
   if (!user) {
-    throw new Error('Invalid email or password');
+    throw new UnauthorizedError('Invalid email or password');
   }
 
   const isPasswordValid = await bcrypt.compare(dto.password, user.password);
   if (!isPasswordValid) {
-    throw new Error('Invalid email or password');
+    throw new UnauthorizedError('Invalid email or password');
   }
 
   if (!user.emailVerified) {
-    throw new Error('Please verify your email before logging in');
+    throw new ForbiddenError('Please verify your email before logging in');
   }
 
   const accessToken = generateAccessToken(user.id);
@@ -209,12 +210,12 @@ export async function login(dto: LoginDtoType) {
 export async function refreshToken(token: string) {
   const storedToken = await prisma.refreshToken.findUnique({ where: { token } });
   if (!storedToken) {
-    throw new Error('Invalid refresh token');
+    throw new UnauthorizedError('Invalid refresh token');
   }
 
   if (new Date() > storedToken.expiresAt) {
     await prisma.refreshToken.delete({ where: { id: storedToken.id } });
-    throw new Error('Refresh token expired');
+    throw new UnauthorizedError('Refresh token expired');
   }
 
   try {
@@ -223,7 +224,7 @@ export async function refreshToken(token: string) {
     return { accessToken };
   } catch {
     await prisma.refreshToken.delete({ where: { id: storedToken.id } });
-    throw new Error('Invalid refresh token');
+    throw new UnauthorizedError('Invalid refresh token');
   }
 }
 
@@ -254,12 +255,12 @@ export async function forgotPassword(email: string) {
 export async function resetPassword(dto: ResetPasswordDtoType) {
   const user = await prisma.user.findUnique({ where: { email: dto.email } });
   if (!user) {
-    throw new Error('Invalid or expired OTP');
+    throw new ValidationError('Invalid or expired OTP');
   }
 
   const isValid = await verifyOTP(dto.email, dto.otp);
   if (!isValid) {
-    throw new Error('Invalid or expired OTP');
+    throw new ValidationError('Invalid or expired OTP');
   }
 
   const hashedPassword = await bcrypt.hash(dto.newPassword, 12);

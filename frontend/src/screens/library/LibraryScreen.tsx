@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { FolderCard, SetCard } from '../../components/domain';
+import { FolderCard, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
 
@@ -21,9 +21,8 @@ import {
   useSets,
   useDeleteSet,
   useUpdateSet,
-  useCreateFolder,
   useDeleteFolder,
-  useUpdateFolder,
+  useFolderModal,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
@@ -40,22 +39,15 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
-  const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
-  const [newFolderName, setNewFolderName] = useState('');
-  const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
-  const [editFolderName, setEditFolderName] = useState('');
-  const [editFolderColor, setEditFolderColor] = useState<string | null>(null);
-  const [assignFolderOpen, setAssignFolderOpen] = useState(false);
 
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { mutate: updateSet } = useUpdateSet(selectedSet?.id ?? '');
   const { show, dialogProps } = useConfirmDialog();
-  const { mutate: createFolder, isPending: creatingFolder } = useCreateFolder();
   const { mutateAsync: deleteFolderAsync } = useDeleteFolder();
-  const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder(selectedFolder?.id ?? '');
+
+  const folderModal = useFolderModal(selectedFolder);
 
   const refreshing = foldersLoading || setsLoading;
 
@@ -104,7 +96,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const handleAssignFolder = (folderId: string | null) => {
     updateSet({ folderId }, {
       onSuccess: () => {
-        setAssignFolderOpen(false);
+        folderModal.closeAssignModal();
         setSelectedSet(null);
         Toast.show({ type: 'success', text1: folderId ? 'Moved to folder' : 'Removed from folder' });
       },
@@ -130,34 +122,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   const handleCloseEditFolderModal = () => {
-    setEditFolderModalOpen(false);
-    setEditFolderName('');
-    setEditFolderColor(null);
+    folderModal.closeEditModal();
     setSelectedFolder(null);
-  };
-
-  const handleEditFolder = () => {
-    if (!editFolderName.trim() || !selectedFolder) return;
-    updateFolder({ name: editFolderName.trim(), color: editFolderColor }, {
-      onSuccess: () => {
-        handleCloseEditFolderModal();
-        Toast.show({ type: 'success', text1: 'Folder updated' });
-      },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Update failed', text2: getErrorMessage(err) }),
-    });
-  };
-
-  const handleCreateFolder = () => {
-    if (!newFolderName.trim()) return;
-    createFolder({ name: newFolderName.trim(), color: selectedColor ?? undefined }, {
-      onSuccess: () => {
-        setNewFolderName('');
-        setSelectedColor(null);
-        setNewFolderModalOpen(false);
-        Toast.show({ type: 'success', text1: 'Folder created' });
-      },
-      onError: err => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-    });
   };
 
   return (
@@ -274,7 +240,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             <FolderCard
               folder={item}
               setCount={setCountByFolder(item.id)}
-              onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name })}
+              onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name, folderColor: item.color })}
               onMenuPress={() => setSelectedFolder(item)}
             />
           )}
@@ -295,47 +261,26 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           onPress={() =>
             activeTab === 'sets'
               ? navigation.navigate('CreateSet', {})
-              : setNewFolderModalOpen(true)
+              : folderModal.openCreateModal()
           }
           fullWidth
         />
       </View>
 
       {/* ── Set actions sheet ── */}
-      <ActionSheet
+      <SetActionSheet
+        set={selectedSet}
         visible={!!selectedSet}
-        title={selectedSet?.title}
         onClose={() => setSelectedSet(null)}
-        actions={[
-          {
-            label: 'Study Set',
-            iconName: 'book-outline',
-            onPress: () =>
-              selectedSet &&
-              navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title }),
-          },
-          {
-            label: 'Create Card',
-            iconName: 'add-circle-outline',
-            onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
-          },
-          {
-            label: 'Assign Folder',
-            iconName: 'folder-outline',
-            onPress: () => setAssignFolderOpen(true),
-          },
-          {
-            label: 'Edit',
-            iconName: 'pencil-outline',
-            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
-          },
-          {
-            label: 'Delete',
-            iconName: 'trash-outline',
-            destructive: true,
-            onPress: () => selectedSet && handleDeleteSet(selectedSet.id),
-          },
-        ]}
+        onStudy={() =>
+          selectedSet &&
+          navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title })
+        }
+        onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
+        showAssignFolder
+        onAssignFolder={() => folderModal.openAssignModal()}
+        onEdit={() => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id })}
+        onDelete={() => selectedSet && handleDeleteSet(selectedSet.id)}
       />
 
       {/* ── Folder actions sheet ── */}
@@ -352,12 +297,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           {
             label: 'Edit',
             iconName: 'pencil-outline',
-            onPress: () => {
-              if (!selectedFolder) return;
-              setEditFolderName(selectedFolder.name);
-              setEditFolderColor(selectedFolder.color);
-              setEditFolderModalOpen(true);
-            },
+            onPress: () => selectedFolder && folderModal.openEditModal(selectedFolder),
           },
           {
             label: 'Delete Folder',
@@ -370,64 +310,64 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
       {/* ── New folder modal ── */}
       <AppModal
-        visible={newFolderModalOpen}
+        visible={folderModal.newFolderModalOpen}
         title="New Folder"
-        onClose={() => { setNewFolderModalOpen(false); setNewFolderName(''); setSelectedColor(null); }}
+        onClose={folderModal.closeCreateModal}
       >
         <Input
           label="Folder name"
           placeholder="e.g. New Testament"
-          value={newFolderName}
-          onChangeText={setNewFolderName}
+          value={folderModal.newFolderName}
+          onChangeText={folderModal.setNewFolderName}
           autoCapitalize="words"
           returnKeyType="done"
-          onSubmitEditing={handleCreateFolder}
+          onSubmitEditing={folderModal.handleCreateFolder}
         />
         <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
           Color
         </Typography>
-        <ColorPicker value={selectedColor} onChange={setSelectedColor} />
+        <ColorPicker value={folderModal.selectedColor} onChange={folderModal.setSelectedColor} />
         <Divider />
         <Button
           label="Create Folder"
-          onPress={handleCreateFolder}
-          loading={creatingFolder}
+          onPress={folderModal.handleCreateFolder}
+          loading={folderModal.creatingFolder}
           fullWidth
         />
       </AppModal>
 
       {/* ── Edit folder modal ── */}
       <AppModal
-        visible={editFolderModalOpen}
+        visible={folderModal.editFolderModalOpen}
         title="Edit Folder"
         onClose={handleCloseEditFolderModal}
       >
         <Input
           label="Folder name"
-          value={editFolderName}
-          onChangeText={setEditFolderName}
+          value={folderModal.editFolderName}
+          onChangeText={folderModal.setEditFolderName}
           autoCapitalize="words"
           returnKeyType="done"
-          onSubmitEditing={handleEditFolder}
+          onSubmitEditing={folderModal.handleEditFolder}
         />
         <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
           Color
         </Typography>
-        <ColorPicker value={editFolderColor} onChange={setEditFolderColor} />
+        <ColorPicker value={folderModal.editFolderColor} onChange={folderModal.setEditFolderColor} />
         <Divider />
         <Button
           label="Save Changes"
-          onPress={handleEditFolder}
-          loading={updatingFolder}
+          onPress={folderModal.handleEditFolder}
+          loading={folderModal.updatingFolder}
           fullWidth
         />
       </AppModal>
 
       {/* ── Assign Folder modal ── */}
       <AppModal
-        visible={assignFolderOpen}
+        visible={folderModal.assignFolderOpen}
         title="Move to Folder"
-        onClose={() => setAssignFolderOpen(false)}
+        onClose={folderModal.closeAssignModal}
       >
         <Pressable style={styles.setOption} onPress={() => handleAssignFolder(null)}>
           <Typography preset="body" color={colors.textSecondary}>No Folder</Typography>

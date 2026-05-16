@@ -4,29 +4,26 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { SetCard } from '../../components/domain';
-import { ActionSheet, ConfirmDialog, EmptyState } from '../../components/feedback';
+import { SetActionSheet, SetCard } from '../../components/domain';
+import { ConfirmDialog, EmptyState } from '../../components/feedback';
 import { Input, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
-import { useConfirmDialog, useFolders, useSets, useDeleteSet } from '../../hooks';
+import { useConfirmDialog, useSets, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'FolderDetail'>) {
-  const { folderId } = route.params;
+  const { folderId, folderColor } = route.params;
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [search, setSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
 
-  const { data: folders = [] } = useFolders();
   const { data: sets = [], isLoading, refetch } = useSets(folderId);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { show, dialogProps } = useConfirmDialog();
-
-  const folderColor = folders.find(f => f.id === folderId)?.color ?? null;
 
   const toggleSearch = () => {
     if (searchVisible) setSearch('');
@@ -36,6 +33,23 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const filteredSets = search.trim()
     ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
     : sets;
+
+  const handleDeleteSet = (set: StudySet) => {
+    show({
+      title: 'Delete Set',
+      message: 'This cannot be undone.',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: async () => {
+        try {
+          await deleteSetAsync(set.id);
+          Toast.show({ type: 'success', text1: 'Set deleted' });
+        } catch (err) {
+          Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+        }
+      },
+    });
+  };
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -93,51 +107,17 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         )}
       />
 
-      <ActionSheet
+      <SetActionSheet
+        set={selectedSet}
         visible={!!selectedSet}
-        title={selectedSet?.title}
         onClose={() => setSelectedSet(null)}
-        actions={[
-          {
-            label: 'Study Set',
-            iconName: 'book-outline',
-            onPress: () =>
-              selectedSet &&
-              navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title }),
-          },
-          {
-            label: 'Create Card',
-            iconName: 'add-circle-outline',
-            onPress: () => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id }),
-          },
-          {
-            label: 'Edit',
-            iconName: 'pencil-outline',
-            onPress: () => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id }),
-          },
-          {
-            label: 'Delete',
-            iconName: 'trash-outline',
-            destructive: true,
-            onPress: () => {
-              if (!selectedSet) return;
-              show({
-                title: 'Delete Set',
-                message: 'This cannot be undone.',
-                confirmLabel: 'Delete',
-                variant: 'danger',
-                onConfirm: async () => {
-                  try {
-                    await deleteSetAsync(selectedSet.id);
-                    Toast.show({ type: 'success', text1: 'Set deleted' });
-                  } catch (err) {
-                    Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
-                  }
-                },
-              });
-            },
-          },
-        ]}
+        onStudy={() =>
+          selectedSet &&
+          navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title })
+        }
+        onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
+        onEdit={() => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id })}
+        onDelete={() => selectedSet && handleDeleteSet(selectedSet)}
       />
 
       <ConfirmDialog {...dialogProps} />

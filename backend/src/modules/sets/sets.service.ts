@@ -1,12 +1,13 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { CreateSetDtoType, UpdateSetDtoType } from './sets.dto';
+import { NotFoundError } from '../../utils/errors';
 
 export async function createSet(userId: string, dto: CreateSetDtoType) {
   if (dto.folderId) {
     const folder = await prisma.folder.findFirst({ where: { id: dto.folderId, userId } });
     if (!folder) {
-      throw new Error('Folder not found');
+      throw new NotFoundError('Folder not found');
     }
   }
 
@@ -53,7 +54,7 @@ export async function getSetById(userId: string, setId: string) {
   });
 
   if (!set) {
-    throw new Error('Set not found');
+    throw new NotFoundError('Set not found');
   }
 
   return set;
@@ -62,13 +63,13 @@ export async function getSetById(userId: string, setId: string) {
 export async function updateSet(userId: string, setId: string, dto: UpdateSetDtoType) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {
-    throw new Error('Set not found');
+    throw new NotFoundError('Set not found');
   }
 
   if (dto.folderId) {
     const folder = await prisma.folder.findFirst({ where: { id: dto.folderId, userId } });
     if (!folder) {
-      throw new Error('Folder not found');
+      throw new NotFoundError('Folder not found');
     }
   }
 
@@ -90,7 +91,7 @@ export async function updateSet(userId: string, setId: string, dto: UpdateSetDto
 export async function deleteSet(userId: string, setId: string) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {
-    throw new Error('Set not found');
+    throw new NotFoundError('Set not found');
   }
 
   await prisma.set.delete({ where: { id: setId } });
@@ -136,7 +137,7 @@ export async function cloneSet(userId: string, setId: string) {
   });
 
   if (!originalSet) {
-    throw new Error('Set not found');
+    throw new NotFoundError('Set not found');
   }
 
   const clonedSet = await prisma.set.create({

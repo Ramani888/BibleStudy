@@ -14,7 +14,7 @@ export type AuthStackParamList = {
 // ─── Library Stack (nested inside Library tab) ────────────────────────────────
 export type LibraryStackParamList = {
   Library: undefined;
-  FolderDetail: { folderId: string; folderName: string };
+  FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
   SetDetail: { setId: string; setTitle: string };
   CreateSet: { folderId?: string };
   EditSet: { setId: string };

@@ -1,6 +1,7 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
+import { NotFoundError, ConflictError, ValidationError } from '../../utils/errors';
 
 const friendSelect = {
   id: true,
@@ -36,12 +37,12 @@ export async function listRequests(userId: string, type: 'incoming' | 'outgoing'
 
 export async function sendRequest(senderId: string, receiverId: string) {
   if (senderId === receiverId) {
-    throw new Error('Cannot send friend request to yourself');
+    throw new ValidationError('Cannot send friend request to yourself');
   }
 
   // Check target user exists
   const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
-  if (!receiver) throw new Error('User not found');
+  if (!receiver) throw new NotFoundError('User not found');
 
   // Check not blocked
   const blocked = await prisma.block.findFirst({
@@ -52,13 +53,13 @@ export async function sendRequest(senderId: string, receiverId: string) {
       ],
     },
   });
-  if (blocked) throw new Error('Cannot send friend request');
+  if (blocked) throw new ValidationError('Cannot send friend request');
 
   // Check not already friends
   const existing = await prisma.friendship.findFirst({
     where: { userId: senderId, friendId: receiverId },
   });
-  if (existing) throw new Error('Already friends');
+  if (existing) throw new ConflictError('Already friends');
 
   // Check no pending request either direction
   const pendingRequest = await prisma.friendRequest.findFirst({
@@ -69,7 +70,7 @@ export async function sendRequest(senderId: string, receiverId: string) {
       ],
     },
   });
-  if (pendingRequest) throw new Error('Friend request already pending');
+  if (pendingRequest) throw new ConflictError('Friend request already pending');
 
   const request = await prisma.friendRequest.create({
     data: { senderId, receiverId },
@@ -91,7 +92,7 @@ export async function acceptRequest(userId: string, requestId: string) {
     where: { id: requestId, receiverId: userId, status: 'PENDING' },
     include: { sender: { select: friendSelect } },
   });
-  if (!request) throw new Error('Friend request not found');
+  if (!request) throw new NotFoundError('Friend request not found');
 
   await prisma.$transaction([
     prisma.friendRequest.update({ where: { id: requestId }, data: { status: 'ACCEPTED' } }),
@@ -117,7 +118,7 @@ export async function cancelRequest(userId: string, requestId: string) {
   const request = await prisma.friendRequest.findFirst({
     where: { id: requestId, senderId: userId, status: 'PENDING' },
   });
-  if (!request) throw new Error('Friend request not found');
+  if (!request) throw new NotFoundError('Friend request not found');
 
   await prisma.friendRequest.delete({ where: { id: requestId } });
   return { message: 'Friend request cancelled' };
@@ -127,7 +128,7 @@ export async function rejectRequest(userId: string, requestId: string) {
   const request = await prisma.friendRequest.findFirst({
     where: { id: requestId, receiverId: userId, status: 'PENDING' },
   });
-  if (!request) throw new Error('Friend request not found');
+  if (!request) throw new NotFoundError('Friend request not found');
 
   await prisma.friendRequest.update({ where: { id: requestId }, data: { status: 'REJECTED' } });
   return { message: 'Friend request rejected' };
@@ -137,7 +138,7 @@ export async function removeFriend(userId: string, friendId: string) {
   const friendship = await prisma.friendship.findFirst({
     where: { userId, friendId },
   });
-  if (!friendship) throw new Error('Friend not found');
+  if (!friendship) throw new NotFoundError('Friend not found');
 
   await prisma.$transaction([
     prisma.friendship.deleteMany({ where: { userId, friendId } }),
@@ -148,10 +149,10 @@ export async function removeFriend(userId: string, friendId: string) {
 }
 
 export async function blockUser(blockerId: string, blockedId: string) {
-  if (blockerId === blockedId) throw new Error('Cannot block yourself');
+  if (blockerId === blockedId) throw new ValidationError('Cannot block yourself');
 
   const target = await prisma.user.findUnique({ where: { id: blockedId } });
-  if (!target) throw new Error('User not found');
+  if (!target) throw new NotFoundError('User not found');
 
   await prisma.$transaction([
     prisma.block.upsert({
@@ -178,7 +179,7 @@ export async function blockUser(blockerId: string, blockedId: string) {
 
 export async function unblockUser(blockerId: string, blockedId: string) {
   const block = await prisma.block.findFirst({ where: { blockerId, blockedId } });
-  if (!block) throw new Error('Block not found');
+  if (!block) throw new NotFoundError('Block not found');
 
   await prisma.block.delete({ where: { blockerId_blockedId: { blockerId, blockedId } } });
   return { message: 'User unblocked' };

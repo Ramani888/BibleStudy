@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
+import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -51,9 +52,7 @@ export function FriendRequestsScreen(_props: Props) {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
       <View style={styles.requestRow}>
-        <View style={styles.avatar}>
-          <Icon name="person" size={20} color={colors.textSecondary} />
-        </View>
+        <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
         <View style={styles.info}>
           <Typography preset="body">{person?.name}</Typography>
           {person?.church ? (
@@ -141,14 +140,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     gap: spacing[3],
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   info: { flex: 1 },
   actions: { flexDirection: 'row', gap: spacing[2] },

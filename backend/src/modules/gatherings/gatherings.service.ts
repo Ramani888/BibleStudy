@@ -3,6 +3,7 @@ import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
 import type { Prisma } from '@prisma/client';
 import { CreateGatheringDtoType, UpdateGatheringDtoType, RsvpDtoType } from './gatherings.dto';
+import { NotFoundError, ForbiddenError, ValidationError } from '../../utils/errors';
 
 const hostSelect = {
   id: true,
@@ -33,7 +34,7 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
   // Verify group membership if groupId provided
   if (dto.groupId) {
     const member = await prisma.groupMember.findFirst({ where: { groupId: dto.groupId, userId } });
-    if (!member) throw new Error('Not a member of the specified group');
+    if (!member) throw new ForbiddenError('Not a member of the specified group');
   }
 
   const gathering = await prisma.$transaction(async (tx) => {
@@ -177,20 +178,20 @@ export async function getGathering(userId: string, gatheringId: string) {
     },
   });
 
-  if (!gathering) throw new Error('Gathering not found');
+  if (!gathering) throw new NotFoundError('Gathering not found');
 
   // Visibility check — only allow access if user is host, participant, or visibility permits
   const isHost = gathering.hostId === userId;
   const isParticipant = gathering.participants.some(p => p.userId === userId);
   if (!isHost && !isParticipant) {
     if (gathering.visibility === 'PRIVATE') {
-      throw new Error('Gathering not found');
+      throw new NotFoundError('Gathering not found');
     }
     if (gathering.visibility === 'FRIENDS') {
       const friendship = await prisma.friendship.findFirst({
         where: { userId, friendId: gathering.hostId },
       });
-      if (!friendship) throw new Error('Gathering not found');
+      if (!friendship) throw new NotFoundError('Gathering not found');
     }
   }
 
@@ -199,7 +200,7 @@ export async function getGathering(userId: string, gatheringId: string) {
 
 export async function updateGathering(userId: string, gatheringId: string, dto: UpdateGatheringDtoType) {
   const gathering = await prisma.gathering.findFirst({ where: { id: gatheringId, hostId: userId } });
-  if (!gathering) throw new Error('Gathering not found or not authorized');
+  if (!gathering) throw new NotFoundError('Gathering not found or not authorized');
 
   return prisma.gathering.update({
     where: { id: gatheringId },
@@ -223,7 +224,7 @@ export async function updateGathering(userId: string, gatheringId: string, dto: 
 
 export async function cancelGathering(userId: string, gatheringId: string) {
   const gathering = await prisma.gathering.findFirst({ where: { id: gatheringId, hostId: userId } });
-  if (!gathering) throw new Error('Gathering not found or not authorized');
+  if (!gathering) throw new NotFoundError('Gathering not found or not authorized');
 
   // Fetch participants before deleting so we can notify them
   const participants = await prisma.gatheringParticipant.findMany({
@@ -245,7 +246,7 @@ export async function cancelGathering(userId: string, gatheringId: string) {
 
 export async function rsvp(userId: string, gatheringId: string, dto: RsvpDtoType) {
   const gathering = await prisma.gathering.findUnique({ where: { id: gatheringId } });
-  if (!gathering) throw new Error('Gathering not found');
+  if (!gathering) throw new NotFoundError('Gathering not found');
 
   const existing = await prisma.gatheringParticipant.findFirst({ where: { gatheringId, userId } });
 
@@ -271,11 +272,11 @@ export async function rsvp(userId: string, gatheringId: string, dto: RsvpDtoType
 
 export async function leaveGathering(userId: string, gatheringId: string) {
   const gathering = await prisma.gathering.findUnique({ where: { id: gatheringId } });
-  if (!gathering) throw new Error('Gathering not found');
-  if (gathering.hostId === userId) throw new Error('Host cannot leave — cancel the gathering instead');
+  if (!gathering) throw new NotFoundError('Gathering not found');
+  if (gathering.hostId === userId) throw new ValidationError('Host cannot leave — cancel the gathering instead');
 
   const participant = await prisma.gatheringParticipant.findFirst({ where: { gatheringId, userId } });
-  if (!participant) throw new Error('Not a participant');
+  if (!participant) throw new ForbiddenError('Not a participant');
 
   await prisma.gatheringParticipant.delete({ where: { gatheringId_userId: { gatheringId, userId } } });
   return { message: 'Left gathering' };

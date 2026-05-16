@@ -4,3 +4,5 @@ export { FolderCard } from './FolderCard';
 export { FlashCard } from './FlashCard';
 export { ChatBubble } from './ChatBubble';
 export { CreditBadge } from './CreditBadge';
+export { ClaimCreditButton } from './ClaimCreditButton';
+export { SetActionSheet } from './SetActionSheet';

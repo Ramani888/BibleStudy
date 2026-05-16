@@ -2,20 +2,18 @@ import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
+import { ClaimCreditButton } from '../../components/domain';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState, ErrorState } from '../../components/feedback';
-import { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from '../../hooks';
+import { useCreditBalance, useCreditTransactions } from '../../hooks';
 
 const BALANCE_ICON_SIZE = 32;
-const CLAIM_ICON_SIZE = 16;
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
@@ -37,25 +35,6 @@ const AMOUNT_COLOR: Record<TransactionType, string> = {
 
 function BalanceCard() {
   const { data, isLoading } = useCreditBalance();
-  const { mutate: claim, isPending } = useClaimDailyLogin();
-
-  const handleClaim = () => {
-    claim(undefined, {
-      onSuccess: res => {
-        Toast.show({
-          type: 'success',
-          text1: `+${res.transaction.amount} credit claimed!`,
-          text2: `Balance: ${res.balance}`,
-        });
-      },
-      onError: (err: unknown) =>
-        Toast.show({
-          type: 'error',
-          text1: 'Already claimed today',
-          text2: getErrorMessage(err),
-        }),
-    });
-  };
 
   return (
     <Card style={styles.balanceCard} shadow="md">
@@ -73,18 +52,7 @@ function BalanceCard() {
           <Typography preset="h4" color={colors.textSecondary}>credits</Typography>
         </View>
       )}
-      <Pressable
-        style={({ pressed }) => [styles.claimBtn, { opacity: pressed || isPending ? 0.65 : 1 }]}
-        onPress={handleClaim}
-        disabled={isPending}
-      >
-        <View style={styles.claimBtnContent}>
-          {!isPending && <Icon name="star-outline" size={CLAIM_ICON_SIZE} color={colors.primary} />}
-          <Typography preset="label" color={colors.primary}>
-            {isPending ? 'Claiming…' : 'Claim daily credit (+1)'}
-          </Typography>
-        </View>
-      </Pressable>
+      <ClaimCreditButton />
     </Card>
   );
 }
@@ -175,15 +143,6 @@ const styles = StyleSheet.create({
   balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
   balanceLabel: { letterSpacing: 1, fontSize: 11 },
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
-  claimBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  claimBtn: {
-    borderWidth: 1.5,
-    borderColor: colors.primaryLight,
-    borderRadius: 12,
-    paddingVertical: spacing[3],
-    alignItems: 'center',
-    backgroundColor: colors.primarySurface,
-  },
   historyTitle: { marginBottom: spacing[2] },
   txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing[3], gap: spacing[3] },
   txLeft: { flex: 1, gap: spacing[1] },

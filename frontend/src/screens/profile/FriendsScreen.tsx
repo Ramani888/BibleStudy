@@ -11,6 +11,7 @@ import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
+import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -37,9 +38,7 @@ export function FriendsScreen({ navigation }: Props) {
       style={styles.friendRow}
       onPress={() => navigation.navigate('UserProfile', { userId: item.friendId })}
     >
-      <View style={styles.avatar}>
-        <Icon name="person" size={20} color={colors.textSecondary} />
-      </View>
+      <Avatar uri={item.friend.profileImage ?? null} name={item.friend.name ?? ''} size="sm" />
       <View style={styles.info}>
         <Typography preset="body">{item.friend.name}</Typography>
         {item.friend.church ? (
@@ -108,14 +107,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: colors.border,
     gap: spacing[3],
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   info: { flex: 1 },
 });
