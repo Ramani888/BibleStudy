@@ -3,6 +3,7 @@ import {
   FlatList,
   Pressable,
   StyleSheet,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -13,7 +14,6 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { colors, layout, spacing } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { useFriends, useRemoveFriend } from '../../hooks/useFriends';
@@ -56,18 +56,20 @@ export function FriendsScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <View style={styles.actions}>
-        <Button
-          label="Find Friends"
-          variant="outline"
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.outlineBtn]}
           onPress={() => navigation.navigate('SearchUsers')}
-          style={styles.actionBtn}
-        />
-        <Button
-          label="Requests"
-          variant="outline"
+          activeOpacity={0.7}
+        >
+          <Typography preset="button" color={colors.primary}>Find Friends</Typography>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.actionBtn, styles.outlineBtn]}
           onPress={() => navigation.navigate('FriendRequests')}
-          style={styles.actionBtn}
-        />
+          activeOpacity={0.7}
+        >
+          <Typography preset="button" color={colors.primary}>Requests</Typography>
+        </TouchableOpacity>
       </View>
 
       <FlatList
@@ -98,6 +100,15 @@ const styles = StyleSheet.create({
     padding: layout.screenPaddingH,
   },
   actionBtn: { flex: 1 },
+  outlineBtn: {
+    height: layout.buttonHeight,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    borderColor: colors.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing[4],
+  },
   list: { paddingHorizontal: layout.screenPaddingH },
   emptyContainer: { flex: 1, justifyContent: 'center' },
   friendRow: {
