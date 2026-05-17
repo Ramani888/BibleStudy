@@ -15,7 +15,7 @@ export {
 } from './useCards';
 export { useCreditBalance, useCreditTransactions, useClaimDailyLogin } from './useCredits';
 export { useConfirmDialog } from './useConfirmDialog';
-export { useUpdateProfile, useChangePassword, useDeleteAccount } from './useProfile';
+export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useStudySession } from './useStudySession';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';

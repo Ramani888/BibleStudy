@@ -19,9 +19,3 @@ export function useChangePassword() {
     mutationFn: (payload: ChangePasswordPayload) => usersApi.changePassword(payload),
   });
 }
-
-export function useDeleteAccount() {
-  return useMutation({
-    mutationFn: usersApi.deleteAccount,
-  });
-}

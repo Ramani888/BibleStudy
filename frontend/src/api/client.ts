@@ -1,6 +1,8 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
+import { queryClient } from '../lib/queryClient';
+import { useAuthStore } from '../store/auth.store';
 
 const BASE_URL = Config.API_BASE_URL ?? 'http://10.0.2.2:3010/api/v1';
 
@@ -59,7 +61,6 @@ apiClient.interceptors.response.use(
 
       await storage.setAccessToken(newAccessToken);
 
-      // Update store without importing it (avoids circular deps)
       original.headers.Authorization = `Bearer ${newAccessToken}`;
       drainQueue(newAccessToken);
 
@@ -67,7 +68,8 @@ apiClient.interceptors.response.use(
     } catch {
       // Refresh failed — force logout by clearing tokens
       await storage.clearTokens();
-      // Signal the auth store to reset (store listens to this event)
+      queryClient.clear();
+      useAuthStore.getState().reset();
       refreshQueue = [];
       return Promise.reject(error);
     } finally {

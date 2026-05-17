@@ -1,7 +1,9 @@
 import { create } from 'zustand';
 import { authApi } from '../api/auth.api';
+import { usersApi } from '../api/users.api';
 import { storage } from '../utils/storage';
 import { removeDeviceToken } from '../utils/notifications';
+import { queryClient } from '../lib/queryClient';
 import type { User } from '../types';
 import type {
   LoginPayload,
@@ -22,6 +24,7 @@ interface AuthState {
   verifyEmail: (payload: VerifyEmailPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
   logout: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
   resetPassword: (payload: ResetPasswordPayload) => Promise<void>;
   updateUser: (user: User) => void;
@@ -63,12 +66,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   verifyEmail: async (payload: VerifyEmailPayload) => {
     const result = await authApi.verifyEmail(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
+    queryClient.clear();
     set({ user: result.user, isAuthenticated: true });
   },
 
   login: async (payload: LoginPayload) => {
     const result = await authApi.login(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
+    queryClient.clear();
     set({ user: result.user, isAuthenticated: true });
   },
 
@@ -76,6 +81,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       await removeDeviceToken();
       await authApi.logout();
+    } finally {
+      await storage.clearTokens();
+      get().reset();
+    }
+  },
+
+  deleteAccount: async () => {
+    try {
+      await removeDeviceToken();
+      await usersApi.deleteAccount();
     } finally {
       await storage.clearTokens();
       get().reset();
@@ -92,5 +107,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   updateUser: (user: User) => set({ user }),
 
-  reset: () => set({ user: null, isAuthenticated: false }),
+  reset: () => {
+    queryClient.clear();
+    set({ user: null, isAuthenticated: false });
+  },
 }));

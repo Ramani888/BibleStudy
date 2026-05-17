@@ -8,7 +8,7 @@ import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
 import { Divider } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useDeleteAccount, useConfirmDialog } from '../../hooks';
+import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, spacing } from '../../theme';
 
@@ -16,8 +16,7 @@ const APP_VERSION = '1.0.0';
 
 export function SettingsScreen() {
   const logout = useAuthStore(s => s.logout);
-  const reset = useAuthStore(s => s.reset);
-  const { mutateAsync: deleteAccountAsync } = useDeleteAccount();
+  const deleteAccount = useAuthStore(s => s.deleteAccount);
   const { show, dialogProps } = useConfirmDialog();
 
   const handleSignOut = () => {
@@ -38,8 +37,7 @@ export function SettingsScreen() {
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await deleteAccountAsync();
-          reset();
+          await deleteAccount();
           Toast.show({ type: 'success', text1: 'Account deleted' });
         } catch (err) {
           Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });

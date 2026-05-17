@@ -2,24 +2,16 @@ import React, { useEffect } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import { enableScreens } from 'react-native-screens';
 
+import { queryClient } from './src/lib/queryClient';
 import { useAuthStore } from './src/store';
 import { RootNavigator } from './src/navigation';
 
 // Enable native screens for better performance
 enableScreens(true);
-
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      staleTime: 1000 * 60 * 5, // 5 min
-    },
-  },
-});
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);
