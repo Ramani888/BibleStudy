@@ -72,8 +72,10 @@ export async function sendRequest(senderId: string, receiverId: string) {
   });
   if (pendingRequest) throw new ConflictError('Friend request already pending');
 
-  const request = await prisma.friendRequest.create({
-    data: { senderId, receiverId },
+  const request = await prisma.friendRequest.upsert({
+    where: { senderId_receiverId: { senderId, receiverId } },
+    create: { senderId, receiverId },
+    update: { status: 'PENDING', updatedAt: new Date() },
     include: { sender: { select: friendSelect }, receiver: { select: friendSelect } },
   });
 

@@ -101,6 +101,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         data={users}
         keyExtractor={item => item.id}
         renderItem={renderItem}
+        extraData={sentIds}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           debouncedQuery.length > 1 && !isFetching ? (
