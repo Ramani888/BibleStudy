@@ -225,7 +225,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
               label="Send Friend Request"
               variant="primary"
               onPress={handleSendRequest}
-              loading={sendRequest.isPending}
+              loading={sendRequest.isPending || isFetching}
               fullWidth
             />
           )}

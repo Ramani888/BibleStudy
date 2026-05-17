@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -24,6 +24,7 @@ type Props = ProfileScreenProps<'SearchUsers'>;
 export function SearchUsersScreen({ navigation }: Props) {
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const { data: users = [], isFetching } = useSearchUsers(debouncedQuery);
   const sendRequest = useSendFriendRequest();
 
@@ -32,16 +33,25 @@ export function SearchUsersScreen({ navigation }: Props) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  const handleAdd = (user: UserProfile) => {
+  // Clear local sent-IDs when search results refresh with updated data so the
+  // server-returned pendingRequest field takes over as the source of truth.
+  useEffect(() => {
+    if (!isFetching) setSentIds(new Set());
+  }, [isFetching]);
+
+  const handleAdd = useCallback((user: UserProfile) => {
     sendRequest.mutate(user.id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: `Friend request sent to ${user.name}` }),
+      onSuccess: () => {
+        setSentIds(prev => new Set(prev).add(user.id));
+        Toast.show({ type: 'success', text1: `Friend request sent to ${user.name}` });
+      },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  };
+  }, [sendRequest]);
 
-  const renderItem = ({ item }: { item: UserProfile }) => {
+  const renderItem = useCallback(({ item }: { item: UserProfile }) => {
     const isFriend = !!item.isFriend;
-    const isPending = !!item.pendingRequest;
+    const isPending = !!item.pendingRequest || sentIds.has(item.id);
     return (
       <View style={styles.userRow}>
         <Pressable
@@ -72,7 +82,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         )}
       </View>
     );
-  };
+  }, [sentIds, handleAdd, navigation, sendRequest.isPending]);
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>

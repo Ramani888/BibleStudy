@@ -78,8 +78,7 @@ export async function sendRequest(senderId: string, receiverId: string) {
   });
 
   // Notify receiver
-  const sender = await prisma.user.findUnique({ where: { id: senderId }, select: { name: true } });
-  await sendPushToUser(receiverId, 'New Friend Request', `${sender?.name} wants to be your friend`, {
+  await sendPushToUser(receiverId, 'New Friend Request', `${request.sender?.name} wants to be your friend`, {
     type: 'friend_request',
     id: request.id,
   });
