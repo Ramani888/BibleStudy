@@ -34,7 +34,11 @@ export function useSendFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (receiverId: string) => friendsApi.sendRequest(receiverId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+    onSuccess: (_data, receiverId) => {
+      qc.invalidateQueries({ queryKey: ['users', receiverId] });
+      qc.invalidateQueries({ queryKey: ['friends', 'requests', 'outgoing'] });
+      qc.invalidateQueries({ queryKey: ['users', 'search'] });
+    },
   });
 }
 
@@ -42,7 +46,11 @@ export function useAcceptFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (requestId: string) => friendsApi.acceptRequest(requestId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['friends'] });
+      qc.invalidateQueries({ queryKey: ['friends', 'requests', 'incoming'] });
+      qc.invalidateQueries({ queryKey: ['users'] });
+    },
   });
 }
 
@@ -50,25 +58,9 @@ export function useRejectFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (requestId: string) => friendsApi.rejectRequest(requestId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends', 'requests', 'incoming'] }),
-  });
-}
-
-export function useRemoveFriend() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (friendId: string) => friendsApi.remove(friendId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
-  });
-}
-
-export function useBlockUser() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (userId: string) => friendsApi.block(userId),
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['friends'] });
-      qc.invalidateQueries({ queryKey: ['friends', 'blocked'] });
+      qc.invalidateQueries({ queryKey: ['friends', 'requests', 'incoming'] });
+      qc.invalidateQueries({ queryKey: ['users'] });
     },
   });
 }
@@ -77,7 +69,36 @@ export function useCancelFriendRequest() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (requestId: string) => friendsApi.cancelRequest(requestId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['friends', 'requests', 'outgoing'] });
+      qc.invalidateQueries({ queryKey: ['users'] });
+      qc.invalidateQueries({ queryKey: ['users', 'search'] });
+    },
+  });
+}
+
+export function useRemoveFriend() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (friendId: string) => friendsApi.remove(friendId),
+    onSuccess: (_data, friendId) => {
+      qc.invalidateQueries({ queryKey: ['friends'] });
+      qc.invalidateQueries({ queryKey: ['users', friendId] });
+      qc.invalidateQueries({ queryKey: ['users', 'search'] });
+    },
+  });
+}
+
+export function useBlockUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: string) => friendsApi.block(userId),
+    onSuccess: (_data, userId) => {
+      qc.invalidateQueries({ queryKey: ['friends', 'blocked'] });
+      qc.invalidateQueries({ queryKey: ['friends'] });
+      qc.invalidateQueries({ queryKey: ['users', userId] });
+      qc.invalidateQueries({ queryKey: ['users', 'search'] });
+    },
   });
 }
 
@@ -85,6 +106,9 @@ export function useUnblockUser() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (userId: string) => friendsApi.unblock(userId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['friends', 'blocked'] }),
+    onSuccess: (_data, userId) => {
+      qc.invalidateQueries({ queryKey: ['friends', 'blocked'] });
+      qc.invalidateQueries({ queryKey: ['users', userId] });
+    },
   });
 }

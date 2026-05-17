@@ -39,25 +39,40 @@ export function SearchUsersScreen({ navigation }: Props) {
     });
   };
 
-  const renderItem = ({ item }: { item: UserProfile }) => (
-    <View style={styles.userRow}>
-      <Pressable
-        style={styles.userInfo}
-        onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
-      >
-        <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
-        <View>
-          <Typography preset="body">{item.name}</Typography>
-          {item.church ? (
-            <Typography preset="caption" color={colors.textSecondary}>{item.church}</Typography>
-          ) : null}
-        </View>
-      </Pressable>
-      <Pressable style={styles.addBtn} onPress={() => handleAdd(item)} hitSlop={8}>
-        <Icon name="person-add-outline" size={20} color={colors.primary} />
-      </Pressable>
-    </View>
-  );
+  const renderItem = ({ item }: { item: UserProfile }) => {
+    const isFriend = !!item.isFriend;
+    const isPending = !!item.pendingRequest;
+    return (
+      <View style={styles.userRow}>
+        <Pressable
+          style={styles.userInfo}
+          onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
+        >
+          <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
+          <View>
+            <Typography preset="body">{item.name}</Typography>
+            {item.church ? (
+              <Typography preset="caption" color={colors.textSecondary}>{item.church}</Typography>
+            ) : null}
+          </View>
+        </Pressable>
+        {isFriend ? (
+          <Icon name="checkmark-circle" size={24} color={colors.success} />
+        ) : isPending ? (
+          <Icon name="time-outline" size={24} color={colors.textSecondary} />
+        ) : (
+          <Pressable
+            style={styles.addBtn}
+            onPress={() => handleAdd(item)}
+            hitSlop={8}
+            disabled={sendRequest.isPending}
+          >
+            <Icon name="person-add-outline" size={20} color={colors.primary} />
+          </Pressable>
+        )}
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container} edges={['bottom']}>

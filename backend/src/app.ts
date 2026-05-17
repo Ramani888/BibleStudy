@@ -1,3 +1,4 @@
+import 'express-async-errors'; // must be first — patches Express 4 async error propagation
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import { env } from './config/env';

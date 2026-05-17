@@ -4,6 +4,8 @@ export interface UserProfile {
   profileImage: string | null;
   bio: string | null;
   church: string | null;
+  isFriend?: boolean;
+  pendingRequest?: { id: string; direction: 'incoming' | 'outgoing' } | null;
 }
 
 export interface FriendRequest {

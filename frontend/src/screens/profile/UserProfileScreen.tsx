@@ -30,7 +30,7 @@ import { colors, layout, spacing } from '../../theme';
 
 type Props = ProfileScreenProps<'UserProfile'>;
 
-export function UserProfileScreen({ route }: Props) {
+export function UserProfileScreen({ route, navigation }: Props) {
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, error, refetch } = useUser(userId);
@@ -93,14 +93,20 @@ export function UserProfileScreen({ route }: Props) {
 
   const handleRemoveFriend = () => {
     removeFriend.mutate(userId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Friend removed' }),
+      onSuccess: () => {
+        Toast.show({ type: 'success', text1: 'Friend removed' });
+        navigation.goBack();
+      },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
 
   const handleBlock = () => {
     blockUser.mutate(userId, {
-      onSuccess: () => Toast.show({ type: 'info', text1: 'User blocked' }),
+      onSuccess: () => {
+        Toast.show({ type: 'success', text1: 'User blocked' });
+        navigation.goBack();
+      },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };

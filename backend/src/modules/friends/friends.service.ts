@@ -202,15 +202,7 @@ export async function searchUsers(userId: string, query: string, page = 1, limit
     select: { blockerId: true, blockedId: true },
   });
   const blockedIds = blocks.map(b => (b.blockerId === userId ? b.blockedId : b.blockerId));
-
-  // Get friend IDs
-  const friendships = await prisma.friendship.findMany({
-    where: { userId },
-    select: { friendId: true },
-  });
-  const friendIds = friendships.map(f => f.friendId);
-
-  const excludeIds = [...new Set([userId, ...blockedIds, ...friendIds])];
+  const excludeIds = [userId, ...blockedIds];
 
   const users = await prisma.user.findMany({
     where: {
@@ -220,7 +212,44 @@ export async function searchUsers(userId: string, query: string, page = 1, limit
     select: friendSelect,
     skip,
     take: limit,
+    orderBy: { name: 'asc' },
   });
 
-  return users;
+  if (users.length === 0) return [];
+
+  const userIds = users.map(u => u.id);
+
+  const [friendships, pendingRequests] = await Promise.all([
+    prisma.friendship.findMany({
+      where: { userId, friendId: { in: userIds } },
+      select: { friendId: true },
+    }),
+    prisma.friendRequest.findMany({
+      where: {
+        status: 'PENDING',
+        OR: [
+          { senderId: userId, receiverId: { in: userIds } },
+          { senderId: { in: userIds }, receiverId: userId },
+        ],
+      },
+      select: { id: true, senderId: true, receiverId: true },
+    }),
+  ]);
+
+  const friendSet = new Set(friendships.map(f => f.friendId));
+  const requestMap = new Map(
+    pendingRequests.map(r => [
+      r.senderId === userId ? r.receiverId : r.senderId,
+      {
+        id: r.id,
+        direction: (r.senderId === userId ? 'outgoing' : 'incoming') as 'outgoing' | 'incoming',
+      },
+    ])
+  );
+
+  return users.map(u => ({
+    ...u,
+    isFriend: friendSet.has(u.id),
+    pendingRequest: requestMap.get(u.id) ?? null,
+  }));
 }

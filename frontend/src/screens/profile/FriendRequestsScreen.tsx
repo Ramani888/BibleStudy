@@ -48,6 +48,13 @@ export function FriendRequestsScreen(_props: Props) {
     });
   };
 
+  const handleCancel = (requestId: string) => {
+    cancel.mutate(requestId, {
+      onSuccess: () => Toast.show({ type: 'info', text1: 'Request cancelled' }),
+      onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
+    });
+  };
+
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
@@ -59,30 +66,23 @@ export function FriendRequestsScreen(_props: Props) {
             <Typography preset="caption" color={colors.textSecondary}>{person.church}</Typography>
           ) : null}
         </View>
-        {tab === 'incoming' && (
-          <View style={styles.actions}>
-            <Pressable style={[styles.btn, styles.acceptBtn]} onPress={() => handleAccept(item.id)}>
-              <Icon name="checkmark" size={18} color={colors.textOnPrimary} />
+        {tab === 'incoming' ? (
+          <View style={styles.requestActions}>
+            <Pressable onPress={() => handleAccept(item.id)} hitSlop={8}>
+              <Icon name="checkmark-circle-outline" size={28} color={colors.success} />
             </Pressable>
-            <Pressable style={[styles.btn, styles.rejectBtn]} onPress={() => handleReject(item.id)}>
-              <Icon name="close" size={18} color={colors.textOnPrimary} />
+            <Pressable onPress={() => handleReject(item.id)} hitSlop={8}>
+              <Icon name="close-circle-outline" size={28} color={colors.error} />
             </Pressable>
           </View>
-        )}
-        {tab === 'outgoing' && (
-          <Pressable
-            style={[styles.btn, styles.rejectBtn]}
-            onPress={() => cancel.mutate(item.id, {
-              onSuccess: () => Toast.show({ type: 'info', text1: 'Request cancelled' }),
-              onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-            })}
-          >
-            <Icon name="close" size={18} color={colors.textOnPrimary} />
+        ) : (
+          <Pressable onPress={() => handleCancel(item.id)} hitSlop={8}>
+            <Icon name="close-circle-outline" size={28} color={colors.textSecondary} />
           </Pressable>
         )}
       </View>
     );
-  }, [tab, handleAccept, handleReject, cancel]);
+  }, [tab, handleAccept, handleReject, handleCancel]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
@@ -142,8 +142,5 @@ const styles = StyleSheet.create({
     gap: spacing[3],
   },
   info: { flex: 1 },
-  actions: { flexDirection: 'row', gap: spacing[2] },
-  btn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-  acceptBtn: { backgroundColor: colors.success },
-  rejectBtn: { backgroundColor: colors.error },
+  requestActions: { flexDirection: 'row', gap: spacing[2] },
 });
