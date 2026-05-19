@@ -14,6 +14,8 @@ import { Typography } from '../../../components/ui';
 
 const SEND_ICON_SIZE = 20;
 const CREDIT_ICON_SIZE = 12;
+const MAX_LENGTH = 1000;
+const WARN_THRESHOLD = 900;
 
 interface ChatInputProps {
   onSend: (text: string) => void;
@@ -26,6 +28,8 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
   const insets = useSafeAreaInsets();
 
   const canSend = text.trim().length > 0 && !disabled;
+  const showCounter = text.length > 0;
+  const counterColor = text.length >= WARN_THRESHOLD ? colors.error : colors.textDisabled;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -34,54 +38,67 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
     onSend(msg);
   };
 
-  return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
-    >
-      <View style={[styles.container, { paddingBottom: insets.bottom + spacing[2] }]}>
-        {creditBalance !== undefined && (
-          <View style={styles.creditRow}>
-            <Icon
-              name="star"
-              size={CREDIT_ICON_SIZE}
-              color={creditBalance > 0 ? colors.textSecondary : colors.error}
-            />
-            <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.error}>
-              {creditBalance > 0
-                ? `${creditBalance} credits remaining`
-                : 'No credits — claim your daily credit first'}
-            </Typography>
-          </View>
-        )}
-
-        <View style={styles.inputRow}>
-          <TextInput
-            style={[styles.input, disabled && styles.inputDisabled]}
-            placeholder="Ask a Bible question…"
-            placeholderTextColor={colors.textDisabled}
-            value={text}
-            onChangeText={setText}
-            multiline
-            maxLength={1000}
-            returnKeyType="default"
-            editable={!disabled}
-            onSubmitEditing={handleSend}
+  const inputContent = (
+    <View style={[styles.container, { paddingBottom: insets.bottom + spacing[2] }]}>
+      {creditBalance !== undefined && (
+        <View style={styles.creditRow}>
+          <Icon
+            name="star"
+            size={CREDIT_ICON_SIZE}
+            color={creditBalance > 0 ? colors.textSecondary : colors.error}
           />
-          <Pressable
-            style={[styles.sendBtn, canSend ? styles.sendBtnActive : styles.sendBtnDisabled]}
-            onPress={handleSend}
-            disabled={!canSend}
-            hitSlop={8}
-          >
-            <Icon
-              name="arrow-up"
-              size={SEND_ICON_SIZE}
-              color={canSend ? colors.textOnPrimary : colors.textDisabled}
-            />
-          </Pressable>
+          <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.error}>
+            {creditBalance > 0
+              ? `${creditBalance} credits remaining`
+              : 'No credits — claim your daily credit first'}
+          </Typography>
         </View>
+      )}
+
+      <View style={styles.inputRow}>
+        <TextInput
+          style={[styles.input, disabled && styles.inputDisabled]}
+          placeholder="Ask a Bible question…"
+          placeholderTextColor={colors.textDisabled}
+          value={text}
+          onChangeText={setText}
+          multiline
+          maxLength={MAX_LENGTH}
+          returnKeyType="default"
+          editable={!disabled}
+        />
+        <Pressable
+          style={[styles.sendBtn, canSend ? styles.sendBtnActive : styles.sendBtnDisabled]}
+          onPress={handleSend}
+          disabled={!canSend}
+          hitSlop={8}
+        >
+          <Icon
+            name="arrow-up"
+            size={SEND_ICON_SIZE}
+            color={canSend ? colors.textOnPrimary : colors.textDisabled}
+          />
+        </Pressable>
       </View>
+
+      {showCounter && (
+        <Typography preset="caption" color={counterColor} style={styles.counter}>
+          {text.length} / {MAX_LENGTH}
+        </Typography>
+      )}
+    </View>
+  );
+
+  // Android uses adjustResize (set in AndroidManifest.xml) — the system already
+  // shifts the layout up when the keyboard appears, so wrapping with
+  // KeyboardAvoidingView would double-shift. iOS needs it for padding behavior.
+  if (Platform.OS === 'android') {
+    return inputContent;
+  }
+
+  return (
+    <KeyboardAvoidingView behavior="padding">
+      {inputContent}
     </KeyboardAvoidingView>
   );
 }
@@ -134,5 +151,8 @@ const styles = StyleSheet.create({
   },
   sendBtnDisabled: {
     backgroundColor: colors.gray200,
+  },
+  counter: {
+    textAlign: 'right',
   },
 });

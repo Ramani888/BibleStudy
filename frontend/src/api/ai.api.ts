@@ -1,5 +1,5 @@
-import { apiGet, apiPost } from './client';
-import type { AIChatPayload, AIChatResponse, AIChat, DailyVerse } from '../types';
+import { apiDelete, apiGet, apiPatch, apiPost } from './client';
+import type { AIChatPayload, AIChatResponse, BookmarkedChat, ChatSession, DailyVerse } from '../types';
 
 interface ChatHistoryParams {
   page?: number;
@@ -13,8 +13,13 @@ interface Pagination {
   pages: number;
 }
 
-interface PaginatedChats {
-  chats: AIChat[];
+interface PaginatedSessions {
+  sessions: ChatSession[];
+  pagination: Pagination;
+}
+
+interface PaginatedBookmarks {
+  bookmarks: BookmarkedChat[];
   pagination: Pagination;
 }
 
@@ -26,5 +31,26 @@ export const aiApi = {
     apiPost<AIChatResponse>('/ai/chat', payload),
 
   getHistory: (params?: ChatHistoryParams) =>
-    apiGet<PaginatedChats>('/ai/history', params),
+    apiGet<PaginatedSessions>('/ai/history', params),
+
+  deleteSession: (sessionId: string) =>
+    apiDelete(`/ai/history/${sessionId}`),
+
+  clearHistory: () =>
+    apiDelete('/ai/history'),
+
+  renameSession: (sessionId: string, title: string) =>
+    apiPatch<void>(`/ai/history/${sessionId}/title`, { title }),
+
+  updateTags: (sessionId: string, tags: string[]) =>
+    apiPatch<void>(`/ai/history/${sessionId}/tags`, { tags }),
+
+  getBookmarks: (params?: ChatHistoryParams) =>
+    apiGet<PaginatedBookmarks>('/ai/bookmarks', params),
+
+  addBookmark: (chatId: string) =>
+    apiPost<void>('/ai/bookmarks', { chatId }),
+
+  removeBookmark: (chatId: string) =>
+    apiDelete(`/ai/bookmarks/${chatId}`),
 };

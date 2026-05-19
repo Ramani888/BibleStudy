@@ -1,6 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
+import type { ChatSession } from '../types';
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
 export type AuthStackParamList = {
@@ -26,7 +27,9 @@ export type LibraryStackParamList = {
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
 export type AIStackParamList = {
-  AIChat: undefined;
+  // Pass an existing session to pre-populate and continue that conversation.
+  // Omit or pass undefined to start a fresh conversation.
+  AIChat: { session: ChatSession } | undefined;
   ChatHistory: undefined;
 };
 

@@ -1,5 +1,15 @@
 export { useDailyVerse } from './useDailyVerse';
-export { useAIChat, useAIChatHistory } from './useAI';
+export {
+  useAIChat,
+  useAIChatHistory,
+  useDeleteSession,
+  useClearHistory,
+  useRenameSession,
+  useUpdateSessionTags,
+  useBookmarks,
+  useAddBookmark,
+  useRemoveBookmark,
+} from './useAI';
 export { useSets, useSet, useCreateSet, useUpdateSet, useDeleteSet, useCloneSet, usePublicSets } from './useSets';
 export { useFolders, useFolder, useCreateFolder, useUpdateFolder, useDeleteFolder } from './useFolders';
 export {

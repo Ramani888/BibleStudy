@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "dev:remote": "powershell -ExecutionPolicy Bypass -File ./start-dev.ps1",
+    "tunnel": "ssh -o StrictHostKeyChecking=accept-new -L 5433:localhost:5432 deploy@46.225.189.44 -N",
     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",

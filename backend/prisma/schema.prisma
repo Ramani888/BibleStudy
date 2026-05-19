@@ -35,6 +35,8 @@ model User {
   sets                    Set[]
   cards                   Card[]
   aiChats                 AIChat[]
+  aiChatSessions          AIChatSession[]
+  bookmarks               Bookmark[]
   creditTransactions      CreditTransaction[]
   sentFriendRequests      FriendRequest[]       @relation("SentRequests")
   receivedFriendRequests  FriendRequest[]       @relation("ReceivedRequests")
@@ -146,14 +148,41 @@ model CreditTransaction {
 }
 
 model AIChat {
-  id          String   @id @default(uuid())
+  id          String     @id @default(uuid())
   userId      String
+  sessionId   String?
   question    String
   answer      String
-  creditsUsed Int      @default(1)
-  createdAt   DateTime @default(now())
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creditsUsed Int        @default(1)
+  createdAt   DateTime   @default(now())
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks   Bookmark[]
 
+  @@index([userId])
+  @@index([sessionId])
+}
+
+model AIChatSession {
+  id        String   @id
+  userId    String
+  title     String?
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Bookmark {
+  id        String   @id @default(uuid())
+  userId    String
+  chatId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  chat      AIChat   @relation(fields: [chatId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, chatId])
   @@index([userId])
 }
 

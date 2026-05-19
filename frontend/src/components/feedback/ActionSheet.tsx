@@ -24,7 +24,7 @@ interface ActionSheetProps {
 
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
   return (
-    <AppModal visible={visible} title={title} onClose={onClose} animationType="slide">
+    <AppModal visible={visible} title={title} onClose={onClose} animationType="slide" showHandle>
       <View style={styles.list}>
         {actions.map((action, i) => (
           <React.Fragment key={action.label}>
@@ -32,8 +32,13 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
             <Pressable
               style={({ pressed }) => [styles.item, { opacity: pressed || action.disabled ? 0.5 : 1 }]}
               onPress={() => {
+                // Capture the handler before closing — the closure retains the
+                // correct state even after the parent re-renders with cleared state.
+                const fn = action.onPress;
                 onClose();
-                action.onPress();
+                // Delay until the slide-down animation finishes (~300ms) so the
+                // next modal/dialog doesn't appear while this sheet is still on screen.
+                setTimeout(fn, 300);
               }}
               disabled={action.disabled}
             >
