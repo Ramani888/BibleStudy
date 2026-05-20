@@ -23,7 +23,8 @@ export {
   useReorderCards,
   useRecordStudy,
 } from './useCards';
-export { useCreditBalance, useCreditTransactions, useWeeklyCredits } from './useCredits';
+export { useCreditBalance, useCreditTransactions, useCreditStats } from './useCredits';
+export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useConfirmDialog } from './useConfirmDialog';
 export { useUpdateProfile, useChangePassword } from './useProfile';

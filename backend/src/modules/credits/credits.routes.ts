@@ -8,6 +8,7 @@ router.use(authMiddleware);
 
 router.get('/balance', creditsController.getBalance);
 router.get('/transactions', creditsController.getTransactions);
+router.get('/stats', creditsController.getStats);
 router.post('/daily-login', creditsController.claimDailyLogin);
 
 export default router;

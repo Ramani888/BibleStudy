@@ -25,6 +25,8 @@ interface DailyLoginResult {
   message: string;
 }
 
+interface StatPoint { label: string; earned: number; used: number; }
+
 export const creditsApi = {
   getBalance: () =>
     apiGet<CreditBalance>('/credits/balance'),
@@ -34,4 +36,12 @@ export const creditsApi = {
 
   claimDailyLogin: () =>
     apiPost<DailyLoginResult>('/credits/daily-login'),
+
+  getStats: (period: string, from?: Date, to?: Date, interval?: string) =>
+    apiGet<StatPoint[]>('/credits/stats', {
+      period,
+      ...(from     && { from:     from.toISOString()     }),
+      ...(to       && { to:       to.toISOString()       }),
+      ...(interval && { interval                         }),
+    }),
 };
