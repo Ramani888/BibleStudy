@@ -8,7 +8,6 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ClaimCreditButton } from '../../components/domain';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState, ErrorState } from '../../components/feedback';
 import { useCreditBalance, useCreditTransactions } from '../../hooks';
@@ -52,7 +51,6 @@ function BalanceCard() {
           <Typography preset="h4" color={colors.textSecondary}>credits</Typography>
         </View>
       )}
-      <ClaimCreditButton />
     </Card>
   );
 }

@@ -10,14 +10,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ClaimCreditButton, DailyVerseCard, SetActionSheet, SetCard, CreditBadge } from '../../components/domain';
+import { DailyVerseCard, SetActionSheet, SetCard, CreditBadge } from '../../components/domain';
 import { Avatar, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 const QUICK_ACTION_ICON_SIZE = 28;
 import { SetCardSkeleton } from '../../components/feedback';
 import { useAuthStore } from '../../store';
-import { useDailyVerse, useSets, useCreditBalance } from '../../hooks';
+import { useDailyVerse, useSets, useCreditBalance, useAutoDailyClaim } from '../../hooks';
 import { useFriendsActivityFeed } from '../../hooks/useActivities';
 import { formatDate } from '../../utils/formatters';
 import { colors, layout, spacing } from '../../theme';
@@ -110,6 +110,7 @@ export function HomeScreen() {
   const { data: sets, isLoading: setsLoading, refetch: refetchSets } = useSets();
   const { data: activityData, refetch: refetchActivities } = useFriendsActivityFeed();
   const { data: creditData } = useCreditBalance();
+  useAutoDailyClaim();
 
   const recentSets = sets?.slice(0, 3) ?? [];
   const recentActivities = activityData?.pages[0]?.activities.slice(0, 5) ?? [];
@@ -170,9 +171,6 @@ export function HomeScreen() {
             <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
           </View>
         </View>
-
-        {/* ── Daily Login ── */}
-        <ClaimCreditButton />
 
         <Spacer size={spacing[5]} />
 
