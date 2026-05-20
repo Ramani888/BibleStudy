@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { creditsApi } from '../api';
+import type { CreditTransaction } from '../types';
 
 export function useCreditBalance() {
   return useQuery({
@@ -28,5 +29,38 @@ export function useClaimDailyLogin() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['credits'] });
     },
+  });
+}
+
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+type DayStat = { label: string; earned: number; used: number };
+
+function aggregateLast7Days(transactions: CreditTransaction[]): DayStat[] {
+  return Array.from({ length: 7 }, (_, i) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - i));
+    date.setHours(0, 0, 0, 0);
+    const end = new Date(date);
+    end.setHours(23, 59, 59, 999);
+
+    const dayTxs = transactions.filter(t => {
+      const d = new Date(t.createdAt);
+      return d >= date && d <= end;
+    });
+
+    return {
+      label: DAY_LABELS[date.getDay()],
+      earned: dayTxs.filter(t => t.type === 'REWARD').reduce((s, t) => s + t.amount, 0),
+      used: dayTxs.filter(t => t.type === 'USAGE').reduce((s, t) => s + Math.abs(t.amount), 0),
+    };
+  });
+}
+
+export function useWeeklyCredits() {
+  return useQuery({
+    queryKey: ['credits', 'weekly'],
+    queryFn: () => creditsApi.getTransactions({ limit: 100 }),
+    select: (data) => aggregateLast7Days(data.transactions),
   });
 }
