@@ -37,6 +37,9 @@ export const creditsApi = {
   claimDailyLogin: () =>
     apiPost<DailyLoginResult>('/credits/daily-login'),
 
+  getStreak: () =>
+    apiGet<{ streak: number; longestStreak: number }>('/credits/streak'),
+
   getStats: (period: string, from?: Date, to?: Date, interval?: string) =>
     apiGet<StatPoint[]>('/credits/stats', {
       period,

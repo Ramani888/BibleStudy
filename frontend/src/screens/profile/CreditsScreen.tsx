@@ -11,7 +11,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState, ErrorState } from '../../components/feedback';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCreditBalance, useCreditTransactions } from '../../hooks';
+import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks';
 import { WeeklyChart } from './components/WeeklyChart';
 
 const BALANCE_ICON_SIZE = 32;
@@ -37,12 +37,21 @@ const AMOUNT_COLOR: Record<TransactionType, string> = {
 
 function BalanceCard() {
   const { data, isLoading } = useCreditBalance();
+  const { data: streakData } = useStreak();
+  const streak = streakData?.streak ?? 0;
 
   return (
     <Card style={styles.balanceCard} shadow="md">
-      <Typography preset="label" color={colors.primaryDark} style={styles.balanceLabel}>
-        CURRENT BALANCE
-      </Typography>
+      <View style={styles.balanceHeader}>
+        <Typography preset="label" color={colors.primaryDark} style={styles.balanceLabel}>
+          CURRENT BALANCE
+        </Typography>
+        {streak > 0 && (
+          <View style={styles.streakBadge}>
+            <Typography preset="label" color={colors.primary}>🔥 {streak}</Typography>
+          </View>
+        )}
+      </View>
       {isLoading ? (
         <ActivityIndicator color={colors.primary} />
       ) : (
@@ -145,7 +154,16 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
   balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
+  balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
+  streakBadge: {
+    paddingHorizontal: spacing[2],
+    paddingVertical: spacing[0.5],
+    borderRadius: 12,
+    backgroundColor: colors.primarySurface,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+  },
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
   historyTitle: { marginBottom: spacing[2] },
   txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing[3], gap: spacing[3] },

@@ -36,6 +36,14 @@ export function useClaimDailyLogin() {
 
 export type DayStat = { label: string; earned: number; used: number };
 
+export function useStreak() {
+  return useQuery({
+    queryKey: ['credits', 'streak'],
+    queryFn: creditsApi.getStreak,
+    staleTime: 60_000,
+  });
+}
+
 export function useCreditStats(period: CreditStatsPeriod, from?: Date, to?: Date, interval?: CreditInterval) {
   return useQuery({
     queryKey: ['credits', 'stats', period, from?.toISOString(), to?.toISOString(), interval],

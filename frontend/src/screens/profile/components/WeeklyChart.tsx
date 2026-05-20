@@ -131,7 +131,10 @@ function EmptyView({ height = SVG_H, message = 'No activity' }: { height?: numbe
 
 // ─── Bar Chart ────────────────────────────────────────────────────────────────
 
-function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H }: { stats: DayStat[]; emptyMsg: string; maxBarH?: number }) {
+function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSelect }: {
+  stats: DayStat[]; emptyMsg: string; maxBarH?: number;
+  selectedIdx: number | null; onSelect: (i: number | null) => void;
+}) {
   const maxTotal = Math.max(...stats.map(d => d.earned + d.used), 1);
   const hasData  = stats.some(d => d.earned > 0 || d.used > 0);
   if (!hasData) return <EmptyView height={maxBarH + spacing[6]} message={emptyMsg} />;
@@ -139,13 +142,14 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H }: { stats: DayStat
   return (
     <View style={s.barBars}>
       {stats.map((day, idx) => {
-        const total   = day.earned + day.used;
-        const barH    = (total / maxTotal) * maxBarH;
-        const earnedH = total > 0 ? (day.earned / total) * barH : 0;
-        const usedH   = total > 0 ? (day.used   / total) * barH : 0;
+        const total    = day.earned + day.used;
+        const barH     = (total / maxTotal) * maxBarH;
+        const earnedH  = total > 0 ? (day.earned / total) * barH : 0;
+        const usedH    = total > 0 ? (day.used   / total) * barH : 0;
+        const selected = selectedIdx === idx;
         return (
-          <View key={idx} style={s.barCol}>
-            <View style={[s.barTrack, { height: maxBarH }]}>
+          <Pressable key={idx} style={s.barCol} onPress={() => onSelect(selected ? null : idx)}>
+            <View style={[s.barTrack, { height: maxBarH }, selected && s.barTrackSelected]}>
               {total > 0 && (
                 <View style={[s.barStack, { height: barH }]}>
                   {usedH   > 0 && <View style={[s.barSeg, { height: usedH,   backgroundColor: colors.error   }]} />}
@@ -153,8 +157,8 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H }: { stats: DayStat
                 </View>
               )}
             </View>
-            <Typography preset="caption" color={colors.textDisabled}>{day.label}</Typography>
-          </View>
+            <Typography preset="caption" color={selected ? colors.primary : colors.textDisabled}>{day.label}</Typography>
+          </Pressable>
         );
       })}
     </View>
@@ -163,7 +167,10 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H }: { stats: DayStat
 
 // ─── Line Chart ───────────────────────────────────────────────────────────────
 
-function LineChartView({ stats, width, emptyMsg, svgH = SVG_H }: { stats: DayStat[]; width: number; emptyMsg: string; svgH?: number }) {
+function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSelect }: {
+  stats: DayStat[]; width: number; emptyMsg: string; svgH?: number;
+  selectedIdx: number | null; onSelect: (i: number | null) => void;
+}) {
   const hasData = stats.some(d => d.earned > 0 || d.used > 0);
   if (!hasData) return <EmptyView height={svgH} message={emptyMsg} />;
 
@@ -187,8 +194,10 @@ function LineChartView({ stats, width, emptyMsg, svgH = SVG_H }: { stats: DaySta
         <Polyline points={usedPts}   stroke={colors.error}   strokeWidth={2} fill="none" strokeLinejoin="round" />
         {pts.map((p, i) => (
           <React.Fragment key={i}>
-            <Circle cx={p.x} cy={p.ey} r={4} fill={colors.success} />
-            <Circle cx={p.x} cy={p.uy} r={4} fill={colors.error}   />
+            <Circle cx={p.x} cy={p.ey} r={selectedIdx === i ? 6 : 4} fill={colors.success} />
+            <Circle cx={p.x} cy={p.uy} r={selectedIdx === i ? 6 : 4} fill={colors.error}   />
+            <Circle cx={p.x} cy={p.ey} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
+            <Circle cx={p.x} cy={p.uy} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
           </React.Fragment>
         ))}
       </Svg>
@@ -256,7 +265,12 @@ function DonutChartView({ stats, size = DONUT_SIZE }: { stats: DayStat[]; size?:
 
 // ─── Balance Chart ────────────────────────────────────────────────────────────
 
-function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H }: { stats: DayStat[]; currentBalance: number; width: number; svgH?: number }) {
+function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg, selectedIdx, onSelect }: {
+  stats: DayStat[]; currentBalance: number; width: number; svgH?: number; emptyMsg: string;
+  selectedIdx: number | null; onSelect: (i: number | null) => void;
+}) {
+  if (stats.length === 0) return <EmptyView height={svgH} message={emptyMsg} />;
+
   const netPerDay = stats.map(d => d.earned - d.used);
   const totalNet  = netPerDay.reduce((a, b) => a + b, 0);
   const startBal  = currentBalance - totalNet;
@@ -288,7 +302,12 @@ function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H }: { stat
         </Defs>
         <Path d={areaPath} fill="url(#balGrad)" />
         <Path d={linePath} stroke={colors.primary} strokeWidth={2} fill="none" strokeLinejoin="round" />
-        {pts.map((p, i) => <Circle key={i} cx={p.x} cy={p.y} r={4} fill={colors.primary} />)}
+        {pts.map((p, i) => (
+          <React.Fragment key={i}>
+            <Circle cx={p.x} cy={p.y} r={selectedIdx === i ? 6 : 4} fill={colors.primary} />
+            <Circle cx={p.x} cy={p.y} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
+          </React.Fragment>
+        ))}
       </Svg>
       <View style={s.xLabels}>
         {stats.map((d, i) => (
@@ -310,6 +329,8 @@ function ChartBody({
   emptyMsg,
   isLoading,
   isFullscreen = false,
+  selectedIdx,
+  onSelect,
 }: {
   stats: DayStat[];
   chartType: ChartType;
@@ -317,6 +338,8 @@ function ChartBody({
   emptyMsg: string;
   isLoading: boolean;
   isFullscreen?: boolean;
+  selectedIdx: number | null;
+  onSelect: (i: number | null) => void;
 }) {
   const [width,  setWidth]  = useState(0);
   const [height, setHeight] = useState(0);
@@ -340,13 +363,13 @@ function ChartBody({
           <ActivityIndicator color={colors.primary} />
         </View>
       ) : chartType === 'bar' ? (
-        <BarChartView stats={stats} emptyMsg={emptyMsg} maxBarH={effectiveBarH} />
+        <BarChartView stats={stats} emptyMsg={emptyMsg} maxBarH={effectiveBarH} selectedIdx={selectedIdx} onSelect={onSelect} />
       ) : chartType === 'donut' ? (
         <DonutChartView stats={stats} size={effectiveDonutSz} />
       ) : width > 0 ? (
         chartType === 'line'
-          ? <LineChartView stats={stats} width={width} emptyMsg={emptyMsg} svgH={effectiveSvgH} />
-          : <BalanceChartView stats={stats} currentBalance={currentBalance} width={width} svgH={effectiveSvgH} />
+          ? <LineChartView stats={stats} width={width} emptyMsg={emptyMsg} svgH={effectiveSvgH} selectedIdx={selectedIdx} onSelect={onSelect} />
+          : <BalanceChartView stats={stats} currentBalance={currentBalance} width={width} svgH={effectiveSvgH} emptyMsg={emptyMsg} selectedIdx={selectedIdx} onSelect={onSelect} />
       ) : (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
           <ActivityIndicator color={colors.primary} />
@@ -361,6 +384,7 @@ function ChartBody({
 export function WeeklyChart() {
   const [chartType,       setChartType]       = useState<ChartType>('bar');
   const [period,          setPeriod]          = useState<CreditStatsPeriod>('week');
+  const [selectedIdx,     setSelectedIdx]     = useState<number | null>(null);
   const [prevPeriod,      setPrevPeriod]      = useState<CreditStatsPeriod>('week');
   const [chartInterval,   setChartInterval]   = useState<CreditInterval>('day');
   const [customFrom,      setCustomFrom]      = useState<Date | null>(null);
@@ -379,9 +403,13 @@ export function WeeklyChart() {
   );
   const { data: balanceData } = useCreditBalance();
 
-  const safeStats  = stats ?? [];
-  const currentBal = balanceData?.balance ?? 0;
-  const emptyMsg   = emptyMsgFor(period);
+  const safeStats     = stats ?? [];
+  const currentBal    = balanceData?.balance ?? 0;
+  const emptyMsg      = emptyMsgFor(period);
+  const totalEarned   = safeStats.reduce((s, d) => s + d.earned, 0);
+  const totalUsed     = safeStats.reduce((s, d) => s + d.used,   0);
+  const net           = totalEarned - totalUsed;
+  const hasSummary    = !isLoading && (totalEarned > 0 || totalUsed > 0);
 
   // ── Period handling ────────────────────────────────────────────────────────
 
@@ -389,6 +417,7 @@ export function WeeklyChart() {
     setPrevPeriod(period);
     setPeriod(p);
     setChartInterval(getDefaultInterval(p, null, null));
+    setSelectedIdx(null);
     if (p !== 'custom') { setCustomFrom(null); setCustomTo(null); }
   };
 
@@ -426,6 +455,7 @@ export function WeeklyChart() {
     }
     setCustomTo(date);
     setChartInterval(getDefaultInterval('custom', customFrom, date));
+    setSelectedIdx(null);
   };
 
   const handlePickerCancel = () => {
@@ -451,7 +481,7 @@ export function WeeklyChart() {
           <Pressable
             key={key}
             style={[s.iconBtn, chartType === key && s.iconBtnActive]}
-            onPress={() => setChartType(key)}
+            onPress={() => { setChartType(key); setSelectedIdx(null); }}
           >
             <Icon
               name={icon}
@@ -475,8 +505,23 @@ export function WeeklyChart() {
     );
   }
 
+  function renderDetailStrip() {
+    const sel = selectedIdx !== null ? safeStats[selectedIdx] : null;
+    if (!sel) return null;
+    return (
+      <View style={s.detailStrip}>
+        <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
+        <View style={s.detailDot} />
+        <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
+        <View style={s.detailDot} />
+        <Typography preset="label" color={colors.error}>−{sel.used} used</Typography>
+      </View>
+    );
+  }
+
   const handleIntervalChange = (iv: CreditInterval) => {
     setChartInterval(iv);
+    setSelectedIdx(null);
     if ((iv === '1h' || iv === '2h') && chartType === 'bar') {
       setChartType('line');
     }
@@ -553,7 +598,30 @@ export function WeeklyChart() {
           currentBalance={currentBal}
           emptyMsg={emptyMsg}
           isLoading={isLoading}
+          selectedIdx={selectedIdx}
+          onSelect={setSelectedIdx}
         />
+        {renderDetailStrip()}
+        {hasSummary && (
+          <View style={s.summaryRow}>
+            <View style={s.summaryItem}>
+              <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
+              <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+            </View>
+            <View style={s.summaryDivider} />
+            <View style={s.summaryItem}>
+              <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
+              <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+            </View>
+            <View style={s.summaryDivider} />
+            <View style={s.summaryItem}>
+              <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
+                {net >= 0 ? '+' : ''}{net}
+              </Typography>
+              <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
+            </View>
+          </View>
+        )}
       </Card>
 
       {/* ── Fullscreen modal ── */}
@@ -578,8 +646,31 @@ export function WeeklyChart() {
               emptyMsg={emptyMsg}
               isLoading={isLoading}
               isFullscreen
+              selectedIdx={selectedIdx}
+              onSelect={setSelectedIdx}
             />
           </View>
+          {renderDetailStrip()}
+          {hasSummary && (
+            <View style={s.summaryRow}>
+              <View style={s.summaryItem}>
+                <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+              </View>
+              <View style={s.summaryDivider} />
+              <View style={s.summaryItem}>
+                <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+              </View>
+              <View style={s.summaryDivider} />
+              <View style={s.summaryItem}>
+                <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
+                  {net >= 0 ? '+' : ''}{net}
+                </Typography>
+                <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
+              </View>
+            </View>
+          )}
           {/* Date pickers rendered inside fullscreen modal to avoid iOS modal stacking crash */}
           <DateTimePickerModal
             isVisible={pickingFrom}
@@ -662,8 +753,33 @@ const s = StyleSheet.create({
     justifyContent: 'flex-end',
     overflow: 'hidden',
   },
-  barStack: { width: '100%' },
-  barSeg:   { width: '100%' },
+  barStack:        { width: '100%' },
+  barSeg:          { width: '100%' },
+  barTrackSelected: { borderWidth: 1, borderColor: colors.primary },
+
+  // Detail strip
+  detailStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing[2],
+    paddingVertical: spacing[2],
+    marginTop: spacing[2],
+    backgroundColor: colors.backgroundSecondary,
+    borderRadius: 8,
+  },
+  detailDot: { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.border },
+
+  // Summary row
+  summaryRow: {
+    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingTop: spacing[3],
+    marginTop: spacing[1],
+  },
+  summaryItem:    { flex: 1, alignItems: 'center', gap: spacing[0.5] },
+  summaryDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[1] },
 
   // Donut
   donutWrap: { alignItems: 'center' },

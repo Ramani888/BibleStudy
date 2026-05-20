@@ -159,6 +159,47 @@ export async function getStats(
   }
 }
 
+function toLocalDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+export async function getStreak(userId: string): Promise<{ streak: number; longestStreak: number }> {
+  const rewards = await prisma.creditTransaction.findMany({
+    where: { userId, type: 'REWARD' },
+    select: { createdAt: true },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  if (rewards.length === 0) return { streak: 0, longestStreak: 0 };
+
+  const days = new Set<string>(rewards.map(r => toLocalDateStr(r.createdAt)));
+
+  // Current streak: count consecutive days from today backwards
+  let streak = 0;
+  const cur = new Date();
+  while (days.has(toLocalDateStr(cur))) {
+    streak++;
+    cur.setDate(cur.getDate() - 1);
+  }
+
+  // Longest streak across all history
+  const sorted = Array.from(days).sort();
+  let longest = 1;
+  let run = 1;
+  for (let i = 1; i < sorted.length; i++) {
+    const prev = new Date(sorted[i - 1]);
+    const next = new Date(sorted[i]);
+    if ((next.getTime() - prev.getTime()) / 86400000 === 1) {
+      run++;
+      if (run > longest) longest = run;
+    } else {
+      run = 1;
+    }
+  }
+
+  return { streak, longestStreak: Math.max(streak, longest) };
+}
+
 export async function getBalance(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
