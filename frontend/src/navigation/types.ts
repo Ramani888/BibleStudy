@@ -56,6 +56,9 @@ export type ProfileStackParamList = {
   PublicGroups: undefined;
   // Notifications
   Notifications: undefined;
+  // Notes
+  Notes: undefined;
+  NoteEditor: { noteId?: string };
 };
 
 // ─── Map Stack ────────────────────────────────────────────────────────────────
@@ -70,7 +73,6 @@ export type MapStackParamList = {
 export type AppTabParamList = {
   HomeTab: undefined;
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
-  MapTab: NavigatorScreenParams<MapStackParamList> | undefined;
   AITab: undefined;
   ProfileTab: undefined;
 };

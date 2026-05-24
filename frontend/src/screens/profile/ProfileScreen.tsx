@@ -1,9 +1,8 @@
 import React from 'react';
-import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import Toast from 'react-native-toast-message';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
@@ -11,9 +10,7 @@ import { ConfirmDialog } from '../../components/feedback';
 const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useSetStats, useConfirmDialog, useCreditBalance } from '../../hooks';
-import { useUpdateMapPrivacy } from '../../hooks/useMap';
-import { getErrorMessage } from '../../api/client';
+import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats } from '../../hooks';
 import { colors, layout, spacing } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Plan } from '../../types';
@@ -27,29 +24,11 @@ const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
 export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
-  const updatePrivacy = useUpdateMapPrivacy();
   const { show: showConfirm, dialogProps } = useConfirmDialog();
-
-  const handleLocationPrivacy = () => {
-    const options: Array<{ text: string; value: 'OFF' | 'FRIENDS' | 'EVERYONE' }> = [
-      { text: 'Off', value: 'OFF' },
-      { text: 'Friends Only', value: 'FRIENDS' },
-      { text: 'Everyone', value: 'EVERYONE' },
-    ];
-    Alert.alert('Location Privacy', 'Who can see your location on the map?', [
-      ...options.map(opt => ({
-        text: opt.text,
-        onPress: () => updatePrivacy.mutate(opt.value, {
-          onSuccess: () => Toast.show({ type: 'success', text1: `Privacy set to ${opt.text}` }),
-          onError: (e: unknown) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-        }),
-      })),
-      { text: 'Cancel', style: 'cancel' as const },
-    ]);
-  };
 
   const { data: stats } = useSetStats();
   const { data: creditData } = useCreditBalance();
+  const { totalNotes } = useNoteStats();
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -114,6 +93,11 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             <Typography preset="h3" color={colors.primary}>{stats?.totalCards ?? 0}</Typography>
             <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
           </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
+            <Typography preset="h3" color={colors.primary}>{totalNotes}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Notes</Typography>
+          </View>
         </View>
 
         {/* ── Account menu ── */}
@@ -128,17 +112,19 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             value={`${creditData?.balance ?? 0} credits`}
             onPress={() => navigation.navigate('Credits')}
           />
+          <Divider marginV={0} />
+          <MenuItem
+            iconName="document-text-outline"
+            label="My Notes"
+            onPress={() => navigation.navigate('Notes')}
+          />
         </MenuSection>
 
         {/* ── Community menu ── */}
         <MenuSection label="COMMUNITY">
           <MenuItem iconName="people-outline" label="Friends" onPress={() => navigation.navigate('Friends')} />
           <Divider marginV={0} />
-          <MenuItem iconName="people-circle-outline" label="My Groups" onPress={() => navigation.navigate('Groups')} />
-          <Divider marginV={0} />
           <MenuItem iconName="notifications-outline" label="Notifications" onPress={() => navigation.navigate('Notifications')} />
-          <Divider marginV={0} />
-          <MenuItem iconName="location-outline" label="Location Privacy" onPress={handleLocationPrivacy} />
         </MenuSection>
 
         {/* ── App menu ── */}

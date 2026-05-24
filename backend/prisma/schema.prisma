@@ -50,6 +50,7 @@ model User {
   gatheringParticipations GatheringParticipant[]
   activities              Activity[]
   notifications           Notification[]
+  notes                   Note[]
 }
 
 model RefreshToken {
@@ -325,6 +326,19 @@ model Notification {
 
   @@index([userId, createdAt])
   @@index([userId, read])
+}
+
+model Note {
+  id        String   @id @default(uuid())
+  title     String
+  body      String   @db.Text
+  tags      String[]
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
 }
 
 enum Plan {

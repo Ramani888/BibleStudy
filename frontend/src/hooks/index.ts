@@ -78,3 +78,5 @@ export {
   useMarkAllNotificationsRead,
   useDeleteNotification,
 } from './useNotifications';
+export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from './useNotes';
+export { useNoteStats } from './useNoteStats';

@@ -6,3 +6,4 @@ export * from './set.types';
 export * from './card.types';
 export * from './ai.types';
 export * from './credits.types';
+export * from './notes.types';
