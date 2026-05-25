@@ -7,7 +7,7 @@ import { useAuthStore } from '../store/auth.store';
 
 // Android emulator reaches host machine via 10.0.2.2; iOS simulator uses localhost
 const LOCAL_URL = Platform.OS === 'android'
-  ? 'http://192.168.1.4:3010/api/v1'
+  ? 'http://192.168.1.3:3010/api/v1'
   : 'http://localhost:3010/api/v1';
 const BASE_URL = __DEV__ ? LOCAL_URL : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
 
