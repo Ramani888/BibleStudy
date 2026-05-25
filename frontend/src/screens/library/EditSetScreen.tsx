@@ -4,20 +4,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ConfirmDialog } from '../../components/feedback';
+import { ConfirmDialog, ErrorState } from '../../components/feedback';
 import { SetForm } from './components/SetForm';
 import { Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
 import { colors, layout, spacing } from '../../theme';
 import { useConfirmDialog, useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import type { LibraryScreenProps } from '../../navigation/types';
 
+const ICON_SIZE = 20;
+
 export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet'>) {
   const { setId } = route.params;
-  const { data: set, isLoading } = useSet(setId);
-  const { mutateAsync: updateSet } = useUpdateSet(setId);
+  const { data: set, isLoading, isError, refetch } = useSet(setId);
+  const { mutateAsync: updateSet } = useUpdateSet();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { show, dialogProps } = useConfirmDialog();
 
@@ -31,7 +32,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
         try {
           await deleteSetAsync(setId);
           Toast.show({ type: 'success', text1: 'Set deleted' });
-          navigation.navigate('Library');
+          navigation.popToTop();
         } catch (err) {
           Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
         }
@@ -39,12 +40,16 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
     });
   };
 
-  if (isLoading || !set) {
+  if (isLoading) {
     return (
       <View style={styles.loading}>
         <ActivityIndicator color={colors.primary} size="large" />
       </View>
     );
+  }
+
+  if (isError || !set) {
+    return <ErrorState message="Could not load set." onRetry={refetch} />;
   }
 
   return (
@@ -58,7 +63,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
           defaultValues={set}
           submitLabel="Save Changes"
           onSubmit={async data => {
-            await updateSet(data);
+            await updateSet({ id: setId, payload: { ...data, description: data.description || null } });
             Toast.show({ type: 'success', text1: 'Set updated!' });
             navigation.goBack();
           }}

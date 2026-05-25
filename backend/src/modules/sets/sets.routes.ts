@@ -9,6 +9,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get('/public', setsController.getPublicSets);
+router.get('/friends', setsController.getFriendsSets);
 router.post('/', validate(CreateSetDto), setsController.createSet);
 router.get('/', setsController.listSets);
 router.get('/:id', setsController.getSetById);

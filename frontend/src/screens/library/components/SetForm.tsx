@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -8,7 +8,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { FormField } from '../../../components/forms';
 import { Button, Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
 
-const ICON_SIZE = 18;
 import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
@@ -16,9 +15,11 @@ import { getErrorMessage } from '../../../api';
 import { colors, spacing } from '../../../theme';
 import type { Visibility, CardLayout, StudySet } from '../../../types';
 
+const ICON_SIZE = 18;
+
 interface SetFormProps {
   defaultValues?: Partial<StudySet>;
-  onSubmit: (data: CreateSetFormData & { visibility: Visibility; layout: CardLayout; folderId?: string; color?: string | null }) => Promise<void>;
+  onSubmit: (data: CreateSetFormData & { visibility: Visibility; layout: CardLayout; folderId?: string | null; color?: string | null }) => Promise<void>;
   submitLabel?: string;
 }
 
@@ -37,13 +38,20 @@ const LAYOUT_OPTIONS: { value: CardLayout; label: string }[] = [
 export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFormProps) {
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
   const [layout, setLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
-  const [folderId, setFolderId] = useState<string | undefined>(defaultValues?.folderId ?? undefined);
+  const [folderId, setFolderId] = useState<string | null>(defaultValues?.folderId ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(defaultValues?.color ?? null);
   const [folderPickerOpen, setFolderPickerOpen] = useState(false);
 
   const { data: folders = [] } = useFolders();
 
   const selectedFolder = folders.find(f => f.id === folderId);
+
+  // If the stored folderId references a folder that no longer exists, clear it
+  useEffect(() => {
+    if (folderId && folders.length > 0 && !selectedFolder) {
+      setFolderId(null);
+    }
+  }, [folderId, folders, selectedFolder]);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<CreateSetFormData>({
     resolver: zodResolver(createSetSchema),
@@ -70,6 +78,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
         placeholder="e.g. Romans Study"
         autoCapitalize="sentences"
         returnKeyType="next"
+        maxLength={200}
       />
 
       <FormField
@@ -78,6 +87,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
         label="Description (optional)"
         placeholder="What is this set about?"
         autoCapitalize="sentences"
+        maxLength={1000}
       />
 
       {/* Folder picker */}
@@ -166,30 +176,32 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
         title="Choose Folder"
         onClose={() => setFolderPickerOpen(false)}
       >
-        <Pressable style={styles.folderOption} onPress={() => { setFolderId(undefined); setFolderPickerOpen(false); }}>
-          <Typography preset="body" color={!folderId ? colors.primary : colors.textPrimary}>
-            No folder
-          </Typography>
-          {!folderId && <Badge label="Selected" variant="primary" />}
-        </Pressable>
-        <Divider marginV={spacing[1]} />
-        {folders.map(folder => (
-          <React.Fragment key={folder.id}>
-            <Pressable
-              style={styles.folderOption}
-              onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
-            >
-              <View style={styles.folderRow}>
-                <Icon name="folder-outline" size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
-                <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
-                  {folder.name}
-                </Typography>
-              </View>
-              {folderId === folder.id && <Badge label="Selected" variant="primary" />}
-            </Pressable>
-            <Divider marginV={spacing[1]} />
-          </React.Fragment>
-        ))}
+        <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
+          <Pressable style={styles.folderOption} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
+            <Typography preset="body" color={!folderId ? colors.primary : colors.textPrimary}>
+              No folder
+            </Typography>
+            {!folderId && <Badge label="Selected" variant="primary" />}
+          </Pressable>
+          <Divider marginV={spacing[1]} />
+          {folders.map(folder => (
+            <React.Fragment key={folder.id}>
+              <Pressable
+                style={styles.folderOption}
+                onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
+              >
+                <View style={styles.folderRow}>
+                  <Icon name="folder-outline" size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
+                  <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
+                    {folder.name}
+                  </Typography>
+                </View>
+                {folderId === folder.id && <Badge label="Selected" variant="primary" />}
+              </Pressable>
+              <Divider marginV={spacing[1]} />
+            </React.Fragment>
+          ))}
+        </ScrollView>
       </AppModal>
     </View>
   );

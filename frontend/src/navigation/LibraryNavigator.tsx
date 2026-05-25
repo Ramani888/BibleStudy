@@ -10,6 +10,7 @@ import { EditSetScreen } from '../screens/library/EditSetScreen';
 import { CreateCardScreen } from '../screens/library/CreateCardScreen';
 import { EditCardScreen } from '../screens/library/EditCardScreen';
 import { PublicSetsScreen } from '../screens/library/PublicSetsScreen';
+import { FriendsSetsScreen } from '../screens/library/FriendsSetsScreen';
 import { StudyScreen } from '../screens/study/StudyScreen';
 
 const Stack = createNativeStackNavigator<LibraryStackParamList>();
@@ -68,9 +69,14 @@ export function LibraryNavigator() {
         options={{ title: 'Browse Public Sets' }}
       />
       <Stack.Screen
+        name="FriendsSets"
+        component={FriendsSetsScreen}
+        options={{ title: "Friends' Sets" }}
+      />
+      <Stack.Screen
         name="Study"
         component={StudyScreen}
-        options={({ route }) => ({ title: route.params.setTitle, headerShown: false })}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

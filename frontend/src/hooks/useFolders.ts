@@ -25,10 +25,11 @@ export function useCreateFolder() {
   });
 }
 
-export function useUpdateFolder(id: string) {
+export function useUpdateFolder() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: UpdateFolderPayload) => foldersApi.update(id, payload),
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateFolderPayload }) =>
+      foldersApi.update(id, payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['folders'] }),
   });
 }
@@ -37,6 +38,9 @@ export function useDeleteFolder() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (fid: string) => foldersApi.delete(fid),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['folders'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['folders'] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
+    },
   });
 }

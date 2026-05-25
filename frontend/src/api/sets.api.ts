@@ -8,6 +8,7 @@ interface ListSetsParams {
 interface PublicSetsParams {
   page?: number;
   limit?: number;
+  search?: string;
 }
 
 interface Pagination {
@@ -25,6 +26,9 @@ interface PaginatedSets {
 export const setsApi = {
   getPublic: (params?: PublicSetsParams) =>
     apiGet<PaginatedSets>('/sets/public', params),
+
+  getFriends: (params?: { page?: number; limit?: number }) =>
+    apiGet<PaginatedSets>('/sets/friends', params),
 
   create: (payload: CreateSetPayload) =>
     apiPost<StudySet>('/sets', payload),

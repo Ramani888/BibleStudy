@@ -12,12 +12,13 @@ import { ConfirmDialog, ErrorState } from '../../components/feedback';
 import { FormField } from '../../components/forms';
 import { Button, Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
-import { useCards, useConfirmDialog, useDeleteCard, useUpdateCard } from '../../hooks';
+import { useCardById, useConfirmDialog, useDeleteCard, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { Difficulty } from '../../types';
 import type { LibraryScreenProps } from '../../navigation/types';
+
+const ICON_SIZE = 20;
 
 const schema = z.object({
   question: z.string().trim().min(1, 'Question is required'),
@@ -39,7 +40,7 @@ const DIFF_BG: Record<Difficulty, string> = {
 
 export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCard'>) {
   const { cardId, setId } = route.params;
-  const { data: cards, isLoading, isError, error, refetch } = useCards(setId);
+  const { data: card, isLoading, isError, error, refetch } = useCardById(cardId);
   const { mutateAsync: updateCard } = useUpdateCard(setId);
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
@@ -62,24 +63,24 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
     });
   };
   const answerRef = useRef<TextInput>(null);
-  const [difficulty, setDifficulty] = useState<Difficulty>('MEDIUM');
-  const [note, setNote] = useState('');
-  const [isBlurred, setIsBlurred] = useState(false);
+  const [difficulty, setDifficulty] = useState<Difficulty>(() => card?.difficulty ?? 'MEDIUM');
+  const [note, setNote] = useState(() => card?.note ?? '');
+  const [isBlurred, setIsBlurred] = useState(() => card?.isBlurred ?? false);
 
-  const card = cards?.find(c => c.id === cardId);
+  const initialized = useRef(false);
+  const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<EditCardForm>({
+    resolver: zodResolver(schema),
+  });
 
   React.useEffect(() => {
-    if (card) {
+    if (card && !initialized.current) {
+      initialized.current = true;
       setDifficulty(card.difficulty);
       setNote(card.note ?? '');
       setIsBlurred(card.isBlurred);
+      reset({ question: card.question, answer: card.answer });
     }
-  }, [card]);
-
-  const { control, handleSubmit, formState: { isSubmitting } } = useForm<EditCardForm>({
-    resolver: zodResolver(schema),
-    values: card ? { question: card.question, answer: card.answer } : undefined,
-  });
+  }, [card, reset]);
 
   const questionValue = useWatch({ control, name: 'question' });
   const answerValue   = useWatch({ control, name: 'answer' });
@@ -92,7 +93,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
     );
   }
   if (isError) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
-  if (!card) return <ErrorState message="Card not found" />;
+  if (!card) return <ErrorState message="Card not found" onRetry={refetch} />;
 
   const onSubmit = async (data: EditCardForm) => {
     try {
@@ -124,6 +125,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
             label="Question"
             autoCapitalize="sentences"
             returnKeyType="next"
+            maxLength={5000}
             onSubmitEditing={() => answerRef.current?.focus()}
           />
           <FormField
@@ -133,6 +135,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
             autoCapitalize="sentences"
             inputRef={answerRef}
             returnKeyType="done"
+            maxLength={5000}
           />
 
           {/* Difficulty picker */}
@@ -174,6 +177,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
               onChangeText={setNote}
               multiline
               numberOfLines={3}
+              maxLength={2000}
               placeholderTextColor={colors.textDisabled}
               autoCapitalize="sentences"
             />

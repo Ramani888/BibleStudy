@@ -22,7 +22,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
           defaultValues={{ folderId: route.params?.folderId }}
           submitLabel="Create Set"
           onSubmit={async data => {
-            await createSet({ ...data, color: data.color ?? undefined });
+            await createSet({ ...data, folderId: data.folderId ?? undefined, color: data.color ?? undefined, description: data.description || undefined });
             Toast.show({ type: 'success', text1: 'Set created!' });
             navigation.goBack();
           }}

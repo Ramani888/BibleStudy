@@ -35,9 +35,11 @@ export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuP
       <Typography preset="caption" color={colors.textSecondary} style={styles.count}>
         {setCount} {setCount === 1 ? 'set' : 'sets'}
       </Typography>
-      <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
-        <Icon name="ellipsis-vertical" size={MENU_ICON_SIZE} color={colors.textDisabled} />
-      </Pressable>
+      {onMenuPress && (
+        <Pressable onPress={onMenuPress} hitSlop={8} style={styles.menuBtn}>
+          <Icon name="ellipsis-vertical" size={MENU_ICON_SIZE} color={colors.textDisabled} />
+        </Pressable>
+      )}
     </Pressable>
   );
 }

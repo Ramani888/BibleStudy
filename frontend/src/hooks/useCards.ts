@@ -17,11 +17,22 @@ export function useCards(setId: string) {
   });
 }
 
+export function useCardById(cardId: string) {
+  return useQuery({
+    queryKey: ['card', cardId],
+    queryFn: () => cardsApi.getById(cardId),
+    enabled: !!cardId,
+  });
+}
+
 export function useCreateCard() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateCardPayload) => cardsApi.create(payload),
-    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['cards', vars.setId] }),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['cards', vars.setId] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
+    },
   });
 }
 
@@ -29,7 +40,10 @@ export function useBulkCreateCards() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: BulkCreateCardPayload) => cardsApi.bulkCreate(payload),
-    onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['cards', vars.setId] }),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['cards', vars.setId] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
+    },
   });
 }
 
@@ -38,7 +52,10 @@ export function useUpdateCard(setId: string) {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateCardPayload }) =>
       cardsApi.update(id, payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
+    onSuccess: (_, vars) => {
+      qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['card', vars.id] });
+    },
   });
 }
 
@@ -46,7 +63,10 @@ export function useDeleteCard(setId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => cardsApi.delete(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
+    },
   });
 }
 
@@ -54,7 +74,10 @@ export function useCopyCard(setId: string) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => cardsApi.copy(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
+    },
   });
 }
 
@@ -66,6 +89,7 @@ export function useMoveCard(setId: string) {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['cards', setId] });
       qc.invalidateQueries({ queryKey: ['cards', vars.payload.targetSetId] });
+      qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
 }

@@ -1,21 +1,21 @@
 import { z } from 'zod';
 
 export const CreateSetDto = z.object({
-  title: z.string().min(1, 'Title is required').max(200),
-  description: z.string().max(1000).optional(),
+  title: z.string().trim().min(1, 'Title is required').max(200),
+  description: z.string().trim().max(1000).optional(),
   folderId: z.string().uuid().optional(),
   visibility: z.enum(['PRIVATE', 'PUBLIC', 'FRIENDS']).optional(),
   layout: z.enum(['DEFAULT', 'MINIMAL', 'DETAILED']).optional(),
-  color: z.string().max(7).optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').optional(),
 });
 
 export const UpdateSetDto = z.object({
-  title: z.string().min(1).max(200).optional(),
-  description: z.string().max(1000).nullable().optional(),
+  title: z.string().trim().min(1).max(200).optional(),
+  description: z.string().trim().max(1000).nullable().optional(),
   folderId: z.string().uuid().nullable().optional(),
   visibility: z.enum(['PRIVATE', 'PUBLIC', 'FRIENDS']).optional(),
   layout: z.enum(['DEFAULT', 'MINIMAL', 'DETAILED']).optional(),
-  color: z.string().max(7).nullable().optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').nullable().optional(),
 });
 
 export type CreateSetDtoType = z.infer<typeof CreateSetDto>;

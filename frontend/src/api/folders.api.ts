@@ -15,5 +15,5 @@ export const foldersApi = {
     apiPut<Folder>(`/folders/${id}`, payload),
 
   delete: (id: string) =>
-    apiDelete(`/folders/${id}`),
+    apiDelete<{ affectedSets: number }>(`/folders/${id}`),
 };

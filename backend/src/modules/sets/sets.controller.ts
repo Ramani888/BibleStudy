@@ -47,11 +47,21 @@ export async function deleteSet(req: Request, res: Response): Promise<void> {
 
 export async function getPublicSets(req: Request, res: Response): Promise<void> {
   try {
-    const page = parseInt(req.query.page as string) || 1;
-    const limit = parseInt(req.query.limit as string) || 20;
-    const result = await setsService.getPublicSets(page, limit);
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const search = (req.query.search as string | undefined)?.trim() || undefined;
+    const result = await setsService.getPublicSets(page, limit, search);
     sendSuccess(res, result, 'Public sets retrieved successfully');
   } catch (error) { handleError(res, error, 'Failed to get public sets'); }
+}
+
+export async function getFriendsSets(req: Request, res: Response): Promise<void> {
+  try {
+    const page = Math.max(1, parseInt(req.query.page as string) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const result = await setsService.getFriendsSets(req.user!.id, page, limit);
+    sendSuccess(res, result, 'Friends sets retrieved successfully');
+  } catch (error) { handleError(res, error, 'Failed to get friends sets'); }
 }
 
 export async function cloneSet(req: Request, res: Response): Promise<void> {

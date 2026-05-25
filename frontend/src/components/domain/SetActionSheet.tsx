@@ -13,6 +13,7 @@ interface SetActionSheetProps {
   onDelete: () => void;
   showAssignFolder?: boolean;
   onAssignFolder?: () => void;
+  isOwner?: boolean;
 }
 
 export function SetActionSheet({
@@ -25,6 +26,7 @@ export function SetActionSheet({
   onDelete,
   showAssignFolder,
   onAssignFolder,
+  isOwner = true,
 }: SetActionSheetProps) {
   const actions = [
     {
@@ -32,12 +34,16 @@ export function SetActionSheet({
       iconName: 'book-outline',
       onPress: onStudy,
     },
-    {
-      label: 'Create Card',
-      iconName: 'add-circle-outline',
-      onPress: onCreateCard,
-    },
-    ...(showAssignFolder && onAssignFolder
+    ...(isOwner
+      ? [
+          {
+            label: 'Create Card',
+            iconName: 'add-circle-outline',
+            onPress: onCreateCard,
+          },
+        ]
+      : []),
+    ...(isOwner && showAssignFolder && onAssignFolder
       ? [
           {
             label: 'Assign Folder',
@@ -46,17 +52,21 @@ export function SetActionSheet({
           },
         ]
       : []),
-    {
-      label: 'Edit',
-      iconName: 'pencil-outline',
-      onPress: onEdit,
-    },
-    {
-      label: 'Delete',
-      iconName: 'trash-outline',
-      destructive: true as const,
-      onPress: onDelete,
-    },
+    ...(isOwner
+      ? [
+          {
+            label: 'Edit',
+            iconName: 'pencil-outline',
+            onPress: onEdit,
+          },
+          {
+            label: 'Delete',
+            iconName: 'trash-outline',
+            destructive: true as const,
+            onPress: onDelete,
+          },
+        ]
+      : []),
   ];
 
   return (

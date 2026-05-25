@@ -22,7 +22,8 @@ export type LibraryStackParamList = {
   CreateCard: { setId: string };
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
-  Study: { setId: string; setTitle: string };
+  FriendsSets: undefined;
+  Study: { setId: string; setTitle: string; isOwner?: boolean };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────

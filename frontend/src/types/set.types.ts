@@ -28,7 +28,7 @@ export interface CreateSetPayload {
 
 export interface UpdateSetPayload {
   title?: string;
-  description?: string;
+  description?: string | null;
   folderId?: string | null;
   visibility?: Visibility;
   layout?: CardLayout;

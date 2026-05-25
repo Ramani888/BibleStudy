@@ -8,7 +8,7 @@ import {
   ReorderCardsDtoType,
   StudyCardDtoType,
 } from './cards.dto';
-import { NotFoundError } from '../../utils/errors';
+import { NotFoundError, ValidationError } from '../../utils/errors';
 
 function calculateNextReviewAt(difficulty: Difficulty): Date {
   const now = new Date();
@@ -41,6 +41,8 @@ async function verifyCardOwnership(cardId: string, userId: string) {
 export async function createCard(userId: string, dto: CreateCardDtoType) {
   await verifySetOwnership(userId, dto.setId);
 
+  const existingCount = await prisma.card.count({ where: { setId: dto.setId } });
+
   const card = await prisma.card.create({
     data: {
       setId: dto.setId,
@@ -48,12 +50,14 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
       answer: dto.answer,
       note: dto.note ?? null,
       imageId: dto.imageId ?? null,
-      order: dto.order ?? 0,
+      order: dto.order ?? existingCount,
       isBlurred: dto.isBlurred ?? false,
       difficulty: dto.difficulty ?? 'MEDIUM',
       userId,
     },
   });
+
+  await logActivity(userId, 'CREATED_CARD', dto.setId);
 
   return card;
 }
@@ -61,40 +65,48 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
 export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoType) {
   await verifySetOwnership(userId, dto.setId);
 
-  // Get current card count for ordering
-  const existingCount = await prisma.card.count({ where: { setId: dto.setId } });
+  const cards = await prisma.$transaction(async (tx) => {
+    const existingCount = await tx.card.count({ where: { setId: dto.setId } });
+    return Promise.all(
+      dto.cards.map((card, index) =>
+        tx.card.create({
+          data: {
+            setId: dto.setId,
+            question: card.question,
+            answer: card.answer,
+            note: card.note ?? null,
+            imageId: card.imageId ?? null,
+            order: card.order ?? existingCount + index,
+            isBlurred: card.isBlurred ?? false,
+            difficulty: card.difficulty ?? 'MEDIUM',
+            userId,
+          },
+        })
+      )
+    );
+  });
 
-  const cards = await prisma.$transaction(
-    dto.cards.map((card, index) =>
-      prisma.card.create({
-        data: {
-          setId: dto.setId,
-          question: card.question,
-          answer: card.answer,
-          note: card.note ?? null,
-          imageId: card.imageId ?? null,
-          order: card.order ?? existingCount + index,
-          isBlurred: card.isBlurred ?? false,
-          difficulty: card.difficulty ?? 'MEDIUM',
-          userId,
-        },
-      })
-    )
-  );
+  await logActivity(userId, 'CREATED_CARD', dto.setId);
 
   return cards;
 }
 
 export async function listCardsBySet(userId: string, setId: string) {
-  // Allow access if the user owns the set OR the set is publicly visible.
-  // verifySetOwnership is intentionally not used here because it rejects non-owners.
-  const set = await prisma.set.findFirst({
-    where: {
-      id: setId,
-      OR: [{ userId }, { visibility: 'PUBLIC' }],
-    },
-  });
+  const set = await prisma.set.findFirst({ where: { id: setId } });
   if (!set) throw new NotFoundError('Set not found');
+
+  if (set.userId !== userId) {
+    if (set.visibility === 'PRIVATE') {
+      throw new NotFoundError('Set not found');
+    }
+    if (set.visibility === 'FRIENDS') {
+      const friendship = await prisma.friendship.findFirst({
+        where: { userId, friendId: set.userId },
+      });
+      if (!friendship) throw new NotFoundError('Set not found');
+    }
+    // PUBLIC sets are accessible to all authenticated users
+  }
 
   const cards = await prisma.card.findMany({
     where: { setId },
@@ -130,7 +142,7 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
 export async function deleteCard(userId: string, cardId: string) {
   await verifyCardOwnership(cardId, userId);
 
-  await prisma.card.delete({ where: { id: cardId } });
+  await prisma.card.deleteMany({ where: { id: cardId, userId } });
 
   return { message: 'Card deleted successfully' };
 }
@@ -157,6 +169,8 @@ export async function copyCard(userId: string, cardId: string) {
     },
   });
 
+  await logActivity(userId, 'CREATED_CARD', copy.setId);
+
   return copy;
 }
 
@@ -181,9 +195,15 @@ export async function moveCard(userId: string, cardId: string, targetSetId: stri
 }
 
 export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
-  // Verify all cards belong to user
+  // Verify the count matches all cards currently in the set
+  const totalCount = await prisma.card.count({ where: { setId: dto.setId, userId } });
+  if (totalCount !== dto.cardIds.length) {
+    throw new ValidationError('cardIds must include all cards in the set');
+  }
+
+  // Verify all provided cards belong to this set and user
   const cards = await prisma.card.findMany({
-    where: { id: { in: dto.cardIds }, userId },
+    where: { id: { in: dto.cardIds }, userId, setId: dto.setId },
   });
 
   if (cards.length !== dto.cardIds.length) {

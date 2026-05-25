@@ -8,7 +8,7 @@ const passwordSchema = z
   .regex(/[0-9]/, 'Must contain at least one number');
 
 export const registerSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').trim(),
+  name: z.string().trim().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Enter a valid email').toLowerCase().trim(),
   password: passwordSchema,
 });
@@ -45,8 +45,8 @@ export const changePasswordSchema = z.object({
 });
 
 export const createSetSchema = z.object({
-  title: z.string().trim().min(1, 'Title is required').max(100, 'Max 100 characters'),
-  description: z.string().max(500, 'Max 500 characters').optional(),
+  title: z.string().trim().min(1, 'Title is required').max(200, 'Max 200 characters'),
+  description: z.string().trim().max(1000, 'Max 1000 characters').optional(),
 });
 
 export type RegisterFormData = z.infer<typeof registerSchema>;

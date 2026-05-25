@@ -54,6 +54,23 @@ export async function getFolderById(userId: string, folderId: string) {
   return folder;
 }
 
+async function wouldCreateCycle(folderId: string, newParentId: string, userId: string): Promise<boolean> {
+  let currentId: string | null = newParentId;
+  const visited = new Set<string>();
+  while (currentId !== null) {
+    if (currentId === folderId) return true;
+    if (visited.has(currentId)) break;
+    if (visited.size > 50) break;
+    visited.add(currentId);
+    const row: { parentId: string | null } | null = await prisma.folder.findFirst({
+      where: { id: currentId, userId },
+      select: { parentId: true },
+    });
+    currentId = row?.parentId ?? null;
+  }
+  return false;
+}
+
 export async function updateFolder(userId: string, folderId: string, dto: UpdateFolderDtoType) {
   const folder = await prisma.folder.findFirst({ where: { id: folderId, userId } });
   if (!folder) {
@@ -61,13 +78,15 @@ export async function updateFolder(userId: string, folderId: string, dto: Update
   }
 
   if (dto.parentId !== undefined && dto.parentId !== null) {
-    // Prevent setting folder as its own parent
     if (dto.parentId === folderId) {
       throw new ValidationError('A folder cannot be its own parent');
     }
     const parent = await prisma.folder.findFirst({ where: { id: dto.parentId, userId } });
     if (!parent) {
       throw new NotFoundError('Parent folder not found');
+    }
+    if (await wouldCreateCycle(folderId, dto.parentId, userId)) {
+      throw new ValidationError('Cannot create a circular folder hierarchy');
     }
   }
 
@@ -89,7 +108,14 @@ export async function deleteFolder(userId: string, folderId: string) {
     throw new NotFoundError('Folder not found');
   }
 
-  await prisma.folder.delete({ where: { id: folderId } });
+  const childCount = await prisma.folder.count({ where: { parentId: folderId, userId } });
+  if (childCount > 0) {
+    throw new ValidationError('Cannot delete a folder that contains sub-folders. Delete or move them first.');
+  }
 
-  return { message: 'Folder deleted successfully' };
+  const affectedSets = await prisma.set.count({ where: { folderId, userId } });
+
+  await prisma.folder.deleteMany({ where: { id: folderId, userId } });
+
+  return { message: 'Folder deleted successfully', affectedSets };
 }

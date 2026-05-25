@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import Toast from 'react-native-toast-message';
 
 import { useRecordStudy } from './useCards';
@@ -11,7 +11,16 @@ interface StudySessionResult {
   HARD: number;
 }
 
-export function useStudySession(cards: Card[], setId: string) {
+function fisherYates(n: number): number[] {
+  const arr = Array.from({ length: n }, (_, i) => i);
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+export function useStudySession(cards: Card[], setId: string, isOwner = true) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isRevealed, setIsRevealed] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
@@ -36,7 +45,7 @@ export function useStudySession(cards: Card[], setId: string) {
   }, [cards, retryCards, isRetryMode, isShuffled, shuffleOrder]);
 
   const currentCard = displayCards[currentIndex];
-  const progress = displayCards.length > 0 ? currentIndex / displayCards.length : 0;
+  const progress = displayCards.length > 0 ? (currentIndex + 1) / displayCards.length : 0;
 
   const handleFlip = useCallback((revealed: boolean) => {
     setIsRevealed(revealed);
@@ -46,14 +55,16 @@ export function useStudySession(cards: Card[], setId: string) {
     (difficulty: Difficulty) => {
       if (!currentCard) return;
 
-      // Record in backend (fire and forget — don't block UX)
-      recordStudy(
-        { id: currentCard.id, payload: { difficulty } },
-        {
-          onError: err =>
-            Toast.show({ type: 'error', text1: 'Could not save', text2: getErrorMessage(err) }),
-        },
-      );
+      // Record in backend only for owners — non-owners study in visual-only mode
+      if (isOwner) {
+        recordStudy(
+          { id: currentCard.id, payload: { difficulty } },
+          {
+            onError: err =>
+              Toast.show({ type: 'error', text1: 'Could not save', text2: getErrorMessage(err) }),
+          },
+        );
+      }
 
       if (difficulty === 'HARD') {
         setHardCards(prev => [...prev, currentCard]);
@@ -69,7 +80,7 @@ export function useStudySession(cards: Card[], setId: string) {
         setCurrentIndex(next);
       }
     },
-    [currentCard, currentIndex, displayCards.length, recordStudy],
+    [currentCard, currentIndex, displayCards.length, recordStudy, isOwner],
   );
 
   const handleSkip = useCallback(() => {
@@ -85,20 +96,22 @@ export function useStudySession(cards: Card[], setId: string) {
 
   const toggleShuffle = useCallback(() => {
     if (!isShuffled) {
-      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
-      setShuffleOrder(order);
+      setShuffleOrder(fisherYates(cards.length));
       setIsShuffled(true);
     } else {
       setIsShuffled(false);
     }
     setCurrentIndex(0);
     setIsRevealed(false);
+    setIsComplete(false);
+    setHardCards([]);
+    setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
+    setSkippedCount(0);
   }, [isShuffled, cards.length]);
 
   const handleRestart = useCallback(() => {
     if (isShuffled) {
-      const order = Array.from({ length: cards.length }, (_, i) => i).sort(() => Math.random() - 0.5);
-      setShuffleOrder(order);
+      setShuffleOrder(fisherYates(cards.length));
     }
     setIsRetryMode(false);
     setRetryCards([]);
@@ -111,6 +124,7 @@ export function useStudySession(cards: Card[], setId: string) {
   }, [isShuffled, cards.length]);
 
   const handleRetryHard = useCallback(() => {
+    if (hardCards.length === 0) return;
     setRetryCards(hardCards);
     setIsRetryMode(true);
     setHardCards([]);
@@ -120,6 +134,14 @@ export function useStudySession(cards: Card[], setId: string) {
     setSkippedCount(0);
     setResults({ EASY: 0, MEDIUM: 0, HARD: 0 });
   }, [hardCards]);
+
+  // Rebuild shuffle order when cards array grows/shrinks while shuffle is active
+  useEffect(() => {
+    if (isShuffled && shuffleOrder.length !== cards.length) {
+      setShuffleOrder(fisherYates(cards.length));
+      setCurrentIndex(0);
+    }
+  }, [cards.length, isShuffled, shuffleOrder.length]);
 
   return {
     // State

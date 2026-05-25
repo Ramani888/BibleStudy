@@ -8,7 +8,7 @@ import { useCards, useStudySession } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
-import { CompletionScreen, SetPicker, FlashCardView } from './components';
+import { CompletionScreen, FlashCardView } from './components';
 
 type Props = LibraryScreenProps<'Study'>;
 
@@ -16,7 +16,7 @@ const ICON_SIZE = 20;
 const STAT_ICON_SIZE = 14;
 
 export function StudyScreen({ route, navigation }: Props) {
-  const { setId, setTitle } = route.params;
+  const { setId, setTitle, isOwner = true } = route.params;
 
   const { data: cards = [], isLoading, isError, error, refetch } = useCards(setId);
 
@@ -37,11 +37,7 @@ export function StudyScreen({ route, navigation }: Props) {
     toggleShuffle,
     handleRestart,
     handleRetryHard,
-  } = useStudySession(cards, setId);
-
-  if (!setId) {
-    return <SafeAreaView style={styles.safe}><SetPicker /></SafeAreaView>;
-  }
+  } = useStudySession(cards, setId, isOwner);
 
   if (isLoading) {
     return (
@@ -78,7 +74,7 @@ export function StudyScreen({ route, navigation }: Props) {
           skippedCount={skippedCount}
           onRestart={handleRestart}
           onRetryHard={hardCards.length > 0 ? handleRetryHard : undefined}
-          onExit={() => navigation.navigate('LibraryTab')}
+          onExit={() => navigation.popToTop()}
         />
       </SafeAreaView>
     );
@@ -128,14 +124,16 @@ export function StudyScreen({ route, navigation }: Props) {
         </View>
       )}
 
-      <FlashCardView
-        card={currentCard!}
-        isRevealed={isRevealed}
-        currentIndex={currentIndex}
-        onFlip={handleFlip}
-        onDifficulty={handleDifficulty}
-        onSkip={handleSkip}
-      />
+      {currentCard ? (
+        <FlashCardView
+          card={currentCard}
+          isRevealed={isRevealed}
+          currentIndex={currentIndex}
+          onFlip={handleFlip}
+          onDifficulty={handleDifficulty}
+          onSkip={handleSkip}
+        />
+      ) : null}
     </SafeAreaView>
   );
 }

@@ -29,6 +29,11 @@ export async function createSet(userId: string, dto: CreateSetDtoType) {
 }
 
 export async function listSets(userId: string, folderId?: string) {
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({ where: { id: folderId, userId } });
+    if (!folder) throw new NotFoundError('Folder not found');
+  }
+
   const sets = await prisma.set.findMany({
     where: {
       userId,
@@ -94,17 +99,21 @@ export async function deleteSet(userId: string, setId: string) {
     throw new NotFoundError('Set not found');
   }
 
-  await prisma.set.delete({ where: { id: setId } });
+  await prisma.set.deleteMany({ where: { id: setId, userId } });
 
   return { message: 'Set deleted successfully' };
 }
 
-export async function getPublicSets(page = 1, limit = 20) {
+export async function getPublicSets(page = 1, limit = 20, search?: string) {
   const skip = (page - 1) * limit;
+  const where = {
+    visibility: 'PUBLIC' as const,
+    ...(search ? { title: { contains: search, mode: 'insensitive' as const } } : {}),
+  };
 
   const [sets, total] = await Promise.all([
     prisma.set.findMany({
-      where: { visibility: 'PUBLIC' },
+      where,
       include: {
         user: { select: { id: true, name: true, profileImage: true } },
         _count: { select: { cards: true } },
@@ -113,7 +122,7 @@ export async function getPublicSets(page = 1, limit = 20) {
       skip,
       take: limit,
     }),
-    prisma.set.count({ where: { visibility: 'PUBLIC' } }),
+    prisma.set.count({ where }),
   ]);
 
   return {
@@ -127,17 +136,61 @@ export async function getPublicSets(page = 1, limit = 20) {
   };
 }
 
+export async function getFriendsSets(userId: string, page = 1, limit = 20) {
+  const friendships = await prisma.friendship.findMany({
+    where: { userId },
+    select: { friendId: true },
+  });
+  const friendIds = friendships.map(f => f.friendId);
+
+  if (friendIds.length === 0) {
+    return { sets: [], pagination: { total: 0, page, limit, pages: 0 } };
+  }
+
+  const skip = (page - 1) * limit;
+  const where = { userId: { in: friendIds }, visibility: 'FRIENDS' as const };
+
+  const [sets, total] = await Promise.all([
+    prisma.set.findMany({
+      where,
+      include: {
+        user: { select: { id: true, name: true, profileImage: true } },
+        _count: { select: { cards: true } },
+      },
+      orderBy: { updatedAt: 'desc' },
+      skip,
+      take: limit,
+    }),
+    prisma.set.count({ where }),
+  ]);
+
+  return {
+    sets,
+    pagination: { total, page, limit, pages: Math.ceil(total / limit) },
+  };
+}
+
 export async function cloneSet(userId: string, setId: string) {
   const originalSet = await prisma.set.findFirst({
-    where: {
-      id: setId,
-      OR: [{ visibility: 'PUBLIC' }, { userId }],
-    },
+    where: { id: setId },
     include: { cards: true },
   });
 
   if (!originalSet) {
     throw new NotFoundError('Set not found');
+  }
+
+  if (originalSet.userId !== userId) {
+    if (originalSet.visibility === 'PRIVATE') {
+      throw new NotFoundError('Set not found');
+    }
+    if (originalSet.visibility === 'FRIENDS') {
+      const friendship = await prisma.friendship.findFirst({
+        where: { userId, friendId: originalSet.userId },
+      });
+      if (!friendship) throw new NotFoundError('Set not found');
+    }
+    // PUBLIC: accessible to all authenticated users
   }
 
   const clonedSet = await prisma.set.create({
@@ -148,6 +201,7 @@ export async function cloneSet(userId: string, setId: string) {
       visibility: 'PRIVATE',
       layout: originalSet.layout,
       color: originalSet.color,
+      folderId: originalSet.userId === userId ? originalSet.folderId : null,
       cards: {
         create: originalSet.cards.map((card) => ({
           question: card.question,
@@ -156,6 +210,7 @@ export async function cloneSet(userId: string, setId: string) {
           imageId: card.imageId,
           order: card.order,
           difficulty: card.difficulty,
+          isBlurred: card.isBlurred,
           userId,
         })),
       },
@@ -165,6 +220,8 @@ export async function cloneSet(userId: string, setId: string) {
       _count: { select: { cards: true } },
     },
   });
+
+  await logActivity(userId, 'CREATED_SET', clonedSet.id);
 
   return clonedSet;
 }

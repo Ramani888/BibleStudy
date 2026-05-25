@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   FlatList,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   View,
 } from 'react-native';
@@ -11,10 +12,9 @@ import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { FolderCard, SetActionSheet, SetCard } from '../../components/domain';
-import { ActionSheet, AppModal, ConfirmDialog, EmptyState, SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Divider, Input, Spacer, Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
 import {
   useConfirmDialog,
   useFolders,
@@ -29,6 +29,8 @@ import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
 
+const ICON_SIZE = 20;
+
 type Tab = 'sets' | 'folders';
 type SortOrder = 'newest' | 'alpha' | 'cards';
 
@@ -38,18 +40,19 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [activeTab, setActiveTab] = useState<Tab>('sets');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
-  const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders } = useFolders();
-  const { data: sets = [], isLoading: setsLoading, refetch: refetchSets } = useSets();
+  const { data: folders = [], isLoading: foldersLoading, isRefetching: foldersRefetching, refetch: refetchFolders, isError: foldersError } = useFolders();
+  const { data: sets = [], isLoading: setsLoading, isRefetching: setsRefetching, refetch: refetchSets, isError: setsError } = useSets();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
-  const { mutate: updateSet } = useUpdateSet(selectedSet?.id ?? '');
+  const { mutate: updateSet } = useUpdateSet();
   const { show, dialogProps } = useConfirmDialog();
   const { mutateAsync: deleteFolderAsync } = useDeleteFolder();
 
-  const folderModal = useFolderModal(selectedFolder);
+  const folderModal = useFolderModal();
 
-  const refreshing = foldersLoading || setsLoading;
+  const refreshing = foldersRefetching || setsRefetching;
 
   const toggleSearch = () => {
     if (searchVisible) setSearch('');
@@ -60,21 +63,26 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
 
   const filteredSets = search.trim()
-    ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
+    ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
     : sets;
 
-  const sortedSets = [...filteredSets].sort((a, b) => {
+  const sortedSets = useMemo(() => [...filteredSets].sort((a, b) => {
     if (sortOrder === 'alpha') return a.title.localeCompare(b.title);
     if (sortOrder === 'cards') return (b._count?.cards ?? 0) - (a._count?.cards ?? 0);
-    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-  });
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  }), [filteredSets, sortOrder]);
 
   const filteredFolders = search.trim()
-    ? folders.filter(f => f.name.toLowerCase().includes(search.toLowerCase()))
+    ? folders.filter(f => f.name.toLowerCase().includes(search.trim().toLowerCase()))
     : folders;
 
-  const setCountByFolder = (folderId: string) =>
-    sets.filter(s => s.folderId === folderId).length;
+  const folderSetCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const s of sets) {
+      if (s.folderId) counts[s.folderId] = (counts[s.folderId] ?? 0) + 1;
+    }
+    return counts;
+  }, [sets]);
 
   const handleDeleteSet = (id: string) => {
     show({
@@ -94,10 +102,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   const handleAssignFolder = (folderId: string | null) => {
-    updateSet({ folderId }, {
+    if (!assignTargetSetId) return;
+    updateSet({ id: assignTargetSetId, payload: { folderId } }, {
       onSuccess: () => {
         folderModal.closeAssignModal();
         setSelectedSet(null);
+        setAssignTargetSetId(null);
         Toast.show({ type: 'success', text1: folderId ? 'Moved to folder' : 'Removed from folder' });
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
@@ -107,13 +117,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const handleDeleteFolder = (id: string) => {
     show({
       title: 'Delete Folder',
-      message: 'This cannot be undone.',
+      message: 'Sets inside will be moved to No Folder. This cannot be undone.',
       confirmLabel: 'Delete',
       variant: 'danger',
       onConfirm: async () => {
         try {
-          await deleteFolderAsync(id);
-          Toast.show({ type: 'success', text1: 'Folder deleted' });
+          const result = await deleteFolderAsync(id);
+          const n = result?.affectedSets ?? 0;
+          Toast.show({
+            type: 'success',
+            text1: 'Folder deleted',
+            text2: n > 0 ? `${n} set${n !== 1 ? 's' : ''} moved to No Folder` : undefined,
+          });
         } catch (err) {
           Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
         }
@@ -143,6 +158,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
               </Typography>
             </Pressable>
           )}
+          <Pressable onPress={() => navigation.navigate('FriendsSets')} hitSlop={8}>
+            <Icon name="people-outline" size={ICON_SIZE} color={colors.primary} />
+          </Pressable>
           <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
             <Typography preset="label" color={colors.primary}>Browse Public</Typography>
           </Pressable>
@@ -155,7 +173,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           <Pressable
             key={tab}
             style={[styles.tab, activeTab === tab && styles.tabActive]}
-            onPress={() => setActiveTab(tab)}
+            onPress={() => { setActiveTab(tab); setSearch(''); setSearchVisible(false); }}
           >
             <Typography
               preset="label"
@@ -210,6 +228,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
                 <SetCardSkeleton />
                 <SetCardSkeleton />
               </>
+            ) : setsError ? (
+              <ErrorState message="Failed to load sets" onRetry={refetchSets} />
             ) : (
               <EmptyState
                 title={search ? 'No results' : 'No sets yet'}
@@ -239,17 +259,26 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           renderItem={({ item }) => (
             <FolderCard
               folder={item}
-              setCount={setCountByFolder(item.id)}
+              setCount={folderSetCounts[item.id] ?? 0}
               onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name, folderColor: item.color })}
               onMenuPress={() => setSelectedFolder(item)}
             />
           )}
           ListEmptyComponent={
-            <EmptyState
-              title={search ? 'No results' : 'No folders yet'}
-              subtitle={search ? `No folders match "${search}"` : 'Tap Create Folder to organise your sets'}
-              style={styles.emptyState}
-            />
+            foldersLoading ? (
+              <>
+                <SetCardSkeleton />
+                <SetCardSkeleton />
+              </>
+            ) : foldersError ? (
+              <ErrorState message="Failed to load folders" onRetry={refetchFolders} />
+            ) : (
+              <EmptyState
+                title={search ? 'No results' : 'No folders yet'}
+                subtitle={search ? `No folders match "${search}"` : 'Tap Create Folder to organise your sets'}
+                style={styles.emptyState}
+              />
+            )
           }
         />
       )}
@@ -278,7 +307,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         }
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
         showAssignFolder
-        onAssignFolder={() => folderModal.openAssignModal()}
+        onAssignFolder={() => {
+          if (selectedSet) setAssignTargetSetId(selectedSet.id);
+          folderModal.openAssignModal();
+        }}
         onEdit={() => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id })}
         onDelete={() => selectedSet && handleDeleteSet(selectedSet.id)}
       />
@@ -322,6 +354,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           autoCapitalize="words"
           returnKeyType="done"
           onSubmitEditing={folderModal.handleCreateFolder}
+          editable={!folderModal.creatingFolder}
+          maxLength={200}
         />
         <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
           Color
@@ -349,6 +383,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           autoCapitalize="words"
           returnKeyType="done"
           onSubmitEditing={folderModal.handleEditFolder}
+          editable={!folderModal.updatingFolder}
+          maxLength={200}
         />
         <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
           Color
@@ -367,20 +403,24 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <AppModal
         visible={folderModal.assignFolderOpen}
         title="Move to Folder"
-        onClose={folderModal.closeAssignModal}
+        onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
       >
-        <Pressable style={styles.setOption} onPress={() => handleAssignFolder(null)}>
-          <Typography preset="body" color={colors.textSecondary}>No Folder</Typography>
-        </Pressable>
-        <Divider marginV={spacing[1]} />
-        {folders.map(f => (
-          <React.Fragment key={f.id}>
-            <Pressable style={styles.setOption} onPress={() => handleAssignFolder(f.id)}>
-              <Typography preset="body">{f.name}</Typography>
-            </Pressable>
-            <Divider marginV={spacing[1]} />
-          </React.Fragment>
-        ))}
+        <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
+          <Pressable style={styles.setOption} onPress={() => handleAssignFolder(null)}>
+            <Typography preset="body" color={colors.textSecondary}>No Folder</Typography>
+          </Pressable>
+          <Divider marginV={spacing[1]} />
+          {folders
+            .filter(f => f.id !== sets.find(s => s.id === assignTargetSetId)?.folderId)
+            .map(f => (
+              <React.Fragment key={f.id}>
+                <Pressable style={styles.setOption} onPress={() => handleAssignFolder(f.id)}>
+                  <Typography preset="body">{f.name}</Typography>
+                </Pressable>
+                <Divider marginV={spacing[1]} />
+              </React.Fragment>
+            ))}
+        </ScrollView>
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />

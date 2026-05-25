@@ -1,29 +1,39 @@
-import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SetActionSheet, SetCard } from '../../components/domain';
-import { ConfirmDialog, EmptyState } from '../../components/feedback';
-import { Input, Spacer, Typography } from '../../components/ui';
+import { AppModal, ConfirmDialog, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
+import { Divider, Input, Spacer, Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
-import { useConfirmDialog, useSets, useDeleteSet } from '../../hooks';
+import { useConfirmDialog, useFolderModal, useFolders, useSets, useDeleteSet, useUpdateSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
+const ICON_SIZE = 20;
+
 export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'FolderDetail'>) {
   const { folderId, folderColor } = route.params;
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
 
-  const { data: sets = [], isLoading, refetch } = useSets(folderId);
+  const { data: sets = [], isLoading, isRefetching, isError, refetch } = useSets(folderId);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
+  const { mutate: updateSet } = useUpdateSet();
+  const { data: allFolders = [] } = useFolders();
   const { show, dialogProps } = useConfirmDialog();
+  const folderModal = useFolderModal();
+
+  const cachedFolderName = allFolders.find(f => f.id === folderId)?.name;
+  useEffect(() => {
+    if (cachedFolderName) navigation.setOptions({ title: cachedFolderName });
+  }, [cachedFolderName, navigation]);
 
   const toggleSearch = () => {
     if (searchVisible) setSearch('');
@@ -31,8 +41,20 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   };
 
   const filteredSets = search.trim()
-    ? sets.filter(s => s.title.toLowerCase().includes(search.toLowerCase()))
+    ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
     : sets;
+
+  const handleAssignFolder = (newFolderId: string | null) => {
+    if (!assignTargetSetId) return;
+    updateSet({ id: assignTargetSetId, payload: { folderId: newFolderId } }, {
+      onSuccess: () => {
+        folderModal.closeAssignModal();
+        setAssignTargetSetId(null);
+        Toast.show({ type: 'success', text1: newFolderId ? 'Moved to folder' : 'Removed from folder' });
+      },
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+    });
+  };
 
   const handleDeleteSet = (set: StudySet) => {
     show({
@@ -50,6 +72,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       },
     });
   };
+
+  if (isError) return <ErrorState message="Could not load sets." onRetry={refetch} />;
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
@@ -85,18 +109,24 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isLoading}
+        refreshing={isRefetching}
         onRefresh={refetch}
         ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
         ListEmptyComponent={
-          !isLoading ? (
+          isLoading ? (
+            <>
+              <SetCardSkeleton />
+              <SetCardSkeleton />
+              <SetCardSkeleton />
+            </>
+          ) : (
             <EmptyState
               title={search ? 'No results' : 'No sets in this folder'}
               subtitle={search ? `No sets match "${search}"` : 'Create a set and assign it to this folder'}
               ctaLabel={search ? undefined : 'New Set'}
               onCta={search ? undefined : () => navigation.navigate('CreateSet', { folderId })}
             />
-          ) : null
+          )
         }
         renderItem={({ item }) => (
           <SetCard
@@ -110,15 +140,41 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       <SetActionSheet
         set={selectedSet}
         visible={!!selectedSet}
-        onClose={() => setSelectedSet(null)}
+        onClose={() => { setSelectedSet(null); setAssignTargetSetId(null); }}
         onStudy={() =>
           selectedSet &&
           navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title })
         }
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
+        showAssignFolder
+        onAssignFolder={() => {
+          if (selectedSet) setAssignTargetSetId(selectedSet.id);
+          folderModal.openAssignModal();
+        }}
         onEdit={() => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id })}
         onDelete={() => selectedSet && handleDeleteSet(selectedSet)}
       />
+
+      <AppModal
+        visible={folderModal.assignFolderOpen}
+        title="Move to Folder"
+        onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
+      >
+        <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
+          <Pressable style={styles.setOption} onPress={() => handleAssignFolder(null)}>
+            <Typography preset="body" color={colors.textSecondary}>No Folder</Typography>
+          </Pressable>
+          <Divider marginV={spacing[1]} />
+          {allFolders.filter(f => f.id !== folderId).map(f => (
+            <React.Fragment key={f.id}>
+              <Pressable style={styles.setOption} onPress={() => handleAssignFolder(f.id)}>
+                <Typography preset="body">{f.name}</Typography>
+              </Pressable>
+              <Divider marginV={spacing[1]} />
+            </React.Fragment>
+          ))}
+        </ScrollView>
+      </AppModal>
 
       <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
@@ -142,4 +198,5 @@ const styles = StyleSheet.create({
   searchInput: { marginBottom: 0 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
   newSetBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  setOption: { paddingVertical: spacing[3] },
 });

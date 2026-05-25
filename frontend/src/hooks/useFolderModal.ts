@@ -5,7 +5,7 @@ import { useCreateFolder, useUpdateFolder } from './useFolders';
 import { getErrorMessage } from '../api';
 import type { Folder } from '../types';
 
-export function useFolderModal(selectedFolder: Folder | null) {
+export function useFolderModal() {
   // ── Create states ──
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -15,12 +15,13 @@ export function useFolderModal(selectedFolder: Folder | null) {
   const [editFolderModalOpen, setEditFolderModalOpen] = useState(false);
   const [editFolderName, setEditFolderName] = useState('');
   const [editFolderColor, setEditFolderColor] = useState<string | null>(null);
+  const [editTargetFolder, setEditTargetFolder] = useState<Folder | null>(null);
 
   // ── Assign folder state ──
   const [assignFolderOpen, setAssignFolderOpen] = useState(false);
 
   const { mutate: createFolder, isPending: creatingFolder } = useCreateFolder();
-  const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder(selectedFolder?.id ?? '');
+  const { mutate: updateFolder, isPending: updatingFolder } = useUpdateFolder();
 
   // ── Create handlers ──
   const openCreateModal = useCallback(() => {
@@ -34,7 +35,7 @@ export function useFolderModal(selectedFolder: Folder | null) {
   }, []);
 
   const handleCreateFolder = useCallback(() => {
-    if (!newFolderName.trim()) return;
+    if (!newFolderName.trim() || creatingFolder) return;
     createFolder({ name: newFolderName.trim(), color: selectedColor ?? undefined }, {
       onSuccess: () => {
         setNewFolderName('');
@@ -44,10 +45,11 @@ export function useFolderModal(selectedFolder: Folder | null) {
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
-  }, [newFolderName, selectedColor, createFolder]);
+  }, [newFolderName, selectedColor, createFolder, creatingFolder]);
 
   // ── Edit handlers ──
   const openEditModal = useCallback((folder: Folder) => {
+    setEditTargetFolder(folder);
     setEditFolderName(folder.name);
     setEditFolderColor(folder.color);
     setEditFolderModalOpen(true);
@@ -57,18 +59,19 @@ export function useFolderModal(selectedFolder: Folder | null) {
     setEditFolderModalOpen(false);
     setEditFolderName('');
     setEditFolderColor(null);
+    setEditTargetFolder(null);
   }, []);
 
   const handleEditFolder = useCallback(() => {
-    if (!editFolderName.trim() || !selectedFolder) return;
-    updateFolder({ name: editFolderName.trim(), color: editFolderColor }, {
+    if (!editFolderName.trim() || !editTargetFolder || updatingFolder) return;
+    updateFolder({ id: editTargetFolder.id, payload: { name: editFolderName.trim(), color: editFolderColor } }, {
       onSuccess: () => {
         closeEditModal();
         Toast.show({ type: 'success', text1: 'Folder updated' });
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Update failed', text2: getErrorMessage(err) }),
     });
-  }, [editFolderName, editFolderColor, selectedFolder, updateFolder, closeEditModal]);
+  }, [editFolderName, editFolderColor, editTargetFolder, updateFolder, closeEditModal, updatingFolder]);
 
   // ── Assign handlers ──
   const openAssignModal = useCallback(() => {

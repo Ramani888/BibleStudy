@@ -9,7 +9,7 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useForm, useFieldArray, useWatch } from 'react-hook-form';
+import { useForm, useFieldArray, useWatch, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
@@ -19,16 +19,19 @@ import { CardPreview } from './components/CardPreview';
 import { FormField } from '../../components/forms';
 import { Button, Divider, Spacer, Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
 import { useCreateCard, useBulkCreateCards } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
+const ICON_SIZE = 20;
+
+const MAX_BULK_CARDS = 100;
+
 // ─── Single card schema ───────────────────────────────────────────────────────
 const singleSchema = z.object({
-  question: z.string().trim().min(1, 'Question is required'),
-  answer: z.string().trim().min(1, 'Answer is required'),
+  question: z.string().trim().min(1, 'Question is required').max(5000, 'Max 5000 characters'),
+  answer: z.string().trim().min(1, 'Answer is required').max(5000, 'Max 5000 characters'),
 });
 type SingleForm = z.infer<typeof singleSchema>;
 
@@ -36,10 +39,11 @@ type SingleForm = z.infer<typeof singleSchema>;
 const bulkSchema = z.object({
   pairs: z.array(
     z.object({
-      question: z.string().trim().min(1, 'Required'),
-      answer: z.string().trim().min(1, 'Required'),
+      question: z.string().trim().min(1, 'Required').max(5000, 'Max 5000 characters'),
+      answer: z.string().trim().min(1, 'Required').max(5000, 'Max 5000 characters'),
+      note: z.string().max(2000, 'Max 2000 characters').optional(),
     }),
-  ).min(1),
+  ).min(1).max(MAX_BULK_CARDS, `Cannot exceed ${MAX_BULK_CARDS} cards`),
 });
 type BulkForm = z.infer<typeof bulkSchema>;
 
@@ -94,6 +98,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         placeholder="Enter the question…"
         autoCapitalize="sentences"
         returnKeyType="next"
+        maxLength={5000}
         onSubmitEditing={() => answerRef.current?.focus()}
       />
       <FormField
@@ -104,6 +109,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
         autoCapitalize="sentences"
         inputRef={answerRef}
         returnKeyType="done"
+        maxLength={5000}
         onSubmitEditing={handleSubmit(onSubmit)}
       />
       {noteExpanded ? (
@@ -123,6 +129,7 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
             onChangeText={setNote}
             multiline
             numberOfLines={3}
+            maxLength={2000}
             placeholderTextColor={colors.textDisabled}
             autoCapitalize="sentences"
           />
@@ -159,13 +166,14 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
   const { mutateAsync: bulkCreate } = useBulkCreateCards();
   const questionRefs = useRef<(TextInput | null)[]>([]);
   const answerRefs   = useRef<(TextInput | null)[]>([]);
+  const [noteExpanded, setNoteExpanded] = useState<boolean[]>([false, false]);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<BulkForm>({
     resolver: zodResolver(bulkSchema),
     defaultValues: {
       pairs: [
-        { question: '', answer: '' },
-        { question: '', answer: '' },
+        { question: '', answer: '', note: '' },
+        { question: '', answer: '', note: '' },
       ],
     },
   });
@@ -174,12 +182,22 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
 
   const onSubmit = async (data: BulkForm) => {
     try {
-      await bulkCreate({ setId, cards: data.pairs });
+      await bulkCreate({ setId, cards: data.pairs.map(p => ({ ...p, note: p.note?.trim() || undefined })) });
       Toast.show({ type: 'success', text1: `${data.pairs.length} cards added!` });
       onSaved();
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
+  };
+
+  const handleAppend = () => {
+    append({ question: '', answer: '', note: '' });
+    setNoteExpanded(prev => [...prev, false]);
+  };
+
+  const handleRemove = (i: number) => {
+    remove(i);
+    setNoteExpanded(prev => prev.filter((_, idx) => idx !== i));
   };
 
   return (
@@ -189,7 +207,7 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
           <View style={styles.bulkPairHeader}>
             <Typography preset="label" color={colors.textSecondary}>Card {i + 1}</Typography>
             {fields.length > 1 && (
-              <Pressable onPress={() => remove(i)}>
+              <Pressable onPress={() => handleRemove(i)}>
                 <Typography preset="label" color={colors.error}>Remove</Typography>
               </Pressable>
             )}
@@ -200,6 +218,7 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
             placeholder="Question"
             autoCapitalize="sentences"
             returnKeyType="next"
+            maxLength={5000}
             inputRef={ref => { questionRefs.current[i] = ref; }}
             onSubmitEditing={() => answerRefs.current[i]?.focus()}
           />
@@ -209,6 +228,7 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
             placeholder="Answer"
             autoCapitalize="sentences"
             returnKeyType={i < fields.length - 1 ? 'next' : 'done'}
+            maxLength={5000}
             inputRef={ref => { answerRefs.current[i] = ref; }}
             onSubmitEditing={() => {
               if (i < fields.length - 1) {
@@ -216,6 +236,49 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
               }
             }}
           />
+          {noteExpanded[i] ? (
+            <Controller
+              control={control}
+              name={`pairs.${i}.note`}
+              render={({ field: { value, onChange } }) => (
+                <View>
+                  <View style={styles.noteLabelRow}>
+                    <Typography preset="label" color={colors.textSecondary}>Note (optional)</Typography>
+                    <Pressable
+                      onPress={() => {
+                        onChange('');
+                        setNoteExpanded(prev => { const n = [...prev]; n[i] = false; return n; });
+                      }}
+                      hitSlop={8}
+                    >
+                      <Typography preset="caption" color={colors.textSecondary}>Remove</Typography>
+                    </Pressable>
+                  </View>
+                  <TextInput
+                    style={styles.noteInput}
+                    placeholder="Add a hint or note…"
+                    value={value ?? ''}
+                    onChangeText={onChange}
+                    multiline
+                    numberOfLines={2}
+                    maxLength={2000}
+                    placeholderTextColor={colors.textDisabled}
+                    autoCapitalize="sentences"
+                  />
+                </View>
+              )}
+            />
+          ) : (
+            <Pressable
+              style={styles.addNoteBtn}
+              onPress={() => setNoteExpanded(prev => { const n = [...prev]; n[i] = true; return n; })}
+            >
+              <View style={styles.addNoteBtnContent}>
+                <Icon name="add-circle-outline" size={ICON_SIZE} color={colors.textSecondary} />
+                <Typography preset="label" color={colors.textSecondary}>Add Note</Typography>
+              </View>
+            </Pressable>
+          )}
           {i < fields.length - 1 && <Divider />}
         </View>
       ))}
@@ -223,7 +286,8 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
       <Button
         label="Add Another Card"
         variant="outline"
-        onPress={() => append({ question: '', answer: '' })}
+        onPress={handleAppend}
+        disabled={fields.length >= MAX_BULK_CARDS || isSubmitting}
         fullWidth
       />
 

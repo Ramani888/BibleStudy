@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
@@ -7,17 +7,19 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Divider, Input, Typography } from '../../components/ui';
 
-const ICON_SIZE = 20;
-import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useSets, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useReorderCards, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, shadows, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
+const ICON_SIZE = 20;
+
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
   const { setId, setTitle, isOwner = true } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
+  const [moveTargetCard, setMoveTargetCard] = useState<CardType | null>(null);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
   const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
@@ -25,21 +27,33 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [savingNote, setSavingNote] = useState(false);
   const [cardSearch, setCardSearch] = useState('');
   const [cardSearchVisible, setCardSearchVisible] = useState(false);
+  const [reorderMode, setReorderMode] = useState(false);
+  const [orderedCards, setOrderedCards] = useState<CardType[]>([]);
+  const [moveSearch, setMoveSearch] = useState('');
 
-  const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
+  const { data: cards = [], isLoading, isRefetching, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
   const { mutate: copyCard }   = useCopyCard(setId);
   const { mutate: moveCard }   = useMoveCard(setId);
   const { mutate: updateCard, mutateAsync: updateCardAsync } = useUpdateCard(setId);
+  const { mutate: reorderCards, isPending: isReordering } = useReorderCards();
+
+  const cachedTitle = allSets.find(s => s.id === setId)?.title;
+  useEffect(() => {
+    if (cachedTitle) navigation.setOptions({ title: cachedTitle });
+  }, [cachedTitle, navigation]);
 
   const handleShare = async () => {
-    const cardList = filteredCards
-      .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
-      .join('\n\n');
-    const divider = '─'.repeat(Math.min(setTitle.length, 40));
-    await Share.share({ message: `${setTitle}\n${divider}\n\n${cardList}` });
+    try {
+      const title = cachedTitle ?? setTitle;
+      const cardList = cards
+        .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
+        .join('\n\n');
+      const divider = '─'.repeat(Math.min(title.length, 40));
+      await Share.share({ message: `${title}\n${divider}\n\n${cardList}` });
+    } catch {}
   };
 
   const toggleCardSearch = () => {
@@ -50,8 +64,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const filteredCards = cardSearch.trim()
     ? cards.filter(
         c =>
-          c.question.toLowerCase().includes(cardSearch.toLowerCase()) ||
-          c.answer.toLowerCase().includes(cardSearch.toLowerCase()),
+          c.question.toLowerCase().includes(cardSearch.trim().toLowerCase()) ||
+          c.answer.toLowerCase().includes(cardSearch.trim().toLowerCase()),
       )
     : cards;
 
@@ -75,26 +89,66 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const handleBlurAll = async (blur: boolean) => {
     const toUpdate = cards.filter(c => c.isBlurred !== blur);
     if (toUpdate.length === 0) return;
-    try {
-      await Promise.all(
-        toUpdate.map(c => updateCardAsync({ id: c.id, payload: { isBlurred: blur } })),
-      );
+    const results = await Promise.allSettled(
+      toUpdate.map(c => updateCardAsync({ id: c.id, payload: { isBlurred: blur } })),
+    );
+    const failed = results.filter(r => r.status === 'rejected').length;
+    if (failed === 0) {
       Toast.show({ type: 'success', text1: blur ? 'All cards blurred' : 'All cards unblurred' });
-    } catch {
-      Toast.show({ type: 'error', text1: 'Error', text2: 'Could not update all cards' });
+    } else {
+      Toast.show({ type: 'error', text1: `${toUpdate.length - failed} updated, ${failed} failed` });
     }
   };
 
   const handleMoveCard = (targetSetId: string) => {
-    if (!selectedCard) return;
-    moveCard({ id: selectedCard.id, payload: { targetSetId } }, {
+    if (!moveTargetCard) return;
+    moveCard({ id: moveTargetCard.id, payload: { targetSetId } }, {
       onSuccess: () => {
         setMovePickerOpen(false);
-        setSelectedCard(null);
+        setMoveTargetCard(null);
         Toast.show({ type: 'success', text1: 'Card moved' });
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Move failed', text2: getErrorMessage(err) }),
     });
+  };
+
+  const handleEnterReorder = () => {
+    setOrderedCards([...cards]);
+    setReorderMode(true);
+  };
+
+  const handleMoveUp = (index: number) => {
+    if (index === 0) return;
+    setOrderedCards(prev => {
+      const next = [...prev];
+      [next[index - 1], next[index]] = [next[index], next[index - 1]];
+      return next;
+    });
+  };
+
+  const handleMoveDown = (index: number) => {
+    setOrderedCards(prev => {
+      if (index === prev.length - 1) return prev;
+      const next = [...prev];
+      [next[index], next[index + 1]] = [next[index + 1], next[index]];
+      return next;
+    });
+  };
+
+  const handleSaveReorder = () => {
+    reorderCards({ setId, cardIds: orderedCards.map(c => c.id) }, {
+      onSuccess: () => {
+        setReorderMode(false);
+        setOrderedCards([]);
+        Toast.show({ type: 'success', text1: 'Order saved' });
+      },
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Failed to save order', text2: getErrorMessage(err) }),
+    });
+  };
+
+  const handleCancelReorder = () => {
+    setReorderMode(false);
+    setOrderedCards([]);
   };
 
   const handleSaveNote = () => {
@@ -136,26 +190,41 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   return (
     <SafeAreaView style={styles.safe} edges={['bottom']}>
-      {/* ── Stats bar ── */}
-      <View style={styles.statsBar}>
-        <Typography preset="bodySm" color={colors.textSecondary}>
-          {cards.length} {cards.length === 1 ? 'card' : 'cards'}
-        </Typography>
-        <View style={styles.statsBarActions}>
-          <Pressable onPress={toggleCardSearch} hitSlop={8}>
-            <Icon name="search-outline" size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
+      {/* ── Stats bar / Reorder bar ── */}
+      {reorderMode ? (
+        <View style={styles.reorderBar}>
+          <Pressable onPress={handleCancelReorder} hitSlop={8}>
+            <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
           </Pressable>
-          {cards.length > 0 && (
-            <Pressable onPress={handleShare} hitSlop={8}>
-              <Icon name="share-social-outline" size={ICON_SIZE} color={colors.textSecondary} />
-            </Pressable>
-          )}
-          <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
-            <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textSecondary} />
+          <Typography preset="bodySm" style={{ fontWeight: '600' }}>Reorder Cards</Typography>
+          <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8}>
+            {isReordering
+              ? <ActivityIndicator size="small" color={colors.primary} />
+              : <Typography preset="bodySm" color={colors.primary} style={{ fontWeight: '600' }}>Save</Typography>
+            }
           </Pressable>
         </View>
-      </View>
-      {cardSearchVisible && (
+      ) : (
+        <View style={styles.statsBar}>
+          <Typography preset="bodySm" color={colors.textSecondary}>
+            {cards.length} {cards.length === 1 ? 'card' : 'cards'}
+          </Typography>
+          <View style={styles.statsBarActions}>
+            <Pressable onPress={toggleCardSearch} hitSlop={8}>
+              <Icon name="search-outline" size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
+            </Pressable>
+            {cards.length > 0 && (
+              <Pressable onPress={handleShare} hitSlop={8}>
+                <Icon name="share-social-outline" size={ICON_SIZE} color={colors.textSecondary} />
+              </Pressable>
+            )}
+            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
+              <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textSecondary} />
+            </Pressable>
+          </View>
+        </View>
+      )}
+      {!reorderMode && cardSearchVisible && (
         <View style={styles.searchWrap}>
           <Input
             placeholder="Search cards…"
@@ -168,34 +237,45 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       )}
 
       <FlatList
-        key={cardLayout}
-        data={filteredCards}
+        key={reorderMode ? 'reorder' : cardLayout}
+        data={reorderMode ? orderedCards : filteredCards}
         keyExtractor={item => item.id}
-        numColumns={cardLayout === 'grid' ? 2 : 1}
-        columnWrapperStyle={cardLayout === 'grid' ? styles.gridRow : undefined}
+        numColumns={reorderMode ? 1 : (cardLayout === 'grid' ? 2 : 1)}
+        columnWrapperStyle={!reorderMode && cardLayout === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isLoading}
-        onRefresh={refetch}
+        refreshing={!reorderMode && isRefetching}
+        onRefresh={reorderMode ? undefined : refetch}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
-          !isLoading ? (
+          isLoading ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: spacing[8] }} />
+          ) : (
             <EmptyState
               title={cardSearch ? 'No results' : 'No cards yet'}
               subtitle={cardSearch ? `No cards match "${cardSearch}"` : isOwner ? 'Add cards to start studying this set' : 'This set has no cards yet'}
               ctaLabel={cardSearch || !isOwner ? undefined : 'Add Cards'}
               onCta={cardSearch || !isOwner ? undefined : () => navigation.navigate('CreateCard', { setId })}
             />
-          ) : null
+          )
         }
-        renderItem={({ item }) => (
-          <View style={[styles.cardItem, cardLayout === 'grid' && styles.cardItemGrid]}>
+        renderItem={({ item, index }) => (
+          <View style={[styles.cardItem, !reorderMode && cardLayout === 'grid' && styles.cardItemGrid]}>
             {/* Question section — gray background */}
-            <View style={[styles.questionSection, cardLayout === 'grid' && styles.questionSectionGrid]}>
-              <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
+            <View style={[styles.questionSection, !reorderMode && cardLayout === 'grid' && styles.questionSectionGrid]}>
+              <Typography preset="body" style={styles.question} numberOfLines={!reorderMode && cardLayout === 'grid' ? 3 : undefined}>
                 {item.question}
               </Typography>
-              {isOwner && (
+              {reorderMode ? (
+                <View style={styles.cardActions}>
+                  <Pressable onPress={() => handleMoveUp(index)} disabled={index === 0} hitSlop={6} style={styles.iconBtn}>
+                    <Icon name="chevron-up-outline" size={ICON_SIZE} color={index === 0 ? colors.textDisabled : colors.textSecondary} />
+                  </Pressable>
+                  <Pressable onPress={() => handleMoveDown(index)} disabled={index === orderedCards.length - 1} hitSlop={6} style={styles.iconBtn}>
+                    <Icon name="chevron-down-outline" size={ICON_SIZE} color={index === orderedCards.length - 1 ? colors.textDisabled : colors.textSecondary} />
+                  </Pressable>
+                </View>
+              ) : isOwner ? (
                 <View style={styles.cardActions}>
                   <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
                     <Icon name="information-circle-outline" size={ICON_SIZE} color={colors.textDisabled} />
@@ -207,21 +287,21 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
                     <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textDisabled} />
                   </Pressable>
                 </View>
-              )}
+              ) : null}
             </View>
 
             {/* Answer section — white background */}
-            <View style={[styles.answerSection, cardLayout === 'grid' && styles.answerSectionGrid]}>
-              {item.isBlurred && isOwner ? (
+            <View style={[styles.answerSection, !reorderMode && cardLayout === 'grid' && styles.answerSectionGrid]}>
+              {item.isBlurred && isOwner && !reorderMode ? (
                 <View style={styles.blurOverlay}>
                   <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
                 </View>
               ) : (
                 <>
-                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
+                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={!reorderMode && cardLayout === 'grid' ? 2 : undefined}>
                     {item.answer}
                   </Typography>
-                  {item.note && cardLayout === 'list' ? (
+                  {item.note && !reorderMode && cardLayout === 'list' ? (
                     <>
                       <Divider marginV={spacing[2]} />
                       <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
@@ -258,7 +338,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           {
             label: 'Move to Set',
             iconName: 'arrow-forward-outline',
-            onPress: () => setMovePickerOpen(true),
+            onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); },
           },
           {
             label: 'Delete',
@@ -273,38 +353,53 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       <AppModal
         visible={movePickerOpen}
         title="Move to Set"
-        onClose={() => setMovePickerOpen(false)}
+        onClose={() => { setMovePickerOpen(false); setMoveTargetCard(null); setMoveSearch(''); }}
       >
         {allSets.filter(s => s.id !== setId).length === 0 ? (
           <Typography preset="bodySm" color={colors.textSecondary}>
             No other sets available
           </Typography>
         ) : (
-          allSets
-            .filter(s => s.id !== setId)
-            .map(s => (
-              <React.Fragment key={s.id}>
-                <Pressable style={styles.setOption} onPress={() => handleMoveCard(s.id)}>
-                  <Typography preset="body">{s.title}</Typography>
-                </Pressable>
-                <Divider marginV={spacing[1]} />
-              </React.Fragment>
-            ))
+          <>
+            <Input
+              placeholder="Search sets…"
+              value={moveSearch}
+              onChangeText={setMoveSearch}
+              containerStyle={styles.moveSearchInput}
+            />
+            <ScrollView style={{ maxHeight: 260 }} showsVerticalScrollIndicator={false}>
+              {allSets
+                .filter(s => s.id !== setId && s.title.toLowerCase().includes(moveSearch.trim().toLowerCase()))
+                .map(s => (
+                  <React.Fragment key={s.id}>
+                    <Pressable style={styles.setOption} onPress={() => handleMoveCard(s.id)}>
+                      <Typography preset="body">{s.title}</Typography>
+                    </Pressable>
+                    <Divider marginV={spacing[1]} />
+                  </React.Fragment>
+                ))}
+              {allSets.filter(s => s.id !== setId && s.title.toLowerCase().includes(moveSearch.trim().toLowerCase())).length === 0 && (
+                <Typography preset="bodySm" color={colors.textSecondary} style={{ paddingVertical: spacing[3] }}>
+                  No sets match "{moveSearch}"
+                </Typography>
+              )}
+            </ScrollView>
+          </>
         )}
       </AppModal>
 
       {/* ── Header menu ── */}
       <ActionSheet
         visible={headerMenuOpen}
-        title={setTitle}
+        title={cachedTitle ?? setTitle}
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
+          {
+            label: 'Study Set',
+            iconName: 'book-outline',
+            onPress: () => navigation.navigate('Study', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
+          },
           ...(isOwner ? [
-            {
-              label: 'Study Set',
-              iconName: 'book-outline',
-              onPress: () => navigation.navigate('Study', { setId, setTitle }),
-            },
             {
               label: 'Create Card',
               iconName: 'add-circle-outline',
@@ -320,7 +415,12 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               iconName: allBlurred ? 'eye-outline' : 'eye-off-outline',
               onPress: () => handleBlurAll(!allBlurred),
             },
-          ] as const : []),
+            ...(!isLoading && cards.length > 1 ? [{
+              label: 'Reorder Cards',
+              iconName: 'reorder-three-outline',
+              onPress: handleEnterReorder,
+            }] : []),
+          ] : []),
           {
             label: cardLayout === 'grid' ? 'List View' : 'Grid View',
             iconName: cardLayout === 'grid' ? 'list-outline' : 'grid-outline',
@@ -333,7 +433,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       <AppModal
         visible={!!noteCard}
         title="Note"
-        onClose={() => setNoteCard(null)}
+        onClose={() => { setNoteCard(null); setNoteText(''); }}
       >
         <TextInput
           style={styles.notePopupInput}
@@ -342,6 +442,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           onChangeText={setNoteText}
           multiline
           numberOfLines={3}
+          maxLength={2000}
           placeholderTextColor={colors.textDisabled}
           autoCapitalize="sentences"
         />
@@ -424,4 +525,14 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     textAlignVertical: 'top',
   },
+  reorderBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing[3],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  moveSearchInput: { marginBottom: spacing[2] },
 });
