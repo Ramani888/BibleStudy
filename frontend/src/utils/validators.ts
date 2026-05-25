@@ -45,7 +45,7 @@ export const changePasswordSchema = z.object({
 });
 
 export const createSetSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Max 100 characters').trim(),
+  title: z.string().trim().min(1, 'Title is required').max(100, 'Max 100 characters'),
   description: z.string().max(500, 'Max 500 characters').optional(),
 });
 

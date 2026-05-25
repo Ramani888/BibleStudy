@@ -182,9 +182,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           !isLoading ? (
             <EmptyState
               title={cardSearch ? 'No results' : 'No cards yet'}
-              subtitle={cardSearch ? `No cards match "${cardSearch}"` : 'Add cards to start studying this set'}
-              ctaLabel={cardSearch ? undefined : 'Add Cards'}
-              onCta={cardSearch ? undefined : () => navigation.navigate('CreateCard', { setId })}
+              subtitle={cardSearch ? `No cards match "${cardSearch}"` : isOwner ? 'Add cards to start studying this set' : 'This set has no cards yet'}
+              ctaLabel={cardSearch || !isOwner ? undefined : 'Add Cards'}
+              onCta={cardSearch || !isOwner ? undefined : () => navigation.navigate('CreateCard', { setId })}
             />
           ) : null
         }
