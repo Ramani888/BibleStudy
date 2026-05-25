@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import * as mediaService from './media.service';
 import { sendSuccess, sendError } from '../../utils/response';
 import { AppError } from '../../utils/errors';
-import { ListMediaDto } from './media.dto';
+import { ListMediaDto, RenameMediaDto } from './media.dto';
 
 function handleError(res: Response, error: unknown, fallback = 'Operation failed'): void {
   if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
@@ -31,6 +31,14 @@ export async function deleteFile(req: Request, res: Response): Promise<void> {
     const result = await mediaService.deleteFile(req.user!.id, req.params.id);
     sendSuccess(res, result, result.message);
   } catch (error) { handleError(res, error, 'Failed to delete file'); }
+}
+
+export async function renameFile(req: Request, res: Response): Promise<void> {
+  try {
+    const dto = RenameMediaDto.parse(req.body);
+    const file = await mediaService.renameFile(req.user!.id, req.params.id, dto.name);
+    sendSuccess(res, file, 'File renamed');
+  } catch (error) { handleError(res, error, 'Failed to rename file'); }
 }
 
 export async function getStorageUsage(req: Request, res: Response): Promise<void> {

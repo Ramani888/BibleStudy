@@ -43,3 +43,25 @@ export function useDeleteMedia() {
     },
   });
 }
+
+export function useRenameMedia() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, name }: { id: string; name: string }) => mediaApi.rename(id, name),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['media'] });
+    },
+  });
+}
+
+export function useBulkDeleteMedia() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (ids: string[]) =>
+      Promise.allSettled(ids.map(id => mediaApi.delete(id))),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['media'] });
+      qc.invalidateQueries({ queryKey: ['storage'] });
+    },
+  });
+}

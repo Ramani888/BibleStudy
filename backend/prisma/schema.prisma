@@ -356,6 +356,7 @@ model MediaFile {
 
   @@index([userId])
   @@index([userId, type])
+  @@index([userId, createdAt(sort: Desc)])
 }
 
 enum MediaType {

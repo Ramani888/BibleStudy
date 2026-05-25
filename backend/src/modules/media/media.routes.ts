@@ -15,6 +15,7 @@ router.use(authMiddleware);
 router.post('/upload',   upload.single('file'), mediaController.uploadFile);
 router.get('/',                                 mediaController.listFiles);
 router.get('/storage',                          mediaController.getStorageUsage);
+router.patch('/:id',                            mediaController.renameFile);
 router.delete('/:id',                           mediaController.deleteFile);
 
 export default router;

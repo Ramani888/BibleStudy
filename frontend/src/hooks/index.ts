@@ -80,4 +80,4 @@ export {
 } from './useNotifications';
 export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from './useNotes';
 export { useNoteStats } from './useNoteStats';
-export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia } from './useMedia';
+export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';

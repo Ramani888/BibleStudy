@@ -1,4 +1,4 @@
-import { apiClient, apiDelete, apiGet } from './client';
+import { apiClient, apiDelete, apiGet, apiPatch } from './client';
 import type { MediaFile, MediaFileType, StorageUsage } from '../types';
 
 export const mediaApi = {
@@ -20,4 +20,7 @@ export const mediaApi = {
 
   delete: (id: string) =>
     apiDelete(`/media/${id}`),
+
+  rename: (id: string, name: string) =>
+    apiPatch<MediaFile>(`/media/${id}`, { name }),
 };

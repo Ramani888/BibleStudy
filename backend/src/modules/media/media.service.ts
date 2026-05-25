@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { Prisma } from '@prisma/client';
 import sharp from 'sharp';
 import { prisma } from '../../config/db';
 import { s3, S3_BUCKET, S3_BASE_URL } from '../../config/s3.client';
@@ -39,10 +40,14 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
     finalSize = file.size;
   } else {
     // Compress + convert image to WebP
-    buffer    = await sharp(file.buffer)
-      .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: 85 })
-      .toBuffer();
+    try {
+      buffer = await sharp(file.buffer)
+        .resize(1920, 1920, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toBuffer();
+    } catch {
+      throw new AppError('Could not process image. The file may be corrupted or in an unsupported format.', 400, 'INVALID_FILE');
+    }
     mimeType  = 'image/webp';
     ext       = 'webp';
     finalSize = buffer.length;
@@ -148,6 +153,19 @@ export async function deleteFile(userId: string, fileId: string) {
   });
 
   return { message: 'File deleted successfully' };
+}
+
+export async function renameFile(userId: string, fileId: string, name: string) {
+  const file = await prisma.mediaFile.findFirst({ where: { id: fileId, userId } });
+  if (!file) throw new NotFoundError('Media file not found');
+  try {
+    return await prisma.mediaFile.update({ where: { id: fileId }, data: { name } });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
+      throw new NotFoundError('Media file not found');
+    }
+    throw e;
+  }
 }
 
 export async function getStorageUsage(userId: string) {

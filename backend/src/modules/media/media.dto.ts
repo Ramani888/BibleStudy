@@ -5,3 +5,9 @@ export const ListMediaDto = z.object({
 });
 
 export type ListMediaDtoType = z.infer<typeof ListMediaDto>;
+
+export const RenameMediaDto = z.object({
+  name: z.string().trim().min(1).max(255),
+});
+
+export type RenameMediaDtoType = z.infer<typeof RenameMediaDto>;
