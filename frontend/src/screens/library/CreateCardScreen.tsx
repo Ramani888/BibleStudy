@@ -21,13 +21,14 @@ import { Button, Divider, Spacer, Typography } from '../../components/ui';
 
 const ICON_SIZE = 20;
 import { useCreateCard, useBulkCreateCards } from '../../hooks';
+import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 // ─── Single card schema ───────────────────────────────────────────────────────
 const singleSchema = z.object({
-  question: z.string().min(1, 'Question is required').trim(),
-  answer: z.string().min(1, 'Answer is required').trim(),
+  question: z.string().trim().min(1, 'Question is required'),
+  answer: z.string().trim().min(1, 'Answer is required'),
 });
 type SingleForm = z.infer<typeof singleSchema>;
 
@@ -35,8 +36,8 @@ type SingleForm = z.infer<typeof singleSchema>;
 const bulkSchema = z.object({
   pairs: z.array(
     z.object({
-      question: z.string().min(1, 'Required').trim(),
-      answer: z.string().min(1, 'Required').trim(),
+      question: z.string().trim().min(1, 'Required'),
+      answer: z.string().trim().min(1, 'Required'),
     }),
   ).min(1),
 });
@@ -60,17 +61,25 @@ function SingleCardForm({ setId, onSaved }: { setId: string; onSaved: () => void
   const answerValue   = useWatch({ control, name: 'answer' });
 
   const onSubmit = async (data: SingleForm) => {
-    await createCard({ setId, ...data, note: note.trim() || undefined });
-    Toast.show({ type: 'success', text1: 'Card added!', text2: 'Add another or go back' });
-    setNote('');
-    setNoteExpanded(false);
-    reset();
+    try {
+      await createCard({ setId, ...data, note: note.trim() || undefined });
+      Toast.show({ type: 'success', text1: 'Card added!', text2: 'Add another or go back' });
+      setNote('');
+      setNoteExpanded(false);
+      reset();
+    } catch (e) {
+      Toast.show({ type: 'error', text1: getErrorMessage(e) });
+    }
   };
 
   const onSubmitAndExit = async (data: SingleForm) => {
-    await createCard({ setId, ...data, note: note.trim() || undefined });
-    Toast.show({ type: 'success', text1: 'Card added!' });
-    onSaved();
+    try {
+      await createCard({ setId, ...data, note: note.trim() || undefined });
+      Toast.show({ type: 'success', text1: 'Card added!' });
+      onSaved();
+    } catch (e) {
+      Toast.show({ type: 'error', text1: getErrorMessage(e) });
+    }
   };
 
   return (
@@ -164,9 +173,13 @@ function BulkCardForm({ setId, onSaved }: { setId: string; onSaved: () => void }
   const { fields, append, remove } = useFieldArray({ control, name: 'pairs' });
 
   const onSubmit = async (data: BulkForm) => {
-    await bulkCreate({ setId, cards: data.pairs });
-    Toast.show({ type: 'success', text1: `${data.pairs.length} cards added!` });
-    onSaved();
+    try {
+      await bulkCreate({ setId, cards: data.pairs });
+      Toast.show({ type: 'success', text1: `${data.pairs.length} cards added!` });
+      onSaved();
+    } catch (e) {
+      Toast.show({ type: 'error', text1: getErrorMessage(e) });
+    }
   };
 
   return (

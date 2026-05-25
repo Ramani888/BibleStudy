@@ -86,7 +86,15 @@ export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoTyp
 }
 
 export async function listCardsBySet(userId: string, setId: string) {
-  await verifySetOwnership(userId, setId);
+  // Allow access if the user owns the set OR the set is publicly visible.
+  // verifySetOwnership is intentionally not used here because it rejects non-owners.
+  const set = await prisma.set.findFirst({
+    where: {
+      id: setId,
+      OR: [{ userId }, { visibility: 'PUBLIC' }],
+    },
+  });
+  if (!set) throw new NotFoundError('Set not found');
 
   const cards = await prisma.card.findMany({
     where: { setId },

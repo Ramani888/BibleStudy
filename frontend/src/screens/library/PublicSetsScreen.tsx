@@ -98,7 +98,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         renderItem={({ item }) => (
           <SetCard
             set={item}
-            onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
+            onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })}
             onMenuPress={() => setSelectedSet(item)}
           />
         )}

@@ -20,8 +20,8 @@ import type { Difficulty } from '../../types';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 const schema = z.object({
-  question: z.string().min(1, 'Question is required').trim(),
-  answer: z.string().min(1, 'Answer is required').trim(),
+  question: z.string().trim().min(1, 'Question is required'),
+  answer: z.string().trim().min(1, 'Answer is required'),
 });
 type EditCardForm = z.infer<typeof schema>;
 

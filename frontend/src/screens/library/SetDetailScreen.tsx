@@ -15,7 +15,7 @@ import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
-  const { setId, setTitle } = route.params;
+  const { setId, setTitle, isOwner = true } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
@@ -195,22 +195,24 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
                 {item.question}
               </Typography>
-              <View style={styles.cardActions}>
-                <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
-                  <Icon name="information-circle-outline" size={ICON_SIZE} color={colors.textDisabled} />
-                </Pressable>
-                <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
-                  <Icon name={item.isBlurred ? 'eye-off-outline' : 'eye-outline'} size={ICON_SIZE} color={colors.textDisabled} />
-                </Pressable>
-                <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
-                  <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textDisabled} />
-                </Pressable>
-              </View>
+              {isOwner && (
+                <View style={styles.cardActions}>
+                  <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
+                    <Icon name="information-circle-outline" size={ICON_SIZE} color={colors.textDisabled} />
+                  </Pressable>
+                  <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
+                    <Icon name={item.isBlurred ? 'eye-off-outline' : 'eye-outline'} size={ICON_SIZE} color={colors.textDisabled} />
+                  </Pressable>
+                  <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
+                    <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textDisabled} />
+                  </Pressable>
+                </View>
+              )}
             </View>
 
             {/* Answer section — white background */}
             <View style={[styles.answerSection, cardLayout === 'grid' && styles.answerSectionGrid]}>
-              {item.isBlurred ? (
+              {item.isBlurred && isOwner ? (
                 <View style={styles.blurOverlay}>
                   <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
                 </View>
@@ -297,26 +299,28 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={setTitle}
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
-          {
-            label: 'Study Set',
-            iconName: 'book-outline',
-            onPress: () => navigation.navigate('Study', { setId, setTitle }),
-          },
-          {
-            label: 'Create Card',
-            iconName: 'add-circle-outline',
-            onPress: () => navigation.navigate('CreateCard', { setId }),
-          },
-          {
-            label: 'Edit Set',
-            iconName: 'pencil-outline',
-            onPress: () => navigation.navigate('EditSet', { setId }),
-          },
-          {
-            label: allBlurred ? 'Unblur All' : 'Blur All',
-            iconName: allBlurred ? 'eye-outline' : 'eye-off-outline',
-            onPress: () => handleBlurAll(!allBlurred),
-          },
+          ...(isOwner ? [
+            {
+              label: 'Study Set',
+              iconName: 'book-outline',
+              onPress: () => navigation.navigate('Study', { setId, setTitle }),
+            },
+            {
+              label: 'Create Card',
+              iconName: 'add-circle-outline',
+              onPress: () => navigation.navigate('CreateCard', { setId }),
+            },
+            {
+              label: 'Edit Set',
+              iconName: 'pencil-outline',
+              onPress: () => navigation.navigate('EditSet', { setId }),
+            },
+            {
+              label: allBlurred ? 'Unblur All' : 'Blur All',
+              iconName: allBlurred ? 'eye-outline' : 'eye-off-outline',
+              onPress: () => handleBlurAll(!allBlurred),
+            },
+          ] as const : []),
           {
             label: cardLayout === 'grid' ? 'List View' : 'Grid View',
             iconName: cardLayout === 'grid' ? 'list-outline' : 'grid-outline',

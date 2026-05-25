@@ -16,7 +16,7 @@ export type AuthStackParamList = {
 export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
-  SetDetail: { setId: string; setTitle: string };
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean };
   CreateSet: { folderId?: string };
   EditSet: { setId: string };
   CreateCard: { setId: string };
