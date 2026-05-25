@@ -1,5 +1,5 @@
 import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -10,7 +10,8 @@ import { ConfirmDialog } from '../../components/feedback';
 const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
-import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats } from '../../hooks';
+import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage } from '../../hooks';
+import { ProgressBar } from '../../components/ui/ProgressBar';
 import { colors, layout, spacing } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Plan } from '../../types';
@@ -29,6 +30,10 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const { data: stats } = useSetStats();
   const { data: creditData } = useCreditBalance();
   const { totalNotes } = useNoteStats();
+  const { data: storage } = useStorageUsage();
+
+  const usedMB  = ((storage?.used  ?? 0) / 1048576).toFixed(1);
+  const limitMB = ((storage?.limit ?? 262144000) / 1048576).toFixed(0);
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -100,6 +105,20 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           </View>
         </View>
 
+        {/* ── Storage bar ── */}
+        <Pressable
+          style={({ pressed }) => [styles.storageSection, pressed && { opacity: 0.7 }]}
+          onPress={() => navigation.navigate('Media')}
+        >
+          <View style={styles.storageRow}>
+            <Typography preset="caption" color={colors.textSecondary}>Storage</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>
+              {usedMB} MB of {limitMB} MB
+            </Typography>
+          </View>
+          <ProgressBar progress={(storage?.percent ?? 0) / 100} color={colors.primary} />
+        </Pressable>
+
         {/* ── Account menu ── */}
         <MenuSection label="ACCOUNT">
           <MenuItem iconName="person-outline" label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
@@ -117,6 +136,12 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             iconName="document-text-outline"
             label="My Notes"
             onPress={() => navigation.navigate('Notes')}
+          />
+          <Divider marginV={0} />
+          <MenuItem
+            iconName="images-outline"
+            label="My Media"
+            onPress={() => navigation.navigate('Media')}
           />
         </MenuSection>
 
@@ -198,4 +223,20 @@ const styles = StyleSheet.create({
     marginVertical: spacing[3],
   },
 
+  // Storage
+  storageSection: {
+    backgroundColor: colors.background,
+    marginTop: spacing[3],
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing[3],
+    gap: spacing[2],
+  },
+  storageRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
 });

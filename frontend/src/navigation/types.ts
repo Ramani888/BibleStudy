@@ -59,6 +59,9 @@ export type ProfileStackParamList = {
   // Notes
   Notes: undefined;
   NoteEditor: { noteId?: string };
+  // Media
+  Media: undefined;
+  MediaPDFViewer: { url: string; name: string };
 };
 
 // ─── Map Stack ────────────────────────────────────────────────────────────────

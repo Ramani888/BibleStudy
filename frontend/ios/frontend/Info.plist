@@ -53,6 +53,12 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>BibleStudyPro uses your location to show nearby friends and gatherings on the map.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>BibleStudyPro needs access to your photo library to upload images to your media gallery.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>BibleStudyPro needs camera access to take photos for your media gallery.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>BibleStudyPro needs access to save photos to your library.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

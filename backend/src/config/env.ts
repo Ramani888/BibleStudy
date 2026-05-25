@@ -26,6 +26,13 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().optional().default(''),
   FIREBASE_PRIVATE_KEY: z.string().optional().default(''),
   FIREBASE_CLIENT_EMAIL: z.string().optional().default(''),
+
+  // Hetzner Object Storage (required for media upload feature)
+  HETZNER_S3_ENDPOINT:   z.string().min(1, 'HETZNER_S3_ENDPOINT is required'),
+  HETZNER_S3_BUCKET:     z.string().min(1, 'HETZNER_S3_BUCKET is required'),
+  HETZNER_S3_REGION:     z.string().min(1, 'HETZNER_S3_REGION is required'),
+  HETZNER_S3_ACCESS_KEY: z.string().min(1, 'HETZNER_S3_ACCESS_KEY is required'),
+  HETZNER_S3_SECRET_KEY: z.string().min(1, 'HETZNER_S3_SECRET_KEY is required'),
 });
 
 const parsed = envSchema.safeParse(process.env);

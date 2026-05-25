@@ -18,7 +18,7 @@ model User {
   church          String?
   creditBalance   Int             @default(3)
   storageUsed     BigInt          @default(0)
-  storageLimit    BigInt          @default(209715200)
+  storageLimit    BigInt          @default(262144000)
   plan            Plan            @default(FREE)
   emailVerified   Boolean         @default(false)
   locationLat     Float?
@@ -51,6 +51,7 @@ model User {
   activities              Activity[]
   notifications           Notification[]
   notes                   Note[]
+  mediaFiles              MediaFile[]
 }
 
 model RefreshToken {
@@ -339,6 +340,27 @@ model Note {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model MediaFile {
+  id        String    @id @default(uuid())
+  userId    String
+  key       String    @unique
+  url       String
+  name      String
+  mimeType  String
+  sizeBytes Int
+  type      MediaType
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, type])
+}
+
+enum MediaType {
+  IMAGE
+  PDF
 }
 
 enum Plan {
