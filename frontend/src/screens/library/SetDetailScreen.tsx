@@ -341,6 +341,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); },
           },
           {
+            label: 'Ask AI',
+            iconName: 'sparkles-outline',
+            onPress: () => {
+              if (!selectedCard) return;
+              const prompt = `Explain this flashcard:\nQ: ${selectedCard.question}\nA: ${selectedCard.answer}`;
+              navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: prompt } });
+            },
+          },
+          {
             label: 'Delete',
             iconName: 'trash-outline',
             destructive: true,

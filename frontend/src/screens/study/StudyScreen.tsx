@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -38,6 +38,12 @@ export function StudyScreen({ route, navigation }: Props) {
     handleRestart,
     handleRetryHard,
   } = useStudySession(cards, setId, isOwner);
+
+  const handleAskAI = useCallback(() => {
+    if (!currentCard) return;
+    const prompt = `Explain this flashcard:\nQ: ${currentCard.question}\nA: ${currentCard.answer}`;
+    navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: prompt } });
+  }, [currentCard, navigation]);
 
   if (isLoading) {
     return (
@@ -94,6 +100,9 @@ export function StudyScreen({ route, navigation }: Props) {
           </Typography>
         ) : null}
         <View style={styles.headerRight}>
+          <Pressable onPress={handleAskAI} hitSlop={12} disabled={!isRevealed}>
+            <Icon name="sparkles-outline" size={ICON_SIZE} color={isRevealed ? colors.primary : colors.textDisabled} />
+          </Pressable>
           <Pressable onPress={toggleShuffle} hitSlop={12}>
             <Icon name="shuffle-outline" size={ICON_SIZE} color={isShuffled ? colors.primary : colors.textDisabled} />
           </Pressable>

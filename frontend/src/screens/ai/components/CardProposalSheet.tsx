@@ -26,6 +26,8 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
     try {
       await onSave(selectedSetId);
       setSelectedSetId(null);
+    } catch {
+      // error already handled (toast shown) in onSave — swallow here
     } finally {
       setIsSaving(false);
     }

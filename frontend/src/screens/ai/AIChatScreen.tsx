@@ -18,7 +18,8 @@ import { Typography } from '../../components/ui';
 import { ChatInput } from './components/ChatInput';
 import { CardProposalSheet } from './components/CardProposalSheet';
 import { useAuthStore } from '../../store';
-import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark } from '../../hooks';
+import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
+import { detectTags } from '../../utils/tagDetector';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
@@ -41,8 +42,10 @@ interface Message {
   text: string;
   timestamp: number;
   creditsUsed?: number;
-  followUps?: string[];       // AI-generated follow-up chips
-  suggestedCards?: SuggestedCard[]; // AI-generated flashcard proposals
+  followUps?: string[];
+  suggestedCards?: SuggestedCard[];
+  isHistorical?: boolean;    // true for messages loaded from Chat History (banner suppressed)
+  userQuestion?: string;     // the user question that prompted this AI response (for Save as Card)
 }
 
 const TYPING_INDICATOR = '__typing__' as const;
@@ -59,6 +62,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   // When navigated from Chat History, pre-populate with the existing session.
   const existingSession = route.params?.session;
+  const autoSend = route.params?.autoSend;
 
   const [messages, setMessages] = useState<Message[]>(() => {
     if (!existingSession) return [];
@@ -78,16 +82,16 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         text: chat.answer,
         timestamp: new Date(chat.createdAt).getTime(),
         suggestedCards: chat.suggestedCards ?? undefined,
+        isHistorical: true,
+        userQuestion: chat.question,
       },
     ]);
   });
 
   const listRef = useRef<FlatList>(null);
-  // Reuse the existing sessionId so new messages join the same conversation.
-  // Falls back to a fresh UUID for standalone (null sessionId) chats.
-  const sessionIdRef = useRef<string>(
-    existingSession?.sessionId ?? generateUUID()
-  );
+  const sessionIdRef = useRef<string>(existingSession?.sessionId ?? generateUUID());
+  const lastAutoSendRef = useRef<string | undefined>(undefined);
+  const sessionTagsRef = useRef<string[]>(existingSession?.tags ?? []);
   const { show, dialogProps } = useConfirmDialog();
 
   const [saveModal, setSaveModal] = useState<{
@@ -105,6 +109,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   const { mutate: sendMessage, isPending } = useAIChat();
   const { mutateAsync: bulkCreateCards } = useBulkCreateCards();
+  const { mutate: updateTags } = useUpdateSessionTags();
   const { data: creditData, isLoading: isBalanceLoading } = useCreditBalance();
   // Only fetch bookmarks once the user has received at least one AI response
   // (which gives it a real chatId worth bookmarking)
@@ -174,8 +179,15 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
                   timestamp: new Date(data.createdAt).getTime(),
                   followUps: data.followUps,
                   suggestedCards: data.suggestedCards,
+                  userQuestion: question,
                 }),
             );
+            const newTags = detectTags(data.answer, sessionTagsRef.current);
+            if (newTags.length > 0) {
+              const merged = [...sessionTagsRef.current, ...newTags];
+              sessionTagsRef.current = merged;
+              updateTags({ sessionId: sessionIdRef.current, tags: merged });
+            }
           },
           onError: err => {
             setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
@@ -188,8 +200,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags],
   );
+
+  useEffect(() => {
+    if (!autoSend || isBalanceLoading || autoSend === lastAutoSendRef.current) return;
+    lastAutoSendRef.current = autoSend;
+    handleSend(autoSend);
+  }, [autoSend, isBalanceLoading, handleSend]);
 
   const handleRegenerate = useCallback(
     (item: Message) => {
@@ -227,10 +245,15 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             setMessages(prev =>
               prev.map(m =>
                 m.id === item.id
-                  ? { ...m, chatId: data.id, text: data.answer, timestamp: new Date(data.createdAt).getTime(), followUps: data.followUps, suggestedCards: data.suggestedCards }
+                  ? { ...m, chatId: data.id, text: data.answer, timestamp: new Date(data.createdAt).getTime(), followUps: data.followUps, suggestedCards: data.suggestedCards, isHistorical: undefined }
                   : m,
               ),
             );
+            setSavedMessageIds(prev => {
+              const next = new Set(prev);
+              next.delete(item.id);
+              return next;
+            });
           },
           onError: err => {
             setMessages(prev => prev.map(m => m.id === item.id ? item : m));
@@ -297,6 +320,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       onConfirm: () => {
         setMessages([]);
         sessionIdRef.current = generateUUID();
+        sessionTagsRef.current = [];
       },
     });
   };
@@ -341,6 +365,18 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onPress: handleToggleBookmark,
         disabled: !sheet.message.chatId,
       },
+      {
+        label: 'Save as Card',
+        iconName: 'bookmark-outline',
+        onPress: () => {
+          if (!sheet.message) return;
+          setSaveModal({
+            visible: true,
+            cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }],
+            messageId: sheet.message.id,
+          });
+        },
+      },
     ] : []),
   ] : [];
 
@@ -378,7 +414,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       )}
 
       {/* Flashcard proposal banner — shown when AI generated cards */}
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
+      {item.role === 'ai' && item.text !== TYPING_INDICATOR && !item.isHistorical && item.suggestedCards && item.suggestedCards.length > 0 && (
         <Animated.View entering={FadeIn.duration(200)} style={styles.cardBanner}>
           <Icon name="albums-outline" size={16} color={colors.primary} />
           <Typography preset="bodySm" color={colors.primary} style={styles.cardBannerText}>
@@ -453,6 +489,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
+        extraData={savedMessageIds}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
             <Icon name="sparkles" size={EMPTY_ICON_SIZE} color={colors.primaryLight} />
@@ -492,14 +529,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onClose={() => setSheet({ visible: false, message: null })}
       />
 
-      {messages.some(m => m.suggestedCards && m.suggestedCards.length > 0) && (
-        <CardProposalSheet
-          visible={saveModal.visible}
-          cards={saveModal.cards}
-          onSave={handleSaveCards}
-          onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
-        />
-      )}
+      <CardProposalSheet
+        visible={saveModal.visible}
+        cards={saveModal.cards}
+        onSave={handleSaveCards}
+        onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
+      />
 
       <ConfirmDialog {...dialogProps} />
     </SafeAreaView>

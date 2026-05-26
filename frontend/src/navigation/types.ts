@@ -29,8 +29,9 @@ export type LibraryStackParamList = {
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
 export type AIStackParamList = {
   // Pass an existing session to pre-populate and continue that conversation.
+  // Pass autoSend to open the screen and immediately send a pre-formed question.
   // Omit or pass undefined to start a fresh conversation.
-  AIChat: { session: ChatSession } | undefined;
+  AIChat: { session?: ChatSession; autoSend?: string } | undefined;
   ChatHistory: undefined;
 };
 
@@ -77,7 +78,7 @@ export type MapStackParamList = {
 export type AppTabParamList = {
   HomeTab: undefined;
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
-  AITab: undefined;
+  AITab: NavigatorScreenParams<AIStackParamList> | undefined;
   ProfileTab: undefined;
 };
 
