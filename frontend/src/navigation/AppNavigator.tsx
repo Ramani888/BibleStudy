@@ -28,7 +28,6 @@ export function AppNavigator() {
         tabBarInactiveTintColor: colors.gray500,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarHideOnKeyboard: true,
         tabBarIcon: ({ focused, color, size }) => {
           const icons = TAB_ICONS[route.name];
           const name = focused ? icons.active : icons.inactive;
