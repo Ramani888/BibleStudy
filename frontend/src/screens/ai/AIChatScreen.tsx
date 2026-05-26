@@ -16,12 +16,13 @@ import { ChatBubble, CreditBadge } from '../../components/domain';
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 import { ChatInput } from './components/ChatInput';
+import { CardProposalSheet } from './components/CardProposalSheet';
 import { useAuthStore } from '../../store';
-import { useAIChat, useAddBookmark, useBookmarks, useConfirmDialog, useCreditBalance, useRemoveBookmark } from '../../hooks';
+import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
-import type { ChatMessage } from '../../types';
+import type { ChatMessage, SuggestedCard } from '../../types';
 
 const ICON_SIZE = 20;
 const EMPTY_ICON_SIZE = 48;
@@ -40,7 +41,8 @@ interface Message {
   text: string;
   timestamp: number;
   creditsUsed?: number;
-  followUps?: string[];  // AI-generated follow-up chips
+  followUps?: string[];       // AI-generated follow-up chips
+  suggestedCards?: SuggestedCard[]; // AI-generated flashcard proposals
 }
 
 const TYPING_INDICATOR = '__typing__' as const;
@@ -87,6 +89,13 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
   const { show, dialogProps } = useConfirmDialog();
 
+  const [saveModal, setSaveModal] = useState<{
+    visible: boolean;
+    cards: SuggestedCard[];
+    messageId: string;
+  }>({ visible: false, cards: [], messageId: '' });
+  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(new Set());
+
   // ActionSheet state for long-press on messages
   const [sheet, setSheet] = useState<{ visible: boolean; message: Message | null }>({
     visible: false,
@@ -94,6 +103,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   });
 
   const { mutate: sendMessage, isPending } = useAIChat();
+  const { mutateAsync: bulkCreateCards } = useBulkCreateCards();
   const { data: creditData, isLoading: isBalanceLoading } = useCreditBalance();
   // Only fetch bookmarks once the user has received at least one AI response
   // (which gives it a real chatId worth bookmarking)
@@ -162,6 +172,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
                   text: data.answer,
                   timestamp: new Date(data.createdAt).getTime(),
                   followUps: data.followUps,
+                  suggestedCards: data.suggestedCards,
                 }),
             );
           },
@@ -203,7 +214,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       setMessages(prev =>
         prev.map(m =>
           m.id === item.id
-            ? { ...m, text: TYPING_INDICATOR, chatId: undefined, followUps: undefined }
+            ? { ...m, text: TYPING_INDICATOR, chatId: undefined, followUps: undefined, suggestedCards: undefined }
             : m,
         ),
       );
@@ -215,7 +226,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             setMessages(prev =>
               prev.map(m =>
                 m.id === item.id
-                  ? { ...m, chatId: data.id, text: data.answer, timestamp: new Date(data.createdAt).getTime(), followUps: data.followUps }
+                  ? { ...m, chatId: data.id, text: data.answer, timestamp: new Date(data.createdAt).getTime(), followUps: data.followUps, suggestedCards: data.suggestedCards }
                   : m,
               ),
             );
@@ -289,6 +300,17 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     });
   };
 
+  const handleSaveCards = useCallback(async (setId: string) => {
+    try {
+      await bulkCreateCards({ setId, cards: saveModal.cards });
+      Toast.show({ type: 'success', text1: `${saveModal.cards.length} card${saveModal.cards.length !== 1 ? 's' : ''} saved!` });
+      setSavedMessageIds(prev => new Set([...prev, saveModal.messageId]));
+      setSaveModal({ visible: false, cards: [], messageId: '' });
+    } catch (e) {
+      Toast.show({ type: 'error', text1: 'Failed to save cards', text2: getErrorMessage(e) });
+    }
+  }, [bulkCreateCards, saveModal]);
+
   const isCurrentMessageBookmarked = sheet.message?.chatId
     ? bookmarkedChatIds.has(sheet.message.chatId)
     : false;
@@ -352,8 +374,32 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           ))}
         </Animated.View>
       )}
+
+      {/* Flashcard proposal banner — shown when AI generated cards */}
+      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
+        <Animated.View entering={FadeIn.duration(200)} style={styles.cardBanner}>
+          <Icon name="albums-outline" size={16} color={colors.primary} />
+          <Typography preset="bodySm" color={colors.primary} style={styles.cardBannerText}>
+            {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
+          </Typography>
+          {savedMessageIds.has(item.id) ? (
+            <View style={styles.savedChip}>
+              <Icon name="checkmark-circle" size={14} color={colors.success} />
+              <Typography preset="caption" color={colors.success}> Saved</Typography>
+            </View>
+          ) : (
+            <Pressable
+              style={styles.saveToSetBtn}
+              onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id })}
+              hitSlop={8}
+            >
+              <Typography preset="caption" color={colors.background}>Save to Set</Typography>
+            </Pressable>
+          )}
+        </Animated.View>
+      )}
     </View>
-  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading]);
+  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -444,6 +490,13 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onClose={() => setSheet({ visible: false, message: null })}
       />
 
+      <CardProposalSheet
+        visible={saveModal.visible}
+        cards={saveModal.cards}
+        onSave={handleSaveCards}
+        onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
+      />
+
       <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
@@ -527,4 +580,28 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   followUpText: { flexShrink: 1 },
+
+  cardBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[2],
+    marginTop: spacing[2],
+    marginLeft: 40,
+    marginRight: spacing[4],
+    marginBottom: spacing[3],
+    paddingVertical: spacing[2],
+    paddingHorizontal: spacing[3],
+    backgroundColor: colors.primarySurface,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.primary + '40',
+  },
+  cardBannerText: { flex: 1 },
+  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  saveToSetBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingVertical: spacing[1.5],
+    paddingHorizontal: spacing[3],
+  },
 });

@@ -7,11 +7,18 @@ import { AppError, NotFoundError, PaymentRequiredError } from '../../utils/error
 const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
 const FOLLOWUP_DELIMITER = '|||';
+const CARD_DELIMITER = '---CARD---';
 
 const SYSTEM_PROMPT =
   `You are a helpful Bible study assistant. Answer questions about the Bible, Christian theology, and faith. Be accurate, respectful, and cite Bible verses when relevant.
 
-After your main answer, provide exactly 3 follow-up questions the user might want to ask next. Each follow-up question must be on its own line, starting with "${FOLLOWUP_DELIMITER}". Do not number them. Example:
+If the user explicitly asks you to generate flashcards, study cards, or cards to memorize, include them after your main answer. Format each card as:
+${CARD_DELIMITER}
+Q: [question text]
+A: [answer text]
+Generate between 3 and 8 cards. Only include cards when the user explicitly asks.
+
+After your main answer (and after any cards), provide exactly 3 follow-up questions the user might want to ask next. Each follow-up question must be on its own line, starting with "${FOLLOWUP_DELIMITER}". Do not number them. Example:
 ${FOLLOWUP_DELIMITER}What does this passage mean for daily life?
 ${FOLLOWUP_DELIMITER}Are there related verses elsewhere in the Bible?
 ${FOLLOWUP_DELIMITER}How do different denominations interpret this?`;
@@ -24,22 +31,46 @@ const HARDCODED_VERSE = {
   verse: 16,
 };
 
-function parseFollowUps(raw: string): { answer: string; followUps: string[] } {
+function parseAIResponse(raw: string): {
+  answer: string;
+  followUps: string[];
+  suggestedCards: { question: string; answer: string }[];
+} {
+  // Step 1: strip follow-up lines (start with '|||')
   const lines = raw.split('\n');
   const followUpLines: string[] = [];
-  const answerLines: string[] = [];
-
+  const bodyLines: string[] = [];
   for (const line of lines) {
     if (line.trimStart().startsWith(FOLLOWUP_DELIMITER)) {
       followUpLines.push(line.trimStart().slice(FOLLOWUP_DELIMITER.length).trim());
     } else {
-      answerLines.push(line);
+      bodyLines.push(line);
+    }
+  }
+  const body = bodyLines.join('\n');
+
+  // Step 2: split on card delimiter — [0] is the main answer, [1..n] are card blocks
+  const parts = body.split(CARD_DELIMITER);
+  const answerText = parts[0].trim();
+
+  // Step 3: parse card Q/A pairs from each block
+  const suggestedCards: { question: string; answer: string }[] = [];
+  for (const part of parts.slice(1)) {
+    const partLines = part.split('\n').map(l => l.trim()).filter(Boolean);
+    const qLine = partLines.find(l => l.toUpperCase().startsWith('Q:'));
+    const aLine = partLines.find(l => l.toUpperCase().startsWith('A:'));
+    if (qLine && aLine) {
+      suggestedCards.push({
+        question: qLine.slice(2).trim(),
+        answer: aLine.slice(2).trim(),
+      });
     }
   }
 
   return {
-    answer: answerLines.join('\n').trim(),
+    answer: answerText,
     followUps: followUpLines.filter(q => q.length > 0).slice(0, 3),
+    suggestedCards: suggestedCards.slice(0, 10),
   };
 }
 
@@ -64,7 +95,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
 
   const response = await anthropic.messages.create({
     model: 'claude-haiku-4-5-20251001',
-    max_tokens: 2048,
+    max_tokens: 3072,
     system: SYSTEM_PROMPT,
     messages,
   });
@@ -74,7 +105,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
   }
 
-  const { answer, followUps } = parseFollowUps(textBlock.text);
+  const { answer, followUps, suggestedCards } = parseAIResponse(textBlock.text);
 
   // Upsert session record when sessionId is provided
   const sessionOp = dto.sessionId
@@ -114,6 +145,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     question: dto.question,
     answer,
     followUps,
+    suggestedCards,
     creditsUsed: 1,
     createdAt: aiChat.createdAt,
   };

@@ -47,11 +47,17 @@ export interface BookmarkedChat {
   bookmarkedAt: string;
 }
 
+export interface SuggestedCard {
+  question: string;
+  answer: string;
+}
+
 export interface AIChatResponse {
   id: string;
   question: string;
   answer: string;
   followUps?: string[];
+  suggestedCards?: SuggestedCard[];
   creditsUsed: number;
   createdAt: string;
 }

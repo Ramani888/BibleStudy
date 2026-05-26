@@ -1,0 +1,135 @@
+import React, { useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+
+import { AppModal } from '../../../components/feedback';
+import { Button, Typography } from '../../../components/ui';
+import { useSets } from '../../../hooks';
+import { colors, spacing } from '../../../theme';
+import type { SuggestedCard } from '../../../types';
+
+interface CardProposalSheetProps {
+  visible: boolean;
+  cards: SuggestedCard[];
+  onSave: (setId: string) => Promise<void>;
+  onClose: () => void;
+}
+
+export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
+  const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const { data: sets = [], isLoading: setsLoading } = useSets();
+
+  const handleSave = async () => {
+    if (!selectedSetId) return;
+    setIsSaving(true);
+    try {
+      await onSave(selectedSetId);
+      setSelectedSetId(null);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleClose = () => {
+    setSelectedSetId(null);
+    onClose();
+  };
+
+  return (
+    <AppModal visible={visible} title="Save as Flashcards" onClose={handleClose} showHandle>
+      <Typography preset="bodySm" color={colors.textSecondary} style={styles.subheader}>
+        {cards.length} card{cards.length !== 1 ? 's' : ''} ready to save
+      </Typography>
+
+      {/* Card preview */}
+      <ScrollView style={styles.previewScroll} showsVerticalScrollIndicator={false}>
+        {cards.map((card, i) => (
+          <View key={i} style={styles.cardRow}>
+            <Typography preset="label" color={colors.textSecondary}>Q: {card.question}</Typography>
+            <Typography preset="bodySm" color={colors.textPrimary} style={styles.answerText}>
+              A: {card.answer}
+            </Typography>
+          </View>
+        ))}
+      </ScrollView>
+
+      {/* Set selector */}
+      <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>
+        Choose a Set
+      </Typography>
+      {setsLoading ? (
+        <ActivityIndicator color={colors.primary} style={styles.loader} />
+      ) : sets.length === 0 ? (
+        <Typography preset="bodySm" color={colors.textSecondary} style={styles.emptyText}>
+          No sets yet. Create one in the Library tab first.
+        </Typography>
+      ) : (
+        <ScrollView style={styles.setList} showsVerticalScrollIndicator={false}>
+          {sets.map(set => (
+            <Pressable
+              key={set.id}
+              style={[styles.setRow, selectedSetId === set.id && styles.setRowSelected]}
+              onPress={() => setSelectedSetId(set.id)}
+            >
+              {set.color && <View style={[styles.setColor, { backgroundColor: set.color }]} />}
+              <View style={styles.setInfo}>
+                <Typography preset="body" numberOfLines={1}>{set.title}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>
+                  {set._count?.cards ?? 0} cards
+                </Typography>
+              </View>
+              {selectedSetId === set.id && (
+                <Icon name="checkmark-circle" size={20} color={colors.primary} />
+              )}
+            </Pressable>
+          ))}
+        </ScrollView>
+      )}
+
+      <View style={styles.footer}>
+        <Button
+          label={`Save ${cards.length} Card${cards.length !== 1 ? 's' : ''}`}
+          onPress={handleSave}
+          disabled={!selectedSetId || isSaving || sets.length === 0}
+          loading={isSaving}
+          fullWidth
+        />
+      </View>
+    </AppModal>
+  );
+}
+
+const styles = StyleSheet.create({
+  subheader: { marginBottom: spacing[3] },
+  previewScroll: { maxHeight: 180, marginBottom: spacing[4] },
+  cardRow: {
+    gap: spacing[1],
+    paddingVertical: spacing[2.5],
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  answerText: { paddingLeft: spacing[2] },
+  sectionLabel: { marginBottom: spacing[2] },
+  loader: { marginVertical: spacing[4] },
+  emptyText: { textAlign: 'center', marginVertical: spacing[4] },
+  setList: { maxHeight: 220, marginBottom: spacing[4] },
+  setRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[3],
+    paddingVertical: spacing[3],
+    paddingHorizontal: spacing[3],
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: colors.border,
+    marginBottom: spacing[2],
+  },
+  setRowSelected: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primarySurface,
+  },
+  setColor: { width: 12, height: 12, borderRadius: 6 },
+  setInfo: { flex: 1 },
+  footer: { marginTop: spacing[2] },
+});
