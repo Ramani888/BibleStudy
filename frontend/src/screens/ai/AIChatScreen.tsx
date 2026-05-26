@@ -77,6 +77,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         role: 'ai' as const,
         text: chat.answer,
         timestamp: new Date(chat.createdAt).getTime(),
+        suggestedCards: chat.suggestedCards ?? undefined,
       },
     ]);
   });
@@ -308,6 +309,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       setSaveModal({ visible: false, cards: [], messageId: '' });
     } catch (e) {
       Toast.show({ type: 'error', text1: 'Failed to save cards', text2: getErrorMessage(e) });
+      throw e;
     }
   }, [bulkCreateCards, saveModal]);
 
@@ -490,12 +492,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onClose={() => setSheet({ visible: false, message: null })}
       />
 
-      <CardProposalSheet
-        visible={saveModal.visible}
-        cards={saveModal.cards}
-        onSave={handleSaveCards}
-        onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
-      />
+      {messages.some(m => m.suggestedCards && m.suggestedCards.length > 0) && (
+        <CardProposalSheet
+          visible={saveModal.visible}
+          cards={saveModal.cards}
+          onSave={handleSaveCards}
+          onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
+        />
+      )}
 
       <ConfirmDialog {...dialogProps} />
     </SafeAreaView>

@@ -1,16 +1,16 @@
-# Graph Report - BibleStudy  (2026-05-25)
+# Graph Report - BibleStudy  (2026-05-26)
 
 ## Corpus Check
-- 750 files · ~315,288 words
+- 751 files · ~316,155 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 8658 nodes · 12733 edges · 621 communities (609 shown, 12 thin omitted)
+- 8920 nodes · 13014 edges · 626 communities (613 shown, 13 thin omitted)
 - Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 330 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7baef6aa`
+- Built from commit: `d3e529c9`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -597,6 +597,11 @@
 - [[_COMMUNITY_Community 618|Community 618]]
 - [[_COMMUNITY_Community 619|Community 619]]
 - [[_COMMUNITY_Community 620|Community 620]]
+- [[_COMMUNITY_Community 621|Community 621]]
+- [[_COMMUNITY_Community 622|Community 622]]
+- [[_COMMUNITY_Community 623|Community 623]]
+- [[_COMMUNITY_Community 624|Community 624]]
+- [[_COMMUNITY_Community 625|Community 625]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `sendError()` - 122 edges
@@ -622,63 +627,63 @@
 - `moveCard()` --calls--> `handleMoveCard()`  [INFERRED]
   backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/SetDetailScreen.tsx
 
-## Communities (621 total, 12 thin omitted)
+## Communities (626 total, 13 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.13
-Nodes (45): getFriendsFeed(), getMyFeed(), handleError(), claimDailyLogin(), getBalance(), getStats(), getStreak(), getTransactions() (+37 more)
+Nodes (43): getFriendsFeed(), getMyFeed(), handleError(), claimDailyLogin(), getBalance(), getStats(), getStreak(), getTransactions() (+35 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.1
-Nodes (24): CompletionScreenProps, styles, FolderCard(), FolderCardProps, styles, SetActionSheetProps, useFolderModal(), useCreateFolder() (+16 more)
+Cohesion: 0.04
+Nodes (52): DIFF_CONFIG, FlashCardViewProps, styles, LAYOUT_OPTIONS, SetForm(), SetFormProps, styles, VISIBILITY_OPTIONS (+44 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.12
-Nodes (42): bulkCreateCards(), copyCard(), createCard(), deleteCard(), getCardById(), handleError(), listCardsBySet(), moveCard() (+34 more)
+Cohesion: 0.14
+Nodes (37): bulkCreateCards(), copyCard(), createCard(), deleteCard(), getCardById(), handleError(), listCardsBySet(), moveCard() (+29 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.19
-Nodes (22): forgotPassword(), login(), logout(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword() (+14 more)
+Cohesion: 0.18
+Nodes (23): forgotPassword(), login(), logout(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword() (+15 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.16
-Nodes (23): changePassword(), deleteAccount(), getProfile(), getUserById(), registerDeviceToken(), removeDeviceToken(), updateProfile(), ChangePasswordDto (+15 more)
+Cohesion: 0.15
+Nodes (24): changePassword(), deleteAccount(), getProfile(), getUserById(), registerDeviceToken(), removeDeviceToken(), updateProfile(), ChangePasswordDto (+16 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.07
-Nodes (43): aiApi, ChatHistoryParams, PaginatedBookmarks, PaginatedChats, PaginatedSessions, Pagination, authApi, cardsApi (+35 more)
+Cohesion: 0.15
+Nodes (21): cardsApi, apiClient, apiDelete(), apiGet(), apiPatch(), apiPost(), apiPut(), drainQueue() (+13 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.17
-Nodes (15): AuthNavigator(), RootNavigator(), SplashScreen(), styles, OnboardingScreen(), Props, Slide, SLIDES (+7 more)
+Cohesion: 0.19
+Nodes (13): RootNavigator(), SplashScreen(), styles, OnboardingScreen(), Props, Slide, SLIDES, styles (+5 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.18
 Nodes (26): forgotPassword(), getMe(), login(), logout(), refreshToken(), register(), resendVerification(), resetPassword() (+18 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.12
-Nodes (6): DIFF_CONFIG, FlashCardViewProps, styles, SortOrder, styles, Tab
+Cohesion: 0.09
+Nodes (18): getFriendsFeed(), getMyFeed(), userSelect, anthropic, askQuestion(), getChatHistory(), getDailyVerse(), HARDCODED_VERSE (+10 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.07
-Nodes (46): ForgotPasswordScreen(), LoginScreen(), RegisterScreen(), ResetPasswordScreen(), VerifyEmailScreen(), AuthLayout(), AuthLayoutProps, BrandLogo() (+38 more)
+Cohesion: 0.09
+Nodes (42): ForgotPasswordScreen(), LoginScreen(), RegisterScreen(), ResetPasswordScreen(), VerifyEmailScreen(), AuthLayout(), AuthLayoutProps, BrandLogo() (+34 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.09
-Nodes (37): friendsApi, EmptyState(), EmptyStateProps, styles, useAcceptFriendRequest(), useBlockedUsers(), useBlockUser(), useCancelFriendRequest() (+29 more)
+Cohesion: 0.07
+Nodes (55): getErrorMessage(), friendsApi, handleSave(), EmptyState(), EmptyStateProps, styles, ErrorState(), ErrorStateProps (+47 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.12
-Nodes (17): dependencies, @anthropic-ai/sdk, @aws-sdk/client-s3, bcryptjs, cloudinary, cors, dotenv, express (+9 more)
+Cohesion: 0.05
+Nodes (42): dependencies, @anthropic-ai/sdk, @aws-sdk/client-s3, bcryptjs, cloudinary, cors, dotenv, express (+34 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.07
@@ -689,8 +694,8 @@ Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.09
-Nodes (31): AIChatScreen(), AINav, generateUUID(), Message, styles, SUGGESTIONS, TYPING_INDICATOR, ChatHistoryScreen() (+23 more)
+Cohesion: 0.04
+Nodes (60): AIChatScreen(), AINav, generateUUID(), Message, styles, SUGGESTIONS, TYPING_INDICATOR, ChatHistoryScreen() (+52 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.07
@@ -705,8 +710,8 @@ Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.08
-Nodes (30): addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory(), getDailyVerse(), handleError() (+22 more)
+Cohesion: 0.07
+Nodes (36): router, addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory(), getDailyVerse() (+28 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.07
@@ -734,15 +739,15 @@ Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmak
 
 ### Community 29 - "Community 29"
 Cohesion: 0.06
-Nodes (43): getFriendsFeed(), getMyFeed(), userSelect, connectDB(), disconnectDB(), globalForPrisma, acceptRequest(), blockUser() (+35 more)
+Nodes (53): acceptRequest(), blockUser(), cancelRequest(), friendSelect, listBlocked(), listFriends(), listRequests(), rejectRequest() (+45 more)
 
 ### Community 30 - "Community 30"
 Cohesion: 0.48
 Nodes (5): Card(), CardProps, PressableCard(), PressableCardProps, styles
 
 ### Community 31 - "Community 31"
-Cohesion: 0.15
-Nodes (17): activitiesApi, ActivityItem(), activityLabel(), DailyLoginButton(), HomeNav, HomeScreen(), ParamlessTab, QUICK_ACTIONS (+9 more)
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.07
@@ -765,12 +770,12 @@ Cohesion: 0.07
 Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.15
-Nodes (11): router, router, SendRequestDto, SendRequestDtoType, router, router, upload, authMiddleware() (+3 more)
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 38 - "Community 38"
-Cohesion: 0.18
-Nodes (6): App(), AppBootstrap(), displayName, name, queryClient, styles
+Cohesion: 0.16
+Nodes (7): App(), AppBootstrap(), displayName, name, queryClient, styles, queryClient
 
 ### Community 39 - "Community 39"
 Cohesion: 0.07
@@ -809,8 +814,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 48 - "Community 48"
-Cohesion: 0.15
-Nodes (16): Action, ActionSheet(), ActionSheetProps, styles, ConfirmDialog(), ConfirmDialogProps, styles, AppModal() (+8 more)
+Cohesion: 0.12
+Nodes (18): Action, ActionSheet(), ActionSheetProps, styles, ConfirmDialog(), ConfirmDialogProps, styles, AppModal() (+10 more)
 
 ### Community 49 - "Community 49"
 Cohesion: 0.09
@@ -937,8 +942,8 @@ Cohesion: 0.23
 Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
 
 ### Community 82 - "Community 82"
-Cohesion: 0.18
-Nodes (19): createFolder(), deleteFolder(), getFolderById(), handleError(), listFolders(), updateFolder(), CreateFolderDto, CreateFolderDtoType (+11 more)
+Cohesion: 0.19
+Nodes (18): createFolder(), deleteFolder(), getFolderById(), handleError(), listFolders(), updateFolder(), CreateFolderDto, CreateFolderDtoType (+10 more)
 
 ### Community 83 - "Community 83"
 Cohesion: 0.23
@@ -1181,8 +1186,8 @@ Cohesion: 0.26
 Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
 
 ### Community 149 - "Community 149"
-Cohesion: 0.31
-Nodes (7): AIChat, AIChatPayload, AIChatResponse, BookmarkedChat, ChatMessage, ChatSession, DailyVerse
+Cohesion: 0.27
+Nodes (8): AIChat, AIChatPayload, AIChatResponse, BookmarkedChat, ChatMessage, ChatSession, DailyVerse, SuggestedCard
 
 ### Community 150 - "Community 150"
 Cohesion: 0.36
@@ -1225,8 +1230,8 @@ Cohesion: 0.26
 Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
 
 ### Community 161 - "Community 161"
-Cohesion: 0.48
-Nodes (5): CardLayout, CreateSetPayload, StudySet, UpdateSetPayload, Visibility
+Cohesion: 0.36
+Nodes (6): Visibility, CardLayout, CreateSetPayload, StudySet, UpdateSetPayload, Visibility
 
 ### Community 162 - "Community 162"
 Cohesion: 0.26
@@ -1637,8 +1642,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
 
 ### Community 269 - "Community 269"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, toolchain
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 270 - "Community 270"
 Cohesion: 0.5
@@ -1790,11 +1795,11 @@ Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifac
 
 ### Community 307 - "Community 307"
 Cohesion: 0.22
-Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 308 - "Community 308"
-Cohesion: 0.15
-Nodes (11): createNote(), deleteNote(), getNoteById(), handleError(), listNotes(), updateNote(), CreateNoteDto, CreateNoteDtoType (+3 more)
+Cohesion: 0.16
+Nodes (10): createNote(), deleteNote(), getNoteById(), handleError(), listNotes(), updateNote(), CreateNoteDto, CreateNoteDtoType (+2 more)
 
 ### Community 309 - "Community 309"
 Cohesion: 0.5
@@ -1805,8 +1810,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
 
 ### Community 311 - "Community 311"
-Cohesion: 0.1
-Nodes (22): MenuItem(), MenuItemProps, styles, MenuSection(), MenuSectionProps, styles, useBulkDeleteMedia(), useDeleteMedia() (+14 more)
+Cohesion: 0.07
+Nodes (35): MenuItem(), MenuItemProps, styles, MenuSection(), MenuSectionProps, styles, ClaimCreditButtonProps, styles (+27 more)
 
 ### Community 312 - "Community 312"
 Cohesion: 0.5
@@ -1914,7 +1919,7 @@ Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 361 - "Community 361"
 Cohesion: 0.07
-Nodes (56): getErrorMessage(), formatDate(), formatPickerDate(), GatheringForm(), GatheringFormProps, GatheringFormValues, styles, Visibility (+48 more)
+Nodes (46): formatDate(), formatPickerDate(), GatheringForm(), GatheringFormProps, GatheringFormValues, styles, Visibility, VISIBILITY_OPTIONS (+38 more)
 
 ### Community 362 - "Community 362"
 Cohesion: 0.07
@@ -1949,8 +1954,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 370 - "Community 370"
-Cohesion: 0.6
-Nodes (3): FormField(), FormFieldProps, RefInput
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 371 - "Community 371"
 Cohesion: 0.07
@@ -2045,8 +2050,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 405 - "Community 405"
-Cohesion: 0.15
-Nodes (23): CreateGroupDto, CreateGroupDtoType, UpdateGroupDto, UpdateGroupDtoType, UpdateRoleDto, UpdateRoleDtoType, router, createGroup() (+15 more)
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 406 - "Community 406"
 Cohesion: 0.07
@@ -2237,12 +2242,12 @@ Cohesion: 0.22
 Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 453 - "Community 453"
-Cohesion: 0.11
-Nodes (27): groupsApi, useCreateGroup(), useDeleteGroup(), useGroup(), useGroups(), useLeaveGroup(), useRegenerateInviteCode(), useRemoveMember() (+19 more)
+Cohesion: 0.05
+Nodes (63): CreditBadge(), CreditBadgeProps, styles, DifficultyBadge(), DifficultyBadgeProps, MAP, styles, FlashCard() (+55 more)
 
 ### Community 454 - "Community 454"
-Cohesion: 0.04
-Nodes (42): HistoryItem(), HistoryItemProps, PREDEFINED_TAGS, SessionCardProps, styles, CHART_ICONS, ChartType, emptyMsgFor() (+34 more)
+Cohesion: 0.08
+Nodes (19): CHART_ICONS, ChartType, emptyMsgFor(), fmtDate(), INTERVAL_LABELS, PERIOD_CHIPS, s, WeeklyChart() (+11 more)
 
 ### Community 455 - "Community 455"
 Cohesion: 0.33
@@ -2309,8 +2314,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 472 - "Community 472"
-Cohesion: 0.26
-Nodes (11): notificationsApi, useDeleteNotification(), useMarkAllNotificationsRead(), useMarkNotificationRead(), useNotifications(), getNotificationIcon(), NotificationsScreen(), Props (+3 more)
+Cohesion: 0.36
+Nodes (9): notificationsApi, useDeleteNotification(), useMarkAllNotificationsRead(), useMarkNotificationRead(), useNotifications(), getNotificationIcon(), NotificationsScreen(), Props (+1 more)
 
 ### Community 473 - "Community 473"
 Cohesion: 0.09
@@ -2345,8 +2350,8 @@ Cohesion: 0.09
 Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
 
 ### Community 481 - "Community 481"
-Cohesion: 0.17
-Nodes (17): agg(), claimDailyLogin(), DAY_LABELS, getBalance(), getStats(), getStreak(), getTransactions(), groupByDays() (+9 more)
+Cohesion: 0.15
+Nodes (19): agg(), claimDailyLogin(), DAY_LABELS, getBalance(), getStats(), getStreak(), getTransactions(), groupByDays() (+11 more)
 
 ### Community 482 - "Community 482"
 Cohesion: 0.07
@@ -2405,8 +2410,8 @@ Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 496 - "Community 496"
-Cohesion: 0.18
-Nodes (14): CardPreview(), CardPreviewProps, styles, BulkCardForm(), BulkForm, bulkSchema, CreateCardScreen(), onSubmit() (+6 more)
+Cohesion: 0.1
+Nodes (29): CardPreview(), CardPreviewProps, styles, useBulkCreateCards(), useCardById(), useCards(), useCopyCard(), useCreateCard() (+21 more)
 
 ### Community 497 - "Community 497"
 Cohesion: 0.09
@@ -2481,8 +2486,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 515 - "Community 515"
-Cohesion: 0.17
-Nodes (12): useCreateNote(), useDeleteNote(), useNote(), useNotes(), useUpdateNote(), useNoteStats(), NoteEditorScreen(), NotesScreen() (+4 more)
+Cohesion: 0.33
+Nodes (7): useCreateNote(), useDeleteNote(), useNote(), useNotes(), useUpdateNote(), useNoteStats(), NoteEditorScreen()
 
 ### Community 516 - "Community 516"
 Cohesion: 0.22
@@ -2542,7 +2547,7 @@ Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compil
 
 ### Community 530 - "Community 530"
 Cohesion: 0.22
-Nodes (9): libraries, react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 531 - "Community 531"
 Cohesion: 0.07
@@ -2582,7 +2587,7 @@ Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compil
 
 ### Community 540 - "Community 540"
 Cohesion: 0.09
-Nodes (33): LAYOUT_OPTIONS, SetForm(), SetFormProps, styles, VISIBILITY_OPTIONS, useCardById(), CreateSetScreen(), styles (+25 more)
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 541 - "Community 541"
 Cohesion: 0.26
@@ -2793,12 +2798,12 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain
 
 ### Community 593 - "Community 593"
-Cohesion: 0.27
-Nodes (10): deleteFile(), getStorageUsage(), handleError(), listFiles(), renameFile(), uploadFile(), ListMediaDto, ListMediaDtoType (+2 more)
+Cohesion: 0.13
+Nodes (15): sharp, s3, deleteFile(), getStorageUsage(), handleError(), listFiles(), renameFile(), uploadFile() (+7 more)
 
 ### Community 594 - "Community 594"
-Cohesion: 0.15
-Nodes (13): useBulkCreateCards(), useCards(), useCopyCard(), useCreateCard(), useDeleteCard(), useMoveCard(), useRecordStudy(), useReorderCards() (+5 more)
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 595 - "Community 595"
 Cohesion: 0.22
@@ -2825,12 +2830,12 @@ Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 601 - "Community 601"
-Cohesion: 0.15
-Nodes (22): handleAssignFolder(), cloneSet(), createSet(), deleteSet(), getFriendsSets(), getPublicSets(), getSetById(), handleError() (+14 more)
+Cohesion: 0.16
+Nodes (21): cloneSet(), createSet(), deleteSet(), getFriendsSets(), getPublicSets(), getSetById(), handleError(), listSets() (+13 more)
 
 ### Community 602 - "Community 602"
-Cohesion: 0.17
-Nodes (19): gatheringsApi, useCancelGathering(), useCreateGathering(), useGathering(), useGatherings(), useLeaveGathering(), useParticipants(), useRsvp() (+11 more)
+Cohesion: 0.53
+Nodes (6): gatheringsApi, CreateGatheringPayload, Gathering, GatheringListResponse, GatheringParticipant, UpdateGatheringPayload
 
 ### Community 603 - "Community 603"
 Cohesion: 0.09
@@ -2849,24 +2854,24 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 607 - "Community 607"
-Cohesion: 0.16
-Nodes (12): name, scripts, build, db:generate, db:migrate, db:migrate:deploy, db:studio, dev (+4 more)
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 608 - "Community 608"
-Cohesion: 0.15
-Nodes (13): devDependencies, prisma, ts-node-dev, @types/bcryptjs, @types/cors, @types/express, @types/jsonwebtoken, @types/multer (+5 more)
+Cohesion: 0.18
+Nodes (8): authApi, CompletionScreenProps, styles, SetActionSheetProps, AuthState, removeDeviceToken(), KEYS, storage
 
 ### Community 609 - "Community 609"
-Cohesion: 0.21
-Nodes (6): CreditBadge(), CreditBadgeProps, styles, OTPInput(), OTPInputProps, styles
+Cohesion: 0.3
+Nodes (6): usersApi, ChangePasswordPayload, Plan, UpdateProfilePayload, User, UserPublicProfile
 
 ### Community 610 - "Community 610"
-Cohesion: 0.22
-Nodes (5): sharp, s3, ALLOWED_IMAGE_TYPES, formatBytes(), uploadFile()
+Cohesion: 0.3
+Nodes (8): SetCard(), SetCardProps, styles, Badge(), BadgeProps, BadgeVariant, styles, variantMap
 
 ### Community 611 - "Community 611"
-Cohesion: 0.18
-Nodes (6): ErrorStateProps, styles, Props, SortOrder, styles, { width: SCREEN_WIDTH, height: SCREEN_HEIGHT }
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 612 - "Community 612"
 Cohesion: 0.22
@@ -2885,38 +2890,54 @@ Cohesion: 0.22
 Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 616 - "Community 616"
-Cohesion: 0.53
-Nodes (4): DifficultyBadge(), DifficultyBadgeProps, MAP, styles
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 617 - "Community 617"
-Cohesion: 0.47
-Nodes (3): FlashCard(), FlashCardProps, styles
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 618 - "Community 618"
-Cohesion: 0.53
-Nodes (4): ColorPicker(), ColorPickerProps, PRESET_COLORS, styles
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 619 - "Community 619"
 Cohesion: 0.5
 Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, toolchain
 
 ### Community 620 - "Community 620"
+Cohesion: 0.36
+Nodes (6): aiApi, ChatHistoryParams, PaginatedBookmarks, PaginatedChats, PaginatedSessions, Pagination
+
+### Community 621 - "Community 621"
+Cohesion: 0.39
+Nodes (6): creditsApi, DailyLoginResult, PaginatedTransactions, Pagination, StatPoint, TransactionParams
+
+### Community 622 - "Community 622"
+Cohesion: 0.39
+Nodes (7): useBulkDeleteMedia(), useDeleteMedia(), useMediaFiles(), useRenameMedia(), useStorageUsage(), useUploadMedia(), MediaScreen()
+
+### Community 623 - "Community 623"
 Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
+Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
+
+### Community 625 - "Community 625"
+Cohesion: 0.5
+Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain
 
 ## Knowledge Gaps
-- **4496 isolated node(s):** `command`, `args`, `type`, `command`, `args` (+4491 more)
+- **4663 isolated node(s):** `command`, `args`, `type`, `command`, `args` (+4658 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **12 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getErrorMessage()` connect `Community 361` to `Community 2`, `Community 611`, `Community 515`, `Community 453`, `Community 6`, `Community 4`, `Community 10`, `Community 12`, `Community 48`, `Community 311`, `Community 602`?**
+- **Why does `getErrorMessage()` connect `Community 12` to `Community 4`, `Community 453`, `Community 6`, `Community 361`, `Community 10`, `Community 48`, `Community 311`?**
   _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `onSubmit()` connect `Community 10` to `Community 361`, `Community 5`?**
+- **Why does `onSubmit()` connect `Community 12` to `Community 5`, `Community 311`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `updateProfile()` connect `Community 5` to `Community 10`?**
+- **Why does `updateProfile()` connect `Community 5` to `Community 12`?**
   _High betweenness centrality (0.004) - this node is a cross-community bridge._
 - **Are the 86 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `getMyFeed()`) actually correct?**
   _`sendError()` has 86 INFERRED edges - model-reasoned connections that need verification._
@@ -2925,4 +2946,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 4 inferred relationships involving `getErrorMessage()` (e.g. with `onSubmit()` and `onSubmit()`) actually correct?**
   _`getErrorMessage()` has 4 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `command`, `args`, `type` to the rest of the system?**
-  _4496 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _4663 weakly-connected nodes found - possible documentation gaps or missing edges._

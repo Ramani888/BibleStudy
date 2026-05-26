@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { AskQuestionDtoType } from './ai.dto';
@@ -53,17 +54,19 @@ function parseAIResponse(raw: string): {
   const parts = body.split(CARD_DELIMITER);
   const answerText = parts[0].trim();
 
-  // Step 3: parse card Q/A pairs from each block
+  // Step 3: parse card Q/A pairs from each block (A: captures all continuation lines)
   const suggestedCards: { question: string; answer: string }[] = [];
   for (const part of parts.slice(1)) {
     const partLines = part.split('\n').map(l => l.trim()).filter(Boolean);
-    const qLine = partLines.find(l => l.toUpperCase().startsWith('Q:'));
-    const aLine = partLines.find(l => l.toUpperCase().startsWith('A:'));
-    if (qLine && aLine) {
-      suggestedCards.push({
-        question: qLine.slice(2).trim(),
-        answer: aLine.slice(2).trim(),
-      });
+    const qIdx = partLines.findIndex(l => l.toUpperCase().startsWith('Q:'));
+    const aIdx = partLines.findIndex(l => l.toUpperCase().startsWith('A:'));
+    if (qIdx === -1 || aIdx === -1) continue;
+    const question = partLines[qIdx].slice(2).trim();
+    const firstAnswerLine = partLines[aIdx].slice(2).trim();
+    const continuation = partLines.slice(aIdx + 1).join(' ');
+    const answer = continuation ? `${firstAnswerLine} ${continuation}` : firstAnswerLine;
+    if (question && answer) {
+      suggestedCards.push({ question, answer });
     }
   }
 
@@ -130,6 +133,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
         sessionId: dto.sessionId ?? null,
         question: dto.question,
         answer,
+        suggestedCards: suggestedCards as unknown as Prisma.InputJsonValue,
         creditsUsed: 1,
       },
     }),
@@ -207,6 +211,7 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
     sessionId: true,
     question: true,
     answer: true,
+    suggestedCards: true,
     creditsUsed: true,
     createdAt: true,
   } as const;
@@ -235,10 +240,10 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
 
   // Build lookup maps
   const metaMap = new Map((sessionMeta as { id: string; title: string | null; tags: string[] }[]).map(s => [s.id, s]));
-  const standaloneMsgMap = new Map((standaloneMessages as { id: string; sessionId: string | null; question: string; answer: string; creditsUsed: number; createdAt: Date }[]).map(m => [m.id, m]));
+  const standaloneMsgMap = new Map((standaloneMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[]).map(m => [m.id, m]));
 
-  const sessionMsgMap = new Map<string, { id: string; sessionId: string | null; question: string; answer: string; creditsUsed: number; createdAt: Date }[]>();
-  for (const msg of (sessionMessages as { id: string; sessionId: string | null; question: string; answer: string; creditsUsed: number; createdAt: Date }[])) {
+  const sessionMsgMap = new Map<string, { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[]>();
+  for (const msg of (sessionMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[])) {
     const key = msg.sessionId!;
     if (!sessionMsgMap.has(key)) sessionMsgMap.set(key, []);
     sessionMsgMap.get(key)!.push(msg);
@@ -252,7 +257,7 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
     messageCount: number;
     totalCreditsUsed: number;
     startedAt: Date;
-    messages: { id: string; sessionId: string | null; question: string; answer: string; creditsUsed: number; createdAt: Date }[];
+    messages: { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[];
   };
 
   // Assemble result in the same order as pageSlots

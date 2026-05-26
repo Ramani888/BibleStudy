@@ -22,6 +22,7 @@ export interface AIChat {
   sessionId: string | null;
   question: string;
   answer: string;
+  suggestedCards?: SuggestedCard[];
   creditsUsed: number;
   createdAt: string;
 }

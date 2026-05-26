@@ -150,15 +150,16 @@ model CreditTransaction {
 }
 
 model AIChat {
-  id          String     @id @default(uuid())
-  userId      String
-  sessionId   String?
-  question    String
-  answer      String
-  creditsUsed Int        @default(1)
-  createdAt   DateTime   @default(now())
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  bookmarks   Bookmark[]
+  id              String     @id @default(uuid())
+  userId          String
+  sessionId       String?
+  question        String
+  answer          String
+  suggestedCards  Json       @default("[]")
+  creditsUsed     Int        @default(1)
+  createdAt       DateTime   @default(now())
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookmarks       Bookmark[]
 
   @@index([userId])
   @@index([sessionId])
