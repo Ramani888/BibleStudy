@@ -1,17 +1,10 @@
 import { apiGet, apiPost } from './client';
-import type { CreditBalance, CreditTransaction, TransactionType } from '../types';
+import type { CreditBalance, CreditTransaction, Pagination, TransactionType } from '../types';
 
 interface TransactionParams {
   page?: number;
   limit?: number;
   type?: TransactionType;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
 }
 
 interface PaginatedTransactions {

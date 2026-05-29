@@ -1,5 +1,5 @@
 import { apiDelete, apiGet, apiPost, apiPut } from './client';
-import type { CreateSetPayload, StudySet, UpdateSetPayload } from '../types';
+import type { CreateSetPayload, Pagination, StudySet, UpdateSetPayload } from '../types';
 
 interface ListSetsParams {
   folderId?: string;
@@ -9,13 +9,6 @@ interface PublicSetsParams {
   page?: number;
   limit?: number;
   search?: string;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
 }
 
 interface PaginatedSets {

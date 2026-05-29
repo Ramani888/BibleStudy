@@ -5,9 +5,9 @@ import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
 import { useAuthStore } from '../store/auth.store';
 
-// Android emulator reaches host machine via 10.0.2.2; iOS simulator uses localhost
+// Android emulator: 10.0.2.2 (standard) | Physical device: set DEV_ANDROID_HOST in .env
 const LOCAL_URL = Platform.OS === 'android'
-  ? 'http://192.168.1.3:3010/api/v1'
+  ? `http://${Config.DEV_ANDROID_HOST ?? '10.0.2.2'}:3010/api/v1`
   : 'http://localhost:3010/api/v1';
 const BASE_URL = __DEV__ ? LOCAL_URL : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
 

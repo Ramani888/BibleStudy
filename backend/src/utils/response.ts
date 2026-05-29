@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { AppError } from './errors';
 
 export const sendSuccess = (
   res: Response,
@@ -28,3 +29,9 @@ export const sendError = (
     error: { code, details },
   });
 };
+
+export function handleControllerError(res: Response, error: unknown, fallback = 'Operation failed'): void {
+  if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+  const message = error instanceof Error ? error.message : fallback;
+  sendError(res, message, 500, 'INTERNAL_ERROR');
+}

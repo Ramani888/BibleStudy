@@ -1,16 +1,9 @@
 import { apiDelete, apiGet, apiPatch, apiPost } from './client';
-import type { AIChatPayload, AIChatResponse, BookmarkedChat, ChatSession, DailyVerse } from '../types';
+import type { AIChatPayload, AIChatResponse, BookmarkedChat, ChatSession, DailyVerse, Pagination } from '../types';
 
 interface ChatHistoryParams {
   page?: number;
   limit?: number;
-}
-
-interface Pagination {
-  total: number;
-  page: number;
-  limit: number;
-  pages: number;
 }
 
 interface PaginatedSessions {

@@ -7,7 +7,6 @@ import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
 
-const CHURCH_ICON_SIZE = 14;
 import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage } from '../../hooks';
@@ -15,6 +14,8 @@ import { ProgressBar } from '../../components/ui/ProgressBar';
 import { colors, layout, spacing } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Plan } from '../../types';
+
+const CHURCH_ICON_SIZE = 14;
 
 const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
   FREE: 'neutral',

@@ -1,24 +1,18 @@
 import { Request, Response } from 'express';
 import * as creditsService from './credits.service';
-import { sendSuccess, sendError } from '../../utils/response';
-import { AppError, ValidationError } from '../../utils/errors';
+import { sendSuccess, sendError, handleControllerError } from '../../utils/response';
+import { ValidationError } from '../../utils/errors';
 import type { StatPeriod, StatInterval } from './credits.service';
 
 const VALID_PERIODS:   StatPeriod[]   = ['today', 'week', 'month', 'year', 'custom'];
 const VALID_INTERVALS: StatInterval[] = ['1h', '2h', '6h', 'day', 'week', 'month', 'quarter'];
 const MAX_CUSTOM_DAYS = 90;
 
-function handleError(res: Response, error: unknown, fallback = 'Operation failed'): void {
-  if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
-  const message = error instanceof Error ? error.message : fallback;
-  sendError(res, message, 500, 'INTERNAL_ERROR');
-}
-
 export async function getBalance(req: Request, res: Response): Promise<void> {
   try {
     const result = await creditsService.getBalance(req.user!.id);
     sendSuccess(res, result, 'Balance retrieved successfully');
-  } catch (error) { handleError(res, error, 'Failed to get balance'); }
+  } catch (error) { handleControllerError(res, error, 'Failed to get balance'); }
 }
 
 export async function getTransactions(req: Request, res: Response): Promise<void> {
@@ -27,21 +21,21 @@ export async function getTransactions(req: Request, res: Response): Promise<void
     const limit = Math.min(parseInt(req.query.limit as string) || 20, 100);
     const result = await creditsService.getTransactions(req.user!.id, page, limit);
     sendSuccess(res, result, 'Transactions retrieved successfully');
-  } catch (error) { handleError(res, error, 'Failed to get transactions'); }
+  } catch (error) { handleControllerError(res, error, 'Failed to get transactions'); }
 }
 
 export async function claimDailyLogin(req: Request, res: Response): Promise<void> {
   try {
     const result = await creditsService.claimDailyLogin(req.user!.id);
     sendSuccess(res, result, result.message);
-  } catch (error) { handleError(res, error, 'Failed to claim daily reward'); }
+  } catch (error) { handleControllerError(res, error, 'Failed to claim daily reward'); }
 }
 
 export async function getStreak(req: Request, res: Response): Promise<void> {
   try {
     const result = await creditsService.getStreak(req.user!.id);
     sendSuccess(res, result, 'Streak retrieved successfully');
-  } catch (error) { handleError(res, error, 'Failed to get streak'); }
+  } catch (error) { handleControllerError(res, error, 'Failed to get streak'); }
 }
 
 export async function getStats(req: Request, res: Response): Promise<void> {
@@ -87,5 +81,5 @@ export async function getStats(req: Request, res: Response): Promise<void> {
 
     const result = await creditsService.getStats(req.user!.id, period as StatPeriod, fromDate, toDate, interval);
     sendSuccess(res, result, 'Stats retrieved successfully');
-  } catch (error) { handleError(res, error, 'Failed to get stats'); }
+  } catch (error) { handleControllerError(res, error, 'Failed to get stats'); }
 }
