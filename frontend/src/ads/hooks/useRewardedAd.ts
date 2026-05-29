@@ -38,14 +38,14 @@ export function useRewardedAd({ onEarned }: UseRewardedAdOptions): UseRewardedAd
     const u2 = ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
       didEarn.current = true;
       onEarnedRef.current().catch(() => {}).finally(() => {
-        u1(); u2(); u3();
+        u1(); u2(); u3(); u4();
         loadAd();
       });
     });
 
     const u3 = ad.addAdEventListener(AdEventType.CLOSED, () => {
       if (!didEarn.current) {
-        u1(); u2(); u3();
+        u1(); u2(); u3(); u4();
         loadAd();
       }
       // if didEarn, cleanup is handled in EARNED_REWARD finally
