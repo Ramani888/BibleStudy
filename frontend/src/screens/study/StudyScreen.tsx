@@ -7,6 +7,7 @@ import { Button, ProgressBar, Spacer, Typography } from '../../components/ui';
 import { useCards, useStudySession } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
+import { showInterstitial } from '../../ads/adManager';
 import type { LibraryScreenProps } from '../../navigation/types';
 import { CompletionScreen, FlashCardView } from './components';
 
@@ -45,6 +46,11 @@ export function StudyScreen({ route, navigation }: Props) {
     navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: prompt } });
   }, [currentCard, navigation]);
 
+  const handleExit = useCallback(() => {
+    showInterstitial();
+    navigation.popToTop();
+  }, [navigation]);
+
   if (isLoading) {
     return (
       <SafeAreaView style={styles.safe}>
@@ -80,7 +86,7 @@ export function StudyScreen({ route, navigation }: Props) {
           skippedCount={skippedCount}
           onRestart={handleRestart}
           onRetryHard={hardCards.length > 0 ? handleRetryHard : undefined}
-          onExit={() => navigation.popToTop()}
+          onExit={handleExit}
         />
       </SafeAreaView>
     );

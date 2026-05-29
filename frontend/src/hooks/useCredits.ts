@@ -34,6 +34,16 @@ export function useClaimDailyLogin() {
   });
 }
 
+export function useWatchAd() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: creditsApi.watchAd,
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['credits'] });
+    },
+  });
+}
+
 export type DayStat = { label: string; earned: number; used: number };
 
 export function useStreak() {

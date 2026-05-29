@@ -5,20 +5,22 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
+import Toast from 'react-native-toast-message';
+import { Badge, Button, Card, Divider, Spacer, Typography } from '../../components/ui';
 import { EmptyState, ErrorState } from '../../components/feedback';
 import { useQueryClient } from '@tanstack/react-query';
-import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks';
+import { useCreditBalance, useCreditTransactions, useStreak, useWatchAd } from '../../hooks';
 import { WeeklyChart } from './components/WeeklyChart';
-
-const BALANCE_ICON_SIZE = 32;
+import { useRewardedAd } from '../../ads/hooks/useRewardedAd';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { colors, fontSizes, layout, spacing } from '../../theme';
 import type { TransactionType } from '../../types';
+
+const BALANCE_ICON_SIZE = 32;
+const AD_ICON_SIZE = 28;
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
   USAGE:    { label: 'Used',     variant: 'error',   sign: '−' },
@@ -33,7 +35,6 @@ const AMOUNT_COLOR: Record<TransactionType, string> = {
   PURCHASE: colors.info,
   BONUS:    colors.primary,
 };
-
 
 function BalanceCard() {
   const { data, isLoading } = useCreditBalance();
@@ -63,6 +64,47 @@ function BalanceCard() {
           <Typography preset="h4" color={colors.textSecondary}>credits</Typography>
         </View>
       )}
+    </Card>
+  );
+}
+
+function WatchAdCard() {
+  const { mutateAsync: claimAdReward } = useWatchAd();
+
+  const { show: showAd, isLoaded: adLoaded, isLoading: adLoading } = useRewardedAd({
+    onEarned: async () => {
+      await claimAdReward();
+      Toast.show({
+        type: 'success',
+        text1: '+3 credits earned!',
+        text2: 'Keep watching to earn more.',
+      });
+    },
+  });
+
+  const isDisabled = adLoading || !adLoaded;
+
+  return (
+    <Card style={styles.watchAdCard} shadow="sm">
+      <View style={styles.watchAdRow}>
+        <View style={styles.watchAdIcon}>
+          <Icon name="play-circle-outline" size={AD_ICON_SIZE} color={colors.info} />
+        </View>
+        <View style={styles.watchAdText}>
+          <Typography preset="h4" color={colors.textPrimary}>Earn Credits</Typography>
+          <Typography preset="bodySm" color={colors.textSecondary}>
+            Watch a short ad to earn +3 credits (up to 5×/day)
+          </Typography>
+        </View>
+      </View>
+      <Button
+        label={isDisabled ? 'Loading Ad…' : 'Watch Ad'}
+        onPress={showAd}
+        loading={adLoading}
+        variant="outline"
+        fullWidth
+        style={styles.watchAdBtn}
+      />
     </Card>
   );
 }
@@ -99,6 +141,8 @@ export function CreditsScreen() {
             <BalanceCard />
             <Spacer size={spacing[4]} />
             <WeeklyChart />
+            <Spacer size={spacing[4]} />
+            <WatchAdCard />
             <Spacer size={spacing[6]} />
             <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
           </>
@@ -153,6 +197,8 @@ export function CreditsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+
+  // Balance card
   balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
   balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
@@ -165,6 +211,22 @@ const styles = StyleSheet.create({
     borderColor: colors.primaryLight,
   },
   balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
+
+  // Watch Ad card
+  watchAdCard: { gap: spacing[3], backgroundColor: colors.background },
+  watchAdRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
+  watchAdIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: colors.infoSurface,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  watchAdText: { flex: 1, gap: spacing[1] },
+  watchAdBtn: { marginTop: spacing[1] },
+
+  // Transaction list
   historyTitle: { marginBottom: spacing[2] },
   txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing[3], gap: spacing[3] },
   txLeft: { flex: 1, gap: spacing[1] },

@@ -24,6 +24,7 @@ import {
   useConfirmDialog,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
+import { AdBanner } from '../../ads/components/AdBanner';
 import { colors, layout, spacing } from '../../theme';
 import type { AppTabParamList } from '../../navigation/types';
 import type { StudySet } from '../../types';
@@ -272,6 +273,8 @@ export function HomeScreen() {
 
         <Spacer size={spacing[8]} />
       </ScrollView>
+
+      <AdBanner />
 
       <SetActionSheet
         set={selectedSet}

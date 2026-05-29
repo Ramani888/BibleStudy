@@ -30,6 +30,9 @@ export const creditsApi = {
   claimDailyLogin: () =>
     apiPost<DailyLoginResult>('/credits/daily-login'),
 
+  watchAd: () =>
+    apiPost<DailyLoginResult>('/credits/watch-ad'),
+
   getStreak: () =>
     apiGet<{ streak: number; longestStreak: number }>('/credits/streak'),
 

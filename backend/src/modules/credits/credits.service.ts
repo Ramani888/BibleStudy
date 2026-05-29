@@ -282,3 +282,45 @@ export async function claimDailyLogin(userId: string) {
     message: 'Daily login reward claimed! +1 credit',
   };
 }
+
+export async function watchAd(userId: string) {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
+  const todayEnd = new Date();
+  todayEnd.setHours(23, 59, 59, 999);
+
+  const watchesToday = await prisma.creditTransaction.count({
+    where: {
+      userId,
+      description: 'Ad watch reward',
+      createdAt: { gte: todayStart, lte: todayEnd },
+    },
+  });
+
+  if (watchesToday >= 5) {
+    throw new ConflictError('Daily ad watch limit reached (5/day)');
+  }
+
+  const [updatedUser, transaction] = await prisma.$transaction([
+    prisma.user.update({
+      where: { id: userId },
+      data: { creditBalance: { increment: 3 } },
+      select: { creditBalance: true },
+    }),
+    prisma.creditTransaction.create({
+      data: {
+        userId,
+        type: 'REWARD',
+        amount: 3,
+        description: 'Ad watch reward',
+      },
+    }),
+  ]);
+
+  return {
+    balance: updatedUser.creditBalance,
+    transaction,
+    message: 'Ad watched! +3 credits',
+  };
+}
