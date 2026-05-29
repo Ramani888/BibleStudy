@@ -73,12 +73,12 @@ function WatchAdCard() {
 
   const { show: showAd, isLoaded: adLoaded, isLoading: adLoading } = useRewardedAd({
     onEarned: async () => {
-      await claimAdReward();
-      Toast.show({
-        type: 'success',
-        text1: '+3 credits earned!',
-        text2: 'Keep watching to earn more.',
-      });
+      try {
+        await claimAdReward();
+        Toast.show({ type: 'success', text1: '+3 credits earned!', text2: 'Keep watching to earn more.' });
+      } catch (err) {
+        Toast.show({ type: 'error', text1: getErrorMessage(err) });
+      }
     },
   });
 

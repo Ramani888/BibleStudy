@@ -30,10 +30,10 @@
         android:value="default"
         tools:replace="android:value" />
 
-      <!-- AdMob App ID — replace with your real ID before release -->
+      <!-- AdMob App ID — set ADMOB_ANDROID_APP_ID in .env (see .env.example) -->
       <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-3940256099942544~3347511713"/>
+        android:value="${admobAndroidAppId}"/>
 
       <activity
         android:name=".MainActivity"

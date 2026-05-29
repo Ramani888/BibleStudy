@@ -12,6 +12,7 @@ const APP_OPEN_COOLDOWN_MS     = 4 * 60 * 60 * 1000; // 4 hours
 
 let interstitial: InterstitialAd | null = null;
 let interstitialLoaded = false;
+let interstitialShowing = false;
 let lastInterstitialTime = 0;
 
 function setupInterstitial() {
@@ -23,6 +24,7 @@ function setupInterstitial() {
 
   const u2 = ad.addAdEventListener(AdEventType.CLOSED, () => {
     u1(); u2(); u3();
+    interstitialShowing = false;
     lastInterstitialTime = Date.now();
     setupInterstitial();
   });
@@ -30,6 +32,7 @@ function setupInterstitial() {
   const u3 = ad.addAdEventListener(AdEventType.ERROR, () => {
     u1(); u2(); u3();
     interstitialLoaded = false;
+    interstitialShowing = false;
     setTimeout(setupInterstitial, 60_000);
   });
 
@@ -44,8 +47,9 @@ export function loadInterstitial(): void {
 
 export function showInterstitial(): void {
   const now = Date.now();
-  if (!interstitialLoaded || !interstitial) return;
+  if (!interstitialLoaded || !interstitial || interstitialShowing) return;
   if (now - lastInterstitialTime < INTERSTITIAL_COOLDOWN_MS) return;
+  interstitialShowing = true;
   interstitial.show();
 }
 
@@ -53,6 +57,7 @@ export function showInterstitial(): void {
 
 let appOpen: AppOpenAd | null = null;
 let appOpenLoaded = false;
+let appOpenShowing = false;
 let lastAppOpenTime = 0;
 
 function setupAppOpen() {
@@ -64,6 +69,7 @@ function setupAppOpen() {
 
   const u2 = ad.addAdEventListener(AdEventType.CLOSED, () => {
     u1(); u2(); u3();
+    appOpenShowing = false;
     lastAppOpenTime = Date.now();
     setupAppOpen();
   });
@@ -71,6 +77,7 @@ function setupAppOpen() {
   const u3 = ad.addAdEventListener(AdEventType.ERROR, () => {
     u1(); u2(); u3();
     appOpenLoaded = false;
+    appOpenShowing = false;
     setTimeout(setupAppOpen, 60_000);
   });
 
@@ -85,7 +92,8 @@ export function loadAppOpen(): void {
 
 export function showAppOpen(): void {
   const now = Date.now();
-  if (!appOpenLoaded || !appOpen) return;
+  if (!appOpenLoaded || !appOpen || appOpenShowing) return;
   if (now - lastAppOpenTime < APP_OPEN_COOLDOWN_MS) return;
+  appOpenShowing = true;
   appOpen.show();
 }

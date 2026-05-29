@@ -107,14 +107,20 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
-            manifestPlaceholders = [usesCleartextTraffic: true]
+            manifestPlaceholders = [
+                usesCleartextTraffic: true,
+                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")
+            ]
         }
         release {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             // Allow HTTP until HTTPS/domain is set up — change to false once TLS is configured
-            manifestPlaceholders = [usesCleartextTraffic: true]
+            manifestPlaceholders = [
+                usesCleartextTraffic: true,
+                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")
+            ]
         }
     }
 }

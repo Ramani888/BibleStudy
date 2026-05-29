@@ -51,10 +51,11 @@ export function useRewardedAd({ onEarned }: UseRewardedAdOptions): UseRewardedAd
       // if didEarn, cleanup is handled in EARNED_REWARD finally
     });
 
-    ad.addAdEventListener(AdEventType.ERROR, () => {
-      u1(); u2(); u3();
+    const u4 = ad.addAdEventListener(AdEventType.ERROR, () => {
+      u1(); u2(); u3(); u4();
       setIsLoading(false);
       setIsLoaded(false);
+      setTimeout(() => loadAd(), 30_000);
     });
 
     ad.load();

@@ -32,7 +32,8 @@ function AppBootstrap() {
       .then(() => {
         loadInterstitial();
         loadAppOpen();
-      });
+      })
+      .catch(() => {}); // AdMob init failure is non-fatal; ads simply won't load
   }, []);
 
   // Show App Open ad when app comes to foreground (authenticated users only)
