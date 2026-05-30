@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, shadows, spacing } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const FLASH_CARD_HEIGHT = 320;
@@ -99,14 +99,13 @@ const styles = StyleSheet.create({
   face: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: colors.background,
-    borderRadius: 24,
+    borderRadius: 14,
     borderWidth: 1.5,
     borderColor: colors.border,
     padding: spacing[6],
     alignItems: 'center',
     justifyContent: 'center',
     gap: spacing[4],
-    ...shadows.lg,
   },
   front: {
     borderTopColor: colors.info,

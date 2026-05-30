@@ -665,7 +665,7 @@ const styles = StyleSheet.create({
   },
   uploadSpinner: {
     backgroundColor: colors.background,
-    borderRadius: 16,
+    borderRadius: 12,
     padding: spacing[6],
   },
   loadingCenter: {

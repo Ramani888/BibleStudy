@@ -19,7 +19,7 @@ interface PressableCardProps extends Omit<PressableProps, 'style'> {
 }
 
 /** Static card container */
-export function Card({ children, shadow = 'sm', padding, style, ...rest }: CardProps) {
+export function Card({ children, shadow = 'none', padding, style, ...rest }: CardProps) {
   return (
     <View
       style={[
@@ -38,7 +38,7 @@ export function Card({ children, shadow = 'sm', padding, style, ...rest }: CardP
 /** Tappable card — use for list items, set cards, folder cards, etc. */
 export function PressableCard({
   children,
-  shadow = 'sm',
+  shadow = 'none',
   padding,
   style,
   ...rest

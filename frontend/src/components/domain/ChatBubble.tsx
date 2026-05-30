@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   },
 
   bubble: {
-    borderRadius: 18,
+    borderRadius: 14,
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
     gap: spacing[1],

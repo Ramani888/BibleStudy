@@ -1,4 +1,5 @@
 export { Typography } from './Typography';
+export { AnimatedPressable } from './AnimatedPressable';
 export type { TypographyProps } from './Typography';
 export { Button } from './Button';
 export { Input } from './Input';

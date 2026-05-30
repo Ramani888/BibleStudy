@@ -9,7 +9,7 @@ import { Button, Divider, Input, Typography } from '../../components/ui';
 
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useReorderCards, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, shadows, spacing } from '../../theme';
+import { colors, layout, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
@@ -491,11 +491,10 @@ const styles = StyleSheet.create({
   },
   separator: { height: spacing[3] },
   cardItem: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadows.sm,
   },
   questionSection: {
     backgroundColor: colors.backgroundSecondary,

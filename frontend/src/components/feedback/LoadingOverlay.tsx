@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   },
   box: {
     backgroundColor: colors.backgroundCard,
-    borderRadius: 16,
+    borderRadius: 12,
     padding: spacing[8],
   },
 });

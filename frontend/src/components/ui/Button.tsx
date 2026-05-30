@@ -6,7 +6,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { colors, layout, shadows, spacing } from '../../theme';
+import { colors, layout, spacing } from '../../theme';
 import { Typography } from './Typography';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
@@ -25,7 +25,6 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; labelColor: s
   primary: {
     container: {
       backgroundColor: colors.primary,
-      ...shadows.md,
     },
     labelColor: colors.textOnPrimary,
   },
@@ -48,7 +47,6 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; labelColor: s
   danger: {
     container: {
       backgroundColor: colors.error,
-      ...shadows.md,
     },
     labelColor: colors.textOnPrimary,
   },

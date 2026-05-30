@@ -51,7 +51,7 @@ export function DailyVerseCard({ verse, loading }: DailyVerseCardProps) {
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.primarySurface,
-    borderRadius: 20,
+    borderRadius: 14,
     padding: spacing[5],
     borderWidth: 1,
     borderColor: colors.primaryLight,

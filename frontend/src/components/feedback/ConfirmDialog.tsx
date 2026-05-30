@@ -63,7 +63,7 @@ export function ConfirmDialog({
 const styles = StyleSheet.create({
   wrapper: { justifyContent: 'center' },
   content: {
-    borderRadius: 20,
+    borderRadius: 14,
     marginHorizontal: spacing[6],
     paddingBottom: spacing[5],
   },

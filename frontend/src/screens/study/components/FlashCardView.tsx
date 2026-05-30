@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   diffBtn: {
     flex: 1,
     borderWidth: 1.5,
-    borderRadius: 16,
+    borderRadius: 12,
     paddingVertical: spacing[4],
     alignItems: 'center',
     gap: spacing[1.5],

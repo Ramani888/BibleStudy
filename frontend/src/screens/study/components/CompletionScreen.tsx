@@ -90,7 +90,7 @@ const styles = StyleSheet.create({
   scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
   scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
   statsGrid: { flexDirection: 'row', gap: spacing[3], marginVertical: spacing[2] },
-  statBox: { flex: 1, borderRadius: 16, padding: spacing[4], alignItems: 'center', gap: spacing[1] },
+  statBox: { flex: 1, borderRadius: 12, padding: spacing[4], alignItems: 'center', gap: spacing[1] },
   btns: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[2] },
   flex: { flex: 1 },
 });

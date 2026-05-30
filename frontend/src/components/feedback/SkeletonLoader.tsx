@@ -1,6 +1,22 @@
-import React, { useEffect, useRef } from 'react';
-import { Animated, StyleSheet, View, ViewStyle } from 'react-native';
+import React, { useEffect } from 'react';
+import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, {
+  Easing,
+  interpolate,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+import LinearGradient from 'react-native-linear-gradient';
 import { colors, spacing } from '../../theme';
+
+const SCREEN_WIDTH = Dimensions.get('window').width;
+const SHIMMER_COLORS: [string, string, string] = [
+  'rgba(255,255,255,0)',
+  'rgba(255,255,255,0.55)',
+  'rgba(255,255,255,0)',
+];
 
 interface SkeletonProps {
   width?: number | string;
@@ -10,23 +26,38 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style }: SkeletonProps) {
-  const shimmer = useRef(new Animated.Value(0)).current;
+  const progress = useSharedValue(0);
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(shimmer, { toValue: 1, duration: 900, useNativeDriver: true }),
-        Animated.timing(shimmer, { toValue: 0, duration: 900, useNativeDriver: true }),
-      ]),
-    ).start();
-  }, [shimmer]);
+    progress.value = withRepeat(
+      withTiming(1, { duration: 1200, easing: Easing.linear }),
+      -1,
+    );
+  }, []);
 
-  const opacity = shimmer.interpolate({ inputRange: [0, 1], outputRange: [0.4, 0.9] });
+  const animStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: interpolate(progress.value, [0, 1], [-SCREEN_WIDTH, SCREEN_WIDTH]) },
+    ],
+  }));
 
   return (
-    <Animated.View
-      style={[styles.base, { width: width as number, height, borderRadius, opacity }, style]}
-    />
+    <View
+      style={[
+        styles.base,
+        { width: width as number, height, borderRadius, overflow: 'hidden' },
+        style,
+      ]}
+    >
+      <Animated.View style={[StyleSheet.absoluteFill, animStyle]}>
+        <LinearGradient
+          colors={SHIMMER_COLORS}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFill}
+        />
+      </Animated.View>
+    </View>
   );
 }
 
@@ -49,7 +80,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.backgroundCard,
-    borderRadius: 16,
+    borderRadius: 12,
     padding: spacing[4],
     borderWidth: 1,
     borderColor: colors.border,

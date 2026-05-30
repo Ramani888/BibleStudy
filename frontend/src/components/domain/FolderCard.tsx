@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, shadows, spacing } from '../../theme';
+import { colors, spacing } from '../../theme';
 import { Typography } from '../ui/Typography';
 import type { Folder } from '../../types';
 
@@ -54,7 +54,6 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     overflow: 'hidden',
     gap: spacing[3],
-    ...shadows.sm,
   },
   colorBar: {
     width: 4,

@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { colors, shadows, spacing } from '../../../theme';
+import { colors, spacing } from '../../../theme';
 
 interface CardPreviewProps {
   question: string;
@@ -36,11 +36,10 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
 
 const styles = StyleSheet.create({
   preview: {
-    borderRadius: 16,
+    borderRadius: 12,
     overflow: 'hidden',
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadows.sm,
   },
   previewTop: {
     backgroundColor: colors.backgroundSecondary,

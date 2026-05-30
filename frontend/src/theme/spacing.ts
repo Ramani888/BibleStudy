@@ -32,7 +32,7 @@ export const layout = {
   screenPaddingH: spacing[4],
   screenPaddingV: spacing[6],
   cardPadding: spacing[4],
-  cardRadius: 16,
+  cardRadius: 12,
   inputHeight: 52,
   buttonHeight: 52,
   buttonHeightSm: 40,

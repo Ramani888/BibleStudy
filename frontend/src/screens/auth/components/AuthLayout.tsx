@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
   logoMark: {
     width: 64,
     height: 64,
-    borderRadius: 20,
+    borderRadius: 14,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: colors.background,
-    borderRadius: 24,
+    borderRadius: 12,
     padding: spacing[6],
     borderWidth: 1,
     borderColor: colors.border,

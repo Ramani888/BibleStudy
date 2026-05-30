@@ -1,10 +1,11 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
 import { Badge } from '../ui/Badge';
 import { Typography } from '../ui/Typography';
 import { formatDate } from '../../utils/formatters';
-import { colors, fontSizes, shadows, spacing } from '../../theme';
+import { colors, fontSizes, spacing } from '../../theme';
 import type { StudySet } from '../../types';
 
 const MENU_ICON_SIZE = 20;
@@ -23,10 +24,11 @@ export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps
   const barColor = set.color ?? DEFAULT_COLOR;
 
   return (
-    <Pressable
-      style={({ pressed }) => [styles.card, { opacity: pressed ? 0.85 : 1 }]}
+    <AnimatedPressable
+      style={styles.card}
       onPress={onPress}
       onLongPress={onLongPress}
+      accessibilityRole="button"
     >
       <View style={[styles.colorBar, { backgroundColor: barColor }]} />
       <View style={styles.content}>
@@ -72,7 +74,7 @@ export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps
           <Icon name="ellipsis-vertical" size={MENU_ICON_SIZE} color={colors.textDisabled} />
         </Pressable>
       )}
-    </Pressable>
+    </AnimatedPressable>
   );
 }
 
@@ -80,11 +82,10 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     backgroundColor: colors.background,
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
-    ...shadows.sm,
   },
   colorBar: {
     width: 4,
