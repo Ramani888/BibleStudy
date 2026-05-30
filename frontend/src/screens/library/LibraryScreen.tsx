@@ -204,6 +204,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         <FlatList
           data={setsLoading ? [] : sortedSets}
           keyExtractor={item => item.id}
+          style={styles.list}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -246,6 +247,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         <FlatList
           data={filteredFolders}
           keyExtractor={item => item.id}
+          style={styles.list}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -461,7 +463,7 @@ const styles = StyleSheet.create({
   },
   searchInput: { marginBottom: 0 },
   scroll: { padding: layout.screenPaddingH },
-  list: { gap: spacing[3] },
+  list: { flex: 1, gap: spacing[3] },
   separator: { height: spacing[3] },
   emptyState: { minHeight: 200 },
   colorLabel: { marginBottom: spacing[2] },

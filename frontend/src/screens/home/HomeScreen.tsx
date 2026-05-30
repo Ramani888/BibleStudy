@@ -135,6 +135,7 @@ export function HomeScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
         refreshControl={
@@ -312,6 +313,7 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
+  scrollView: { flex: 1 },
   scroll: { padding: layout.screenPaddingH },
 
   // Header

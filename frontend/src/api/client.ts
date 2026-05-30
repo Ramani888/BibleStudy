@@ -9,8 +9,6 @@ const BASE_URL = __DEV__
   ? 'http://localhost:3010/api/v1'
   : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
 
-console.log(`API Base URL: ${BASE_URL}`);
-
 export const apiClient = axios.create({
   baseURL: BASE_URL,
   timeout: 15_000,

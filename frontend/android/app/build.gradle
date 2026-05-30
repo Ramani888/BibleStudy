@@ -109,7 +109,7 @@ android {
             signingConfig signingConfigs.debug
             manifestPlaceholders = [
                 usesCleartextTraffic: true,
-                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")
+                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-2852887966244482~5170662706")
             ]
         }
         release {
@@ -119,7 +119,7 @@ android {
             // Allow HTTP until HTTPS/domain is set up — change to false once TLS is configured
             manifestPlaceholders = [
                 usesCleartextTraffic: true,
-                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-3940256099942544~3347511713")
+                admobAndroidAppId: (project.env.get("ADMOB_ANDROID_APP_ID") ?: "ca-app-pub-2852887966244482~5170662706")
             ]
         }
     }
@@ -128,6 +128,8 @@ android {
 dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    // Required to reference MobileAds directly in MainApplication.kt
+    implementation("com.google.android.gms:play-services-ads:23.6.0")
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

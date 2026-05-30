@@ -5,6 +5,8 @@ import {
 } from 'react-native-google-mobile-ads';
 import { AD_UNIT_IDS } from './adIds';
 
+const AD_REQUEST_OPTIONS = { requestNonPersonalizedAdsOnly: true };
+
 const INTERSTITIAL_COOLDOWN_MS = 60 * 60 * 1000;  // 60 minutes
 const APP_OPEN_COOLDOWN_MS     = 4 * 60 * 60 * 1000; // 4 hours
 
@@ -16,7 +18,7 @@ let interstitialShowing = false;
 let lastInterstitialTime = 0;
 
 function setupInterstitial() {
-  const ad = InterstitialAd.createForAdRequest(AD_UNIT_IDS.interstitial);
+  const ad = InterstitialAd.createForAdRequest(AD_UNIT_IDS.interstitial, AD_REQUEST_OPTIONS);
 
   const u1 = ad.addAdEventListener(AdEventType.LOADED, () => {
     interstitialLoaded = true;
@@ -61,7 +63,7 @@ let appOpenShowing = false;
 let lastAppOpenTime = 0;
 
 function setupAppOpen() {
-  const ad = AppOpenAd.createForAdRequest(AD_UNIT_IDS.appOpen);
+  const ad = AppOpenAd.createForAdRequest(AD_UNIT_IDS.appOpen, AD_REQUEST_OPTIONS);
 
   const u1 = ad.addAdEventListener(AdEventType.LOADED, () => {
     appOpenLoaded = true;

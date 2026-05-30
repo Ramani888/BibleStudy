@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
 import { AD_UNIT_IDS } from '../adIds';
 
-export function AdBanner() {
-  const [failed, setFailed] = useState(false);
+const RETRY_DELAY_MS = 30_000;
 
-  if (failed) return null;
+export function AdBanner() {
+  const [key, setKey] = useState(0);
 
   return (
     <BannerAd
+      key={key}
       unitId={AD_UNIT_IDS.banner}
       size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER}
-      requestOptions={{ requestNonPersonalizedAdsOnly: false }}
-      onAdFailedToLoad={() => setFailed(true)}
+      requestOptions={{ requestNonPersonalizedAdsOnly: true }}
+      onAdFailedToLoad={() => setTimeout(() => setKey(k => k + 1), RETRY_DELAY_MS)}
     />
   );
 }

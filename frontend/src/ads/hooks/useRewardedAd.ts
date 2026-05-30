@@ -28,7 +28,7 @@ export function useRewardedAd({ onEarned }: UseRewardedAdOptions): UseRewardedAd
     setIsLoading(true);
     didEarn.current = false;
 
-    const ad = RewardedAd.createForAdRequest(AD_UNIT_IDS.rewarded);
+    const ad = RewardedAd.createForAdRequest(AD_UNIT_IDS.rewarded, { requestNonPersonalizedAdsOnly: true });
 
     const u1 = ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
       setIsLoaded(true);

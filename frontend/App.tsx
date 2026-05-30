@@ -25,7 +25,7 @@ function AppBootstrap() {
     initialize();
   }, [initialize]);
 
-  // Init AdMob SDK once, then preload ads
+  // Init AdMob SDK once, then preload full-screen ads
   useEffect(() => {
     MobileAds()
       .initialize()
@@ -33,7 +33,7 @@ function AppBootstrap() {
         loadInterstitial();
         loadAppOpen();
       })
-      .catch(() => {}); // AdMob init failure is non-fatal; ads simply won't load
+      .catch(() => {});
   }, []);
 
   // Show App Open ad when app comes to foreground (authenticated users only)
