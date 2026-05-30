@@ -29,7 +29,7 @@ type Props = ProfileScreenProps<'GroupDetail'>;
 
 export function GroupDetailScreen({ route, navigation }: Props) {
   const { groupId } = route.params;
-  const { user } = useAuthStore();
+  const user = useAuthStore(s => s.user);
   const { data: group, isLoading, isFetching, error, refetch } = useGroup(groupId);
   const leaveGroup = useLeaveGroup();
   const deleteGroup = useDeleteGroup();

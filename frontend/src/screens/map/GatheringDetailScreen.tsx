@@ -30,7 +30,7 @@ const STATUS_LABELS = { GOING: 'Going', MAYBE: 'Maybe', NOT_GOING: "Can't Go" } 
 
 export function GatheringDetailScreen({ route, navigation }: Props) {
   const { gatheringId } = route.params;
-  const { user } = useAuthStore();
+  const user = useAuthStore(s => s.user);
   const { data: gathering, isLoading, isFetching, error, refetch } = useGathering(gatheringId);
   const rsvp = useRsvp();
   const cancelGathering = useCancelGathering();

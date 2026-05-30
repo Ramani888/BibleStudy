@@ -8,8 +8,8 @@ import type {
   ResendVerificationPayload,
   ResetPasswordPayload,
   VerifyEmailPayload,
+  User,
 } from '../types';
-import type { User } from '../types';
 
 export const authApi = {
   register: (payload: RegisterPayload) =>

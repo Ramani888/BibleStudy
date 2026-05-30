@@ -1,11 +1,12 @@
 import { create } from 'zustand';
+import axios from 'axios';
 import { authApi } from '../api/auth.api';
 import { usersApi } from '../api/users.api';
 import { storage } from '../utils/storage';
 import { removeDeviceToken } from '../utils/notifications';
 import { queryClient } from '../lib/queryClient';
-import type { User } from '../types';
 import type {
+  User,
   LoginPayload,
   RegisterPayload,
   VerifyEmailPayload,
@@ -51,9 +52,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       // Token exists — fetch current user to confirm it is still valid
       const user = await authApi.me();
       set({ user, isAuthenticated: true, isInitialized: true });
-    } catch {
-      // Token expired or invalid — clear and show auth screens
-      await storage.clearTokens();
+    } catch (error) {
+      // Only clear tokens on 401 — network/server errors must NOT log the user out
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        await storage.clearTokens();
+        queryClient.clear();
+      }
       set({ isInitialized: true });
     }
   },
