@@ -394,7 +394,7 @@ export async function getDailyVerse() {
 
     const data = await response.json() as {
       random_verse?: {
-        book_name?: string;
+        book?: string;
         chapter?: number;
         verse?: number;
         text?: string;
@@ -404,9 +404,9 @@ export async function getDailyVerse() {
     if (data.random_verse) {
       const verse = data.random_verse;
       return {
-        reference: `${verse.book_name} ${verse.chapter}:${verse.verse}`,
+        reference: `${verse.book} ${verse.chapter}:${verse.verse}`,
         text: verse.text?.trim() ?? '',
-        book: verse.book_name ?? '',
+        book: verse.book ?? '',
         chapter: verse.chapter ?? 0,
         verse: verse.verse ?? 0,
       };
