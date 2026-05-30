@@ -1,15 +1,15 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { Platform } from 'react-native';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
 import { useAuthStore } from '../store/auth.store';
 
-// Android emulator: 10.0.2.2 (standard) | Physical device: set DEV_ANDROID_HOST in .env
-const LOCAL_URL = Platform.OS === 'android'
-  ? `http://${Config.DEV_ANDROID_HOST ?? '10.0.2.2'}:3010/api/v1`
-  : 'http://localhost:3010/api/v1';
-const BASE_URL = __DEV__ ? LOCAL_URL : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
+// Dev: adb reverse tcp:3010 tcp:3010 tunnels localhost → PC (works for physical device + emulator + iOS sim)
+const BASE_URL = __DEV__
+  ? 'http://localhost:3010/api/v1'
+  : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
+
+console.log(`API Base URL: ${BASE_URL}`);
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
