@@ -48,7 +48,7 @@ export function StudyScreen({ route, navigation }: Props) {
 
   const handleExit = useCallback(() => {
     showInterstitial();
-    navigation.popToTop();
+    navigation.goBack();
   }, [navigation]);
 
   if (isLoading) {

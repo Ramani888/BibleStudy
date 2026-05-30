@@ -29,11 +29,22 @@ interface ActionSheetProps {
 
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
   const ref = useRef<BottomSheetModal>(null);
+  const isOpenRef = useRef(false);
+
+  // Track open state separately to avoid calling dismiss() when the sheet is
+  // already closed (user swipe / backdrop tap sets isOpenRef=false before the
+  // visible=false effect fires, preventing a double-dismiss that breaks
+  // BottomSheetModal's internal state and blocks future present() calls).
+  const handleDismiss = useCallback(() => {
+    isOpenRef.current = false;
+    onClose();
+  }, [onClose]);
 
   useEffect(() => {
-    if (visible) {
+    if (visible && !isOpenRef.current) {
+      isOpenRef.current = true;
       ref.current?.present();
-    } else {
+    } else if (!visible && isOpenRef.current) {
       ref.current?.dismiss();
     }
   }, [visible]);
@@ -61,7 +72,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
     <BottomSheetModal
       ref={ref}
       snapPoints={snapPoints}
-      onDismiss={onClose}
+      onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={styles.handle}
       backgroundStyle={styles.background}
