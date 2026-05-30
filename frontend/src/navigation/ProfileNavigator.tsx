@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { ProfileStackParamList } from './types';
 import { colors, fontWeights } from '../theme';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
@@ -27,6 +28,28 @@ import { MediaPDFViewerScreen } from '../screens/profile/MediaPDFViewerScreen';
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export function ProfileNavigator() {
+  // `navigation` here is the TAB navigator's context (parent of ProfileNavigator).
+  // When ProfileTab loses focus (user switches to another tab), we reset the
+  // Profile stack to the root screen — invisibly, while the user is already
+  // on a different tab, so there is no visible flash.
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      const tabState = navigation.getState();
+      const profileTabRoute = tabState?.routes?.find(r => r.name === 'ProfileTab');
+      const profileStackState = profileTabRoute?.state;
+
+      if (profileStackState && (profileStackState.index ?? 0) > 0) {
+        navigation.dispatch({
+          ...CommonActions.reset({ index: 0, routes: [{ name: 'Profile' }] }),
+          target: profileStackState.key,
+        });
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <Stack.Navigator
       screenOptions={{

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { LibraryStackParamList } from './types';
 import { colors, fontWeights } from '../theme';
 import { LibraryScreen } from '../screens/library/LibraryScreen';
@@ -16,6 +17,23 @@ import { StudyScreen } from '../screens/study/StudyScreen';
 const Stack = createNativeStackNavigator<LibraryStackParamList>();
 
 export function LibraryNavigator() {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('blur', () => {
+      const tabState = navigation.getState();
+      const route = tabState?.routes?.find(r => r.name === 'LibraryTab');
+      const stackState = route?.state;
+      if (stackState && (stackState.index ?? 0) > 0) {
+        navigation.dispatch({
+          ...CommonActions.reset({ index: 0, routes: [{ name: 'Library' }] }),
+          target: stackState.key,
+        });
+      }
+    });
+    return unsubscribe;
+  }, [navigation]);
+
   return (
     <Stack.Navigator
       screenOptions={{
