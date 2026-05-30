@@ -1,7 +1,10 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
+import LottieView from 'lottie-react-native';
 import { colors, spacing } from '../../theme';
 import { Button, Typography } from '../ui';
+
+const DEFAULT_ANIMATION = require('../../assets/animations/empty.json');
 
 interface EmptyStateProps {
   title: string;
@@ -15,7 +18,16 @@ interface EmptyStateProps {
 export function EmptyState({ title, subtitle, ctaLabel, onCta, icon, style }: EmptyStateProps) {
   return (
     <View style={[styles.container, style]}>
-      {icon && <View style={styles.icon}>{icon}</View>}
+      {icon ? (
+        <View style={styles.icon}>{icon}</View>
+      ) : (
+        <LottieView
+          source={DEFAULT_ANIMATION}
+          autoPlay
+          loop
+          style={styles.lottie}
+        />
+      )}
       <Typography preset="h4" align="center" color={colors.textPrimary}>
         {title}
       </Typography>
@@ -42,6 +54,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing[8],
+  },
+  lottie: {
+    width: 120,
+    height: 120,
+    marginBottom: spacing[3],
   },
   icon: {
     marginBottom: spacing[4],

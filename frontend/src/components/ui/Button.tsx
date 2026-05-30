@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   ActivityIndicator,
+  GestureResponderEvent,
   Pressable,
   PressableProps,
   StyleSheet,
@@ -8,6 +9,7 @@ import {
 } from 'react-native';
 import { colors, layout, spacing } from '../../theme';
 import { Typography } from './Typography';
+import { triggerHaptic } from '../../utils/haptics';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'sm' | 'md';
@@ -60,11 +62,17 @@ export function Button({
   fullWidth = false,
   disabled,
   style,
+  onPressIn,
   ...rest
 }: ButtonProps) {
   const isDisabled = disabled || loading;
   const { container, labelColor } = variantStyles[variant];
   const height = size === 'sm' ? layout.buttonHeightSm : layout.buttonHeight;
+
+  const handlePressIn = useCallback((e: GestureResponderEvent) => {
+    triggerHaptic('light');
+    onPressIn?.(e);
+  }, [onPressIn]);
 
   return (
     <Pressable
@@ -76,6 +84,7 @@ export function Button({
         style,
       ]}
       disabled={isDisabled}
+      onPressIn={handlePressIn}
       {...rest}
     >
       {loading ? (

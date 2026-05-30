@@ -6,6 +6,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import Toast from 'react-native-toast-message';
 import { enableScreens } from 'react-native-screens';
 import MobileAds from 'react-native-google-mobile-ads';
+import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { queryClient } from './src/lib/queryClient';
 import { useAuthStore } from './src/store';
@@ -58,8 +59,10 @@ export default function App() {
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
-          <AppBootstrap />
-          <Toast />
+          <BottomSheetModalProvider>
+            <AppBootstrap />
+            <Toast />
+          </BottomSheetModalProvider>
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

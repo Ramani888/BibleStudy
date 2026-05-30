@@ -1,5 +1,6 @@
 import React, { useCallback } from 'react';
 import { Pressable, PressableProps, StyleProp, ViewStyle } from 'react-native';
+import { triggerHaptic } from '../../utils/haptics';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -38,6 +39,7 @@ export function AnimatedPressable({
   }));
 
   const handlePressIn = useCallback<NonNullable<PressableProps['onPressIn']>>((e) => {
+    triggerHaptic('light');
     scale.value = withSpring(scaleTo, { damping: 15, stiffness: 200 });
     opacity.value = withTiming(0.82, { duration: 80 });
     onPressIn?.(e);

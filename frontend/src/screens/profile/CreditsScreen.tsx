@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
   View,
 } from 'react-native';
+import LottieView from 'lottie-react-native';
+
+const SUCCESS_ANIMATION = require('../../assets/animations/success.json');
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
@@ -69,12 +72,15 @@ function BalanceCard() {
 }
 
 function WatchAdCard() {
+  const [showSuccess, setShowSuccess] = useState(false);
   const { mutateAsync: claimAdReward } = useWatchAd();
 
   const { show: showAd, isLoaded: adLoaded, isLoading: adLoading } = useRewardedAd({
     onEarned: async () => {
       try {
         await claimAdReward();
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
         Toast.show({ type: 'success', text1: '+3 credits earned!', text2: 'Keep watching to earn more.' });
       } catch (err) {
         Toast.show({ type: 'error', text1: getErrorMessage(err) });
@@ -85,27 +91,39 @@ function WatchAdCard() {
   const isDisabled = adLoading || !adLoaded;
 
   return (
-    <Card style={styles.watchAdCard} shadow="sm">
-      <View style={styles.watchAdRow}>
-        <View style={styles.watchAdIcon}>
-          <Icon name="play-circle-outline" size={AD_ICON_SIZE} color={colors.info} />
+    <View>
+      <Card style={styles.watchAdCard} shadow="sm">
+        <View style={styles.watchAdRow}>
+          <View style={styles.watchAdIcon}>
+            <Icon name="play-circle-outline" size={AD_ICON_SIZE} color={colors.info} />
+          </View>
+          <View style={styles.watchAdText}>
+            <Typography preset="h4" color={colors.textPrimary}>Earn Credits</Typography>
+            <Typography preset="bodySm" color={colors.textSecondary}>
+              Watch a short ad to earn +3 credits (up to 5×/day)
+            </Typography>
+          </View>
         </View>
-        <View style={styles.watchAdText}>
-          <Typography preset="h4" color={colors.textPrimary}>Earn Credits</Typography>
-          <Typography preset="bodySm" color={colors.textSecondary}>
-            Watch a short ad to earn +3 credits (up to 5×/day)
-          </Typography>
+        <Button
+          label={isDisabled ? 'Loading Ad…' : 'Watch Ad'}
+          onPress={showAd}
+          loading={adLoading}
+          variant="outline"
+          fullWidth
+          style={styles.watchAdBtn}
+        />
+      </Card>
+      {showSuccess && (
+        <View style={styles.successOverlay} pointerEvents="none">
+          <LottieView
+            source={SUCCESS_ANIMATION}
+            autoPlay
+            loop={false}
+            style={styles.successLottie}
+          />
         </View>
-      </View>
-      <Button
-        label={isDisabled ? 'Loading Ad…' : 'Watch Ad'}
-        onPress={showAd}
-        loading={adLoading}
-        variant="outline"
-        fullWidth
-        style={styles.watchAdBtn}
-      />
-    </Card>
+      )}
+    </View>
   );
 }
 
@@ -225,6 +243,15 @@ const styles = StyleSheet.create({
   },
   watchAdText: { flex: 1, gap: spacing[1] },
   watchAdBtn: { marginTop: spacing[1] },
+  successOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  successLottie: {
+    width: 140,
+    height: 140,
+  },
 
   // Transaction list
   historyTitle: { marginBottom: spacing[2] },

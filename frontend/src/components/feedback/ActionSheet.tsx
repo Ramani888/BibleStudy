@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { AppModal } from './Modal';
+import {
+  BottomSheetModal,
+  BottomSheetView,
+  BottomSheetBackdrop,
+} from '@gorhom/bottom-sheet';
+import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Divider, Typography } from '../ui';
-import { colors, spacing } from '../../theme';
+import { colors, layout, spacing } from '../../theme';
 
 const ACTION_ICON_SIZE = 20;
 
@@ -23,58 +28,116 @@ interface ActionSheetProps {
 }
 
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
+  const ref = useRef<BottomSheetModal>(null);
+
+  useEffect(() => {
+    if (visible) {
+      ref.current?.present();
+    } else {
+      ref.current?.dismiss();
+    }
+  }, [visible]);
+
+  const snapPoints = useMemo(() => {
+    // ~8% per row (action/cancel) + 10% extra for title if present + 12% base
+    const rows = actions.length + 1; // actions + cancel row
+    const pct = Math.max(35, Math.min(70, rows * 8 + 12 + (title ? 10 : 0)));
+    return [`${pct}%`];
+  }, [actions.length, title]);
+
+  const renderBackdrop = useCallback(
+    (props: BottomSheetBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        disappearsOnIndex={-1}
+        appearsOnIndex={0}
+        pressBehavior="close"
+      />
+    ),
+    [],
+  );
+
   return (
-    <AppModal visible={visible} title={title} onClose={onClose} animationType="slide" showHandle>
-      <View style={styles.list}>
-        {actions.map((action, i) => (
-          <React.Fragment key={action.label}>
-            {i > 0 && <Divider marginV={0} />}
-            <Pressable
-              style={({ pressed }) => [styles.item, { opacity: pressed || action.disabled ? 0.5 : 1 }]}
-              onPress={() => {
-                // Capture the handler before closing — the closure retains the
-                // correct state even after the parent re-renders with cleared state.
-                const fn = action.onPress;
-                onClose();
-                // Delay until the slide-down animation finishes (~300ms) so the
-                // next modal/dialog doesn't appear while this sheet is still on screen.
-                setTimeout(fn, 300);
-              }}
-              disabled={action.disabled}
-            >
-              <View style={styles.actionRow}>
-                {action.iconName && (
-                  <Icon
-                    name={action.iconName}
-                    size={ACTION_ICON_SIZE}
-                    color={action.destructive ? colors.error : colors.textSecondary}
-                  />
-                )}
-                <Typography
-                  preset="bodyLg"
-                  color={action.destructive ? colors.error : colors.textPrimary}
-                >
-                  {action.label}
-                </Typography>
-              </View>
-            </Pressable>
-          </React.Fragment>
-        ))}
-      </View>
-      <Divider />
-      <Pressable
-        style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.6 : 1 }]}
-        onPress={onClose}
-      >
-        <Typography preset="bodyLg" color={colors.textSecondary} align="center">
-          Cancel
-        </Typography>
-      </Pressable>
-    </AppModal>
+    <BottomSheetModal
+      ref={ref}
+      snapPoints={snapPoints}
+      onDismiss={onClose}
+      backdropComponent={renderBackdrop}
+      handleIndicatorStyle={styles.handle}
+      backgroundStyle={styles.background}
+    >
+      <BottomSheetView style={styles.content}>
+        {title && (
+          <Typography preset="h4" style={styles.title}>{title}</Typography>
+        )}
+        <View style={styles.list}>
+          {actions.map((action, i) => (
+            <React.Fragment key={action.label}>
+              {i > 0 && <Divider marginV={0} />}
+              <Pressable
+                style={({ pressed }) => [
+                  styles.item,
+                  { opacity: pressed || action.disabled ? 0.5 : 1 },
+                ]}
+                onPress={() => {
+                  const fn = action.onPress;
+                  ref.current?.dismiss();
+                  setTimeout(fn, 300);
+                }}
+                disabled={action.disabled}
+              >
+                <View style={styles.actionRow}>
+                  {action.iconName && (
+                    <Icon
+                      name={action.iconName}
+                      size={ACTION_ICON_SIZE}
+                      color={action.destructive ? colors.error : colors.textSecondary}
+                    />
+                  )}
+                  <Typography
+                    preset="bodyLg"
+                    color={action.destructive ? colors.error : colors.textPrimary}
+                  >
+                    {action.label}
+                  </Typography>
+                </View>
+              </Pressable>
+            </React.Fragment>
+          ))}
+        </View>
+        <Divider />
+        <Pressable
+          style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.6 : 1 }]}
+          onPress={() => ref.current?.dismiss()}
+        >
+          <Typography preset="bodyLg" color={colors.textSecondary} align="center">
+            Cancel
+          </Typography>
+        </Pressable>
+      </BottomSheetView>
+    </BottomSheetModal>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    backgroundColor: colors.backgroundCard,
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+  },
+  handle: {
+    backgroundColor: colors.primaryLight,
+    width: 40,
+    height: 4,
+  },
+  content: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingBottom: spacing[6],
+  },
+  title: {
+    marginBottom: spacing[4],
+    marginTop: spacing[2],
+  },
   list: { gap: 0 },
   item: {
     paddingVertical: spacing[4],
