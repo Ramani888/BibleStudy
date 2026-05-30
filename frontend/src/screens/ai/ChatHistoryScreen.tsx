@@ -456,31 +456,33 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
 
           {/* ── Tag filter bar ── */}
           {hasAnyTaggedSession && (
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.tagBar}
-            >
-              <Pressable
-                style={[styles.tagFilter, activeTag === null && styles.tagFilterActive]}
-                onPress={() => setActiveTag(null)}
+            <View style={styles.tagBarWrapper}>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.tagBar}
               >
-                <Typography preset="caption" color={activeTag === null ? colors.textOnPrimary : colors.textSecondary}>
-                  All
-                </Typography>
-              </Pressable>
-              {PREDEFINED_TAGS.map(tag => (
                 <Pressable
-                  key={tag}
-                  style={[styles.tagFilter, activeTag === tag && styles.tagFilterActive]}
-                  onPress={() => setActiveTag(prev => prev === tag ? null : tag)}
+                  style={[styles.tagFilter, activeTag === null && styles.tagFilterActive]}
+                  onPress={() => setActiveTag(null)}
                 >
-                  <Typography preset="caption" color={activeTag === tag ? colors.textOnPrimary : colors.textSecondary}>
-                    {tag}
+                  <Typography preset="caption" color={activeTag === null ? colors.textOnPrimary : colors.textSecondary}>
+                    All
                   </Typography>
                 </Pressable>
-              ))}
-            </ScrollView>
+                {PREDEFINED_TAGS.map(tag => (
+                  <Pressable
+                    key={tag}
+                    style={[styles.tagFilter, activeTag === tag && styles.tagFilterActive]}
+                    onPress={() => setActiveTag(prev => prev === tag ? null : tag)}
+                  >
+                    <Typography preset="caption" color={activeTag === tag ? colors.textOnPrimary : colors.textSecondary}>
+                      {tag}
+                    </Typography>
+                  </Pressable>
+                ))}
+              </ScrollView>
+            </View>
           )}
         </>
       )}
@@ -665,13 +667,15 @@ const styles = StyleSheet.create({
   },
   clearBtn: { padding: spacing[1] },
 
+  tagBarWrapper: {
+    backgroundColor: colors.background,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
   tagBar: {
     paddingHorizontal: layout.screenPaddingH,
     paddingVertical: spacing[2],
     gap: spacing[2],
-    backgroundColor: colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   tagFilter: {
     paddingHorizontal: spacing[3],
