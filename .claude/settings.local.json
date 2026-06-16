@@ -96,7 +96,18 @@
       "Bash(echo \"EXIT:$?\")",
       "Bash(echo \"BACKEND_EXIT:$?\")",
       "Bash(echo \"FRONTEND_EXIT:$?\")",
-      "Bash(echo \"PRISMA_EXIT:$?\")"
+      "Bash(echo \"PRISMA_EXIT:$?\")",
+      "Bash(pip3 show *)",
+      "Bash(code-review-graph update *)",
+      "Bash(./gradlew app:installDebug -PreactNativeDevServerPort=8081)",
+      "Bash(/usr/libexec/java_home *)",
+      "Bash(./gradlew app:assembleDebug --no-daemon)",
+      "Bash(launchctl getenv *)",
+      "Bash(defaults read *)",
+      "Bash(JAVA_HOME=$\\(/usr/libexec/java_home -v17\\) JAVA_HOME=$\\(/usr/libexec/java_home -v17\\) ./gradlew app:assembleDebug --no-daemon)",
+      "Bash(chmod +x *)",
+      "Bash(grep -rhnE '//\\\\s*[─━=—\\\\-]{3,}|//.*[─━]{3,}' --include='*.ts' --include='*.tsx' .)",
+      "Bash(grep -rn -A6 \"<FAB$\\\\|<FAB \" src/screens)"
     ]
   },
   "enableAllProjectMcpServers": true,

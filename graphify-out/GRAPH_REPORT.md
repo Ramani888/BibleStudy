@@ -1,18 +1,13 @@
-# Graph Report - BibleStudy  (2026-05-26)
+# Graph Report - .  (2026-05-31)
 
 ## Corpus Check
-- 751 files · ~316,155 words
+- 257 files · ~95,332 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 8920 nodes · 13014 edges · 626 communities (613 shown, 13 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 330 edges (avg confidence: 0.8)
+- 1116 nodes · 1216 edges · 222 communities detected
+- Extraction: 74% EXTRACTED · 26% INFERRED · 0% AMBIGUOUS · INFERRED: 315 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `d3e529c9`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Community 0|Community 0]]
@@ -83,6 +78,7 @@
 - [[_COMMUNITY_Community 65|Community 65]]
 - [[_COMMUNITY_Community 66|Community 66]]
 - [[_COMMUNITY_Community 67|Community 67]]
+- [[_COMMUNITY_Community 68|Community 68]]
 - [[_COMMUNITY_Community 69|Community 69]]
 - [[_COMMUNITY_Community 70|Community 70]]
 - [[_COMMUNITY_Community 71|Community 71]]
@@ -113,7 +109,9 @@
 - [[_COMMUNITY_Community 96|Community 96]]
 - [[_COMMUNITY_Community 97|Community 97]]
 - [[_COMMUNITY_Community 98|Community 98]]
+- [[_COMMUNITY_Community 99|Community 99]]
 - [[_COMMUNITY_Community 100|Community 100]]
+- [[_COMMUNITY_Community 101|Community 101]]
 - [[_COMMUNITY_Community 102|Community 102]]
 - [[_COMMUNITY_Community 103|Community 103]]
 - [[_COMMUNITY_Community 104|Community 104]]
@@ -129,6 +127,7 @@
 - [[_COMMUNITY_Community 114|Community 114]]
 - [[_COMMUNITY_Community 115|Community 115]]
 - [[_COMMUNITY_Community 116|Community 116]]
+- [[_COMMUNITY_Community 117|Community 117]]
 - [[_COMMUNITY_Community 118|Community 118]]
 - [[_COMMUNITY_Community 119|Community 119]]
 - [[_COMMUNITY_Community 120|Community 120]]
@@ -174,6 +173,7 @@
 - [[_COMMUNITY_Community 160|Community 160]]
 - [[_COMMUNITY_Community 161|Community 161]]
 - [[_COMMUNITY_Community 162|Community 162]]
+- [[_COMMUNITY_Community 163|Community 163]]
 - [[_COMMUNITY_Community 164|Community 164]]
 - [[_COMMUNITY_Community 165|Community 165]]
 - [[_COMMUNITY_Community 166|Community 166]]
@@ -232,2718 +232,1249 @@
 - [[_COMMUNITY_Community 219|Community 219]]
 - [[_COMMUNITY_Community 220|Community 220]]
 - [[_COMMUNITY_Community 221|Community 221]]
-- [[_COMMUNITY_Community 222|Community 222]]
-- [[_COMMUNITY_Community 223|Community 223]]
-- [[_COMMUNITY_Community 224|Community 224]]
-- [[_COMMUNITY_Community 225|Community 225]]
-- [[_COMMUNITY_Community 226|Community 226]]
-- [[_COMMUNITY_Community 227|Community 227]]
-- [[_COMMUNITY_Community 228|Community 228]]
-- [[_COMMUNITY_Community 229|Community 229]]
-- [[_COMMUNITY_Community 230|Community 230]]
-- [[_COMMUNITY_Community 231|Community 231]]
-- [[_COMMUNITY_Community 232|Community 232]]
-- [[_COMMUNITY_Community 233|Community 233]]
-- [[_COMMUNITY_Community 234|Community 234]]
-- [[_COMMUNITY_Community 235|Community 235]]
-- [[_COMMUNITY_Community 236|Community 236]]
-- [[_COMMUNITY_Community 237|Community 237]]
-- [[_COMMUNITY_Community 238|Community 238]]
-- [[_COMMUNITY_Community 239|Community 239]]
-- [[_COMMUNITY_Community 240|Community 240]]
-- [[_COMMUNITY_Community 241|Community 241]]
-- [[_COMMUNITY_Community 242|Community 242]]
-- [[_COMMUNITY_Community 243|Community 243]]
-- [[_COMMUNITY_Community 244|Community 244]]
-- [[_COMMUNITY_Community 245|Community 245]]
-- [[_COMMUNITY_Community 246|Community 246]]
-- [[_COMMUNITY_Community 247|Community 247]]
-- [[_COMMUNITY_Community 248|Community 248]]
-- [[_COMMUNITY_Community 249|Community 249]]
-- [[_COMMUNITY_Community 250|Community 250]]
-- [[_COMMUNITY_Community 251|Community 251]]
-- [[_COMMUNITY_Community 252|Community 252]]
-- [[_COMMUNITY_Community 253|Community 253]]
-- [[_COMMUNITY_Community 254|Community 254]]
-- [[_COMMUNITY_Community 255|Community 255]]
-- [[_COMMUNITY_Community 256|Community 256]]
-- [[_COMMUNITY_Community 257|Community 257]]
-- [[_COMMUNITY_Community 258|Community 258]]
-- [[_COMMUNITY_Community 259|Community 259]]
-- [[_COMMUNITY_Community 260|Community 260]]
-- [[_COMMUNITY_Community 261|Community 261]]
-- [[_COMMUNITY_Community 262|Community 262]]
-- [[_COMMUNITY_Community 263|Community 263]]
-- [[_COMMUNITY_Community 264|Community 264]]
-- [[_COMMUNITY_Community 265|Community 265]]
-- [[_COMMUNITY_Community 266|Community 266]]
-- [[_COMMUNITY_Community 267|Community 267]]
-- [[_COMMUNITY_Community 268|Community 268]]
-- [[_COMMUNITY_Community 269|Community 269]]
-- [[_COMMUNITY_Community 270|Community 270]]
-- [[_COMMUNITY_Community 271|Community 271]]
-- [[_COMMUNITY_Community 272|Community 272]]
-- [[_COMMUNITY_Community 273|Community 273]]
-- [[_COMMUNITY_Community 274|Community 274]]
-- [[_COMMUNITY_Community 275|Community 275]]
-- [[_COMMUNITY_Community 276|Community 276]]
-- [[_COMMUNITY_Community 277|Community 277]]
-- [[_COMMUNITY_Community 278|Community 278]]
-- [[_COMMUNITY_Community 279|Community 279]]
-- [[_COMMUNITY_Community 280|Community 280]]
-- [[_COMMUNITY_Community 281|Community 281]]
-- [[_COMMUNITY_Community 282|Community 282]]
-- [[_COMMUNITY_Community 283|Community 283]]
-- [[_COMMUNITY_Community 284|Community 284]]
-- [[_COMMUNITY_Community 285|Community 285]]
-- [[_COMMUNITY_Community 286|Community 286]]
-- [[_COMMUNITY_Community 287|Community 287]]
-- [[_COMMUNITY_Community 288|Community 288]]
-- [[_COMMUNITY_Community 289|Community 289]]
-- [[_COMMUNITY_Community 290|Community 290]]
-- [[_COMMUNITY_Community 291|Community 291]]
-- [[_COMMUNITY_Community 292|Community 292]]
-- [[_COMMUNITY_Community 293|Community 293]]
-- [[_COMMUNITY_Community 294|Community 294]]
-- [[_COMMUNITY_Community 295|Community 295]]
-- [[_COMMUNITY_Community 296|Community 296]]
-- [[_COMMUNITY_Community 297|Community 297]]
-- [[_COMMUNITY_Community 298|Community 298]]
-- [[_COMMUNITY_Community 299|Community 299]]
-- [[_COMMUNITY_Community 300|Community 300]]
-- [[_COMMUNITY_Community 301|Community 301]]
-- [[_COMMUNITY_Community 302|Community 302]]
-- [[_COMMUNITY_Community 303|Community 303]]
-- [[_COMMUNITY_Community 304|Community 304]]
-- [[_COMMUNITY_Community 305|Community 305]]
-- [[_COMMUNITY_Community 306|Community 306]]
-- [[_COMMUNITY_Community 307|Community 307]]
-- [[_COMMUNITY_Community 308|Community 308]]
-- [[_COMMUNITY_Community 309|Community 309]]
-- [[_COMMUNITY_Community 310|Community 310]]
-- [[_COMMUNITY_Community 311|Community 311]]
-- [[_COMMUNITY_Community 312|Community 312]]
-- [[_COMMUNITY_Community 313|Community 313]]
-- [[_COMMUNITY_Community 314|Community 314]]
-- [[_COMMUNITY_Community 315|Community 315]]
-- [[_COMMUNITY_Community 316|Community 316]]
-- [[_COMMUNITY_Community 317|Community 317]]
-- [[_COMMUNITY_Community 318|Community 318]]
-- [[_COMMUNITY_Community 319|Community 319]]
-- [[_COMMUNITY_Community 320|Community 320]]
-- [[_COMMUNITY_Community 321|Community 321]]
-- [[_COMMUNITY_Community 344|Community 344]]
-- [[_COMMUNITY_Community 345|Community 345]]
-- [[_COMMUNITY_Community 346|Community 346]]
-- [[_COMMUNITY_Community 347|Community 347]]
-- [[_COMMUNITY_Community 348|Community 348]]
-- [[_COMMUNITY_Community 349|Community 349]]
-- [[_COMMUNITY_Community 350|Community 350]]
-- [[_COMMUNITY_Community 351|Community 351]]
-- [[_COMMUNITY_Community 352|Community 352]]
-- [[_COMMUNITY_Community 353|Community 353]]
-- [[_COMMUNITY_Community 354|Community 354]]
-- [[_COMMUNITY_Community 355|Community 355]]
-- [[_COMMUNITY_Community 356|Community 356]]
-- [[_COMMUNITY_Community 357|Community 357]]
-- [[_COMMUNITY_Community 358|Community 358]]
-- [[_COMMUNITY_Community 359|Community 359]]
-- [[_COMMUNITY_Community 360|Community 360]]
-- [[_COMMUNITY_Community 361|Community 361]]
-- [[_COMMUNITY_Community 362|Community 362]]
-- [[_COMMUNITY_Community 363|Community 363]]
-- [[_COMMUNITY_Community 364|Community 364]]
-- [[_COMMUNITY_Community 365|Community 365]]
-- [[_COMMUNITY_Community 366|Community 366]]
-- [[_COMMUNITY_Community 367|Community 367]]
-- [[_COMMUNITY_Community 368|Community 368]]
-- [[_COMMUNITY_Community 369|Community 369]]
-- [[_COMMUNITY_Community 370|Community 370]]
-- [[_COMMUNITY_Community 371|Community 371]]
-- [[_COMMUNITY_Community 372|Community 372]]
-- [[_COMMUNITY_Community 373|Community 373]]
-- [[_COMMUNITY_Community 374|Community 374]]
-- [[_COMMUNITY_Community 375|Community 375]]
-- [[_COMMUNITY_Community 376|Community 376]]
-- [[_COMMUNITY_Community 377|Community 377]]
-- [[_COMMUNITY_Community 389|Community 389]]
-- [[_COMMUNITY_Community 390|Community 390]]
-- [[_COMMUNITY_Community 391|Community 391]]
-- [[_COMMUNITY_Community 392|Community 392]]
-- [[_COMMUNITY_Community 393|Community 393]]
-- [[_COMMUNITY_Community 394|Community 394]]
-- [[_COMMUNITY_Community 395|Community 395]]
-- [[_COMMUNITY_Community 396|Community 396]]
-- [[_COMMUNITY_Community 397|Community 397]]
-- [[_COMMUNITY_Community 398|Community 398]]
-- [[_COMMUNITY_Community 399|Community 399]]
-- [[_COMMUNITY_Community 400|Community 400]]
-- [[_COMMUNITY_Community 401|Community 401]]
-- [[_COMMUNITY_Community 402|Community 402]]
-- [[_COMMUNITY_Community 403|Community 403]]
-- [[_COMMUNITY_Community 404|Community 404]]
-- [[_COMMUNITY_Community 405|Community 405]]
-- [[_COMMUNITY_Community 406|Community 406]]
-- [[_COMMUNITY_Community 407|Community 407]]
-- [[_COMMUNITY_Community 408|Community 408]]
-- [[_COMMUNITY_Community 409|Community 409]]
-- [[_COMMUNITY_Community 410|Community 410]]
-- [[_COMMUNITY_Community 411|Community 411]]
-- [[_COMMUNITY_Community 412|Community 412]]
-- [[_COMMUNITY_Community 413|Community 413]]
-- [[_COMMUNITY_Community 414|Community 414]]
-- [[_COMMUNITY_Community 415|Community 415]]
-- [[_COMMUNITY_Community 416|Community 416]]
-- [[_COMMUNITY_Community 417|Community 417]]
-- [[_COMMUNITY_Community 418|Community 418]]
-- [[_COMMUNITY_Community 419|Community 419]]
-- [[_COMMUNITY_Community 420|Community 420]]
-- [[_COMMUNITY_Community 421|Community 421]]
-- [[_COMMUNITY_Community 422|Community 422]]
-- [[_COMMUNITY_Community 423|Community 423]]
-- [[_COMMUNITY_Community 424|Community 424]]
-- [[_COMMUNITY_Community 425|Community 425]]
-- [[_COMMUNITY_Community 426|Community 426]]
-- [[_COMMUNITY_Community 427|Community 427]]
-- [[_COMMUNITY_Community 428|Community 428]]
-- [[_COMMUNITY_Community 429|Community 429]]
-- [[_COMMUNITY_Community 430|Community 430]]
-- [[_COMMUNITY_Community 431|Community 431]]
-- [[_COMMUNITY_Community 432|Community 432]]
-- [[_COMMUNITY_Community 433|Community 433]]
-- [[_COMMUNITY_Community 434|Community 434]]
-- [[_COMMUNITY_Community 435|Community 435]]
-- [[_COMMUNITY_Community 436|Community 436]]
-- [[_COMMUNITY_Community 437|Community 437]]
-- [[_COMMUNITY_Community 438|Community 438]]
-- [[_COMMUNITY_Community 439|Community 439]]
-- [[_COMMUNITY_Community 440|Community 440]]
-- [[_COMMUNITY_Community 441|Community 441]]
-- [[_COMMUNITY_Community 442|Community 442]]
-- [[_COMMUNITY_Community 443|Community 443]]
-- [[_COMMUNITY_Community 444|Community 444]]
-- [[_COMMUNITY_Community 445|Community 445]]
-- [[_COMMUNITY_Community 446|Community 446]]
-- [[_COMMUNITY_Community 447|Community 447]]
-- [[_COMMUNITY_Community 448|Community 448]]
-- [[_COMMUNITY_Community 449|Community 449]]
-- [[_COMMUNITY_Community 450|Community 450]]
-- [[_COMMUNITY_Community 451|Community 451]]
-- [[_COMMUNITY_Community 452|Community 452]]
-- [[_COMMUNITY_Community 453|Community 453]]
-- [[_COMMUNITY_Community 454|Community 454]]
-- [[_COMMUNITY_Community 455|Community 455]]
-- [[_COMMUNITY_Community 456|Community 456]]
-- [[_COMMUNITY_Community 457|Community 457]]
-- [[_COMMUNITY_Community 458|Community 458]]
-- [[_COMMUNITY_Community 459|Community 459]]
-- [[_COMMUNITY_Community 460|Community 460]]
-- [[_COMMUNITY_Community 461|Community 461]]
-- [[_COMMUNITY_Community 462|Community 462]]
-- [[_COMMUNITY_Community 463|Community 463]]
-- [[_COMMUNITY_Community 464|Community 464]]
-- [[_COMMUNITY_Community 465|Community 465]]
-- [[_COMMUNITY_Community 466|Community 466]]
-- [[_COMMUNITY_Community 468|Community 468]]
-- [[_COMMUNITY_Community 469|Community 469]]
-- [[_COMMUNITY_Community 470|Community 470]]
-- [[_COMMUNITY_Community 471|Community 471]]
-- [[_COMMUNITY_Community 472|Community 472]]
-- [[_COMMUNITY_Community 473|Community 473]]
-- [[_COMMUNITY_Community 474|Community 474]]
-- [[_COMMUNITY_Community 475|Community 475]]
-- [[_COMMUNITY_Community 476|Community 476]]
-- [[_COMMUNITY_Community 477|Community 477]]
-- [[_COMMUNITY_Community 478|Community 478]]
-- [[_COMMUNITY_Community 479|Community 479]]
-- [[_COMMUNITY_Community 480|Community 480]]
-- [[_COMMUNITY_Community 481|Community 481]]
-- [[_COMMUNITY_Community 482|Community 482]]
-- [[_COMMUNITY_Community 483|Community 483]]
-- [[_COMMUNITY_Community 484|Community 484]]
-- [[_COMMUNITY_Community 485|Community 485]]
-- [[_COMMUNITY_Community 486|Community 486]]
-- [[_COMMUNITY_Community 487|Community 487]]
-- [[_COMMUNITY_Community 488|Community 488]]
-- [[_COMMUNITY_Community 489|Community 489]]
-- [[_COMMUNITY_Community 490|Community 490]]
-- [[_COMMUNITY_Community 491|Community 491]]
-- [[_COMMUNITY_Community 492|Community 492]]
-- [[_COMMUNITY_Community 493|Community 493]]
-- [[_COMMUNITY_Community 494|Community 494]]
-- [[_COMMUNITY_Community 495|Community 495]]
-- [[_COMMUNITY_Community 496|Community 496]]
-- [[_COMMUNITY_Community 497|Community 497]]
-- [[_COMMUNITY_Community 498|Community 498]]
-- [[_COMMUNITY_Community 499|Community 499]]
-- [[_COMMUNITY_Community 500|Community 500]]
-- [[_COMMUNITY_Community 501|Community 501]]
-- [[_COMMUNITY_Community 502|Community 502]]
-- [[_COMMUNITY_Community 503|Community 503]]
-- [[_COMMUNITY_Community 504|Community 504]]
-- [[_COMMUNITY_Community 505|Community 505]]
-- [[_COMMUNITY_Community 506|Community 506]]
-- [[_COMMUNITY_Community 507|Community 507]]
-- [[_COMMUNITY_Community 508|Community 508]]
-- [[_COMMUNITY_Community 509|Community 509]]
-- [[_COMMUNITY_Community 510|Community 510]]
-- [[_COMMUNITY_Community 511|Community 511]]
-- [[_COMMUNITY_Community 512|Community 512]]
-- [[_COMMUNITY_Community 513|Community 513]]
-- [[_COMMUNITY_Community 514|Community 514]]
-- [[_COMMUNITY_Community 515|Community 515]]
-- [[_COMMUNITY_Community 516|Community 516]]
-- [[_COMMUNITY_Community 517|Community 517]]
-- [[_COMMUNITY_Community 518|Community 518]]
-- [[_COMMUNITY_Community 519|Community 519]]
-- [[_COMMUNITY_Community 520|Community 520]]
-- [[_COMMUNITY_Community 521|Community 521]]
-- [[_COMMUNITY_Community 522|Community 522]]
-- [[_COMMUNITY_Community 523|Community 523]]
-- [[_COMMUNITY_Community 524|Community 524]]
-- [[_COMMUNITY_Community 525|Community 525]]
-- [[_COMMUNITY_Community 526|Community 526]]
-- [[_COMMUNITY_Community 527|Community 527]]
-- [[_COMMUNITY_Community 528|Community 528]]
-- [[_COMMUNITY_Community 529|Community 529]]
-- [[_COMMUNITY_Community 530|Community 530]]
-- [[_COMMUNITY_Community 531|Community 531]]
-- [[_COMMUNITY_Community 532|Community 532]]
-- [[_COMMUNITY_Community 533|Community 533]]
-- [[_COMMUNITY_Community 534|Community 534]]
-- [[_COMMUNITY_Community 535|Community 535]]
-- [[_COMMUNITY_Community 536|Community 536]]
-- [[_COMMUNITY_Community 537|Community 537]]
-- [[_COMMUNITY_Community 538|Community 538]]
-- [[_COMMUNITY_Community 539|Community 539]]
-- [[_COMMUNITY_Community 540|Community 540]]
-- [[_COMMUNITY_Community 541|Community 541]]
-- [[_COMMUNITY_Community 542|Community 542]]
-- [[_COMMUNITY_Community 543|Community 543]]
-- [[_COMMUNITY_Community 544|Community 544]]
-- [[_COMMUNITY_Community 545|Community 545]]
-- [[_COMMUNITY_Community 546|Community 546]]
-- [[_COMMUNITY_Community 547|Community 547]]
-- [[_COMMUNITY_Community 548|Community 548]]
-- [[_COMMUNITY_Community 549|Community 549]]
-- [[_COMMUNITY_Community 550|Community 550]]
-- [[_COMMUNITY_Community 551|Community 551]]
-- [[_COMMUNITY_Community 552|Community 552]]
-- [[_COMMUNITY_Community 553|Community 553]]
-- [[_COMMUNITY_Community 554|Community 554]]
-- [[_COMMUNITY_Community 555|Community 555]]
-- [[_COMMUNITY_Community 556|Community 556]]
-- [[_COMMUNITY_Community 557|Community 557]]
-- [[_COMMUNITY_Community 558|Community 558]]
-- [[_COMMUNITY_Community 559|Community 559]]
-- [[_COMMUNITY_Community 560|Community 560]]
-- [[_COMMUNITY_Community 561|Community 561]]
-- [[_COMMUNITY_Community 562|Community 562]]
-- [[_COMMUNITY_Community 563|Community 563]]
-- [[_COMMUNITY_Community 564|Community 564]]
-- [[_COMMUNITY_Community 565|Community 565]]
-- [[_COMMUNITY_Community 566|Community 566]]
-- [[_COMMUNITY_Community 567|Community 567]]
-- [[_COMMUNITY_Community 568|Community 568]]
-- [[_COMMUNITY_Community 569|Community 569]]
-- [[_COMMUNITY_Community 570|Community 570]]
-- [[_COMMUNITY_Community 571|Community 571]]
-- [[_COMMUNITY_Community 572|Community 572]]
-- [[_COMMUNITY_Community 573|Community 573]]
-- [[_COMMUNITY_Community 574|Community 574]]
-- [[_COMMUNITY_Community 575|Community 575]]
-- [[_COMMUNITY_Community 576|Community 576]]
-- [[_COMMUNITY_Community 577|Community 577]]
-- [[_COMMUNITY_Community 578|Community 578]]
-- [[_COMMUNITY_Community 579|Community 579]]
-- [[_COMMUNITY_Community 580|Community 580]]
-- [[_COMMUNITY_Community 581|Community 581]]
-- [[_COMMUNITY_Community 582|Community 582]]
-- [[_COMMUNITY_Community 583|Community 583]]
-- [[_COMMUNITY_Community 584|Community 584]]
-- [[_COMMUNITY_Community 585|Community 585]]
-- [[_COMMUNITY_Community 586|Community 586]]
-- [[_COMMUNITY_Community 587|Community 587]]
-- [[_COMMUNITY_Community 588|Community 588]]
-- [[_COMMUNITY_Community 589|Community 589]]
-- [[_COMMUNITY_Community 590|Community 590]]
-- [[_COMMUNITY_Community 591|Community 591]]
-- [[_COMMUNITY_Community 592|Community 592]]
-- [[_COMMUNITY_Community 593|Community 593]]
-- [[_COMMUNITY_Community 594|Community 594]]
-- [[_COMMUNITY_Community 595|Community 595]]
-- [[_COMMUNITY_Community 596|Community 596]]
-- [[_COMMUNITY_Community 597|Community 597]]
-- [[_COMMUNITY_Community 598|Community 598]]
-- [[_COMMUNITY_Community 599|Community 599]]
-- [[_COMMUNITY_Community 600|Community 600]]
-- [[_COMMUNITY_Community 601|Community 601]]
-- [[_COMMUNITY_Community 602|Community 602]]
-- [[_COMMUNITY_Community 603|Community 603]]
-- [[_COMMUNITY_Community 604|Community 604]]
-- [[_COMMUNITY_Community 605|Community 605]]
-- [[_COMMUNITY_Community 606|Community 606]]
-- [[_COMMUNITY_Community 607|Community 607]]
-- [[_COMMUNITY_Community 608|Community 608]]
-- [[_COMMUNITY_Community 609|Community 609]]
-- [[_COMMUNITY_Community 610|Community 610]]
-- [[_COMMUNITY_Community 611|Community 611]]
-- [[_COMMUNITY_Community 612|Community 612]]
-- [[_COMMUNITY_Community 613|Community 613]]
-- [[_COMMUNITY_Community 614|Community 614]]
-- [[_COMMUNITY_Community 615|Community 615]]
-- [[_COMMUNITY_Community 616|Community 616]]
-- [[_COMMUNITY_Community 617|Community 617]]
-- [[_COMMUNITY_Community 618|Community 618]]
-- [[_COMMUNITY_Community 619|Community 619]]
-- [[_COMMUNITY_Community 620|Community 620]]
-- [[_COMMUNITY_Community 621|Community 621]]
-- [[_COMMUNITY_Community 622|Community 622]]
-- [[_COMMUNITY_Community 623|Community 623]]
-- [[_COMMUNITY_Community 624|Community 624]]
-- [[_COMMUNITY_Community 625|Community 625]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `sendError()` - 122 edges
-2. `sendSuccess()` - 115 edges
-3. `Typography()` - 63 edges
-4. `dependencies` - 37 edges
-5. `getErrorMessage()` - 36 edges
-6. `ProfileScreenProps` - 34 edges
-7. `authMiddleware()` - 32 edges
-8. `apiGet()` - 30 edges
-9. `ErrorState()` - 28 edges
-10. `apiPost()` - 26 edges
+1. `sendSuccess()` - 107 edges
+2. `handleControllerError()` - 92 edges
+3. `sendError()` - 22 edges
+4. `logActivity()` - 12 edges
+5. `AIChatScreen()` - 10 edges
+6. `Build a React Native Screen in BibleStudyPro` - 9 edges
+7. `AppDelegate` - 8 edges
+8. `Review checklist` - 8 edges
+9. `Commit protocol` - 8 edges
+10. `Connect a New API Endpoint in BibleStudyPro` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `createCard()` --calls--> `onSubmit()`  [INFERRED]
-  backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/CreateCardScreen.tsx
-- `createCard()` --calls--> `onSubmitAndExit()`  [INFERRED]
-  backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/CreateCardScreen.tsx
-- `updateCard()` --calls--> `handleBlurToggle()`  [INFERRED]
-  backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/SetDetailScreen.tsx
-- `updateCard()` --calls--> `handleSaveNote()`  [INFERRED]
-  backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/SetDetailScreen.tsx
-- `moveCard()` --calls--> `handleMoveCard()`  [INFERRED]
-  backend/src/modules/cards/cards.service.ts → frontend/src/screens/library/SetDetailScreen.tsx
+- `handleBlurToggle()` --calls--> `updateCard()`  [INFERRED]
+  frontend/src/screens/library/SetDetailScreen.tsx → backend/src/modules/cards/cards.controller.ts
+- `handleSaveNote()` --calls--> `updateCard()`  [INFERRED]
+  frontend/src/screens/library/SetDetailScreen.tsx → backend/src/modules/cards/cards.controller.ts
+- `onSubmit()` --calls--> `updateProfile()`  [INFERRED]
+  frontend/src/screens/profile/EditProfileScreen.tsx → backend/src/modules/users/users.controller.ts
+- `handleCopyCard()` --calls--> `copyCard()`  [INFERRED]
+  frontend/src/screens/library/SetDetailScreen.tsx → backend/src/modules/cards/cards.controller.ts
+- `handleMoveCard()` --calls--> `moveCard()`  [INFERRED]
+  frontend/src/screens/library/SetDetailScreen.tsx → backend/src/modules/cards/cards.controller.ts
 
-## Communities (626 total, 13 thin omitted)
+## Communities
 
 ### Community 0 - "Community 0"
-Cohesion: 0.13
-Nodes (43): getFriendsFeed(), getMyFeed(), handleError(), claimDailyLogin(), getBalance(), getStats(), getStreak(), getTransactions() (+35 more)
+Cohesion: 0.04
+Nodes (111): getFriendsFeed(), getMyFeed(), addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory() (+103 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (52): DIFF_CONFIG, FlashCardViewProps, styles, LAYOUT_OPTIONS, SetForm(), SetFormProps, styles, VISIBILITY_OPTIONS (+44 more)
+Cohesion: 0.06
+Nodes (24): logActivity(), bulkCreateCards(), calculateNextReviewAt(), copyCard(), createCard(), deleteCard(), getCardById(), moveCard() (+16 more)
 
 ### Community 2 - "Community 2"
-Cohesion: 0.14
-Nodes (37): bulkCreateCards(), copyCard(), createCard(), deleteCard(), getCardById(), handleError(), listCardsBySet(), moveCard() (+29 more)
+Cohesion: 0.06
+Nodes (13): AIChatScreen(), generateUUID(), useAddBookmark(), useAIChat(), useBookmarks(), useRemoveBookmark(), useUpdateSessionTags(), useAutoDailyClaim() (+5 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Nodes (10): acceptRequest(), sendRequest(), createGathering(), getGathering(), getNearby(), listParticipants(), rsvp(), getNearbyGatherings() (+2 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.18
-Nodes (23): forgotPassword(), login(), logout(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword() (+15 more)
+Cohesion: 0.08
+Nodes (15): CardProposalSheet(), EditSetScreen(), FolderDetailScreen(), SetPicker(), SettingsScreen(), useConfirmDialog(), useFolderModal(), useCreateFolder() (+7 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.15
-Nodes (24): changePassword(), deleteAccount(), getProfile(), getUserById(), registerDeviceToken(), removeDeviceToken(), updateProfile(), ChangePasswordDto (+16 more)
+Cohesion: 0.08
+Nodes (11): createCard(), updateCard(), getErrorMessage(), onSubmit(), onSubmitAndExit(), onSubmit(), onSubmit(), handleSave() (+3 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.15
-Nodes (21): cardsApi, apiClient, apiDelete(), apiGet(), apiPatch(), apiPost(), apiPut(), drainQueue() (+13 more)
+Cohesion: 0.07
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 7 - "Community 7"
-Cohesion: 0.19
-Nodes (13): RootNavigator(), SplashScreen(), styles, OnboardingScreen(), Props, Slide, SLIDES, styles (+5 more)
+Cohesion: 0.07
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.18
-Nodes (26): forgotPassword(), getMe(), login(), logout(), refreshToken(), register(), resendVerification(), resetPassword() (+18 more)
+Cohesion: 0.07
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 9 - "Community 9"
-Cohesion: 0.09
-Nodes (18): getFriendsFeed(), getMyFeed(), userSelect, anthropic, askQuestion(), getChatHistory(), getDailyVerse(), HARDCODED_VERSE (+10 more)
+Cohesion: 0.07
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.09
-Nodes (42): ForgotPasswordScreen(), LoginScreen(), RegisterScreen(), ResetPasswordScreen(), VerifyEmailScreen(), AuthLayout(), AuthLayoutProps, BrandLogo() (+34 more)
+Cohesion: 0.07
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
 
 ### Community 12 - "Community 12"
-Cohesion: 0.07
-Nodes (55): getErrorMessage(), friendsApi, handleSave(), EmptyState(), EmptyStateProps, styles, ErrorState(), ErrorStateProps (+47 more)
+Cohesion: 0.1
+Nodes (12): AppDelegate, ReactNativeDelegate, apiPost(), MessagingDelegate, onTokenRefresh(), registerDeviceToken(), removeDeviceToken(), setupForegroundHandler() (+4 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.05
-Nodes (42): dependencies, @anthropic-ai/sdk, @aws-sdk/client-s3, bcryptjs, cloudinary, cors, dotenv, express (+34 more)
+Cohesion: 0.15
+Nodes (19): authMiddleware(), forgotPassword(), login(), parseDuration(), refreshToken(), register(), resendVerification(), resetPassword() (+11 more)
 
 ### Community 14 - "Community 14"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Cohesion: 0.11
+Nodes (8): CreateGroupScreen(), GroupsScreen(), JoinGroupScreen(), PublicGroupsScreen(), useCreateGroup(), useGroups(), useJoinGroup(), usePublicGroups()
 
 ### Community 15 - "Community 15"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 16 - "Community 16"
-Cohesion: 0.04
-Nodes (60): AIChatScreen(), AINav, generateUUID(), Message, styles, SUGGESTIONS, TYPING_INDICATOR, ChatHistoryScreen() (+52 more)
-
-### Community 17 - "Community 17"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 18 - "Community 18"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 19 - "Community 19"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 20 - "Community 20"
-Cohesion: 0.07
-Nodes (36): router, addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory(), getDailyVerse() (+28 more)
-
-### Community 21 - "Community 21"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 23 - "Community 23"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 24 - "Community 24"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 25 - "Community 25"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 26 - "Community 26"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 27 - "Community 27"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 29 - "Community 29"
-Cohesion: 0.06
-Nodes (53): acceptRequest(), blockUser(), cancelRequest(), friendSelect, listBlocked(), listFriends(), listRequests(), rejectRequest() (+45 more)
-
-### Community 30 - "Community 30"
-Cohesion: 0.48
-Nodes (5): Card(), CardProps, PressableCard(), PressableCardProps, styles
-
-### Community 31 - "Community 31"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 32 - "Community 32"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 33 - "Community 33"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 34 - "Community 34"
-Cohesion: 0.06
-Nodes (36): dependencies, axios, @gorhom/bottom-sheet, @hookform/resolvers, react, react-hook-form, react-native, @react-native-async-storage/async-storage (+28 more)
-
-### Community 35 - "Community 35"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 36 - "Community 36"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 37 - "Community 37"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 38 - "Community 38"
-Cohesion: 0.16
-Nodes (7): App(), AppBootstrap(), displayName, name, queryClient, styles, queryClient
-
-### Community 39 - "Community 39"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 40 - "Community 40"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 41 - "Community 41"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 42 - "Community 42"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 43 - "Community 43"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 44 - "Community 44"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 45 - "Community 45"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 46 - "Community 46"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 47 - "Community 47"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 48 - "Community 48"
-Cohesion: 0.12
-Nodes (18): Action, ActionSheet(), ActionSheetProps, styles, ConfirmDialog(), ConfirmDialogProps, styles, AppModal() (+10 more)
-
-### Community 49 - "Community 49"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 51 - "Community 51"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 52 - "Community 52"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 53 - "Community 53"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 54 - "Community 54"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 55 - "Community 55"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 56 - "Community 56"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 57 - "Community 57"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 58 - "Community 58"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 59 - "Community 59"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 60 - "Community 60"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 61 - "Community 61"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 62 - "Community 62"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 63 - "Community 63"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 64 - "Community 64"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 65 - "Community 65"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 66 - "Community 66"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 67 - "Community 67"
-Cohesion: 0.6
-Nodes (3): shadow(), ShadowKey, shadows
-
-### Community 69 - "Community 69"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 70 - "Community 70"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 71 - "Community 71"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 72 - "Community 72"
-Cohesion: 0.09
-Nodes (22): devDependencies, @babel/core, babel-plugin-module-resolver, @babel/preset-env, @babel/runtime, eslint, jest, patch-package (+14 more)
-
-### Community 73 - "Community 73"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 74 - "Community 74"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 75 - "Community 75"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 76 - "Community 76"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 77 - "Community 77"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 78 - "Community 78"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 79 - "Community 79"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 80 - "Community 80"
-Cohesion: 0.4
-Nodes (4): ClaimDailyLoginDto, ClaimDailyLoginDtoType, PaginationDto, PaginationDtoType
-
-### Community 81 - "Community 81"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 82 - "Community 82"
-Cohesion: 0.19
-Nodes (18): createFolder(), deleteFolder(), getFolderById(), handleError(), listFolders(), updateFolder(), CreateFolderDto, CreateFolderDtoType (+10 more)
-
-### Community 83 - "Community 83"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 84 - "Community 84"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 85 - "Community 85"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 86 - "Community 86"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 87 - "Community 87"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 88 - "Community 88"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 89 - "Community 89"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 90 - "Community 90"
-Cohesion: 0.22
-Nodes (15): getNearby(), getFriendsLocations(), getNearbyGatherings(), handleError(), updateLocation(), updatePrivacy(), PrivacyDto, PrivacyDtoType (+7 more)
-
-### Community 91 - "Community 91"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 93 - "Community 93"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 94 - "Community 94"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 95 - "Community 95"
-Cohesion: 0.18
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 96 - "Community 96"
-Cohesion: 0.13
-Nodes (16): compilerOptions, baseUrl, paths, types, exclude, extends, include, @api/* (+8 more)
-
-### Community 97 - "Community 97"
 Cohesion: 0.15
 Nodes (14): API layer, Before writing any code, Build sequence for a new screen, code:ts (import type { LibraryScreenProps } from '../../navigation/ty), code:tsx (const { data, isLoading, error } = useMyHook();), code:tsx (const { mutate, isPending } = useCreateThing();), Components, Empty state pattern (+6 more)
 
-### Community 100 - "Community 100"
+### Community 16 - "Community 16"
 Cohesion: 0.13
 Nodes (15): API client notes, code:bash (grep -r "router\.(get|post|put|patch|delete)" backend/src/ro), code:ts (export interface Thing {), code:ts (import apiClient from './client';), code:ts (export { getThings, getThingById, createThing, updateThing, ), code:bash (cd frontend && npx tsc --noEmit --pretty false), code:ts (onError: err => Toast.show({ type: 'error', text1: getErrorM), Connect a New API Endpoint in BibleStudyPro (+7 more)
 
-### Community 102 - "Community 102"
-Cohesion: 0.5
-Nodes (3): config, { getDefaultConfig, mergeConfig }, path
-
-### Community 103 - "Community 103"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 104 - "Community 104"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 105 - "Community 105"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 106 - "Community 106"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 107 - "Community 107"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 108 - "Community 108"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 109 - "Community 109"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 110 - "Community 110"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 111 - "Community 111"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 112 - "Community 112"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 113 - "Community 113"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 114 - "Community 114"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 115 - "Community 115"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 116 - "Community 116"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 118 - "Community 118"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 119 - "Community 119"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 120 - "Community 120"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 121 - "Community 121"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 122 - "Community 122"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 123 - "Community 123"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 124 - "Community 124"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 125 - "Community 125"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 126 - "Community 126"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 127 - "Community 127"
+### Community 17 - "Community 17"
 Cohesion: 0.13
 Nodes (15): Android, code:sh (# Using npm), code:sh (# Using npm), code:sh (bundle install), code:sh (bundle exec pod install), code:sh (# Using npm), Congratulations! :tada:, Getting Started (+7 more)
 
-### Community 128 - "Community 128"
+### Community 18 - "Community 18"
+Cohesion: 0.15
+Nodes (5): getAvailableIntervals(), getDefaultInterval(), handlePeriod(), handleToConfirm(), renderIntervalRow()
+
+### Community 19 - "Community 19"
+Cohesion: 0.22
+Nodes (10): agg(), getStats(), getStreak(), groupByDays(), groupByHours(), groupByMonths(), groupByQuarters(), groupByWeeks() (+2 more)
+
+### Community 20 - "Community 20"
 Cohesion: 0.13
 Nodes (14): Build a React Native Screen in BibleStudyPro, code:block1 (get_minimal_context(task="build <ScreenName> screen")), code:ts (export async function getThings(params?: ThingParams): Promi), code:ts (import { useQuery, useMutation, useQueryClient } from '@tans), code:tsx (import React from 'react';), code:bash (cd frontend && npx tsc --noEmit --pretty false), Step 1 — Explore first (graph, not files), Step 2 — Types (+6 more)
 
-### Community 129 - "Community 129"
+### Community 21 - "Community 21"
+Cohesion: 0.13
+Nodes (7): AppError, ConflictError, ForbiddenError, NotFoundError, PaymentRequiredError, UnauthorizedError, ValidationError
+
+### Community 22 - "Community 22"
 Cohesion: 0.14
 Nodes (13): 1. Check what changed, 2. Type-check (frontend changes only), 3. Stage files, 4. Write commit message, 5. Commit, 6. Confirm, code:bash (git status), code:bash (cd /Volumes/DevSSD/Work/BibleStudy/frontend && npx tsc --noE) (+5 more)
 
-### Community 130 - "Community 130"
+### Community 23 - "Community 23"
 Cohesion: 0.15
-Nodes (13): compilerOptions, esModuleInterop, forceConsistentCasingInFileNames, lib, module, outDir, resolveJsonModule, rootDir (+5 more)
+Nodes (3): FriendsScreen(), useFriends(), useRemoveFriend()
 
-### Community 131 - "Community 131"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+### Community 24 - "Community 24"
+Cohesion: 0.17
+Nodes (5): CreateGatheringScreen(), EditGatheringScreen(), useCreateGathering(), useGathering(), useUpdateGathering()
 
-### Community 132 - "Community 132"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 133 - "Community 133"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 134 - "Community 134"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 135 - "Community 135"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 136 - "Community 136"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 137 - "Community 137"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 138 - "Community 138"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 139 - "Community 139"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 140 - "Community 140"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 141 - "Community 141"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 142 - "Community 142"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 143 - "Community 143"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 145 - "Community 145"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 146 - "Community 146"
-Cohesion: 0.6
-Nodes (3): layout, spacing, SpacingKey
-
-### Community 147 - "Community 147"
-Cohesion: 0.48
-Nodes (5): fontSizes, fontWeights, lineHeights, TextPreset, textPresets
-
-### Community 148 - "Community 148"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 149 - "Community 149"
-Cohesion: 0.27
-Nodes (8): AIChat, AIChatPayload, AIChatResponse, BookmarkedChat, ChatMessage, ChatSession, DailyVerse, SuggestedCard
-
-### Community 150 - "Community 150"
-Cohesion: 0.36
-Nodes (8): AuthTokens, ForgotPasswordPayload, LoginPayload, RefreshPayload, RegisterPayload, ResendVerificationPayload, ResetPasswordPayload, VerifyEmailPayload
-
-### Community 151 - "Community 151"
-Cohesion: 0.36
-Nodes (8): BulkCreateCardPayload, Card, CreateCardPayload, Difficulty, MoveCardPayload, ReorderCardsPayload, StudyResultPayload, UpdateCardPayload
-
-### Community 152 - "Community 152"
-Cohesion: 0.6
-Nodes (3): CreditBalance, CreditTransaction, TransactionType
-
-### Community 154 - "Community 154"
-Cohesion: 0.47
-Nodes (4): CreateFolderPayload, Folder, FolderSetSummary, UpdateFolderPayload
-
-### Community 155 - "Community 155"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 156 - "Community 156"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 157 - "Community 157"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 158 - "Community 158"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 159 - "Community 159"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 160 - "Community 160"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 161 - "Community 161"
-Cohesion: 0.36
-Nodes (6): Visibility, CardLayout, CreateSetPayload, StudySet, UpdateSetPayload, Visibility
-
-### Community 162 - "Community 162"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 164 - "Community 164"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 165 - "Community 165"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 166 - "Community 166"
-Cohesion: 0.27
-Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
-
-### Community 167 - "Community 167"
-Cohesion: 0.27
-Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
-
-### Community 168 - "Community 168"
-Cohesion: 0.27
-Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
-
-### Community 169 - "Community 169"
-Cohesion: 0.27
-Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
-
-### Community 170 - "Community 170"
+### Community 25 - "Community 25"
 Cohesion: 0.18
-Nodes (14): ChatBubble(), ChatBubbleProps, dotStyles, formatTime(), mdStyles, Role, styles, TypingDots() (+6 more)
+Nodes (2): askQuestion(), parseAIResponse()
 
-### Community 171 - "Community 171"
+### Community 26 - "Community 26"
 Cohesion: 0.24
 Nodes (8): code:block1 (get_minimal_context(task="<what user asked about>")), Exploration protocol, Project context, Step 1 — orient, Step 2 — scope the question, Step 3 — drill down, Step 4 — answer, Token efficiency rules
 
-### Community 172 - "Community 172"
+### Community 27 - "Community 27"
 Cohesion: 0.22
 Nodes (8): API layer, Hooks, Navigation, Output format, Performance, React Native anti-patterns, Review checklist, TypeScript
 
-### Community 175 - "Community 175"
+### Community 28 - "Community 28"
 Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
+Nodes (0): 
 
-### Community 176 - "Community 176"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 179 - "Community 179"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 180 - "Community 180"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 181 - "Community 181"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 182 - "Community 182"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 183 - "Community 183"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 184 - "Community 184"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 185 - "Community 185"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 186 - "Community 186"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 187 - "Community 187"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 188 - "Community 188"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 189 - "Community 189"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 190 - "Community 190"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 191 - "Community 191"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 192 - "Community 192"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 193 - "Community 193"
-Cohesion: 0.31
-Nodes (7): client, _comment, configuration_version, project_info, project_id, project_number, storage_bucket
-
-### Community 194 - "Community 194"
-Cohesion: 0.25
-Nodes (7): hooks, PostToolUse, PreToolUse, SessionStart, permissions, allow, deny
-
-### Community 195 - "Community 195"
+### Community 29 - "Community 29"
 Cohesion: 0.22
 Nodes (7): After writing the hook, Before writing, code:ts (// frontend/src/hooks/useThings.ts), Common mistakes to avoid, Full hook template, Implement a React Query Hook in BibleStudyPro, Query key conventions
 
-### Community 196 - "Community 196"
+### Community 30 - "Community 30"
+Cohesion: 0.25
+Nodes (2): useNotes(), useNoteStats()
+
+### Community 31 - "Community 31"
+Cohesion: 0.25
+Nodes (0): 
+
+### Community 32 - "Community 32"
+Cohesion: 0.38
+Nodes (4): loadAppOpen(), loadInterstitial(), setupAppOpen(), setupInterstitial()
+
+### Community 33 - "Community 33"
 Cohesion: 0.29
-Nodes (6): args, command, env, type, mcpServers, code-review-graph
+Nodes (0): 
 
-### Community 197 - "Community 197"
-Cohesion: 0.33
-Nodes (6): abi, artifactName, output, runtimeFiles, toolchain, appmodules::@6890427a1f51a3e7e1df
-
-### Community 198 - "Community 198"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 199 - "Community 199"
-Cohesion: 0.33
-Nodes (6): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 200 - "Community 200"
-Cohesion: 0.53
-Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
-
-### Community 201 - "Community 201"
-Cohesion: 0.33
-Nodes (6): abi, artifactName, output, runtimeFiles, toolchain, appmodules::@6890427a1f51a3e7e1df
-
-### Community 202 - "Community 202"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 203 - "Community 203"
-Cohesion: 0.33
-Nodes (6): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 204 - "Community 204"
-Cohesion: 0.53
-Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
-
-### Community 205 - "Community 205"
-Cohesion: 0.33
-Nodes (5): args, command, type, mcpServers, code-review-graph
-
-### Community 206 - "Community 206"
+### Community 34 - "Community 34"
 Cohesion: 0.29
-Nodes (5): args, command, type, mcpServers, code-review-graph
+Nodes (0): 
 
-### Community 207 - "Community 207"
+### Community 35 - "Community 35"
 Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
+Nodes (2): updateFolder(), wouldCreateCycle()
 
-### Community 208 - "Community 208"
+### Community 36 - "Community 36"
 Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
+Nodes (2): formatBytes(), uploadFile()
 
-### Community 209 - "Community 209"
-Cohesion: 0.53
-Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
-
-### Community 210 - "Community 210"
+### Community 37 - "Community 37"
 Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
+Nodes (0): 
 
-### Community 211 - "Community 211"
-Cohesion: 0.53
-Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
-
-### Community 212 - "Community 212"
+### Community 38 - "Community 38"
 Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
+Nodes (0): 
 
-### Community 213 - "Community 213"
+### Community 39 - "Community 39"
 Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
+Nodes (0): 
 
-### Community 214 - "Community 214"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 215 - "Community 215"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 216 - "Community 216"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 217 - "Community 217"
-Cohesion: 0.43
-Nodes (5): engines, node, name, private, version
-
-### Community 218 - "Community 218"
-Cohesion: 0.29
-Nodes (7): scripts, android, ios, lint, postinstall, start, test
-
-### Community 219 - "Community 219"
-Cohesion: 0.33
-Nodes (6): abi, artifactName, output, runtimeFiles, toolchain, appmodules::@6890427a1f51a3e7e1df
-
-### Community 220 - "Community 220"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 221 - "Community 221"
-Cohesion: 0.33
-Nodes (6): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 222 - "Community 222"
-Cohesion: 0.33
-Nodes (6): abi, artifactName, output, runtimeFiles, toolchain, appmodules::@6890427a1f51a3e7e1df
-
-### Community 223 - "Community 223"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 224 - "Community 224"
-Cohesion: 0.33
-Nodes (6): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 225 - "Community 225"
+### Community 40 - "Community 40"
 Cohesion: 0.47
 Nodes (4): code:block1 (Screen (screens/<domain>/<Name>Screen.tsx)), Layer map, Output format, Trace protocol
 
-### Community 226 - "Community 226"
-Cohesion: 0.4
-Nodes (4): images, info, author, version
-
-### Community 227 - "Community 227"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, toolchain
-
-### Community 228 - "Community 228"
-Cohesion: 0.4
-Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
-
-### Community 229 - "Community 229"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles
-
-### Community 230 - "Community 230"
-Cohesion: 0.4
-Nodes (5): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles
-
-### Community 231 - "Community 231"
-Cohesion: 0.6
-Nodes (3): enabled, packages, prefabPath
-
-### Community 232 - "Community 232"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, toolchain
-
-### Community 233 - "Community 233"
-Cohesion: 0.4
-Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
-
-### Community 234 - "Community 234"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles
-
-### Community 235 - "Community 235"
-Cohesion: 0.4
-Nodes (5): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles
-
-### Community 236 - "Community 236"
-Cohesion: 0.6
-Nodes (3): enabled, packages, prefabPath
-
-### Community 237 - "Community 237"
-Cohesion: 0.47
-Nodes (4): enableAllProjectMcpServers, enabledMcpjsonServers, permissions, allow
-
-### Community 238 - "Community 238"
+### Community 41 - "Community 41"
 Cohesion: 0.4
 Nodes (4): Debug Issue, Steps, Tips, Token Efficiency Rules
 
-### Community 239 - "Community 239"
+### Community 42 - "Community 42"
 Cohesion: 0.4
 Nodes (4): Explore Codebase, Steps, Tips, Token Efficiency Rules
 
-### Community 240 - "Community 240"
+### Community 43 - "Community 43"
 Cohesion: 0.4
 Nodes (4): Refactor Safely, Safety Checks, Steps, Token Efficiency Rules
 
-### Community 241 - "Community 241"
+### Community 44 - "Community 44"
 Cohesion: 0.4
 Nodes (4): Output Format, Review Changes, Steps, Token Efficiency Rules
 
-### Community 242 - "Community 242"
-Cohesion: 0.6
-Nodes (3): enabled, packages, prefabPath
-
-### Community 243 - "Community 243"
-Cohesion: 0.6
-Nodes (3): enabled, packages, prefabPath
-
-### Community 244 - "Community 244"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 245 - "Community 245"
+### Community 45 - "Community 45"
 Cohesion: 0.4
-Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
+Nodes (0): 
 
-### Community 246 - "Community 246"
+### Community 46 - "Community 46"
 Cohesion: 0.4
-Nodes (5): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles
+Nodes (2): connectDB(), startServer()
 
-### Community 247 - "Community 247"
+### Community 47 - "Community 47"
 Cohesion: 0.4
-Nodes (5): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles
+Nodes (0): 
 
-### Community 248 - "Community 248"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 249 - "Community 249"
-Cohesion: 0.4
-Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
-
-### Community 250 - "Community 250"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnscreens::@25bcbd507e98d3a854ad, abi, artifactName, output, runtimeFiles
-
-### Community 251 - "Community 251"
-Cohesion: 0.4
-Nodes (5): react_codegen_safeareacontext::@7984cd80db47aa7b952a, abi, artifactName, output, runtimeFiles
-
-### Community 252 - "Community 252"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, toolchain
-
-### Community 253 - "Community 253"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, toolchain
-
-### Community 254 - "Community 254"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
-
-### Community 255 - "Community 255"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 256 - "Community 256"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, toolchain
-
-### Community 257 - "Community 257"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, toolchain
-
-### Community 258 - "Community 258"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
-
-### Community 259 - "Community 259"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain
-
-### Community 260 - "Community 260"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, runtimeFiles
-
-### Community 261 - "Community 261"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, runtimeFiles
-
-### Community 262 - "Community 262"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, runtimeFiles
-
-### Community 263 - "Community 263"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, runtimeFiles
-
-### Community 264 - "Community 264"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, runtimeFiles
-
-### Community 265 - "Community 265"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, runtimeFiles
-
-### Community 266 - "Community 266"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, runtimeFiles
-
-### Community 267 - "Community 267"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, runtimeFiles
-
-### Community 268 - "Community 268"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
-
-### Community 269 - "Community 269"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 270 - "Community 270"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, toolchain
-
-### Community 271 - "Community 271"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
-
-### Community 272 - "Community 272"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 273 - "Community 273"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, toolchain
-
-### Community 274 - "Community 274"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, toolchain
-
-### Community 275 - "Community 275"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
-
-### Community 276 - "Community 276"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain
-
-### Community 277 - "Community 277"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, runtimeFiles
-
-### Community 278 - "Community 278"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, runtimeFiles
-
-### Community 279 - "Community 279"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, runtimeFiles
-
-### Community 280 - "Community 280"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, runtimeFiles
-
-### Community 281 - "Community 281"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, runtimeFiles
-
-### Community 282 - "Community 282"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, runtimeFiles
-
-### Community 283 - "Community 283"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, runtimeFiles
-
-### Community 284 - "Community 284"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, runtimeFiles
-
-### Community 285 - "Community 285"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
-
-### Community 286 - "Community 286"
-Cohesion: 0.4
-Nodes (3): info, author, version
-
-### Community 287 - "Community 287"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, toolchain
-
-### Community 288 - "Community 288"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, toolchain
-
-### Community 289 - "Community 289"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, toolchain
-
-### Community 290 - "Community 290"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
-
-### Community 291 - "Community 291"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 292 - "Community 292"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, toolchain
-
-### Community 293 - "Community 293"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
-
-### Community 294 - "Community 294"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain
-
-### Community 295 - "Community 295"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, runtimeFiles
-
-### Community 296 - "Community 296"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, runtimeFiles
-
-### Community 297 - "Community 297"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, runtimeFiles
-
-### Community 298 - "Community 298"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, runtimeFiles
-
-### Community 299 - "Community 299"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, runtimeFiles
-
-### Community 300 - "Community 300"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, runtimeFiles
-
-### Community 301 - "Community 301"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, runtimeFiles
-
-### Community 302 - "Community 302"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, runtimeFiles
-
-### Community 303 - "Community 303"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
-
-### Community 304 - "Community 304"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, toolchain
-
-### Community 305 - "Community 305"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, toolchain
-
-### Community 306 - "Community 306"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, toolchain
-
-### Community 307 - "Community 307"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
-
-### Community 308 - "Community 308"
-Cohesion: 0.16
-Nodes (10): createNote(), deleteNote(), getNoteById(), handleError(), listNotes(), updateNote(), CreateNoteDto, CreateNoteDtoType (+2 more)
-
-### Community 309 - "Community 309"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, toolchain
-
-### Community 310 - "Community 310"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
-
-### Community 311 - "Community 311"
-Cohesion: 0.07
-Nodes (35): MenuItem(), MenuItemProps, styles, MenuSection(), MenuSectionProps, styles, ClaimCreditButtonProps, styles (+27 more)
-
-### Community 312 - "Community 312"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, runtimeFiles
-
-### Community 313 - "Community 313"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCConfigSpec::@89f1b79ed4954e2f2cff, abi, artifactName, runtimeFiles
-
-### Community 314 - "Community 314"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCGeolocationSpec::@1b959fcb56e23f7716ba, abi, artifactName, runtimeFiles
-
-### Community 315 - "Community 315"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, runtimeFiles
-
-### Community 316 - "Community 316"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, runtimeFiles
-
-### Community 317 - "Community 317"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, runtimeFiles
-
-### Community 318 - "Community 318"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnreanimated::@8afabad14bfffa3f8b9a, abi, artifactName, runtimeFiles
-
-### Community 319 - "Community 319"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, runtimeFiles
-
-### Community 320 - "Community 320"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
-
-### Community 344 - "Community 344"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 345 - "Community 345"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 346 - "Community 346"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 347 - "Community 347"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 348 - "Community 348"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 349 - "Community 349"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 350 - "Community 350"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 351 - "Community 351"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 352 - "Community 352"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 353 - "Community 353"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 354 - "Community 354"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 355 - "Community 355"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 356 - "Community 356"
-Cohesion: 0.33
-Nodes (7): DailyVerseCard(), DailyVerseCardProps, styles, SetCardSkeleton(), Skeleton(), SkeletonProps, styles
-
-### Community 357 - "Community 357"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 358 - "Community 358"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 359 - "Community 359"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 360 - "Community 360"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 361 - "Community 361"
-Cohesion: 0.07
-Nodes (46): formatDate(), formatPickerDate(), GatheringForm(), GatheringFormProps, GatheringFormValues, styles, Visibility, VISIBILITY_OPTIONS (+38 more)
-
-### Community 362 - "Community 362"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 363 - "Community 363"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 364 - "Community 364"
-Cohesion: 0.24
-Nodes (17): cancelGathering(), createGathering(), getGathering(), getNearby(), handleError(), leaveGathering(), listGatherings(), listParticipants() (+9 more)
-
-### Community 365 - "Community 365"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 366 - "Community 366"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 367 - "Community 367"
-Cohesion: 0.07
-Nodes (26): Agent & Skill Usage Guide, API Layer, Backend Base URL, code:block1 (frontend/src/), code:block2 (RootNavigator), code:bash (# Frontend), Coding Conventions, Common Commands (+18 more)
-
-### Community 368 - "Community 368"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 369 - "Community 369"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 370 - "Community 370"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 371 - "Community 371"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 372 - "Community 372"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 373 - "Community 373"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 374 - "Community 374"
-Cohesion: 0.29
-Nodes (6): args, command, env, type, mcpServers, code-review-graph
-
-### Community 375 - "Community 375"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 376 - "Community 376"
-Cohesion: 0.33
-Nodes (5): args, command, type, mcpServers, code-review-graph
-
-### Community 377 - "Community 377"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 389 - "Community 389"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 390 - "Community 390"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 391 - "Community 391"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 392 - "Community 392"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 393 - "Community 393"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 394 - "Community 394"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 395 - "Community 395"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 396 - "Community 396"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 397 - "Community 397"
-Cohesion: 0.6
-Nodes (3): Divider(), DividerProps, styles
-
-### Community 398 - "Community 398"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 399 - "Community 399"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 400 - "Community 400"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 401 - "Community 401"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 402 - "Community 402"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 403 - "Community 403"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 404 - "Community 404"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 405 - "Community 405"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 406 - "Community 406"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 407 - "Community 407"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 408 - "Community 408"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 409 - "Community 409"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 410 - "Community 410"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 411 - "Community 411"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 412 - "Community 412"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 413 - "Community 413"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 414 - "Community 414"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 415 - "Community 415"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 416 - "Community 416"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 417 - "Community 417"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 418 - "Community 418"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 419 - "Community 419"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 420 - "Community 420"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 421 - "Community 421"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 422 - "Community 422"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 423 - "Community 423"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 424 - "Community 424"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 425 - "Community 425"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 426 - "Community 426"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 427 - "Community 427"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 428 - "Community 428"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 429 - "Community 429"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 430 - "Community 430"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 431 - "Community 431"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 432 - "Community 432"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 433 - "Community 433"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 434 - "Community 434"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 435 - "Community 435"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 436 - "Community 436"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 437 - "Community 437"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 438 - "Community 438"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 439 - "Community 439"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 440 - "Community 440"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 441 - "Community 441"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 442 - "Community 442"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 443 - "Community 443"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 444 - "Community 444"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 445 - "Community 445"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 446 - "Community 446"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 447 - "Community 447"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 448 - "Community 448"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 449 - "Community 449"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 450 - "Community 450"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 451 - "Community 451"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 452 - "Community 452"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 453 - "Community 453"
-Cohesion: 0.05
-Nodes (63): CreditBadge(), CreditBadgeProps, styles, DifficultyBadge(), DifficultyBadgeProps, MAP, styles, FlashCard() (+55 more)
-
-### Community 454 - "Community 454"
-Cohesion: 0.08
-Nodes (19): CHART_ICONS, ChartType, emptyMsgFor(), fmtDate(), INTERVAL_LABELS, PERIOD_CHIPS, s, WeeklyChart() (+11 more)
-
-### Community 455 - "Community 455"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 456 - "Community 456"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 457 - "Community 457"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 458 - "Community 458"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 459 - "Community 459"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, toolchain
-
-### Community 460 - "Community 460"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, runtimeFiles
-
-### Community 461 - "Community 461"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, toolchain
-
-### Community 462 - "Community 462"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, runtimeFiles
-
-### Community 463 - "Community 463"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, toolchain
-
-### Community 464 - "Community 464"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, runtimeFiles
-
-### Community 465 - "Community 465"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, toolchain
-
-### Community 466 - "Community 466"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, runtimeFiles
-
-### Community 468 - "Community 468"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 469 - "Community 469"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 470 - "Community 470"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 471 - "Community 471"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 472 - "Community 472"
-Cohesion: 0.36
-Nodes (9): notificationsApi, useDeleteNotification(), useMarkAllNotificationsRead(), useMarkNotificationRead(), useNotifications(), getNotificationIcon(), NotificationsScreen(), Props (+1 more)
-
-### Community 473 - "Community 473"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 474 - "Community 474"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 475 - "Community 475"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 476 - "Community 476"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 477 - "Community 477"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 478 - "Community 478"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 479 - "Community 479"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 480 - "Community 480"
-Cohesion: 0.09
-Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
-
-### Community 481 - "Community 481"
-Cohesion: 0.15
-Nodes (19): agg(), claimDailyLogin(), DAY_LABELS, getBalance(), getStats(), getStreak(), getTransactions(), groupByDays() (+11 more)
-
-### Community 482 - "Community 482"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 483 - "Community 483"
-Cohesion: 0.19
-Nodes (7): AppDelegate, ReactNativeDelegate, MessagingDelegate, RCTDefaultReactNativeFactoryDelegate, UIApplicationDelegate, UIResponder, UNUserNotificationCenterDelegate
-
-### Community 484 - "Community 484"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 485 - "Community 485"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 486 - "Community 486"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 487 - "Community 487"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 488 - "Community 488"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 489 - "Community 489"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 490 - "Community 490"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 491 - "Community 491"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 492 - "Community 492"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 493 - "Community 493"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 494 - "Community 494"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 495 - "Community 495"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 496 - "Community 496"
-Cohesion: 0.1
-Nodes (29): CardPreview(), CardPreviewProps, styles, useBulkCreateCards(), useCardById(), useCards(), useCopyCard(), useCreateCard() (+21 more)
-
-### Community 497 - "Community 497"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 498 - "Community 498"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 499 - "Community 499"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 500 - "Community 500"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 501 - "Community 501"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 502 - "Community 502"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 503 - "Community 503"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 504 - "Community 504"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 505 - "Community 505"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 506 - "Community 506"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 507 - "Community 507"
-Cohesion: 0.33
-Nodes (6): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles, toolchain
-
-### Community 508 - "Community 508"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles
-
-### Community 509 - "Community 509"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles
-
-### Community 510 - "Community 510"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles
-
-### Community 511 - "Community 511"
-Cohesion: 0.4
-Nodes (5): react_codegen_rnsvg::@4f40eb209d0c0b4a3b65, abi, artifactName, output, runtimeFiles
-
-### Community 512 - "Community 512"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 513 - "Community 513"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 514 - "Community 514"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 515 - "Community 515"
-Cohesion: 0.33
-Nodes (7): useCreateNote(), useDeleteNote(), useNote(), useNotes(), useUpdateNote(), useNoteStats(), NoteEditorScreen()
-
-### Community 516 - "Community 516"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 517 - "Community 517"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 518 - "Community 518"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 519 - "Community 519"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 520 - "Community 520"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
-
-### Community 521 - "Community 521"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 522 - "Community 522"
-Cohesion: 0.33
-Nodes (5): CreateNotePayload, Note, NOTE_PREDEFINED_TAGS, NotePredefinedTag, UpdateNotePayload
-
-### Community 523 - "Community 523"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
-
-### Community 524 - "Community 524"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
-
-### Community 525 - "Community 525"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 526 - "Community 526"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 527 - "Community 527"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 528 - "Community 528"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 529 - "Community 529"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 530 - "Community 530"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain, abi, artifactName (+1 more)
-
-### Community 531 - "Community 531"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 532 - "Community 532"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 533 - "Community 533"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 534 - "Community 534"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 535 - "Community 535"
-Cohesion: 0.23
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 536 - "Community 536"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 537 - "Community 537"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 538 - "Community 538"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 539 - "Community 539"
-Cohesion: 0.12
-Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
-
-### Community 540 - "Community 540"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 541 - "Community 541"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 542 - "Community 542"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 543 - "Community 543"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 544 - "Community 544"
-Cohesion: 0.26
-Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
-
-### Community 545 - "Community 545"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain, abi, artifactName (+1 more)
-
-### Community 546 - "Community 546"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 547 - "Community 547"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 548 - "Community 548"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 549 - "Community 549"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 550 - "Community 550"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 551 - "Community 551"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 552 - "Community 552"
-Cohesion: 0.22
-Nodes (8): inputs, kind, paths, build, source, version, major, minor
-
-### Community 553 - "Community 553"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 554 - "Community 554"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 555 - "Community 555"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 556 - "Community 556"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 557 - "Community 557"
-Cohesion: 0.33
-Nodes (5): entries, kind, version, major, minor
-
-### Community 558 - "Community 558"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 559 - "Community 559"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
-
-### Community 560 - "Community 560"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, toolchain
-
-### Community 561 - "Community 561"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, runtimeFiles
-
-### Community 562 - "Community 562"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, runtimeFiles
-
-### Community 563 - "Community 563"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, runtimeFiles
-
-### Community 564 - "Community 564"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, runtimeFiles
-
-### Community 565 - "Community 565"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 566 - "Community 566"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
-
-### Community 567 - "Community 567"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 568 - "Community 568"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, toolchain
-
-### Community 569 - "Community 569"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, runtimeFiles
-
-### Community 570 - "Community 570"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, runtimeFiles
-
-### Community 571 - "Community 571"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, runtimeFiles
-
-### Community 572 - "Community 572"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, runtimeFiles
-
-### Community 573 - "Community 573"
+### Community 48 - "Community 48"
 Cohesion: 0.5
-Nodes (3): MediaFile, MediaFileType, StorageUsage
+Nodes (1): MainActivity
 
-### Community 574 - "Community 574"
+### Community 49 - "Community 49"
 Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
+Nodes (0): 
 
-### Community 575 - "Community 575"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 576 - "Community 576"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, toolchain
-
-### Community 577 - "Community 577"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, toolchain
-
-### Community 578 - "Community 578"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, runtimeFiles
-
-### Community 579 - "Community 579"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, runtimeFiles
-
-### Community 580 - "Community 580"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, runtimeFiles
-
-### Community 581 - "Community 581"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, runtimeFiles
-
-### Community 582 - "Community 582"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
-
-### Community 583 - "Community 583"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 584 - "Community 584"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNMapsSpecs::@5748abef1962d24942ec, abi, artifactName, toolchain
-
-### Community 585 - "Community 585"
+### Community 50 - "Community 50"
 Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, toolchain
+Nodes (0): 
 
-### Community 586 - "Community 586"
+### Community 51 - "Community 51"
 Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, runtimeFiles
+Nodes (0): 
 
-### Community 587 - "Community 587"
+### Community 52 - "Community 52"
 Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, runtimeFiles
+Nodes (0): 
 
-### Community 588 - "Community 588"
+### Community 53 - "Community 53"
 Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, runtimeFiles
+Nodes (0): 
 
-### Community 589 - "Community 589"
+### Community 54 - "Community 54"
 Cohesion: 0.5
-Nodes (4): react_codegen_rnpdf::@7ef4ba29a735fbf48be7, abi, artifactName, runtimeFiles
+Nodes (0): 
 
-### Community 590 - "Community 590"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 591 - "Community 591"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain
-
-### Community 592 - "Community 592"
+### Community 55 - "Community 55"
 Cohesion: 0.5
-Nodes (4): react_codegen_RNImagePickerSpec::@f66ee9a2efecfb28bee4, abi, artifactName, toolchain
-
-### Community 593 - "Community 593"
-Cohesion: 0.13
-Nodes (15): sharp, s3, deleteFile(), getStorageUsage(), handleError(), listFiles(), renameFile(), uploadFile() (+7 more)
-
-### Community 594 - "Community 594"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
-
-### Community 595 - "Community 595"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 596 - "Community 596"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 597 - "Community 597"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 598 - "Community 598"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 599 - "Community 599"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
-
-### Community 600 - "Community 600"
-Cohesion: 0.07
-Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
+Nodes (0): 
 
-### Community 601 - "Community 601"
-Cohesion: 0.16
-Nodes (21): cloneSet(), createSet(), deleteSet(), getFriendsSets(), getPublicSets(), getSetById(), handleError(), listSets() (+13 more)
+### Community 56 - "Community 56"
+Cohesion: 0.67
+Nodes (1): MainApplication
 
-### Community 602 - "Community 602"
-Cohesion: 0.53
-Nodes (6): gatheringsApi, CreateGatheringPayload, Gathering, GatheringListResponse, GatheringParticipant, UpdateGatheringPayload
+### Community 57 - "Community 57"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 603 - "Community 603"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+### Community 58 - "Community 58"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 604 - "Community 604"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+### Community 59 - "Community 59"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 605 - "Community 605"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+### Community 60 - "Community 60"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 606 - "Community 606"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+### Community 61 - "Community 61"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 607 - "Community 607"
-Cohesion: 0.09
-Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+### Community 62 - "Community 62"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 608 - "Community 608"
-Cohesion: 0.18
-Nodes (8): authApi, CompletionScreenProps, styles, SetActionSheetProps, AuthState, removeDeviceToken(), KEYS, storage
+### Community 63 - "Community 63"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 609 - "Community 609"
-Cohesion: 0.3
-Nodes (6): usersApi, ChangePasswordPayload, Plan, UpdateProfilePayload, User, UserPublicProfile
+### Community 64 - "Community 64"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 610 - "Community 610"
-Cohesion: 0.3
-Nodes (8): SetCard(), SetCardProps, styles, Badge(), BadgeProps, BadgeVariant, styles, variantMap
+### Community 65 - "Community 65"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 611 - "Community 611"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 66 - "Community 66"
+Cohesion: 0.67
+Nodes (0): 
 
-### Community 612 - "Community 612"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 67 - "Community 67"
+Cohesion: 1.0
+Nodes (0): 
 
-### Community 613 - "Community 613"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 68 - "Community 68"
+Cohesion: 1.0
+Nodes (0): 
 
-### Community 614 - "Community 614"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 69 - "Community 69"
+Cohesion: 1.0
+Nodes (0): 
 
-### Community 615 - "Community 615"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 70 - "Community 70"
+Cohesion: 1.0
+Nodes (0): 
 
-### Community 616 - "Community 616"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
+### Community 71 - "Community 71"
+Cohesion: 1.0
+Nodes (0): 
 
-### Community 617 - "Community 617"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 618 - "Community 618"
-Cohesion: 0.22
-Nodes (8): configurations, kind, paths, build, source, version, major, minor
-
-### Community 619 - "Community 619"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnasyncstorage::@1596841e19ec5b9eeffe, abi, artifactName, toolchain
-
-### Community 620 - "Community 620"
-Cohesion: 0.36
-Nodes (6): aiApi, ChatHistoryParams, PaginatedBookmarks, PaginatedChats, PaginatedSessions, Pagination
-
-### Community 621 - "Community 621"
-Cohesion: 0.39
-Nodes (6): creditsApi, DailyLoginResult, PaginatedTransactions, Pagination, StatPoint, TransactionParams
-
-### Community 622 - "Community 622"
-Cohesion: 0.39
-Nodes (7): useBulkDeleteMedia(), useDeleteMedia(), useMediaFiles(), useRenameMedia(), useStorageUsage(), useUploadMedia(), MediaScreen()
-
-### Community 623 - "Community 623"
-Cohesion: 0.5
-Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
-
-### Community 625 - "Community 625"
-Cohesion: 0.5
-Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, toolchain
+### Community 72 - "Community 72"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 73 - "Community 73"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 74 - "Community 74"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 75 - "Community 75"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 76 - "Community 76"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 77 - "Community 77"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 78 - "Community 78"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 79 - "Community 79"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 80 - "Community 80"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 81 - "Community 81"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 82 - "Community 82"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 83 - "Community 83"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 84 - "Community 84"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 85 - "Community 85"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 86 - "Community 86"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 87 - "Community 87"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 88 - "Community 88"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 89 - "Community 89"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 90 - "Community 90"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 91 - "Community 91"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 92 - "Community 92"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 93 - "Community 93"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 94 - "Community 94"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 95 - "Community 95"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 96 - "Community 96"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 97 - "Community 97"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 98 - "Community 98"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 99 - "Community 99"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 100 - "Community 100"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 101 - "Community 101"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 102 - "Community 102"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 103 - "Community 103"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 104 - "Community 104"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 105 - "Community 105"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 106 - "Community 106"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 107 - "Community 107"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 108 - "Community 108"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 109 - "Community 109"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 110 - "Community 110"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 111 - "Community 111"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 112 - "Community 112"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 113 - "Community 113"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 114 - "Community 114"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 115 - "Community 115"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 116 - "Community 116"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 117 - "Community 117"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 118 - "Community 118"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 119 - "Community 119"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 120 - "Community 120"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 121 - "Community 121"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 122 - "Community 122"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 123 - "Community 123"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 124 - "Community 124"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 125 - "Community 125"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 126 - "Community 126"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 127 - "Community 127"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 128 - "Community 128"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 129 - "Community 129"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 130 - "Community 130"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 131 - "Community 131"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 132 - "Community 132"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 133 - "Community 133"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 134 - "Community 134"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 135 - "Community 135"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 136 - "Community 136"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 137 - "Community 137"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 138 - "Community 138"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 139 - "Community 139"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 140 - "Community 140"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 141 - "Community 141"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 142 - "Community 142"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 143 - "Community 143"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 144 - "Community 144"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 145 - "Community 145"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 146 - "Community 146"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 147 - "Community 147"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 148 - "Community 148"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 149 - "Community 149"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 150 - "Community 150"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 151 - "Community 151"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 152 - "Community 152"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 153 - "Community 153"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 154 - "Community 154"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 155 - "Community 155"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 156 - "Community 156"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 157 - "Community 157"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 158 - "Community 158"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 159 - "Community 159"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 160 - "Community 160"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 161 - "Community 161"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 162 - "Community 162"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 163 - "Community 163"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 164 - "Community 164"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 165 - "Community 165"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 166 - "Community 166"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 167 - "Community 167"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 168 - "Community 168"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 169 - "Community 169"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 170 - "Community 170"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 171 - "Community 171"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 172 - "Community 172"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 173 - "Community 173"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 174 - "Community 174"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 175 - "Community 175"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 176 - "Community 176"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 177 - "Community 177"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 178 - "Community 178"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 179 - "Community 179"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 180 - "Community 180"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 181 - "Community 181"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 182 - "Community 182"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 183 - "Community 183"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 184 - "Community 184"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 185 - "Community 185"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 186 - "Community 186"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 187 - "Community 187"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 188 - "Community 188"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 189 - "Community 189"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 190 - "Community 190"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 191 - "Community 191"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 192 - "Community 192"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 193 - "Community 193"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 194 - "Community 194"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 195 - "Community 195"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 196 - "Community 196"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 197 - "Community 197"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 198 - "Community 198"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 199 - "Community 199"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 200 - "Community 200"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 201 - "Community 201"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 202 - "Community 202"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 203 - "Community 203"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 204 - "Community 204"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 205 - "Community 205"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 206 - "Community 206"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 207 - "Community 207"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 208 - "Community 208"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 209 - "Community 209"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 210 - "Community 210"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 211 - "Community 211"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 212 - "Community 212"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 213 - "Community 213"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 214 - "Community 214"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 215 - "Community 215"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 216 - "Community 216"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 217 - "Community 217"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 218 - "Community 218"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 219 - "Community 219"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 220 - "Community 220"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 221 - "Community 221"
+Cohesion: 1.0
+Nodes (0): 
 
 ## Knowledge Gaps
-- **4663 isolated node(s):** `command`, `args`, `type`, `command`, `args` (+4658 more)
+- **166 isolated node(s):** `When to use graph tools FIRST`, `Key Tools`, `Workflow`, `Stack`, `Backend Base URL` (+161 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **13 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **Thin community `Community 67`** (2 nodes): `AppBootstrap()`, `App.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 68`** (2 nodes): `AdBanner()`, `AdBanner.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 69`** (2 nodes): `useRewardedAd.ts`, `useRewardedAd()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 70`** (2 nodes): `MapNavigator.tsx`, `MapNavigator()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 71`** (2 nodes): `AINavigator()`, `AINavigator.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 72`** (2 nodes): `LibraryNavigator.tsx`, `LibraryNavigator()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 73`** (2 nodes): `AuthNavigator()`, `AuthNavigator.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 74`** (2 nodes): `tagDetector.ts`, `detectTags()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 75`** (2 nodes): `haptics.ts`, `triggerHaptic()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 76`** (2 nodes): `CompletionScreen()`, `CompletionScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 77`** (2 nodes): `RegisterScreen.tsx`, `RegisterScreen()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 78`** (2 nodes): `LoginScreen.tsx`, `LoginScreen()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 79`** (2 nodes): `BrandLogo()`, `AuthLayout.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 80`** (2 nodes): `PublicSetsScreen.tsx`, `toggleSearch()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 81`** (2 nodes): `CardPreview()`, `CardPreview.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 82`** (2 nodes): `MapScreen.tsx`, `handleCreateGathering()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 83`** (2 nodes): `MenuSection.tsx`, `MenuSection()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 84`** (2 nodes): `handleSend()`, `ChatInput.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 85`** (2 nodes): `Spacer.tsx`, `Spacer()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 86`** (2 nodes): `Divider()`, `Divider.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 87`** (2 nodes): `Typography.tsx`, `Typography()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 88`** (2 nodes): `ProgressBar.tsx`, `ProgressBar()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 89`** (2 nodes): `getInitials()`, `Avatar.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 90`** (2 nodes): `Badge()`, `Badge.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 91`** (2 nodes): `Button()`, `Button.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 92`** (2 nodes): `AnimatedPressable()`, `AnimatedPressable.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 93`** (2 nodes): `ColorPicker()`, `ColorPicker.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 94`** (2 nodes): `FormField()`, `FormField.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 95`** (2 nodes): `ConfirmDialog()`, `ConfirmDialog.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 96`** (2 nodes): `SkeletonLoader.tsx`, `Skeleton()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 97`** (2 nodes): `LoadingOverlay.tsx`, `LoadingOverlay()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 98`** (2 nodes): `SetActionSheet.tsx`, `SetActionSheet()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 99`** (2 nodes): `SetCard.tsx`, `SetCard()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 100`** (2 nodes): `handlePress()`, `FlashCard.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 101`** (2 nodes): `formatTime()`, `ChatBubble.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 102`** (2 nodes): `CreditBadge()`, `CreditBadge.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 103`** (2 nodes): `shadows.ts`, `shadow()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 104`** (2 nodes): `useActivities.ts`, `useFriendsActivityFeed()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 105`** (2 nodes): `useDailyVerse.ts`, `useDailyVerse()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 106`** (2 nodes): `useUser.ts`, `useUser()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 107`** (2 nodes): `validate.middleware.ts`, `validate()`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 108`** (1 nodes): `jest.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 109`** (1 nodes): `index.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 110`** (1 nodes): `metro.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 111`** (1 nodes): `babel.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 112`** (1 nodes): `App.test.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 113`** (1 nodes): `adIds.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 114`** (1 nodes): `common.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 115`** (1 nodes): `set.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 116`** (1 nodes): `groups.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 117`** (1 nodes): `folder.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 118`** (1 nodes): `card.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 119`** (1 nodes): `gatherings.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 120`** (1 nodes): `env.d.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 121`** (1 nodes): `map.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 122`** (1 nodes): `media.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 123`** (1 nodes): `activities.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 124`** (1 nodes): `credits.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 125`** (1 nodes): `auth.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 126`** (1 nodes): `friends.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 127`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 128`** (1 nodes): `notification.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 129`** (1 nodes): `notes.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 130`** (1 nodes): `ai.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 131`** (1 nodes): `user.types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 132`** (1 nodes): `AppNavigator.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 133`** (1 nodes): `types.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 134`** (1 nodes): `ProfileNavigator.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 135`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 136`** (1 nodes): `storage.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 137`** (1 nodes): `validators.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 138`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 139`** (1 nodes): `StudyScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 140`** (1 nodes): `FlashCardView.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 141`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 142`** (1 nodes): `VerifyEmailScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 143`** (1 nodes): `FriendsSetsScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 144`** (1 nodes): `ProfileScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 145`** (1 nodes): `SearchUsersScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 146`** (1 nodes): `MediaPDFViewerScreen.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 147`** (1 nodes): `MenuItem.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 148`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 149`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 150`** (1 nodes): `Input.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 151`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 152`** (1 nodes): `ActionSheet.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 153`** (1 nodes): `ErrorState.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 154`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 155`** (1 nodes): `Modal.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 156`** (1 nodes): `EmptyState.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 157`** (1 nodes): `FolderCard.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 158`** (1 nodes): `DailyVerseCard.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 159`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 160`** (1 nodes): `colors.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 161`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 162`** (1 nodes): `typography.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 163`** (1 nodes): `spacing.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 164`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 165`** (1 nodes): `queryClient.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 166`** (1 nodes): `ai.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 167`** (1 nodes): `friends.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 168`** (1 nodes): `groups.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 169`** (1 nodes): `notes.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 170`** (1 nodes): `users.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 171`** (1 nodes): `gatherings.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 172`** (1 nodes): `map.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 173`** (1 nodes): `credits.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 174`** (1 nodes): `activities.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 175`** (1 nodes): `media.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 176`** (1 nodes): `notifications.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 177`** (1 nodes): `auth.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 178`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 179`** (1 nodes): `cards.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 180`** (1 nodes): `folders.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 181`** (1 nodes): `sets.api.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 182`** (1 nodes): `index.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 183`** (1 nodes): `auth.store.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 184`** (1 nodes): `ecosystem.config.js`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 185`** (1 nodes): `start-dev.ps1`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 186`** (1 nodes): `app.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 187`** (1 nodes): `express.d.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 188`** (1 nodes): `s3.client.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 189`** (1 nodes): `env.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 190`** (1 nodes): `rateLimit.middleware.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 191`** (1 nodes): `auth.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 192`** (1 nodes): `auth.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 193`** (1 nodes): `cards.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 194`** (1 nodes): `cards.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 195`** (1 nodes): `groups.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 196`** (1 nodes): `groups.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 197`** (1 nodes): `map.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 198`** (1 nodes): `map.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 199`** (1 nodes): `notes.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 200`** (1 nodes): `notes.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 201`** (1 nodes): `ai.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 202`** (1 nodes): `ai.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 203`** (1 nodes): `sets.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 204`** (1 nodes): `sets.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 205`** (1 nodes): `users.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 206`** (1 nodes): `users.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 207`** (1 nodes): `activities.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 208`** (1 nodes): `folders.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 209`** (1 nodes): `folders.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 210`** (1 nodes): `friends.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 211`** (1 nodes): `friends.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 212`** (1 nodes): `gatherings.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 213`** (1 nodes): `gatherings.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 214`** (1 nodes): `credits.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 215`** (1 nodes): `credits.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 216`** (1 nodes): `notifications.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 217`** (1 nodes): `notifications.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 218`** (1 nodes): `media.routes.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 219`** (1 nodes): `media.dto.ts`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 220`** (1 nodes): `planning.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 221`** (1 nodes): `planning.md`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `getErrorMessage()` connect `Community 12` to `Community 4`, `Community 453`, `Community 6`, `Community 361`, `Community 10`, `Community 48`, `Community 311`?**
-  _High betweenness centrality (0.005) - this node is a cross-community bridge._
-- **Why does `onSubmit()` connect `Community 12` to `Community 5`, `Community 311`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Why does `updateProfile()` connect `Community 5` to `Community 12`?**
-  _High betweenness centrality (0.004) - this node is a cross-community bridge._
-- **Are the 86 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `getMyFeed()`) actually correct?**
-  _`sendError()` has 86 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 85 inferred relationships involving `sendSuccess()` (e.g. with `getMyFeed()` and `getFriendsFeed()`) actually correct?**
-  _`sendSuccess()` has 85 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 4 inferred relationships involving `getErrorMessage()` (e.g. with `onSubmit()` and `onSubmit()`) actually correct?**
-  _`getErrorMessage()` has 4 INFERRED edges - model-reasoned connections that need verification._
-- **What connects `command`, `args`, `type` to the rest of the system?**
-  _4663 weakly-connected nodes found - possible documentation gaps or missing edges._
+- **Why does `getErrorMessage()` connect `Community 5` to `Community 12`?**
+  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+- **Are the 106 inferred relationships involving `sendSuccess()` (e.g. with `register()` and `verifyEmail()`) actually correct?**
+  _`sendSuccess()` has 106 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 90 inferred relationships involving `handleControllerError()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
+  _`handleControllerError()` has 90 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 20 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `register()`) actually correct?**
+  _`sendError()` has 20 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 11 inferred relationships involving `logActivity()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
+  _`logActivity()` has 11 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 8 inferred relationships involving `AIChatScreen()` (e.g. with `useConfirmDialog()` and `useAIChat()`) actually correct?**
+  _`AIChatScreen()` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `When to use graph tools FIRST`, `Key Tools`, `Workflow` to the rest of the system?**
+  _166 weakly-connected nodes found - possible documentation gaps or missing edges._
