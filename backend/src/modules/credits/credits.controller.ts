@@ -31,13 +31,6 @@ export async function claimDailyLogin(req: Request, res: Response): Promise<void
   } catch (error) { handleControllerError(res, error, 'Failed to claim daily reward'); }
 }
 
-export async function watchAd(req: Request, res: Response): Promise<void> {
-  try {
-    const result = await creditsService.watchAd(req.user!.id);
-    sendSuccess(res, result, result.message);
-  } catch (error) { handleControllerError(res, error, 'Failed to process ad reward'); }
-}
-
 export async function getStreak(req: Request, res: Response): Promise<void> {
   try {
     const result = await creditsService.getStreak(req.user!.id);

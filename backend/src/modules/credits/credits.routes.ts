@@ -11,6 +11,5 @@ router.get('/streak', creditsController.getStreak);
 router.get('/transactions', creditsController.getTransactions);
 router.get('/stats', creditsController.getStats);
 router.post('/daily-login', creditsController.claimDailyLogin);
-router.post('/watch-ad',   creditsController.watchAd);
 
 export default router;
