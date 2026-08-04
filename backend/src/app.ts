@@ -24,6 +24,7 @@ import activitiesRoutes from './modules/activities/activities.routes';
 import notificationsRoutes from './modules/notifications/notifications.routes';
 import notesRoutes from './modules/notes/notes.routes';
 import mediaRoutes from './modules/media/media.routes';
+import quizRoutes from './modules/quiz/quiz.routes';
 
 const app = express();
 
@@ -92,6 +93,7 @@ app.use('/api/v1/activities',      activitiesRoutes);
 app.use('/api/v1/notifications',   notificationsRoutes);
 app.use('/api/v1/notes',           notesRoutes);
 app.use('/api/v1/media',           mediaRoutes);
+app.use('/api/v1/quiz',            quizRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {
