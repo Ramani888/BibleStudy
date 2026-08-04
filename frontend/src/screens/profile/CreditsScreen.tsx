@@ -82,7 +82,7 @@ export function CreditsScreen() {
   const transactions = data?.pages.flatMap(p => p.transactions) ?? [];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <FlatList
         data={transactions}
         keyExtractor={item => item.id}

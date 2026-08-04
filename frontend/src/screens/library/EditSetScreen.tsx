@@ -53,7 +53,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"

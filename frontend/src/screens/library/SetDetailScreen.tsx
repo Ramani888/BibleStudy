@@ -189,7 +189,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       {/* ── Stats bar / Reorder bar ── */}
       {reorderMode ? (
         <View style={styles.reorderBar}>

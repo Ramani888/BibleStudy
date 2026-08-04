@@ -43,7 +43,7 @@ export function BlockedUsersScreen(_props: Props) {
   if (error) return <ErrorState message="Could not load blocked users" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       <FlatList
         data={blocked}
         keyExtractor={item => item.id}

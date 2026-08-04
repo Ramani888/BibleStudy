@@ -12,7 +12,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
   const { mutateAsync: createSet } = useCreateSet();
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={['bottom']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"

@@ -83,7 +83,7 @@ export function NotificationsScreen(_props: Props) {
   if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={[]}>
       {unreadCount > 0 && (
         <View style={styles.header}>
           <Typography preset="caption" color={colors.textSecondary}>

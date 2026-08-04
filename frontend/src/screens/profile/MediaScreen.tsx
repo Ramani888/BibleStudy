@@ -369,7 +369,7 @@ export function MediaScreen({ navigation }: Props) {
   }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       {/* Tab row / Selection header */}
       {selectionMode ? (
         <View style={styles.selectionHeader}>

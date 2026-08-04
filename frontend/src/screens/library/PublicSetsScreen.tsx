@@ -57,7 +57,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   if (isError) return <ErrorState message="Could not load public sets." onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <View style={styles.header}>
         <Typography preset="bodySm" color={colors.textSecondary}>
           {(isFetching && !isLoading && !isRefetching && !isFetchingNextPage)

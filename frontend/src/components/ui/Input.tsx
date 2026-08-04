@@ -116,6 +116,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     ...textPresets.body,
+    lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
     color: colors.textPrimary,
     paddingVertical: 0,
   },

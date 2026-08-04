@@ -48,7 +48,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
   if (error || !user) {
     return (
-      <SafeAreaView style={styles.safe} edges={['top']}>
+      <SafeAreaView style={styles.safe} edges={[]}>
         <ErrorState message="Could not load profile" onRetry={refetch} />
       </SafeAreaView>
     );
@@ -114,7 +114,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const memberSince = formatDateOnly(user.createdAt);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={styles.safe} edges={[]}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
