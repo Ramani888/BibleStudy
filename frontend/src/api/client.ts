@@ -1,12 +1,22 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import { NativeModules } from 'react-native';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
 import { useAuthStore } from '../store/auth.store';
 
-// Dev: adb reverse tcp:3010 tcp:3010 tunnels localhost → PC (works for physical device + emulator + iOS sim)
+// Dev host resolution: reuse the host the JS bundle was loaded from (Metro).
+// - iOS simulator / Android (with `adb reverse`): resolves to `localhost`.
+// - Physical device: resolves to the dev machine's LAN IP (e.g. 192.168.1.2),
+//   since Metro served the bundle from there. Auto-adapts across Wi-Fi networks,
+//   so no hardcoded IP and no `adb reverse` needed for a physical iPhone.
+const getDevHost = (): string => {
+  const scriptURL: string | undefined = NativeModules.SourceCode?.scriptURL;
+  return scriptURL?.match(/https?:\/\/([^:/]+)/)?.[1] ?? 'localhost';
+};
+
 const BASE_URL = __DEV__
-  ? 'http://localhost:3010/api/v1'
+  ? `http://${getDevHost()}:3010/api/v1`
   : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
 
 export const apiClient = axios.create({
