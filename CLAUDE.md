@@ -57,7 +57,15 @@ A Bible study flashcard app with AI assistant features.
 
 ### Backend Base URL
 
-`/api/v1` — modules: `auth`, `users`, `ai`, `cards`, `credits`, `folders`, `sets`
+`/api/v1` — 15 modules: `auth`, `users`, `folders`, `sets`, `cards`, `ai`,
+`credits`, `friends`, `groups`, `gatherings`, `map`, `activities`,
+`notifications`, `notes`, `media`.
+
+Each module under `backend/src/modules/<feature>/` has the same 4 files:
+`<f>.routes.ts` · `<f>.controller.ts` · `<f>.service.ts` (owns all Prisma) ·
+`<f>.dto.ts` (zod). Beyond the study core (folders/sets/cards/ai/credits) there
+is a full **social layer**: friends, groups, in-person gatherings on a map,
+an activity feed, and notifications.
 
 ---
 
@@ -73,15 +81,22 @@ frontend/src/
     feedback/   # Modal, ActionSheet, EmptyState, ErrorState, LoadingOverlay, SkeletonLoader
     forms/      # FormField, OTPInput
     domain/     # ChatBubble, CreditBadge, DailyVerseCard, DifficultyBadge, FlashCard, FolderCard, SetCard
-  hooks/        # useAI, useCards, useCredits, useDailyVerse, useFolders, useProfile, useSets
+  hooks/        # useAI, useCards, useCredits, useDailyVerse, useFolders, useSets, useNotes,
+                #   useMedia, useFriends, useGroups, useGatherings, useMap, useActivities,
+                #   useNotifications, useProfile, useUser, useStudySession, ... (23 hooks)
   navigation/   # RootNavigator → AuthNavigator | AppNavigator (tabs)
   screens/
     auth/       # Login, Register, VerifyEmail, ForgotPassword, ResetPassword
+    onboarding/ # OnboardingScreen
     home/       # HomeScreen
-    library/    # LibraryScreen, FolderDetail, SetDetail, CreateSet, EditSet, CreateCard, EditCard, PublicSets
+    library/    # LibraryScreen, FolderDetail, SetDetail, CreateSet, EditSet, CreateCard, EditCard, PublicSets, FriendsSets
     ai/         # AIChatScreen, ChatHistoryScreen
     study/      # StudyScreen
-    profile/    # ProfileScreen, EditProfile, ChangePassword, Credits, Settings
+    map/        # MapScreen, GatheringDetail, CreateGathering, EditGathering
+    profile/    # ProfileScreen, EditProfile, ChangePassword, Credits, Settings + social:
+                #   Notes/NoteEditor, Media/MediaPDFViewer, Notifications,
+                #   Friends/FriendRequests/SearchUsers/UserProfile/BlockedUsers,
+                #   Groups/GroupDetail/CreateGroup/EditGroup/JoinGroup/PublicGroups
   store/        # auth.store.ts (Zustand)
   theme/        # colors, spacing, typography, shadows
   types/        # per-domain TypeScript types
@@ -100,13 +115,23 @@ RootNavigator
                        Library → FolderDetail → SetDetail
                                               → CreateSet / EditSet
                                               → CreateCard / EditCard
-                              → PublicSets
+                              → PublicSets / FriendsSets
     StudyTab       → StudyScreen
     AITab          → AINavigator (stack)
                        AIChat → ChatHistory
-    ProfileTab     → ProfileNavigator (stack)
+    MapTab         → MapNavigator (stack)
+                       Map → GatheringDetail → CreateGathering / EditGathering
+    ProfileTab     → ProfileNavigator (stack)   # hosts the social layer
                        Profile → EditProfile → ChangePassword → Credits → Settings
+                               → Notes → NoteEditor
+                               → Media → MediaPDFViewer
+                               → Notifications
+                               → Friends → FriendRequests / SearchUsers / UserProfile / BlockedUsers
+                               → Groups → GroupDetail / CreateGroup / EditGroup / JoinGroup / PublicGroups
 ```
+
+> Full architecture is documented in the Obsidian brain at `obsidian/` (open
+> `obsidian/Home.md`) — kept in sync with this file.
 
 ---
 
