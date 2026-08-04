@@ -13,6 +13,7 @@ export interface RecordAttemptPayload {
   setId: string;
   total: number;
   correct: number;
+  mode?: string;
 }
 
 export interface RecordAttemptResult {
@@ -27,10 +28,30 @@ export interface SetBestScore {
   attempts: number;
 }
 
-// A client-side multiple-choice question, built from a Card by useQuizSession.
+// The quiz modes. `mix` is a meta-mode (rotate all supported modes).
+export type QuizMode =
+  | 'mc'            // Q&A: question -> pick answer
+  | 'type_answer'   // Q&A: type the answer
+  | 'blanks'        // Story: fill blanked words
+  | 'type_verbatim' // Story: type the whole passage
+  | 'story_mc'      // Story: reference -> pick text
+  | 'chunks'        // Story: order the word-groups
+  | 'read';         // Story: read to memorize (unscored)
+
+export type QuizSelectableMode = QuizMode | 'mix';
+
+// One built quiz item (a discriminated union by mode).
+export type QuizItem =
+  | { mode: 'mc' | 'story_mc'; cardId: string; prompt: string; options: string[]; answerIndex: number }
+  | { mode: 'type_answer' | 'type_verbatim'; cardId: string; prompt: string; answer: string }
+  | { mode: 'blanks'; cardId: string; prompt: string; tokens: string[]; blankAt: number[] }
+  | { mode: 'chunks'; cardId: string; prompt: string; chunks: string[]; correct: string[] }
+  | { mode: 'read'; cardId: string; prompt: string; text: string };
+
+// Kept for the original MC view's prop shape.
 export interface QuizQuestion {
   cardId: string;
-  prompt: string;       // the card's question
-  options: string[];    // 4 answer strings (1 correct + 3 distractors), shuffled
-  answerIndex: number;  // index of the correct option within `options`
+  prompt: string;
+  options: string[];
+  answerIndex: number;
 }

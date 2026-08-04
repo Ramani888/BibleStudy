@@ -5,7 +5,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { EmptyState, ErrorState } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 import { useSets, useAllQuizBest } from '../../hooks';
-import { MIN_QUIZ_CARDS } from '../../hooks/useQuizSession';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
 import type { QuizScreenProps } from '../../navigation/types';
@@ -25,13 +24,13 @@ export function QuizHubScreen({ navigation }: Props) {
 
   const renderItem = ({ item }: { item: StudySet }) => {
     const count = item._count?.cards ?? 0;
-    const quizzable = count >= MIN_QUIZ_CARDS;
+    const quizzable = count > 0;
     const best = bestBySet[item.id];
 
     return (
       <Pressable
         disabled={!quizzable}
-        onPress={() => navigation.navigate('Quiz', { setId: item.id, setTitle: item.title })}
+        onPress={() => navigation.navigate('QuizModePicker', { setId: item.id, setTitle: item.title })}
         style={[styles.row, !quizzable && styles.rowDisabled]}
         accessibilityRole="button"
       >
@@ -41,7 +40,7 @@ export function QuizHubScreen({ navigation }: Props) {
         <View style={styles.rowText}>
           <Typography preset="h4" color={colors.textPrimary} numberOfLines={1}>{item.title}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>
-            {quizzable ? `${count} cards` : `Needs ${MIN_QUIZ_CARDS}+ cards (has ${count})`}
+            {quizzable ? `${count} ${count === 1 ? 'card' : 'cards'}` : 'No cards yet'}
           </Typography>
         </View>
         {best !== undefined && (
@@ -76,7 +75,7 @@ export function QuizHubScreen({ navigation }: Props) {
           ) : !isLoading ? (
             <EmptyState
               title="No sets to quiz yet"
-              subtitle={`Create a set with ${MIN_QUIZ_CARDS}+ cards to start quizzing`}
+              subtitle="Create a set with cards to start quizzing"
             />
           ) : null
         }

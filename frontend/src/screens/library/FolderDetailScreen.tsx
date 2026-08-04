@@ -143,7 +143,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         onClose={() => { setSelectedSet(null); setAssignTargetSetId(null); }}
         onQuiz={() =>
           selectedSet &&
-          navigation.navigate('Quiz', { setId: selectedSet.id, setTitle: selectedSet.title })
+          navigation.navigate('QuizModePicker', { setId: selectedSet.id, setTitle: selectedSet.title })
         }
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
         showAssignFolder

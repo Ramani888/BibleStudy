@@ -476,7 +476,7 @@ export function HomeScreen() {
         onQuiz={() =>
           selectedSet &&
           navigation.navigate('QuizTab', {
-            screen: 'Quiz',
+            screen: 'QuizModePicker',
             params: { setId: selectedSet.id, setTitle: selectedSet.title },
           })
         }

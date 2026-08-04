@@ -11,6 +11,7 @@ const RESULT_ICON_SIZE = 56;
 interface Props {
   setId: string;
   setTitle: string;
+  mode?: string;
   total: number;
   correct: number;
   scorePct: number;
@@ -18,20 +19,21 @@ interface Props {
   onExit: () => void;
 }
 
-export function QuizResultScreen({ setId, setTitle, total, correct, scorePct, onRetake, onExit }: Props) {
+export function QuizResultScreen({ setId, setTitle, mode, total, correct, scorePct, onRetake, onExit }: Props) {
   const { mutate: recordAttempt } = useRecordQuizAttempt();
   const recorded = useRef(false);
   const [best, setBest] = useState<number | null>(null);
 
-  // Persist the attempt exactly once when the result screen mounts.
+  // Persist the attempt once on mount — but only if something was scored
+  // (a Read-only quiz has total 0 and isn't recorded).
   useEffect(() => {
-    if (recorded.current) return;
+    if (recorded.current || total === 0) return;
     recorded.current = true;
     recordAttempt(
-      { setId, total, correct },
+      { setId, total, correct, mode },
       { onSuccess: res => setBest(res.best) },
     );
-  }, [recordAttempt, setId, total, correct]);
+  }, [recordAttempt, setId, total, correct, mode]);
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
   const isNewBest = best !== null && scorePct >= best;

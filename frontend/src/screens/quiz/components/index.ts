@@ -1,2 +1,2 @@
-export { QuizQuestionView } from './QuizQuestionView';
+export { QuizItemView } from './QuizItemView';
 export { QuizResultScreen } from './QuizResultScreen';

@@ -406,7 +406,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           {
             label: 'Quiz',
             iconName: 'help-circle-outline',
-            onPress: () => navigation.navigate('Quiz', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
+            onPress: () => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
           },
           ...(isOwner ? [
             {

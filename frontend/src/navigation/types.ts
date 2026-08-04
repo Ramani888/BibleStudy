@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
-import type { ChatSession } from '../types';
+import type { ChatSession, QuizSelectableMode } from '../types';
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
 export type AuthStackParamList = {
@@ -23,13 +23,15 @@ export type LibraryStackParamList = {
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
   FriendsSets: undefined;
-  Quiz: { setId: string; setTitle: string; isOwner?: boolean };
+  QuizModePicker: { setId: string; setTitle: string; isOwner?: boolean };
+  Quiz: { setId: string; setTitle: string; mode?: QuizSelectableMode; isOwner?: boolean };
 };
 
 // ─── Quiz Stack (nested inside Quiz tab) ──────────────────────────────────────
 export type QuizStackParamList = {
   QuizHub: undefined;
-  Quiz: { setId: string; setTitle: string; isOwner?: boolean };
+  QuizModePicker: { setId: string; setTitle: string; isOwner?: boolean };
+  Quiz: { setId: string; setTitle: string; mode?: QuizSelectableMode; isOwner?: boolean };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────

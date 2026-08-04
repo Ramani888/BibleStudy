@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { QuizStackParamList } from './types';
 import { QuizHubScreen } from '../screens/quiz/QuizHubScreen';
+import { QuizModePickerScreen } from '../screens/quiz/QuizModePickerScreen';
 import { QuizScreen } from '../screens/quiz/QuizScreen';
 
 const Stack = createNativeStackNavigator<QuizStackParamList>();
@@ -29,6 +30,7 @@ export function QuizNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="QuizHub" component={QuizHubScreen} />
+      <Stack.Screen name="QuizModePicker" component={QuizModePickerScreen} />
       <Stack.Screen name="Quiz" component={QuizScreen} />
     </Stack.Navigator>
   );
