@@ -1,7 +1,7 @@
-# Graph Report - .  (2026-05-31)
+# Graph Report - .  (2026-08-04)
 
 ## Corpus Check
-- 257 files · ~95,332 words
+- 257 files · ~94,683 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -1465,7 +1465,7 @@ Nodes (0):
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `getErrorMessage()` connect `Community 5` to `Community 12`?**
-  _High betweenness centrality (0.043) - this node is a cross-community bridge._
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
 - **Are the 106 inferred relationships involving `sendSuccess()` (e.g. with `register()` and `verifyEmail()`) actually correct?**
   _`sendSuccess()` has 106 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 90 inferred relationships involving `handleControllerError()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
