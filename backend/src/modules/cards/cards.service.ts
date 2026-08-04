@@ -30,6 +30,7 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
   const card = await prisma.card.create({
     data: {
       setId: dto.setId,
+      type: dto.type ?? 'QA',
       question: dto.question,
       answer: dto.answer,
       note: dto.note ?? null,
@@ -110,6 +111,7 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
   const updated = await prisma.card.update({
     where: { id: cardId },
     data: {
+      ...(dto.type !== undefined && { type: dto.type }),
       ...(dto.question !== undefined && { question: dto.question }),
       ...(dto.answer !== undefined && { answer: dto.answer }),
       ...(dto.imageId !== undefined && { imageId: dto.imageId }),

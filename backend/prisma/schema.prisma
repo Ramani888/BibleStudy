@@ -119,6 +119,7 @@ model Set {
 model Card {
   id            String     @id @default(uuid())
   setId         String
+  type          CardType   @default(QA)
   question      String
   answer        String
   note          String?
@@ -369,6 +370,7 @@ model QuizAttempt {
   total     Int
   correct   Int
   scorePct  Int
+  mode      String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   set       Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
@@ -376,6 +378,11 @@ model QuizAttempt {
   @@index([userId])
   @@index([setId])
   @@index([userId, setId])
+}
+
+enum CardType {
+  QA
+  STORY
 }
 
 enum MediaType {

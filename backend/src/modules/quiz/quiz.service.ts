@@ -16,6 +16,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
       total:   dto.total,
       correct: dto.correct,
       scorePct,
+      mode:    dto.mode ?? null,
     },
   });
 

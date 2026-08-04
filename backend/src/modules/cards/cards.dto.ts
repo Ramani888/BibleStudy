@@ -1,15 +1,22 @@
 import { z } from 'zod';
 
-export const CreateCardDto = z.object({
-  setId: z.string().uuid('Invalid set ID'),
-  question: z.string().trim().min(1, 'Question is required').max(5000, 'Max 5000 characters'),
-  answer: z.string().trim().min(1, 'Answer is required').max(5000, 'Max 5000 characters'),
-  note: z.string().trim().max(2000).optional(),
-  imageId: z.string().uuid('Invalid image ID').optional(),
-  order: z.number().int().min(0).optional(),
-  isBlurred: z.boolean().optional(),
-  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
-});
+export const CreateCardDto = z
+  .object({
+    setId: z.string().uuid('Invalid set ID'),
+    type: z.enum(['QA', 'STORY']).optional(),
+    // QA: question required (enforced below). STORY: question = reference, optional.
+    question: z.string().trim().max(5000, 'Max 5000 characters').optional().default(''),
+    answer: z.string().trim().min(1, 'Answer is required').max(5000, 'Max 5000 characters'),
+    note: z.string().trim().max(2000).optional(),
+    imageId: z.string().uuid('Invalid image ID').optional(),
+    order: z.number().int().min(0).optional(),
+    isBlurred: z.boolean().optional(),
+    difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
+  })
+  .refine(d => d.type === 'STORY' || d.question.length > 0, {
+    message: 'Question is required',
+    path: ['question'],
+  });
 
 export const BulkCreateCardsDto = z.object({
   setId: z.string().uuid('Invalid set ID'),
@@ -30,7 +37,8 @@ export const BulkCreateCardsDto = z.object({
 });
 
 export const UpdateCardDto = z.object({
-  question: z.string().trim().min(1).max(5000, 'Max 5000 characters').optional(),
+  type: z.enum(['QA', 'STORY']).optional(),
+  question: z.string().trim().max(5000, 'Max 5000 characters').optional(),
   answer: z.string().trim().min(1).max(5000, 'Max 5000 characters').optional(),
   note: z.string().trim().max(2000).nullable().optional(),
   imageId: z.string().uuid('Invalid image ID').nullable().optional(),
