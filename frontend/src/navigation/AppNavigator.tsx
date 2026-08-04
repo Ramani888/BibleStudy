@@ -8,6 +8,7 @@ import type { AppTabParamList } from './types';
 import { colors, fontSizes, fontWeights, layout, spacing } from '../theme';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { LibraryNavigator } from './LibraryNavigator';
+import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 
@@ -16,6 +17,7 @@ const Tab = createBottomTabNavigator<AppTabParamList>();
 const TAB_ICONS: Record<string, { active: string; inactive: string }> = {
   HomeTab:    { active: 'home',          inactive: 'home-outline'          },
   LibraryTab: { active: 'library',       inactive: 'library-outline'       },
+  QuizTab:    { active: 'help-circle',   inactive: 'help-circle-outline'   },
   AITab:      { active: 'chatbubbles',   inactive: 'chatbubbles-outline'   },
   ProfileTab: { active: 'person-circle', inactive: 'person-circle-outline' },
 };
@@ -45,7 +47,8 @@ export function AppNavigator() {
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
       <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
-<Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
+      <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
+      <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
       <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile' }} />
     </Tab.Navigator>
   );

@@ -408,6 +408,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             iconName: 'book-outline',
             onPress: () => navigation.navigate('Study', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
           },
+          {
+            label: 'Quiz',
+            iconName: 'help-circle-outline',
+            onPress: () => navigation.navigate('Quiz', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
+          },
           ...(isOwner ? [
             {
               label: 'Create Card',

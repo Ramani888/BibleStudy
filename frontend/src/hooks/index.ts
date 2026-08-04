@@ -32,6 +32,7 @@ export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useStudySession } from './useStudySession';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
+export { useAllQuizBest, useQuizBest, useRecordQuizAttempt } from './useQuiz';
 
 // Phase 2 — Community
 export {

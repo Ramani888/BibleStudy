@@ -1,0 +1,100 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import Icon from 'react-native-vector-icons/Ionicons';
+import { Button, Spacer, Typography } from '../../../components/ui';
+import { useRecordQuizAttempt } from '../../../hooks';
+import { colors, layout, spacing } from '../../../theme';
+
+const RESULT_ICON_SIZE = 56;
+
+interface Props {
+  setId: string;
+  setTitle: string;
+  total: number;
+  correct: number;
+  scorePct: number;
+  onRetake: () => void;
+  onExit: () => void;
+}
+
+export function QuizResultScreen({ setId, setTitle, total, correct, scorePct, onRetake, onExit }: Props) {
+  const { mutate: recordAttempt } = useRecordQuizAttempt();
+  const recorded = useRef(false);
+  const [best, setBest] = useState<number | null>(null);
+
+  // Persist the attempt exactly once when the result screen mounts.
+  useEffect(() => {
+    if (recorded.current) return;
+    recorded.current = true;
+    recordAttempt(
+      { setId, total, correct },
+      { onSuccess: res => setBest(res.best) },
+    );
+  }, [recordAttempt, setId, total, correct]);
+
+  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
+  const isNewBest = best !== null && scorePct >= best;
+
+  return (
+    <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
+      <Icon name="ribbon-outline" size={RESULT_ICON_SIZE} color={colors.warning} />
+      <Typography preset="h2" align="center">Quiz Complete!</Typography>
+      <Typography preset="body" color={colors.textSecondary} align="center" style={styles.sub}>
+        {setTitle}
+      </Typography>
+
+      <View style={styles.scoreWrap}>
+        <Typography style={[styles.scoreNumber, { color: scoreColor }]}>{scorePct}%</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>
+          {correct} / {total} correct
+        </Typography>
+      </View>
+
+      {best !== null && (
+        <View style={styles.bestPill}>
+          <Icon
+            name={isNewBest ? 'trophy' : 'trophy-outline'}
+            size={16}
+            color={isNewBest ? colors.warning : colors.textSecondary}
+          />
+          <Typography preset="caption" color={isNewBest ? colors.warning : colors.textSecondary}>
+            {isNewBest ? 'New best!' : `Best: ${best}%`}
+          </Typography>
+        </View>
+      )}
+
+      <Spacer size={spacing[4]} />
+      <View style={styles.btns}>
+        <Button label="Retake" onPress={onRetake} variant="secondary" style={styles.flex} />
+        <Button label="Done" onPress={onExit} style={styles.flex} />
+      </View>
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  wrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: layout.screenPaddingH,
+    gap: spacing[4],
+  },
+  sub: { marginTop: -spacing[2] },
+  scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
+  scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
+  bestPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[1],
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1],
+    borderRadius: 999,
+    backgroundColor: colors.backgroundSecondary,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  btns: { flexDirection: 'row', gap: spacing[3], alignSelf: 'stretch' },
+  flex: { flex: 1 },
+});

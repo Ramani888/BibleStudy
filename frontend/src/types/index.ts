@@ -8,3 +8,4 @@ export * from './ai.types';
 export * from './credits.types';
 export * from './notes.types';
 export * from './media.types';
+export * from './quiz.types';

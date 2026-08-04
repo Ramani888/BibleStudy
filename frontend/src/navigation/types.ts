@@ -24,6 +24,13 @@ export type LibraryStackParamList = {
   PublicSets: undefined;
   FriendsSets: undefined;
   Study: { setId: string; setTitle: string; isOwner?: boolean };
+  Quiz: { setId: string; setTitle: string; isOwner?: boolean };
+};
+
+// ─── Quiz Stack (nested inside Quiz tab) ──────────────────────────────────────
+export type QuizStackParamList = {
+  QuizHub: undefined;
+  Quiz: { setId: string; setTitle: string; isOwner?: boolean };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
@@ -78,6 +85,7 @@ export type MapStackParamList = {
 export type AppTabParamList = {
   HomeTab: undefined;
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
+  QuizTab: NavigatorScreenParams<QuizStackParamList> | undefined;
   AITab: NavigatorScreenParams<AIStackParamList> | undefined;
   ProfileTab: undefined;
 };
@@ -95,6 +103,12 @@ export type LibraryScreenProps<T extends keyof LibraryStackParamList> =
 export type AIScreenProps<T extends keyof AIStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<AIStackParamList, T>,
+    BottomTabScreenProps<AppTabParamList>
+  >;
+
+export type QuizScreenProps<T extends keyof QuizStackParamList> =
+  CompositeScreenProps<
+    NativeStackScreenProps<QuizStackParamList, T>,
     BottomTabScreenProps<AppTabParamList>
   >;
 

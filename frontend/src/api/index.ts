@@ -16,3 +16,4 @@ export { activitiesApi } from './activities.api';
 export { notificationsApi } from './notifications.api';
 export { notesApi } from './notes.api';
 export { mediaApi } from './media.api';
+export { quizApi } from './quiz.api';
