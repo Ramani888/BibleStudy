@@ -1,5 +1,6 @@
 ---
 tags: [frontend, feature, quiz, plan]
+status: shipped 2026-08
 ---
 
 # Quiz Feature v2 — Plan (card types + 7 quiz modes)
