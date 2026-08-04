@@ -1,17 +1,16 @@
--- CreateTable
-CREATE TABLE "Note" (
-    "id" TEXT NOT NULL,
-    "title" TEXT NOT NULL,
-    "body" TEXT NOT NULL,
-    "userId" TEXT NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3) NOT NULL,
+-- Redefine "Note": the legacy shape from the init migration
+-- (content / folderId / verseReference) is replaced by the new note design
+-- (body, user-owned only). The table, its userId FK (init) and userId index
+-- (add_otp migration) already exist, so we transform in place instead of
+-- re-creating them.
 
-    CONSTRAINT "Note_pkey" PRIMARY KEY ("id")
-);
+-- Drop legacy folder association (FK + index) if present
+ALTER TABLE "Note" DROP CONSTRAINT IF EXISTS "Note_folderId_fkey";
+DROP INDEX IF EXISTS "Note_folderId_idx";
 
--- CreateIndex
-CREATE INDEX "Note_userId_idx" ON "Note"("userId");
+-- Drop legacy columns
+ALTER TABLE "Note" DROP COLUMN IF EXISTS "folderId";
+ALTER TABLE "Note" DROP COLUMN IF EXISTS "verseReference";
 
--- AddForeignKey
-ALTER TABLE "Note" ADD CONSTRAINT "Note_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- Rename "content" -> "body" (preserves existing note text)
+ALTER TABLE "Note" RENAME COLUMN "content" TO "body";
