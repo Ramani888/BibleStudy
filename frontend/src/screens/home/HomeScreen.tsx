@@ -35,7 +35,6 @@ import {
   useStreak,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { AdBanner } from '../../ads/components/AdBanner';
 import { colors, layout, spacing } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
@@ -469,8 +468,6 @@ export function HomeScreen() {
 
         <Spacer size={spacing[8]} />
       </ScrollView>
-
-      <AdBanner />
 
       <SetActionSheet
         set={selectedSet}

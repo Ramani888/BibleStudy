@@ -29,12 +29,9 @@ PODS:
     - GoogleUtilities/Reachability (~> 8.1)
     - GoogleUtilities/UserDefaults (~> 8.1)
     - nanopb (~> 3.30910.0)
-  - Google-Mobile-Ads-SDK (12.2.0):
-    - GoogleUserMessagingPlatform (>= 1.1)
   - GoogleDataTransport (10.1.0):
     - nanopb (~> 3.30910.0)
     - PromisesObjC (~> 2.4)
-  - GoogleUserMessagingPlatform (2.7.0)
   - GoogleUtilities/AppDelegateSwizzler (8.1.0):
     - GoogleUtilities/Environment
     - GoogleUtilities/Logger
@@ -2260,30 +2257,6 @@ PODS:
     - ReactCommon/turbomodule/core
     - ReactNativeDependencies
     - Yoga
-  - RNGoogleMobileAds (14.11.0):
-    - Google-Mobile-Ads-SDK (= 12.2.0)
-    - GoogleUserMessagingPlatform (= 2.7.0)
-    - hermes-engine
-    - RCTRequired
-    - RCTTypeSafety
-    - React-Core
-    - React-Core-prebuilt
-    - React-debug
-    - React-Fabric
-    - React-featureflags
-    - React-graphics
-    - React-ImageManager
-    - React-jsi
-    - React-NativeModulesApple
-    - React-RCTFabric
-    - React-renderercss
-    - React-rendererdebug
-    - React-utils
-    - ReactCodegen
-    - ReactCommon/turbomodule/bridging
-    - ReactCommon/turbomodule/core
-    - ReactNativeDependencies
-    - Yoga
   - RNReactNativeHapticFeedback (3.0.0):
     - hermes-engine
     - RCTRequired
@@ -2657,7 +2630,6 @@ DEPENDENCIES:
   - "RNFBApp (from `../node_modules/@react-native-firebase/app`)"
   - "RNFBMessaging (from `../node_modules/@react-native-firebase/messaging`)"
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
-  - RNGoogleMobileAds (from `../node_modules/react-native-google-mobile-ads`)
   - RNReactNativeHapticFeedback (from `../node_modules/react-native-haptic-feedback`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -2674,9 +2646,7 @@ SPEC REPOS:
     - FirebaseCoreInternal
     - FirebaseInstallations
     - FirebaseMessaging
-    - Google-Mobile-Ads-SDK
     - GoogleDataTransport
-    - GoogleUserMessagingPlatform
     - GoogleUtilities
     - lottie-ios
     - nanopb
@@ -2860,8 +2830,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-firebase/messaging"
   RNGestureHandler:
     :path: "../node_modules/react-native-gesture-handler"
-  RNGoogleMobileAds:
-    :path: "../node_modules/react-native-google-mobile-ads"
   RNReactNativeHapticFeedback:
     :path: "../node_modules/react-native-haptic-feedback"
   RNReanimated:
@@ -2886,9 +2854,7 @@ SPEC CHECKSUMS:
   FirebaseCoreInternal: e7bbaeb00ab73011298f35ed223aa7371e212948
   FirebaseInstallations: 047343aa91fd6a1ebfa3eb374ddecf36a8aaddfd
   FirebaseMessaging: ed18fb50634e6e85b5d3e77e628c21e2c928cc53
-  Google-Mobile-Ads-SDK: 1dfb0c3cb46c7e2b00b0f4de74a1e06d9ea25d67
   GoogleDataTransport: aae35b7ea0c09004c3797d53c8c41f66f219d6a7
-  GoogleUserMessagingPlatform: a8b56893477f67212fbc8411c139e61d463349f5
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   hermes-engine: 21f43866cd86a85a1736bf6911c64b2c9f9752c6
   lottie-ios: 8f959969761e9c45d70353667d00af0e5b9cadb3
@@ -2979,7 +2945,6 @@ SPEC CHECKSUMS:
   RNFBApp: 36eb434d58b125bdc63797c78ca67d2648f9cdb2
   RNFBMessaging: 0b04592f48e374bb77b9b7ca965ddc2711c76409
   RNGestureHandler: 6d378fd1aa991c7ab62a4215ee6cc417895a6954
-  RNGoogleMobileAds: 7106f0f2a6222bceb9c93e87d38ab8ed0d1f9f39
   RNReactNativeHapticFeedback: 3784309fd1d42a557ad2d7a3d69bfc32d649ddd9
   RNReanimated: 0cb8806c6ef2b0f6404e1d0f3ce8ac8177984cf5
   RNScreens: 088d923c4327c63c9f8c942cae17a9d038f47d97

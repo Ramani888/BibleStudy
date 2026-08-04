@@ -26,7 +26,6 @@ import {
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { colors, layout, spacing } from '../../theme';
-import { AdBanner } from '../../ads/components/AdBanner';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
 
@@ -285,8 +284,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           }
         />
       )}
-
-      <AdBanner />
 
       {/* ── Bottom CTA ── */}
       <View style={styles.bottomCta}>
