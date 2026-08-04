@@ -44,10 +44,6 @@ export const ReorderCardsDto = z.object({
   cardIds: z.array(z.string().uuid()).min(1, 'Card IDs are required').max(500, 'Cannot reorder more than 500 cards'),
 });
 
-export const StudyCardDto = z.object({
-  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']),
-});
-
 export const MoveCardDto = z.object({
   targetSetId: z.string().uuid('Invalid target set ID'),
 });
@@ -56,5 +52,4 @@ export type CreateCardDtoType = z.infer<typeof CreateCardDto>;
 export type BulkCreateCardsDtoType = z.infer<typeof BulkCreateCardsDto>;
 export type UpdateCardDtoType = z.infer<typeof UpdateCardDto>;
 export type ReorderCardsDtoType = z.infer<typeof ReorderCardsDto>;
-export type StudyCardDtoType = z.infer<typeof StudyCardDto>;
 export type MoveCardDtoType = z.infer<typeof MoveCardDto>;

@@ -473,10 +473,10 @@ export function HomeScreen() {
         set={selectedSet}
         visible={!!selectedSet}
         onClose={() => setSelectedSet(null)}
-        onStudy={() =>
+        onQuiz={() =>
           selectedSet &&
-          navigation.navigate('LibraryTab', {
-            screen: 'Study',
+          navigation.navigate('QuizTab', {
+            screen: 'Quiz',
             params: { setId: selectedSet.id, setTitle: selectedSet.title },
           })
         }

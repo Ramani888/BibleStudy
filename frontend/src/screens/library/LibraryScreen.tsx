@@ -303,9 +303,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         set={selectedSet}
         visible={!!selectedSet}
         onClose={() => setSelectedSet(null)}
-        onStudy={() =>
+        onQuiz={() =>
           selectedSet &&
-          navigation.navigate('Study', { setId: selectedSet.id, setTitle: selectedSet.title })
+          navigation.navigate('Quiz', { setId: selectedSet.id, setTitle: selectedSet.title })
         }
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
         showAssignFolder

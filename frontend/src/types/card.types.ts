@@ -49,7 +49,3 @@ export interface ReorderCardsPayload {
   setId: string;
   cardIds: string[];
 }
-
-export interface StudyResultPayload {
-  difficulty: Difficulty;
-}

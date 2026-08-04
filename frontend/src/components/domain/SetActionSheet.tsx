@@ -7,7 +7,7 @@ interface SetActionSheetProps {
   set: StudySet | null;
   visible: boolean;
   onClose: () => void;
-  onStudy: () => void;
+  onQuiz: () => void;
   onCreateCard: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -20,7 +20,7 @@ export function SetActionSheet({
   set,
   visible,
   onClose,
-  onStudy,
+  onQuiz,
   onCreateCard,
   onEdit,
   onDelete,
@@ -30,9 +30,9 @@ export function SetActionSheet({
 }: SetActionSheetProps) {
   const actions = [
     {
-      label: 'Study Set',
-      iconName: 'book-outline',
-      onPress: onStudy,
+      label: 'Quiz',
+      iconName: 'help-circle-outline',
+      onPress: onQuiz,
     },
     ...(isOwner
       ? [

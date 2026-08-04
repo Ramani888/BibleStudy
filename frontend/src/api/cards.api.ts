@@ -5,7 +5,6 @@ import type {
   CreateCardPayload,
   MoveCardPayload,
   ReorderCardsPayload,
-  StudyResultPayload,
   UpdateCardPayload,
 } from '../types';
 
@@ -30,9 +29,6 @@ export const cardsApi = {
 
   delete: (id: string) =>
     apiDelete(`/cards/${id}`),
-
-  recordStudy: (id: string, payload: StudyResultPayload) =>
-    apiPost<Card>(`/cards/${id}/study`, payload),
 
   copy: (id: string) =>
     apiPost<Card>(`/cards/${id}/copy`),

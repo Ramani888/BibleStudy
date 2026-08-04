@@ -22,14 +22,12 @@ export {
   useCopyCard,
   useMoveCard,
   useReorderCards,
-  useRecordStudy,
 } from './useCards';
 export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak } from './useCredits';
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useConfirmDialog } from './useConfirmDialog';
 export { useUpdateProfile, useChangePassword } from './useProfile';
-export { useStudySession } from './useStudySession';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
 export { useAllQuizBest, useQuizBest, useRecordQuizAttempt } from './useQuiz';

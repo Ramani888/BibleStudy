@@ -64,10 +64,3 @@ export async function reorderCards(req: Request, res: Response): Promise<void> {
     sendSuccess(res, result, result.message);
   } catch (error) { handleControllerError(res, error, 'Failed to reorder cards'); }
 }
-
-export async function recordStudyResult(req: Request, res: Response): Promise<void> {
-  try {
-    const card = await cardsService.recordStudyResult(req.user!.id, req.params.id, req.body);
-    sendSuccess(res, card, 'Study result recorded');
-  } catch (error) { handleControllerError(res, error, 'Failed to record study result'); }
-}

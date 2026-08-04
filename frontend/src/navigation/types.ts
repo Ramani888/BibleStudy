@@ -23,7 +23,6 @@ export type LibraryStackParamList = {
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
   FriendsSets: undefined;
-  Study: { setId: string; setTitle: string; isOwner?: boolean };
   Quiz: { setId: string; setTitle: string; isOwner?: boolean };
 };
 

@@ -5,7 +5,6 @@ import type {
   CreateCardPayload,
   MoveCardPayload,
   ReorderCardsPayload,
-  StudyResultPayload,
   UpdateCardPayload,
 } from '../types';
 
@@ -99,14 +98,5 @@ export function useReorderCards() {
   return useMutation({
     mutationFn: (payload: ReorderCardsPayload) => cardsApi.reorder(payload),
     onSuccess: (_, vars) => qc.invalidateQueries({ queryKey: ['cards', vars.setId] }),
-  });
-}
-
-export function useRecordStudy(setId: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, payload }: { id: string; payload: StudyResultPayload }) =>
-      cardsApi.recordStudy(id, payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['cards', setId] }),
   });
 }

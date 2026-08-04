@@ -1,4 +1,3 @@
-import { Difficulty } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import {
@@ -6,23 +5,8 @@ import {
   BulkCreateCardsDtoType,
   UpdateCardDtoType,
   ReorderCardsDtoType,
-  StudyCardDtoType,
 } from './cards.dto';
 import { NotFoundError, ValidationError } from '../../utils/errors';
-
-function calculateNextReviewAt(difficulty: Difficulty): Date {
-  const now = new Date();
-  switch (difficulty) {
-    case 'EASY':
-      return new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3 days
-    case 'MEDIUM':
-      return new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000); // 1 day
-    case 'HARD':
-      return new Date(now.getTime() + 4 * 60 * 60 * 1000); // 4 hours
-    default:
-      return new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
-  }
-}
 
 async function verifySetOwnership(userId: string, setId: string) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
@@ -220,23 +204,4 @@ export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
   await prisma.$transaction(updates);
 
   return { message: 'Cards reordered successfully' };
-}
-
-export async function recordStudyResult(userId: string, cardId: string, dto: StudyCardDtoType) {
-  const card = await verifyCardOwnership(cardId, userId);
-
-  const nextReviewAt = calculateNextReviewAt(dto.difficulty);
-
-  const updated = await prisma.card.update({
-    where: { id: cardId },
-    data: {
-      difficulty: dto.difficulty,
-      lastStudiedAt: new Date(),
-      nextReviewAt,
-    },
-  });
-
-  await logActivity(userId, 'STUDIED_CARDS', card.setId);
-
-  return updated;
 }
