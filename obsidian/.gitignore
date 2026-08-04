@@ -1,0 +1,4 @@
+# Obsidian machine-specific UI state (not worth versioning)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
