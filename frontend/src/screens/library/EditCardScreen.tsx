@@ -20,8 +20,10 @@ import type { LibraryScreenProps } from '../../navigation/types';
 
 const ICON_SIZE = 20;
 
+// Question optional so Story cards (reference optional) edit cleanly; QA cards
+// already carry a question.
 const schema = z.object({
-  question: z.string().trim().min(1, 'Question is required'),
+  question: z.string().trim().max(5000, 'Max 5000 characters'),
   answer: z.string().trim().min(1, 'Answer is required'),
 });
 type EditCardForm = z.infer<typeof schema>;
@@ -122,7 +124,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
           <FormField
             name="question"
             control={control}
-            label="Question"
+            label={card.type === 'STORY' ? 'Reference (optional)' : 'Question'}
             autoCapitalize="sentences"
             returnKeyType="next"
             maxLength={5000}
@@ -131,11 +133,12 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
           <FormField
             name="answer"
             control={control}
-            label="Answer"
+            label={card.type === 'STORY' ? 'Text' : 'Answer'}
             autoCapitalize="sentences"
             inputRef={answerRef}
             returnKeyType="done"
             maxLength={5000}
+            multiline={card.type === 'STORY'}
           />
 
           {/* Difficulty picker */}

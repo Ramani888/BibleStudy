@@ -1,9 +1,11 @@
 export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export type CardType = 'QA' | 'STORY';
 
 export interface Card {
   id: string;
   setId: string;
   userId: string | null;
+  type: CardType;
   question: string;
   answer: string;
   note: string | null;
@@ -19,7 +21,8 @@ export interface Card {
 
 export interface CreateCardPayload {
   setId: string;
-  question: string;
+  type?: CardType;
+  question?: string;
   answer: string;
   note?: string;
   imageId?: string;
@@ -33,6 +36,7 @@ export interface BulkCreateCardPayload {
 }
 
 export interface UpdateCardPayload {
+  type?: CardType;
   question?: string;
   answer?: string;
   note?: string | null;

@@ -17,6 +17,7 @@ type FormFieldProps<T extends FieldValues> = {
   onSubmitEditing?: TextInputProps['onSubmitEditing'];
   inputRef?: React.Ref<TextInput>;
   maxLength?: number;
+  multiline?: boolean;
 };
 
 export function FormField<T extends FieldValues>({
@@ -33,6 +34,7 @@ export function FormField<T extends FieldValues>({
   onSubmitEditing,
   inputRef,
   maxLength,
+  multiline,
 }: FormFieldProps<T>) {
   return (
     <Controller
@@ -55,6 +57,7 @@ export function FormField<T extends FieldValues>({
           returnKeyType={returnKeyType}
           onSubmitEditing={onSubmitEditing}
           maxLength={maxLength}
+          multiline={multiline}
         />
       )}
     />
