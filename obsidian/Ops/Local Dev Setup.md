@@ -40,11 +40,12 @@ cd frontend && npx tsc --noEmit                # type check
 
 ## Running on a physical iOS device
 
-The app's dev API base URL (`frontend/src/api/client.ts`) resolves its host from
-**Metro's bundler URL** (`NativeModules.SourceCode.scriptURL`), so it works on a
-physical iPhone without hardcoding an IP:
-- Simulator / Android (`adb reverse`) → `localhost:3010`.
-- Physical device → the Mac's LAN IP (e.g. `192.168.1.2:3010`) automatically.
+The app's dev API base URL (`frontend/src/api/client.ts`) is set to the Mac's
+**LAN IP** (`http://192.168.1.2:3010/api/v1`) so a physical iPhone can reach the
+backend — `localhost` on a real device means the phone itself.
+
+> ⚠️ Hardcoded — **update this line if the Mac's LAN IP changes** (new Wi-Fi /
+> router). Check the current IP with `ipconfig getifaddr en0`.
 
 Requirements:
 - iPhone and Mac on the **same Wi-Fi** (private, not guest/client-isolated).
