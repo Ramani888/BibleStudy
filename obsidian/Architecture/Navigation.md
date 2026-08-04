@@ -15,7 +15,7 @@ RootNavigator                         ← gated by auth.store (see [[Auth & Toke
 ├── AuthNavigator (stack)
 │     Login → Register → VerifyEmail → ForgotPassword → ResetPassword
 │     (Onboarding shown for first-run)
-└── AppNavigator (bottom tabs)  ← exactly 4 tabs
+└── AppNavigator (bottom tabs)  ← 5 tabs
       HomeTab     → HomeScreen
       LibraryTab  → LibraryNavigator (stack)
                       Library → FolderDetail → SetDetail
@@ -24,6 +24,9 @@ RootNavigator                         ← gated by auth.store (see [[Auth & Toke
                              → PublicSets
                              → FriendsSets
                              → Study          ← StudyScreen lives inside LibraryTab
+                             → Quiz           ← per-set quiz entry (also in QuizTab)
+      QuizTab     → QuizNavigator (stack)     ← see [[Quiz Feature]]
+                      QuizHub → Quiz
       AITab       → AINavigator (stack)
                       AIChat → ChatHistory
       ProfileTab  → ProfileNavigator (stack)  ← hosts the social layer

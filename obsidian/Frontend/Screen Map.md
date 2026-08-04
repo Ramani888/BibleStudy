@@ -29,6 +29,12 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 ## study/
 - StudyScreen → `useStudySession`, `useCards`
 
+## quiz/  (see [[Quiz Feature]])
+- QuizHubScreen → `useSets`, `useAllQuizBest` (Quiz tab landing — pick a set)
+- QuizScreen → `useCards`, `useQuizSession` (runs the MC quiz; two entry points:
+  Quiz tab hub + per-set button on SetDetail)
+- components: QuizQuestionView, QuizResultScreen (`useRecordQuizAttempt`)
+
 ## ai/
 - AIChatScreen → `useAI` (chat, credits spent)
 - ChatHistoryScreen → `useAI` sessions + bookmarks

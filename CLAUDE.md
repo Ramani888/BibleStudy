@@ -57,9 +57,9 @@ A Bible study flashcard app with AI assistant features.
 
 ### Backend Base URL
 
-`/api/v1` — 15 modules: `auth`, `users`, `folders`, `sets`, `cards`, `ai`,
+`/api/v1` — 16 modules: `auth`, `users`, `folders`, `sets`, `cards`, `ai`,
 `credits`, `friends`, `groups`, `gatherings`, `map`, `activities`,
-`notifications`, `notes`, `media`.
+`notifications`, `notes`, `media`, `quiz`.
 
 Each module under `backend/src/modules/<feature>/` has the same 4 files:
 `<f>.routes.ts` · `<f>.controller.ts` · `<f>.service.ts` (owns all Prisma) ·
@@ -109,14 +109,16 @@ frontend/src/
 RootNavigator
   AuthNavigator (stack)
     Login → Register → VerifyEmail → ForgotPassword → ResetPassword
-  AppNavigator (bottom tabs)   # exactly 4 tabs
+  AppNavigator (bottom tabs)   # 5 tabs
     HomeTab        → HomeScreen
     LibraryTab     → LibraryNavigator (stack)
                        Library → FolderDetail → SetDetail
                                               → CreateSet / EditSet
                                               → CreateCard / EditCard
                               → PublicSets / FriendsSets
-                              → Study            # study lives INSIDE LibraryTab
+                              → Study / Quiz     # study & quiz live INSIDE LibraryTab
+    QuizTab        → QuizNavigator (stack)
+                       QuizHub → Quiz            # quiz reachable via tab hub OR per-set
     AITab          → AINavigator (stack)
                        AIChat → ChatHistory
     ProfileTab     → ProfileNavigator (stack)   # hosts the social layer

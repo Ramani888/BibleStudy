@@ -24,6 +24,8 @@ timeline & the 2026-08-04 reconciliation: [[Migration History]].
   *(Redefined from the legacy init shape — see [[Migration History]].)*
 - **MediaFile** — uploaded media (image/PDF) in S3: `key` (unique), `url`,
   `mimeType`, `sizeBytes`, `type` (MediaType). Replaced the old `File` table.
+- **QuizAttempt** — a finished quiz's result: `userId`, `setId`, `total`,
+  `correct`, `scorePct`. One row per completed quiz. See [[Quiz Feature]].
 
 ### AI & credits
 - **AIChat** — a Q&A exchange: `question`, `answer`, `suggestedCards` (Json),
