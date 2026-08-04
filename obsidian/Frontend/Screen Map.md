@@ -33,7 +33,7 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 - AIChatScreen → `useAI` (chat, credits spent)
 - ChatHistoryScreen → `useAI` sessions + bookmarks
 
-## map/  (gatherings)
+## map/  (gatherings) — ⚠️ NOT mounted / currently unreachable (MapNavigator isn't rendered)
 - MapScreen → `useMap`, `useGatherings`
 - GatheringDetailScreen → `useGatherings`
 - CreateGatheringScreen / EditGatheringScreen → `useGatherings`

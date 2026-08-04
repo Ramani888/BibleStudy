@@ -109,18 +109,16 @@ frontend/src/
 RootNavigator
   AuthNavigator (stack)
     Login → Register → VerifyEmail → ForgotPassword → ResetPassword
-  AppNavigator (bottom tabs)
+  AppNavigator (bottom tabs)   # exactly 4 tabs
     HomeTab        → HomeScreen
     LibraryTab     → LibraryNavigator (stack)
                        Library → FolderDetail → SetDetail
                                               → CreateSet / EditSet
                                               → CreateCard / EditCard
                               → PublicSets / FriendsSets
-    StudyTab       → StudyScreen
+                              → Study            # study lives INSIDE LibraryTab
     AITab          → AINavigator (stack)
                        AIChat → ChatHistory
-    MapTab         → MapNavigator (stack)
-                       Map → GatheringDetail → CreateGathering / EditGathering
     ProfileTab     → ProfileNavigator (stack)   # hosts the social layer
                        Profile → EditProfile → ChangePassword → Credits → Settings
                                → Notes → NoteEditor
@@ -129,6 +127,18 @@ RootNavigator
                                → Friends → FriendRequests / SearchUsers / UserProfile / BlockedUsers
                                → Groups → GroupDetail / CreateGroup / EditGroup / JoinGroup / PublicGroups
 ```
+
+> **Note:** `MapNavigator` + the `map/` screens (Map, Gatherings) exist in the
+> code but are **not mounted** in any navigator yet — the Map feature is
+> currently unreachable.
+
+**Safe-area convention:** all stack navigators use `headerShown: false` with a
+custom in-screen header. Tab-hosted screens therefore wrap content in
+`<SafeAreaView edges={['top']}>` — **top only**; the bottom tab bar owns the
+bottom inset (it adds `insets.bottom` to its height in `AppNavigator`). Do **not**
+use `edges={['bottom']}` / all-edges on a tab-hosted screen — it double-counts the
+bottom inset and leaves a gap above the tab bar. Screens outside the tabs (auth,
+onboarding) manage their own insets.
 
 > Full architecture is documented in the Obsidian brain at `obsidian/` (open
 > `obsidian/Home.md`) — kept in sync with this file.
