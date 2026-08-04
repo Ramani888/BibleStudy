@@ -142,7 +142,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       {/* ── Header ── */}
       <View style={styles.header}>
         <Typography preset="h2">Library</Typography>

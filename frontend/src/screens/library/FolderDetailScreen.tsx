@@ -76,7 +76,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   if (isError) return <ErrorState message="Could not load sets." onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       {folderColor && <View style={[styles.colorBar, { backgroundColor: folderColor }]} />}
       <View style={styles.header}>
         <Typography preset="bodySm" color={colors.textSecondary}>

@@ -87,7 +87,7 @@ export function FriendRequestsScreen(_props: Props) {
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       {/* Tab switcher */}
       <View style={styles.tabs}>
         <Pressable

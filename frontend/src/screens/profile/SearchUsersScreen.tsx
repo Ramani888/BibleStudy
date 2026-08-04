@@ -85,7 +85,7 @@ export function SearchUsersScreen({ navigation }: Props) {
   }, [sentIds, handleAdd, navigation, sendRequest.isPending]);
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.searchBar}>
         <Input
           placeholder="Search by name..."

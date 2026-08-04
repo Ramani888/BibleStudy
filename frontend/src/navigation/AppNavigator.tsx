@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import type { AppTabParamList } from './types';
@@ -20,13 +21,20 @@ const TAB_ICONS: Record<string, { active: string; inactive: string }> = {
 };
 
 export function AppNavigator() {
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.gray500,
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            height: layout.tabBarHeight + insets.bottom,
+            paddingBottom: insets.bottom + spacing[1],
+          },
+        ],
         tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({ focused, color, size }) => {
           const icons = TAB_ICONS[route.name];
@@ -48,8 +56,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     borderTopColor: colors.border,
     borderTopWidth: StyleSheet.hairlineWidth,
-    height: layout.tabBarHeight,
-    paddingBottom: spacing[2],
     paddingTop: spacing[1],
   },
   tabLabel: {

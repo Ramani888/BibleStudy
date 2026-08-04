@@ -401,7 +401,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const hasAnyTaggedSession = allSessions.some(s => s.tags?.length > 0);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       {/* ── View Mode Toggle (All / Bookmarked) ── */}
       <View style={styles.modeToggle}>
         <Pressable

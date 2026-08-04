@@ -54,7 +54,7 @@ export function FriendsScreen({ navigation }: Props) {
   if (error) return <ErrorState message="Could not load friends" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.actions}>
         <TouchableOpacity
           style={[styles.actionBtn, styles.outlineBtn]}

@@ -42,7 +42,7 @@ export function GroupsScreen({ navigation }: Props) {
   if (error) return <ErrorState message="Could not load groups" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <View style={styles.header}>
         <Pressable style={styles.joinBtn} onPress={() => navigation.navigate('PublicGroups')}>
           <Icon name="compass-outline" size={18} color={colors.primary} />

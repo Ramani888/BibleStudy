@@ -144,7 +144,7 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
+    <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}

@@ -307,7 +307,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
   const [activeTab, setActiveTab] = useState<Tab>('single');
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <KeyboardAvoidingView
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

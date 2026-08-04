@@ -132,7 +132,7 @@ export function NotesScreen({ navigation }: Props) {
   if (error) return <ErrorState message="Could not load notes" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Search + Sort */}
       <View style={styles.searchRow}>
         <View style={styles.searchWrap}>

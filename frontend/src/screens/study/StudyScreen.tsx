@@ -51,7 +51,7 @@ export function StudyScreen({ route, navigation }: Props) {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.centerWrap}>
           <Typography preset="body" color={colors.textSecondary}>Loading cards…</Typography>
         </View>
@@ -65,7 +65,7 @@ export function StudyScreen({ route, navigation }: Props) {
 
   if (cards.length === 0) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <View style={styles.centerWrap}>
           <Typography preset="h4" align="center">No cards in this set</Typography>
           <Spacer size={spacing[4]} />
@@ -77,7 +77,7 @@ export function StudyScreen({ route, navigation }: Props) {
 
   if (isComplete) {
     return (
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top']}>
         <CompletionScreen
           total={displayCards.length}
           results={results}
@@ -91,7 +91,7 @@ export function StudyScreen({ route, navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => navigation.goBack()} hitSlop={12} style={styles.exitBtn}>

@@ -34,7 +34,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   if (isError) return <ErrorState message="Could not load friends' sets." onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <View style={styles.header}>
         <Typography preset="bodySm" color={colors.textSecondary}>
           {total} {total === 1 ? 'set' : 'sets'} shared by friends

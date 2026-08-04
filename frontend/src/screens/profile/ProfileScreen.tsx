@@ -37,7 +37,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const limitMB = ((storage?.limit ?? 262144000) / 1048576).toFixed(0);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
