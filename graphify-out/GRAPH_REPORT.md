@@ -1,12 +1,12 @@
 # Graph Report - .  (2026-08-04)
 
 ## Corpus Check
-- 253 files · ~93,821 words
+- 253 files · ~93,558 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1102 nodes · 1204 edges · 218 communities detected
-- Extraction: 74% EXTRACTED · 26% INFERRED · 0% AMBIGUOUS · INFERRED: 315 edges (avg confidence: 0.8)
+- 1100 nodes · 1200 edges · 218 communities detected
+- Extraction: 74% EXTRACTED · 26% INFERRED · 0% AMBIGUOUS · INFERRED: 313 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -230,8 +230,8 @@
 - [[_COMMUNITY_Community 217|Community 217]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `sendSuccess()` - 107 edges
-2. `handleControllerError()` - 92 edges
+1. `sendSuccess()` - 106 edges
+2. `handleControllerError()` - 91 edges
 3. `sendError()` - 22 edges
 4. `logActivity()` - 12 edges
 5. `AIChatScreen()` - 10 edges
@@ -257,7 +257,7 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.04
-Nodes (110): getFriendsFeed(), getMyFeed(), addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory() (+102 more)
+Nodes (109): getFriendsFeed(), getMyFeed(), addBookmark(), askQuestion(), clearHistory(), deleteSession(), getBookmarks(), getChatHistory() (+101 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
@@ -316,12 +316,12 @@ Cohesion: 0.11
 Nodes (8): CreateGroupScreen(), GroupsScreen(), JoinGroupScreen(), PublicGroupsScreen(), useCreateGroup(), useGroups(), useJoinGroup(), usePublicGroups()
 
 ### Community 15 - "Community 15"
-Cohesion: 0.15
-Nodes (14): API layer, Before writing any code, Build sequence for a new screen, code:ts (import type { LibraryScreenProps } from '../../navigation/ty), code:tsx (const { data, isLoading, error } = useMyHook();), code:tsx (const { mutate, isPending } = useCreateThing();), Components, Empty state pattern (+6 more)
-
-### Community 16 - "Community 16"
 Cohesion: 0.13
 Nodes (15): API client notes, code:bash (grep -r "router\.(get|post|put|patch|delete)" backend/src/ro), code:ts (export interface Thing {), code:ts (import apiClient from './client';), code:ts (export { getThings, getThingById, createThing, updateThing, ), code:bash (cd frontend && npx tsc --noEmit --pretty false), code:ts (onError: err => Toast.show({ type: 'error', text1: getErrorM), Connect a New API Endpoint in BibleStudyPro (+7 more)
+
+### Community 16 - "Community 16"
+Cohesion: 0.15
+Nodes (14): API layer, Before writing any code, Build sequence for a new screen, code:ts (import type { LibraryScreenProps } from '../../navigation/ty), code:tsx (const { data, isLoading, error } = useMyHook();), code:tsx (const { mutate, isPending } = useCreateThing();), Components, Empty state pattern (+6 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.13
@@ -332,16 +332,16 @@ Cohesion: 0.15
 Nodes (5): getAvailableIntervals(), getDefaultInterval(), handlePeriod(), handleToConfirm(), renderIntervalRow()
 
 ### Community 19 - "Community 19"
-Cohesion: 0.22
-Nodes (10): agg(), getStats(), getStreak(), groupByDays(), groupByHours(), groupByMonths(), groupByQuarters(), groupByWeeks() (+2 more)
-
-### Community 20 - "Community 20"
 Cohesion: 0.13
 Nodes (14): Build a React Native Screen in BibleStudyPro, code:block1 (get_minimal_context(task="build <ScreenName> screen")), code:ts (export async function getThings(params?: ThingParams): Promi), code:ts (import { useQuery, useMutation, useQueryClient } from '@tans), code:tsx (import React from 'react';), code:bash (cd frontend && npx tsc --noEmit --pretty false), Step 1 — Explore first (graph, not files), Step 2 — Types (+6 more)
 
-### Community 21 - "Community 21"
+### Community 20 - "Community 20"
 Cohesion: 0.13
 Nodes (7): AppError, ConflictError, ForbiddenError, NotFoundError, PaymentRequiredError, UnauthorizedError, ValidationError
+
+### Community 21 - "Community 21"
+Cohesion: 0.24
+Nodes (10): agg(), getStats(), getStreak(), groupByDays(), groupByHours(), groupByMonths(), groupByQuarters(), groupByWeeks() (+2 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.14
@@ -1441,16 +1441,16 @@ Nodes (0):
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `getErrorMessage()` connect `Community 3` to `Community 12`?**
-  _High betweenness centrality (0.058) - this node is a cross-community bridge._
-- **Why does `getMessaging()` connect `Community 4` to `Community 12`?**
-  _High betweenness centrality (0.055) - this node is a cross-community bridge._
-- **Are the 106 inferred relationships involving `sendSuccess()` (e.g. with `register()` and `verifyEmail()`) actually correct?**
-  _`sendSuccess()` has 106 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 90 inferred relationships involving `handleControllerError()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
-  _`handleControllerError()` has 90 INFERRED edges - model-reasoned connections that need verification._
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
+- **Are the 105 inferred relationships involving `sendSuccess()` (e.g. with `register()` and `verifyEmail()`) actually correct?**
+  _`sendSuccess()` has 105 INFERRED edges - model-reasoned connections that need verification._
+- **Are the 89 inferred relationships involving `handleControllerError()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
+  _`handleControllerError()` has 89 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 20 inferred relationships involving `sendError()` (e.g. with `authMiddleware()` and `register()`) actually correct?**
   _`sendError()` has 20 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 11 inferred relationships involving `logActivity()` (e.g. with `createCard()` and `bulkCreateCards()`) actually correct?**
   _`logActivity()` has 11 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 8 inferred relationships involving `AIChatScreen()` (e.g. with `useConfirmDialog()` and `useAIChat()`) actually correct?**
   _`AIChatScreen()` has 8 INFERRED edges - model-reasoned connections that need verification._
+- **What connects `When to use graph tools FIRST`, `Key Tools`, `Workflow` to the rest of the system?**
+  _166 weakly-connected nodes found - possible documentation gaps or missing edges._

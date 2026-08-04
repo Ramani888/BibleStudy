@@ -4302,7 +4302,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L1",
       "id": "backend_src_utils_errors_ts",
-      "community": 21,
+      "community": 20,
       "norm_label": "errors.ts"
     },
     {
@@ -4311,7 +4311,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L1",
       "id": "errors_apperror",
-      "community": 21,
+      "community": 20,
       "norm_label": "apperror"
     },
     {
@@ -4320,7 +4320,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L2",
       "id": "errors_apperror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4329,7 +4329,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L13",
       "id": "errors_notfounderror",
-      "community": 21,
+      "community": 20,
       "norm_label": "notfounderror"
     },
     {
@@ -4338,7 +4338,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L14",
       "id": "errors_notfounderror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4347,7 +4347,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L17",
       "id": "errors_unauthorizederror",
-      "community": 21,
+      "community": 20,
       "norm_label": "unauthorizederror"
     },
     {
@@ -4356,7 +4356,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L18",
       "id": "errors_unauthorizederror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4365,7 +4365,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L21",
       "id": "errors_forbiddenerror",
-      "community": 21,
+      "community": 20,
       "norm_label": "forbiddenerror"
     },
     {
@@ -4374,7 +4374,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L22",
       "id": "errors_forbiddenerror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4383,7 +4383,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L25",
       "id": "errors_conflicterror",
-      "community": 21,
+      "community": 20,
       "norm_label": "conflicterror"
     },
     {
@@ -4392,7 +4392,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L26",
       "id": "errors_conflicterror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4401,7 +4401,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L29",
       "id": "errors_validationerror",
-      "community": 21,
+      "community": 20,
       "norm_label": "validationerror"
     },
     {
@@ -4410,7 +4410,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L30",
       "id": "errors_validationerror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -4419,7 +4419,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L33",
       "id": "errors_paymentrequirederror",
-      "community": 21,
+      "community": 20,
       "norm_label": "paymentrequirederror"
     },
     {
@@ -4428,7 +4428,7 @@
       "source_file": "backend/src/utils/errors.ts",
       "source_location": "L34",
       "id": "errors_paymentrequirederror_constructor",
-      "community": 21,
+      "community": 20,
       "norm_label": ".constructor()"
     },
     {
@@ -6714,7 +6714,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L1",
       "id": "backend_src_modules_credits_credits_service_ts",
-      "community": 19,
+      "community": 21,
       "norm_label": "credits.service.ts"
     },
     {
@@ -6723,7 +6723,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L15",
       "id": "credits_service_agg",
-      "community": 19,
+      "community": 21,
       "norm_label": "agg()"
     },
     {
@@ -6732,7 +6732,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L23",
       "id": "credits_service_hourlabel",
-      "community": 19,
+      "community": 21,
       "norm_label": "hourlabel()"
     },
     {
@@ -6741,7 +6741,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L30",
       "id": "credits_service_groupbyhours",
-      "community": 19,
+      "community": 21,
       "norm_label": "groupbyhours()"
     },
     {
@@ -6750,7 +6750,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L44",
       "id": "credits_service_groupbydays",
-      "community": 19,
+      "community": 21,
       "norm_label": "groupbydays()"
     },
     {
@@ -6759,7 +6759,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L58",
       "id": "credits_service_groupbyweeks",
-      "community": 19,
+      "community": 21,
       "norm_label": "groupbyweeks()"
     },
     {
@@ -6768,7 +6768,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L72",
       "id": "credits_service_groupbymonths",
-      "community": 19,
+      "community": 21,
       "norm_label": "groupbymonths()"
     },
     {
@@ -6777,7 +6777,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L83",
       "id": "credits_service_groupbyquarters",
-      "community": 19,
+      "community": 21,
       "norm_label": "groupbyquarters()"
     },
     {
@@ -6786,7 +6786,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L97",
       "id": "credits_service_resolveinterval",
-      "community": 19,
+      "community": 21,
       "norm_label": "resolveinterval()"
     },
     {
@@ -6795,7 +6795,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L114",
       "id": "credits_service_getstats",
-      "community": 19,
+      "community": 21,
       "norm_label": "getstats()"
     },
     {
@@ -6804,7 +6804,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L162",
       "id": "credits_service_tolocaldatestr",
-      "community": 19,
+      "community": 21,
       "norm_label": "tolocaldatestr()"
     },
     {
@@ -6813,7 +6813,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L166",
       "id": "credits_service_getstreak",
-      "community": 19,
+      "community": 21,
       "norm_label": "getstreak()"
     },
     {
@@ -6822,7 +6822,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L203",
       "id": "credits_service_getbalance",
-      "community": 19,
+      "community": 21,
       "norm_label": "getbalance()"
     },
     {
@@ -6831,7 +6831,7 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L216",
       "id": "credits_service_gettransactions",
-      "community": 19,
+      "community": 21,
       "norm_label": "gettransactions()"
     },
     {
@@ -6840,17 +6840,8 @@
       "source_file": "backend/src/modules/credits/credits.service.ts",
       "source_location": "L240",
       "id": "credits_service_claimdailylogin",
-      "community": 19,
+      "community": 21,
       "norm_label": "claimdailylogin()"
-    },
-    {
-      "label": "watchAd()",
-      "file_type": "code",
-      "source_file": "backend/src/modules/credits/credits.service.ts",
-      "source_location": "L286",
-      "id": "credits_service_watchad",
-      "community": 19,
-      "norm_label": "watchad()"
     },
     {
       "label": "credits.routes.ts",
@@ -6898,19 +6889,10 @@
       "norm_label": "claimdailylogin()"
     },
     {
-      "label": "watchAd()",
-      "file_type": "code",
-      "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L34",
-      "id": "credits_controller_watchad",
-      "community": 0,
-      "norm_label": "watchad()"
-    },
-    {
       "label": "getStreak()",
       "file_type": "code",
       "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L41",
+      "source_location": "L34",
       "id": "credits_controller_getstreak",
       "community": 0,
       "norm_label": "getstreak()"
@@ -6919,7 +6901,7 @@
       "label": "getStats()",
       "file_type": "code",
       "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L48",
+      "source_location": "L41",
       "id": "credits_controller_getstats",
       "community": 0,
       "norm_label": "getstats()"
@@ -8126,7 +8108,7 @@
       "file_type": "document",
       "source_file": ".claude/agents/rn-screen-builder.md",
       "source_location": "L1",
-      "community": 15,
+      "community": 16,
       "norm_label": "rn-screen-builder.md",
       "id": "claude_agents_rn_screen_builder_md"
     },
@@ -8135,7 +8117,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L13",
-      "community": 15,
+      "community": 16,
       "norm_label": "stack",
       "id": "agents_rn_screen_builder_stack"
     },
@@ -8144,7 +8126,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L21",
-      "community": 15,
+      "community": 16,
       "norm_label": "non-negotiable conventions",
       "id": "agents_rn_screen_builder_non_negotiable_conventions"
     },
@@ -8153,7 +8135,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L23",
-      "community": 15,
+      "community": 16,
       "norm_label": "before writing any code",
       "id": "agents_rn_screen_builder_before_writing_any_code"
     },
@@ -8162,7 +8144,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L28",
-      "community": 15,
+      "community": 16,
       "norm_label": "components",
       "id": "agents_rn_screen_builder_components"
     },
@@ -8171,7 +8153,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L33",
-      "community": 15,
+      "community": 16,
       "norm_label": "code:ts (import type { libraryscreenprops } from '../../navigation/ty)",
       "id": "agents_rn_screen_builder_codeblock_1"
     },
@@ -8180,7 +8162,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L43",
-      "community": 15,
+      "community": 16,
       "norm_label": "hooks",
       "id": "agents_rn_screen_builder_hooks"
     },
@@ -8189,7 +8171,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L51",
-      "community": 15,
+      "community": 16,
       "norm_label": "api layer",
       "id": "agents_rn_screen_builder_api_layer"
     },
@@ -8198,7 +8180,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L58",
-      "community": 15,
+      "community": 16,
       "norm_label": "typescript",
       "id": "agents_rn_screen_builder_typescript"
     },
@@ -8207,7 +8189,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L63",
-      "community": 15,
+      "community": 16,
       "norm_label": "build sequence for a new screen",
       "id": "agents_rn_screen_builder_build_sequence_for_a_new_screen"
     },
@@ -8216,7 +8198,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L72",
-      "community": 15,
+      "community": 16,
       "norm_label": "error handling pattern",
       "id": "agents_rn_screen_builder_error_handling_pattern"
     },
@@ -8225,7 +8207,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L73",
-      "community": 15,
+      "community": 16,
       "norm_label": "code:tsx (const { data, isloading, error } = usemyhook();)",
       "id": "agents_rn_screen_builder_codeblock_2"
     },
@@ -8234,7 +8216,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L79",
-      "community": 15,
+      "community": 16,
       "norm_label": "empty state pattern",
       "id": "agents_rn_screen_builder_empty_state_pattern"
     },
@@ -8243,7 +8225,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L80",
-      "community": 15,
+      "community": 16,
       "norm_label": "code:tsx ({data?.length === 0 && ()",
       "id": "agents_rn_screen_builder_codeblock_3"
     },
@@ -8252,7 +8234,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L91",
-      "community": 15,
+      "community": 16,
       "norm_label": "mutation + toast pattern",
       "id": "agents_rn_screen_builder_mutation_toast_pattern"
     },
@@ -8261,7 +8243,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L92",
-      "community": 15,
+      "community": 16,
       "norm_label": "code:tsx (const { mutate, ispending } = usecreatething();)",
       "id": "agents_rn_screen_builder_codeblock_4"
     },
@@ -8396,7 +8378,7 @@
       "file_type": "document",
       "source_file": ".claude/skills/build-rn-screen.md",
       "source_location": "L1",
-      "community": 20,
+      "community": 19,
       "norm_label": "build-rn-screen.md",
       "id": "claude_skills_build_rn_screen_md"
     },
@@ -8405,7 +8387,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L6",
-      "community": 20,
+      "community": 19,
       "norm_label": "build a react native screen in biblestudypro",
       "id": "skills_build_rn_screen_build_a_react_native_screen_in_biblestudypro"
     },
@@ -8414,7 +8396,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L10",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 1 \u2014 explore first (graph, not files)",
       "id": "skills_build_rn_screen_step_1_explore_first_graph_not_files"
     },
@@ -8423,7 +8405,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L11",
-      "community": 20,
+      "community": 19,
       "norm_label": "code:block1 (get_minimal_context(task=\"build <screenname> screen\"))",
       "id": "skills_build_rn_screen_codeblock_1"
     },
@@ -8432,7 +8414,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L17",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 2 \u2014 types",
       "id": "skills_build_rn_screen_step_2_types"
     },
@@ -8441,7 +8423,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L20",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 3 \u2014 api function",
       "id": "skills_build_rn_screen_step_3_api_function"
     },
@@ -8450,7 +8432,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L22",
-      "community": 20,
+      "community": 19,
       "norm_label": "code:ts (export async function getthings(params?: thingparams): promi)",
       "id": "skills_build_rn_screen_codeblock_2"
     },
@@ -8459,7 +8441,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L30",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 4 \u2014 hook",
       "id": "skills_build_rn_screen_step_4_hook"
     },
@@ -8468,7 +8450,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L32",
-      "community": 20,
+      "community": 19,
       "norm_label": "code:ts (import { usequery, usemutation, usequeryclient } from '@tans)",
       "id": "skills_build_rn_screen_codeblock_3"
     },
@@ -8477,7 +8459,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L51",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 5 \u2014 navigation",
       "id": "skills_build_rn_screen_step_5_navigation"
     },
@@ -8486,7 +8468,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L55",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 6 \u2014 screen file",
       "id": "skills_build_rn_screen_step_6_screen_file"
     },
@@ -8495,7 +8477,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L57",
-      "community": 20,
+      "community": 19,
       "norm_label": "code:tsx (import react from 'react';)",
       "id": "skills_build_rn_screen_codeblock_4"
     },
@@ -8504,7 +8486,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L91",
-      "community": 20,
+      "community": 19,
       "norm_label": "step 7 \u2014 verify",
       "id": "skills_build_rn_screen_step_7_verify"
     },
@@ -8513,7 +8495,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L92",
-      "community": 20,
+      "community": 19,
       "norm_label": "code:bash (cd frontend && npx tsc --noemit --pretty false)",
       "id": "skills_build_rn_screen_codeblock_5"
     },
@@ -8522,7 +8504,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L97",
-      "community": 20,
+      "community": 19,
       "norm_label": "token efficiency",
       "id": "skills_build_rn_screen_token_efficiency"
     },
@@ -8531,7 +8513,7 @@
       "file_type": "document",
       "source_file": ".claude/skills/connect-api.md",
       "source_location": "L1",
-      "community": 16,
+      "community": 15,
       "norm_label": "connect-api.md",
       "id": "claude_skills_connect_api_md"
     },
@@ -8540,7 +8522,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L6",
-      "community": 16,
+      "community": 15,
       "norm_label": "connect a new api endpoint in biblestudypro",
       "id": "skills_connect_api_connect_a_new_api_endpoint_in_biblestudypro"
     },
@@ -8549,7 +8531,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L8",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 0 \u2014 verify the backend route exists",
       "id": "skills_connect_api_step_0_verify_the_backend_route_exists"
     },
@@ -8558,7 +8540,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L9",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:bash (grep -r \"router\\.(get|post|put|patch|delete)\" backend/src/ro)",
       "id": "skills_connect_api_codeblock_1"
     },
@@ -8567,7 +8549,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L14",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 1 \u2014 add types",
       "id": "skills_connect_api_step_1_add_types"
     },
@@ -8576,7 +8558,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L16",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:ts (export interface thing {)",
       "id": "skills_connect_api_codeblock_2"
     },
@@ -8585,7 +8567,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L32",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 2 \u2014 add api function",
       "id": "skills_connect_api_step_2_add_api_function"
     },
@@ -8594,7 +8576,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L34",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:ts (import apiclient from './client';)",
       "id": "skills_connect_api_codeblock_3"
     },
@@ -8603,7 +8585,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L68",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 3 \u2014 export from index",
       "id": "skills_connect_api_step_3_export_from_index"
     },
@@ -8612,7 +8594,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L70",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:ts (export { getthings, getthingbyid, creatething, updatething, )",
       "id": "skills_connect_api_codeblock_4"
     },
@@ -8621,7 +8603,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L74",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 4 \u2014 wire to a hook",
       "id": "skills_connect_api_step_4_wire_to_a_hook"
     },
@@ -8630,7 +8612,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L77",
-      "community": 16,
+      "community": 15,
       "norm_label": "step 5 \u2014 verify",
       "id": "skills_connect_api_step_5_verify"
     },
@@ -8639,7 +8621,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L78",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:bash (cd frontend && npx tsc --noemit --pretty false)",
       "id": "skills_connect_api_codeblock_5"
     },
@@ -8648,7 +8630,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L82",
-      "community": 16,
+      "community": 15,
       "norm_label": "api client notes",
       "id": "skills_connect_api_api_client_notes"
     },
@@ -8657,7 +8639,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L90",
-      "community": 16,
+      "community": 15,
       "norm_label": "error handling",
       "id": "skills_connect_api_error_handling"
     },
@@ -8666,7 +8648,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L92",
-      "community": 16,
+      "community": 15,
       "norm_label": "code:ts (onerror: err => toast.show({ type: 'error', text1: geterrorm)",
       "id": "skills_connect_api_codeblock_6"
     },
@@ -9692,7 +9674,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/agents/rn-screen-builder.md",
       "source_location": "L1",
-      "community": 15,
+      "community": 16,
       "norm_label": "rn-screen-builder.md",
       "id": "claude_worktrees_agent_a56a6735982ae2358_claude_agents_rn_screen_builder_md"
     },
@@ -9710,7 +9692,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/build-rn-screen.md",
       "source_location": "L1",
-      "community": 20,
+      "community": 19,
       "norm_label": "build-rn-screen.md",
       "id": "claude_worktrees_agent_a56a6735982ae2358_claude_skills_build_rn_screen_md"
     },
@@ -9719,7 +9701,7 @@
       "file_type": "document",
       "source_file": ".claude/worktrees/agent-a56a6735982ae2358/.claude/skills/connect-api.md",
       "source_location": "L1",
-      "community": 16,
+      "community": 15,
       "norm_label": "connect-api.md",
       "id": "claude_worktrees_agent_a56a6735982ae2358_claude_skills_connect_api_md"
     },
@@ -15976,18 +15958,6 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L37",
-      "weight": 1.0,
-      "_src": "response_sendsuccess",
-      "_tgt": "credits_controller_watchad",
-      "source": "response_sendsuccess",
-      "target": "credits_controller_watchad"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "backend/src/modules/credits/credits.controller.ts",
       "source_location": "L44",
       "weight": 1.0,
       "_src": "response_sendsuccess",
@@ -17290,18 +17260,6 @@
       "_tgt": "credits_controller_claimdailylogin",
       "source": "response_handlecontrollererror",
       "target": "credits_controller_claimdailylogin"
-    },
-    {
-      "relation": "calls",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L38",
-      "weight": 1.0,
-      "_src": "response_handlecontrollererror",
-      "_tgt": "credits_controller_watchad",
-      "source": "response_handlecontrollererror",
-      "target": "credits_controller_watchad"
     },
     {
       "relation": "calls",
@@ -20268,18 +20226,6 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/src/modules/credits/credits.service.ts",
-      "source_location": "L286",
-      "weight": 1.0,
-      "_src": "backend_src_modules_credits_credits_service_ts",
-      "_tgt": "credits_service_watchad",
-      "source": "backend_src_modules_credits_credits_service_ts",
-      "target": "credits_service_watchad",
-      "confidence_score": 1.0
-    },
-    {
       "relation": "calls",
       "confidence": "EXTRACTED",
       "source_file": "backend/src/modules/credits/credits.service.ts",
@@ -20454,18 +20400,6 @@
       "source_location": "L34",
       "weight": 1.0,
       "_src": "backend_src_modules_credits_credits_controller_ts",
-      "_tgt": "credits_controller_watchad",
-      "source": "backend_src_modules_credits_credits_controller_ts",
-      "target": "credits_controller_watchad",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L41",
-      "weight": 1.0,
-      "_src": "backend_src_modules_credits_credits_controller_ts",
       "_tgt": "credits_controller_getstreak",
       "source": "backend_src_modules_credits_credits_controller_ts",
       "target": "credits_controller_getstreak",
@@ -20475,7 +20409,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "backend/src/modules/credits/credits.controller.ts",
-      "source_location": "L48",
+      "source_location": "L41",
       "weight": 1.0,
       "_src": "backend_src_modules_credits_credits_controller_ts",
       "_tgt": "credits_controller_getstats",
