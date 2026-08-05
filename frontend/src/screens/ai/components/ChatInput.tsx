@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -8,9 +8,9 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, fontSizes, spacing } from '../../../theme';
+import { fontSizes, spacing, useTheme, type ThemeColors } from '../../../theme';
 import { Typography } from '../../../components/ui';
+import { StarIcon, ArrowUpIcon } from '../../../components/icons';
 
 const SEND_ICON_SIZE = 20;
 const CREDIT_ICON_SIZE = 12;
@@ -24,6 +24,8 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [text, setText] = useState('');
   const insets = useSafeAreaInsets();
 
@@ -42,8 +44,7 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
     <View style={[styles.container, { paddingBottom: insets.bottom + spacing[2] }]}>
       {creditBalance !== undefined && (
         <View style={styles.creditRow}>
-          <Icon
-            name="star"
+          <StarIcon
             size={CREDIT_ICON_SIZE}
             color={creditBalance > 0 ? colors.textSecondary : colors.error}
           />
@@ -73,8 +74,7 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
           disabled={!canSend}
           hitSlop={8}
         >
-          <Icon
-            name="arrow-up"
+          <ArrowUpIcon
             size={SEND_ICON_SIZE}
             color={canSend ? colors.textOnPrimary : colors.textDisabled}
           />
@@ -103,7 +103,7 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
     backgroundColor: colors.background,
     borderTopWidth: 1,

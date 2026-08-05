@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -10,7 +10,19 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/Ionicons';
+import {
+  ArrowRightIcon,
+  ChatIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CloseCircleIcon,
+  PencilIcon,
+  SearchIcon,
+  SparklesIcon,
+  StarIcon,
+  TagIcon,
+  TrashIcon,
+} from '../../components/icons';
 import Toast from 'react-native-toast-message';
 
 import {
@@ -21,7 +33,7 @@ import {
   ErrorState,
   LoadingOverlay,
 } from '../../components/feedback';
-import { Button, Card, Divider, Spacer, Typography } from '../../components/ui';
+import { Button, Card, Divider, ScreenHeader, Spacer, Typography } from '../../components/ui';
 import {
   useAIChatHistory,
   useBookmarks,
@@ -32,7 +44,8 @@ import {
   useUpdateSessionTags,
 } from '../../hooks';
 import { formatDate } from '../../utils/formatters';
-import { colors, fontSizes, layout, spacing } from '../../theme';
+import { useTheme, fontSizes, layout, spacing } from '../../theme';
+import type { ThemeColors } from '../../theme';
 import type { AIChat, BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
 
@@ -50,6 +63,8 @@ const ListSeparator = () => <Spacer size={spacing[3]} />;
 
 // ─── Individual Q&A pair inside an expanded session ──────────────────────────
 function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <>
       {index > 0 && <Divider marginV={spacing[3]} />}
@@ -61,7 +76,7 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
       </View>
       <View style={[styles.aRow, { marginTop: spacing[2] }]}>
         <View style={styles.aBadge}>
-          <Icon name="sparkles" size={BADGE_ICON_SIZE} color={colors.primary} />
+          <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
         </View>
         <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
           {chat.answer}
@@ -73,29 +88,31 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
 
 // ─── Bookmarked message card ──────────────────────────────────────────────────
 function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [expanded, setExpanded] = useState(false);
   return (
     <Pressable onPress={() => setExpanded(e => !e)}>
       <Card style={styles.card}>
         <View style={styles.titleRow}>
           <View style={[styles.sessionIcon, { backgroundColor: colors.warningSurface }]}>
-            <Icon name="star" size={SESSION_ICON_SIZE} color={colors.warning} />
+            <StarIcon size={SESSION_ICON_SIZE} color={colors.warning} />
           </View>
           <Typography preset="body" style={[styles.flex, styles.sessionTitle]} numberOfLines={expanded ? undefined : 2}>
             {chat.question}
           </Typography>
-          <Icon
-            name={expanded ? 'chevron-up' : 'chevron-down'}
-            size={CHEVRON_SIZE}
-            color={colors.textSecondary}
-          />
+          {expanded ? (
+            <ChevronUpIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
+          ) : (
+            <ChevronDownIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
+          )}
         </View>
         {expanded && (
           <Animated.View entering={FadeIn.duration(200)}>
             <Divider marginV={spacing[3]} />
             <View style={styles.aRow}>
               <View style={styles.aBadge}>
-                <Icon name="sparkles" size={BADGE_ICON_SIZE} color={colors.primary} />
+                <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
               </View>
               <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
                 {chat.answer}
@@ -119,6 +136,8 @@ interface SessionCardProps {
 }
 
 function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [expanded, setExpanded] = useState(false);
   const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
   const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
@@ -132,7 +151,7 @@ function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
       <Card style={styles.card}>
         <View style={styles.titleRow}>
           <View style={styles.sessionIcon}>
-            <Icon name="chatbubbles-outline" size={SESSION_ICON_SIZE} color={colors.primary} />
+            <ChatIcon size={SESSION_ICON_SIZE} color={colors.primary} />
           </View>
           <Typography
             preset="body"
@@ -141,11 +160,11 @@ function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
           >
             {displayTitle}
           </Typography>
-          <Icon
-            name={expanded ? 'chevron-up' : 'chevron-down'}
-            size={CHEVRON_SIZE}
-            color={colors.textSecondary}
-          />
+          {expanded ? (
+            <ChevronUpIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
+          ) : (
+            <ChevronDownIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
+          )}
         </View>
 
         {session.tags && session.tags.length > 0 && (
@@ -180,7 +199,7 @@ function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
           onPress={() => onContinue(session)}
         >
           <Typography preset="label" color={colors.primary}>Continue conversation</Typography>
-          <Icon name="arrow-forward" size={14} color={colors.primary} />
+          <ArrowRightIcon size={14} color={colors.primary} />
         </Pressable>
 
         {expanded && (
@@ -198,6 +217,8 @@ function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const {
     data,
     isLoading,
@@ -369,19 +390,19 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const sheetActions = [
     {
       label: 'Rename',
-      iconName: 'pencil-outline',
+      icon: PencilIcon,
       onPress: handleOpenRename,
       disabled: !sheet.session?.sessionId,
     },
     {
       label: 'Edit Tags',
-      iconName: 'pricetag-outline',
+      icon: TagIcon,
       onPress: handleOpenTags,
       disabled: !sheet.session?.sessionId,
     },
     {
       label: 'Delete',
-      iconName: 'trash-outline',
+      icon: TrashIcon,
       onPress: handleDeleteSession,
       destructive: true,
       disabled: !sheet.session?.sessionId || isDeleting,
@@ -401,7 +422,9 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const hasAnyTaggedSession = allSessions.some(s => s.tags?.length > 0);
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
+    <SafeAreaView style={styles.safe} edges={['top']}>
+      <ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />
+
       {/* ── View Mode Toggle (All / Bookmarked) ── */}
       <View style={styles.modeToggle}>
         <Pressable
@@ -416,8 +439,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           style={[styles.modeTab, viewMode === 'bookmarked' && styles.modeTabActive]}
           onPress={() => setViewMode('bookmarked')}
         >
-          <Icon
-            name="star"
+          <StarIcon
             size={14}
             color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary}
           />
@@ -432,7 +454,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           {/* ── Search + Clear ── */}
           <View style={styles.topBar}>
             <View style={styles.searchRow}>
-              <Icon name="search-outline" size={16} color={colors.textSecondary} />
+              <SearchIcon size={16} color={colors.textSecondary} />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search conversations…"
@@ -443,13 +465,13 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
               />
               {searchQuery.length > 0 && (
                 <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
-                  <Icon name="close-circle" size={16} color={colors.textSecondary} />
+                  <CloseCircleIcon size={16} color={colors.textSecondary} />
                 </Pressable>
               )}
             </View>
             {allSessions.length > 0 && (
               <Pressable onPress={handleClearAll} hitSlop={8} style={styles.clearBtn}>
-                <Icon name="trash-outline" size={18} color={colors.error} />
+                <TrashIcon size={18} color={colors.error} />
               </Pressable>
             )}
           </View>
@@ -616,7 +638,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
 
   modeToggle: {

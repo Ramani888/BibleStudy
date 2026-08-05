@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { AIStackParamList } from './types';
-import { colors, fontWeights } from '../theme';
 import { AIChatScreen } from '../screens/ai/AIChatScreen';
 import { ChatHistoryScreen } from '../screens/ai/ChatHistoryScreen';
 
@@ -27,27 +26,9 @@ export function AINavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTitleStyle: {
-          color: colors.textPrimary,
-          fontWeight: fontWeights.semiBold,
-        },
-        headerTintColor: colors.primary,
-        headerShadowVisible: false,
-      }}
-    >
-      <Stack.Screen
-        name="AIChat"
-        component={AIChatScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ChatHistory"
-        component={ChatHistoryScreen}
-        options={{ title: 'Chat History' }}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="AIChat" component={AIChatScreen} />
+      <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} />
     </Stack.Navigator>
   );
 }

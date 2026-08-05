@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { CheckCircleIcon } from '../../../components/icons';
 
 import { AppModal } from '../../../components/feedback';
 import { Button, Typography } from '../../../components/ui';
 import { useSets } from '../../../hooks';
-import { colors, spacing } from '../../../theme';
+import { spacing, useTheme, type ThemeColors } from '../../../theme';
 import type { SuggestedCard } from '../../../types';
 
 interface CardProposalSheetProps {
@@ -16,6 +16,8 @@ interface CardProposalSheetProps {
 }
 
 export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { data: sets = [], isLoading: setsLoading } = useSets();
@@ -82,7 +84,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
                 </Typography>
               </View>
               {selectedSetId === set.id && (
-                <Icon name="checkmark-circle" size={20} color={colors.primary} />
+                <CheckCircleIcon size={20} color={colors.primary} />
               )}
             </Pressable>
           ))}
@@ -102,7 +104,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   subheader: { marginBottom: spacing[3] },
   previewScroll: { maxHeight: 180, marginBottom: spacing[4] },
   cardRow: {

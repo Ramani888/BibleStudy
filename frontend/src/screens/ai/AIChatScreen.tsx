@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -9,10 +9,10 @@ import {
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import { ChatBubble, CreditBadge } from '../../components/domain';
+import { ChatBubble } from '../../components/domain';
+import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 import { ChatInput } from './components/ChatInput';
@@ -21,7 +21,7 @@ import { useAuthStore } from '../../store';
 import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
 import { detectTags } from '../../utils/tagDetector';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme, type ThemeColors } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, SuggestedCard } from '../../types';
 
@@ -58,6 +58,8 @@ const SUGGESTIONS = [
 ];
 
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const user = useAuthStore(s => s.user);
 
   // When navigated from Chat History, pre-populate with the existing session.
@@ -344,30 +346,30 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const sheetActions = sheet.message ? [
     {
       label: 'Copy',
-      iconName: 'copy-outline',
+      icon: CopyIcon,
       onPress: handleCopyMessage,
     },
     {
       label: 'Share',
-      iconName: 'share-outline',
+      icon: ShareIcon,
       onPress: handleShareMessage,
     },
     ...(sheet.message.role === 'ai' ? [
       {
         label: 'Regenerate',
-        iconName: 'refresh-outline',
+        icon: RefreshIcon,
         onPress: () => sheet.message && handleRegenerate(sheet.message),
         disabled: isPending,
       },
       {
         label: isCurrentMessageBookmarked ? 'Remove Bookmark' : 'Bookmark',
-        iconName: isCurrentMessageBookmarked ? 'star' : 'star-outline',
+        icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon,
         onPress: handleToggleBookmark,
         disabled: !sheet.message.chatId,
       },
       {
         label: 'Save as Card',
-        iconName: 'bookmark-outline',
+        icon: BookmarkIcon,
         onPress: () => {
           if (!sheet.message) return;
           setSaveModal({
@@ -404,7 +406,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
               onPress={() => handleSend(q)}
               disabled={isPending || isBalanceLoading}
             >
-              <Icon name="arrow-forward-outline" size={12} color={colors.primary} />
+              <ArrowRightIcon size={12} color={colors.primary} />
               <Typography preset="caption" color={colors.primary} style={styles.followUpText}>
                 {q}
               </Typography>
@@ -416,13 +418,13 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       {/* Flashcard proposal banner — shown when AI generated cards */}
       {item.role === 'ai' && item.text !== TYPING_INDICATOR && !item.isHistorical && item.suggestedCards && item.suggestedCards.length > 0 && (
         <Animated.View entering={FadeIn.duration(200)} style={styles.cardBanner}>
-          <Icon name="albums-outline" size={16} color={colors.primary} />
+          <AlbumsIcon size={16} color={colors.primary} />
           <Typography preset="bodySm" color={colors.primary} style={styles.cardBannerText}>
             {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
           </Typography>
           {savedMessageIds.has(item.id) ? (
             <View style={styles.savedChip}>
-              <Icon name="checkmark-circle" size={14} color={colors.success} />
+              <CheckCircleIcon size={14} color={colors.success} />
               <Typography preset="caption" color={colors.success}> Saved</Typography>
             </View>
           ) : (
@@ -437,7 +439,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         </Animated.View>
       )}
     </View>
-  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal]);
+  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal, colors, styles]);
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -445,7 +447,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       <View style={styles.header}>
         <View style={styles.headerLeft}>
           <View style={styles.aiBadge}>
-            <Icon name="sparkles" size={ICON_SIZE} color={colors.textOnPrimary} />
+            <SparklesIcon size={ICON_SIZE} color={colors.textOnPrimary} />
           </View>
           <View>
             <Typography preset="h4">AI Bible Assistant</Typography>
@@ -455,7 +457,6 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <CreditBadge balance={creditBalance} />
           {/* Always rendered to prevent layout shift — hidden via opacity when no messages */}
           <Pressable
             onPress={handleExport}
@@ -463,11 +464,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             disabled={!hasExportableMessages}
             style={{ opacity: hasExportableMessages ? 1 : 0 }}
           >
-            <Icon name="document-text-outline" size={ICON_SIZE} color={colors.textSecondary} />
+            <FileTextIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
           <Pressable onPress={handleClearChat} hitSlop={8}>
-            <Icon
-              name="trash-outline"
+            <TrashIcon
               size={ICON_SIZE}
               color={messages.length > 0 ? colors.textSecondary : colors.textDisabled}
             />
@@ -477,7 +477,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             hitSlop={8}
             style={({ pressed }) => [styles.historyBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <Icon name="time-outline" size={ICON_SIZE} color={colors.primary} />
+            <ClockIcon size={ICON_SIZE} color={colors.primary} />
           </Pressable>
         </View>
       </View>
@@ -492,7 +492,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         extraData={savedMessageIds}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <Icon name="sparkles" size={EMPTY_ICON_SIZE} color={colors.primaryLight} />
+            <SparklesIcon size={EMPTY_ICON_SIZE} color={colors.primaryLight} />
             <Typography preset="h4" align="center">Ask anything about the Bible</Typography>
             <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
               Theology, history, verses, devotional insights — I'm here to help.
@@ -541,7 +541,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
 
   header: {
@@ -566,7 +566,7 @@ const styles = StyleSheet.create({
   aiBadge: {
     width: 40,
     height: 40,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -593,7 +593,7 @@ const styles = StyleSheet.create({
   },
   suggestion: {
     backgroundColor: colors.primarySurface,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     borderWidth: 1,
     borderColor: colors.primaryLight,
     padding: spacing[3],
@@ -633,7 +633,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primarySurface,
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: colors.primary + '40',
+    borderColor: colors.primaryLight,
   },
   cardBannerText: { flex: 1 },
   savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
