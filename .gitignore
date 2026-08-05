@@ -30,3 +30,6 @@ graphify-out/cost.json
 # Android release keystore — never commit this
 frontend/android/app/*.keystore
 !frontend/android/app/debug.keystore
+
+# Claude Code local settings — machine-specific, may contain secrets
+.claude/settings.local.json
