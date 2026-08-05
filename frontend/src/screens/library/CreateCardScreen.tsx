@@ -6,13 +6,12 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
 import { PlusCircleIcon } from '../../components/icons';
-import { CardPreview } from './components/CardPreview';
 import { FormField } from '../../components/forms';
 import { Button, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
 
@@ -24,9 +23,14 @@ import type { CardType } from '../../types';
 
 const ICON_SIZE = 20;
 
-const COPY: Record<CardType, { qLabel: string; qPlaceholder: string; aLabel: string; aPlaceholder: string }> = {
-  QA:    { qLabel: 'Question', qPlaceholder: 'Enter the question…', aLabel: 'Answer', aPlaceholder: 'Enter the answer…' },
-  STORY: { qLabel: 'Reference (optional)', qPlaceholder: 'e.g. John 3:16', aLabel: 'Text', aPlaceholder: 'Enter the verse or passage…' },
+const COPY: Record<CardType, {
+  qLabel: string; qPlaceholder: string; aLabel: string; aPlaceholder: string;
+  noteBtn: string; noteLabel: string; notePlaceholder: string;
+}> = {
+  QA:    { qLabel: 'Question', qPlaceholder: 'Enter the question…', aLabel: 'Answer', aPlaceholder: 'Enter the answer…',
+           noteBtn: 'Add Hint', noteLabel: 'Hint (optional)', notePlaceholder: 'Add a hint…' },
+  STORY: { qLabel: 'Reference (optional)', qPlaceholder: 'e.g. John 3:16', aLabel: 'Text', aPlaceholder: 'Enter the verse or passage…',
+           noteBtn: 'Add Note', noteLabel: 'Note (optional)', notePlaceholder: 'Add a note or reflection…' },
 };
 
 function makeSchema(type: CardType) {
@@ -71,9 +75,6 @@ const CardForm = forwardRef<CardFormHandle, {
     defaultValues: { question: '', answer: '' },
   });
 
-  const questionValue = useWatch({ control, name: 'question' });
-  const answerValue   = useWatch({ control, name: 'answer' });
-
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(d => save(d)),
   }));
@@ -94,8 +95,6 @@ const CardForm = forwardRef<CardFormHandle, {
 
   return (
     <View style={styles.formGap}>
-      <CardPreview question={questionValue || ''} answer={answerValue || ''} />
-
       <FormField
         name="question"
         control={control}
@@ -113,29 +112,28 @@ const CardForm = forwardRef<CardFormHandle, {
         placeholder={copy.aPlaceholder}
         autoCapitalize="sentences"
         inputRef={answerRef}
-        returnKeyType="done"
         maxLength={5000}
-        multiline={type === 'STORY'}
-        onSubmitEditing={type === 'STORY' ? undefined : handleSubmit(d => save(d))}
+        multiline
+        minHeight={type === 'STORY' ? 120 : 80}
       />
 
       {noteExpanded ? (
         <View>
           <View style={styles.noteLabelRow}>
-            <Typography preset="label" color={colors.textSecondary}>Note (optional)</Typography>
+            <Typography preset="label" color={colors.textSecondary}>{copy.noteLabel}</Typography>
             <Pressable onPress={() => { setNoteExpanded(false); setNote(''); }} hitSlop={8}>
               <Typography preset="caption" color={colors.textSecondary}>Remove</Typography>
             </Pressable>
           </View>
           <TextInput
             style={styles.noteInput}
-            placeholder="Add a hint or note…"
+            placeholder={copy.notePlaceholder}
             value={note}
             onChangeText={setNote}
             multiline
             numberOfLines={3}
             maxLength={2000}
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textSecondary}
             autoCapitalize="sentences"
           />
         </View>
@@ -143,7 +141,7 @@ const CardForm = forwardRef<CardFormHandle, {
         <Pressable style={styles.addNoteBtn} onPress={() => setNoteExpanded(true)}>
           <View style={styles.addNoteBtnContent}>
             <PlusCircleIcon size={ICON_SIZE} color={colors.textSecondary} />
-            <Typography preset="label" color={colors.textSecondary}>Add Note</Typography>
+            <Typography preset="label" color={colors.textSecondary}>{copy.noteBtn}</Typography>
           </View>
         </Pressable>
       )}
@@ -208,7 +206,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       borderTopColor: colors.border,
     },
     noteLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] },
-    addNoteBtn: { borderWidth: 1.5, borderRadius: 12, borderColor: colors.border, borderStyle: 'dashed', paddingVertical: spacing[3], alignItems: 'center' },
-    noteInput: { borderWidth: 1.5, borderRadius: 12, borderColor: colors.border, backgroundColor: colors.backgroundSecondary, paddingHorizontal: spacing[4], paddingVertical: spacing[3], minHeight: 80, color: colors.textPrimary, textAlignVertical: 'top' },
+    addNoteBtn: { borderWidth: 1.5, borderRadius: layout.cardRadius, borderColor: colors.border, borderStyle: 'dashed', paddingVertical: spacing[3], alignItems: 'center' },
+    noteInput: { borderRadius: layout.cardRadius, backgroundColor: colors.backgroundSecondary, paddingHorizontal: spacing[4], paddingVertical: spacing[3], minHeight: 80, color: colors.textPrimary, textAlignVertical: 'top' },
     addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
   });

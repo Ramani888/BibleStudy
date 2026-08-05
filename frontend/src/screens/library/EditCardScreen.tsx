@@ -169,9 +169,9 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
             label={card.type === 'STORY' ? 'Text' : 'Answer'}
             autoCapitalize="sentences"
             inputRef={answerRef}
-            returnKeyType="done"
             maxLength={5000}
-            multiline={card.type === 'STORY'}
+            multiline
+            minHeight={card.type === 'STORY' ? 120 : 80}
           />
 
           {/* Difficulty picker */}
@@ -204,17 +204,17 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
           {/* Note */}
           <View>
             <Typography preset="label" color={colors.textSecondary} style={styles.label}>
-              Note (optional)
+              {card.type === 'STORY' ? 'Note (optional)' : 'Hint (optional)'}
             </Typography>
             <TextInput
               style={styles.noteInput}
-              placeholder="Add a hint or note…"
+              placeholder={card.type === 'STORY' ? 'Add a note or reflection…' : 'Add a hint…'}
               value={note}
               onChangeText={setNote}
               multiline
               numberOfLines={3}
               maxLength={2000}
-              placeholderTextColor={colors.textDisabled}
+              placeholderTextColor={colors.textSecondary}
               autoCapitalize="sentences"
             />
           </View>
@@ -275,9 +275,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       alignItems: 'center',
     },
     noteInput: {
-      borderWidth: 1.5,
-      borderRadius: 12,
-      borderColor: colors.border,
+      borderRadius: layout.cardRadius,
       backgroundColor: colors.backgroundSecondary,
       paddingHorizontal: spacing[4],
       paddingVertical: spacing[3],
