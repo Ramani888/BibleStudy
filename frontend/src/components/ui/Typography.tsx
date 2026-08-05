@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text, TextProps, TextStyle } from 'react-native';
-import { colors, textPresets, TextPreset } from '../../theme';
+import { textPresets, TextPreset, useTheme } from '../../theme';
 
 export interface TypographyProps extends TextProps {
   preset?: TextPreset;
@@ -11,15 +11,18 @@ export interface TypographyProps extends TextProps {
 
 export function Typography({
   preset = 'body',
-  color = colors.textPrimary,
+  color,
   align,
   style,
   children,
   ...rest
 }: TypographyProps) {
+  const { colors } = useTheme();
+  // Default to the themed primary text color so text is dark-mode aware.
+  const resolved = color ?? colors.textPrimary;
   return (
     <Text
-      style={[textPresets[preset], { color }, align ? { textAlign: align } : null, style]}
+      style={[textPresets[preset], { color: resolved }, align ? { textAlign: align } : null, style]}
       {...rest}
     >
       {children}

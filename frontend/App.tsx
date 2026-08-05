@@ -9,6 +9,7 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import { queryClient } from './src/lib/queryClient';
 import { useAuthStore } from './src/store';
+import { useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 
 // Enable native screens for better performance
@@ -16,11 +17,13 @@ enableScreens(true);
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);
+  const hydrateTheme = useThemeStore(s => s.hydrate);
 
-  // Init auth
+  // Init auth + load saved light/dark preference
   useEffect(() => {
     initialize();
-  }, [initialize]);
+    hydrateTheme();
+  }, [initialize, hydrateTheme]);
 
   return <RootNavigator />;
 }

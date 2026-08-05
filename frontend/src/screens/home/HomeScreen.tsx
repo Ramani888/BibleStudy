@@ -1,66 +1,53 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
+import React, { useMemo } from 'react';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import Icon from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
-import Animated, {
-  FadeInDown,
-  useAnimatedStyle,
-  useSharedValue,
-  withSequence,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
-import Toast from 'react-native-toast-message';
 
-import { SetActionSheet, SetCard, CreditBadge } from '../../components/domain';
 import { Avatar, Spacer, Typography, AnimatedPressable } from '../../components/ui';
-import { ConfirmDialog, ErrorState, SetCardSkeleton } from '../../components/feedback';
+import {
+  FlameIcon,
+  BellIcon,
+  ArrowRightIcon,
+  ChevronRightIcon,
+  BookIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  FileTextIcon,
+  FolderIcon,
+  UsersIcon,
+  SearchIcon,
+  UserIcon,
+  LibraryIcon,
+  type IconComponent,
+} from '../../components/icons';
 import { useAuthStore } from '../../store';
 import {
-  useDailyVerse,
   useSets,
+  usePublicSets,
+  useFriendsSets,
+  useFriendsActivityFeed,
+  useGroups,
+  useFriends,
+  useFolders,
+  useNotes,
   useCreditBalance,
+  useDailyVerse,
   useAutoDailyClaim,
-  useDeleteSet,
-  useConfirmDialog,
   useStreak,
+  useDueSummary,
+  useNotifications,
 } from '../../hooks';
-import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { useTheme, type Theme } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
-import type { StudySet } from '../../types';
-
-const ICON_SIZE = 20;
-const QUICK_ACTION_ICON_SIZE = 26;
+import type { DueSummary, StudySet } from '../../types';
+import type { Activity } from '../../types/activities.types';
+import type { Group } from '../../types/groups.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
-type ParamlessTab = 'HomeTab' | 'LibraryTab' | 'AITab' | 'ProfileTab';
 
-interface QuickAction {
-  label: string;
-  iconName: string;
-  tab: ParamlessTab;
-  color: string;
-  bg: string;
-}
-
-const QUICK_ACTIONS: QuickAction[] = [
-  { label: 'Library', iconName: 'library-outline',    tab: 'LibraryTab', color: colors.info,    bg: colors.infoSurface    },
-  { label: 'AI Chat', iconName: 'chatbubbles-outline', tab: 'AITab',      color: colors.primary, bg: colors.primarySurface },
-  { label: 'Profile', iconName: 'person-outline',      tab: 'ProfileTab', color: colors.warning, bg: colors.warningSurface },
-];
-
-const VERSE_GRADIENT: [string, string, string] = ['#F4DFA0', '#D4990E', '#7D5606'];
+const plural = (n: number) => (n === 1 ? '' : 's');
 
 function getGreeting(): string {
   const h = new Date().getHours();
@@ -69,187 +56,235 @@ function getGreeting(): string {
   return 'Good evening';
 }
 
-// ─── Streak Badge ─────────────────────────────────────────────────────────────
-function StreakBadge({ streak }: { streak: number | undefined }) {
+// ─── Sticky Header ────────────────────────────────────────────────────────────
+function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
+  greeting: string; name: string; avatarUri?: string | null; unread: number; onAI: () => void; onBell: () => void; onAvatar: () => void;
+}) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   return (
-    <View style={styles.streakBadge}>
-      <Typography preset="label" color={streak ? colors.warning : colors.textSecondary}>
-        🔥 {streak ?? '—'}
-      </Typography>
+    <View style={styles.header}>
+      <Pressable style={styles.headerLeft} onPress={onAvatar} accessibilityRole="button" accessibilityLabel="Go to profile">
+        <Avatar uri={avatarUri} name={name} size="sm" />
+        <View style={styles.greetingCol}>
+          <Typography preset="caption" color={colors.textSecondary}>{greeting},</Typography>
+          <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{name}</Typography>
+        </View>
+      </Pressable>
+      <View style={styles.headerActions}>
+        <Pressable onPress={onAI} hitSlop={8} style={styles.headerIconBtn} accessibilityRole="button" accessibilityLabel="AI Chat">
+          <SparklesIcon size={20} color={colors.textPrimary} />
+        </Pressable>
+        <Pressable onPress={onBell} hitSlop={8} style={styles.headerIconBtn} accessibilityRole="button" accessibilityLabel="Notifications">
+          <BellIcon size={20} color={colors.textPrimary} />
+          {unread > 0 && (
+            <View style={styles.bellBadge}>
+              <Typography preset="caption" color={colors.textOnPrimary}>{unread > 9 ? '9+' : unread}</Typography>
+            </View>
+          )}
+        </Pressable>
+      </View>
     </View>
   );
 }
 
-// ─── Hero Verse Card ──────────────────────────────────────────────────────────
-interface HeroVerseCardProps {
-  text?: string;
-  reference?: string;
-  loading?: boolean;
-  error?: boolean;
-  onRetry?: () => void;
-}
+// ─── Featured card (bold dark hero) ───────────────────────────────────────────
+function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate }: {
+  due?: DueSummary; continueSet: StudySet | null; streak: number;
+  onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
+}) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
 
-function HeroVerseCard({ text, reference, loading, error, onRetry }: HeroVerseCardProps) {
-  if (loading) {
-    return (
-      <LinearGradient colors={VERSE_GRADIENT} style={styles.heroCard}>
-        <View style={styles.heroLabelRow}>
-          <View style={[styles.heroLabelDot, { backgroundColor: 'rgba(255,255,255,0.4)' }]} />
-          <View style={{ width: 120, height: 10, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 5 }} />
-        </View>
-        <Spacer size={spacing[4]} />
-        <View style={{ width: '90%', height: 16, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 6 }} />
-        <Spacer size={spacing[2]} />
-        <View style={{ width: '80%', height: 16, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 6 }} />
-        <Spacer size={spacing[2]} />
-        <View style={{ width: '65%', height: 16, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 6 }} />
-        <Spacer size={spacing[4]} />
-        <View style={{ width: 100, height: 11, backgroundColor: 'rgba(255,255,255,0.3)', borderRadius: 5, alignSelf: 'flex-end' }} />
-      </LinearGradient>
-    );
+  const hasDue = !!due && due.dueCount > 0 && !!due.topSet;
+  const weekProgress = Math.min(streak, 7) / 7;
+
+  let badge: string, title: string, subtitle: string, onPress: () => void;
+  if (hasDue) {
+    badge = 'DUE'; title = due!.topSet!.title;
+    subtitle = `${due!.dueCount} card${plural(due!.dueCount)} to review`;
+    onPress = () => onReview(due!.topSet!.id, due!.topSet!.title);
+  } else if (continueSet) {
+    badge = 'CONTINUE'; title = continueSet.title;
+    subtitle = `${continueSet._count?.cards ?? 0} card${plural(continueSet._count?.cards ?? 0)}`;
+    onPress = () => onContinue(continueSet);
+  } else {
+    badge = 'START'; title = 'Create your first study set'; subtitle = 'Begin your journey'; onPress = onCreate;
   }
-
-  if (error) {
-    return (
-      <LinearGradient colors={VERSE_GRADIENT} style={styles.heroCard}>
-        <View style={styles.heroErrorWrap}>
-          <Icon name="cloud-offline-outline" size={28} color="rgba(255,255,255,0.7)" />
-          <Spacer size={spacing[2]} />
-          <Typography preset="bodySm" color="rgba(255,255,255,0.85)">
-            Could not load today's verse
-          </Typography>
-          {onRetry && (
-            <Pressable onPress={onRetry} style={styles.heroRetryBtn} accessibilityRole="button">
-              <Typography preset="label" color={colors.palette.white}>Try again</Typography>
-            </Pressable>
-          )}
-        </View>
-      </LinearGradient>
-    );
-  }
-
-  if (!text || !reference) return null;
 
   return (
-    <LinearGradient colors={VERSE_GRADIENT} style={styles.heroCard}>
-      <View style={styles.heroLabelRow}>
-        <View style={styles.heroLabelDot} />
-        <Typography preset="caption" color="rgba(255,255,255,0.85)" style={styles.heroLabelText}>
-          VERSE OF THE DAY
-        </Typography>
+    <AnimatedPressable style={styles.featured} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
+      <View style={styles.featuredTop}>
+        <View style={styles.badge}>
+          <Typography preset="caption" color={colors.textOnPrimary}>{badge}</Typography>
+        </View>
+        <ArrowRightIcon size={18} color={colors.textOnPrimary} />
       </View>
-      <Spacer size={spacing[4]} />
-      <Typography preset="bodyLg" color={colors.palette.white} style={styles.heroVerseText}>
-        "{text}"
-      </Typography>
-      <Spacer size={spacing[3]} />
-      <Typography preset="label" color="rgba(255,255,255,0.75)" style={styles.heroReference}>
-        — {reference}
-      </Typography>
-    </LinearGradient>
+      <Typography preset="h4" color={colors.textOnPrimary} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
+      <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
+
+      <View style={styles.progressTrack}>
+        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%` }]} />
+      </View>
+      <View style={styles.featuredFooter}>
+        <FlameIcon size={14} color={colors.warning} />
+        <Typography preset="caption" color={colors.textOnPrimaryMuted}>{streak} day streak · weekly goal {Math.min(streak, 7)}/7</Typography>
+      </View>
+    </AnimatedPressable>
   );
 }
 
-// ─── Stat Chip (with value-change pop animation) ──────────────────────────────
-interface StatChipProps {
-  iconName: string;
-  value: string | number;
-  label: string;
-  iconColor: string;
-}
-
-function StatChip({ iconName, value, label, iconColor }: StatChipProps) {
-  const scale = useSharedValue(1);
-  const prevValue = useRef(value);
-
-  useEffect(() => {
-    if (prevValue.current !== value) {
-      prevValue.current = value;
-      scale.value = withSequence(
-        withTiming(1.08, { duration: 120 }),
-        withSpring(1, { damping: 10, stiffness: 200 }),
-      );
-    }
-  }, [value]);
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: scale.value }],
-  }));
-
+// ─── Circular quick action ────────────────────────────────────────────────────
+function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   return (
-    <Animated.View style={[styles.statChip, animStyle]}>
-      <Icon name={iconName} size={18} color={iconColor} />
-      <Typography preset="h4" color={colors.textPrimary}>{value}</Typography>
+    <AnimatedPressable style={styles.quickAction} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
+      <View style={styles.quickCircle}>
+        <Icon size={22} color={colors.textPrimary} />
+      </View>
       <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
-    </Animated.View>
+    </AnimatedPressable>
   );
 }
 
-// ─── Quick Action Grid ────────────────────────────────────────────────────────
-function QuickActionGrid() {
-  const navigation = useNavigation<HomeNav>();
+// ─── Recent set row ───────────────────────────────────────────────────────────
+function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: () => void }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  const count = set._count?.cards ?? 0;
   return (
-    <View style={styles.actionGrid}>
-      {QUICK_ACTIONS.map(action => (
-        <AnimatedPressable
-          key={action.tab}
-          accessibilityRole="button"
-          accessibilityLabel={`Go to ${action.label}`}
-          style={[styles.actionItem, { backgroundColor: action.bg }]}
-          onPress={() => navigation.navigate(action.tab)}
-        >
-          <View style={[styles.actionIconWrap, { backgroundColor: action.color + '20' }]}>
-            <Icon name={action.iconName} size={QUICK_ACTION_ICON_SIZE} color={action.color} />
-          </View>
-          <Typography preset="label" color={action.color}>{action.label}</Typography>
-        </AnimatedPressable>
+    <AnimatedPressable style={styles.setRow} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+      <View style={styles.setIcon}>
+        <LibraryIcon size={18} color={colors.textPrimary} />
+      </View>
+      <View style={styles.flex1}>
+        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{set.title}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
+      </View>
+      {due ? (
+        <View style={styles.dueBadge}><Typography preset="caption" color={colors.success}>DUE</Typography></View>
+      ) : (
+        <ChevronRightIcon size={18} color={colors.textSecondary} />
+      )}
+    </AnimatedPressable>
+  );
+}
+
+// ─── Reusable mini set card (for the horizontal rails) ────────────────────────
+function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponent; onPress: () => void }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  const count = set._count?.cards ?? 0;
+  return (
+    <AnimatedPressable style={styles.miniCard} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+      <View style={styles.miniIcon}>
+        <Icon size={18} color={colors.textPrimary} />
+      </View>
+      <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{set.title}</Typography>
+      <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
+    </AnimatedPressable>
+  );
+}
+
+// ─── Group mini card ──────────────────────────────────────────────────────────
+function GroupCard({ group, onPress }: { group: Group; onPress: () => void }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  const members = group._count?.members ?? 0;
+  return (
+    <AnimatedPressable style={styles.miniCard} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${group.name}`}>
+      <View style={styles.miniIcon}>
+        <UsersIcon size={18} color={colors.textPrimary} />
+      </View>
+      <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{group.name}</Typography>
+      <Typography preset="caption" color={colors.textSecondary}>{members} member{plural(members)}</Typography>
+    </AnimatedPressable>
+  );
+}
+
+// ─── Activity feed item ───────────────────────────────────────────────────────
+function activityText(a: Activity): string {
+  const name = a.user?.name ?? 'Someone';
+  switch (a.type) {
+    case 'ADDED_FRIEND': return `${name} added a new friend`;
+    case 'JOINED_GROUP': return `${name} joined a group`;
+    case 'JOINED_GATHERING': return `${name} joined a gathering`;
+    case 'CREATED_SET': return `${name} created a new set`;
+    case 'STUDIED_CARDS': return `${name} studied some cards`;
+    case 'CREATED_NOTE': return `${name} wrote a note`;
+    default: return `${name} was active`;
+  }
+}
+
+function ActivityItem({ activity }: { activity: Activity }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  return (
+    <View style={styles.activityItem}>
+      <Avatar uri={activity.user?.profileImage} name={activity.user?.name} size="sm" />
+      <View style={styles.flex1}>
+        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{activityText(activity)}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{formatDate(activity.createdAt)}</Typography>
+      </View>
+    </View>
+  );
+}
+
+// ─── Summary card (Friends · Folders · Sets · Cards · Credits · Groups) ────────
+function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  return (
+    <View style={styles.summaryCard}>
+      {stats.map(s => (
+        <View key={s.label} style={styles.summaryStat}>
+          <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>{s.label}</Typography>
+        </View>
       ))}
     </View>
   );
 }
 
-// ─── Continue Studying Card ───────────────────────────────────────────────────
-interface ContinueStudyingCardProps {
-  set: StudySet;
-  onPress: () => void;
-  onMenuPress: () => void;
+// ─── Verse card (purple box with big corner quote marks) ──────────────────────
+function VerseCard({ text, reference }: { text?: string; reference?: string }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
+  if (!text || !reference) return null;
+  return (
+    <View style={styles.verseCard}>
+      <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>“</Typography>
+      <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>”</Typography>
+      <Typography preset="verse" color={colors.textOnPrimary} style={styles.verseText}>{text}</Typography>
+      <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.verseRef}>— {reference}</Typography>
+    </View>
+  );
 }
 
-function ContinueStudyingCard({ set, onPress, onMenuPress }: ContinueStudyingCardProps) {
-  const cardCount = set._count?.cards ?? 0;
+function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   return (
-    <AnimatedPressable
-      accessibilityRole="button"
-      accessibilityLabel={`Continue studying ${set.title}`}
-      style={styles.continueCard}
-      onPress={onPress}
-    >
-      <View style={styles.continueIconWrap}>
-        <Icon name="book-outline" size={22} color={colors.primary} />
-      </View>
-      <View style={styles.continueContent}>
-        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>
-          {set.title}
-        </Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {cardCount} {cardCount === 1 ? 'card' : 'cards'} · {formatDate(set.updatedAt)}
-        </Typography>
-      </View>
-      <View style={styles.continueRight}>
-        <View style={styles.continueStudyBtn}>
-          <Typography preset="label" color={colors.primary}>Study</Typography>
-          <Icon name="arrow-forward" size={13} color={colors.primary} />
-        </View>
-        <Pressable
-          onPress={onMenuPress}
-          hitSlop={8}
-          accessibilityRole="button"
-          accessibilityLabel="More options"
-        >
-          <Icon name="ellipsis-vertical" size={18} color={colors.textSecondary} />
+    <View style={styles.sectionRow}>
+      <Typography preset="h4" color={colors.textPrimary}>{title}</Typography>
+      {actionLabel && onAction && (
+        <Pressable onPress={onAction} hitSlop={8} style={styles.rowCenter} accessibilityRole="button" accessibilityLabel={actionLabel}>
+          <Typography preset="label" color={colors.primary}>{actionLabel}</Typography>
+          <ChevronRightIcon size={16} color={colors.primary} />
         </Pressable>
-      </View>
-    </AnimatedPressable>
+      )}
+    </View>
   );
 }
 
@@ -257,429 +292,265 @@ function ContinueStudyingCard({ set, onPress, onMenuPress }: ContinueStudyingCar
 export function HomeScreen() {
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
-  const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { spacing } = theme;
 
-  const {
-    data: verse,
-    isLoading: verseLoading,
-    isError: verseError,
-    refetch: refetchVerse,
-  } = useDailyVerse();
-  const {
-    data: sets,
-    isLoading: setsLoading,
-    isRefetching: setsRefetching,
-    isError: setsError,
-    refetch: refetchSets,
-  } = useSets();
-  const { data: creditData, refetch: refetchCredits, isRefetching: creditsRefetching } = useCreditBalance();
-  const { data: streakData, isLoading: streakLoading } = useStreak();
+  const { data: sets } = useSets();
+  const { data: publicData } = usePublicSets();
+  const { data: friendsData } = useFriendsSets();
+  const { data: activityData } = useFriendsActivityFeed();
+  const { data: groups } = useGroups();
+  const { data: friends } = useFriends();
+  const { data: folders } = useFolders();
+  const { data: notes } = useNotes();
+  const { data: creditData } = useCreditBalance();
+  const { data: verse } = useDailyVerse();
+  const { data: streakData } = useStreak();
+  const { data: dueSummary } = useDueSummary();
+  const { data: notifData } = useNotifications(1);
   useAutoDailyClaim();
 
-  const { mutateAsync: deleteSetAsync } = useDeleteSet();
-  const { show, dialogProps } = useConfirmDialog();
+  const publicSets = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
+  const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
+  const activities = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
+  const topGroups = useMemo(() => (groups ?? []).slice(0, 8), [groups]);
 
-  const streak = streakData?.streak;
+  const streak = streakData?.streak ?? 0;
+  const firstName = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
-  const recentSets = sets?.slice(1, 3) ?? [];
-  const totalCards = sets?.reduce((sum, s) => sum + (s._count?.cards ?? 0), 0) ?? 0;
-  const refreshing = setsRefetching || creditsRefetching;
+  const cardTotal = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);
+  const recentSets = useMemo(
+    () => [...(sets ?? [])].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4),
+    [sets],
+  );
 
-  const onRefresh = useCallback(async () => {
-    await Promise.all([refetchSets(), refetchCredits()]);
-  }, [refetchSets, refetchCredits]);
+  const goReview = (setId: string, setTitle: string) => navigation.navigate('QuizTab', { screen: 'QuizModePicker', params: { setId, setTitle } });
+  const goContinue = (s: StudySet) => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } });
+  const goCreate = () => navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} });
 
-  const handleDeleteSet = (id: string, title: string) => {
-    show({
-      title: 'Delete Set',
-      message: `Delete "${title}"? This will permanently remove all its cards.`,
-      confirmLabel: 'Delete',
-      variant: 'danger',
-      onConfirm: async () => {
-        try {
-          await deleteSetAsync(id);
-          Toast.show({ type: 'success', text1: 'Set deleted' });
-        } catch (err) {
-          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
-        }
-      },
-    });
-  };
+  const quickActions: Array<{ label: string; Icon: IconComponent; onPress: () => void }> = [
+    { label: 'Library', Icon: LibraryIcon, onPress: () => navigation.navigate('LibraryTab', { screen: 'Library' }) },
+    { label: 'Quiz', Icon: CheckCircleIcon, onPress: () => navigation.navigate('QuizTab', { screen: 'QuizHub' }) },
+    { label: 'AI Chat', Icon: SparklesIcon, onPress: () => navigation.navigate('AITab', { screen: 'AIChat' }) },
+    { label: 'Notes', Icon: FileTextIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Notes' }) },
+    { label: 'Media', Icon: FolderIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Media' }) },
+    { label: 'Discover', Icon: SearchIcon, onPress: () => navigation.navigate('LibraryTab', { screen: 'PublicSets' }) },
+    { label: 'Friends', Icon: UsersIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Friends' }) },
+    { label: 'Profile', Icon: UserIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Profile' }) },
+  ];
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
-        }
-      >
-        {/* ── Header ── */}
-        <View style={styles.header}>
-          <View style={styles.greetingCol}>
-            <Typography preset="bodySm" color={colors.textSecondary}>{getGreeting()},</Typography>
-            <Typography preset="h3" numberOfLines={1}>{user?.name?.split(' ')[0] ?? 'Friend'}</Typography>
-          </View>
-          <View style={styles.headerRight}>
-            <StreakBadge streak={streak} />
-            <CreditBadge balance={creditData?.balance ?? 0} />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Go to profile"
-              onPress={() => navigation.navigate('ProfileTab')}
-            >
-              <Avatar uri={user?.profileImage} name={user?.name} size="sm" />
-            </Pressable>
-          </View>
+      <StickyHeader
+        greeting={getGreeting()}
+        name={firstName}
+        avatarUri={user?.profileImage}
+        unread={notifData?.unreadCount ?? 0}
+        onAI={() => navigation.navigate('AITab', { screen: 'AIChat' })}
+        onBell={() => navigation.navigate('ProfileTab', { screen: 'Notifications' })}
+        onAvatar={() => navigation.navigate('ProfileTab', { screen: 'Profile' })}
+      />
+
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <FeaturedCard due={dueSummary} continueSet={continueSet} streak={streak} onReview={goReview} onContinue={goContinue} onCreate={goCreate} />
+
+        <Spacer size={spacing[6]} />
+        <View style={styles.quickGrid}>
+          {quickActions.map(a => (
+            <QuickAction key={a.label} Icon={a.Icon} label={a.label} onPress={a.onPress} />
+          ))}
         </View>
 
-        {/* ── Hero Verse ── */}
-        <Animated.View entering={FadeInDown.delay(0).springify()}>
-          <HeroVerseCard
-            text={verse?.text}
-            reference={verse?.reference}
-            loading={verseLoading}
-            error={verseError}
-            onRetry={refetchVerse}
-          />
-        </Animated.View>
-
-        <Spacer size={spacing[5]} />
-
-        {/* ── Stats Row ── */}
-        <Animated.View entering={FadeInDown.delay(80).springify()} style={styles.statsRow}>
-          <StatChip
-            iconName="layers-outline"
-            value={(setsLoading || setsError) ? '—' : (sets?.length ?? 0)}
-            label="Sets"
-            iconColor={colors.info}
-          />
-          <StatChip
-            iconName="copy-outline"
-            value={(setsLoading || setsError) ? '—' : totalCards}
-            label="Cards"
-            iconColor={colors.primary}
-          />
-          <StatChip
-            iconName="flame-outline"
-            value={streakLoading ? '—' : (streak ?? 0)}
-            label="Streak"
-            iconColor={colors.warning}
-          />
-        </Animated.View>
-
-        <Spacer size={spacing[6]} />
-
-        {/* ── Quick Actions ── */}
-        <Animated.View entering={FadeInDown.delay(160).springify()}>
-          <Typography preset="h4" style={styles.sectionTitle}>Quick Actions</Typography>
-          <QuickActionGrid />
-        </Animated.View>
-
-        <Spacer size={spacing[6]} />
-
-        {/* ── Sets Section ── */}
-        <Animated.View entering={FadeInDown.delay(240).springify()}>
-          <View style={styles.sectionHeader}>
-            <Typography preset="h4">My Sets</Typography>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="See all sets"
-              onPress={() => navigation.navigate('LibraryTab')}
-            >
-              <Typography preset="label" color={colors.primary}>See all</Typography>
-            </Pressable>
-          </View>
-
-          {setsError ? (
-            <ErrorState
-              message="Could not load your sets."
-              onRetry={refetchSets}
-              style={styles.inlineError}
-            />
-          ) : setsLoading ? (
+        {recentSets.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <SectionRow title="My Sets" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'Library' })} />
+            <Spacer size={spacing[3]} />
             <View style={styles.setsList}>
-              <SetCardSkeleton />
-              <SetCardSkeleton />
+              {recentSets.map(s => (
+                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onPress={() => goContinue(s)} />
+              ))}
             </View>
-          ) : sets?.length === 0 ? (
-            <View style={styles.emptyWrap}>
-              <Icon name="book-outline" size={32} color={colors.textDisabled} />
-              <Spacer size={spacing[3]} />
-              <Typography preset="body" color={colors.textSecondary} align="center">
-                No sets yet. Create your first study set!
-              </Typography>
-              <Spacer size={spacing[3]} />
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Create new set"
-                style={styles.createBtn}
-                onPress={() => navigation.navigate('LibraryTab')}
-              >
-                <View style={styles.createBtnContent}>
-                  <Icon name="add" size={ICON_SIZE} color={colors.primary} />
-                  <Typography preset="label" color={colors.primary}>New Set</Typography>
-                </View>
-              </Pressable>
+          </>
+        )}
+
+        {/* Summary */}
+        <Spacer size={spacing[6]} />
+        <SummaryCard stats={[
+          { value: friends?.length ?? 0, label: 'Friends' },
+          { value: folders?.length ?? 0, label: 'Folders' },
+          { value: sets?.length ?? 0, label: 'Sets' },
+          { value: cardTotal, label: 'Cards' },
+          { value: creditData?.balance ?? 0, label: 'Credits' },
+          { value: notes?.length ?? 0, label: 'Notes' },
+        ]} />
+
+        {/* From your friends */}
+        {friendsSets.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <SectionRow title="From your friends" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' })} />
+            <Spacer size={spacing[3]} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
+              {friendsSets.map(s => (
+                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
+              ))}
+            </ScrollView>
+          </>
+        )}
+
+        {/* Your groups */}
+        {topGroups.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <SectionRow title="Your Groups" actionLabel="See all" onAction={() => navigation.navigate('ProfileTab', { screen: 'Groups' })} />
+            <Spacer size={spacing[3]} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
+              {topGroups.map(g => (
+                <GroupCard key={g.id} group={g} onPress={() => navigation.navigate('ProfileTab', { screen: 'GroupDetail', params: { groupId: g.id } })} />
+              ))}
+            </ScrollView>
+          </>
+        )}
+
+        {/* Recent activity */}
+        {activities.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <SectionRow title="Recent activity" />
+            <Spacer size={spacing[3]} />
+            <View style={styles.activityList}>
+              {activities.map(a => <ActivityItem key={a.id} activity={a} />)}
             </View>
-          ) : (
-            <>
-              {continueSet && (
-                <ContinueStudyingCard
-                  set={continueSet}
-                  onPress={() =>
-                    navigation.navigate('LibraryTab', {
-                      screen: 'SetDetail',
-                      params: { setId: continueSet.id, setTitle: continueSet.title },
-                    })
-                  }
-                  onMenuPress={() => setSelectedSet(continueSet)}
-                />
-              )}
-              {recentSets.length > 0 && (
-                <>
-                  <Spacer size={spacing[3]} />
-                  <Typography preset="caption" color={colors.textSecondary} style={styles.moreLabel}>
-                    MORE SETS
-                  </Typography>
-                  <Spacer size={spacing[2]} />
-                  <View style={styles.setsList}>
-                    {recentSets.map(set => (
-                      <SetCard
-                        key={set.id}
-                        set={set}
-                        onPress={() =>
-                          navigation.navigate('LibraryTab', {
-                            screen: 'SetDetail',
-                            params: { setId: set.id, setTitle: set.title },
-                          })
-                        }
-                        onMenuPress={() => setSelectedSet(set)}
-                      />
-                    ))}
-                  </View>
-                </>
-              )}
-            </>
-          )}
-        </Animated.View>
+          </>
+        )}
+
+        {/* Discover */}
+        {publicSets.length > 0 && (
+          <>
+            <Spacer size={spacing[6]} />
+            <SectionRow title="Discover" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'PublicSets' })} />
+            <Spacer size={spacing[3]} />
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
+              {publicSets.map(s => (
+                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
+              ))}
+            </ScrollView>
+          </>
+        )}
+
+        {/* Daily verse */}
+        <Spacer size={spacing[6]} />
+        <VerseCard text={verse?.text} reference={verse?.reference} />
 
         <Spacer size={spacing[8]} />
       </ScrollView>
-
-      <SetActionSheet
-        set={selectedSet}
-        visible={!!selectedSet}
-        onClose={() => setSelectedSet(null)}
-        onQuiz={() =>
-          selectedSet &&
-          navigation.navigate('QuizTab', {
-            screen: 'QuizModePicker',
-            params: { setId: selectedSet.id, setTitle: selectedSet.title },
-          })
-        }
-        onCreateCard={() =>
-          selectedSet &&
-          navigation.navigate('LibraryTab', {
-            screen: 'CreateCard',
-            params: { setId: selectedSet.id },
-          })
-        }
-        onEdit={() =>
-          selectedSet &&
-          navigation.navigate('LibraryTab', {
-            screen: 'EditSet',
-            params: { setId: selectedSet.id },
-          })
-        }
-        onDelete={() => selectedSet && handleDeleteSet(selectedSet.id, selectedSet.title)}
-        isOwner={selectedSet?.userId === user?.id}
-      />
-
-      <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  scrollView: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH },
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.background },
+    scrollView: { flex: 1 },
+    scroll: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
+    flex1: { flex: 1 },
+    rowCenter: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing[5],
-  },
-  greetingCol: { flex: 1, marginRight: spacing[3] },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    // Header
+    header: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[3],
+      backgroundColor: colors.background,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing[3], flex: 1 },
+    greetingCol: { flex: 1 },
+    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    headerIconBtn: {
+      width: 40, height: 40, borderRadius: 20,
+      alignItems: 'center', justifyContent: 'center',
+      backgroundColor: colors.backgroundSecondary,
+    },
+    bellBadge: {
+      position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: 8, paddingHorizontal: 3,
+      backgroundColor: colors.error, alignItems: 'center', justifyContent: 'center',
+    },
 
-  // Streak badge
-  streakBadge: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
-    backgroundColor: colors.warningSurface,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.palette.yellow500 + '40',
-  },
+    // Featured card
+    featured: {
+      backgroundColor: colors.featuredSurface,
+      borderRadius: 20, padding: spacing[5], gap: spacing[2],
+    },
+    featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+    badge: { backgroundColor: colors.success, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
+    featuredTitle: { marginTop: spacing[1] },
+    progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.overlayLight, marginTop: spacing[2], overflow: 'hidden' },
+    progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.success },
+    featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing[1], marginTop: spacing[1] },
 
-  // Hero verse
-  heroCard: {
-    borderRadius: 14,
-    padding: spacing[5],
-  },
-  heroLabelRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1.5],
-  },
-  heroLabelDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.75)',
-  },
-  heroLabelText: {
-    letterSpacing: 1,
-  },
-  heroVerseText: {
-    fontStyle: 'italic',
-    lineHeight: 28,
-  },
-  heroReference: {
-    textAlign: 'right',
-  },
-  heroErrorWrap: {
-    alignItems: 'center',
-    paddingVertical: spacing[4],
-  },
-  heroRetryBtn: {
-    marginTop: spacing[3],
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[2],
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.35)',
-  },
+    // Quick actions
+    quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing[5] },
+    quickAction: { width: '25%', alignItems: 'center', gap: spacing[2] },
+    quickCircle: {
+      width: 56, height: 56, borderRadius: 28,
+      borderWidth: 1, borderColor: colors.border,
+      alignItems: 'center', justifyContent: 'center',
+    },
 
-  // Stats
-  statsRow: {
-    flexDirection: 'row',
-    gap: spacing[3],
-  },
-  statChip: {
-    flex: 1,
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 12,
-    paddingVertical: spacing[4],
-    alignItems: 'center',
-    gap: spacing[1],
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
+    // Section
+    sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 
-  // Quick actions
-  actionGrid: {
-    flexDirection: 'row',
-    gap: spacing[3],
-  },
-  actionItem: {
-    flex: 1,
-    borderRadius: 12,
-    paddingVertical: spacing[5],
-    alignItems: 'center',
-    gap: spacing[2],
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  actionIconWrap: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+    // Recent sets
+    setsList: { gap: spacing[3] },
+    setRow: {
+      flexDirection: 'row', alignItems: 'center', gap: spacing[3],
+      backgroundColor: colors.backgroundCard, borderRadius: 14, padding: spacing[4],
+    },
+    setIcon: {
+      width: 40, height: 40, borderRadius: 20,
+      borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
+    },
+    dueBadge: { backgroundColor: colors.successSurface, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
 
-  // Section headings
-  sectionTitle: { marginBottom: spacing[3] },
-  sectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: spacing[3],
-  },
-  moreLabel: { letterSpacing: 0.8 },
+    // Horizontal rails (friends / groups / discover)
+    railContent: { gap: spacing[3], paddingRight: spacing[2] },
+    miniCard: {
+      width: 140, gap: spacing[2], padding: spacing[4], borderRadius: 14,
+      backgroundColor: colors.backgroundCard, borderWidth: 1, borderColor: colors.border,
+    },
+    miniIcon: {
+      width: 36, height: 36, borderRadius: 18,
+      borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
+    },
+    miniTitle: { minHeight: 34 },
 
-  // Continue studying
-  continueCard: {
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 12,
-    padding: spacing[4],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[3],
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  continueIconWrap: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: colors.primaryLight + '60',
-  },
-  continueContent: {
-    flex: 1,
-    gap: spacing[1],
-  },
-  continueRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[3],
-  },
-  continueStudyBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1],
-  },
+    // Summary — separate square boxes, 3 per row
+    summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing[3] },
+    summaryStat: {
+      width: '31%', aspectRatio: 1.4,
+      alignItems: 'center', justifyContent: 'center', gap: spacing[1],
+      backgroundColor: colors.backgroundCard, borderRadius: 16,
+    },
 
-  // Sets list
-  setsList: { gap: spacing[3] },
+    // Activity feed
+    activityList: { gap: spacing[4] },
+    activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
 
-  // Empty state
-  emptyWrap: {
-    padding: spacing[6],
-    alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderStyle: 'dashed',
-  },
-  createBtn: {
-    borderWidth: 1.5,
-    borderColor: colors.primary,
-    borderRadius: 10,
-    paddingHorizontal: spacing[5],
-    paddingVertical: spacing[2],
-  },
-  createBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-
-  // Inline error
-  inlineError: {
-    paddingVertical: spacing[6],
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-});
+    // Verse card
+    verseCard: {
+      backgroundColor: colors.primary, borderRadius: 16, minHeight: 190,
+      paddingHorizontal: spacing[6], paddingVertical: spacing[7],
+      justifyContent: 'center', gap: spacing[3], overflow: 'hidden',
+    },
+    verseText: { fontStyle: 'italic', textAlign: 'center' },
+    verseRef: { textAlign: 'center' },
+    quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
+    quoteTopLeft: { top: spacing[2], left: spacing[4] },
+    quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
+  });

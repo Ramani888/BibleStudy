@@ -1,5 +1,10 @@
-export { colors } from './colors';
-export type { Colors } from './colors';
+export { colors, lightColors, darkColors } from './colors';
+export type { Colors, ThemeColors } from './colors';
+
+export { useTheme, useThemeName } from './useTheme';
+export type { Theme, ThemeName } from './useTheme';
+export { useThemeStore } from './themeStore';
+export type { ThemeMode } from './themeStore';
 
 export {
   fontFamilies,

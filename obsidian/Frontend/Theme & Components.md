@@ -4,6 +4,10 @@ tags: [frontend, design]
 
 # Theme & Components
 
+> **Redesigning?** Follow [[Design Language (Calm Serene)]] — the app-wide
+> style reference. This note is the token/component inventory; that one is the
+> how-to-style rulebook.
+
 Design tokens in `frontend/src/theme/`; component library in
 `frontend/src/components/`. These are **enforced conventions** (see
 [[Frontend Architecture]]).

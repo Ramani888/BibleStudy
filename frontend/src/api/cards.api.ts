@@ -3,12 +3,16 @@ import type {
   BulkCreateCardPayload,
   Card,
   CreateCardPayload,
+  DueSummary,
   MoveCardPayload,
   ReorderCardsPayload,
   UpdateCardPayload,
 } from '../types';
 
 export const cardsApi = {
+  dueSummary: () =>
+    apiGet<DueSummary>('/cards/due-summary'),
+
   create: (payload: CreateCardPayload) =>
     apiPost<Card>('/cards', payload),
 

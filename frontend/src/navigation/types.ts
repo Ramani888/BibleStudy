@@ -88,7 +88,7 @@ export type AppTabParamList = {
   LibraryTab: NavigatorScreenParams<LibraryStackParamList> | undefined;
   QuizTab: NavigatorScreenParams<QuizStackParamList> | undefined;
   AITab: NavigatorScreenParams<AIStackParamList> | undefined;
-  ProfileTab: undefined;
+  ProfileTab: NavigatorScreenParams<ProfileStackParamList> | undefined;
 };
 
 // ─── Convenience screen prop types ───────────────────────────────────────────

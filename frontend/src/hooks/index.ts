@@ -14,6 +14,7 @@ export { useSets, useSet, useCreateSet, useUpdateSet, useDeleteSet, useCloneSet,
 export { useFolders, useFolder, useCreateFolder, useUpdateFolder, useDeleteFolder } from './useFolders';
 export {
   useCards,
+  useDueSummary,
   useCardById,
   useCreateCard,
   useBulkCreateCards,

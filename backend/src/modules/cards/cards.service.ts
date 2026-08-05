@@ -8,6 +8,33 @@ import {
 } from './cards.dto';
 import { NotFoundError, ValidationError } from '../../utils/errors';
 
+/**
+ * Spaced-repetition summary for the Home "TODAY" card: how many of the user's
+ * cards are due for review now, across how many sets, and the set with the most
+ * due cards (so Home can deep-link straight into the set that needs review).
+ */
+export async function getDueSummary(userId: string) {
+  const grouped = await prisma.card.groupBy({
+    by: ['setId'],
+    where: { set: { userId }, nextReviewAt: { lte: new Date() } },
+    _count: { _all: true },
+  });
+
+  const dueCount = grouped.reduce((sum, g) => sum + g._count._all, 0);
+  const dueSets = grouped.length;
+
+  let topSet: { id: string; title: string } | null = null;
+  if (grouped.length > 0) {
+    const top = grouped.reduce((a, b) => (b._count._all > a._count._all ? b : a));
+    topSet = await prisma.set.findUnique({
+      where: { id: top.setId },
+      select: { id: true, title: true },
+    });
+  }
+
+  return { dueCount, dueSets, topSet };
+}
+
 async function verifySetOwnership(userId: string, setId: string) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {

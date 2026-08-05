@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 
 import type { AppTabParamList } from './types';
-import { colors, fontSizes, fontWeights, layout, spacing } from '../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme, type ThemeColors } from '../theme';
+import {
+  HomeIcon,
+  LibraryIcon,
+  CheckCircleIcon,
+  SparklesIcon,
+  UserIcon,
+  type IconComponent,
+} from '../components/icons';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
@@ -14,34 +21,30 @@ import { ProfileNavigator } from './ProfileNavigator';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
-const TAB_ICONS: Record<string, { active: string; inactive: string }> = {
-  HomeTab:    { active: 'home',          inactive: 'home-outline'          },
-  LibraryTab: { active: 'library',       inactive: 'library-outline'       },
-  QuizTab:    { active: 'help-circle',   inactive: 'help-circle-outline'   },
-  AITab:      { active: 'chatbubbles',   inactive: 'chatbubbles-outline'   },
-  ProfileTab: { active: 'person-circle', inactive: 'person-circle-outline' },
+const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
+  HomeTab: HomeIcon,
+  LibraryTab: LibraryIcon,
+  QuizTab: CheckCircleIcon,
+  AITab: SparklesIcon,
+  ProfileTab: UserIcon,
 };
 
 export function AppNavigator() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.gray500,
-        tabBarStyle: [
-          styles.tabBar,
-          {
-            height: layout.tabBarHeight + insets.bottom,
-            paddingBottom: insets.bottom + spacing[1],
-          },
-        ],
+        tabBarInactiveTintColor: colors.textDisabled,
+        tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ focused, color, size }) => {
-          const icons = TAB_ICONS[route.name];
-          const name = focused ? icons.active : icons.inactive;
-          return <Icon name={name} size={size ?? 24} color={color} />;
+        tabBarIcon: ({ color, size }) => {
+          const TabIcon = TAB_ICONS[route.name as keyof AppTabParamList];
+          return <TabIcon size={size ?? 24} color={color} />;
         },
       })}
     >
@@ -54,15 +57,18 @@ export function AppNavigator() {
   );
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: colors.background,
-    borderTopColor: colors.border,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingTop: spacing[1],
-  },
-  tabLabel: {
-    fontSize: fontSizes.xs,
-    fontWeight: fontWeights.medium,
-  },
-});
+const makeStyles = (colors: ThemeColors, bottomInset: number) =>
+  StyleSheet.create({
+    tabBar: {
+      backgroundColor: colors.background,
+      borderTopColor: colors.border,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      height: layout.tabBarHeight + bottomInset,
+      paddingTop: spacing[1],
+      paddingBottom: bottomInset + spacing[1],
+    },
+    tabLabel: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.medium,
+    },
+  });

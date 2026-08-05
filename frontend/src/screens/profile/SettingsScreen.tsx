@@ -1,16 +1,16 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
-import { Divider } from '../../components/ui';
+import { Divider, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, spacing } from '../../theme';
+import { colors, spacing, useThemeName, useThemeStore } from '../../theme';
 
 const APP_VERSION = '1.0.0';
 
@@ -18,6 +18,8 @@ export function SettingsScreen() {
   const logout = useAuthStore(s => s.logout);
   const deleteAccount = useAuthStore(s => s.deleteAccount);
   const { show, dialogProps } = useConfirmDialog();
+  const isDark = useThemeName() === 'dark';
+  const setMode = useThemeStore(s => s.setMode);
 
   const handleSignOut = () => {
     show({
@@ -52,6 +54,18 @@ export function SettingsScreen() {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Appearance ── */}
+        <MenuSection label="APPEARANCE">
+          <View style={styles.themeRow}>
+            <Typography preset="body" color={colors.textPrimary}>Dark Mode</Typography>
+            <Switch
+              value={isDark}
+              onValueChange={v => setMode(v ? 'dark' : 'light')}
+              trackColor={{ true: colors.primary, false: colors.border }}
+            />
+          </View>
+        </MenuSection>
+
         {/* ── Account ── */}
         <MenuSection label="ACCOUNT">
           <MenuItem
@@ -86,4 +100,11 @@ export function SettingsScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
   scroll: { paddingBottom: spacing[12] },
+  themeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[3],
+  },
 });

@@ -2,6 +2,13 @@ import { Request, Response } from 'express';
 import * as cardsService from './cards.service';
 import { sendSuccess, handleControllerError } from '../../utils/response';
 
+export async function getDueSummary(req: Request, res: Response): Promise<void> {
+  try {
+    const summary = await cardsService.getDueSummary(req.user!.id);
+    sendSuccess(res, summary, 'Due summary retrieved');
+  } catch (error) { handleControllerError(res, error, 'Failed to get due summary'); }
+}
+
 export async function createCard(req: Request, res: Response): Promise<void> {
   try {
     const card = await cardsService.createCard(req.user!.id, req.body);

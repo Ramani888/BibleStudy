@@ -49,6 +49,13 @@ export interface MoveCardPayload {
   targetSetId: string;
 }
 
+/** Spaced-repetition summary for the Home "TODAY" card. */
+export interface DueSummary {
+  dueCount: number;
+  dueSets: number;
+  topSet: { id: string; title: string } | null;
+}
+
 export interface ReorderCardsPayload {
   setId: string;
   cardIds: string[];

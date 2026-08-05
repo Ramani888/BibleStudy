@@ -36,6 +36,7 @@ a map). Full-stack: **Node/Express/Prisma/PostgreSQL** backend + **React Native
 - [[Screen Map]] — every screen and its data source
 - [[Hooks & API Layer]] — how screens talk to the backend
 - [[Theme & Components]] — design tokens + component library
+- [[Design Language (Calm Serene)]] — app-wide redesign reference (start here for styling)
 
 ## 🛠️ Ops
 - [[Local Dev Setup]] — running locally (Postgres 5434)

@@ -1,24 +1,19 @@
 import { Platform } from 'react-native';
 
+// Inter is bundled (assets/fonts/Inter-*.ttf, linked via react-native-asset).
+// Per-weight family names resolve on both iOS (PostScript name) and Android
+// (asset file base name). No Inter-Medium file → medium maps to SemiBold.
+const inter = {
+  regular: 'Inter-Regular',
+  medium: 'Inter-SemiBold',
+  semiBold: 'Inter-SemiBold',
+  bold: 'Inter-Bold',
+};
+
 const fontFamily = Platform.select({
-  ios: {
-    regular: 'System',
-    medium: 'System',
-    semiBold: 'System',
-    bold: 'System',
-  },
-  android: {
-    regular: 'Roboto',
-    medium: 'Roboto-Medium',
-    semiBold: 'Roboto-Medium',
-    bold: 'Roboto-Bold',
-  },
-  default: {
-    regular: 'System',
-    medium: 'System',
-    semiBold: 'System',
-    bold: 'System',
-  },
+  ios: inter,
+  android: inter,
+  default: inter,
 })!;
 
 export const fontFamilies = fontFamily;
@@ -80,6 +75,13 @@ export const textPresets = {
     fontSize: fontSizes.lg,
     fontWeight: fontWeights.regular,
     lineHeight: fontSizes.lg * lineHeights.normal,
+  },
+  // Serene scripture serif — system fonts only (no bundled assets).
+  verse: {
+    fontFamily: Platform.select({ ios: 'Georgia', android: 'serif', default: 'serif' }),
+    fontSize: fontSizes.xl,
+    fontWeight: fontWeights.regular,
+    lineHeight: fontSizes.xl * lineHeights.relaxed,
   },
   body: {
     fontFamily: fontFamilies.regular,

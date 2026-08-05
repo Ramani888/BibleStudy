@@ -16,6 +16,14 @@ export function useCards(setId: string) {
   });
 }
 
+/** Spaced-repetition due summary for the Home "TODAY" card. */
+export function useDueSummary() {
+  return useQuery({
+    queryKey: ['cards', 'due-summary'],
+    queryFn: () => cardsApi.dueSummary(),
+  });
+}
+
 export function useCardById(cardId: string) {
   return useQuery({
     queryKey: ['card', cardId],
