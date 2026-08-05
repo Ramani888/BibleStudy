@@ -56,7 +56,7 @@ export function AppModal({
     >
       <KeyboardAvoidingView
         style={[styles.wrapper, wrapperStyle]}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <Pressable style={styles.backdrop} onPress={onClose} />
         <View style={[styles.sheet, contentStyle, { paddingBottom }]}>
@@ -85,7 +85,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       backgroundColor: colors.overlay,
     },
     sheet: {
-      backgroundColor: colors.backgroundCard,
+      backgroundColor: colors.background,
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
       paddingTop: spacing[4],

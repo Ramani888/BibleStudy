@@ -593,7 +593,7 @@ export function MediaScreen({ navigation }: Props) {
           onSubmitEditing={handleRenameConfirm}
           maxLength={255 - (renameState.file?.name.match(/\.[^.]+$/)?.[0]?.length ?? 0)}
           placeholder="File name"
-          placeholderTextColor={colors.textDisabled}
+          placeholderTextColor={colors.textSecondary}
         />
         <View style={{ height: spacing[3] }} />
         <Button

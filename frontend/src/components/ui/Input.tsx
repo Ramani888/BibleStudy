@@ -39,13 +39,6 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { colors } = theme;
   const [secure, setSecure] = useState(isPassword);
-  const [focused, setFocused] = useState(false);
-
-  const borderColor = error
-    ? colors.error
-    : focused
-    ? colors.borderFocus
-    : colors.border;
 
   return (
     <View style={[styles.container, containerStyle]}>
@@ -55,16 +48,14 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
         </Typography>
       )}
 
-      <View style={[styles.inputRow, { borderColor }]}>
+      <View style={[styles.inputRow, rest.multiline && styles.inputRowMultiline]}>
         {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
 
         <TextInput
           ref={ref}
-          style={[styles.input, leftIcon ? styles.inputWithLeft : null, style]}
-          placeholderTextColor={colors.textDisabled}
+          style={[styles.input, leftIcon ? styles.inputWithLeft : null, rest.multiline ? styles.inputMultiline : null, style]}
+          placeholderTextColor={colors.textSecondary}
           secureTextEntry={secure}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
           autoCapitalize="none"
           {...rest}
         />
@@ -111,11 +102,17 @@ const makeStyles = ({ colors, spacing, layout, textPresets }: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       height: layout.inputHeight,
-      borderWidth: 1.5,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       backgroundColor: colors.backgroundSecondary,
       paddingHorizontal: spacing[4],
       overflow: 'hidden',
+    },
+    // Multiline: let the row grow with content instead of clipping to one line.
+    inputRowMultiline: {
+      height: undefined,
+      minHeight: layout.inputHeight,
+      alignItems: 'flex-start',
+      paddingVertical: spacing[3],
     },
     input: {
       flex: 1,
@@ -123,6 +120,9 @@ const makeStyles = ({ colors, spacing, layout, textPresets }: Theme) =>
       lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
       color: colors.textPrimary,
       paddingVertical: 0,
+    },
+    inputMultiline: {
+      textAlignVertical: 'top',
     },
     inputWithLeft: {
       paddingLeft: spacing[2],

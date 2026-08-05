@@ -18,6 +18,8 @@ type FormFieldProps<T extends FieldValues> = {
   inputRef?: React.Ref<TextInput>;
   maxLength?: number;
   multiline?: boolean;
+  /** Starting height for multiline fields — the box grows past it with content. */
+  minHeight?: number;
 };
 
 export function FormField<T extends FieldValues>({
@@ -35,6 +37,7 @@ export function FormField<T extends FieldValues>({
   inputRef,
   maxLength,
   multiline,
+  minHeight,
 }: FormFieldProps<T>) {
   return (
     <Controller
@@ -58,6 +61,7 @@ export function FormField<T extends FieldValues>({
           onSubmitEditing={onSubmitEditing}
           maxLength={maxLength}
           multiline={multiline}
+          style={minHeight ? { minHeight } : undefined}
         />
       )}
     />

@@ -436,7 +436,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search conversations…"
-                placeholderTextColor={colors.textDisabled}
+                placeholderTextColor={colors.textSecondary}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 returnKeyType="search"
@@ -565,7 +565,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           value={renameModal.value}
           onChangeText={v => setRenameModal(prev => ({ ...prev, value: v }))}
           placeholder="Conversation name…"
-          placeholderTextColor={colors.textDisabled}
+          placeholderTextColor={colors.textSecondary}
           autoFocus
           maxLength={200}
         />

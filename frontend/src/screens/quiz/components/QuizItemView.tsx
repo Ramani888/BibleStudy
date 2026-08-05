@@ -114,7 +114,7 @@ function TypeIn({ item, submitted, onSubmit }: any) {
         onChangeText={setVal}
         editable={!submitted}
         placeholder="Your answer…"
-        placeholderTextColor={colors.textDisabled}
+        placeholderTextColor={colors.textSecondary}
         multiline={item.mode === 'type_verbatim'}
         autoCapitalize="none"
       />

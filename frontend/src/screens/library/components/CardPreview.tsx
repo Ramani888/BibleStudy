@@ -44,7 +44,7 @@ const makeStyles = ({ colors, spacing }: Theme) =>
       overflow: 'hidden',
     },
     previewTop: {
-      backgroundColor: colors.backgroundSecondary,
+      backgroundColor: colors.backgroundCard,
       padding: spacing[4],
       minHeight: 72,
       justifyContent: 'center',

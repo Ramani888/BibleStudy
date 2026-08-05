@@ -140,7 +140,7 @@ export function NotesScreen({ navigation }: Props) {
           <TextInput
             style={styles.searchInput}
             placeholder="Search notes…"
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textSecondary}
             value={search}
             onChangeText={setSearch}
             returnKeyType="search"

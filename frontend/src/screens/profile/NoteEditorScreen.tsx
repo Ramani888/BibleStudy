@@ -147,7 +147,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           <TextInput
             style={styles.titleInput}
             placeholder="Title"
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textSecondary}
             value={title}
             onChangeText={setTitle}
             returnKeyType="next"
@@ -171,7 +171,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
             ref={bodyRef}
             style={styles.bodyInput}
             placeholder="Write your note here…"
-            placeholderTextColor={colors.textDisabled}
+            placeholderTextColor={colors.textSecondary}
             value={body}
             onChangeText={setBody}
             multiline

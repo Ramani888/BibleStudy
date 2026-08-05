@@ -59,7 +59,7 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
         <TextInput
           style={[styles.input, disabled && styles.inputDisabled]}
           placeholder="Ask a Bible question…"
-          placeholderTextColor={colors.textDisabled}
+          placeholderTextColor={colors.textSecondary}
           value={text}
           onChangeText={setText}
           multiline
