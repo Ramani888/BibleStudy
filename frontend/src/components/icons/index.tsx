@@ -296,3 +296,65 @@ export const StarIcon: IconComponent = ({ size = 24, color = DEFAULT_COLOR }) =>
     <Path fill={color} d="M12 2.5l2.9 6 6.6.6-5 4.3 1.5 6.4L12 16.9 5.9 20.3 7.4 13.9l-5-4.3 6.6-.6z" />
   </Svg>
 );
+
+export const StarOutlineIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 2.5l2.9 6 6.6.6-5 4.3 1.5 6.4L12 16.9 5.9 20.3 7.4 13.9l-5-4.3 6.6-.6z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ClockIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Circle cx={12} cy={12} r={10} {...stroke(color, strokeWidth)} />
+    <Path d="M12 6v6l4 2" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ChatIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ArrowUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 19V5M5 12l7-7 7 7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const AlbumsIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z" {...stroke(color, strokeWidth)} />
+    <Path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65" {...stroke(color, strokeWidth)} />
+    <Path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const CloseCircleIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Circle cx={12} cy={12} r={10} {...stroke(color, strokeWidth)} />
+    <Path d="m15 9-6 6M9 9l6 6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const RefreshIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M3 12a9 9 0 0 1 15-6.7L21 8" {...stroke(color, strokeWidth)} />
+    <Path d="M21 3v5h-5" {...stroke(color, strokeWidth)} />
+    <Path d="M21 12a9 9 0 0 1-15 6.7L3 16" {...stroke(color, strokeWidth)} />
+    <Path d="M3 21v-5h5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BookmarkIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const TagIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12.6 2.6A2 2 0 0 0 11.2 2H4a2 2 0 0 0-2 2v7.2a2 2 0 0 0 .6 1.4l8.4 8.4a2 2 0 0 0 2.8 0l6.4-6.4a2 2 0 0 0 0-2.8Z" {...stroke(color, strokeWidth)} />
+    <Path d="M7 7h.01" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
