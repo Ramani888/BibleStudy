@@ -1,4 +1,3 @@
-export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
 export type CardType = 'QA' | 'STORY';
 
 export interface Card {
@@ -12,7 +11,6 @@ export interface Card {
   imageId: string | null;
   order: number;
   isBlurred: boolean;
-  difficulty: Difficulty;
   lastStudiedAt: string | null;
   nextReviewAt: string | null;
   createdAt: string;
@@ -27,7 +25,6 @@ export interface CreateCardPayload {
   note?: string;
   imageId?: string;
   isBlurred?: boolean;
-  difficulty?: Difficulty;
 }
 
 export interface BulkCreateCardPayload {
@@ -42,7 +39,6 @@ export interface UpdateCardPayload {
   note?: string | null;
   imageId?: string | null;
   isBlurred?: boolean;
-  difficulty?: Difficulty;
 }
 
 export interface MoveCardPayload {
