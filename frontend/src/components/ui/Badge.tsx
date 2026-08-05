@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { spacing, Theme, useTheme } from '../../theme';
 import { Typography } from './Typography';
 
 type BadgeVariant = 'primary' | 'success' | 'error' | 'warning' | 'info' | 'neutral';
@@ -11,17 +11,20 @@ export interface BadgeProps {
   style?: ViewStyle;
 }
 
-const variantMap: Record<BadgeVariant, { bg: string; text: string }> = {
+const makeVariantMap = (
+  colors: Theme['colors'],
+): Record<BadgeVariant, { bg: string; text: string }> => ({
   primary: { bg: colors.primarySurface, text: colors.primaryDark },
   success: { bg: colors.successSurface, text: colors.success },
   error: { bg: colors.errorSurface, text: colors.error },
   warning: { bg: colors.warningSurface, text: colors.warning },
   info: { bg: colors.infoSurface, text: colors.info },
   neutral: { bg: colors.gray100, text: colors.gray700 },
-};
+});
 
 export function Badge({ label, variant = 'neutral', style }: BadgeProps) {
-  const { bg, text } = variantMap[variant];
+  const { colors } = useTheme();
+  const { bg, text } = makeVariantMap(colors)[variant];
   return (
     <View style={[styles.base, { backgroundColor: bg }, style]}>
       <Typography preset="caption" color={text} style={styles.text}>

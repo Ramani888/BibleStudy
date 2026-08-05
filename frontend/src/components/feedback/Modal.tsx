@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   KeyboardAvoidingView,
   Modal as RNModal,
@@ -10,13 +10,15 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, layout, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 import { Typography } from '../ui';
 
 interface AppModalProps extends Pick<ModalProps, 'visible' | 'animationType'> {
   title?: string;
   onClose?: () => void;
   children: React.ReactNode;
+  /** Pinned footer region (usually the primary action button). */
+  footer?: React.ReactNode;
   contentStyle?: ViewStyle;
   wrapperStyle?: ViewStyle;
   /** Show a drag handle pill at the top — use for bottom-sheet style modals */
@@ -29,14 +31,21 @@ export function AppModal({
   title,
   onClose,
   children,
+  footer,
   contentStyle,
   wrapperStyle,
   showHandle = false,
 }: AppModalProps) {
+  const theme = useTheme();
+  const { spacing } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  // Bottom sheets (slide) show a drag handle; centered dialogs (fade) don't.
+  const showGrabber = showHandle || animationType !== 'fade';
   const insets = useSafeAreaInsets();
   // Bottom sheets need safe-area padding so content clears the home indicator.
   // Centered/fade modals use a fixed base padding.
-  const paddingBottom = showHandle ? insets.bottom + spacing[3] : spacing[4];
+  // Bottom-anchored sheets (slide) clear the home indicator; centered dialogs (fade) don't.
+  const paddingBottom = animationType === 'fade' ? spacing[4] : insets.bottom + spacing[4];
 
   return (
     <RNModal
@@ -51,44 +60,52 @@ export function AppModal({
       >
         <Pressable style={styles.backdrop} onPress={onClose} />
         <View style={[styles.sheet, contentStyle, { paddingBottom }]}>
-          {showHandle && <View style={styles.handle} />}
+          {showGrabber && <View style={styles.handle} />}
           {title && (
-            <Typography preset="h4" style={styles.title}>
+            <Typography preset="h4" numberOfLines={1} style={styles.title}>
               {title}
             </Typography>
           )}
           {children}
+          {footer && <View style={styles.footer}>{footer}</View>}
         </View>
       </KeyboardAvoidingView>
     </RNModal>
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.overlay,
-  },
-  sheet: {
-    backgroundColor: colors.backgroundCard,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: spacing[4],
-    paddingHorizontal: layout.screenPaddingH,
-  },
-  handle: {
-    width: 40,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: colors.gray300,
-    alignSelf: 'center',
-    marginBottom: spacing[4],
-  },
-  title: {
-    marginBottom: spacing[4],
-  },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    wrapper: {
+      flex: 1,
+      justifyContent: 'flex-end',
+    },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.overlay,
+    },
+    sheet: {
+      backgroundColor: colors.backgroundCard,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingTop: spacing[4],
+      paddingHorizontal: layout.screenPaddingH,
+    },
+    handle: {
+      width: 40,
+      height: 4,
+      borderRadius: 2,
+      backgroundColor: colors.border,
+      alignSelf: 'center',
+      marginBottom: spacing[4],
+    },
+    title: {
+      marginBottom: spacing[4],
+    },
+    footer: {
+      marginTop: spacing[5],
+      paddingTop: spacing[4],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+  });

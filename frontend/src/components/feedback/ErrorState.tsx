@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { Button, Typography } from '../ui';
 
 interface ErrorStateProps {
@@ -14,6 +14,7 @@ export function ErrorState({
   onRetry,
   style,
 }: ErrorStateProps) {
+  const { colors } = useTheme();
   return (
     <View style={[styles.container, style]}>
       <Typography preset="h4" align="center" color={colors.textPrimary}>

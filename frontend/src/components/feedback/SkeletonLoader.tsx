@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   Easing,
@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
-import { colors, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SHIMMER_COLORS: [string, string, string] = [
@@ -26,6 +26,8 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style }: SkeletonProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -63,6 +65,8 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
 
 /** Pre-built skeleton for a set card */
 export function SetCardSkeleton() {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
     <View style={styles.card}>
       <Skeleton height={18} width="60%" borderRadius={6} />
@@ -74,16 +78,17 @@ export function SetCardSkeleton() {
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: colors.gray200,
-  },
-  card: {
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 12,
-    padding: spacing[4],
-    borderWidth: 1,
-    borderColor: colors.border,
-    marginBottom: spacing[3],
-  },
-});
+const makeStyles = ({ colors, spacing }: Theme) =>
+  StyleSheet.create({
+    base: {
+      backgroundColor: colors.backgroundSecondary,
+    },
+    card: {
+      backgroundColor: colors.backgroundCard,
+      borderRadius: 12,
+      padding: spacing[4],
+      borderWidth: 1,
+      borderColor: colors.border,
+      marginBottom: spacing[3],
+    },
+  });

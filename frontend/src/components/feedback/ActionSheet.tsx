@@ -8,12 +8,16 @@ import {
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Divider, Typography } from '../ui';
-import { colors, layout, spacing } from '../../theme';
+import type { IconComponent } from '../icons';
+import { Theme, useTheme } from '../../theme';
 
 const ACTION_ICON_SIZE = 20;
 
 export interface Action {
   label: string;
+  /** SVG icon component (preferred). Falls back to `iconName` if omitted. */
+  icon?: IconComponent;
+  /** @deprecated Ionicons name — kept for callers not yet migrated to SVG. */
   iconName?: string;
   onPress: () => void;
   destructive?: boolean;
@@ -28,6 +32,9 @@ interface ActionSheetProps {
 }
 
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   const ref = useRef<BottomSheetModal>(null);
   const isOpenRef = useRef(false);
 
@@ -98,13 +105,18 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
                 disabled={action.disabled}
               >
                 <View style={styles.actionRow}>
-                  {action.iconName && (
+                  {action.icon ? (
+                    <action.icon
+                      size={ACTION_ICON_SIZE}
+                      color={action.destructive ? colors.error : colors.textSecondary}
+                    />
+                  ) : action.iconName ? (
                     <Icon
                       name={action.iconName}
                       size={ACTION_ICON_SIZE}
                       color={action.destructive ? colors.error : colors.textSecondary}
                     />
-                  )}
+                  ) : null}
                   <Typography
                     preset="bodyLg"
                     color={action.destructive ? colors.error : colors.textPrimary}
@@ -130,35 +142,36 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
   );
 }
 
-const styles = StyleSheet.create({
-  background: {
-    backgroundColor: colors.backgroundCard,
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-  },
-  handle: {
-    backgroundColor: colors.primaryLight,
-    width: 40,
-    height: 4,
-  },
-  content: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: spacing[6],
-  },
-  title: {
-    marginBottom: spacing[4],
-    marginTop: spacing[2],
-  },
-  list: { gap: 0 },
-  item: {
-    paddingVertical: spacing[4],
-  },
-  actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[3],
-  },
-  cancel: {
-    paddingVertical: spacing[3],
-  },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    background: {
+      backgroundColor: colors.backgroundCard,
+      borderTopLeftRadius: 14,
+      borderTopRightRadius: 14,
+    },
+    handle: {
+      backgroundColor: colors.primaryLight,
+      width: 40,
+      height: 4,
+    },
+    content: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingBottom: spacing[6],
+    },
+    title: {
+      marginBottom: spacing[4],
+      marginTop: spacing[2],
+    },
+    list: { gap: 0 },
+    item: {
+      paddingVertical: spacing[4],
+    },
+    actionRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+    },
+    cancel: {
+      paddingVertical: spacing[3],
+    },
+  });

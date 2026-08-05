@@ -1,26 +1,39 @@
-import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo, useRef, useState } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { SetForm } from './components/SetForm';
-import { colors, layout, spacing } from '../../theme';
+import { SetForm, type SetFormHandle } from './components/SetForm';
+import { Button, Screen, ScreenHeader } from '../../components/ui';
 import { useCreateSet } from '../../hooks';
+import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'CreateSet'>) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const { mutateAsync: createSet } = useCreateSet();
 
+  const formRef = useRef<SetFormHandle>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const header = <ScreenHeader title="New Set" handle />;
+  const footer = (
+    <View style={styles.footer}>
+      <Button label="Create Set" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
-      <ScrollView
+    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
+      <ScrollView style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <SetForm
+          ref={formRef}
           defaultValues={{ folderId: route.params?.folderId }}
-          submitLabel="Create Set"
+          onSubmittingChange={setSubmitting}
           onSubmit={async data => {
             await createSet({ ...data, folderId: data.folderId ?? undefined, color: data.color ?? undefined, description: data.description || undefined });
             Toast.show({ type: 'success', text1: 'Set created!' });
@@ -28,11 +41,18 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
           }}
         />
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: layout.screenPaddingH, gap: spacing[4] },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    flex: { flex: 1 },
+    scroll: { padding: layout.screenPaddingH, gap: spacing[4] },
+    footer: {
+      padding: layout.screenPaddingH,
+      paddingBottom: spacing[2],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+  });

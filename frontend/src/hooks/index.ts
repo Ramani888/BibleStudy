@@ -28,6 +28,8 @@ export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak } fr
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useConfirmDialog } from './useConfirmDialog';
+export { useDebouncedValue } from './useDebouncedValue';
+export { useSearchToggle } from './useSearchToggle';
 export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';

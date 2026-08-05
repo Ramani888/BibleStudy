@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { AppModal } from './Modal';
 import { Button, Divider, Typography } from '../ui';
-import { colors, fontSizes, lineHeights, spacing } from '../../theme';
+import { fontSizes, lineHeights, spacing, useTheme } from '../../theme';
 
 export interface ConfirmDialogProps {
   visible: boolean;
@@ -27,6 +27,7 @@ export function ConfirmDialog({
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { colors } = useTheme();
   return (
     <AppModal
       visible={visible}

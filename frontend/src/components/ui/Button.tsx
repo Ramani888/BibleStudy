@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, Theme, useTheme } from '../../theme';
 import { Typography } from './Typography';
 import { triggerHaptic } from '../../utils/haptics';
 
@@ -23,11 +23,11 @@ interface ButtonProps extends Omit<PressableProps, 'style'> {
   style?: ViewStyle;
 }
 
-const variantStyles: Record<ButtonVariant, { container: ViewStyle; labelColor: string }> = {
+const makeVariantStyles = (
+  colors: Theme['colors'],
+): Record<ButtonVariant, { container: ViewStyle; labelColor: string }> => ({
   primary: {
-    container: {
-      backgroundColor: colors.primary,
-    },
+    container: { backgroundColor: colors.primary },
     labelColor: colors.textOnPrimary,
   },
   secondary: {
@@ -47,12 +47,10 @@ const variantStyles: Record<ButtonVariant, { container: ViewStyle; labelColor: s
     labelColor: colors.primary,
   },
   danger: {
-    container: {
-      backgroundColor: colors.error,
-    },
+    container: { backgroundColor: colors.error },
     labelColor: colors.textOnPrimary,
   },
-};
+});
 
 export function Button({
   label,
@@ -65,8 +63,9 @@ export function Button({
   onPressIn,
   ...rest
 }: ButtonProps) {
+  const { colors } = useTheme();
   const isDisabled = disabled || loading;
-  const { container, labelColor } = variantStyles[variant];
+  const { container, labelColor } = makeVariantStyles(colors)[variant];
   const height = size === 'sm' ? layout.buttonHeightSm : layout.buttonHeight;
 
   const handlePressIn = useCallback((e: GestureResponderEvent) => {

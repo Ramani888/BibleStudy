@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { colors, spacing } from '../../../theme';
+import { Theme, useTheme } from '../../../theme';
 
 interface CardPreviewProps {
   question: string;
@@ -10,6 +10,9 @@ interface CardPreviewProps {
 }
 
 export function CardPreview({ question, answer }: CardPreviewProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   return (
     <View style={styles.preview}>
       <View style={styles.previewTop}>
@@ -34,26 +37,25 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  preview: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  previewTop: {
-    backgroundColor: colors.backgroundSecondary,
-    padding: spacing[4],
-    minHeight: 72,
-    justifyContent: 'center',
-  },
-  previewBottom: {
-    backgroundColor: colors.background,
-    padding: spacing[4],
-    minHeight: 56,
-    justifyContent: 'center',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  previewText: { lineHeight: 22 },
-});
+const makeStyles = ({ colors, spacing }: Theme) =>
+  StyleSheet.create({
+    preview: {
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    previewTop: {
+      backgroundColor: colors.backgroundSecondary,
+      padding: spacing[4],
+      minHeight: 72,
+      justifyContent: 'center',
+    },
+    previewBottom: {
+      backgroundColor: colors.background,
+      padding: spacing[4],
+      minHeight: 56,
+      justifyContent: 'center',
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    previewText: { lineHeight: 22 },
+  });

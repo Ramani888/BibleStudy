@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import LottieView from 'lottie-react-native';
-import { colors, spacing } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { Button, Typography } from '../ui';
 
 const DEFAULT_ANIMATION = require('../../assets/animations/empty.json');
@@ -16,6 +16,7 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ title, subtitle, ctaLabel, onCta, icon, style }: EmptyStateProps) {
+  const { colors } = useTheme();
   return (
     <View style={[styles.container, style]}>
       {icon ? (

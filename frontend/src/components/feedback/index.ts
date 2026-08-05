@@ -7,3 +7,5 @@ export { ActionSheet } from './ActionSheet';
 export type { Action } from './ActionSheet';
 export { ConfirmDialog } from './ConfirmDialog';
 export type { ConfirmDialogProps } from './ConfirmDialog';
+export { SelectSheet } from './SelectSheet';
+export type { SelectOption } from './SelectSheet';

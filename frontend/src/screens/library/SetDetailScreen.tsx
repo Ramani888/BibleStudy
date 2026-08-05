@@ -1,21 +1,28 @@
-import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo, useState, useEffect } from 'react';
+import { ActivityIndicator, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import Icon from 'react-native-vector-icons/Ionicons';
-import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
-import { Button, Divider, Input, Typography } from '../../components/ui';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
+import { Button, Divider, Input, Screen, ScreenHeader, Typography } from '../../components/ui';
+import {
+  SearchIcon, ShareIcon, MoreVerticalIcon, ChevronUpIcon, ChevronDownIcon, InfoIcon, EyeIcon, EyeOffIcon,
+  HelpCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
+  ListIcon, GridIcon,
+} from '../../components/icons';
 
-import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useReorderCards, useSets, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
 const ICON_SIZE = 20;
 
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors, spacing } = theme;
+
   const { setId, setTitle, isOwner = true } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
@@ -25,11 +32,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
-  const [cardSearch, setCardSearch] = useState('');
-  const [cardSearchVisible, setCardSearchVisible] = useState(false);
+  const { query: cardSearch, setQuery: setCardSearch, visible: cardSearchVisible, toggle: toggleCardSearch } = useSearchToggle();
   const [reorderMode, setReorderMode] = useState(false);
   const [orderedCards, setOrderedCards] = useState<CardType[]>([]);
-  const [moveSearch, setMoveSearch] = useState('');
 
   const { data: cards = [], isLoading, isRefetching, isError, refetch } = useCards(setId);
   const { data: allSets = [] } = useSets();
@@ -54,11 +59,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       const divider = '─'.repeat(Math.min(title.length, 40));
       await Share.share({ message: `${title}\n${divider}\n\n${cardList}` });
     } catch {}
-  };
-
-  const toggleCardSearch = () => {
-    if (cardSearchVisible) setCardSearch('');
-    setCardSearchVisible(v => !v);
   };
 
   const filteredCards = cardSearch.trim()
@@ -184,47 +184,45 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     });
   };
 
-  if (isError) {
-    return <ErrorState message="Could not load cards." onRetry={refetch} />;
-  }
-
-  return (
-    <SafeAreaView style={styles.safe} edges={[]}>
-      {/* ── Stats bar / Reorder bar ── */}
-      {reorderMode ? (
-        <View style={styles.reorderBar}>
-          <Pressable onPress={handleCancelReorder} hitSlop={8}>
-            <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
-          </Pressable>
-          <Typography preset="bodySm" style={{ fontWeight: '600' }}>Reorder Cards</Typography>
-          <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8}>
-            {isReordering
-              ? <ActivityIndicator size="small" color={colors.primary} />
-              : <Typography preset="bodySm" color={colors.primary} style={{ fontWeight: '600' }}>Save</Typography>
-            }
-          </Pressable>
-        </View>
-      ) : (
-        <View style={styles.statsBar}>
-          <Typography preset="bodySm" color={colors.textSecondary}>
-            {cards.length} {cards.length === 1 ? 'card' : 'cards'}
-          </Typography>
-          <View style={styles.statsBarActions}>
+  // ── Header (normal vs reorder) ──
+  const header = reorderMode ? (
+    <View style={styles.reorderBar}>
+      <Pressable onPress={handleCancelReorder} hitSlop={8}>
+        <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
+      </Pressable>
+      <Typography preset="bodySm" style={styles.reorderTitle}>Reorder Cards</Typography>
+      <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8}>
+        {isReordering
+          ? <ActivityIndicator size="small" color={colors.primary} />
+          : <Typography preset="bodySm" color={colors.primary} style={styles.reorderTitle}>Save</Typography>
+        }
+      </Pressable>
+    </View>
+  ) : (
+    <View>
+      <ScreenHeader
+        title={cachedTitle ?? setTitle}
+        onBack={() => navigation.goBack()}
+        right={
+          <>
             <Pressable onPress={toggleCardSearch} hitSlop={8}>
-              <Icon name="search-outline" size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
+              <SearchIcon size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
             </Pressable>
             {cards.length > 0 && (
               <Pressable onPress={handleShare} hitSlop={8}>
-                <Icon name="share-social-outline" size={ICON_SIZE} color={colors.textSecondary} />
+                <ShareIcon size={ICON_SIZE} color={colors.textSecondary} />
               </Pressable>
             )}
-            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={styles.menuBtn}>
-              <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textSecondary} />
+            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8}>
+              <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
-          </View>
-        </View>
-      )}
-      {!reorderMode && cardSearchVisible && (
+          </>
+        }
+      />
+      <Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>
+        {cards.length} {cards.length === 1 ? 'card' : 'cards'}
+      </Typography>
+      {cardSearchVisible && (
         <View style={styles.searchWrap}>
           <Input
             placeholder="Search cards…"
@@ -235,7 +233,30 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           />
         </View>
       )}
+    </View>
+  );
 
+  // ── Footer (primary study action) — hidden in reorder mode / when empty ──
+  const footer = !reorderMode && cards.length > 0 ? (
+    <View style={styles.footer}>
+      <Button
+        label="Start Quiz"
+        onPress={() => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner })}
+        fullWidth
+      />
+    </View>
+  ) : undefined;
+
+  if (isError) {
+    return (
+      <Screen header={header}>
+        <ErrorState message="Could not load cards." onRetry={refetch} />
+      </Screen>
+    );
+  }
+
+  return (
+    <Screen header={header} footer={footer}>
       <FlatList
         key={reorderMode ? 'reorder' : cardLayout}
         data={reorderMode ? orderedCards : filteredCards}
@@ -249,7 +270,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           isLoading ? (
-            <ActivityIndicator color={colors.primary} style={{ marginTop: spacing[8] }} />
+            <ActivityIndicator color={colors.primary} style={styles.listLoader} />
           ) : (
             <EmptyState
               title={cardSearch ? 'No results' : 'No cards yet'}
@@ -261,7 +282,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         }
         renderItem={({ item, index }) => (
           <View style={[styles.cardItem, !reorderMode && cardLayout === 'grid' && styles.cardItemGrid]}>
-            {/* Question section — gray background */}
+            {/* Question section */}
             <View style={[styles.questionSection, !reorderMode && cardLayout === 'grid' && styles.questionSectionGrid]}>
               <Typography preset="body" style={styles.question} numberOfLines={!reorderMode && cardLayout === 'grid' ? 3 : undefined}>
                 {item.question}
@@ -269,28 +290,28 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               {reorderMode ? (
                 <View style={styles.cardActions}>
                   <Pressable onPress={() => handleMoveUp(index)} disabled={index === 0} hitSlop={6} style={styles.iconBtn}>
-                    <Icon name="chevron-up-outline" size={ICON_SIZE} color={index === 0 ? colors.textDisabled : colors.textSecondary} />
+                    <ChevronUpIcon size={ICON_SIZE} color={index === 0 ? colors.textDisabled : colors.textSecondary} />
                   </Pressable>
                   <Pressable onPress={() => handleMoveDown(index)} disabled={index === orderedCards.length - 1} hitSlop={6} style={styles.iconBtn}>
-                    <Icon name="chevron-down-outline" size={ICON_SIZE} color={index === orderedCards.length - 1 ? colors.textDisabled : colors.textSecondary} />
+                    <ChevronDownIcon size={ICON_SIZE} color={index === orderedCards.length - 1 ? colors.textDisabled : colors.textSecondary} />
                   </Pressable>
                 </View>
               ) : isOwner ? (
                 <View style={styles.cardActions}>
                   <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
-                    <Icon name="information-circle-outline" size={ICON_SIZE} color={colors.textDisabled} />
+                    <InfoIcon size={ICON_SIZE} color={colors.textDisabled} />
                   </Pressable>
                   <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
-                    <Icon name={item.isBlurred ? 'eye-off-outline' : 'eye-outline'} size={ICON_SIZE} color={colors.textDisabled} />
+                    {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textDisabled} /> : <EyeIcon size={ICON_SIZE} color={colors.textDisabled} />}
                   </Pressable>
                   <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
-                    <Icon name="ellipsis-vertical" size={ICON_SIZE} color={colors.textDisabled} />
+                    <MoreVerticalIcon size={ICON_SIZE} color={colors.textDisabled} />
                   </Pressable>
                 </View>
               ) : null}
             </View>
 
-            {/* Answer section — white background */}
+            {/* Answer section */}
             <View style={[styles.answerSection, !reorderMode && cardLayout === 'grid' && styles.answerSectionGrid]}>
               {item.isBlurred && isOwner && !reorderMode ? (
                 <View style={styles.blurOverlay}>
@@ -323,79 +344,30 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title="Card options"
         onClose={() => setSelectedCard(null)}
         actions={[
+          { label: 'Edit', icon: PencilIcon, onPress: () => selectedCard && navigation.navigate('EditCard', { cardId: selectedCard.id, setId }) },
+          { label: 'Copy', icon: CopyIcon, onPress: () => selectedCard && handleCopyCard(selectedCard.id) },
+          { label: 'Move to Set', icon: ArrowRightIcon, onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); } },
           {
-            label: 'Edit',
-            iconName: 'pencil-outline',
-            onPress: () =>
-              selectedCard &&
-              navigation.navigate('EditCard', { cardId: selectedCard.id, setId }),
-          },
-          {
-            label: 'Copy',
-            iconName: 'copy-outline',
-            onPress: () => selectedCard && handleCopyCard(selectedCard.id),
-          },
-          {
-            label: 'Move to Set',
-            iconName: 'arrow-forward-outline',
-            onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); },
-          },
-          {
-            label: 'Ask AI',
-            iconName: 'sparkles-outline',
-            onPress: () => {
+            label: 'Ask AI', icon: SparklesIcon, onPress: () => {
               if (!selectedCard) return;
               const prompt = `Explain this flashcard:\nQ: ${selectedCard.question}\nA: ${selectedCard.answer}`;
               navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: prompt } });
             },
           },
-          {
-            label: 'Delete',
-            iconName: 'trash-outline',
-            destructive: true,
-            onPress: () => selectedCard && handleDelete(selectedCard.id),
-          },
+          { label: 'Delete', icon: TrashIcon, destructive: true, onPress: () => selectedCard && handleDelete(selectedCard.id) },
         ]}
       />
 
       {/* ── Move to set picker ── */}
-      <AppModal
+      <SelectSheet
         visible={movePickerOpen}
         title="Move to Set"
-        onClose={() => { setMovePickerOpen(false); setMoveTargetCard(null); setMoveSearch(''); }}
-      >
-        {allSets.filter(s => s.id !== setId).length === 0 ? (
-          <Typography preset="bodySm" color={colors.textSecondary}>
-            No other sets available
-          </Typography>
-        ) : (
-          <>
-            <Input
-              placeholder="Search sets…"
-              value={moveSearch}
-              onChangeText={setMoveSearch}
-              containerStyle={styles.moveSearchInput}
-            />
-            <ScrollView style={{ maxHeight: 260 }} showsVerticalScrollIndicator={false}>
-              {allSets
-                .filter(s => s.id !== setId && s.title.toLowerCase().includes(moveSearch.trim().toLowerCase()))
-                .map(s => (
-                  <React.Fragment key={s.id}>
-                    <Pressable style={styles.setOption} onPress={() => handleMoveCard(s.id)}>
-                      <Typography preset="body">{s.title}</Typography>
-                    </Pressable>
-                    <Divider marginV={spacing[1]} />
-                  </React.Fragment>
-                ))}
-              {allSets.filter(s => s.id !== setId && s.title.toLowerCase().includes(moveSearch.trim().toLowerCase())).length === 0 && (
-                <Typography preset="bodySm" color={colors.textSecondary} style={{ paddingVertical: spacing[3] }}>
-                  No sets match "{moveSearch}"
-                </Typography>
-              )}
-            </ScrollView>
-          </>
-        )}
-      </AppModal>
+        searchPlaceholder="Search sets…"
+        options={allSets.filter(s => s.id !== setId).map(s => ({ id: s.id, label: s.title }))}
+        onSelect={handleMoveCard}
+        onClose={() => { setMovePickerOpen(false); setMoveTargetCard(null); }}
+        emptyText="No other sets available"
+      />
 
       {/* ── Header menu ── */}
       <ActionSheet
@@ -403,38 +375,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={cachedTitle ?? setTitle}
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
-          {
-            label: 'Quiz',
-            iconName: 'help-circle-outline',
-            onPress: () => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner }),
-          },
+          { label: 'Quiz', icon: HelpCircleIcon, onPress: () => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner }) },
           ...(isOwner ? [
-            {
-              label: 'Create Card',
-              iconName: 'add-circle-outline',
-              onPress: () => navigation.navigate('CreateCard', { setId }),
-            },
-            {
-              label: 'Edit Set',
-              iconName: 'pencil-outline',
-              onPress: () => navigation.navigate('EditSet', { setId }),
-            },
-            {
-              label: allBlurred ? 'Unblur All' : 'Blur All',
-              iconName: allBlurred ? 'eye-outline' : 'eye-off-outline',
-              onPress: () => handleBlurAll(!allBlurred),
-            },
-            ...(!isLoading && cards.length > 1 ? [{
-              label: 'Reorder Cards',
-              iconName: 'reorder-three-outline',
-              onPress: handleEnterReorder,
-            }] : []),
+            { label: 'Create Card', icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
+            { label: 'Edit Set', icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
+            { label: allBlurred ? 'Unblur All' : 'Blur All', icon: allBlurred ? EyeIcon : EyeOffIcon, onPress: () => handleBlurAll(!allBlurred) },
+            ...(!isLoading && cards.length > 1 ? [{ label: 'Reorder Cards', icon: ReorderIcon, onPress: handleEnterReorder }] : []),
           ] : []),
-          {
-            label: cardLayout === 'grid' ? 'List View' : 'Grid View',
-            iconName: cardLayout === 'grid' ? 'list-outline' : 'grid-outline',
-            onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list'),
-          },
+          { label: cardLayout === 'grid' ? 'List View' : 'Grid View', icon: cardLayout === 'grid' ? ListIcon : GridIcon, onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list') },
         ]}
       />
 
@@ -470,77 +418,72 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  statsBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  list: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing[8],
-  },
-  separator: { height: spacing[3] },
-  cardItem: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  questionSection: {
-    backgroundColor: colors.backgroundSecondary,
-    padding: spacing[4],
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing[3],
-  },
-  question: { flex: 1, fontWeight: '500', lineHeight: 22 },
-  cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-  iconBtn: { padding: spacing[1] },
-  answerSection: {
-    backgroundColor: colors.background,
-    padding: spacing[4],
-  },
-  answer: { lineHeight: 22 },
-  note: { lineHeight: 20 },
-  blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
-  setOption: { paddingVertical: spacing[3] },
-  statsBarActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
-  menuBtn: { paddingHorizontal: spacing[2] },
-  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
-  searchInput: { marginBottom: 0 },
-  gridRow: { gap: spacing[3] },
-  cardItemGrid: { flex: 1 },
-  questionSectionGrid: { padding: spacing[3] },
-  answerSectionGrid: { padding: spacing[3] },
-  notePopupInput: {
-    borderWidth: 1.5,
-    borderRadius: 12,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-    minHeight: 80,
-    color: colors.textPrimary,
-    textAlignVertical: 'top',
-  },
-  reorderBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  moveSearchInput: { marginBottom: spacing[2] },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    reorderBar: {
+      minHeight: layout.headerHeight,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[3],
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    reorderTitle: { fontWeight: '600' },
+    footer: {
+      padding: layout.screenPaddingH,
+      paddingBottom: spacing[4],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    count: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[2] },
+    searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
+    searchInput: { marginBottom: 0 },
+    list: {
+      padding: layout.screenPaddingH,
+      paddingBottom: spacing[8],
+    },
+    listLoader: { marginTop: spacing[8] },
+    separator: { height: spacing[3] },
+    cardItem: {
+      borderRadius: 12,
+      overflow: 'hidden',
+    },
+    questionSection: {
+      backgroundColor: colors.backgroundSecondary,
+      padding: spacing[4],
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: spacing[3],
+    },
+    question: { flex: 1, fontWeight: '500', lineHeight: 22 },
+    cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    iconBtn: { padding: spacing[1] },
+    answerSection: {
+      backgroundColor: colors.backgroundCard,
+      padding: spacing[4],
+    },
+    answer: { lineHeight: 22 },
+    note: { lineHeight: 20 },
+    blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
+    gridRow: { gap: spacing[3] },
+    cardItemGrid: { flex: 1 },
+    questionSectionGrid: { padding: spacing[3] },
+    answerSectionGrid: { padding: spacing[3] },
+    notePopupInput: {
+      borderWidth: 1.5,
+      borderRadius: 12,
+      borderColor: colors.border,
+      backgroundColor: colors.backgroundSecondary,
+      paddingHorizontal: spacing[4],
+      paddingVertical: spacing[3],
+      minHeight: 80,
+      color: colors.textPrimary,
+      textAlignVertical: 'top',
+    },
+  });

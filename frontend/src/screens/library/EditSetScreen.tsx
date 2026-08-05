@@ -1,26 +1,33 @@
-import React from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import Icon from 'react-native-vector-icons/Ionicons';
 import { ConfirmDialog, ErrorState } from '../../components/feedback';
-import { SetForm } from './components/SetForm';
-import { Typography } from '../../components/ui';
+import { SetForm, type SetFormHandle } from './components/SetForm';
+import { Button, Screen, ScreenHeader, Typography } from '../../components/ui';
+import { TrashIcon } from '../../components/icons';
 
-import { colors, layout, spacing } from '../../theme';
 import { useConfirmDialog, useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
+import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 const ICON_SIZE = 20;
 
 export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet'>) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   const { setId } = route.params;
   const { data: set, isLoading, isError, refetch } = useSet(setId);
   const { mutateAsync: updateSet } = useUpdateSet();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { show, dialogProps } = useConfirmDialog();
+
+  const formRef = useRef<SetFormHandle>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  const header = <ScreenHeader title="Edit Set" handle />;
 
   const handleDelete = () => {
     show({
@@ -42,26 +49,40 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
 
   if (isLoading) {
     return (
-      <View style={styles.loading}>
-        <ActivityIndicator color={colors.primary} size="large" />
-      </View>
+      <Screen header={header} edges={['top', 'bottom']}>
+        <View style={styles.loading}>
+          <ActivityIndicator color={colors.primary} size="large" />
+        </View>
+      </Screen>
     );
   }
 
   if (isError || !set) {
-    return <ErrorState message="Could not load set." onRetry={refetch} />;
+    return (
+      <Screen header={header} edges={['top', 'bottom']}>
+        <ErrorState message="Could not load set." onRetry={refetch} />
+      </Screen>
+    );
   }
 
+  const footer = (
+    <View style={styles.footer}>
+      <Button label="Save Changes" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.safe} edges={['bottom']}>
+    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
       <ScrollView
+        style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <SetForm
+          ref={formRef}
           defaultValues={set}
-          submitLabel="Save Changes"
+          onSubmittingChange={setSubmitting}
           onSubmit={async data => {
             await updateSet({ id: setId, payload: { ...data, description: data.description || null } });
             Toast.show({ type: 'success', text1: 'Set updated!' });
@@ -70,27 +91,34 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
         />
         <View style={styles.deleteSection}>
           <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
-            <Icon name="trash-outline" size={ICON_SIZE} color={colors.error} />
+            <TrashIcon size={ICON_SIZE} color={colors.error} />
             <Typography preset="label" color={colors.error}>Delete Set</Typography>
           </Pressable>
         </View>
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background },
-  deleteSection: {
-    marginTop: spacing[6],
-    alignItems: 'center',
-    paddingVertical: spacing[4],
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    flex: { flex: 1 },
+    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+    loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    footer: {
+      padding: layout.screenPaddingH,
+      paddingBottom: spacing[2],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    deleteSection: {
+      marginTop: spacing[6],
+      alignItems: 'center',
+      paddingVertical: spacing[4],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  });

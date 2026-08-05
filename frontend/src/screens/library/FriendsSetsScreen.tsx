@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import React, { useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
-import { Spacer, Typography } from '../../components/ui';
+import { Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { CopyIcon } from '../../components/icons';
 
 import { useCloneSet, useFriendsSets } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSets'>) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors, spacing } = theme;
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 
@@ -31,16 +34,25 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   const sets = data?.pages.flatMap(p => p.sets) ?? [];
   const total = data?.pages[0]?.pagination.total ?? 0;
 
-  if (isError) return <ErrorState message="Could not load friends' sets." onRetry={refetch} />;
+  const header = <ScreenHeader title="Friends' Sets" onBack={() => navigation.goBack()} />;
+  const footer = (
+    <View style={styles.footer}>
+      <Typography preset="caption" color={colors.textSecondary} align="center">
+        {total} {total === 1 ? 'set' : 'sets'} shared by friends
+      </Typography>
+    </View>
+  );
+
+  if (isError) {
+    return (
+      <Screen header={header}>
+        <ErrorState message="Could not load friends' sets." onRetry={refetch} />
+      </Screen>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
-      <View style={styles.header}>
-        <Typography preset="bodySm" color={colors.textSecondary}>
-          {total} {total === 1 ? 'set' : 'sets'} shared by friends
-        </Typography>
-      </View>
-
+    <Screen header={header} footer={footer}>
       <FlatList
         data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
@@ -90,7 +102,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         actions={[
           {
             label: 'Clone to Library',
-            iconName: 'copy-outline',
+            icon: CopyIcon,
             onPress: () =>
               selectedSet &&
               cloneSet(selectedSet.id, {
@@ -104,18 +116,18 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
           },
         ]}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
-  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
-});
+const makeStyles = ({ colors, layout, spacing }: Theme) =>
+  StyleSheet.create({
+    list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
+    footer: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[3],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
+  });

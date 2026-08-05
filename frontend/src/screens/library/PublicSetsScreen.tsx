@@ -1,38 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
-import Icon from 'react-native-vector-icons/Ionicons';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
-import { Input, Spacer, Typography } from '../../components/ui';
+import { Input, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { CopyIcon, SearchIcon } from '../../components/icons';
 
-import { usePublicSets, useCloneSet } from '../../hooks';
+import { useCloneSet, useDebouncedValue, usePublicSets } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 const ICON_SIZE = 20;
 
 export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'>) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors, spacing } = theme;
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [search, setSearch] = useState('');
-  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [searchVisible, setSearchVisible] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => {
-      setDebouncedSearch(search.trim());
-    }, 300);
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [search]);
+  const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
   const {
     data,
@@ -54,22 +46,40 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
     setSearchVisible(v => !v);
   };
 
-  if (isError) return <ErrorState message="Could not load public sets." onRetry={refetch} />;
+  const countText = (isFetching && !isLoading && !isRefetching && !isFetchingNextPage)
+    ? 'Searching…'
+    : debouncedSearch
+      ? `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"`
+      : `${total} public ${total === 1 ? 'set' : 'sets'} available`;
+
+  const header = (
+    <ScreenHeader
+      title="Browse Public Sets"
+      onBack={() => navigation.goBack()}
+      right={
+        <Pressable onPress={toggleSearch} hitSlop={8}>
+          <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
+        </Pressable>
+      }
+    />
+  );
+
+  const footer = (
+    <View style={styles.footer}>
+      <Typography preset="caption" color={colors.textSecondary} align="center">{countText}</Typography>
+    </View>
+  );
+
+  if (isError) {
+    return (
+      <Screen header={header}>
+        <ErrorState message="Could not load public sets." onRetry={refetch} />
+      </Screen>
+    );
+  }
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
-      <View style={styles.header}>
-        <Typography preset="bodySm" color={colors.textSecondary}>
-          {(isFetching && !isLoading && !isRefetching && !isFetchingNextPage)
-            ? 'Searching…'
-            : debouncedSearch
-              ? `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"`
-              : `${total} public ${total === 1 ? 'set' : 'sets'} available`}
-        </Typography>
-        <Pressable onPress={toggleSearch} hitSlop={8}>
-          <Icon name="search-outline" size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
-        </Pressable>
-      </View>
+    <Screen header={header} footer={footer}>
       {searchVisible && (
         <View style={styles.searchWrap}>
           <Input
@@ -126,7 +136,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         actions={[
           {
             label: 'Clone to Library',
-            iconName: 'copy-outline',
+            icon: CopyIcon,
             onPress: () =>
               selectedSet &&
               cloneSet(selectedSet.id, {
@@ -140,23 +150,20 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
           },
         ]}
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
-  searchInput: { marginBottom: 0 },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
-  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
-});
+const makeStyles = ({ colors, layout, spacing }: Theme) =>
+  StyleSheet.create({
+    searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
+    searchInput: { marginBottom: 0 },
+    list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
+    footer: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[3],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
+  });

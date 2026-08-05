@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, spacing } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 
 const CHECK_SIZE = 16;
 
@@ -18,6 +18,9 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorPickerProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   return (
     <View style={styles.grid}>
       {presets.map(color => (
@@ -36,21 +39,22 @@ export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorP
   );
 }
 
-const styles = StyleSheet.create({
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[3],
-  },
-  swatch: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  swatchSelected: {
-    borderWidth: 2,
-    borderColor: colors.background,
-  },
-});
+const makeStyles = ({ colors, spacing }: Theme) =>
+  StyleSheet.create({
+    grid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: spacing[3],
+    },
+    swatch: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    swatchSelected: {
+      borderWidth: 2,
+      borderColor: colors.background,
+    },
+  });

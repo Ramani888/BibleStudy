@@ -1,4 +1,4 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef, useMemo, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, layout, spacing, textPresets } from '../../theme';
+import { Theme, useTheme } from '../../theme';
 import { Typography } from './Typography';
 
 const EYE_SIZE = 20;
@@ -35,6 +35,9 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
   style,
   ...rest
 }, ref) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   const [secure, setSecure] = useState(isPassword);
   const [focused, setFocused] = useState(false);
 
@@ -96,41 +99,42 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
   );
 });
 
-const styles = StyleSheet.create({
-  container: {
-    width: '100%',
-  },
-  label: {
-    marginBottom: spacing[1.5],
-  },
-  inputRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: layout.inputHeight,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    backgroundColor: colors.backgroundSecondary,
-    paddingHorizontal: spacing[4],
-    overflow: 'hidden',
-  },
-  input: {
-    flex: 1,
-    ...textPresets.body,
-    lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
-    color: colors.textPrimary,
-    paddingVertical: 0,
-  },
-  inputWithLeft: {
-    paddingLeft: spacing[2],
-  },
-  iconLeft: {
-    marginRight: spacing[2],
-  },
-  iconRight: {
-    marginLeft: spacing[2],
-  },
-  hint: {
-    marginTop: spacing[1],
-    marginLeft: spacing[1],
-  },
-});
+const makeStyles = ({ colors, spacing, layout, textPresets }: Theme) =>
+  StyleSheet.create({
+    container: {
+      width: '100%',
+    },
+    label: {
+      marginBottom: spacing[1.5],
+    },
+    inputRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: layout.inputHeight,
+      borderWidth: 1.5,
+      borderRadius: 12,
+      backgroundColor: colors.backgroundSecondary,
+      paddingHorizontal: spacing[4],
+      overflow: 'hidden',
+    },
+    input: {
+      flex: 1,
+      ...textPresets.body,
+      lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
+      color: colors.textPrimary,
+      paddingVertical: 0,
+    },
+    inputWithLeft: {
+      paddingLeft: spacing[2],
+    },
+    iconLeft: {
+      marginRight: spacing[2],
+    },
+    iconRight: {
+      marginLeft: spacing[2],
+    },
+    hint: {
+      marginTop: spacing[1],
+      marginLeft: spacing[1],
+    },
+  });

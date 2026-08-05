@@ -2,7 +2,6 @@ import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { LibraryStackParamList } from './types';
-import { colors, fontWeights } from '../theme';
 import { LibraryScreen } from '../screens/library/LibraryScreen';
 import { FolderDetailScreen } from '../screens/library/FolderDetailScreen';
 import { SetDetailScreen } from '../screens/library/SetDetailScreen';
@@ -36,72 +35,34 @@ export function LibraryNavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator
-      screenOptions={{
-        headerStyle: { backgroundColor: colors.background },
-        headerTitleStyle: {
-          color: colors.textPrimary,
-          fontWeight: fontWeights.semiBold,
-        },
-        headerTintColor: colors.primary,
-        headerShadowVisible: false,
-      }}
-    >
-      <Stack.Screen
-        name="Library"
-        component={LibraryScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="FolderDetail"
-        component={FolderDetailScreen}
-        options={({ route }) => ({ title: route.params.folderName })}
-      />
-      <Stack.Screen
-        name="SetDetail"
-        component={SetDetailScreen}
-        options={({ route }) => ({ title: route.params.setTitle })}
-      />
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="Library" component={LibraryScreen} />
+      <Stack.Screen name="FolderDetail" component={FolderDetailScreen} />
+      <Stack.Screen name="SetDetail" component={SetDetailScreen} />
       <Stack.Screen
         name="CreateSet"
         component={CreateSetScreen}
-        options={{ title: 'New Set', presentation: 'modal' }}
+        options={{ presentation: 'modal' }}
       />
       <Stack.Screen
         name="EditSet"
         component={EditSetScreen}
-        options={{ title: 'Edit Set', presentation: 'modal' }}
+        options={{ presentation: 'modal' }}
       />
       <Stack.Screen
         name="CreateCard"
         component={CreateCardScreen}
-        options={{ title: 'Add Cards', presentation: 'modal' }}
+        options={{ presentation: 'modal' }}
       />
       <Stack.Screen
         name="EditCard"
         component={EditCardScreen}
-        options={{ title: 'Edit Card', presentation: 'modal' }}
+        options={{ presentation: 'modal' }}
       />
-      <Stack.Screen
-        name="PublicSets"
-        component={PublicSetsScreen}
-        options={{ title: 'Browse Public Sets' }}
-      />
-      <Stack.Screen
-        name="FriendsSets"
-        component={FriendsSetsScreen}
-        options={{ title: "Friends' Sets" }}
-      />
-      <Stack.Screen
-        name="QuizModePicker"
-        component={QuizModePickerScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Quiz"
-        component={QuizScreen}
-        options={{ headerShown: false }}
-      />
+      <Stack.Screen name="PublicSets" component={PublicSetsScreen} />
+      <Stack.Screen name="FriendsSets" component={FriendsSetsScreen} />
+      <Stack.Screen name="QuizModePicker" component={QuizModePickerScreen} />
+      <Stack.Screen name="Quiz" component={QuizScreen} />
     </Stack.Navigator>
   );
 }

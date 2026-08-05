@@ -1,26 +1,32 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 
-import Icon from 'react-native-vector-icons/Ionicons';
+import { ChevronRightIcon, FolderIcon } from '../../../components/icons';
 import { FormField } from '../../../components/forms';
-import { Button, Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
+import { Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
 
 import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
 import { getErrorMessage } from '../../../api';
-import { colors, spacing } from '../../../theme';
+import { Theme, useTheme } from '../../../theme';
 import type { Visibility, CardLayout, StudySet } from '../../../types';
 
 const ICON_SIZE = 18;
 
+/** Imperative handle so the screen can pin the submit button in its footer. */
+export interface SetFormHandle {
+  submit: () => void;
+}
+
 interface SetFormProps {
   defaultValues?: Partial<StudySet>;
   onSubmit: (data: CreateSetFormData & { visibility: Visibility; layout: CardLayout; folderId?: string | null; color?: string | null }) => Promise<void>;
-  submitLabel?: string;
+  /** Notifies the parent so the footer button can show a loading state. */
+  onSubmittingChange?: (submitting: boolean) => void;
 }
 
 const VISIBILITY_OPTIONS: { value: Visibility; label: string; desc: string }[] = [
@@ -35,7 +41,13 @@ const LAYOUT_OPTIONS: { value: CardLayout; label: string }[] = [
   { value: 'DETAILED', label: 'Detailed' },
 ];
 
-export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFormProps) {
+export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
+  { defaultValues, onSubmit, onSubmittingChange },
+  ref,
+) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors, spacing } = theme;
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
   const [layout, setLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
   const [folderId, setFolderId] = useState<string | null>(defaultValues?.folderId ?? null);
@@ -69,6 +81,12 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
     }
   };
 
+  useImperativeHandle(ref, () => ({ submit: handleSubmit(handleSave) }));
+
+  useEffect(() => {
+    onSubmittingChange?.(isSubmitting);
+  }, [isSubmitting, onSubmittingChange]);
+
   return (
     <View style={styles.container}>
       <FormField
@@ -99,7 +117,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
           <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
             {selectedFolder ? selectedFolder.name : 'No folder'}
           </Typography>
-          <Icon name="chevron-forward" size={ICON_SIZE} color={colors.textSecondary} />
+          <ChevronRightIcon size={ICON_SIZE} color={colors.textSecondary} />
         </Pressable>
       </View>
 
@@ -163,13 +181,6 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
         </View>
       </View>
 
-      <Button
-        label={submitLabel}
-        onPress={handleSubmit(handleSave)}
-        loading={isSubmitting}
-        fullWidth
-      />
-
       {/* Folder picker modal */}
       <AppModal
         visible={folderPickerOpen}
@@ -191,7 +202,7 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
                 onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
               >
                 <View style={styles.folderRow}>
-                  <Icon name="folder-outline" size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
+                  <FolderIcon size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
                   <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
                     {folder.name}
                   </Typography>
@@ -205,51 +216,47 @@ export function SetForm({ defaultValues, onSubmit, submitLabel = 'Save' }: SetFo
       </AppModal>
     </View>
   );
-}
-
-const styles = StyleSheet.create({
-  container: { gap: spacing[4] },
-  fieldLabel: { marginBottom: spacing[1.5] },
-  picker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: 52,
-    borderWidth: 1.5,
-    borderRadius: 12,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
-    paddingHorizontal: spacing[4],
-  },
-  optionRow: { flexDirection: 'row', gap: spacing[2] },
-  optionChip: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 12,
-    padding: spacing[3],
-    alignItems: 'center',
-    gap: spacing[0.5],
-    backgroundColor: colors.backgroundSecondary,
-  },
-  layoutChip: {
-    flex: 1,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: 12,
-    paddingVertical: spacing[3],
-    alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-  },
-  optionChipActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySurface,
-  },
-  folderOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing[3],
-  },
-  folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
 });
+
+const makeStyles = ({ colors, spacing }: Theme) =>
+  StyleSheet.create({
+    container: { gap: spacing[4] },
+    fieldLabel: { marginBottom: spacing[1.5] },
+    picker: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      height: 52,
+      borderRadius: 12,
+      backgroundColor: colors.backgroundSecondary,
+      paddingHorizontal: spacing[4],
+    },
+    optionRow: { flexDirection: 'row', gap: spacing[2] },
+    optionChip: {
+      flex: 1,
+      borderRadius: 12,
+      padding: spacing[3],
+      alignItems: 'center',
+      gap: spacing[0.5],
+      backgroundColor: colors.backgroundSecondary,
+    },
+    layoutChip: {
+      flex: 1,
+      borderRadius: 12,
+      paddingVertical: spacing[3],
+      alignItems: 'center',
+      backgroundColor: colors.backgroundSecondary,
+    },
+    optionChipActive: {
+      borderWidth: 1.5,
+      borderColor: colors.primary,
+      backgroundColor: colors.primarySurface,
+    },
+    folderOption: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing[3],
+    },
+    folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  });

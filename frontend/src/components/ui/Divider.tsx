@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, spacing } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 
 interface DividerProps {
   marginV?: number;
@@ -8,14 +8,15 @@ interface DividerProps {
   style?: ViewStyle;
 }
 
-export function Divider({
-  marginV = spacing[4],
-  color = colors.border,
-  style,
-}: DividerProps) {
+export function Divider({ marginV = spacing[4], color, style }: DividerProps) {
+  const { colors } = useTheme();
   return (
     <View
-      style={[styles.divider, { marginVertical: marginV, backgroundColor: color }, style]}
+      style={[
+        styles.divider,
+        { marginVertical: marginV, backgroundColor: color ?? colors.border },
+        style,
+      ]}
     />
   );
 }

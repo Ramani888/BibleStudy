@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
-import { colors, layout, shadows, ShadowKey, spacing } from '../../theme';
+import { shadows, ShadowKey, Theme, useTheme } from '../../theme';
 
 interface CardProps extends ViewProps {
   children: React.ReactNode;
@@ -20,6 +20,8 @@ interface PressableCardProps extends Omit<PressableProps, 'style'> {
 
 /** Static card container */
 export function Card({ children, shadow = 'none', padding, style, ...rest }: CardProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
     <View
       style={[
@@ -43,6 +45,8 @@ export function PressableCard({
   style,
   ...rest
 }: PressableCardProps) {
+  const theme = useTheme();
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
     <Pressable
       style={({ pressed }) => [
@@ -59,12 +63,13 @@ export function PressableCard({
   );
 }
 
-const styles = StyleSheet.create({
-  base: {
-    backgroundColor: colors.backgroundCard,
-    borderRadius: layout.cardRadius,
-    padding: spacing[4],
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    base: {
+      backgroundColor: colors.backgroundCard,
+      borderRadius: layout.cardRadius,
+      padding: spacing[4],
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+  });
