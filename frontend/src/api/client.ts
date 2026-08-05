@@ -8,7 +8,7 @@ import { useAuthStore } from '../store/auth.store';
 // (localhost = the phone itself on a real device). Update this if the Mac's
 // LAN IP changes (new Wi-Fi/router).
 const BASE_URL = __DEV__
-  ? 'http://192.168.1.2:3010/api/v1'
+  ? 'http://192.168.1.4:3010/api/v1'
   : Config.API_BASE_URL ?? 'http://46.225.189.44/api/v1';
 
 export const apiClient = axios.create({
