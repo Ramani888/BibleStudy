@@ -7,7 +7,7 @@ import { ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } f
 import { Button, Input, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
 import { SearchIcon } from '../../components/icons';
 
-import { useConfirmDialog, useFolderModal, useFolders, useSearchToggle, useSets, useDeleteSet, useUpdateSet } from '../../hooks';
+import { useConfirmDialog, useFolderModal, useFolders, useManualRefresh, useSearchToggle, useSets, useDeleteSet, useUpdateSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -24,7 +24,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
-  const { data: sets = [], isLoading, isRefetching, isError, refetch } = useSets(folderId);
+  const { data: sets = [], isLoading, isError, refetch } = useSets(folderId);
+  const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { mutate: updateSet } = useUpdateSet();
   const { data: allFolders = [] } = useFolders();
@@ -111,8 +112,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         contentContainerStyle={styles.list}
         ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{sets.length} {sets.length === 1 ? 'set' : 'sets'}</Typography>}
         showsVerticalScrollIndicator={false}
-        refreshing={isRefetching}
-        onRefresh={refetch}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
         ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
         ListEmptyComponent={
           isLoading ? (

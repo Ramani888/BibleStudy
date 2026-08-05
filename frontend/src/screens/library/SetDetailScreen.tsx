@@ -10,7 +10,7 @@ import {
   ListIcon, GridIcon,
 } from '../../components/icons';
 
-import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -36,7 +36,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [reorderMode, setReorderMode] = useState(false);
   const [orderedCards, setOrderedCards] = useState<CardType[]>([]);
 
-  const { data: cards = [], isLoading, isRefetching, isError, refetch } = useCards(setId);
+  const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
+  const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { data: allSets = [] } = useSets();
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
@@ -236,17 +237,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     </View>
   );
 
-  // ── Footer (primary study action) — hidden in reorder mode / when empty ──
-  const footer = !reorderMode && cards.length > 0 ? (
-    <View style={styles.footer}>
-      <Button
-        label="Start Quiz"
-        onPress={() => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner })}
-        fullWidth
-      />
-    </View>
-  ) : undefined;
-
   if (isError) {
     return (
       <Screen header={header}>
@@ -256,7 +246,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   }
 
   return (
-    <Screen header={header} footer={footer}>
+    <Screen header={header}>
       <FlatList
         key={reorderMode ? 'reorder' : cardLayout}
         data={reorderMode ? orderedCards : filteredCards}
@@ -265,8 +255,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         columnWrapperStyle={!reorderMode && cardLayout === 'grid' ? styles.gridRow : undefined}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={!reorderMode && isRefetching}
-        onRefresh={reorderMode ? undefined : refetch}
+        refreshing={!reorderMode && refreshing}
+        onRefresh={reorderMode ? undefined : onRefresh}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         ListEmptyComponent={
           isLoading ? (
@@ -400,7 +390,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           multiline
           numberOfLines={3}
           maxLength={2000}
-          placeholderTextColor={colors.textDisabled}
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="sentences"
         />
         <Divider />
@@ -435,12 +425,6 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       borderBottomColor: colors.border,
     },
     reorderTitle: { fontWeight: '600' },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
     count: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[2] },
     searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
     searchInput: { marginBottom: 0 },
@@ -451,15 +435,17 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     listLoader: { marginTop: spacing[8] },
     separator: { height: spacing[3] },
     cardItem: {
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       overflow: 'hidden',
     },
     questionSection: {
-      backgroundColor: colors.backgroundSecondary,
+      backgroundColor: colors.backgroundCard,
       padding: spacing[4],
       flexDirection: 'row',
       alignItems: 'flex-start',
       gap: spacing[3],
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
     },
     question: { flex: 1, fontWeight: '500', lineHeight: 22 },
     cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },

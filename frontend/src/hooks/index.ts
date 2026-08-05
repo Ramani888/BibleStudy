@@ -30,6 +30,7 @@ export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useConfirmDialog } from './useConfirmDialog';
 export { useDebouncedValue } from './useDebouncedValue';
 export { useSearchToggle } from './useSearchToggle';
+export { useManualRefresh } from './useManualRefresh';
 export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';

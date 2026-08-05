@@ -22,6 +22,7 @@ import {
   useDeleteFolder,
   useFolderModal,
   useSearchToggle,
+  useManualRefresh,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { Theme, useTheme } from '../../theme';
@@ -45,8 +46,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
-  const { data: folders = [], isLoading: foldersLoading, isRefetching: foldersRefetching, refetch: refetchFolders, isError: foldersError } = useFolders();
-  const { data: sets = [], isLoading: setsLoading, isRefetching: setsRefetching, refetch: refetchSets, isError: setsError } = useSets();
+  const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders, isError: foldersError } = useFolders();
+  const { data: sets = [], isLoading: setsLoading, refetch: refetchSets, isError: setsError } = useSets();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { mutate: updateSet } = useUpdateSet();
   const { show, dialogProps } = useConfirmDialog();
@@ -54,7 +55,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const folderModal = useFolderModal();
 
-  const refreshing = foldersRefetching || setsRefetching;
+  const { refreshing, onRefresh } = useManualRefresh(() => Promise.all([refetchFolders(), refetchSets()]));
 
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
@@ -80,6 +81,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     }
     return counts;
   }, [sets]);
+
+  const sortedFolders = useMemo(() => [...filteredFolders].sort((a, b) => {
+    if (sortOrder === 'alpha') return a.name.localeCompare(b.name);
+    if (sortOrder === 'cards') return (folderSetCounts[b.id] ?? 0) - (folderSetCounts[a.id] ?? 0);
+    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+  }), [filteredFolders, sortOrder, folderSetCounts]);
 
   const switchTab = (tab: Tab) => {
     setActiveTab(tab);
@@ -164,14 +171,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           <Pressable onPress={toggleSearch} hitSlop={8}>
             <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
           </Pressable>
-          {activeTab === 'sets' && (
-            <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn}>
-              <SortIcon size={ICON_SIZE} color={colors.primary} />
-              <Typography preset="caption" color={colors.primary}>
-                {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : 'Cards'}
-              </Typography>
-            </Pressable>
-          )}
+          <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn}>
+            <SortIcon size={ICON_SIZE} color={colors.primary} />
+            <Typography preset="caption" color={colors.primary}>
+              {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : activeTab === 'sets' ? 'Cards' : 'Sets'}
+            </Typography>
+          </Pressable>
         </View>
       </View>
 
@@ -232,7 +237,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => { refetchFolders(); refetchSets(); }}
+              onRefresh={onRefresh}
               tintColor={colors.primary}
             />
           }
@@ -265,7 +270,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         />
       ) : (
         <FlatList
-          data={filteredFolders}
+          data={foldersLoading ? [] : sortedFolders}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
@@ -274,7 +279,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
-              onRefresh={() => { refetchFolders(); refetchSets(); }}
+              onRefresh={onRefresh}
               tintColor={colors.primary}
             />
           }
