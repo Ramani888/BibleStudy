@@ -30,6 +30,7 @@
     "react-native": "0.84.1",
     "react-native-config": "^1.6.1",
     "react-native-document-picker": "^9.3.1",
+    "react-native-draggable-flatlist": "^4.0.3",
     "react-native-gesture-handler": "^2.30.0",
     "react-native-haptic-feedback": "^3.0.0",
     "react-native-image-picker": "^8.2.1",

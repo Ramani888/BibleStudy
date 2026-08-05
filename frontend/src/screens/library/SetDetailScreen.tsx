@@ -1,11 +1,12 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
+import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
 
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, Divider, Input, Screen, ScreenHeader, Typography } from '../../components/ui';
 import {
-  SearchIcon, ShareIcon, MoreVerticalIcon, ChevronUpIcon, ChevronDownIcon, InfoIcon, EyeIcon, EyeOffIcon,
+  SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
   HelpCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
   ListIcon, GridIcon,
 } from '../../components/icons';
@@ -118,24 +119,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     setReorderMode(true);
   };
 
-  const handleMoveUp = (index: number) => {
-    if (index === 0) return;
-    setOrderedCards(prev => {
-      const next = [...prev];
-      [next[index - 1], next[index]] = [next[index], next[index - 1]];
-      return next;
-    });
-  };
-
-  const handleMoveDown = (index: number) => {
-    setOrderedCards(prev => {
-      if (index === prev.length - 1) return prev;
-      const next = [...prev];
-      [next[index], next[index + 1]] = [next[index + 1], next[index]];
-      return next;
-    });
-  };
-
   const handleSaveReorder = () => {
     reorderCards({ setId, cardIds: orderedCards.map(c => c.id) }, {
       onSuccess: () => {
@@ -245,88 +228,118 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     );
   }
 
+  // ── Normal card (list / grid) ──
+  const renderCard = ({ item }: { item: CardType }) => (
+    <View style={[styles.cardItem, cardLayout === 'grid' && styles.cardItemGrid]}>
+      <View style={[styles.questionSection, cardLayout === 'grid' && styles.questionSectionGrid]}>
+        <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
+          {item.question}
+        </Typography>
+        {isOwner ? (
+          <View style={styles.cardActions}>
+            <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
+              <InfoIcon size={ICON_SIZE} color={colors.textDisabled} />
+            </Pressable>
+            <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
+              {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textDisabled} /> : <EyeIcon size={ICON_SIZE} color={colors.textDisabled} />}
+            </Pressable>
+            <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
+              <MoreVerticalIcon size={ICON_SIZE} color={colors.textDisabled} />
+            </Pressable>
+          </View>
+        ) : null}
+      </View>
+
+      <View style={[styles.answerSection, cardLayout === 'grid' && styles.answerSectionGrid]}>
+        {item.isBlurred && isOwner ? (
+          <View style={styles.blurOverlay}>
+            <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
+          </View>
+        ) : (
+          <>
+            <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
+              {item.answer}
+            </Typography>
+            {item.note && cardLayout === 'list' ? (
+              <>
+                <Divider marginV={spacing[2]} />
+                <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
+                <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
+                  {item.note}
+                </Typography>
+              </>
+            ) : null}
+          </>
+        )}
+      </View>
+    </View>
+  );
+
+  // ── Reorder card (drag handle) ──
+  const renderReorderCard = ({ item, drag, isActive }: RenderItemParams<CardType>) => (
+    <ScaleDecorator>
+      <Pressable
+        onLongPress={drag}
+        delayLongPress={150}
+        disabled={isActive}
+        style={[styles.cardItem, isActive && styles.cardItemActive]}
+      >
+        <View style={styles.questionSection}>
+          <Typography preset="body" style={styles.question} numberOfLines={2}>
+            {item.question}
+          </Typography>
+          <View style={styles.cardActions}>
+            <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
+          </View>
+        </View>
+        <View style={styles.answerSection}>
+          <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={2}>
+            {item.answer}
+          </Typography>
+        </View>
+      </Pressable>
+    </ScaleDecorator>
+  );
+
   return (
     <Screen header={header}>
-      <FlatList
-        key={reorderMode ? 'reorder' : cardLayout}
-        data={reorderMode ? orderedCards : filteredCards}
-        keyExtractor={item => item.id}
-        numColumns={reorderMode ? 1 : (cardLayout === 'grid' ? 2 : 1)}
-        columnWrapperStyle={!reorderMode && cardLayout === 'grid' ? styles.gridRow : undefined}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshing={!reorderMode && refreshing}
-        onRefresh={reorderMode ? undefined : onRefresh}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        ListEmptyComponent={
-          isLoading ? (
-            <ActivityIndicator color={colors.primary} style={styles.listLoader} />
-          ) : (
-            <EmptyState
-              title={cardSearch ? 'No results' : 'No cards yet'}
-              subtitle={cardSearch ? `No cards match "${cardSearch}"` : isOwner ? 'Add cards to start studying this set' : 'This set has no cards yet'}
-              ctaLabel={cardSearch || !isOwner ? undefined : 'Add Cards'}
-              onCta={cardSearch || !isOwner ? undefined : () => navigation.navigate('CreateCard', { setId })}
-            />
-          )
-        }
-        renderItem={({ item, index }) => (
-          <View style={[styles.cardItem, !reorderMode && cardLayout === 'grid' && styles.cardItemGrid]}>
-            {/* Question section */}
-            <View style={[styles.questionSection, !reorderMode && cardLayout === 'grid' && styles.questionSectionGrid]}>
-              <Typography preset="body" style={styles.question} numberOfLines={!reorderMode && cardLayout === 'grid' ? 3 : undefined}>
-                {item.question}
-              </Typography>
-              {reorderMode ? (
-                <View style={styles.cardActions}>
-                  <Pressable onPress={() => handleMoveUp(index)} disabled={index === 0} hitSlop={6} style={styles.iconBtn}>
-                    <ChevronUpIcon size={ICON_SIZE} color={index === 0 ? colors.textDisabled : colors.textSecondary} />
-                  </Pressable>
-                  <Pressable onPress={() => handleMoveDown(index)} disabled={index === orderedCards.length - 1} hitSlop={6} style={styles.iconBtn}>
-                    <ChevronDownIcon size={ICON_SIZE} color={index === orderedCards.length - 1 ? colors.textDisabled : colors.textSecondary} />
-                  </Pressable>
-                </View>
-              ) : isOwner ? (
-                <View style={styles.cardActions}>
-                  <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
-                    <InfoIcon size={ICON_SIZE} color={colors.textDisabled} />
-                  </Pressable>
-                  <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
-                    {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textDisabled} /> : <EyeIcon size={ICON_SIZE} color={colors.textDisabled} />}
-                  </Pressable>
-                  <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
-                    <MoreVerticalIcon size={ICON_SIZE} color={colors.textDisabled} />
-                  </Pressable>
-                </View>
-              ) : null}
-            </View>
-
-            {/* Answer section */}
-            <View style={[styles.answerSection, !reorderMode && cardLayout === 'grid' && styles.answerSectionGrid]}>
-              {item.isBlurred && isOwner && !reorderMode ? (
-                <View style={styles.blurOverlay}>
-                  <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
-                </View>
-              ) : (
-                <>
-                  <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={!reorderMode && cardLayout === 'grid' ? 2 : undefined}>
-                    {item.answer}
-                  </Typography>
-                  {item.note && !reorderMode && cardLayout === 'list' ? (
-                    <>
-                      <Divider marginV={spacing[2]} />
-                      <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
-                      <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
-                        {item.note}
-                      </Typography>
-                    </>
-                  ) : null}
-                </>
-              )}
-            </View>
-          </View>
-        )}
-      />
+      {reorderMode ? (
+        <DraggableFlatList
+          data={orderedCards}
+          onDragEnd={({ data }) => setOrderedCards(data)}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          renderItem={renderReorderCard}
+        />
+      ) : (
+        <FlatList
+          key={cardLayout}
+          data={filteredCards}
+          keyExtractor={item => item.id}
+          numColumns={cardLayout === 'grid' ? 2 : 1}
+          columnWrapperStyle={cardLayout === 'grid' ? styles.gridRow : undefined}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
+          ListEmptyComponent={
+            isLoading ? (
+              <ActivityIndicator color={colors.primary} style={styles.listLoader} />
+            ) : (
+              <EmptyState
+                title={cardSearch ? 'No results' : 'No cards yet'}
+                subtitle={cardSearch ? `No cards match "${cardSearch}"` : isOwner ? 'Add cards to start studying this set' : 'This set has no cards yet'}
+                ctaLabel={cardSearch || !isOwner ? undefined : 'Add Cards'}
+                onCta={cardSearch || !isOwner ? undefined : () => navigation.navigate('CreateCard', { setId })}
+              />
+            )
+          }
+          renderItem={renderCard}
+        />
+      )}
 
       {/* ── Card action sheet ── */}
       <ActionSheet
@@ -438,6 +451,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       borderRadius: layout.cardRadius,
       overflow: 'hidden',
     },
+    cardItemActive: { opacity: 0.9 },
     questionSection: {
       backgroundColor: colors.backgroundCard,
       padding: spacing[4],
@@ -457,8 +471,12 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     answer: { lineHeight: 22 },
     note: { lineHeight: 20 },
     blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
-    gridRow: { gap: spacing[3] },
-    cardItemGrid: { flex: 1 },
+    // space-between + fixed half-width so an odd last card stays half-width
+    // (left column) instead of stretching to fill the row. flex-start keeps each
+    // card at its own content height (default 'stretch' would over-tall the
+    // shorter card, leaving its answer background cut off at the bottom).
+    gridRow: { justifyContent: 'space-between', alignItems: 'flex-start' },
+    cardItemGrid: { width: '48.5%' },
     questionSectionGrid: { padding: spacing[3] },
     answerSectionGrid: { padding: spacing[3] },
     notePopupInput: {
