@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { SetActionSheet, SetCard } from '../../components/domain';
+import { QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
 import { Button, Input, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
 import { SearchIcon } from '../../components/icons';
@@ -21,6 +21,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const { colors, spacing } = theme;
   const { folderId, folderName, folderColor } = route.params;
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const [quizSet, setQuizSet] = useState<{ id: string; title: string } | null>(null);
   const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
@@ -142,10 +143,12 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         set={selectedSet}
         visible={!!selectedSet}
         onClose={() => { setSelectedSet(null); setAssignTargetSetId(null); }}
-        onQuiz={() =>
-          selectedSet &&
-          navigation.navigate('QuizModePicker', { setId: selectedSet.id, setTitle: selectedSet.title })
-        }
+        onQuiz={() => {
+          if (!selectedSet) return;
+          const target = { id: selectedSet.id, title: selectedSet.title };
+          setSelectedSet(null);
+          setTimeout(() => setQuizSet(target), 350);
+        }}
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
         showAssignFolder
         onAssignFolder={() => {
@@ -165,6 +168,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         onSelect={handleAssignFolder}
         onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
         emptyText="No other folders"
+      />
+
+      <QuizModeSheet
+        visible={!!quizSet}
+        setIds={quizSet ? [quizSet.id] : []}
+        setTitles={quizSet ? [quizSet.title] : []}
+        onClose={() => setQuizSet(null)}
+        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
       />
 
       <ConfirmDialog {...dialogProps} />

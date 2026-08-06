@@ -14,6 +14,19 @@ export function formatDate(dateStr: string): string {
   return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+/** "Today · 3:45 PM", "Yesterday · 9:00 AM", "Aug 5 · 2:30 PM" */
+export function formatDateWithTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+  if (diffDays === 0) return `Today · ${time}`;
+  if (diffDays === 1) return `Yesterday · ${time}`;
+  const day = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return `${day} · ${time}`;
+}
+
 /**
  * Format bytes to human-readable storage size.
  */

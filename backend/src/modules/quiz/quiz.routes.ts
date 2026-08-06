@@ -8,7 +8,10 @@ const router = Router();
 
 router.use(authMiddleware);
 
-router.post('/attempts', validate(RecordAttemptDto), quizController.recordAttempt);
+router.post('/attempts',        validate(RecordAttemptDto), quizController.recordAttempt);
+router.put('/attempts/:id',    validate(RecordAttemptDto), quizController.updateAttempt);
+router.delete('/attempts/:id',                             quizController.deleteAttempt);
+router.get('/attempts/recent',                       quizController.getRecentAttempts);
 router.get('/best',                                  quizController.getAllBest);
 router.get('/sets/:setId/best',                      quizController.getBest);
 

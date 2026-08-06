@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import { FolderCard, SetActionSheet, SetCard } from '../../components/domain';
+import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Input, Screen, Spacer, Typography } from '../../components/ui';
 import { GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
@@ -43,6 +43,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const [activeTab, setActiveTab] = useState<Tab>('sets');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const [quizSet, setQuizSet] = useState<{ id: string; title: string }[] | null>(null);
   const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
@@ -315,10 +316,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         set={selectedSet}
         visible={!!selectedSet}
         onClose={() => setSelectedSet(null)}
-        onQuiz={() =>
-          selectedSet &&
-          navigation.navigate('QuizModePicker', { setId: selectedSet.id, setTitle: selectedSet.title })
-        }
+        onQuiz={() => {
+          if (!selectedSet) return;
+          const target = { id: selectedSet.id, title: selectedSet.title };
+          setSelectedSet(null);
+          setTimeout(() => setQuizSet([target]), 350);
+        }}
         onCreateCard={() => selectedSet && navigation.navigate('CreateCard', { setId: selectedSet.id })}
         showAssignFolder
         onAssignFolder={() => {
@@ -327,6 +330,14 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         }}
         onEdit={() => selectedSet && navigation.navigate('EditSet', { setId: selectedSet.id })}
         onDelete={() => selectedSet && handleDeleteSet(selectedSet.id)}
+      />
+
+      <QuizModeSheet
+        visible={!!quizSet}
+        setIds={quizSet ? [quizSet[0].id] : []}
+        setTitles={quizSet ? [quizSet[0].title] : []}
+        onClose={() => setQuizSet(null)}
+        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
       />
 
       {/* ── Folder actions sheet ── */}

@@ -10,15 +10,32 @@ export interface QuizAttempt {
 }
 
 export interface RecordAttemptPayload {
-  setId: string;
+  setIds: string[];
   total: number;
   correct: number;
   mode?: string;
+  quizName?: string;
 }
 
 export interface RecordAttemptResult {
   attempt: QuizAttempt;
   best: number | null;
+}
+
+// A quiz attempt joined with its set title (for the history list).
+export interface QuizAttemptWithSet {
+  id: string;
+  setId: string;
+  setIds: string[];
+  setTitle: string;
+  setTitles: string[];
+  mode: string | null;
+  quizName?: string;
+  practicedAt?: string;
+  scorePct: number;
+  total: number;
+  correct: number;
+  createdAt: string;
 }
 
 // Best score + attempt count for a set (Quiz hub badges).

@@ -172,6 +172,10 @@ export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
     else { setIndex(n); setSubmitted(false); setLastCorrect(null); }
   }, [index, total]);
 
+  const prev = useCallback(() => {
+    if (index > 0) { setIndex(i => i - 1); setSubmitted(false); setLastCorrect(null); }
+  }, [index]);
+
   const restart = useCallback(() => {
     setSeed(s => s + 1);
     setIndex(0); setSubmitted(false); setLastCorrect(null); setCorrectCount(0); setIsComplete(false);
@@ -182,6 +186,6 @@ export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
     item, index, total, progress,
     submitted, lastCorrect,
     correctCount, scoredTotal, scorePct, isComplete,
-    submit, next, restart,
+    submit, next, prev, restart,
   };
 }

@@ -1,87 +1,129 @@
-import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { ErrorState } from '../../components/feedback';
-import { ProgressBar, Typography } from '../../components/ui';
-import { Screen } from '../../components/ui/Screen';
-import { CloseIcon } from '../../components/icons';
-import { useCards } from '../../hooks';
+import { Typography } from '../../components/ui';
+import { useCardsForSets, useUpdateQuizAttempt } from '../../hooks';
 import { useQuizSession } from '../../hooks/useQuizSession';
-import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
 import type { QuizSelectableMode } from '../../types';
 
-type Params = { setId: string; setTitle: string; mode?: QuizSelectableMode; isOwner?: boolean };
+type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string };
+
+function formatTime(s: number): string {
+  return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+}
 
 export function QuizScreen() {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
-  const { setId, setTitle, mode = 'mix' } = params;
+  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = params;
 
-  const { data: cards = [], isLoading, isError, error, refetch } = useCards(setId);
+  const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
   const s = useQuizSession(cards, mode);
-  const goBack = () => navigation.goBack();
+  const { mutate: updateAttempt } = useUpdateQuizAttempt();
+  const [responses, setResponses] = useState<Record<number, unknown>>({});
+  const saveResponse = (idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r }));
+  const goBack = () => (navigation as any).popToTop();
 
-  if (isError) return <ErrorState message={getErrorMessage(error)} onRetry={refetch} />;
+  const [elapsed, setElapsed] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  let body: React.ReactNode;
-  if (isLoading) {
-    body = <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>Loading…</Typography></View>;
-  } else if (!s.isAvailable) {
-    body = <View style={styles.center}><Typography preset="h4" align="center">Nothing to quiz here</Typography></View>;
-  } else if (s.isComplete) {
-    body = (
+  useEffect(() => {
+    intervalRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, []);
+
+  const finish = () => {
+    if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+    if (retakeAttemptId) {
+      updateAttempt({ attemptId: retakeAttemptId, payload: { setIds, total: 0, correct: 0, mode, quizName } });
+    }
+    s.next(); // marks isComplete → renders result screen
+  };
+
+  const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : `${setTitles.length} Sets`);
+
+  if (isError) return (
+    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View style={styles.center}><Typography preset="h4" align="center">Failed to load cards</Typography></View>
+    </View>
+  );
+
+  if (isLoading) return (
+    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>Loading…</Typography></View>
+    </View>
+  );
+
+  if (!s.isAvailable) return (
+    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+      <View style={styles.center}><Typography preset="h4" align="center">Nothing to quiz here</Typography></View>
+    </View>
+  );
+
+  if (s.isComplete) return (
+    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <QuizResultScreen
-        setId={setId} setTitle={setTitle} mode={mode}
-        total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
+        setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
+        total={0} correct={0} scorePct={0}
+        retakeAttemptId={retakeAttemptId}
         onRetake={s.restart} onExit={goBack}
       />
-    );
-  } else {
-    body = (
-      <>
-        <View style={styles.header}>
-          <Pressable onPress={goBack} hitSlop={12} style={styles.exit}>
-            <CloseIcon size={20} color={colors.primary} />
-            <Typography preset="label" color={colors.primary}>Exit</Typography>
-          </Pressable>
-          <Typography preset="label" color={colors.textPrimary} numberOfLines={1} style={styles.title}>{setTitle}</Typography>
-          <Typography preset="label" color={colors.textSecondary}>{s.index + 1} / {s.total}</Typography>
+    </View>
+  );
+
+  return (
+    <View style={[styles.fill, { backgroundColor: colors.background }]}>
+      {/* Header: timer | title | counter */}
+      <View style={[styles.header, { paddingTop: insets.top + spacing[2] }]}>
+        <View style={styles.timerWrap}>
+          <Typography preset="label" color={colors.textSecondary} style={styles.timer}>
+            {formatTime(elapsed)}
+          </Typography>
         </View>
-        <ProgressBar progress={s.progress} style={styles.progress} />
-        {s.item && (
-          <QuizItemView
-            item={s.item}
-            submitted={s.submitted}
-            lastCorrect={s.lastCorrect}
-            isLast={s.index + 1 >= s.total}
-            onSubmit={s.submit}
-            onNext={s.next}
-          />
-        )}
-      </>
-    );
-  }
+        <Typography preset="label" color={colors.textPrimary} numberOfLines={1} style={styles.title}>
+          {headerTitle}
+        </Typography>
+        <View style={styles.counterWrap}>
+          <Typography preset="label" color={colors.textSecondary}>{s.index + 1}/{s.total}</Typography>
+        </View>
+      </View>
 
-  return <Screen>{body}</Screen>;
+      <View style={[styles.progressTrack, { backgroundColor: colors.backgroundSecondary }]}>
+        <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.primary }]} />
+      </View>
+
+      {s.item && (
+        <QuizItemView
+          key={s.index}
+          item={s.item}
+          initialResponse={responses[s.index]}
+          onResponseChange={r => saveResponse(s.index, r)}
+          hasPrev={s.index > 0}
+          isLast={s.index + 1 >= s.total}
+          onPrev={s.prev}
+          onNext={s.next}
+          onFinish={finish}
+          bottomInset={insets.bottom}
+        />
+      )}
+    </View>
+  );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[3],
-    },
-    title: { flex: 1, textAlign: 'center', marginHorizontal: spacing[2] },
-    exit: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    progress: { marginHorizontal: layout.screenPaddingH, marginBottom: spacing[4] },
-  });
-}
+const styles = StyleSheet.create({
+  fill:          { flex: 1 },
+  center:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
+  header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
+  timerWrap:     { width: 56, alignItems: 'flex-start' },
+  timer:         { fontVariant: ['tabular-nums'] },
+  title:         { flex: 1, textAlign: 'center' },
+  counterWrap:   { width: 56, alignItems: 'flex-end' },
+  progressTrack: { height: 4, width: '100%' },
+  progressFill:  { height: 4 },
+});

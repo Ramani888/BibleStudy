@@ -5,3 +5,4 @@ export { FlashCard } from './FlashCard';
 export { ChatBubble } from './ChatBubble';
 export { CreditBadge } from './CreditBadge';
 export { SetActionSheet } from './SetActionSheet';
+export { QuizModeSheet } from './QuizModeSheet';

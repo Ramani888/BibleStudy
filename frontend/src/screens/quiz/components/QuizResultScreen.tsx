@@ -4,39 +4,47 @@ import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { Button, Typography } from '../../../components/ui';
 import { StarIcon, StarOutlineIcon } from '../../../components/icons';
-import { useRecordQuizAttempt } from '../../../hooks';
+import { useRecordQuizAttempt, useUpdateQuizAttempt } from '../../../hooks';
 import { layout, spacing, useTheme } from '../../../theme';
 
 const RESULT_ICON_SIZE = 56;
 
 interface Props {
-  setId: string;
+  setIds: string[];
   setTitle: string;
   mode?: string;
+  quizName?: string;
   total: number;
   correct: number;
   scorePct: number;
+  retakeAttemptId?: string;
   onRetake: () => void;
   onExit: () => void;
 }
 
-export function QuizResultScreen({ setId, setTitle, mode, total, correct, scorePct, onRetake, onExit }: Props) {
+export function QuizResultScreen({ setIds, setTitle, mode, quizName, total, correct, scorePct, retakeAttemptId, onRetake, onExit }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const { mutate: recordAttempt } = useRecordQuizAttempt();
+  const { mutate: updateAttempt } = useUpdateQuizAttempt();
   const recorded = useRef(false);
   const [best, setBest] = useState<number | null>(null);
 
-  // Persist the attempt once on mount — only if something was scored
-  // (a Read-only quiz has total 0 and isn't recorded).
   useEffect(() => {
     if (recorded.current || total === 0) return;
     recorded.current = true;
-    recordAttempt(
-      { setId, total, correct, mode },
-      { onSuccess: res => setBest(res.best) },
-    );
-  }, [recordAttempt, setId, total, correct, mode]);
+    if (retakeAttemptId) {
+      updateAttempt(
+        { attemptId: retakeAttemptId, payload: { setIds, total, correct, mode, quizName } },
+        { onSuccess: res => setBest(res.best) },
+      );
+    } else {
+      recordAttempt(
+        { setIds, total, correct, mode, quizName },
+        { onSuccess: res => setBest(res.best) },
+      );
+    }
+  }, [recordAttempt, updateAttempt, setIds, total, correct, mode, quizName, retakeAttemptId]);
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
   const isNewBest = best !== null && scorePct >= best;

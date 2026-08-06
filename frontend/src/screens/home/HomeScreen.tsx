@@ -325,7 +325,8 @@ export function HomeScreen() {
     [sets],
   );
 
-  const goReview = (setId: string, setTitle: string) => navigation.navigate('QuizTab', { screen: 'QuizModePicker', params: { setId, setTitle } });
+  const goReview = (setId: string, setTitle: string) =>
+    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } });
   const goContinue = (s: StudySet) => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } });
   const goCreate = () => navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} });
 
@@ -446,6 +447,7 @@ export function HomeScreen() {
 
         <Spacer size={spacing[8]} />
       </ScrollView>
+
     </SafeAreaView>
   );
 }

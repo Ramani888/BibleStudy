@@ -15,4 +15,5 @@ export { ColorPicker, PRESET_COLORS } from './ColorPicker';
 export { Screen } from './Screen';
 export { ScreenHeader } from './ScreenHeader';
 export { AccentIcon } from './AccentIcon';
+export { FilterChip } from './FilterChip';
 export { ListCard } from './ListCard';

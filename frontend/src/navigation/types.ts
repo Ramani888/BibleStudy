@@ -23,15 +23,15 @@ export type LibraryStackParamList = {
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
   FriendsSets: undefined;
-  QuizModePicker: { setId: string; setTitle: string; isOwner?: boolean };
-  Quiz: { setId: string; setTitle: string; mode?: QuizSelectableMode; isOwner?: boolean };
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode };
 };
 
 // ─── Quiz Stack (nested inside Quiz tab) ──────────────────────────────────────
 export type QuizStackParamList = {
   QuizHub: undefined;
-  QuizModePicker: { setId: string; setTitle: string; isOwner?: boolean };
-  Quiz: { setId: string; setTitle: string; mode?: QuizSelectableMode; isOwner?: boolean };
+  QuizDetail: { id: string; setIds: string[]; setTitles: string[]; mode: string | null; scorePct: number; correct: number; total: number; createdAt: string; practicedAt?: string; quizName?: string };
+  QuizSetup: { preSelectedSetIds?: string[]; preSelectedSetTitles?: string[]; retakeAttemptId?: string } | undefined;
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
@@ -74,14 +74,6 @@ export type ProfileStackParamList = {
   MediaPDFViewer: { url: string; name: string };
 };
 
-// ─── Map Stack ────────────────────────────────────────────────────────────────
-export type MapStackParamList = {
-  Map: undefined;
-  GatheringDetail: { gatheringId: string };
-  CreateGathering: { groupId?: string };
-  EditGathering: { gatheringId: string };
-};
-
 // ─── Bottom Tabs ──────────────────────────────────────────────────────────────
 export type AppTabParamList = {
   HomeTab: undefined;
@@ -119,8 +111,3 @@ export type ProfileScreenProps<T extends keyof ProfileStackParamList> =
     BottomTabScreenProps<AppTabParamList>
   >;
 
-export type MapScreenProps<T extends keyof MapStackParamList> =
-  CompositeScreenProps<
-    NativeStackScreenProps<MapStackParamList, T>,
-    BottomTabScreenProps<AppTabParamList>
-  >;

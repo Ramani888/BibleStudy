@@ -4,6 +4,7 @@ import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-
 import Toast from 'react-native-toast-message';
 
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
+import { QuizModeSheet } from '../../components/domain';
 import { Button, Divider, Input, Screen, ScreenHeader, Typography } from '../../components/ui';
 import {
   SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
@@ -30,6 +31,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [moveTargetCard, setMoveTargetCard] = useState<CardType | null>(null);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
+  const [quizSheetOpen, setQuizSheetOpen] = useState(false);
   const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -378,7 +380,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={cachedTitle ?? setTitle}
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
-          { label: 'Quiz', icon: HelpCircleIcon, onPress: () => navigation.navigate('QuizModePicker', { setId, setTitle: cachedTitle ?? setTitle, isOwner }) },
+          { label: 'Quiz', icon: HelpCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
           ...(isOwner ? [
             { label: 'Create Card', icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
             { label: 'Edit Set', icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
@@ -387,6 +389,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ] : []),
           { label: cardLayout === 'grid' ? 'List View' : 'Grid View', icon: cardLayout === 'grid' ? ListIcon : GridIcon, onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list') },
         ]}
+      />
+
+      <QuizModeSheet
+        visible={quizSheetOpen}
+        setIds={[setId]}
+        setTitles={[cachedTitle ?? setTitle]}
+        onClose={() => setQuizSheetOpen(false)}
+        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
       />
 
       {/* ── Note popup ── */}

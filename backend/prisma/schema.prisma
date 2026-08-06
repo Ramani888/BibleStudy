@@ -367,11 +367,14 @@ model QuizAttempt {
   id        String   @id @default(uuid())
   userId    String
   setId     String
+  setIds    String[]
   total     Int
   correct   Int
   scorePct  Int
   mode      String?
-  createdAt DateTime @default(now())
+  quizName   String?
+  createdAt  DateTime @default(now())
+  practicedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   set       Set      @relation(fields: [setId], references: [id], onDelete: Cascade)
 
