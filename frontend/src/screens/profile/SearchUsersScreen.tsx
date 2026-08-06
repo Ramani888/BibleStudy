@@ -1,20 +1,15 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { CheckCircleIcon, ClockIcon, UserPlusIcon } from '../../components/icons';
 import { useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import type { UserProfile } from '../../types/friends.types';
@@ -22,6 +17,8 @@ import type { UserProfile } from '../../types/friends.types';
 type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
@@ -33,8 +30,6 @@ export function SearchUsersScreen({ navigation }: Props) {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Clear local sent-IDs when search results refresh with updated data so the
-  // server-returned pendingRequest field takes over as the source of truth.
   useEffect(() => {
     if (!isFetching) setSentIds(new Set());
   }, [isFetching]);
@@ -60,16 +55,16 @@ export function SearchUsersScreen({ navigation }: Props) {
         >
           <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
           <View>
-            <Typography preset="body">{item.name}</Typography>
+            <Typography preset="label">{item.name}</Typography>
             {item.church ? (
               <Typography preset="caption" color={colors.textSecondary}>{item.church}</Typography>
             ) : null}
           </View>
         </Pressable>
         {isFriend ? (
-          <Icon name="checkmark-circle" size={24} color={colors.success} />
+          <CheckCircleIcon size={24} color={colors.success} />
         ) : isPending ? (
-          <Icon name="time-outline" size={24} color={colors.textSecondary} />
+          <ClockIcon size={24} color={colors.textSecondary} />
         ) : (
           <Pressable
             style={styles.addBtn}
@@ -77,15 +72,17 @@ export function SearchUsersScreen({ navigation }: Props) {
             hitSlop={8}
             disabled={sendRequest.isPending}
           >
-            <Icon name="person-add-outline" size={20} color={colors.primary} />
+            <UserPlusIcon size={20} color={colors.primary} />
           </Pressable>
         )}
       </View>
     );
-  }, [sentIds, handleAdd, navigation, sendRequest.isPending]);
+  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, styles]);
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
+    <Screen
+      header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}
+    >
       <View style={styles.searchBar}>
         <Input
           placeholder="Search by name..."
@@ -111,23 +108,24 @@ export function SearchUsersScreen({ navigation }: Props) {
           ) : null
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  searchBar: { padding: layout.screenPaddingH },
-  list: { paddingHorizontal: layout.screenPaddingH },
-  userRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-  },
-  userInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
-  addBtn: { padding: spacing[1] },
-  loader: { paddingVertical: spacing[2] },
-  empty: { padding: layout.screenPaddingH, alignItems: 'center' },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    searchBar: { padding: layout.screenPaddingH },
+    list: { paddingHorizontal: layout.screenPaddingH },
+    userRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing[3],
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    userInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
+    addBtn: { padding: spacing[1] },
+    loader: { paddingVertical: spacing[2] },
+    empty: { padding: layout.screenPaddingH, alignItems: 'center' },
+  });
+}

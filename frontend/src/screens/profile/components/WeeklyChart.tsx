@@ -6,7 +6,7 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, {
   Circle,
   Defs,
@@ -18,21 +18,29 @@ import Svg, {
 } from 'react-native-svg';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Toast from 'react-native-toast-message';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { Card, Typography } from '../../../components/ui';
+import {
+  BarChartIcon,
+  CalendarIcon,
+  CloseIcon,
+  ExpandIcon,
+  PieChartIcon,
+  TrendingUpIcon,
+  type IconComponent,
+} from '../../../components/icons';
 import { useCreditBalance, useCreditStats } from '../../../hooks';
-import { colors, spacing } from '../../../theme';
+import { spacing, useTheme } from '../../../theme';
 import type { CreditStatsPeriod, CreditInterval, DayStat } from '../../../hooks/useCredits';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
 type ChartType = 'bar' | 'line' | 'donut' | 'balance';
 
-const CHART_ICONS: { key: ChartType; icon: string }[] = [
-  { key: 'bar',     icon: 'bar-chart-outline'  },
-  { key: 'line',    icon: 'trending-up-outline' },
-  { key: 'donut',   icon: 'pie-chart-outline'   },
-  { key: 'balance', icon: 'analytics-outline'   },
+const CHART_ICONS: { key: ChartType; Icon: IconComponent }[] = [
+  { key: 'bar',     Icon: BarChartIcon    },
+  { key: 'line',    Icon: TrendingUpIcon  },
+  { key: 'donut',   Icon: PieChartIcon    },
+  { key: 'balance', Icon: BarChartIcon    },
 ];
 
 const PERIOD_CHIPS: { key: CreditStatsPeriod; label: string }[] = [
@@ -46,6 +54,8 @@ const MAX_CUSTOM_DAYS = 90;
 const ICON_BTN_SIZE   = 18;
 const CHIP_ICON_SIZE  = 13;
 const MAX_BAR_H       = 140;
+const FS_BAR_H        = 260;
+const FS_SVG_H        = 300;
 const SVG_H           = 180;
 const SVG_PAD         = 12;
 const DONUT_SIZE      = 200;
@@ -119,10 +129,12 @@ function emptyMsgFor(period: CreditStatsPeriod): string {
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
 
-function EmptyView({ height = SVG_H, message = 'No activity' }: { height?: number; message?: string }) {
+function EmptyView({ height = SVG_H, message = 'No activity', colors }: {
+  height?: number; message?: string; colors: ReturnType<typeof useTheme>['colors'];
+}) {
   return (
     <View style={[s.centerBox, { height }]}>
-      <Typography preset="bodySm" color={colors.textDisabled} style={s.emptyText}>
+      <Typography preset="caption" color={colors.textDisabled} style={s.emptyText}>
         {message}
       </Typography>
     </View>
@@ -131,13 +143,14 @@ function EmptyView({ height = SVG_H, message = 'No activity' }: { height?: numbe
 
 // ─── Bar Chart ────────────────────────────────────────────────────────────────
 
-function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSelect }: {
+function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; emptyMsg: string; maxBarH?: number;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
+  colors: ReturnType<typeof useTheme>['colors'];
 }) {
   const maxTotal = Math.max(...stats.map(d => d.earned + d.used), 1);
   const hasData  = stats.some(d => d.earned > 0 || d.used > 0);
-  if (!hasData) return <EmptyView height={maxBarH + spacing[6]} message={emptyMsg} />;
+  if (!hasData) return <EmptyView height={maxBarH + spacing[6]} message={emptyMsg} colors={colors} />;
 
   return (
     <View style={s.barBars}>
@@ -149,7 +162,7 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
         const selected = selectedIdx === idx;
         return (
           <Pressable key={idx} style={s.barCol} onPress={() => onSelect(selected ? null : idx)}>
-            <View style={[s.barTrack, { height: maxBarH }, selected && s.barTrackSelected]}>
+            <View style={[s.barTrack, { height: maxBarH, backgroundColor: colors.backgroundSecondary }, selected && { borderWidth: 1, borderColor: colors.primary }]}>
               {total > 0 && (
                 <View style={[s.barStack, { height: barH }]}>
                   {usedH   > 0 && <View style={[s.barSeg, { height: usedH,   backgroundColor: colors.error   }]} />}
@@ -167,12 +180,13 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
 
 // ─── Line Chart ───────────────────────────────────────────────────────────────
 
-function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSelect }: {
+function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; width: number; emptyMsg: string; svgH?: number;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
+  colors: ReturnType<typeof useTheme>['colors'];
 }) {
   const hasData = stats.some(d => d.earned > 0 || d.used > 0);
-  if (!hasData) return <EmptyView height={svgH} message={emptyMsg} />;
+  if (!hasData) return <EmptyView height={svgH} message={emptyMsg} colors={colors} />;
 
   const maxVal = Math.max(...stats.map(d => Math.max(d.earned, d.used)), 1);
   const xStep  = (width - SVG_PAD * 2) / Math.max(stats.length - 1, 1);
@@ -212,7 +226,9 @@ function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSe
 
 // ─── Donut Chart ──────────────────────────────────────────────────────────────
 
-function DonutChartView({ stats, size = DONUT_SIZE }: { stats: DayStat[]; size?: number }) {
+function DonutChartView({ stats, size = DONUT_SIZE, colors }: {
+  stats: DayStat[]; size?: number; colors: ReturnType<typeof useTheme>['colors'];
+}) {
   const totalEarned = stats.reduce((sum, d) => sum + d.earned, 0);
   const totalUsed   = stats.reduce((sum, d) => sum + d.used,   0);
   const total       = totalEarned + totalUsed;
@@ -227,7 +243,7 @@ function DonutChartView({ stats, size = DONUT_SIZE }: { stats: DayStat[]; size?:
   const usedDash   = total > 0 ? (totalUsed   / total) * c : 0;
   const earnedDeg  = total > 0 ? (totalEarned / total) * 360 : 0;
 
-  const fSize  = Math.max(12, size * 0.088);
+  const fSize   = Math.max(12, size * 0.088);
   const fSizeSm = Math.max(10, size * 0.075);
 
   return (
@@ -265,11 +281,12 @@ function DonutChartView({ stats, size = DONUT_SIZE }: { stats: DayStat[]; size?:
 
 // ─── Balance Chart ────────────────────────────────────────────────────────────
 
-function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg, selectedIdx, onSelect }: {
+function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; currentBalance: number; width: number; svgH?: number; emptyMsg: string;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
+  colors: ReturnType<typeof useTheme>['colors'];
 }) {
-  if (stats.length === 0) return <EmptyView height={svgH} message={emptyMsg} />;
+  if (stats.length === 0) return <EmptyView height={svgH} message={emptyMsg} colors={colors} />;
 
   const netPerDay = stats.map(d => d.earned - d.used);
   const totalNet  = netPerDay.reduce((a, b) => a + b, 0);
@@ -318,58 +335,41 @@ function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg
   );
 }
 
-// ─── ChartBody (shared between card and fullscreen) ───────────────────────────
+// ─── ChartBody ────────────────────────────────────────────────────────────────
 
-const LABEL_H = 24; // caption text row height
+const LABEL_H = 24;
 
 function ChartBody({
-  stats,
-  chartType,
-  currentBalance,
-  emptyMsg,
-  isLoading,
-  isFullscreen = false,
-  selectedIdx,
-  onSelect,
+  stats, chartType, currentBalance, emptyMsg, isLoading,
+  isFullscreen = false, selectedIdx, onSelect, colors,
 }: {
-  stats: DayStat[];
-  chartType: ChartType;
-  currentBalance: number;
-  emptyMsg: string;
-  isLoading: boolean;
-  isFullscreen?: boolean;
-  selectedIdx: number | null;
-  onSelect: (i: number | null) => void;
+  stats: DayStat[]; chartType: ChartType; currentBalance: number; emptyMsg: string;
+  isLoading: boolean; isFullscreen?: boolean;
+  selectedIdx: number | null; onSelect: (i: number | null) => void;
+  colors: ReturnType<typeof useTheme>['colors'];
 }) {
-  const [width,  setWidth]  = useState(0);
-  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(0);
 
-  const effectiveBarH    = isFullscreen && height > 0 ? height - LABEL_H - spacing[2] : MAX_BAR_H;
-  const effectiveSvgH    = isFullscreen && height > 0 ? height - LABEL_H              : SVG_H;
-  const effectiveDonutSz = isFullscreen && width > 0 && height > 0
-    ? Math.min(Math.floor(Math.min(width, height) * 0.85), 320)
-    : DONUT_SIZE;
+  const effectiveBarH    = isFullscreen ? FS_BAR_H : MAX_BAR_H;
+  const effectiveSvgH    = isFullscreen ? FS_SVG_H : SVG_H;
+  const effectiveDonutSz = isFullscreen ? 260 : DONUT_SIZE;
 
   return (
     <View
-      style={isFullscreen ? { flex: 1 } : undefined}
-      onLayout={e => {
-        setWidth(e.nativeEvent.layout.width);
-        setHeight(e.nativeEvent.layout.height);
-      }}
+      onLayout={e => setWidth(e.nativeEvent.layout.width)}
     >
       {isLoading ? (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
           <ActivityIndicator color={colors.primary} />
         </View>
       ) : chartType === 'bar' ? (
-        <BarChartView stats={stats} emptyMsg={emptyMsg} maxBarH={effectiveBarH} selectedIdx={selectedIdx} onSelect={onSelect} />
+        <BarChartView stats={stats} emptyMsg={emptyMsg} maxBarH={effectiveBarH} selectedIdx={selectedIdx} onSelect={onSelect} colors={colors} />
       ) : chartType === 'donut' ? (
-        <DonutChartView stats={stats} size={effectiveDonutSz} />
+        <DonutChartView stats={stats} size={effectiveDonutSz} colors={colors} />
       ) : width > 0 ? (
         chartType === 'line'
-          ? <LineChartView stats={stats} width={width} emptyMsg={emptyMsg} svgH={effectiveSvgH} selectedIdx={selectedIdx} onSelect={onSelect} />
-          : <BalanceChartView stats={stats} currentBalance={currentBalance} width={width} svgH={effectiveSvgH} emptyMsg={emptyMsg} selectedIdx={selectedIdx} onSelect={onSelect} />
+          ? <LineChartView stats={stats} width={width} emptyMsg={emptyMsg} svgH={effectiveSvgH} selectedIdx={selectedIdx} onSelect={onSelect} colors={colors} />
+          : <BalanceChartView stats={stats} currentBalance={currentBalance} width={width} svgH={effectiveSvgH} emptyMsg={emptyMsg} selectedIdx={selectedIdx} onSelect={onSelect} colors={colors} />
       ) : (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
           <ActivityIndicator color={colors.primary} />
@@ -382,6 +382,10 @@ function ChartBody({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function WeeklyChart() {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const styles = makeStyles(colors);
+
   const [chartType,       setChartType]       = useState<ChartType>('bar');
   const [period,          setPeriod]          = useState<CreditStatsPeriod>('week');
   const [selectedIdx,     setSelectedIdx]     = useState<number | null>(null);
@@ -411,8 +415,6 @@ export function WeeklyChart() {
   const net           = totalEarned - totalUsed;
   const hasSummary    = !isLoading && (totalEarned > 0 || totalUsed > 0);
 
-  // ── Period handling ────────────────────────────────────────────────────────
-
   const handlePeriod = (p: CreditStatsPeriod) => {
     setPrevPeriod(period);
     setPeriod(p);
@@ -440,9 +442,7 @@ export function WeeklyChart() {
   const handleToConfirm = (date: Date) => {
     setPickingTo(false);
     if (!customFrom) return;
-
     const diffDays = Math.ceil((date.getTime() - customFrom.getTime()) / (1000 * 60 * 60 * 24));
-
     if (date < customFrom) {
       Toast.show({ type: 'error', text1: 'End date must be after start date' });
       setPeriod(prevPeriod); setCustomFrom(null);
@@ -468,38 +468,37 @@ export function WeeklyChart() {
     }
   };
 
-  // ── Sub-UI helpers ─────────────────────────────────────────────────────────
+  const handleIntervalChange = (iv: CreditInterval) => {
+    setChartInterval(iv);
+    setSelectedIdx(null);
+    if ((iv === '1h' || iv === '2h') && chartType === 'bar') setChartType('line');
+  };
 
   const customLabel = customFrom && customTo
     ? `${fmtDate(customFrom)}–${fmtDate(customTo)}`
     : null;
 
-  function renderChartIcons(closeIcon: boolean) {
+  function renderChartIcons(isFullscreenMode: boolean) {
     return (
       <View style={s.headerRight}>
-        {CHART_ICONS.map(({ key, icon }) => (
+        {CHART_ICONS.map(({ key, Icon }) => (
           <Pressable
             key={key}
-            style={[s.iconBtn, chartType === key && s.iconBtnActive]}
+            style={[styles.iconBtn, chartType === key && styles.iconBtnActive]}
             onPress={() => { setChartType(key); setSelectedIdx(null); }}
           >
-            <Icon
-              name={icon}
-              size={ICON_BTN_SIZE}
-              color={chartType === key ? colors.primary : colors.textSecondary}
-            />
+            <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.primary : colors.textSecondary} />
           </Pressable>
         ))}
-        <View style={s.iconDivider} />
+        <View style={styles.iconDivider} />
         <Pressable
-          style={s.iconBtn}
-          onPress={closeIcon ? () => setFullscreen(false) : () => setFullscreen(true)}
+          style={styles.iconBtn}
+          onPress={isFullscreenMode ? () => setFullscreen(false) : () => setFullscreen(true)}
         >
-          <Icon
-            name={closeIcon ? 'close-outline' : 'expand-outline'}
-            size={ICON_BTN_SIZE}
-            color={colors.textSecondary}
-          />
+          {isFullscreenMode
+            ? <CloseIcon size={ICON_BTN_SIZE} color={colors.textSecondary} />
+            : <ExpandIcon size={ICON_BTN_SIZE} color={colors.textSecondary} />
+          }
         </Pressable>
       </View>
     );
@@ -509,23 +508,15 @@ export function WeeklyChart() {
     const sel = selectedIdx !== null ? safeStats[selectedIdx] : null;
     if (!sel) return null;
     return (
-      <View style={s.detailStrip}>
+      <View style={styles.detailStrip}>
         <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
-        <View style={s.detailDot} />
+        <View style={styles.detailDot} />
         <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
-        <View style={s.detailDot} />
+        <View style={styles.detailDot} />
         <Typography preset="label" color={colors.error}>−{sel.used} used</Typography>
       </View>
     );
   }
-
-  const handleIntervalChange = (iv: CreditInterval) => {
-    setChartInterval(iv);
-    setSelectedIdx(null);
-    if ((iv === '1h' || iv === '2h') && chartType === 'bar') {
-      setChartType('line');
-    }
-  };
 
   function renderIntervalRow() {
     const available = getAvailableIntervals(period, customFrom, customTo);
@@ -535,7 +526,7 @@ export function WeeklyChart() {
         {available.map(iv => (
           <Pressable
             key={iv}
-            style={[s.chip, chartInterval === iv && s.chipActive]}
+            style={[styles.chip, chartInterval === iv && styles.chipActive]}
             onPress={() => handleIntervalChange(iv)}
           >
             <Typography preset="label" color={chartInterval === iv ? colors.textOnPrimary : colors.textSecondary}>
@@ -553,7 +544,7 @@ export function WeeklyChart() {
         {PERIOD_CHIPS.map(({ key, label }) => (
           <Pressable
             key={key}
-            style={[s.chip, period === key && s.chipActive]}
+            style={[styles.chip, period === key && styles.chipActive]}
             onPress={() => handlePeriod(key)}
           >
             <Typography preset="label" color={period === key ? colors.textOnPrimary : colors.textSecondary}>
@@ -562,14 +553,10 @@ export function WeeklyChart() {
           </Pressable>
         ))}
         <Pressable
-          style={[s.chip, s.chipCustom, period === 'custom' && s.chipActive]}
+          style={[styles.chip, styles.chipCustom, period === 'custom' && styles.chipActive]}
           onPress={openCustomPicker}
         >
-          <Icon
-            name="calendar-outline"
-            size={CHIP_ICON_SIZE}
-            color={period === 'custom' ? colors.textOnPrimary : colors.textSecondary}
-          />
+          <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnPrimary : colors.textSecondary} />
           {customLabel && (
             <Typography preset="caption" color={period === 'custom' ? colors.textOnPrimary : colors.textSecondary}>
               {customLabel}
@@ -580,215 +567,144 @@ export function WeeklyChart() {
     );
   }
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  function renderSummary() {
+    if (!hasSummary) return null;
+    return (
+      <View style={styles.summaryRow}>
+        <View style={s.summaryItem}>
+          <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+        </View>
+        <View style={styles.summaryDivider} />
+        <View style={s.summaryItem}>
+          <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+        </View>
+        <View style={styles.summaryDivider} />
+        <View style={s.summaryItem}>
+          <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
+            {net >= 0 ? '+' : ''}{net}
+          </Typography>
+          <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
+        </View>
+      </View>
+    );
+  }
+
+  const sharedChartProps = {
+    stats: safeStats, chartType, currentBalance: currentBal,
+    emptyMsg, isLoading, selectedIdx, onSelect: setSelectedIdx, colors,
+  };
+
+  const datePickers = (
+    <>
+      <DateTimePickerModal
+        isVisible={pickingFrom}
+        mode="date"
+        maximumDate={new Date()}
+        onConfirm={handleFromConfirm}
+        onCancel={handlePickerCancel}
+      />
+      <DateTimePickerModal
+        isVisible={pickingTo}
+        mode="date"
+        minimumDate={customFrom ?? undefined}
+        maximumDate={new Date()}
+        onConfirm={handleToConfirm}
+        onCancel={handlePickerCancel}
+      />
+    </>
+  );
 
   return (
     <>
-      {/* ── Card ── */}
-      <Card style={s.card} shadow="sm">
+      <Card style={styles.card} shadow="sm">
         <View style={s.header}>
           <Typography preset="h4">Credit Activity</Typography>
           {renderChartIcons(false)}
         </View>
         {renderPeriodRow()}
         {renderIntervalRow()}
-        <ChartBody
-          stats={safeStats}
-          chartType={chartType}
-          currentBalance={currentBal}
-          emptyMsg={emptyMsg}
-          isLoading={isLoading}
-          selectedIdx={selectedIdx}
-          onSelect={setSelectedIdx}
-        />
+        <ChartBody {...sharedChartProps} />
         {renderDetailStrip()}
-        {hasSummary && (
-          <View style={s.summaryRow}>
-            <View style={s.summaryItem}>
-              <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
-              <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
-            </View>
-            <View style={s.summaryDivider} />
-            <View style={s.summaryItem}>
-              <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
-              <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
-            </View>
-            <View style={s.summaryDivider} />
-            <View style={s.summaryItem}>
-              <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
-                {net >= 0 ? '+' : ''}{net}
-              </Typography>
-              <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
-            </View>
-          </View>
-        )}
+        {renderSummary()}
       </Card>
 
-      {/* ── Fullscreen modal ── */}
       <Modal
         visible={fullscreen}
         animationType="slide"
-        statusBarTranslucent
         onRequestClose={() => setFullscreen(false)}
       >
-        <SafeAreaView style={s.fsContainer}>
+        <View style={[styles.fsContainer, { paddingTop: insets.top + spacing[2], paddingBottom: Math.max(insets.bottom, spacing[4]) }]}>
           <View style={s.header}>
             <Typography preset="h4">Credit Activity</Typography>
             {renderChartIcons(true)}
           </View>
           {renderPeriodRow()}
           {renderIntervalRow()}
-          <View style={s.fsChartArea}>
-            <ChartBody
-              stats={safeStats}
-              chartType={chartType}
-              currentBalance={currentBal}
-              emptyMsg={emptyMsg}
-              isLoading={isLoading}
-              isFullscreen
-              selectedIdx={selectedIdx}
-              onSelect={setSelectedIdx}
-            />
-          </View>
+          <ChartBody {...sharedChartProps} isFullscreen />
           {renderDetailStrip()}
-          {hasSummary && (
-            <View style={s.summaryRow}>
-              <View style={s.summaryItem}>
-                <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
-                <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
-              </View>
-              <View style={s.summaryDivider} />
-              <View style={s.summaryItem}>
-                <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
-                <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
-              </View>
-              <View style={s.summaryDivider} />
-              <View style={s.summaryItem}>
-                <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
-                  {net >= 0 ? '+' : ''}{net}
-                </Typography>
-                <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
-              </View>
-            </View>
-          )}
-          {/* Date pickers rendered inside fullscreen modal to avoid iOS modal stacking crash */}
-          <DateTimePickerModal
-            isVisible={pickingFrom}
-            mode="date"
-            maximumDate={new Date()}
-            onConfirm={handleFromConfirm}
-            onCancel={handlePickerCancel}
-          />
-          <DateTimePickerModal
-            isVisible={pickingTo}
-            mode="date"
-            minimumDate={customFrom ?? undefined}
-            maximumDate={new Date()}
-            onConfirm={handleToConfirm}
-            onCancel={handlePickerCancel}
-          />
-        </SafeAreaView>
+          <View style={s.fsSpacer} />
+          {renderSummary()}
+          {datePickers}
+        </View>
       </Modal>
 
-      {/* ── Date pickers for non-fullscreen context ── */}
-      {!fullscreen && (
-        <>
-          <DateTimePickerModal
-            isVisible={pickingFrom}
-            mode="date"
-            maximumDate={new Date()}
-            onConfirm={handleFromConfirm}
-            onCancel={handlePickerCancel}
-          />
-          <DateTimePickerModal
-            isVisible={pickingTo}
-            mode="date"
-            minimumDate={customFrom ?? undefined}
-            maximumDate={new Date()}
-            onConfirm={handleToConfirm}
-            onCancel={handlePickerCancel}
-          />
-        </>
-      )}
+      {!fullscreen && datePickers}
     </>
   );
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
+// Static layout constants that don't depend on theme color
 const s = StyleSheet.create({
-  card: { backgroundColor: colors.background, gap: spacing[3] },
-
-  // Header
-  header:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerRight:   { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-  iconBtn:       { padding: spacing[1.5], borderRadius: 6 },
-  iconBtnActive: { backgroundColor: colors.primarySurface },
-  iconDivider:   { width: 1, height: 16, backgroundColor: colors.border, marginHorizontal: spacing[1] },
-
-  // Period row
-  periodRow:  { flexDirection: 'row', gap: spacing[1.5], flexWrap: 'wrap' },
-  chip:       {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1.5],
-    borderRadius: 20,
-    backgroundColor: colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  chipActive: { backgroundColor: colors.primary, borderColor: colors.primary },
-  chipCustom: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-
-  // Shared
-  centerBox: { alignItems: 'center', justifyContent: 'center' },
-  emptyText: { textAlign: 'center' },
-
-  // Bar
-  barBars:  { flexDirection: 'row', gap: spacing[2] },
-  barCol:   { flex: 1, alignItems: 'center', gap: spacing[1] },
-  barTrack: {
-    width: '100%',
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 4,
-    justifyContent: 'flex-end',
-    overflow: 'hidden',
-  },
-  barStack:        { width: '100%' },
-  barSeg:          { width: '100%' },
-  barTrackSelected: { borderWidth: 1, borderColor: colors.primary },
-
-  // Detail strip
-  detailStrip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[2],
-    paddingVertical: spacing[2],
-    marginTop: spacing[2],
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 8,
-  },
-  detailDot: { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.border },
-
-  // Summary row
-  summaryRow: {
-    flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing[3],
-    marginTop: spacing[1],
-  },
-  summaryItem:    { flex: 1, alignItems: 'center', gap: spacing[0.5] },
-  summaryDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[1] },
-
-  // Donut
-  donutWrap: { alignItems: 'center' },
-
-  // X-axis labels (line + balance)
-  xLabels: { flexDirection: 'row', marginTop: spacing[1] },
-  xLabel:  { flex: 1, textAlign: 'center' },
-
-  // Fullscreen
-  fsContainer: { flex: 1, backgroundColor: colors.background, padding: spacing[4], gap: spacing[3] },
-  fsChartArea: { flex: 1, justifyContent: 'center' },
+  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  periodRow:   { flexDirection: 'row', gap: spacing[1.5], flexWrap: 'wrap' },
+  centerBox:   { alignItems: 'center', justifyContent: 'center' },
+  emptyText:   { textAlign: 'center' },
+  barBars:     { flexDirection: 'row', gap: spacing[2] },
+  barCol:      { flex: 1, alignItems: 'center', gap: spacing[1] },
+  barTrack:    { width: '100%', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  barStack:    { width: '100%' },
+  barSeg:      { width: '100%' },
+  donutWrap:   { alignItems: 'center' },
+  xLabels:     { flexDirection: 'row', marginTop: spacing[1] },
+  xLabel:      { flex: 1, textAlign: 'center' },
+  summaryItem: { flex: 1, alignItems: 'center', gap: spacing[0.5] },
+  fsSpacer: { flex: 1 },
 });
+
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    card: { backgroundColor: colors.background, gap: spacing[3] },
+    iconBtn:       { padding: spacing[1.5], borderRadius: 6 },
+    iconBtnActive: { backgroundColor: colors.primarySurface },
+    iconDivider:   { width: 1, height: 16, backgroundColor: colors.border, marginHorizontal: spacing[1] },
+    chip: {
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[1.5],
+      borderRadius: 20,
+      backgroundColor: colors.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    chipActive:  { backgroundColor: colors.primary, borderColor: colors.primary },
+    chipCustom:  { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    detailStrip: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing[2],
+      paddingVertical: spacing[2],
+      marginTop: spacing[2],
+      backgroundColor: colors.backgroundSecondary,
+      borderRadius: 8,
+    },
+    detailDot:     { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.border },
+    summaryRow:    { flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing[3], marginTop: spacing[1] },
+    summaryDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[1] },
+    fsContainer:   { flex: 1, backgroundColor: colors.background, padding: spacing[4], gap: spacing[3] },
+  });
+}

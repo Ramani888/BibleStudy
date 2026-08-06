@@ -1,21 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { getErrorMessage } from '../../api/client';
 import { useGroup, useUpdateGroup, useRegenerateInviteCode } from '../../hooks/useGroups';
 
 type Props = ProfileScreenProps<'EditGroup'>;
 
 export function EditGroupScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { groupId } = route.params;
   const { data: group, isLoading, error, refetch } = useGroup(groupId);
   const updateGroup = useUpdateGroup();
@@ -25,10 +28,7 @@ export function EditGroupScreen({ route, navigation }: Props) {
   const [description, setDescription] = useState('');
 
   useEffect(() => {
-    if (group) {
-      setName(group.name);
-      setDescription(group.description ?? '');
-    }
+    if (group) { setName(group.name); setDescription(group.description ?? ''); }
   }, [group]);
 
   const handleSave = () => {
@@ -56,38 +56,48 @@ export function EditGroupScreen({ route, navigation }: Props) {
   if (error) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
-        <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-          <View style={styles.form}>
-            <Input label="Group Name *" value={name} onChangeText={setName} />
-            <Input label="Description" value={description} onChangeText={setDescription} multiline numberOfLines={3} />
-          </View>
-
-          {group && (
-            <View style={styles.inviteSection}>
-              <Typography preset="label">Current Invite Code</Typography>
-              <Typography preset="body" color={colors.textSecondary}>{group.inviteCode}</Typography>
-              <Button
-                label="Regenerate Code"
-                variant="outline"
-                onPress={handleRegenerate}
-                loading={regenerateInvite.isPending}
-              />
-            </View>
-          )}
-
+    <Screen
+      edges={['top', 'bottom']}
+      header={<ScreenHeader title="Edit Group" onClose={() => navigation.goBack()} />}
+      footer={
+        <View style={styles.footer}>
           <Button label="Save Changes" onPress={handleSave} loading={updateGroup.isPending} />
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </View>
+      }
+      keyboardAvoiding
+    >
+      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
+        <View style={styles.form}>
+          <Input label="Group Name *" value={name} onChangeText={setName} />
+          <Input label="Description" value={description} onChangeText={setDescription} multiline numberOfLines={3} />
+        </View>
+        {group && (
+          <View style={styles.inviteSection}>
+            <Typography preset="label">Current Invite Code</Typography>
+            <Typography preset="label" color={colors.textSecondary}>{group.inviteCode}</Typography>
+            <Button
+              label="Regenerate Code"
+              variant="outline"
+              onPress={handleRegenerate}
+              loading={regenerateInvite.isPending}
+            />
+          </View>
+        )}
+      </ScrollView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  content: { padding: layout.screenPaddingH, gap: spacing[4] },
-  form: { gap: spacing[3] },
-  inviteSection: { gap: spacing[2], padding: spacing[3], backgroundColor: colors.backgroundSecondary, borderRadius: 8 },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    content: { padding: layout.screenPaddingH, gap: spacing[4] },
+    form: { gap: spacing[3] },
+    inviteSection: {
+      gap: spacing[2],
+      padding: spacing[3],
+      backgroundColor: colors.backgroundSecondary,
+      borderRadius: 8,
+    },
+    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
+  });
+}

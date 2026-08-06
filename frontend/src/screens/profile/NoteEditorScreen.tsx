@@ -1,8 +1,6 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   ScrollView,
   Share,
@@ -10,22 +8,26 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNote, useCreateNote, useUpdateNote } from '../../hooks';
-import { Typography } from '../../components/ui/Typography';
+import { Button, Typography } from '../../components/ui';
 import { AppModal } from '../../components/feedback/Modal';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { colors, layout, spacing } from '../../theme';
+import { type Theme, fontSizes, fontWeights, lineHeights, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'NoteEditor'>;
 
 export function NoteEditorScreen({ navigation, route }: Props) {
+  const theme = useTheme();
+  const styles = React.useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = theme;
   const noteId = route.params?.noteId;
   const isEdit = !!noteId;
 
@@ -74,7 +76,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
     try {
       await Share.share({ message: `${title.trim()}\n\n${body.trim()}` });
     } catch {
-      // share cancelled or unavailable — no user-facing action needed
+      // share cancelled
     }
   };
 
@@ -82,43 +84,6 @@ export function NoteEditorScreen({ navigation, route }: Props) {
     setSelectedTags(prev =>
       prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag],
     );
-
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      title: isEdit ? 'Edit Note' : 'New Note',
-      headerRight: () => (
-        <View style={styles.headerButtons}>
-          <Pressable onPress={() => setTagModalVisible(true)} hitSlop={8}>
-            <Icon
-              name="pricetags-outline"
-              size={22}
-              color={selectedTags.length > 0 ? colors.primary : colors.textSecondary}
-            />
-          </Pressable>
-          <Pressable onPress={handleShare} disabled={!canShare} hitSlop={8}>
-            <Icon
-              name="share-social-outline"
-              size={22}
-              color={canShare ? colors.textSecondary : colors.textDisabled}
-            />
-          </Pressable>
-          <Pressable onPress={handleSave} disabled={!canSave} hitSlop={8}>
-            {isSaving ? (
-              <ActivityIndicator size="small" color={colors.primary} />
-            ) : (
-              <Typography
-                preset="label"
-                color={canSave ? colors.primary : colors.textDisabled}
-              >
-                Save
-              </Typography>
-            )}
-          </Pressable>
-        </View>
-      ),
-    });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, body, isSaving, canSave, canShare, selectedTags]);
 
   if (isEdit && (isLoading || (isFetching && !initialized.current))) {
     return (
@@ -133,60 +98,78 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? 88 : 0}
-      >
-        <ScrollView
-          style={styles.flex}
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-        >
-          <TextInput
-            style={styles.titleInput}
-            placeholder="Title"
-            placeholderTextColor={colors.textSecondary}
-            value={title}
-            onChangeText={setTitle}
-            returnKeyType="next"
-            onSubmitEditing={() => bodyRef.current?.focus()}
-            maxLength={500}
-            autoFocus={!isEdit}
-          />
-          <View style={styles.divider} />
-
-          {selectedTags.length > 0 && (
-            <View style={styles.tagRow}>
-              {selectedTags.map(tag => (
-                <View key={tag} style={styles.tagPill}>
-                  <Typography preset="caption" color={colors.primary}>{tag}</Typography>
-                </View>
-              ))}
+    <Screen
+      edges={['top', 'bottom']}
+      keyboardAvoiding
+      header={
+        <ScreenHeader
+          title={isEdit ? 'Edit Note' : 'New Note'}
+          handle
+          right={
+            <View style={styles.headerActions}>
+              <Pressable onPress={() => setTagModalVisible(true)} hitSlop={8}>
+                <TagIcon size={22} color={selectedTags.length > 0 ? colors.primary : colors.textSecondary} />
+              </Pressable>
+              <Pressable onPress={handleShare} disabled={!canShare} hitSlop={8}>
+                <ShareIcon size={22} color={canShare ? colors.textSecondary : colors.textDisabled} />
+              </Pressable>
             </View>
-          )}
-
-          <TextInput
-            ref={bodyRef}
-            style={styles.bodyInput}
-            placeholder="Write your note here…"
-            placeholderTextColor={colors.textSecondary}
-            value={body}
-            onChangeText={setBody}
-            multiline
-            textAlignVertical="top"
-            scrollEnabled={false}
+          }
+        />
+      }
+      footer={
+        <View style={styles.footer}>
+          <Button
+            label={isEdit ? 'Save Changes' : 'Save Note'}
+            onPress={handleSave}
+            loading={isSaving}
+            disabled={!canSave}
+            fullWidth
           />
-        </ScrollView>
-      </KeyboardAvoidingView>
-
-      <AppModal
-        visible={tagModalVisible}
-        title="Add Tags"
-        onClose={() => setTagModalVisible(false)}
-        showHandle
+        </View>
+      }
+    >
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
+        <TextInput
+          style={styles.titleInput}
+          placeholder="Title"
+          placeholderTextColor={colors.textSecondary}
+          value={title}
+          onChangeText={setTitle}
+          returnKeyType="next"
+          onSubmitEditing={() => bodyRef.current?.focus()}
+          maxLength={500}
+          autoFocus={!isEdit}
+        />
+        <View style={styles.divider} />
+        {selectedTags.length > 0 && (
+          <View style={styles.tagRow}>
+            {selectedTags.map(tag => (
+              <View key={tag} style={styles.tagPill}>
+                <Typography preset="caption" color={colors.primary}>{tag}</Typography>
+              </View>
+            ))}
+          </View>
+        )}
+        <TextInput
+          ref={bodyRef}
+          style={styles.bodyInput}
+          placeholder="Write your note here…"
+          placeholderTextColor={colors.textSecondary}
+          value={body}
+          onChangeText={setBody}
+          multiline
+          textAlignVertical="top"
+          scrollEnabled={false}
+        />
+      </ScrollView>
+
+      <AppModal visible={tagModalVisible} title="Add Tags" onClose={() => setTagModalVisible(false)} showHandle>
         <View style={styles.tagGrid}>
           {NOTE_PREDEFINED_TAGS.map(tag => {
             const active = selectedTags.includes(tag);
@@ -196,10 +179,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
                 style={[styles.tagChip, active && styles.tagChipActive]}
                 onPress={() => toggleTag(tag)}
               >
-                <Typography
-                  preset="caption"
-                  color={active ? colors.primary : colors.textSecondary}
-                >
+                <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}>
                   {tag}
                 </Typography>
               </Pressable>
@@ -210,86 +190,62 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           <Typography preset="label" color={colors.textOnPrimary}>Done</Typography>
         </Pressable>
       </AppModal>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-
-  headerButtons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[4],
-  },
-
-  scroll: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing[12],
-    flexGrow: 1,
-  },
-
-  titleInput: {
-    fontSize: 22,
-    fontWeight: '700' as const,
-    color: colors.textPrimary,
-    paddingVertical: spacing[2],
-    marginBottom: spacing[2],
-  },
-  divider: {
-    height: 1,
-    backgroundColor: colors.border,
-    marginBottom: spacing[4],
-  },
-
-  tagRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[2],
-    marginBottom: spacing[3],
-  },
-  tagPill: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
-    borderRadius: 20,
-    backgroundColor: colors.primaryLight,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-
-  bodyInput: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    lineHeight: 24,
-    minHeight: 200,
-    flexGrow: 1,
-  },
-
-  tagGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[2],
-    marginBottom: spacing[4],
-  },
-  tagChip: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[2],
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
-  },
-  tagChipActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primaryLight,
-  },
-  tagDoneBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: 12,
-    paddingVertical: spacing[3],
-    alignItems: 'center',
-    marginTop: spacing[2],
-  },
-});
+function makeStyles({ colors, spacing, layout }: Theme) {
+  return StyleSheet.create({
+    flex: { flex: 1 },
+    centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
+    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6], flexGrow: 1 },
+    titleInput: {
+      fontSize: fontSizes['2xl'],
+      fontWeight: fontWeights.bold,
+      color: colors.textPrimary,
+      paddingVertical: spacing[2],
+      marginBottom: spacing[2],
+    },
+    divider: { height: 1, backgroundColor: colors.border, marginBottom: spacing[4] },
+    tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[3] },
+    tagPill: {
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[1],
+      borderRadius: 20,
+      backgroundColor: colors.primaryLight,
+      borderWidth: 1,
+      borderColor: colors.primary,
+    },
+    bodyInput: {
+      fontSize: fontSizes.md,
+      color: colors.textPrimary,
+      lineHeight: fontSizes.md * lineHeights.relaxed,
+      minHeight: 200,
+      flexGrow: 1,
+    },
+    footer: {
+      padding: layout.screenPaddingH,
+      paddingBottom: spacing[2],
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[4] },
+    tagChip: {
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[2],
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    tagChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
+    tagDoneBtn: {
+      backgroundColor: colors.primary,
+      borderRadius: 12,
+      paddingVertical: spacing[3],
+      alignItems: 'center',
+      marginTop: spacing[2],
+    },
+  });
+}

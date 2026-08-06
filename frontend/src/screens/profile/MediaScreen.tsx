@@ -12,8 +12,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -33,8 +32,26 @@ import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { ActionSheet } from '../../components/feedback/ActionSheet';
 import { AppModal } from '../../components/feedback/Modal';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import {
+  AlbumsIcon,
+  ArrowUpIcon,
+  CameraIcon,
+  CheckCircleIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  FileTextIcon,
+  PencilIcon,
+  PlusIcon,
+  ShareIcon,
+  SortIcon,
+  TrashIcon,
+  ClockIcon,
+  type IconComponent,
+} from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { colors, layout, spacing } from '../../theme';
+import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const CELL_GAP = 2;
@@ -42,6 +59,12 @@ const CELL_SIZE = (SCREEN_WIDTH - CELL_GAP * 2) / 3;
 const FAB_SIZE = 56;
 
 type SortOrder = 'newest' | 'oldest' | 'alpha';
+
+const SORT_ICONS: Record<SortOrder, IconComponent> = {
+  newest: ClockIcon,
+  oldest: ArrowUpIcon,
+  alpha:  SortIcon,
+};
 
 function formatFileSize(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -61,9 +84,6 @@ function formatRelativeDate(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-// Cross-platform pinch-to-zoom + pan image viewer.
-// ScrollView's minimumZoomScale/maximumZoomScale/centerContent are iOS-only;
-// RNGH + Reanimated gives identical behaviour on both platforms.
 function PinchableImage({ url }: { url: string }) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
@@ -73,9 +93,7 @@ function PinchableImage({ url }: { url: string }) {
   const savedTranslateY = useSharedValue(0);
 
   const pinch = Gesture.Pinch()
-    .onUpdate((e) => {
-      scale.value = Math.max(1, Math.min(savedScale.value * e.scale, 4));
-    })
+    .onUpdate((e) => { scale.value = Math.max(1, Math.min(savedScale.value * e.scale, 4)); })
     .onEnd(() => {
       savedScale.value = scale.value;
       if (scale.value < 1.05) {
@@ -99,8 +117,6 @@ function PinchableImage({ url }: { url: string }) {
       savedTranslateY.value = translateY.value;
     });
 
-  const composed = Gesture.Simultaneous(pinch, pan);
-
   const animStyle = useAnimatedStyle(() => ({
     transform: [
       { scale: scale.value },
@@ -110,9 +126,9 @@ function PinchableImage({ url }: { url: string }) {
   }));
 
   return (
-    <GestureDetector gesture={composed}>
+    <GestureDetector gesture={Gesture.Simultaneous(pinch, pan)}>
       <Animated.View style={[StyleSheet.absoluteFill, animStyle]}>
-        <Image source={{ uri: url }} style={styles.viewerImage} resizeMode="contain" />
+        <Image source={{ uri: url }} style={s.viewerImage} resizeMode="contain" />
       </Animated.View>
     </GestureDetector>
   );
@@ -121,27 +137,19 @@ function PinchableImage({ url }: { url: string }) {
 type Props = ProfileScreenProps<'Media'>;
 
 export function MediaScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<MediaFileType>('IMAGE');
   const [viewerImage, setViewerImage] = useState<MediaFile | null>(null);
-
-  // Sort (Feature 4)
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
-
-  // Selection / bulk delete (Feature 5)
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-
-  // Camera source picker sheet (Feature 3)
   const [pickSheetVisible, setPickSheetVisible] = useState(false);
-
-  // File action sheet — rename / share / delete (Features 1, 2)
   const [actionSheetFile, setActionSheetFile] = useState<MediaFile | null>(null);
-
-  // Rename modal (Feature 1)
-  const [renameState, setRenameState] = useState<{
-    visible: boolean; file: MediaFile | null; value: string;
-  }>({ visible: false, file: null, value: '' });
+  const [renameState, setRenameState] = useState<{ visible: boolean; file: MediaFile | null; value: string }>({
+    visible: false, file: null, value: '',
+  });
 
   const { data: files = [], isLoading, isFetching, error, refetch } = useMediaFiles(activeTab);
   const uploadMedia = useUploadMedia();
@@ -150,7 +158,6 @@ export function MediaScreen({ navigation }: Props) {
   const bulkDeleteMedia = useBulkDeleteMedia();
   const { show: showConfirm, dialogProps } = useConfirmDialog();
 
-  // ── Sort (Feature 4) ──────────────────────────────────────────────────────
   const sortedFiles = useMemo(() => {
     if (sortOrder === 'newest') return files;
     const arr = [...files];
@@ -158,17 +165,10 @@ export function MediaScreen({ navigation }: Props) {
     return arr.sort((a, b) => a.name.localeCompare(b.name));
   }, [files, sortOrder]);
 
-  const sortIconName = useMemo(() =>
-    sortOrder === 'newest' ? 'time-outline'
-    : sortOrder === 'oldest' ? 'arrow-up-outline'
-    : 'text-outline',
-  [sortOrder]);
-
+  const SortIcon_ = SORT_ICONS[sortOrder];
   const cycleSortOrder = useCallback(() =>
-    setSortOrder(s => s === 'newest' ? 'oldest' : s === 'oldest' ? 'alpha' : 'newest'),
-  []);
+    setSortOrder(s => s === 'newest' ? 'oldest' : s === 'oldest' ? 'alpha' : 'newest'), []);
 
-  // ── Selection / bulk delete (Feature 5) ──────────────────────────────────
   const exitSelectionMode = useCallback(() => {
     setSelectionMode(false);
     setSelectedIds(new Set());
@@ -204,18 +204,15 @@ export function MediaScreen({ navigation }: Props) {
     });
   }, [showConfirm, bulkDeleteMedia, selectedIds, exitSelectionMode]);
 
-  // ── Share (Feature 2) ─────────────────────────────────────────────────────
   const handleShare = useCallback(async (file: MediaFile) => {
     try { await Share.share({ message: file.url }); } catch {}
   }, []);
 
-  // ── Long press → file action sheet (Features 1, 2) ───────────────────────
   const handleLongPress = useCallback((file: MediaFile) => {
     if (selectionMode) return;
     setActionSheetFile(file);
   }, [selectionMode]);
 
-  // ── Upload handlers ───────────────────────────────────────────────────────
   const handlePickImage = useCallback(async () => {
     try {
       const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
@@ -230,10 +227,8 @@ export function MediaScreen({ navigation }: Props) {
         Toast.show({ type: 'error', text1: 'Could not read image — try a different photo' });
         return;
       }
-
       const fd = new FormData();
       fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
-
       await uploadMedia.mutateAsync({ formData: fd });
       Toast.show({ type: 'success', text1: 'Image uploaded' });
     } catch (e) {
@@ -266,17 +261,12 @@ export function MediaScreen({ navigation }: Props) {
 
   const handlePickPDF = useCallback(async () => {
     try {
-      const result = await DocumentPicker.pickSingle({
-        type: [DocumentPicker.types.pdf],
-        copyTo: 'cachesDirectory',
-      });
+      const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.pdf], copyTo: 'cachesDirectory' });
       const uri = result.fileCopyUri ?? result.uri;
       const name = result.name ?? 'document.pdf';
       const type = result.type ?? 'application/pdf';
-
       const fd = new FormData();
       fd.append('file', { uri, type, name } as unknown as Blob);
-
       await uploadMedia.mutateAsync({ formData: fd });
       Toast.show({ type: 'success', text1: 'PDF uploaded' });
     } catch (e) {
@@ -285,7 +275,6 @@ export function MediaScreen({ navigation }: Props) {
     }
   }, [uploadMedia]);
 
-  // ── Delete (single) ───────────────────────────────────────────────────────
   const handleDelete = useCallback((file: MediaFile) => {
     showConfirm({
       title: `Delete ${file.type === 'IMAGE' ? 'Image' : 'PDF'}`,
@@ -303,7 +292,6 @@ export function MediaScreen({ navigation }: Props) {
     });
   }, [showConfirm, deleteMedia]);
 
-  // ── Rename confirm (Feature 1) ────────────────────────────────────────────
   const handleRenameConfirm = useCallback(async () => {
     if (!renameState.file || !renameState.value.trim()) return;
     const ext = renameState.file.name.match(/\.[^.]+$/)?.[0] ?? '';
@@ -317,19 +305,18 @@ export function MediaScreen({ navigation }: Props) {
     }
   }, [renameMedia, renameState]);
 
-  // ── Render items ──────────────────────────────────────────────────────────
   const renderImageItem = useCallback(({ item }: { item: MediaFile }) => {
     const isSelected = selectedIds.has(item.id);
     return (
       <Pressable
-        style={({ pressed }) => [styles.imageCell, pressed && !selectionMode && { opacity: 0.8 }]}
+        style={({ pressed }) => [s.imageCell, pressed && !selectionMode && { opacity: 0.8 }]}
         onPress={() => selectionMode ? handleToggleSelect(item.id) : setViewerImage(item)}
         onLongPress={() => handleLongPress(item)}
       >
-        <Image source={{ uri: item.url }} style={styles.imageThumbnail} resizeMode="cover" />
+        <Image source={{ uri: item.url }} style={s.imageThumbnail} resizeMode="cover" />
         {isSelected && (
           <View style={styles.selectionOverlay}>
-            <Icon name="checkmark-circle" size={28} color="#fff" />
+            <CheckCircleIcon size={28} color={colors.textInverse} />
           </View>
         )}
       </Pressable>
@@ -351,41 +338,42 @@ export function MediaScreen({ navigation }: Props) {
         onLongPress={() => handleLongPress(item)}
       >
         <View style={styles.pdfIcon}>
-          <Icon name="document-text-outline" size={28} color={colors.primary} />
+          <FileTextIcon size={28} color={colors.primary} />
         </View>
-        <View style={styles.pdfInfo}>
-          <Typography preset="body" numberOfLines={1} style={styles.pdfName}>{item.name}</Typography>
+        <View style={s.pdfInfo}>
+          <Typography preset="label" numberOfLines={1} style={s.pdfName}>{item.name}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>
             {formatFileSize(item.sizeBytes)} · {formatRelativeDate(item.createdAt)}
           </Typography>
         </View>
-        <Icon
-          name={isSelected ? 'checkmark-circle' : 'chevron-forward-outline'}
-          size={isSelected ? 22 : 18}
-          color={isSelected ? colors.primary : colors.textDisabled}
-        />
+        {isSelected
+          ? <CheckCircleIcon size={22} color={colors.primary} />
+          : <ChevronRightIcon size={18} color={colors.textDisabled} />
+        }
       </Pressable>
     );
-  }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress]);
+  }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress, colors, styles]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
+    <Screen
+      header={<ScreenHeader title="My Media" onBack={() => navigation.goBack()} />}
+    >
       {/* Tab row / Selection header */}
       {selectionMode ? (
         <View style={styles.selectionHeader}>
           <Pressable onPress={exitSelectionMode} hitSlop={8}>
-            <Typography preset="bodySm" color={colors.primary}>Cancel</Typography>
+            <Typography preset="caption" color={colors.primary}>Cancel</Typography>
           </Pressable>
-          <Typography preset="bodySm" style={styles.selectionCount}>
+          <Typography preset="caption" style={s.selectionCount}>
             {selectedIds.size} selected
           </Typography>
           <Pressable
             onPress={handleBulkDelete}
             disabled={selectedIds.size === 0}
             hitSlop={8}
-            style={{ opacity: selectedIds.size === 0 ? 0.4 : 1 }}
+            style={selectedIds.size === 0 ? styles.btnDisabled : undefined}
           >
-            <Icon name="trash-outline" size={20} color={colors.error} />
+            <TrashIcon size={20} color={colors.error} />
           </Pressable>
         </View>
       ) : (
@@ -396,33 +384,31 @@ export function MediaScreen({ navigation }: Props) {
               style={[styles.tabPill, activeTab === tab && styles.tabPillActive]}
               onPress={() => setActiveTab(tab)}
             >
-              <Icon
-                name={tab === 'IMAGE' ? 'images-outline' : 'document-text-outline'}
-                size={16}
-                color={activeTab === tab ? colors.primary : colors.textSecondary}
-              />
+              {tab === 'IMAGE'
+                ? <AlbumsIcon size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />
+                : <FileTextIcon size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />
+              }
               <Typography
-                preset="bodySm"
+                preset="caption"
                 color={activeTab === tab ? colors.primary : colors.textSecondary}
-                style={activeTab === tab ? styles.tabLabelActive : undefined}
+                style={activeTab === tab ? s.tabLabelActive : undefined}
               >
                 {tab === 'IMAGE' ? 'Images' : 'PDFs'}
               </Typography>
             </Pressable>
           ))}
-          <Pressable onPress={cycleSortOrder} style={styles.iconBtn} hitSlop={8}>
-            <Icon name={sortIconName} size={20} color={colors.textSecondary} />
+          <Pressable onPress={cycleSortOrder} style={s.iconBtn} hitSlop={8}>
+            <SortIcon_ size={20} color={colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={() => setSelectionMode(true)} style={styles.iconBtn} hitSlop={8}>
-            <Icon name="checkmark-circle-outline" size={20} color={colors.textSecondary} />
+          <Pressable onPress={() => setSelectionMode(true)} style={s.iconBtn} hitSlop={8}>
+            <CheckCircleIcon size={20} color={colors.textSecondary} />
           </Pressable>
         </View>
       )}
 
-      <View style={styles.contentArea}>
-        {/* Error / Lists */}
+      <View style={s.contentArea}>
         {error ? (
-          <View style={styles.list}>
+          <View style={s.list}>
             <ErrorState message="Could not load media" onRetry={refetch} />
           </View>
         ) : activeTab === 'IMAGE' ? (
@@ -432,9 +418,9 @@ export function MediaScreen({ navigation }: Props) {
             keyExtractor={item => item.id}
             renderItem={renderImageItem}
             numColumns={3}
-            columnWrapperStyle={styles.imageRow}
-            style={styles.list}
-            contentContainerStyle={styles.imageList}
+            columnWrapperStyle={s.imageRow}
+            style={s.list}
+            contentContainerStyle={s.imageList}
             refreshControl={
               <RefreshControl
                 refreshing={isFetching && !isLoading}
@@ -445,7 +431,7 @@ export function MediaScreen({ navigation }: Props) {
             }
             ListEmptyComponent={
               isLoading
-                ? <View style={styles.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
+                ? <View style={s.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
                 : <EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />
             }
           />
@@ -455,9 +441,9 @@ export function MediaScreen({ navigation }: Props) {
             data={sortedFiles}
             keyExtractor={item => item.id}
             renderItem={renderPDFItem}
-            style={styles.list}
-            contentContainerStyle={styles.pdfList}
-            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            style={s.list}
+            contentContainerStyle={s.pdfList}
+            ItemSeparatorComponent={() => <View style={s.separator} />}
             refreshControl={
               <RefreshControl
                 refreshing={isFetching && !isLoading}
@@ -468,13 +454,12 @@ export function MediaScreen({ navigation }: Props) {
             }
             ListEmptyComponent={
               isLoading
-                ? <View style={styles.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
+                ? <View style={s.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
                 : <EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />
             }
           />
         )}
 
-        {/* FAB — hidden in selection mode */}
         {!selectionMode && (
           <Pressable
             style={({ pressed }) => [
@@ -485,11 +470,10 @@ export function MediaScreen({ navigation }: Props) {
             onPress={activeTab === 'IMAGE' ? () => setPickSheetVisible(true) : handlePickPDF}
             disabled={uploadMedia.isPending}
           >
-            <Icon name="add" size={28} color={colors.background} />
+            <PlusIcon size={28} color={colors.background} />
           </Pressable>
         )}
 
-        {/* Upload overlay — scoped to content area, blocks interaction during upload */}
         {uploadMedia.isPending && (
           <Pressable style={styles.uploadOverlay} onPress={() => {}}>
             <View style={styles.uploadSpinner}>
@@ -499,8 +483,7 @@ export function MediaScreen({ navigation }: Props) {
         )}
       </View>
 
-      {/* Full-screen image viewer — GestureHandlerRootView is required inside Modal
-          because Modal renders in a separate native view outside the app's gesture context */}
+      {/* Full-screen image viewer */}
       <Modal
         visible={viewerImage !== null}
         statusBarTranslucent
@@ -509,53 +492,47 @@ export function MediaScreen({ navigation }: Props) {
       >
         <GestureHandlerRootView style={styles.viewer}>
           {viewerImage && <PinchableImage url={viewerImage.url} />}
-          {/* Share button — top-left */}
           {viewerImage && (
             <Pressable
               style={({ pressed }) => [styles.viewerShareBtn, { top: insets.top + spacing[4] }, pressed && { opacity: 0.7 }]}
               onPress={() => handleShare(viewerImage)}
               hitSlop={12}
             >
-              <Icon name="share-outline" size={22} color={colors.background} />
+              <ShareIcon size={22} color={colors.textInverse} />
             </Pressable>
           )}
-          {/* Close button — top-right */}
           <Pressable
             style={({ pressed }) => [styles.closeBtn, { top: insets.top + spacing[4] }, pressed && { opacity: 0.7 }]}
             onPress={() => setViewerImage(null)}
             hitSlop={12}
           >
-            <Icon name="close" size={28} color={colors.background} />
+            <CloseIcon size={28} color={colors.textInverse} />
           </Pressable>
           {viewerImage && (
-            <View style={[styles.viewerCaption, { bottom: insets.bottom + spacing[4] }]}>
-              <Typography preset="caption" color={colors.background} numberOfLines={1}>
-                {viewerImage.name}
-              </Typography>
+            <View style={[s.viewerCaption, { bottom: insets.bottom + spacing[4] }]}>
+              <Typography preset="caption" color={colors.textInverse} numberOfLines={1}>{viewerImage.name}</Typography>
             </View>
           )}
         </GestureHandlerRootView>
       </Modal>
 
-      {/* Feature 3: Image source picker */}
       <ActionSheet
         visible={pickSheetVisible}
         title="Add Image"
         actions={[
-          { label: 'Photo Library', iconName: 'images-outline', onPress: handlePickImage },
-          { label: 'Take Photo', iconName: 'camera-outline', onPress: handlePickFromCamera },
+          { label: 'Photo Library', icon: AlbumsIcon, onPress: handlePickImage },
+          { label: 'Take Photo',    icon: CameraIcon, onPress: handlePickFromCamera },
         ]}
         onClose={() => setPickSheetVisible(false)}
       />
 
-      {/* Features 1, 2: File actions (long press) */}
       <ActionSheet
         visible={actionSheetFile !== null}
         title={actionSheetFile?.name}
         actions={[
           {
             label: 'Rename',
-            iconName: 'pencil-outline',
+            icon: PencilIcon,
             onPress: () => {
               if (!actionSheetFile) return;
               const stem = actionSheetFile.name.replace(/\.[^.]+$/, '');
@@ -564,12 +541,12 @@ export function MediaScreen({ navigation }: Props) {
           },
           {
             label: 'Share',
-            iconName: 'share-outline',
+            icon: ShareIcon,
             onPress: () => { if (actionSheetFile) handleShare(actionSheetFile); },
           },
           {
             label: 'Delete',
-            iconName: 'trash-outline',
+            icon: TrashIcon,
             destructive: true,
             onPress: () => { if (actionSheetFile) handleDelete(actionSheetFile); },
           },
@@ -577,7 +554,6 @@ export function MediaScreen({ navigation }: Props) {
         onClose={() => setActionSheetFile(null)}
       />
 
-      {/* Feature 1: Rename modal */}
       <AppModal
         visible={renameState.visible}
         title="Rename File"
@@ -585,7 +561,7 @@ export function MediaScreen({ navigation }: Props) {
       >
         <TextInput
           value={renameState.value}
-          onChangeText={v => setRenameState(s => ({ ...s, value: v }))}
+          onChangeText={v => setRenameState(st => ({ ...st, value: v }))}
           style={styles.renameInput}
           autoFocus
           selectTextOnFocus
@@ -595,187 +571,140 @@ export function MediaScreen({ navigation }: Props) {
           placeholder="File name"
           placeholderTextColor={colors.textSecondary}
         />
-        <View style={{ height: spacing[3] }} />
+        <View style={styles.gap3} />
         <Button
           label="Save"
           onPress={handleRenameConfirm}
           loading={renameMedia.isPending}
           disabled={!renameState.value.trim() || renameMedia.isPending}
         />
-        <View style={{ height: spacing[2] }} />
+        <View style={styles.gap2} />
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
-
-  // Selection header (replaces tabRow in selection mode)
-  selectionHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginHorizontal: layout.screenPaddingH,
-    marginTop: spacing[3],
-    marginBottom: spacing[3],
-    height: 40,
-  },
-  selectionCount: { fontWeight: '600' as const },
-
-  tabRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[3],
-    marginHorizontal: layout.screenPaddingH,
-    marginTop: spacing[3],
-    marginBottom: spacing[3],
-  },
-  tabPill: {
-    flexGrow: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[2],
-    paddingVertical: spacing[2],
-    borderRadius: 10,
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  tabPillActive: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySurface,
-  },
-  tabLabelActive: { fontWeight: '600' as const },
-  iconBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-
+// Static layout (pure geometry, no color tokens)
+const s = StyleSheet.create({
   contentArea: { flex: 1 },
-  list: {
-    flex: 1,
-    backgroundColor: colors.backgroundSecondary,
-  },
-  uploadOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.35)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  uploadSpinner: {
-    backgroundColor: colors.background,
-    borderRadius: 12,
-    padding: spacing[6],
-  },
-  loadingCenter: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingTop: spacing[16],
-  },
-  imageList: {
-    paddingBottom: FAB_SIZE + spacing[8],
-    flexGrow: 1,
-  },
+  list: { flex: 1 },
+  loadingCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing[16] },
+  imageList: { paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1 },
   imageRow: { gap: CELL_GAP },
   imageCell: { width: CELL_SIZE, height: CELL_SIZE },
   imageThumbnail: { width: '100%', height: '100%' },
-  selectionOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  pdfList: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: FAB_SIZE + spacing[8],
-    flexGrow: 1,
-  },
+  pdfList: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1 },
   separator: { height: spacing[3] },
-  pdfRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[3],
-    backgroundColor: colors.background,
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: colors.border,
-    padding: spacing[4],
-  },
-  pdfRowPressed: { opacity: 0.7 },
-  pdfRowSelected: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-  pdfIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   pdfInfo: { flex: 1, gap: spacing[1] },
-  pdfName: { fontWeight: '500' as const },
-
-  fab: {
-    position: 'absolute',
-    bottom: spacing[8],
-    right: layout.screenPaddingH,
-    width: FAB_SIZE,
-    height: FAB_SIZE,
-    borderRadius: FAB_SIZE / 2,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
-  },
-  fabPressed: { opacity: 0.85 },
-  fabDisabled: { opacity: 0.5 },
-
-  viewer: { flex: 1, backgroundColor: '#000' },
-  viewerImage: {
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-  },
-  viewerShareBtn: {
-    position: 'absolute',
-    left: spacing[4],
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  closeBtn: {
-    position: 'absolute',
-    right: spacing[4],
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  viewerCaption: {
-    position: 'absolute',
-    left: spacing[4],
-    right: spacing[4],
-    alignItems: 'center',
-  },
-
-  renameInput: {
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 10,
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-    fontSize: 16,
-    color: colors.textPrimary,
-    backgroundColor: colors.backgroundSecondary,
-  },
+  pdfName: { fontWeight: fontWeights.medium },
+  selectionCount: { fontWeight: fontWeights.semiBold },
+  tabLabelActive: { fontWeight: fontWeights.semiBold },
+  iconBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  viewerImage: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT },
+  viewerCaption: { position: 'absolute', left: spacing[4], right: spacing[4], alignItems: 'center' },
 });
+
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    selectionHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      marginHorizontal: layout.screenPaddingH,
+      marginTop: spacing[3],
+      marginBottom: spacing[3],
+      height: 40,
+    },
+    tabRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      marginHorizontal: layout.screenPaddingH,
+      marginTop: spacing[3],
+      marginBottom: spacing[3],
+    },
+    tabPill: {
+      flexGrow: 1,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing[2],
+      paddingVertical: spacing[2],
+      borderRadius: 10,
+      backgroundColor: colors.background,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    tabPillActive: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
+    pdfRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      backgroundColor: colors.background,
+      borderRadius: 14,
+      padding: spacing[4],
+    },
+    pdfRowPressed: { opacity: 0.7 },
+    pdfRowSelected: { borderWidth: 1, borderColor: colors.primary, backgroundColor: colors.primarySurface },
+    pdfIcon: {
+      width: 44, height: 44, borderRadius: 10,
+      backgroundColor: colors.primarySurface,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    uploadOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.overlay,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    selectionOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.overlay,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    viewer: { flex: 1, backgroundColor: colors.shadow },
+    viewerShareBtn: {
+      position: 'absolute',
+      left: spacing[4],
+      width: 40, height: 40, borderRadius: 20,
+      backgroundColor: colors.overlay,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    closeBtn: {
+      position: 'absolute',
+      right: spacing[4],
+      width: 40, height: 40, borderRadius: 20,
+      backgroundColor: colors.overlay,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    fab: {
+      position: 'absolute',
+      bottom: spacing[8],
+      right: layout.screenPaddingH,
+      width: FAB_SIZE, height: FAB_SIZE,
+      borderRadius: FAB_SIZE / 2,
+      backgroundColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+      ...shadows.lg,
+    },
+    fabPressed: { opacity: 0.85 },
+    fabDisabled: { opacity: 0.5 },
+    btnDisabled: { opacity: 0.4 },
+    gap3: { height: spacing[3] },
+    gap2: { height: spacing[2] },
+    uploadSpinner: { backgroundColor: colors.background, borderRadius: 12, padding: spacing[6] },
+    renameInput: {
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 10,
+      paddingHorizontal: spacing[4],
+      paddingVertical: spacing[3],
+      fontSize: fontSizes.md,
+      color: colors.textPrimary,
+      backgroundColor: colors.backgroundSecondary,
+    },
+  });
+}

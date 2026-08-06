@@ -1,24 +1,21 @@
 import React, { useState } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
-import { Typography } from '../../components/ui/Typography';
+import { layout, spacing, useTheme } from '../../theme';
 import { Input } from '../../components/ui/Input';
 import { Button } from '../../components/ui/Button';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { getErrorMessage } from '../../api/client';
 import { useJoinGroup } from '../../hooks/useGroups';
 
 type Props = ProfileScreenProps<'JoinGroup'>;
 
 export function JoinGroupScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const joinGroup = useJoinGroup();
   const [inviteCode, setInviteCode] = useState('');
 
@@ -37,30 +34,33 @@ export function JoinGroupScreen({ navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['bottom']}>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex}>
-        <View style={styles.content}>
-          <Typography preset="h3">Join a Group</Typography>
-          <Typography preset="body" color={colors.textSecondary}>
-            Ask a group admin for an invite code
-          </Typography>
-          <Input
-            label="Invite Code"
-            value={inviteCode}
-            onChangeText={setInviteCode}
-            placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-            autoCapitalize="none"
-            autoFocus
-          />
+    <Screen
+      edges={['top', 'bottom']}
+      header={<ScreenHeader title="Join a Group" onClose={() => navigation.goBack()} />}
+      footer={
+        <View style={styles.footer}>
           <Button label="Join Group" onPress={handleJoin} loading={joinGroup.isPending} />
         </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      }
+      keyboardAvoiding
+    >
+      <View style={styles.content}>
+        <Input
+          label="Invite Code"
+          value={inviteCode}
+          onChangeText={setInviteCode}
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          autoCapitalize="none"
+          autoFocus
+        />
+      </View>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  content: { padding: layout.screenPaddingH, gap: spacing[4] },
-});
+function makeStyles(_colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    content: { padding: layout.screenPaddingH, gap: spacing[4] },
+    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
+  });
+}

@@ -1,20 +1,16 @@
 import React, { useCallback, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
 import {
   useFriendRequests,
   useAcceptFriendRequest,
@@ -27,9 +23,11 @@ import type { FriendRequest } from '../../types/friends.types';
 type Props = ProfileScreenProps<'FriendRequests'>;
 type Tab = 'incoming' | 'outgoing';
 
-export function FriendRequestsScreen(_props: Props) {
+export function FriendRequestsScreen({ navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const [tab, setTab] = useState<Tab>('incoming');
-  const { data: requests = [], isLoading, isFetching, error, refetch } = useFriendRequests(tab);
+  const { data: requests = [], isFetching, error, refetch } = useFriendRequests(tab);
   const accept = useAcceptFriendRequest();
   const reject = useRejectFriendRequest();
   const cancel = useCancelFriendRequest();
@@ -61,7 +59,7 @@ export function FriendRequestsScreen(_props: Props) {
       <View style={styles.requestRow}>
         <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
         <View style={styles.info}>
-          <Typography preset="body">{person?.name}</Typography>
+          <Typography preset="label">{person?.name}</Typography>
           {person?.church ? (
             <Typography preset="caption" color={colors.textSecondary}>{person.church}</Typography>
           ) : null}
@@ -69,26 +67,28 @@ export function FriendRequestsScreen(_props: Props) {
         {tab === 'incoming' ? (
           <View style={styles.requestActions}>
             <Pressable onPress={() => handleAccept(item.id)} hitSlop={8}>
-              <Icon name="checkmark-circle-outline" size={28} color={colors.success} />
+              <CheckCircleIcon size={28} color={colors.success} />
             </Pressable>
             <Pressable onPress={() => handleReject(item.id)} hitSlop={8}>
-              <Icon name="close-circle-outline" size={28} color={colors.error} />
+              <CloseCircleIcon size={28} color={colors.error} />
             </Pressable>
           </View>
         ) : (
           <Pressable onPress={() => handleCancel(item.id)} hitSlop={8}>
-            <Icon name="close-circle-outline" size={28} color={colors.textSecondary} />
+            <CloseCircleIcon size={28} color={colors.textSecondary} />
           </Pressable>
         )}
       </View>
     );
-  }, [tab, handleAccept, handleReject, handleCancel]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, colors]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
-      {/* Tab switcher */}
+    <Screen
+      header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
+    >
       <View style={styles.tabs}>
         <Pressable
           style={[styles.tab, tab === 'incoming' && styles.activeTab]}
@@ -122,25 +122,31 @@ export function FriendRequestsScreen(_props: Props) {
           />
         }
       />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  tabs: { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
-  tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center' },
-  activeTab: { borderBottomWidth: 2, borderBottomColor: colors.primary },
-  list: { paddingHorizontal: layout.screenPaddingH },
-  emptyContainer: { flex: 1, justifyContent: 'center' },
-  requestRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-    gap: spacing[3],
-  },
-  info: { flex: 1 },
-  requestActions: { flexDirection: 'row', gap: spacing[2] },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    tabs: {
+      flexDirection: 'row',
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center' },
+    activeTab: { borderBottomWidth: 2, borderBottomColor: colors.primary },
+    list: { paddingHorizontal: layout.screenPaddingH },
+    emptyContainer: { flex: 1, justifyContent: 'center' },
+    requestRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing[3],
+      paddingHorizontal: layout.screenPaddingH,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      gap: spacing[3],
+    },
+    info: { flex: 1 },
+    requestActions: { flexDirection: 'row', gap: spacing[2] },
+  });
+}

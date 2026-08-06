@@ -1,17 +1,16 @@
-import React, { useLayoutEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Linking, Platform, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { Button, Typography } from '../../components/ui';
 import { ErrorState } from '../../components/feedback/ErrorState';
-import { colors, spacing } from '../../theme';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'MediaPDFViewer'>;
 
-// Polls the Google Docs viewer page for error text and notifies RN when preview
-// fails. Google returns HTTP 200 even on failure so onError never fires — JS
-// detection is the only way to catch the "preview unavailable" page.
 const GOOGLE_DOCS_ERROR_DETECTOR = `
   (function() {
     var checks = 0;
@@ -33,21 +32,19 @@ const GOOGLE_DOCS_ERROR_DETECTOR = `
 `;
 
 export function MediaPDFViewerScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { url, name } = route.params;
   const [loadError, setLoadError] = useState(false);
 
-  useLayoutEffect(() => {
-    navigation.setOptions({ title: name });
-  }, [navigation, name]);
-
-  // Android: WebView + Google Docs viewer — react-native-pdf has new-arch init
-  // issues on Android with RN 0.84. The Docs viewer works in-app without native modules.
   if (Platform.OS === 'android') {
-    return <AndroidPDFViewer url={url} />;
+    return (
+      <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
+        <AndroidPDFViewer url={url} colors={colors} styles={styles} />
+      </Screen>
+    );
   }
 
-  // iOS: use react-native-pdf (works correctly on iOS).
-  // Lazy require so a broken Android native module doesn't crash the JS bundle.
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const Pdf = require('react-native-pdf').default as React.ComponentType<{
     source: { uri: string; cache: boolean };
@@ -57,62 +54,57 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   }>;
 
   if (loadError) {
-    return <ErrorState message="Could not load PDF" onRetry={() => setLoadError(false)} />;
+    return (
+      <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
+        <ErrorState message="Could not load PDF" onRetry={() => setLoadError(false)} />
+      </Screen>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Pdf
-        source={{ uri: url, cache: true }}
-        style={styles.pdf}
-        onError={() => setLoadError(true)}
-        renderActivityIndicator={() => (
-          <ActivityIndicator size="large" color={colors.primary} />
-        )}
-      />
-    </View>
+    <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
+      <View style={styles.pdfWrap}>
+        <Pdf
+          source={{ uri: url, cache: true }}
+          style={styles.pdf}
+          onError={() => setLoadError(true)}
+          renderActivityIndicator={() => (
+            <ActivityIndicator size="large" color={colors.primary} />
+          )}
+        />
+      </View>
+    </Screen>
   );
 }
 
-function AndroidPDFViewer({ url }: { url: string }) {
+function AndroidPDFViewer({ url, colors, styles }: {
+  url: string;
+  colors: ReturnType<typeof useTheme>['colors'];
+  styles: ReturnType<typeof makeStyles>;
+}) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
   const viewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
 
   if (error) {
     return (
       <View style={styles.errorContainer}>
-        <Typography preset="h4" align="center" color={colors.textPrimary}>
-          Preview unavailable
-        </Typography>
-        <Typography
-          preset="body"
-          align="center"
-          color={colors.textSecondary}
-          style={styles.errorMessage}
-        >
+        <Typography preset="h4" align="center" color={colors.textPrimary}>Preview unavailable</Typography>
+        <Typography preset="body" align="center" color={colors.textSecondary} style={styles.errorMessage}>
           This PDF could not be previewed in-app.
         </Typography>
-        <Button
-          label="Open in browser"
-          variant="outline"
-          onPress={() => Linking.openURL(url)}
-          style={styles.errorBtn}
-        />
+        <Button label="Open in browser" variant="outline" onPress={() => Linking.openURL(url)} style={styles.errorBtn} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={styles.pdfWrap}>
       <WebView
         source={{ uri: viewerUrl }}
         style={styles.pdf}
         injectedJavaScript={GOOGLE_DOCS_ERROR_DETECTOR}
-        onMessage={(e) => {
-          if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true);
-        }}
+        onMessage={(e) => { if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true); }}
         onLoadEnd={() => setLoading(false)}
         onError={() => setError(true)}
       />
@@ -125,21 +117,22 @@ function AndroidPDFViewer({ url }: { url: string }) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  pdf: { flex: 1, width: '100%' },
-  loadingOverlay: {
-    backgroundColor: colors.background,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  errorContainer: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing[8],
-    backgroundColor: colors.background,
-  },
-  errorMessage: { marginTop: spacing[2] },
-  errorBtn: { marginTop: spacing[6], minWidth: 140 },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    pdfWrap: { flex: 1 },
+    pdf: { flex: 1, width: '100%' },
+    loadingOverlay: {
+      backgroundColor: colors.background,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    errorContainer: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing[8],
+    },
+    errorMessage: { marginTop: spacing[2] },
+    errorBtn: { marginTop: spacing[6], minWidth: 140 },
+  });
+}

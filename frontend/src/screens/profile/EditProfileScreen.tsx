@@ -1,27 +1,20 @@
 import React, { useRef } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useHeaderHeight } from '@react-navigation/elements';
+import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
+import type { ProfileScreenProps } from '../../navigation/types';
 import { FormField } from '../../components/forms';
 import { Avatar, Button, Typography } from '../../components/ui';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { CameraIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
 import { useUpdateProfile } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, layout, spacing } from '../../theme';
-import type { ProfileScreenProps } from '../../navigation/types';
+import { layout, spacing, useTheme } from '../../theme';
 
 const schema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').trim(),
@@ -31,8 +24,9 @@ const schema = z.object({
 type EditProfileForm = z.infer<typeof schema>;
 
 export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const user = useAuthStore(s => s.user);
-  const headerHeight = useHeaderHeight();
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const bioRef = useRef<TextInput>(null);
   const churchRef = useRef<TextInput>(null);
@@ -61,81 +55,73 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+    <Screen
+      keyboardAvoiding
+      header={<ScreenHeader title="Edit Profile" onBack={() => navigation.goBack()} />}
+      footer={
+        <View style={styles.footer}>
+          <Button label="Save Changes" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+        </View>
+      }
     >
-      <SafeAreaView style={styles.safe} edges={[]}>
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <Pressable
+          style={styles.avatarSection}
+          onPress={() => Toast.show({ type: 'info', text1: 'Image upload coming soon' })}
         >
-          {/* Avatar section */}
-          <View style={styles.avatarSection}>
-            <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
-            <Pressable onPress={() => Toast.show({ type: 'info', text1: 'Image upload coming soon' })}>
-              <Typography preset="label" color={colors.primary}>
-                Change Photo
-              </Typography>
-            </Pressable>
+          <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
+          <View style={styles.cameraRow}>
+            <CameraIcon size={16} color={colors.primary} />
+            <Typography preset="label" color={colors.primary}>Change Photo</Typography>
           </View>
+        </Pressable>
 
-          <View style={styles.form}>
-            <FormField
-              name="name"
-              control={control}
-              label="Full name"
-              placeholder="Your name"
-              autoCapitalize="words"
-              returnKeyType="next"
-              onSubmitEditing={() => bioRef.current?.focus()}
-            />
-
-            <FormField
-              name="bio"
-              control={control}
-              label="Bio (optional)"
-              placeholder="Tell us about yourself…"
-              autoCapitalize="sentences"
-              inputRef={bioRef}
-              returnKeyType="next"
-              onSubmitEditing={() => churchRef.current?.focus()}
-            />
-
-            <FormField
-              name="church"
-              control={control}
-              label="Church (optional)"
-              placeholder="Your church or congregation"
-              autoCapitalize="words"
-              inputRef={churchRef}
-              returnKeyType="done"
-              onSubmitEditing={handleSubmit(onSubmit)}
-            />
-
-            <Button
-              label="Save Changes"
-              onPress={handleSubmit(onSubmit)}
-              loading={isSubmitting}
-              fullWidth
-            />
-          </View>
-        </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+        <View style={styles.form}>
+          <FormField
+            name="name"
+            control={control}
+            label="Full name"
+            placeholder="Your name"
+            autoCapitalize="words"
+            returnKeyType="next"
+            onSubmitEditing={() => bioRef.current?.focus()}
+          />
+          <FormField
+            name="bio"
+            control={control}
+            label="Bio (optional)"
+            placeholder="Tell us about yourself…"
+            autoCapitalize="sentences"
+            inputRef={bioRef}
+            returnKeyType="next"
+            onSubmitEditing={() => churchRef.current?.focus()}
+          />
+          <FormField
+            name="church"
+            control={control}
+            label="Church (optional)"
+            placeholder="Your church or congregation"
+            autoCapitalize="words"
+            inputRef={churchRef}
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit(onSubmit)}
+          />
+        </View>
+      </ScrollView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH },
-  avatarSection: {
-    alignItems: 'center',
-    paddingVertical: spacing[6],
-    gap: spacing[3],
-  },
-  form: { gap: spacing[4] },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
+    avatarSection: { alignItems: 'center', paddingVertical: spacing[6], gap: spacing[3] },
+    cameraRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    form: { gap: spacing[4] },
+    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
+  });
+}

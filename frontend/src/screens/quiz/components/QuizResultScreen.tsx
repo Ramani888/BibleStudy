@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { Button, Spacer, Typography } from '../../../components/ui';
+
+import { Button, Typography } from '../../../components/ui';
+import { StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useRecordQuizAttempt } from '../../../hooks';
-import { colors, layout, spacing } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 
 const RESULT_ICON_SIZE = 56;
 
@@ -20,11 +21,13 @@ interface Props {
 }
 
 export function QuizResultScreen({ setId, setTitle, mode, total, correct, scorePct, onRetake, onExit }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { mutate: recordAttempt } = useRecordQuizAttempt();
   const recorded = useRef(false);
   const [best, setBest] = useState<number | null>(null);
 
-  // Persist the attempt once on mount — but only if something was scored
+  // Persist the attempt once on mount — only if something was scored
   // (a Read-only quiz has total 0 and isn't recorded).
   useEffect(() => {
     if (recorded.current || total === 0) return;
@@ -40,7 +43,7 @@ export function QuizResultScreen({ setId, setTitle, mode, total, correct, scoreP
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
-      <Icon name="ribbon-outline" size={RESULT_ICON_SIZE} color={colors.warning} />
+      <StarIcon size={RESULT_ICON_SIZE} color={colors.warning} />
       <Typography preset="h2" align="center">Quiz Complete!</Typography>
       <Typography preset="body" color={colors.textSecondary} align="center" style={styles.sub}>
         {setTitle}
@@ -55,18 +58,16 @@ export function QuizResultScreen({ setId, setTitle, mode, total, correct, scoreP
 
       {best !== null && (
         <View style={styles.bestPill}>
-          <Icon
-            name={isNewBest ? 'trophy' : 'trophy-outline'}
-            size={16}
-            color={isNewBest ? colors.warning : colors.textSecondary}
-          />
+          {isNewBest
+            ? <StarIcon size={16} color={colors.warning} />
+            : <StarOutlineIcon size={16} color={colors.textSecondary} />
+          }
           <Typography preset="caption" color={isNewBest ? colors.warning : colors.textSecondary}>
             {isNewBest ? 'New best!' : `Best: ${best}%`}
           </Typography>
         </View>
       )}
 
-      <Spacer size={spacing[4]} />
       <View style={styles.btns}>
         <Button label="Retake" onPress={onRetake} variant="secondary" style={styles.flex} />
         <Button label="Done" onPress={onExit} style={styles.flex} />
@@ -75,28 +76,30 @@ export function QuizResultScreen({ setId, setTitle, mode, total, correct, scoreP
   );
 }
 
-const styles = StyleSheet.create({
-  wrap: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: layout.screenPaddingH,
-    gap: spacing[4],
-  },
-  sub: { marginTop: -spacing[2] },
-  scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
-  scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
-  bestPill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1],
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
-    borderRadius: 999,
-    backgroundColor: colors.backgroundSecondary,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  btns: { flexDirection: 'row', gap: spacing[3], alignSelf: 'stretch' },
-  flex: { flex: 1 },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    wrap: {
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      padding: layout.screenPaddingH,
+      gap: spacing[4],
+    },
+    sub: { marginTop: -spacing[2] },
+    scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
+    scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
+    bestPill: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[1],
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[1],
+      borderRadius: 999,
+      backgroundColor: colors.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    btns: { flexDirection: 'row', gap: spacing[3], alignSelf: 'stretch' },
+    flex: { flex: 1 },
+  });
+}

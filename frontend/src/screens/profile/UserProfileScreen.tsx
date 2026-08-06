@@ -1,13 +1,5 @@
 import React from 'react';
-import {
-  Image,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Image, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -15,6 +7,9 @@ import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from '../../components/icons';
 import { useUser } from '../../hooks/useUser';
 import {
   useAcceptFriendRequest,
@@ -26,11 +21,13 @@ import {
 } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import { formatDateOnly } from '../../utils/formatters';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'UserProfile'>;
 
 export function UserProfileScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, error, refetch } = useUser(userId);
@@ -42,15 +39,13 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const removeFriend = useRemoveFriend();
   const blockUser = useBlockUser();
 
-  if (isLoading) {
-    return <LoadingOverlay visible />;
-  }
+  if (isLoading) return <LoadingOverlay visible />;
 
   if (error || !user) {
     return (
-      <SafeAreaView style={styles.safe} edges={[]}>
+      <Screen header={<ScreenHeader title="Profile" onBack={() => navigation.goBack()} />}>
         <ErrorState message="Could not load profile" onRetry={refetch} />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
@@ -62,9 +57,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   };
 
   const handleCancelRequest = () => {
-    if (!user.pendingRequest) {
-      return;
-    }
+    if (!user.pendingRequest) return;
     cancelRequest.mutate(user.pendingRequest.id, {
       onSuccess: () => Toast.show({ type: 'success', text1: 'Request cancelled' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
@@ -72,9 +65,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   };
 
   const handleAccept = () => {
-    if (!user.pendingRequest) {
-      return;
-    }
+    if (!user.pendingRequest) return;
     acceptRequest.mutate(user.pendingRequest.id, {
       onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request accepted' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
@@ -82,9 +73,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   };
 
   const handleDecline = () => {
-    if (!user.pendingRequest) {
-      return;
-    }
+    if (!user.pendingRequest) return;
     rejectRequest.mutate(user.pendingRequest.id, {
       onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request declined' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
@@ -93,199 +82,120 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
   const handleRemoveFriend = () => {
     removeFriend.mutate(userId, {
-      onSuccess: () => {
-        Toast.show({ type: 'success', text1: 'Friend removed' });
-        navigation.goBack();
-      },
+      onSuccess: () => { Toast.show({ type: 'success', text1: 'Friend removed' }); navigation.goBack(); },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
 
   const handleBlock = () => {
     blockUser.mutate(userId, {
-      onSuccess: () => {
-        Toast.show({ type: 'success', text1: 'User blocked' });
-        navigation.goBack();
-      },
+      onSuccess: () => { Toast.show({ type: 'success', text1: 'User blocked' }); navigation.goBack(); },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
 
-  const memberSince = formatDateOnly(user.createdAt);
-
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
+    <Screen header={<ScreenHeader title={user.name ?? 'Profile'} onBack={() => navigation.goBack()} />}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
       >
-        {/* Avatar */}
         <View style={styles.avatarContainer}>
           {user.profileImage ? (
             <Image source={{ uri: user.profileImage }} style={styles.avatar} />
           ) : (
             <View style={styles.avatarPlaceholder}>
-              <Icon name="person" size={48} color={colors.textSecondary} />
+              <UserIcon size={48} color={colors.textSecondary} />
             </View>
           )}
         </View>
 
-        {/* Name */}
-        <Typography preset="h2" align="center">
-          {user.name}
-        </Typography>
+        <Typography preset="h4" align="center">{user.name}</Typography>
 
-        {/* Church */}
         {user.church ? (
           <View style={styles.metaRow}>
-            <Icon name="home-outline" size={16} color={colors.textSecondary} />
-            <Typography preset="body" color={colors.textSecondary}>
-              {user.church}
-            </Typography>
+            <HomeIcon size={16} color={colors.textSecondary} />
+            <Typography preset="body" color={colors.textSecondary}>{user.church}</Typography>
           </View>
         ) : null}
 
-        {/* Bio */}
         {user.bio ? (
-          <Typography
-            preset="body"
-            color={colors.textSecondary}
-            align="center"
-            style={styles.bio}
-          >
+          <Typography preset="body" color={colors.textSecondary} align="center" style={styles.bio}>
             {user.bio}
           </Typography>
         ) : null}
 
-        {/* Member since */}
         <View style={styles.metaRow}>
-          <Icon name="calendar-outline" size={16} color={colors.textSecondary} />
-          <Typography preset="bodySm" color={colors.textSecondary}>
-            Member since {memberSince}
+          <CalendarIcon size={16} color={colors.textSecondary} />
+          <Typography preset="caption" color={colors.textSecondary}>
+            Member since {formatDateOnly(user.createdAt)}
           </Typography>
         </View>
 
-        {/* Mutual friends */}
         {user.mutualFriendsCount > 0 ? (
           <View style={styles.metaRow}>
-            <Icon name="people-outline" size={16} color={colors.textSecondary} />
-            <Typography preset="bodySm" color={colors.textSecondary}>
-              {user.mutualFriendsCount} mutual{' '}
-              {user.mutualFriendsCount === 1 ? 'friend' : 'friends'}
+            <UsersIcon size={16} color={colors.textSecondary} />
+            <Typography preset="caption" color={colors.textSecondary}>
+              {user.mutualFriendsCount} mutual {user.mutualFriendsCount === 1 ? 'friend' : 'friends'}
             </Typography>
           </View>
         ) : null}
 
-        {/* Actions */}
         <View style={styles.actions}>
           {user.isFriend ? (
-            <Button
-              label="Remove Friend"
-              variant="outline"
-              onPress={handleRemoveFriend}
-              loading={removeFriend.isPending}
-              fullWidth
-            />
+            <Button label="Remove Friend" variant="outline" onPress={handleRemoveFriend} loading={removeFriend.isPending} fullWidth />
           ) : user.pendingRequest?.direction === 'outgoing' ? (
             <>
-              <Button
-                label="Request Pending"
-                variant="secondary"
-                disabled
-                fullWidth
-              />
-              <Button
-                label="Cancel Request"
-                variant="outline"
-                onPress={handleCancelRequest}
-                loading={cancelRequest.isPending}
-                fullWidth
-              />
+              <Button label="Request Pending" variant="secondary" disabled fullWidth />
+              <Button label="Cancel Request" variant="outline" onPress={handleCancelRequest} loading={cancelRequest.isPending} fullWidth />
             </>
           ) : user.pendingRequest?.direction === 'incoming' ? (
             <>
-              <Button
-                label="Accept"
-                variant="primary"
-                onPress={handleAccept}
-                loading={acceptRequest.isPending}
-                fullWidth
-              />
-              <Button
-                label="Decline"
-                variant="outline"
-                onPress={handleDecline}
-                loading={rejectRequest.isPending}
-                fullWidth
-              />
+              <Button label="Accept" variant="primary" onPress={handleAccept} loading={acceptRequest.isPending} fullWidth />
+              <Button label="Decline" variant="outline" onPress={handleDecline} loading={rejectRequest.isPending} fullWidth />
             </>
           ) : (
-            <Button
-              label="Send Friend Request"
-              variant="primary"
-              onPress={handleSendRequest}
-              loading={sendRequest.isPending || isFetching}
-              fullWidth
-            />
+            <Button label="Send Friend Request" variant="primary" onPress={handleSendRequest} loading={sendRequest.isPending || isFetching} fullWidth />
           )}
 
-          <Button
-            label="Block User"
-            variant="danger"
-            onPress={handleBlock}
-            loading={blockUser.isPending}
-            fullWidth
-            style={styles.blockBtn}
-          />
+          <Button label="Block User" variant="danger" onPress={handleBlock} loading={blockUser.isPending} fullWidth style={styles.blockBtn} />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  content: {
-    padding: layout.screenPaddingH,
-    paddingTop: spacing[6],
-    gap: spacing[3],
-    alignItems: 'stretch',
-  },
-  avatarContainer: {
-    alignItems: 'center',
-    marginBottom: spacing[2],
-  },
-  avatar: {
-    width: layout.avatarLg,
-    height: layout.avatarLg,
-    borderRadius: layout.avatarLg / 2,
-  },
-  avatarPlaceholder: {
-    width: layout.avatarLg,
-    height: layout.avatarLg,
-    borderRadius: layout.avatarLg / 2,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[2],
-  },
-  bio: {
-    marginVertical: spacing[1],
-  },
-  actions: {
-    gap: spacing[2],
-    marginTop: spacing[4],
-  },
-  blockBtn: {
-    marginTop: spacing[2],
-  },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    content: {
+      padding: layout.screenPaddingH,
+      paddingTop: spacing[6],
+      gap: spacing[3],
+      alignItems: 'stretch',
+    },
+    avatarContainer: { alignItems: 'center', marginBottom: spacing[2] },
+    avatar: {
+      width: layout.avatarLg,
+      height: layout.avatarLg,
+      borderRadius: layout.avatarLg / 2,
+    },
+    avatarPlaceholder: {
+      width: layout.avatarLg,
+      height: layout.avatarLg,
+      borderRadius: layout.avatarLg / 2,
+      backgroundColor: colors.backgroundSecondary,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    metaRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing[2],
+    },
+    bio: { marginVertical: spacing[1] },
+    actions: { gap: spacing[2], marginTop: spacing[4] },
+    blockBtn: { marginTop: spacing[2] },
+  });
+}

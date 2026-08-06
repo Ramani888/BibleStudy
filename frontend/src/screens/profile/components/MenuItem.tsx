@@ -1,14 +1,14 @@
 import React from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, spacing } from '../../../theme';
+import { Pressable, StyleSheet } from 'react-native';
+import { spacing, useTheme } from '../../../theme';
 import { Typography } from '../../../components/ui';
+import { ChevronRightIcon, type IconComponent } from '../../../components/icons';
 
-const ICON_SIZE = 20;
+const ICON_SIZE = 22;
 const CHEVRON_SIZE = 18;
 
 interface MenuItemProps {
-  iconName: string;
+  icon: IconComponent;
   label: string;
   value?: string;
   destructive?: boolean;
@@ -17,13 +17,15 @@ interface MenuItemProps {
 }
 
 export function MenuItem({
-  iconName,
+  icon: Icon,
   label,
   value,
   destructive = false,
   onPress,
   showChevron = true,
 }: MenuItemProps) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const labelColor = destructive ? colors.error : colors.textPrimary;
   const iconColor = destructive ? colors.error : colors.textSecondary;
 
@@ -32,41 +34,30 @@ export function MenuItem({
       style={({ pressed }) => [styles.row, { opacity: pressed ? 0.6 : 1 }]}
       onPress={onPress}
     >
-      <View style={[styles.iconWrap, destructive && styles.iconWrapDestructive]}>
-        <Icon name={iconName} size={ICON_SIZE} color={iconColor} />
-      </View>
-      <Typography preset="body" color={labelColor} style={styles.label}>
+      <Icon size={ICON_SIZE} color={iconColor} />
+      <Typography preset="label" color={labelColor} style={styles.label}>
         {label}
       </Typography>
       {value ? (
-        <Typography preset="bodySm" color={colors.textSecondary}>
+        <Typography preset="caption" color={colors.textSecondary}>
           {value}
         </Typography>
       ) : null}
       {showChevron && (
-        <Icon name="chevron-forward" size={CHEVRON_SIZE} color={colors.textDisabled} />
+        <ChevronRightIcon size={CHEVRON_SIZE} color={colors.textDisabled} />
       )}
     </Pressable>
   );
 }
 
-const styles = StyleSheet.create({
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing[3],
-    gap: spacing[3],
-  },
-  iconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: colors.backgroundSecondary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  iconWrapDestructive: {
-    backgroundColor: colors.errorSurface,
-  },
-  label: { flex: 1 },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    row: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing[4],
+      gap: spacing[4],
+    },
+    label: { flex: 1 },
+  });
+}

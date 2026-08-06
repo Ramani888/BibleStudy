@@ -1,24 +1,18 @@
 import React from 'react';
-import {
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  Share,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { Pressable, RefreshControl, ScrollView, Share, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { CalendarIcon, ShareIcon, SwapIcon, UserMinusIcon, UsersIcon } from '../../components/icons';
 import { useGroup, useLeaveGroup, useDeleteGroup, useUpdateMemberRole, useRemoveMember } from '../../hooks/useGroups';
 import { useConfirmDialog } from '../../hooks';
 import { useAuthStore } from '../../store/auth.store';
@@ -28,6 +22,8 @@ import type { GroupMember } from '../../types/groups.types';
 type Props = ProfileScreenProps<'GroupDetail'>;
 
 export function GroupDetailScreen({ route, navigation }: Props) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { groupId } = route.params;
   const user = useAuthStore(s => s.user);
   const { data: group, isLoading, isFetching, error, refetch } = useGroup(groupId);
@@ -56,12 +52,8 @@ export function GroupDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Leave',
       variant: 'danger',
       onConfirm: async () => {
-        try {
-          await leaveGroup.mutateAsync(groupId);
-          navigation.goBack();
-        } catch (e) {
-          Toast.show({ type: 'error', text1: getErrorMessage(e) });
-        }
+        try { await leaveGroup.mutateAsync(groupId); navigation.goBack(); }
+        catch (e) { Toast.show({ type: 'error', text1: getErrorMessage(e) }); }
       },
     });
   };
@@ -73,12 +65,8 @@ export function GroupDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Delete',
       variant: 'danger',
       onConfirm: async () => {
-        try {
-          await deleteGroup.mutateAsync(groupId);
-          navigation.goBack();
-        } catch (e) {
-          Toast.show({ type: 'error', text1: getErrorMessage(e) });
-        }
+        try { await deleteGroup.mutateAsync(groupId); navigation.goBack(); }
+        catch (e) { Toast.show({ type: 'error', text1: getErrorMessage(e) }); }
       },
     });
   };
@@ -91,11 +79,8 @@ export function GroupDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Confirm',
       variant: 'default',
       onConfirm: async () => {
-        try {
-          await updateRole.mutateAsync({ groupId, userId: member.userId, role: newRole });
-        } catch (e) {
-          Toast.show({ type: 'error', text1: getErrorMessage(e) });
-        }
+        try { await updateRole.mutateAsync({ groupId, userId: member.userId, role: newRole }); }
+        catch (e) { Toast.show({ type: 'error', text1: getErrorMessage(e) }); }
       },
     });
   };
@@ -107,11 +92,8 @@ export function GroupDetailScreen({ route, navigation }: Props) {
       confirmLabel: 'Remove',
       variant: 'danger',
       onConfirm: async () => {
-        try {
-          await removeMember.mutateAsync({ groupId, userId: member.userId });
-        } catch (e) {
-          Toast.show({ type: 'error', text1: getErrorMessage(e) });
-        }
+        try { await removeMember.mutateAsync({ groupId, userId: member.userId }); }
+        catch (e) { Toast.show({ type: 'error', text1: getErrorMessage(e) }); }
       },
     });
   };
@@ -119,11 +101,10 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   const renderMember = ({ item }: { item: GroupMember }) => {
     const isMemberOwner = item.userId === group?.ownerId;
     const canManage = isAdmin && !isMemberOwner && item.userId !== user?.id;
-
     return (
       <View style={styles.memberRow}>
         <Avatar uri={item.user.profileImage ?? null} name={item.user.name ?? ''} size="sm" />
-        <Typography preset="body" style={styles.flex}>{item.user.name}</Typography>
+        <Typography preset="label" style={styles.flex}>{item.user.name}</Typography>
         {item.role === 'ADMIN' && (
           <View style={styles.adminBadge}>
             <Typography preset="caption" color={colors.primary}>Admin</Typography>
@@ -132,10 +113,10 @@ export function GroupDetailScreen({ route, navigation }: Props) {
         {canManage && (
           <View style={styles.memberActions}>
             <Pressable onPress={() => handleToggleRole(item)} hitSlop={8}>
-              <Icon name="swap-horizontal-outline" size={18} color={colors.textSecondary} />
+              <SwapIcon size={18} color={colors.textSecondary} />
             </Pressable>
             <Pressable onPress={() => handleRemoveMember(item)} hitSlop={8}>
-              <Icon name="person-remove-outline" size={18} color={colors.error} />
+              <UserMinusIcon size={18} color={colors.error} />
             </Pressable>
           </View>
         )}
@@ -144,48 +125,50 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
+    <Screen
+      header={
+        <ScreenHeader
+          title={group.name}
+          onBack={() => navigation.goBack()}
+          right={
+            <Pressable onPress={handleShare} hitSlop={8}>
+              <ShareIcon size={22} color={colors.primary} />
+            </Pressable>
+          }
+        />
+      }
+    >
       <ScrollView
         contentContainerStyle={styles.content}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
       >
-        <Typography preset="h2">{group.name}</Typography>
         {group.description ? (
           <Typography preset="body" color={colors.textSecondary}>{group.description}</Typography>
         ) : null}
 
-        <View style={styles.row}>
-          <Icon name="people-outline" size={16} color={colors.textSecondary} />
+        <View style={styles.metaRow}>
+          <UsersIcon size={16} color={colors.textSecondary} />
           <Typography preset="caption" color={colors.textSecondary}>
             {group._count?.members ?? group.members?.length ?? 0} members
           </Typography>
-          <Icon name="calendar-outline" size={16} color={colors.textSecondary} />
+          <CalendarIcon size={16} color={colors.textSecondary} />
           <Typography preset="caption" color={colors.textSecondary}>
             {group._count?.gatherings ?? 0} gatherings
           </Typography>
         </View>
 
-        {/* Invite code */}
         <Pressable style={styles.inviteRow} onPress={handleShare}>
           <View style={styles.inviteInfo}>
             <Typography preset="label">Invite Code</Typography>
             <Typography preset="caption" color={colors.textSecondary}>{group.inviteCode}</Typography>
           </View>
-          <Icon name="share-outline" size={20} color={colors.primary} />
+          <ShareIcon size={20} color={colors.primary} />
         </Pressable>
 
-        {/* Admin actions */}
         {isAdmin && (
-          <View style={styles.adminActions}>
-            <Button
-              label="Edit Group"
-              variant="outline"
-              onPress={() => navigation.navigate('EditGroup', { groupId })}
-            />
-          </View>
+          <Button label="Edit Group" variant="outline" onPress={() => navigation.navigate('EditGroup', { groupId })} />
         )}
 
-        {/* Members list */}
         <Typography preset="label" style={styles.sectionTitle}>Members</Typography>
         {group.members?.map(member => (
           <React.Fragment key={member.userId}>
@@ -193,7 +176,6 @@ export function GroupDetailScreen({ route, navigation }: Props) {
           </React.Fragment>
         ))}
 
-        {/* Leave / Delete */}
         <View style={styles.dangerZone}>
           {!isOwner && (
             <Button label="Leave Group" variant="outline" onPress={handleLeave} style={styles.leaveBtn} />
@@ -205,41 +187,41 @@ export function GroupDetailScreen({ route, navigation }: Props) {
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  content: { padding: layout.screenPaddingH, gap: spacing[3] },
-  row: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  flex: { flex: 1 },
-  inviteRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: spacing[3],
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: 8,
-  },
-  inviteInfo: { gap: spacing[1] },
-  adminActions: { gap: spacing[2] },
-  sectionTitle: { marginTop: spacing[2] },
-  memberRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing[2],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-    gap: spacing[3],
-  },
-  adminBadge: {
-    paddingHorizontal: spacing[2],
-    paddingVertical: 2,
-    borderRadius: 4,
-    backgroundColor: colors.primarySurface,
-  },
-  memberActions: { flexDirection: 'row', gap: spacing[2] },
-  dangerZone: { marginTop: spacing[4] },
-  leaveBtn: { borderColor: colors.error },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    content: { padding: layout.screenPaddingH, gap: spacing[3] },
+    metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    flex: { flex: 1 },
+    inviteRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: spacing[3],
+      backgroundColor: colors.backgroundSecondary,
+      borderRadius: 8,
+    },
+    inviteInfo: { gap: spacing[1] },
+    sectionTitle: { marginTop: spacing[2] },
+    memberRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing[2],
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      gap: spacing[3],
+    },
+    adminBadge: {
+      paddingHorizontal: spacing[2],
+      paddingVertical: spacing[0.5],
+      borderRadius: 4,
+      backgroundColor: colors.primarySurface,
+    },
+    memberActions: { flexDirection: 'row', gap: spacing[2] },
+    dangerZone: { marginTop: spacing[4] },
+    leaveBtn: { borderColor: colors.error },
+  });
+}

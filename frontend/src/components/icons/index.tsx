@@ -358,3 +358,131 @@ export const TagIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidt
     <Path d="M7 7h.01" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+export const PlusIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 5v14M5 12h14" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BuildingIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M3 21h18" {...stroke(color, strokeWidth)} />
+    <Path d="M5 21V7l8-4v18" {...stroke(color, strokeWidth)} />
+    <Path d="M19 21V11l-6-4" {...stroke(color, strokeWidth)} />
+    <Path d="M9 9h.01M9 13h.01M9 17h.01M13 13h.01M13 17h.01" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const CalendarIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M8 2v4M16 2v4" {...stroke(color, strokeWidth)} />
+    <Path d="M3 10h18" {...stroke(color, strokeWidth)} />
+    <Path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const CompassIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Circle cx={12} cy={12} r={10} {...stroke(color, strokeWidth)} />
+    <Path d="m16.2 7.8-2 6.3-6.4 2 2-6.3z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const LogOutIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" {...stroke(color, strokeWidth)} />
+    <Path d="m16 17 5-5-5-5" {...stroke(color, strokeWidth)} />
+    <Path d="M21 12H9" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const LinkIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" {...stroke(color, strokeWidth)} />
+    <Path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const UserPlusIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" {...stroke(color, strokeWidth)} />
+    <Circle cx={9} cy={7} r={4} {...stroke(color, strokeWidth)} />
+    <Path d="M19 8v6M16 11h6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const UserMinusIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" {...stroke(color, strokeWidth)} />
+    <Circle cx={9} cy={7} r={4} {...stroke(color, strokeWidth)} />
+    <Path d="M22 11h-6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const SwapIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M7 16V4M4 7l3-3 3 3" {...stroke(color, strokeWidth)} />
+    <Path d="M17 8v12M14 17l3 3 3-3" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const LockIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M19 11H5a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2Z" {...stroke(color, strokeWidth)} />
+    <Path d="M7 11V7a5 5 0 0 1 10 0v4" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const SettingsIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2Z" {...stroke(color, strokeWidth)} />
+    <Circle cx={12} cy={12} r={3} {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BarChartIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M3 3v18h18" {...stroke(color, strokeWidth)} />
+    <Path d="M7 16v-5M12 16V8M17 16v-3" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const TrendingUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="m22 7-8.5 8.5-5-5L2 17" {...stroke(color, strokeWidth)} />
+    <Path d="M16 7h6v6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const PieChartIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M21.21 15.89A10 10 0 1 1 8 2.83" {...stroke(color, strokeWidth)} />
+    <Path d="M22 12A10 10 0 0 0 12 2v10z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ExpandIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const CameraIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z" {...stroke(color, strokeWidth)} />
+    <Circle cx={12} cy={13} r={3} {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ShuffleIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const TrophyIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M7 3h10l2 6a6 6 0 01-12 0L7 3zM12 15v4M8 19h8M6 6H4c0 4 3 6 5 7M18 6h2c0 4-3 6-5 7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);

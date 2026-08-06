@@ -1,25 +1,25 @@
 import React, { useCallback } from 'react';
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { colors, layout, spacing } from '../../theme';
+import { layout, shadows, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { ChevronRightIcon, CompassIcon, LinkIcon, PlusIcon, UsersIcon } from '../../components/icons';
 import { useGroups } from '../../hooks/useGroups';
 import type { Group } from '../../types/groups.types';
+
+const FAB_SIZE = 56;
 
 type Props = ProfileScreenProps<'Groups'>;
 
 export function GroupsScreen({ navigation }: Props) {
-  const { data: groups = [], isLoading, isFetching, error, refetch } = useGroups();
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
+  const { data: groups = [], isFetching, error, refetch } = useGroups();
 
   const renderItem = useCallback(({ item }: { item: Group }) => (
     <Pressable
@@ -27,33 +27,39 @@ export function GroupsScreen({ navigation }: Props) {
       onPress={() => navigation.navigate('GroupDetail', { groupId: item.id })}
     >
       <View style={styles.groupIcon}>
-        <Icon name="people" size={22} color={colors.primary} />
+        <UsersIcon size={22} color={colors.primary} />
       </View>
       <View style={styles.info}>
-        <Typography preset="body">{item.name}</Typography>
+        <Typography preset="label">{item.name}</Typography>
         <Typography preset="caption" color={colors.textSecondary}>
-          {item._count?.members ?? 0} members • {item.visibility.toLowerCase()}
+          {item._count?.members ?? 0} members · {item.visibility.toLowerCase()}
         </Typography>
       </View>
-      <Icon name="chevron-forward" size={20} color={colors.textSecondary} />
+      <ChevronRightIcon size={20} color={colors.textSecondary} />
     </Pressable>
-  ), [navigation]);
+  ), [navigation, colors, styles]);
 
   if (error) return <ErrorState message="Could not load groups" onRetry={refetch} />;
 
   return (
-    <SafeAreaView style={styles.container} edges={[]}>
-      <View style={styles.header}>
-        <Pressable style={styles.joinBtn} onPress={() => navigation.navigate('PublicGroups')}>
-          <Icon name="compass-outline" size={18} color={colors.primary} />
-          <Typography preset="label" color={colors.primary}>Discover</Typography>
-        </Pressable>
-        <Pressable style={styles.joinBtn} onPress={() => navigation.navigate('JoinGroup')}>
-          <Icon name="link-outline" size={18} color={colors.primary} />
-          <Typography preset="label" color={colors.primary}>Join via Code</Typography>
-        </Pressable>
-      </View>
-
+    <Screen
+      header={
+        <ScreenHeader
+          title="My Groups"
+          onBack={() => navigation.goBack()}
+          right={
+            <View style={styles.headerActions}>
+              <Pressable onPress={() => navigation.navigate('PublicGroups')} hitSlop={8}>
+                <CompassIcon size={22} color={colors.primary} />
+              </Pressable>
+              <Pressable onPress={() => navigation.navigate('JoinGroup')} hitSlop={8}>
+                <LinkIcon size={22} color={colors.primary} />
+              </Pressable>
+            </View>
+          }
+        />
+      }
+    >
       <FlatList
         data={groups}
         keyExtractor={item => item.id}
@@ -71,51 +77,42 @@ export function GroupsScreen({ navigation }: Props) {
         }
       />
 
-      {/* FAB */}
       <Pressable style={styles.fab} onPress={() => navigation.navigate('CreateGroup')}>
-        <Icon name="add" size={28} color={colors.textOnPrimary} />
+        <PlusIcon size={28} color={colors.textOnPrimary} />
       </Pressable>
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
-  header: { flexDirection: 'row', justifyContent: 'flex-end', padding: layout.screenPaddingH },
-  joinBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-  list: { paddingHorizontal: layout.screenPaddingH },
-  emptyContainer: { flex: 1, justifyContent: 'center' },
-  groupRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing[3],
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: colors.border,
-    gap: spacing[3],
-  },
-  groupIcon: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: { flex: 1 },
-  fab: {
-    position: 'absolute',
-    bottom: spacing[6],
-    right: spacing[4],
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 5,
-    shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-  },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    headerActions: { flexDirection: 'row', gap: spacing[3] },
+    list: { paddingHorizontal: layout.screenPaddingH },
+    emptyContainer: { flex: 1, justifyContent: 'center' },
+    groupRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: spacing[3],
+      paddingHorizontal: layout.screenPaddingH,
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+      gap: spacing[3],
+    },
+    groupIcon: {
+      width: 44, height: 44, borderRadius: 22,
+      backgroundColor: colors.primarySurface,
+      alignItems: 'center', justifyContent: 'center',
+    },
+    info: { flex: 1 },
+    fab: {
+      position: 'absolute',
+      bottom: spacing[6],
+      right: spacing[4],
+      width: FAB_SIZE, height: FAB_SIZE,
+      borderRadius: FAB_SIZE / 2,
+      backgroundColor: colors.primary,
+      alignItems: 'center', justifyContent: 'center',
+      ...shadows.md,
+    },
+  });
+}

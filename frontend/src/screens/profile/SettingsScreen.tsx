@@ -1,20 +1,26 @@
 import React from 'react';
 import { ScrollView, StyleSheet, Switch, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 
+import type { ProfileScreenProps } from '../../navigation/types';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
 import { Divider, Typography } from '../../components/ui';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { BookIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
 import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { colors, spacing, useThemeName, useThemeStore } from '../../theme';
+import { spacing, useTheme, useThemeName, useThemeStore } from '../../theme';
 
 const APP_VERSION = '1.0.0';
 
-export function SettingsScreen() {
+export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
+
   const logout = useAuthStore(s => s.logout);
   const deleteAccount = useAuthStore(s => s.deleteAccount);
   const { show, dialogProps } = useConfirmDialog();
@@ -49,15 +55,14 @@ export function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe} edges={[]}>
+    <Screen header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        {/* ── Appearance ── */}
-        <MenuSection label="APPEARANCE">
+        <MenuSection label="Appearance">
           <View style={styles.themeRow}>
-            <Typography preset="body" color={colors.textPrimary}>Dark Mode</Typography>
+            <Typography preset="label" color={colors.textPrimary}>Dark Mode</Typography>
             <Switch
               value={isDark}
               onValueChange={v => setMode(v ? 'dark' : 'light')}
@@ -66,45 +71,33 @@ export function SettingsScreen() {
           </View>
         </MenuSection>
 
-        {/* ── Account ── */}
-        <MenuSection label="ACCOUNT">
-          <MenuItem
-            iconName="log-out-outline"
-            label="Sign Out"
-            showChevron={false}
-            onPress={handleSignOut}
-          />
+        <MenuSection label="Account">
+          <MenuItem icon={LogOutIcon} label="Sign Out" showChevron={false} onPress={handleSignOut} />
           <Divider marginV={0} />
-          <MenuItem
-            iconName="trash-outline"
-            label="Delete Account"
-            destructive
-            showChevron={false}
-            onPress={handleDeleteAccount}
-          />
+          <MenuItem icon={TrashIcon} label="Delete Account" destructive showChevron={false} onPress={handleDeleteAccount} />
         </MenuSection>
 
-        {/* ── App info ── */}
-        <MenuSection label="APP INFO">
-          <MenuItem iconName="book-outline" label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
+        <MenuSection label="App Info">
+          <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
           <Divider marginV={0} />
-          <MenuItem iconName="star-outline" label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
+          <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
         </MenuSection>
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
-  scroll: { paddingBottom: spacing[12] },
-  themeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-  },
-});
+function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    safe: { flex: 1 },
+    scroll: { paddingBottom: spacing[12] },
+    themeRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingVertical: spacing[4],
+    },
+  });
+}

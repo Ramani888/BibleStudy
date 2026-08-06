@@ -8,7 +8,6 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import {
   ArrowRightIcon,
@@ -34,6 +33,7 @@ import {
   LoadingOverlay,
 } from '../../components/feedback';
 import { Button, Card, Divider, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { Screen } from '../../components/ui/Screen';
 import {
   useAIChatHistory,
   useBookmarks,
@@ -422,8 +422,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const hasAnyTaggedSession = allSessions.some(s => s.tags?.length > 0);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
-      <ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />
+    <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />}>
 
       {/* ── View Mode Toggle (All / Bookmarked) ── */}
       <View style={styles.modeToggle}>
@@ -512,6 +511,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
       {/* ── List ── */}
       {viewMode === 'bookmarked' ? (
         <FlatList
+          style={styles.fill}
           data={allBookmarks}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.list}
@@ -535,6 +535,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         />
       ) : (
         <FlatList
+          style={styles.fill}
           data={filteredSessions}
           keyExtractor={(item) => item.sessionId ?? item.messages[0]?.id ?? 'unknown'}
           contentContainerStyle={styles.list}
@@ -634,12 +635,13 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
 
       <LoadingOverlay visible={isDeleting || isClearingHistory} />
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </Screen>
   );
 }
 
 const makeStyles = (colors: ThemeColors) => StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
+  safe: { flex: 1 },
+  fill: { flex: 1 },
 
   modeToggle: {
     flexDirection: 'row',

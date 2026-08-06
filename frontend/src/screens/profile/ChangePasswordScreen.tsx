@@ -1,27 +1,22 @@
 import React, { useRef } from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useHeaderHeight } from '@react-navigation/elements';
-import type { ProfileScreenProps } from '../../navigation/types';
+import { ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 
+import type { ProfileScreenProps } from '../../navigation/types';
 import { FormField } from '../../components/forms';
 import { Button } from '../../components/ui';
+import { Screen } from '../../components/ui/Screen';
+import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { useChangePassword } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { changePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
-  const headerHeight = useHeaderHeight();
+  const { colors } = useTheme();
+  const styles = makeStyles(colors);
   const { mutateAsync: changePassword } = useChangePassword();
   const newRef = useRef<TextInput>(null);
   const confirmRef = useRef<TextInput>(null);
@@ -46,17 +41,21 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   };
 
   return (
-    <KeyboardAvoidingView
-      style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? headerHeight : 0}
+    <Screen
+      keyboardAvoiding
+      header={<ScreenHeader title="Change Password" onBack={() => navigation.goBack()} />}
+      footer={
+        <View style={styles.footer}>
+          <Button label="Change Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+        </View>
+      }
     >
-      <SafeAreaView style={styles.safe} edges={[]}>
-        <ScrollView
-          contentContainerStyle={styles.scroll}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-        >
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.form}>
           <FormField
             name="currentPassword"
             control={control}
@@ -66,7 +65,6 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
             returnKeyType="next"
             onSubmitEditing={() => newRef.current?.focus()}
           />
-
           <FormField
             name="newPassword"
             control={control}
@@ -77,7 +75,6 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
             returnKeyType="next"
             onSubmitEditing={() => confirmRef.current?.focus()}
           />
-
           <FormField
             name="confirmPassword"
             control={control}
@@ -88,21 +85,16 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
             returnKeyType="done"
             onSubmitEditing={handleSubmit(onSubmit)}
           />
-
-          <Button
-            label="Change Password"
-            onPress={handleSubmit(onSubmit)}
-            loading={isSubmitting}
-            fullWidth
-          />
-        </ScrollView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+        </View>
+      </ScrollView>
+    </Screen>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  flex: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH, gap: spacing[4] },
-});
+function makeStyles(_colors: ReturnType<typeof useTheme>['colors']) {
+  return StyleSheet.create({
+    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
+    form: { gap: spacing[4] },
+    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
+  });
+}
