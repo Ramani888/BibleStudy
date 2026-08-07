@@ -34,7 +34,7 @@ export { useManualRefresh } from './useManualRefresh';
 export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
-export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets } from './useQuiz';
+export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses } from './useQuiz';
 
 // Phase 2 — Community
 export {

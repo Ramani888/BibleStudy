@@ -86,6 +86,15 @@ export function useQuizAttemptSave(retakeAttemptId?: string) {
   };
 }
 
+/** Responses for a single attempt — fetched on demand (not included in list). */
+export function useQuizAttemptResponses(attemptId: string) {
+  return useQuery({
+    queryKey: ['quiz', 'attempt', attemptId, 'responses'],
+    queryFn: () => quizApi.getAttemptResponses(attemptId),
+    enabled: !!attemptId,
+  });
+}
+
 /** Delete a quiz attempt; refreshes the hub list on success. */
 export function useDeleteQuizAttempt() {
   const qc = useQueryClient();

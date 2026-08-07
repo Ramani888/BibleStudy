@@ -1,9 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, BackHandler, StatusBar, StyleSheet, View } from 'react-native';
+import { Alert, BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
+import { BackIcon } from '../../components/icons';
 import { useCardsForSets } from '../../hooks';
 import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
@@ -32,54 +33,72 @@ export function QuizScreen() {
 
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const quizStarted = useRef(false);
 
+  // Fix 4: only start timer once quiz is actually ready
   useEffect(() => {
+    if (isLoading || isError || !s.isAvailable || quizStarted.current) return;
+    quizStarted.current = true;
     intervalRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
+  }, [isLoading, isError, s.isAvailable]);
 
-  // Android back button — prompt before leaving an active quiz
+  // Fix 8: only register BackHandler during an active quiz (not loading/error/complete)
   useEffect(() => {
+    if (isLoading || isError || !s.isAvailable || s.isComplete) return;
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
-      if (s.isComplete) return false; // let default handle it on result screen
       Alert.alert('Quit quiz?', 'Your progress will be lost.', [
         { text: 'Stay', style: 'cancel' },
         { text: 'Quit', style: 'destructive', onPress: goBack },
       ]);
-      return true; // consume the event
+      return true;
     });
     return () => handler.remove();
-  }, [s.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading, isError, s.isAvailable, s.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const finish = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    s.next(); // marks isComplete → renders result screen; saving is handled there
+    s.next();
   };
 
   const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : `${setTitles.length} Sets`);
 
+  // Fix 1: back button on error/loading/unavailable states (gesture is disabled globally)
+  const safeHeader = (
+    <View style={[styles.safeHeader, { paddingTop: insets.top }]}>
+      <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Go back">
+        <BackIcon size={24} color={colors.textPrimary} />
+      </Pressable>
+    </View>
+  );
+
   if (isError) return (
-    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+    <View style={[styles.fill, { backgroundColor: colors.background }]}>
+      {safeHeader}
       <View style={styles.center}><Typography preset="h4" align="center">Failed to load cards</Typography></View>
     </View>
   );
 
   if (isLoading) return (
-    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+    <View style={[styles.fill, { backgroundColor: colors.background }]}>
+      {safeHeader}
       <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>Loading…</Typography></View>
     </View>
   );
 
   if (!s.isAvailable) return (
-    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top }]}>
+    <View style={[styles.fill, { backgroundColor: colors.background }]}>
+      {safeHeader}
       <View style={styles.center}><Typography preset="h4" align="center">Nothing to quiz here</Typography></View>
     </View>
   );
 
+  // Fix 2: StatusBar hidden on result screen too
   if (s.isComplete) {
     const summaryItems = buildSummaryItems(s.items, responses);
     return (
       <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <StatusBar hidden />
         <QuizResultScreen
           setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
           total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
@@ -96,7 +115,6 @@ export function QuizScreen() {
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       <StatusBar hidden />
-      {/* Header: timer | title | counter */}
       <View style={[styles.header, { paddingTop: insets.top + spacing[2] }]}>
         <View style={styles.timerWrap}>
           <Typography preset="label" color={colors.textSecondary} style={styles.timer}>
@@ -136,6 +154,7 @@ export function QuizScreen() {
 const styles = StyleSheet.create({
   fill:          { flex: 1 },
   center:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
+  safeHeader:    { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[3] },
   header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
   timerWrap:     { width: 56, alignItems: 'flex-start' },
   timer:         { fontVariant: ['tabular-nums'] },

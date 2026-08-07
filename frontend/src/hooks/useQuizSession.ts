@@ -160,7 +160,10 @@ function formatUserAnswer(item: QuizItem, response: unknown): string {
       }).join(' ');
     }
     case 'chunks':
-      return Array.isArray(response) ? (response as string[]).join(' → ') : '—';
+      // response stores "i::chunkText" keys — strip the prefix before display
+      return Array.isArray(response)
+        ? (response as string[]).map(k => k.slice(k.indexOf('::') + 2)).join(' → ')
+        : '—';
     case 'read':
       return '(read)';
   }

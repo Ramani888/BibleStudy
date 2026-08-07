@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
@@ -74,6 +74,13 @@ export function QuizSetupScreen() {
     return ALL_SELECTABLE.filter(m => m === 'mix' || available.includes(m as any));
   }, [selectedSetIds, cards, available]);
 
+  // Fix 5: reset mode when selected sets change and mode is no longer available
+  useEffect(() => {
+    if (chipModes.length > 0 && !chipModes.includes(selectedMode)) {
+      setSelectedMode('mix');
+    }
+  }, [chipModes]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const handleToggle = (id: string, title: string) => {
     if (selectedSetIds.includes(id)) {
       const idx = selectedSetIds.indexOf(id);
@@ -99,7 +106,7 @@ export function QuizSetupScreen() {
       footer={
         <View style={styles.footer}>
           <Button
-            label="Start Quiz"
+            label={cardsLoading ? 'Loading cards…' : 'Start Quiz'}
             onPress={() => navigation.navigate('Quiz', {
               setIds: selectedSetIds,
               setTitles: selectedSetTitles,
@@ -107,7 +114,7 @@ export function QuizSetupScreen() {
               retakeAttemptId: params?.retakeAttemptId,
               quizName: quizName.trim() || undefined,
             })}
-            disabled={!canStart}
+            disabled={!canStart || cardsLoading}
             fullWidth
           />
         </View>

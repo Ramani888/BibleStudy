@@ -1,5 +1,5 @@
 import { apiDelete, apiGet, apiPost, apiPut } from './client';
-import type { QuizAttemptWithSet, RecordAttemptPayload, RecordAttemptResult, SetBestScore } from '../types';
+import type { QuizAttemptWithSet, RecordAttemptPayload, RecordAttemptResult, SetBestScore, SummaryItem } from '../types';
 
 export const quizApi = {
   recordAttempt: (payload: RecordAttemptPayload) =>
@@ -19,4 +19,7 @@ export const quizApi = {
 
   getRecentAttempts: (limit = 20) =>
     apiGet<QuizAttemptWithSet[]>(`/quiz/attempts/recent?limit=${limit}`),
+
+  getAttemptResponses: (attemptId: string) =>
+    apiGet<{ responses: SummaryItem[] | null }>(`/quiz/attempts/${attemptId}/responses`),
 };

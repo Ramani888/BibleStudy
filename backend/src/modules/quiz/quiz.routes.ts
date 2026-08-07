@@ -12,6 +12,7 @@ router.post('/attempts',        validate(RecordAttemptDto), quizController.recor
 router.put('/attempts/:id',    validate(RecordAttemptDto), quizController.updateAttempt);
 router.delete('/attempts/:id',                             quizController.deleteAttempt);
 router.get('/attempts/recent',                       quizController.getRecentAttempts);
+router.get('/attempts/:id/responses',                quizController.getAttemptResponses);
 router.get('/best',                                  quizController.getAllBest);
 router.get('/sets/:setId/best',                      quizController.getBest);
 

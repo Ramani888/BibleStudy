@@ -38,6 +38,13 @@ export async function getRecentAttempts(req: Request, res: Response): Promise<vo
   } catch (error) { handleControllerError(res, error, 'Failed to get recent attempts'); }
 }
 
+export async function getAttemptResponses(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await quizService.getAttemptResponses(req.user!.id, req.params.id);
+    sendSuccess(res, result, 'Attempt responses retrieved');
+  } catch (error) { handleControllerError(res, error, 'Failed to get attempt responses'); }
+}
+
 export async function getAllBest(req: Request, res: Response): Promise<void> {
   try {
     const rows = await quizService.getAllBest(req.user!.id);

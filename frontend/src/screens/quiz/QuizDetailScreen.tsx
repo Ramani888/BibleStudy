@@ -6,7 +6,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
-import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
+import { useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
 import { type Theme, useTheme } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
@@ -59,7 +59,8 @@ export function QuizDetailScreen() {
     ]);
   };
 
-  const storedResponses = live?.responses as SummaryItem[] | undefined;
+  const { data: responsesData } = useQuizAttemptResponses(params.id);
+  const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
 
   const footer = (
     <Animated.View

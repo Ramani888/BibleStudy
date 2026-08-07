@@ -28,7 +28,7 @@ const MODE_LABEL: Record<string, string> = {
 export function QuizSummaryScreen() {
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors, spacing } = theme;
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
@@ -36,7 +36,7 @@ export function QuizSummaryScreen() {
 
   const handleBack = () => {
     if (exitToHub) {
-      (navigation as any).pop(2); // pop QuizSummary + Quiz, land on hub
+      (navigation as any).popToTop(); // pop back to App (hub), safe regardless of stack depth
     } else {
       navigation.goBack();
     }
@@ -130,7 +130,7 @@ export function QuizSummaryScreen() {
         data={filtered}
         keyExtractor={i => String(i.index)}
         renderItem={renderItem}
-        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + 16 }]}
+        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing[4] }]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.empty}>

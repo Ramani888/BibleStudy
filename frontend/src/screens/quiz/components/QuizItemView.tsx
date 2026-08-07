@@ -28,7 +28,7 @@ function getDefaultResponse(item: QuizItem): unknown {
 
 export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev, isLast, onPrev, onNext, onFinish, bottomInset = 0 }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [response, setResponseState] = useState<unknown>(() => initialResponse ?? getDefaultResponse(item));
 
@@ -107,7 +107,7 @@ function Body({ item, response, onChangeResponse }: BodyProps) {
 
 function MC({ item, response, onChangeResponse }: { item: any; response: number | null; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <>
       {item.options.map((opt: string, i: number) => (
@@ -128,7 +128,7 @@ function MC({ item, response, onChangeResponse }: { item: any; response: number 
 
 function TypeIn({ item, response, onChangeResponse }: { item: any; response: string; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <TextInput
       style={styles.input}
@@ -144,7 +144,7 @@ function TypeIn({ item, response, onChangeResponse }: { item: any; response: str
 
 function Blanks({ item, response, onChangeResponse }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const blankPos = useMemo(
     () => new Map<number, number>(item.blankAt.map((t: number, k: number) => [t, k])),
     [item.blankAt],
@@ -172,7 +172,7 @@ function Blanks({ item, response, onChangeResponse }: { item: any; response: str
 
 function Chunks({ item, response, onChangeResponse }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const styles = useMemo(() => makeStyles(colors), [colors]);
   const chunkKey = (c: string, i: number) => `${i}::${c}`;
   const unkey = (k: string) => k.slice(k.indexOf('::') + 2);
 

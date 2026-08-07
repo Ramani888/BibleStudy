@@ -80,11 +80,19 @@ export async function getRecentAttempts(userId: string, limit = 20) {
       correct:   r.correct,
       quizName:    r.quizName ?? undefined,
       timeSecs:    r.timeSecs ?? undefined,
-      responses:   r.responses ?? undefined,
       createdAt:   r.createdAt.toISOString(),
       practicedAt: (r.practicedAt ?? r.createdAt).toISOString(),
     };
   });
+}
+
+export async function getAttemptResponses(userId: string, attemptId: string) {
+  const row = await prisma.quizAttempt.findFirst({
+    where: { id: attemptId, userId },
+    select: { responses: true },
+  });
+  if (!row) throw new NotFoundError('Attempt not found');
+  return { responses: row.responses ?? null };
 }
 
 export async function getAllBest(userId: string) {
