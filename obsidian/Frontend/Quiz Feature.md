@@ -4,66 +4,76 @@ tags: [frontend, feature, quiz]
 
 # Quiz Feature
 
-A **Quiz mode** built automatically from a set's existing cards (multiple-choice,
-auto-scored, persisted). Reachable two ways: a **Quiz tab** (browse & pick) and a
-**Quiz button** inside each [[Module - Library (Folders, Sets, Cards)|set]]. Ported
-from the BibleMemory app's `QuizMethod` (see below), adapted from
-`Verse{reference,text}` → `Card{question,answer}`.
+> **v2 shipped 2026-08.** This note is the historical overview. For the full
+> v2 design (2 card types, 7 modes, Mix) see [[Quiz Feature v2 Plan]].
 
-Added 2026-08. Related: [[Navigation]], [[Screen Map]], [[Hooks & API Layer]],
-[[Database Schema]].
+A **Quiz** module built from a set's existing cards — auto-scored, persisted as
+`QuizAttempt`, reachable from the Quiz tab or per-set from SetDetail.
+Replaced the old Study feature entirely (Study removed front + back).
 
-## Concept
-Reuses the cards already added to a set — no new content type. Each card →
-one MC question: `card.question` is the prompt, `card.answer` is the correct
-option, and **3 distractors come from other cards' answers in the same set**.
-Requires **≥ 4 cards** (1 correct + 3 distractors).
+Related: [[Navigation]], [[Screen Map]], [[Hooks & API Layer]], [[Database Schema]].
 
-## Navigation
-`AppNavigator` grows from 4 → **5 tabs**: Home · Library · **Quiz** · AI · Profile.
-- **Quiz tab** → `QuizNavigator` (stack): `QuizHub → Quiz`.
-- **Per-set** → `SetDetail` gets a **Quiz** button next to "Study Set"; the `Quiz`
-  screen is also registered in `LibraryNavigator`. Same screen, two entry points.
+## v2 Architecture (current — 2026-08)
 
+### Card types (2)
+- **Q&A** — `question` + `answer` (original card format).
+- **Story** — `reference` (optional) + `text` (passage). `Card.type` enum on schema.
+
+### Quiz modes (7)
+| Mode | Card type | Scored |
+|------|-----------|--------|
+| MC (question→answer) | QA | ✓ |
+| Type answer | QA | ✓ lenient |
+| Fill blanks | STORY | ✓ per-blank |
+| Type verbatim | STORY | ✓ lenient |
+| MC story (reference↔text) | STORY | ✓ |
+| Chunks (assemble order) | STORY | ✓ order |
+| Read (memorize) | STORY | ✗ unscored |
+
+**Mix** = per card picks a random supported scored mode.
+
+### Flow
 ```
-QuizTab → QuizHub (lists sets + best scores + "Mixed (all sets)") → Quiz → QuizResult
-SetDetail → [Quiz] ─────────────────────────────────────────────▶ Quiz → QuizResult
+QuizTab → QuizHubScreen (recent attempts history)
+             → QuizSetupScreen (set picker + mode chips + Start)
+                → QuizScreen (full-screen, timer, progress bar)
+                   → QuizSummaryScreen (per-question review)
+                   → QuizDetailScreen (score hero + attempt info)
+SetDetail → QuizModeSheet (bottom sheet, tap mode → QuizScreen)
 ```
 
-## Engine — `useQuizSession(cards, setId)`
-Modeled on [[Screen Map|useStudySession]]. Guard: `< 4 cards` → unavailable.
-Per card: `prompt=card.question`, `correct=card.answer`,
-`distractors = shuffle(otherCards.answers).slice(0,3)`,
-`options = shuffle([correct, ...distractors])` (Fisher-Yates). Grade by exact
-index. Tracks `currentIndex / progress / correctCount / isComplete`; on finish
-`scorePct = round(correct/total*100)` and persists a QuizAttempt. **Mixed mode**
-= same engine with cards flattened across all the user's sets.
+### Screens & components
+- `QuizHubScreen` — history list (`useRecentQuizAttempts`), "Start New Quiz" footer.
+- `QuizSetupScreen` — set picker (search + sort), mode chips, Start CTA.
+- `QuizScreen` — raw View + `useSafeAreaInsets`, full-width progress bar, timer.
+- `QuizSummaryScreen` — per-question correct/wrong review.
+- `QuizDetailScreen` — score hero, mode/date chips, info card for a past attempt.
+- `components/QuizItemView` — renders one question for any mode.
+- `components/QuizResultScreen` — score + review icon + pills, saves attempt.
 
-Option visual states (from BibleMemory): `idle → correct(green) / wrong(red) /
-faded(others 60%)`. Feedback banner + "Next Question".
+### Engine — `useQuizSession`
+Given cards + chosenMode: builds question list, grades responses per mode,
+tracks timer + progress. Mix = per card picks a random supported scored mode.
+`normalize()` = lowercase + strip punctuation for lenient grading.
 
-## Backend — `quiz` module (16th)
-`backend/src/modules/quiz/` (routes/controller/service/dto):
-- `POST /api/v1/quiz/attempts` `{ setId, total, correct }` → `{ attempt, best }`
+### Backend — `quiz` module (16th)
+`backend/src/modules/quiz/` — routes/controller/service/dto:
+- `POST /api/v1/quiz/attempts` `{ setId, total, correct, mode?, timeSec? }` → `{ attempt, best }`
+- `GET  /api/v1/quiz/attempts/recent?limit=N` → recent attempts with set title
 - `GET  /api/v1/quiz/sets/:setId/best` → best % for a set
-- `GET  /api/v1/quiz/best` → best per set (feeds hub badges)
+- `GET  /api/v1/quiz/best` → best per set (hub badges)
 
-### Data model — `QuizAttempt` (additive migration)
-`id · userId(FK User, cascade) · setId(FK Set, cascade) · total · correct ·
-scorePct · createdAt`. Indexes: `(userId)`, `(setId)`, `(userId,setId)`.
-Does not mutate cards, so (unlike Study) it is **not** owner-gated — any
-authenticated user's attempt on a visible set is recorded. See [[Database Schema]].
+### Data model — `QuizAttempt`
+`id · userId · setId · total · correct · scorePct · mode? · timeSec? · createdAt`.
 
-## Files
-- FE screens: `screens/quiz/{QuizHubScreen,QuizScreen}.tsx` +
-  `components/{QuizQuestionView,QuizResultScreen}.tsx`
-- FE nav: `navigation/QuizNavigator.tsx`; edits to `AppNavigator`,
-  `LibraryNavigator`, `types.ts`; `SetDetailScreen` Quiz button
-- FE logic/data: `hooks/{useQuizSession,useQuiz}.ts`, `api/quiz.api.ts`,
-  `types/quiz.types.ts`
-- BE: `modules/quiz/*`, `schema.prisma`, migration, `app.ts`
+## v1 (historical reference — MC only)
 
-## Deferred (v2)
-Reverse direction (answer→question) coin-flip · Type-the-answer & Blanks modes
-(BibleMemory has these) · AI-generated distractors (Claude+credits) · quiz history
-list / streaks / leaderboards · `COMPLETED_QUIZ` activity (needs enum migration).
+Original v1 was MC-only (≥4 cards, auto-distractors from other cards' answers,
+Fisher-Yates shuffled options). Single `QuizHub → QuizScreen` flow. Superseded
+by v2 which added card types, 7 modes, the Setup screen, and attempt history.
+
+## Deferred
+- AI-generated distractors (Claude + credits).
+- Reverse-direction Story-MC (text → reference).
+- `COMPLETED_QUIZ` activity feed event.
+- Quiz streaks / leaderboards.

@@ -79,6 +79,15 @@ optional `QuizAttempt.mode`.
 5. QuizModePicker + hub/SetDetail wiring.
 6. Verify (tsc/lint, device) + docs + graphify.
 
+## Theme compliance (2026-08-07)
+Full quiz module audit completed. All 8 files (QuizHubScreen, QuizDetailScreen,
+QuizSetupScreen, QuizSummaryScreen, QuizScreen, QuizItemView, QuizResultScreen,
+spacing.ts) are now 100% theme-clean:
+- No hardcoded colors, shadows, or raw `<Text>` (was already clean).
+- All borderRadius/fontSize/width/height replaced with `layout.*` / `spacing[N]` / `fontSizes.*`.
+- New `layout` tokens added: `cardRadiusSm`, `cardRadiusLg`, `pillRadius`, `iconCircleLg`, `progressBarHeight`.
+- Committed: `747885b`.
+
 ## Open flags
 - Story-MC "reference↔text": show reference, pick text (and/or reverse). Default:
   reference→text only for v1.

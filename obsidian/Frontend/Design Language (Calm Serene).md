@@ -1,6 +1,6 @@
 ---
 tags: [frontend, design, redesign]
-updated: 2026-08-05
+updated: 2026-08-07
 ---
 
 # Design Language — Calm / Serene
@@ -9,8 +9,14 @@ The single reference for the app-wide redesign. Every module we polish follows
 **this** doc, so the whole app feels like one product — not 16 screens each
 styled on a different day. Companion to [[Theme & Components]].
 
-Mood chosen: **soft-light serene** (keep the light gold theme, make it airy).
-Not dark mode — see the decision in project memory.
+> ⚠️ **PALETTE PIVOT (2026-08-05):** The original gold/light-only theme was
+> abandoned. Current palette = **indigo #6366F1 primary + violet #A78BFA** (copied
+> from the Meditation project). Full light/dark system added via `theme/useTheme()` +
+> `theme/themeStore.ts`. The color-discipline section below is partially stale —
+> replace "Gold" references with "Indigo primary". The structural rules (whitespace,
+> one-hero, typography, soft surfaces, motion) remain valid.
+
+Mood: **calm + serene** (indigo/violet palette, light + dark modes, airy whitespace).
 
 ---
 
@@ -116,9 +122,10 @@ Run this on each module as we go (tick in that module's note):
 
 | Module | Status |
 |--------|--------|
-| Home | 🟢 done — verse serif hero, softer gradient, de-duped streak, quiet stat chips + quick actions, radii 14–18, section rhythm. Device-test pending. |
-| Auth | ⚪ not started |
-| Library | ⚪ not started |
-| Quiz | ⚪ not started |
-| AI | ⚪ not started |
-| Profile + social | ⚪ not started |
+| Home | 🟢 done — indigo theme, tracker-style layout, quick-actions, streak, verse card. Not device-tested. |
+| Library | 🟢 done — all 9 screens, Screen/ScreenHeader/makeStyles, SVG icons, ListCard/AccentIcon, Header→Body→Footer. Not device-tested. |
+| AI | 🟢 done — dark-mode aware, consistent header/icons. |
+| Profile + social | 🟢 done — all 24 screens, Fiverr-inspired ProfileScreen, full makeStyles, 15 new SVG icons. |
+| Quiz | 🟢 done — fully restructured (2026-08-06): new flow Hub→Setup→Quiz→Summary/Detail. Theme audit clean (2026-08-07, commit `747885b`). Not device-tested. |
+| Auth | 🟢 done — AuthLayout dark-mode aware (useTheme+makeStyles), SparklesIcon SVG, all 5 screens use useTheme(). Not device-tested. |
+| Onboarding | 🟢 done — Ionicons replaced with SVG (BookIcon/LibraryIcon/SparklesIcon), makeStyles, dark-mode aware. Not device-tested. |

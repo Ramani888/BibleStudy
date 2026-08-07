@@ -41,11 +41,11 @@ Return path is the reverse; services return raw data, controllers wrap it via
 
 ## Backend module inventory
 
-15 feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
+16 feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
 
 `auth` · `users` · `folders` · `sets` · `cards` · `ai` · `credits` ·
 `friends` · `groups` · `gatherings` · `map` · `activities` · `notifications` ·
-`notes` · `media`
+`notes` · `media` · `quiz`
 
 Grouped in this brain as: [[Module - Auth & Users]],
 [[Module - Library (Folders, Sets, Cards)]], [[Module - AI & Credits]],
@@ -53,13 +53,13 @@ Grouped in this brain as: [[Module - Auth & Users]],
 
 ## Frontend surface
 
-Bottom-tab shell (Home · Library · Study · AI · Profile) plus a Map area and a
-large Profile stack that hosts the social features. Full list in [[Screen Map]].
+5-tab shell (Home · Library · Quiz · AI · Profile) plus a large Profile stack
+that hosts the social features. Map feature deleted (2026-08-06). Full list in [[Screen Map]].
 
 ## Notable facts / gotchas
 
-- **CLAUDE.md is out of date** on module count — it lists only 7 backend modules;
-  there are actually 15 (the whole social layer is undocumented there).
+- **CLAUDE.md is slightly out of date** on module count — it lists 16 modules
+  but omits the `map` backend module (still exists as BE, frontend screens deleted).
 - The client is **mobile-only** — Express CORS allows requests with no `Origin`
   header unconditionally (RN isn't a browser). See `backend/src/app.ts`.
 - Body limit is **10mb** (media metadata + base64 edge cases).
