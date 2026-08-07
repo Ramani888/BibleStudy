@@ -167,12 +167,10 @@ export async function verifyEmail(dto: VerifyEmailDtoType) {
     data: { userId: user.id, token: refreshToken, expiresAt },
   });
 
-  const { password: _password, ...userWithoutPassword } = user;
-
   return {
     accessToken,
     refreshToken,
-    user: { ...userWithoutPassword, emailVerified: true },
+    user: { ...toUserOut(user), emailVerified: true },
   };
 }
 
@@ -183,7 +181,7 @@ export async function login(dto: LoginDtoType) {
   }
 
   if (!user.password) {
-    throw new UnauthorizedError('This account uses social login. Please sign in with Google or Apple.');
+    throw new AppError('This account uses social login. Please sign in with Google or Apple.', 401, 'SOCIAL_LOGIN_ONLY');
   }
 
   const isPasswordValid = await bcrypt.compare(dto.password, user.password);
@@ -208,12 +206,10 @@ export async function login(dto: LoginDtoType) {
     },
   });
 
-  const { password: _password, ...userWithoutPassword } = user;
-
   return {
     accessToken,
     refreshToken,
-    user: userWithoutPassword,
+    user: toUserOut(user),
   };
 }
 
@@ -292,9 +288,14 @@ export async function resetPassword(dto: ResetPasswordDtoType) {
 
 // ─── Shared helper: issue tokens + build response ────────────────────────────
 const USER_SELECT = {
-  id: true, name: true, email: true, profileImage: true, bio: true,
+  id: true, name: true, email: true, password: true, profileImage: true, bio: true,
   church: true, creditBalance: true, plan: true, emailVerified: true, createdAt: true,
 } as const;
+
+function toUserOut<T extends { password: string | null }>(user: T) {
+  const { password, ...rest } = user;
+  return { ...rest, hasPassword: password !== null };
+}
 
 async function issueSocialSession(userId: string) {
   const accessToken  = generateAccessToken(userId);
@@ -333,7 +334,7 @@ export async function googleAuth(dto: GoogleAuthDtoType) {
 
   const { googleId: _gid, ...userOut } = user;
   const tokens = await issueSocialSession(user.id);
-  return { ...tokens, user: userOut };
+  return { ...tokens, user: toUserOut(userOut) };
 }
 
 // ─── Apple Sign-In ────────────────────────────────────────────────────────────
@@ -373,6 +374,6 @@ export async function appleAuth(dto: AppleAuthDtoType) {
 
   const { appleId: _aid, ...userOut } = user;
   const tokens = await issueSocialSession(user.id);
-  return { ...tokens, user: userOut };
+  return { ...tokens, user: toUserOut(userOut) };
 }
 

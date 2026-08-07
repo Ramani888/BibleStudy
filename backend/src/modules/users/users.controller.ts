@@ -50,6 +50,7 @@ export async function changePassword(req: Request, res: Response): Promise<void>
   }
 }
 
+
 export async function deleteAccount(req: Request, res: Response): Promise<void> {
   try {
     const userId = req.user!.id;

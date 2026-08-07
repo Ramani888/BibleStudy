@@ -19,3 +19,4 @@ export function useChangePassword() {
     mutationFn: (payload: ChangePasswordPayload) => usersApi.changePassword(payload),
   });
 }
+

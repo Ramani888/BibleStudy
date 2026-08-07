@@ -3,31 +3,21 @@ import { prisma } from '../../config/db';
 import { UpdateProfileDtoType, ChangePasswordDtoType } from './users.dto';
 import { NotFoundError, UnauthorizedError } from '../../utils/errors';
 
+const PROFILE_SELECT = {
+  id: true, name: true, email: true, password: true, profileImage: true,
+  bio: true, church: true, creditBalance: true, storageUsed: true,
+  storageLimit: true, plan: true, emailVerified: true, createdAt: true, updatedAt: true,
+} as const;
+
+function toProfileOut<T extends { password: string | null }>(user: T) {
+  const { password, ...rest } = user;
+  return { ...rest, hasPassword: password !== null };
+}
+
 export async function getProfile(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profileImage: true,
-      bio: true,
-      church: true,
-      creditBalance: true,
-      storageUsed: true,
-      storageLimit: true,
-      plan: true,
-      emailVerified: true,
-      createdAt: true,
-      updatedAt: true,
-    },
-  });
-
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
-
-  return user;
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: PROFILE_SELECT });
+  if (!user) throw new NotFoundError('User not found');
+  return toProfileOut(user);
 }
 
 export async function updateProfile(userId: string, dto: UpdateProfileDtoType) {
@@ -39,52 +29,26 @@ export async function updateProfile(userId: string, dto: UpdateProfileDtoType) {
       ...(dto.church !== undefined && { church: dto.church }),
       ...(dto.profileImage !== undefined && { profileImage: dto.profileImage }),
     },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-      profileImage: true,
-      bio: true,
-      church: true,
-      creditBalance: true,
-      storageUsed: true,
-      storageLimit: true,
-      plan: true,
-      emailVerified: true,
-      createdAt: true,
-      updatedAt: true,
-    },
+    select: PROFILE_SELECT,
   });
-
-  return user;
+  return toProfileOut(user);
 }
 
 export async function changePassword(userId: string, dto: ChangePasswordDtoType) {
   const user = await prisma.user.findUnique({ where: { id: userId } });
-  if (!user) {
-    throw new NotFoundError('User not found');
-  }
+  if (!user) throw new NotFoundError('User not found');
 
-  if (!user.password) {
-    throw new UnauthorizedError('This account uses social login and has no password to change.');
-  }
-
-  const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
-  if (!isPasswordValid) {
-    throw new UnauthorizedError('Current password is incorrect');
+  if (user.password) {
+    if (!dto.currentPassword) throw new UnauthorizedError('Current password is required');
+    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isPasswordValid) throw new UnauthorizedError('Current password is incorrect');
   }
 
   const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
-
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword },
-  });
-
-  // Invalidate all refresh tokens after password change
+  await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
   await prisma.refreshToken.deleteMany({ where: { userId } });
 
-  return { message: 'Password changed successfully' };
+  return { message: user.password ? 'Password changed successfully' : 'Password set successfully' };
 }
 
 export async function deleteAccount(userId: string) {

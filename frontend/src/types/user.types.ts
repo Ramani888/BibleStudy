@@ -11,6 +11,7 @@ export interface User {
   storageLimit: number;
   plan: Plan;
   emailVerified: boolean;
+  hasPassword: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -23,9 +24,10 @@ export interface UpdateProfilePayload {
 }
 
 export interface ChangePasswordPayload {
-  currentPassword: string;
+  currentPassword?: string;
   newPassword: string;
 }
+
 
 export interface UserPublicProfile {
   id: string;
