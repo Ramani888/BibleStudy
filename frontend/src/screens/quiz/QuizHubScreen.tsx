@@ -6,7 +6,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActionSheet, EmptyState, ErrorState, Skeleton } from '../../components/feedback';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, EyeIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
+import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { type Theme, useTheme } from '../../theme';
@@ -164,6 +164,20 @@ export function QuizHubScreen() {
             icon: EyeIcon,
             onPress: () => activeItem && handleDetails(activeItem),
           },
+          ...(activeItem?.responses && (activeItem.responses as any[]).length > 0 ? [{
+            label: 'Summary',
+            icon: ListIcon,
+            onPress: () => {
+              closeSheet();
+              (navigation as any).navigate('QuizSummary', {
+                items: activeItem!.responses,
+                title: activeItem!.quizName ?? activeItem!.setTitle,
+                scorePct: activeItem!.scorePct,
+                total: activeItem!.total,
+                correct: activeItem!.correct,
+              });
+            },
+          }] : []),
           {
             label: 'Re-Quiz',
             icon: RefreshIcon,

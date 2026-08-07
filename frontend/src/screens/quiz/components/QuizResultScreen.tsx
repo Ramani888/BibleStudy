@@ -1,11 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
+import { useNavigation } from '@react-navigation/native';
 
 import { Button, Typography } from '../../../components/ui';
-import { StarIcon, StarOutlineIcon } from '../../../components/icons';
+import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useQuizAttemptSave } from '../../../hooks';
 import { layout, spacing, useTheme } from '../../../theme';
+import type { SummaryItem } from '../../../types';
 
 const RESULT_ICON_SIZE = 56;
 const AUTO_EXIT_SECS = 5;
@@ -19,16 +21,19 @@ interface Props {
   correct: number;
   scorePct: number;
   timeSecs?: number;
+  summaryItems: SummaryItem[];
   retakeAttemptId?: string;
+  isFocused: boolean;
   onExit: () => void;
 }
 
 export function QuizResultScreen({
   setIds, setTitle, mode, quizName,
   total, correct, scorePct, timeSecs,
-  retakeAttemptId, onExit,
+  summaryItems, retakeAttemptId, isFocused, onExit,
 }: Props) {
   const { colors } = useTheme();
+  const navigation = useNavigation();
   const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
   const saved = useRef(false);
   const [best, setBest] = useState<number | null>(null);
@@ -38,24 +43,17 @@ export function QuizResultScreen({
   useEffect(() => {
     if (saved.current || total === 0) return;
     saved.current = true;
-    const payload = { setIds, total, correct, mode, quizName, timeSecs };
-    console.log('[QuizResult] saving payload:', JSON.stringify(payload));
-    save(payload)
-      .then(res => {
-        console.log('[QuizResult] save success:', JSON.stringify(res));
-        setBest(res.best ?? null);
-      })
-      .catch(err => {
-        console.error('[QuizResult] save failed:', err?.message ?? err);
-        console.error('[QuizResult] response body:', JSON.stringify(err?.response?.data));
-      });
+    save({ setIds, total, correct, mode, quizName, timeSecs, responses: summaryItems })
+      .then(res => { setBest(res.best ?? null); })
+      .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-exit countdown — pauses while save is in flight so we don't
-  // navigate away before the invalidation completes
+  // Countdown only ticks when save is done AND this screen is in the foreground.
+  // If user navigates to QuizSummary, isFocused becomes false and the interval
+  // is cleared — so the auto-exit doesn't fire while they're reviewing answers.
   useEffect(() => {
-    if (isPending) return;
+    if (isPending || !isFocused) return;
     const id = setInterval(() => {
       setCountdown(c => {
         if (c <= 1) { clearInterval(id); onExit(); return 0; }
@@ -63,10 +61,21 @@ export function QuizResultScreen({
       });
     }, 1000);
     return () => clearInterval(id);
-  }, [isPending, onExit]);
+  }, [isPending, isFocused, onExit]);
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
   const isNewBest = best !== null && scorePct >= best;
+
+  const openSummary = () => {
+    (navigation as any).navigate('QuizSummary', {
+      items: summaryItems,
+      title: setTitle,
+      scorePct,
+      total,
+      correct,
+      exitToHub: true,
+    });
+  };
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
@@ -82,6 +91,19 @@ export function QuizResultScreen({
           {correct} / {total} correct
         </Typography>
       </View>
+
+      {/* Summary icon button */}
+      <Pressable
+        onPress={openSummary}
+        style={({ pressed }) => [styles.reviewBtn, { opacity: pressed ? 0.6 : 1 }]}
+        accessibilityRole="button"
+        accessibilityLabel="View summary"
+      >
+        <View style={[styles.reviewIcon, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+          <ListIcon size={22} color={colors.textSecondary} />
+        </View>
+        <Typography preset="caption" color={colors.textSecondary}>Review</Typography>
+      </Pressable>
 
       {best !== null && (
         <View style={[styles.pill, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
@@ -121,9 +143,18 @@ const styles = StyleSheet.create({
     padding: layout.screenPaddingH,
     gap: spacing[4],
   },
-  sub: { marginTop: -spacing[2] },
+  sub:       { marginTop: -spacing[2] },
   scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
   scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
+  reviewBtn: { alignItems: 'center', gap: spacing[1] },
+  reviewIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   pill: {
     flexDirection: 'row',
     alignItems: 'center',

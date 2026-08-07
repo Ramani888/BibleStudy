@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Alert, BackHandler, StatusBar, StyleSheet, View } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
 import { useCardsForSets } from '../../hooks';
-import { useQuizSession } from '../../hooks/useQuizSession';
+import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
 import type { QuizSelectableMode } from '../../types';
@@ -23,6 +23,7 @@ export function QuizScreen() {
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
   const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = params;
 
+  const isFocused = useIsFocused();
   const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
   const s = useQuizSession(cards, mode);
   const [responses, setResponses] = useState<Record<number, unknown>>({});
@@ -75,17 +76,22 @@ export function QuizScreen() {
     </View>
   );
 
-  if (s.isComplete) return (
-    <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-      <QuizResultScreen
-        setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
-        total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
-        timeSecs={elapsed}
-        retakeAttemptId={retakeAttemptId}
-        onExit={goBack}
-      />
-    </View>
-  );
+  if (s.isComplete) {
+    const summaryItems = buildSummaryItems(s.items, responses);
+    return (
+      <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+        <QuizResultScreen
+          setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
+          total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
+          timeSecs={elapsed}
+          summaryItems={summaryItems}
+          retakeAttemptId={retakeAttemptId}
+          isFocused={isFocused}
+          onExit={goBack}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>

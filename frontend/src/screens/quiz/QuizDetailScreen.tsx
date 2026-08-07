@@ -5,11 +5,12 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, CheckCircleIcon, ClockIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
+import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { type Theme, useTheme } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
+import type { SummaryItem } from '../../types';
 
 type Params = QuizStackParamList['QuizDetail'];
 
@@ -58,6 +59,8 @@ export function QuizDetailScreen() {
     ]);
   };
 
+  const storedResponses = live?.responses as SummaryItem[] | undefined;
+
   const footer = (
     <Animated.View
       entering={FadeInDown.delay(320).springify().damping(20)}
@@ -83,9 +86,25 @@ export function QuizDetailScreen() {
           title={quizName ?? setsLabel ?? 'Quiz Details'}
           onBack={() => navigation.goBack()}
           right={
-            <Pressable onPress={handleDelete} hitSlop={12} disabled={isPending} accessibilityRole="button">
-              <TrashIcon size={20} color={colors.error} />
-            </Pressable>
+            <View style={styles.headerActions}>
+              {storedResponses && storedResponses.length > 0 && (
+                <Pressable
+                  onPress={() => navigation.navigate('QuizSummary' as any, {
+                    items: storedResponses,
+                    title: quizName ?? setsLabel,
+                    scorePct, total, correct,
+                  })}
+                  hitSlop={12}
+                  accessibilityRole="button"
+                  accessibilityLabel="View summary"
+                >
+                  <ListIcon size={20} color={colors.textSecondary} />
+                </Pressable>
+              )}
+              <Pressable onPress={handleDelete} hitSlop={12} disabled={isPending} accessibilityRole="button">
+                <TrashIcon size={20} color={colors.error} />
+              </Pressable>
+            </View>
           }
         />
       }
@@ -195,6 +214,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
     // Chips
+    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
     chips: { flexDirection: 'row', gap: spacing[2], flexWrap: 'wrap', justifyContent: 'center' },
     chip: {
       paddingHorizontal: spacing[3],
@@ -225,5 +245,6 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       paddingHorizontal: layout.screenPaddingH,
       paddingVertical: spacing[4],
       borderTopWidth: 1,
+      gap: spacing[3],
     },
   });

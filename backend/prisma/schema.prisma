@@ -374,6 +374,7 @@ model QuizAttempt {
   mode      String?
   quizName   String?
   timeSecs   Int?
+  responses  Json?
   createdAt  DateTime @default(now())
   practicedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

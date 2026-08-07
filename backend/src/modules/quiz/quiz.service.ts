@@ -16,9 +16,10 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
       total:   dto.total,
       correct: dto.correct,
       scorePct,
-      mode:     dto.mode ?? null,
-      quizName: dto.quizName ?? null,
-      timeSecs: dto.timeSecs ?? null,
+      mode:      dto.mode ?? null,
+      quizName:  dto.quizName ?? null,
+      timeSecs:  dto.timeSecs ?? null,
+      ...(dto.responses ? { responses: dto.responses } : {}),
     },
   });
 
@@ -30,7 +31,7 @@ export async function updateAttempt(userId: string, attemptId: string, dto: Reco
   const scorePct = Math.round((dto.correct / dto.total) * 100);
   const updated = await prisma.quizAttempt.updateMany({
     where: { id: attemptId, userId },
-    data: { total: dto.total, correct: dto.correct, scorePct, timeSecs: dto.timeSecs ?? null },
+    data: { total: dto.total, correct: dto.correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
   });
   if (updated.count === 0) throw new NotFoundError('Attempt not found');
   const best = await getBestForSet(userId, dto.setIds[0]);
@@ -79,6 +80,7 @@ export async function getRecentAttempts(userId: string, limit = 20) {
       correct:   r.correct,
       quizName:    r.quizName ?? undefined,
       timeSecs:    r.timeSecs ?? undefined,
+      responses:   r.responses ?? undefined,
       createdAt:   r.createdAt.toISOString(),
       practicedAt: (r.practicedAt ?? r.createdAt).toISOString(),
     };

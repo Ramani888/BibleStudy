@@ -7,6 +7,7 @@ import type { ChatSession, QuizSelectableMode } from '../types';
 export type RootStackParamList = {
   App: undefined;
   Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
+  QuizSummary: { items: import('../types').SummaryItem[]; title: string; scorePct: number; total: number; correct: number; exitToHub?: boolean };
 };
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────

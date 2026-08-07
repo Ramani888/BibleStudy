@@ -18,6 +18,7 @@ import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { QuizScreen } from '../screens/quiz/QuizScreen';
+import { QuizSummaryScreen } from '../screens/quiz/QuizSummaryScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -102,6 +103,7 @@ export function RootNavigator() {
             component={QuizScreen}
             options={{ gestureEnabled: false }}
           />
+          <RootStack.Screen name="QuizSummary" component={QuizSummaryScreen} />
         </RootStack.Navigator>
       ) : (
         <AuthNavigator />

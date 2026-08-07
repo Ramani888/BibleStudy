@@ -9,6 +9,16 @@ export interface QuizAttempt {
   createdAt: string;
 }
 
+// One item in a quiz summary — human-readable, stored with the attempt.
+export interface SummaryItem {
+  index: number;
+  mode: string;
+  prompt: string;
+  isCorrect: boolean;
+  userAnswer: string;
+  correctAnswer: string;
+}
+
 export interface RecordAttemptPayload {
   setIds: string[];
   total: number;
@@ -16,6 +26,7 @@ export interface RecordAttemptPayload {
   mode?: string;
   quizName?: string;
   timeSecs?: number;
+  responses?: SummaryItem[];
 }
 
 export interface RecordAttemptResult {
@@ -34,6 +45,7 @@ export interface QuizAttemptWithSet {
   quizName?: string;
   practicedAt?: string;
   timeSecs?: number;
+  responses?: SummaryItem[];
   scorePct: number;
   total: number;
   correct: number;

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import type { Card, QuizItem, QuizMode, QuizSelectableMode } from '../types';
+import type { Card, QuizItem, QuizMode, QuizSelectableMode, SummaryItem } from '../types';
 
 export const MIN_MC_CARDS = 4; // MC / Story-MC need 4 options
 const OPTIONS = 4;
@@ -143,6 +143,61 @@ export function gradeItem(item: QuizItem, response: unknown): boolean {
   }
 }
 
+// ─── summary helpers ─────────────────────────────────────────────────────────
+function formatUserAnswer(item: QuizItem, response: unknown): string {
+  switch (item.mode) {
+    case 'mc':
+    case 'story_mc':
+      return typeof response === 'number' ? (item.options[response] ?? '—') : '—';
+    case 'type_answer':
+    case 'type_verbatim':
+      return String(response ?? '').trim() || '—';
+    case 'blanks': {
+      const r = (response as string[]) ?? [];
+      return item.tokens.map((t, i) => {
+        const blankIdx = item.blankAt.indexOf(i);
+        return blankIdx >= 0 ? (r[blankIdx] || '___') : t;
+      }).join(' ');
+    }
+    case 'chunks':
+      return Array.isArray(response) ? (response as string[]).join(' → ') : '—';
+    case 'read':
+      return '(read)';
+  }
+}
+
+function formatCorrectAnswer(item: QuizItem): string {
+  switch (item.mode) {
+    case 'mc':
+    case 'story_mc':
+      return item.options[item.answerIndex];
+    case 'type_answer':
+    case 'type_verbatim':
+      return item.answer;
+    case 'blanks':
+      return item.tokens.join(' ');
+    case 'chunks':
+      return item.correct.join(' → ');
+    case 'read':
+      return item.text;
+  }
+}
+
+export function buildSummaryItems(items: QuizItem[], responses: Record<number, unknown>): SummaryItem[] {
+  return items.map((item, index) => {
+    const response = responses[index];
+    const isCorrect = MODE_META[item.mode].scored ? gradeItem(item, response) : true;
+    return {
+      index,
+      mode: item.mode,
+      prompt: item.prompt,
+      isCorrect,
+      userAnswer: formatUserAnswer(item, response),
+      correctAnswer: formatCorrectAnswer(item),
+    };
+  });
+}
+
 // ─── hook ───────────────────────────────────────────────────────────────────
 export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
   const [seed, setSeed] = useState(0);
@@ -192,7 +247,7 @@ export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
 
   return {
     isAvailable: total > 0,
-    item, index, total, progress,
+    items, item, index, total, progress,
     submitted, lastCorrect,
     correctCount, scoredTotal, scorePct, isComplete,
     submit, next, prev, restart,
