@@ -5,7 +5,6 @@ import type { QuizStackParamList } from './types';
 import { QuizHubScreen } from '../screens/quiz/QuizHubScreen';
 import { QuizDetailScreen } from '../screens/quiz/QuizDetailScreen';
 import { QuizSetupScreen } from '../screens/quiz/QuizSetupScreen';
-import { QuizScreen } from '../screens/quiz/QuizScreen';
 
 const Stack = createNativeStackNavigator<QuizStackParamList>();
 
@@ -33,7 +32,6 @@ export function QuizNavigator() {
       <Stack.Screen name="QuizHub" component={QuizHubScreen} />
       <Stack.Screen name="QuizDetail" component={QuizDetailScreen} />
       <Stack.Screen name="QuizSetup" component={QuizSetupScreen} />
-      <Stack.Screen name="Quiz" component={QuizScreen} />
     </Stack.Navigator>
   );
 }

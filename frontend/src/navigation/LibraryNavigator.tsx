@@ -11,7 +11,6 @@ import { CreateCardScreen } from '../screens/library/CreateCardScreen';
 import { EditCardScreen } from '../screens/library/EditCardScreen';
 import { PublicSetsScreen } from '../screens/library/PublicSetsScreen';
 import { FriendsSetsScreen } from '../screens/library/FriendsSetsScreen';
-import { QuizScreen } from '../screens/quiz/QuizScreen';
 
 const Stack = createNativeStackNavigator<LibraryStackParamList>();
 
@@ -60,7 +59,6 @@ export function LibraryNavigator() {
       />
       <Stack.Screen name="PublicSets" component={PublicSetsScreen} />
       <Stack.Screen name="FriendsSets" component={FriendsSetsScreen} />
-      <Stack.Screen name="Quiz" component={QuizScreen} />
     </Stack.Navigator>
   );
 }

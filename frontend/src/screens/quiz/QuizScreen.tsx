@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, BackHandler, StatusBar, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,7 +27,7 @@ export function QuizScreen() {
   const s = useQuizSession(cards, mode);
   const [responses, setResponses] = useState<Record<number, unknown>>({});
   const saveResponse = (idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r }));
-  const goBack = () => (navigation as any).popToTop();
+  const goBack = () => navigation.goBack();
 
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -36,6 +36,19 @@ export function QuizScreen() {
     intervalRef.current = setInterval(() => setElapsed(e => e + 1), 1000);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, []);
+
+  // Android back button — prompt before leaving an active quiz
+  useEffect(() => {
+    const handler = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (s.isComplete) return false; // let default handle it on result screen
+      Alert.alert('Quit quiz?', 'Your progress will be lost.', [
+        { text: 'Stay', style: 'cancel' },
+        { text: 'Quit', style: 'destructive', onPress: goBack },
+      ]);
+      return true; // consume the event
+    });
+    return () => handler.remove();
+  }, [s.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const finish = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -76,6 +89,7 @@ export function QuizScreen() {
 
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
+      <StatusBar hidden />
       {/* Header: timer | title | counter */}
       <View style={[styles.header, { paddingTop: insets.top + spacing[2] }]}>
         <View style={styles.timerWrap}>

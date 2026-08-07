@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
@@ -12,10 +13,13 @@ import {
   setupForegroundHandler,
   handleNotificationNavigation,
 } from '../utils/notifications';
-import type { AppTabParamList } from './types';
+import type { RootStackParamList } from './types';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
+import { QuizScreen } from '../screens/quiz/QuizScreen';
+
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 const ONBOARDING_KEY = '@onboarding_seen';
 
@@ -34,7 +38,7 @@ export function RootNavigator() {
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const notificationsSetUp = useRef(false);
-  const navigationRef = useRef<NavigationContainerRef<AppTabParamList>>(null);
+  const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
 
   const navigate = useCallback((screen: string, params: object) => {
     if (navigationRef.current?.isReady()) {
@@ -90,7 +94,18 @@ export function RootNavigator() {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      {isAuthenticated ? <AppNavigator /> : <AuthNavigator />}
+      {isAuthenticated ? (
+        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+          <RootStack.Screen name="App" component={AppNavigator} />
+          <RootStack.Screen
+            name="Quiz"
+            component={QuizScreen}
+            options={{ gestureEnabled: false }}
+          />
+        </RootStack.Navigator>
+      ) : (
+        <AuthNavigator />
+      )}
     </NavigationContainer>
   );
 }

@@ -3,6 +3,12 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import type { ChatSession, QuizSelectableMode } from '../types';
 
+// ─── Root Stack (above tabs — full-screen overlays) ───────────────────────────
+export type RootStackParamList = {
+  App: undefined;
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
+};
+
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
 export type AuthStackParamList = {
   Login: undefined;
