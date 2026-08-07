@@ -23,7 +23,7 @@ import {
   AppleAuthDtoType,
 } from './auth.dto';
 import { env } from '../../config/env';
-import { NotFoundError, UnauthorizedError, ForbiddenError, ConflictError, ValidationError } from '../../utils/errors';
+import { AppError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError, ValidationError } from '../../utils/errors';
 
 const googleClient = new OAuth2Client(env.GOOGLE_CLIENT_ID);
 
@@ -192,7 +192,7 @@ export async function login(dto: LoginDtoType) {
   }
 
   if (!user.emailVerified) {
-    throw new ForbiddenError('Please verify your email before logging in');
+    throw new AppError('Please verify your email before logging in', 403, 'EMAIL_NOT_VERIFIED');
   }
 
   const accessToken = generateAccessToken(user.id);
