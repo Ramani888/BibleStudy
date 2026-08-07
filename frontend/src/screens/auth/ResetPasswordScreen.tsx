@@ -15,16 +15,12 @@ import type { AuthScreenProps } from '../../navigation/types';
 
 export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'ResetPassword'>) {
   const { colors, spacing } = useTheme();
-  const { email } = route.params;
-  const resetPassword = useAuthStore(s => s.resetPassword);
+  const { email }       = route.params;
+  const resetPassword   = useAuthStore(s => s.resetPassword);
+  const confirmRef      = useRef<TextInput>(null);
   const [resending, setResending] = useState(false);
-  const confirmRef = useRef<TextInput>(null);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<ResetPasswordFormData>({
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm<ResetPasswordFormData>({
     resolver: zodResolver(resetPasswordSchema),
     defaultValues: { otp: '', newPassword: '', confirmPassword: '' },
   });
@@ -32,18 +28,10 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
   const onSubmit = useCallback(async (data: ResetPasswordFormData) => {
     try {
       await resetPassword({ email, otp: data.otp, newPassword: data.newPassword });
-      Toast.show({
-        type: 'success',
-        text1: 'Password reset!',
-        text2: 'You can now sign in with your new password.',
-      });
+      Toast.show({ type: 'success', text1: 'Password reset!', text2: 'You can now sign in with your new password.' });
       navigation.navigate('Login');
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Reset failed',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Reset failed', text2: getErrorMessage(err) });
     }
   }, [email, resetPassword, navigation]);
 
@@ -59,28 +47,25 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
     }
   }, [email]);
 
-  const subtitle = useMemo(
-    () => `Enter the code sent to ${email} and choose a new password`,
-    [email],
-  );
-
-  const footer = useMemo(
-    () => (
-      <Pressable onPress={handleResend} disabled={resending}>
-        <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
-          {resending ? 'Sending…' : 'Resend code'}
-        </Typography>
-      </Pressable>
-    ),
-    [handleResend, resending],
-  );
+  const subtitle = useMemo(() => `Enter the code sent to ${email} and choose a new password`, [email]);
 
   return (
-    <AuthLayout title="New password" subtitle={subtitle} footer={footer}>
+    <AuthLayout
+      title="New password"
+      subtitle={subtitle}
+      footer={
+        <>
+          <Button label="Reset Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Pressable onPress={handleResend} disabled={resending}>
+            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.primary} align="center">
+              {resending ? 'Sending…' : 'Resend code'}
+            </Typography>
+          </Pressable>
+        </>
+      }
+    >
       <View style={{ gap: spacing[2] }}>
-        <Typography preset="label" color={colors.textSecondary}>
-          Verification code
-        </Typography>
+        <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
         <Controller
           name="otp"
           control={control}
@@ -89,7 +74,6 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
           )}
         />
       </View>
-
       <FormField
         name="newPassword"
         control={control}
@@ -99,7 +83,6 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         returnKeyType="next"
         onSubmitEditing={() => confirmRef.current?.focus()}
       />
-
       <FormField
         name="confirmPassword"
         control={control}
@@ -109,13 +92,6 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         inputRef={confirmRef}
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
-      />
-
-      <Button
-        label="Reset Password"
-        onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        fullWidth
       />
     </AuthLayout>
   );

@@ -17,12 +17,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
   const { colors } = useTheme();
   const forgotPassword = useAuthStore(s => s.forgotPassword);
 
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { isSubmitting },
-  } = useForm<ForgotPasswordFormData>({
+  const { control, handleSubmit, getValues, formState: { isSubmitting } } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
     defaultValues: { email: '' },
   });
@@ -30,18 +25,10 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       await forgotPassword(data);
-      Toast.show({
-        type: 'success',
-        text1: 'Code sent',
-        text2: 'Check your email for a reset code.',
-      });
+      Toast.show({ type: 'success', text1: 'Code sent', text2: 'Check your email for a reset code.' });
       navigation.navigate('ResetPassword', { email: getValues('email') });
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Request failed',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Request failed', text2: getErrorMessage(err) });
     }
   };
 
@@ -50,14 +37,15 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
       title="Reset password"
       subtitle="Enter your email and we'll send you a reset code"
       footer={
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Typography preset="body" color={colors.textSecondary}>
-            Remember your password?{' '}
-            <Typography preset="body" color={colors.primary}>
-              Sign in
+        <>
+          <Button label="Send Reset Code" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Pressable onPress={() => navigation.navigate('Login')}>
+            <Typography preset="bodySm" color={colors.textSecondary} align="center">
+              Remember your password?{' '}
+              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
             </Typography>
-          </Typography>
-        </Pressable>
+          </Pressable>
+        </>
       }
     >
       <FormField
@@ -68,13 +56,6 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
         keyboardType="email-address"
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
-      />
-
-      <Button
-        label="Send Reset Code"
-        onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        fullWidth
       />
     </AuthLayout>
   );

@@ -46,6 +46,20 @@ export const ResetPasswordDto = z.object({
     .regex(/[0-9]/, 'Password must contain at least one number'),
 });
 
+export const GoogleAuthDto = z.object({
+  idToken: z.string().min(1, 'Google ID token is required'),
+});
+
+export const AppleAuthDto = z.object({
+  identityToken: z.string().min(1, 'Apple identity token is required'),
+  nonce:         z.string().min(1, 'Nonce is required'),
+  fullName: z.object({
+    givenName:  z.string().nullable().optional(),
+    familyName: z.string().nullable().optional(),
+  }).optional(),
+  email: z.string().email().nullable().optional(),
+});
+
 export type RegisterDtoType = z.infer<typeof RegisterDto>;
 export type VerifyEmailDtoType = z.infer<typeof VerifyEmailDto>;
 export type LoginDtoType = z.infer<typeof LoginDto>;
@@ -54,3 +68,5 @@ export type LogoutDtoType = z.infer<typeof LogoutDto>;
 export type ResendVerificationDtoType = z.infer<typeof ResendVerificationDto>;
 export type ForgotPasswordDtoType = z.infer<typeof ForgotPasswordDto>;
 export type ResetPasswordDtoType = z.infer<typeof ResetPasswordDto>;
+export type GoogleAuthDtoType = z.infer<typeof GoogleAuthDto>;
+export type AppleAuthDtoType  = z.infer<typeof AppleAuthDto>;

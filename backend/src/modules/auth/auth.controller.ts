@@ -138,3 +138,23 @@ export async function getMe(req: Request, res: Response): Promise<void> {
     sendError(res, message, 500, 'INTERNAL_ERROR');
   }
 }
+
+export async function googleAuth(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await authService.googleAuth(req.body);
+    sendSuccess(res, result, 'Google sign-in successful');
+  } catch (error) {
+    if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+    sendError(res, 'Google sign-in failed', 500, 'INTERNAL_ERROR');
+  }
+}
+
+export async function appleAuth(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await authService.appleAuth(req.body);
+    sendSuccess(res, result, 'Apple sign-in successful');
+  } catch (error) {
+    if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+    sendError(res, 'Apple sign-in failed', 500, 'INTERNAL_ERROR');
+  }
+}

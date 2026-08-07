@@ -37,4 +37,10 @@ export const authApi = {
 
   me: () =>
     apiGet<User>('/auth/me'),
+
+  googleSignIn: (payload: { idToken: string }) =>
+    apiPost<AuthTokens & { user: User }>('/auth/google', payload),
+
+  appleSignIn: (payload: { identityToken: string; nonce: string; email?: string; fullName?: { givenName?: string | null; familyName?: string | null } }) =>
+    apiPost<AuthTokens & { user: User }>('/auth/apple', payload),
 };

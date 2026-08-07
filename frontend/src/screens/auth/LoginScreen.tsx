@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pressable, TextInput } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,19 +12,18 @@ import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
 import { useTheme } from '../../theme';
+import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   const { colors } = useTheme();
-  const login = useAuthStore(s => s.login);
-  const passwordRef = useRef<TextInput>(null);
+  const login          = useAuthStore(s => s.login);
+  const loginWithGoogle = useAuthStore(s => s.loginWithGoogle);
+  const loginWithApple  = useAuthStore(s => s.loginWithApple);
+  const passwordRef    = useRef<TextInput>(null);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { isSubmitting },
-  } = useForm<LoginFormData>({
+  const { control, handleSubmit, getValues, formState: { isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '' },
   });
@@ -32,23 +31,37 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data);
-      // RootNavigator auto-switches to AppNavigator on isAuthenticated = true
     } catch (err) {
-      // If email is not verified, guide the user to the verification screen
       if (axios.isAxiosError(err) && err.response?.data?.error?.code === 'EMAIL_NOT_VERIFIED') {
-        Toast.show({
-          type: 'info',
-          text1: 'Email not verified',
-          text2: 'Redirecting you to verify your email…',
-        });
+        Toast.show({ type: 'info', text1: 'Email not verified', text2: 'Redirecting to verify your email…' });
         navigation.navigate('VerifyEmail', { email: getValues('email') });
         return;
       }
-      Toast.show({
-        type: 'error',
-        text1: 'Login failed',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Login failed', text2: getErrorMessage(err) });
+    }
+  };
+
+  const handleGoogle = async () => {
+    setSocialLoading('google');
+    try {
+      await loginWithGoogle();
+    } catch (err: any) {
+      if (err?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
+        Toast.show({ type: 'error', text1: 'Google sign-in failed', text2: getErrorMessage(err) });
+      }
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleApple = async () => {
+    setSocialLoading('apple');
+    try {
+      await loginWithApple();
+    } catch (err) {
+      Toast.show({ type: 'error', text1: 'Apple sign-in failed', text2: getErrorMessage(err) });
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -56,15 +69,19 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     <AuthLayout
       title="Welcome back"
       subtitle="Sign in to continue your study journey"
+      onGoogle={handleGoogle}
+      onApple={handleApple}
+      socialLoading={socialLoading}
       footer={
-        <Pressable onPress={() => navigation.navigate('Register')}>
-          <Typography preset="body" color={colors.textSecondary}>
-            Don't have an account?{' '}
-            <Typography preset="body" color={colors.primary}>
-              Register
+        <>
+          <Button label="Sign In" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Pressable onPress={() => navigation.navigate('Register')}>
+            <Typography preset="bodySm" color={colors.textSecondary} align="center">
+              Don't have an account?{' '}
+              <Typography preset="bodySm" color={colors.primary}>Register</Typography>
             </Typography>
-          </Typography>
-        </Pressable>
+          </Pressable>
+        </>
       }
     >
       <FormField
@@ -76,7 +93,6 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         returnKeyType="next"
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
-
       <FormField
         name="password"
         control={control}
@@ -87,19 +103,11 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
       />
-
       <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
         <Typography preset="label" color={colors.primary} align="right">
           Forgot password?
         </Typography>
       </Pressable>
-
-      <Button
-        label="Sign In"
-        onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        fullWidth
-      />
     </AuthLayout>
   );
 }

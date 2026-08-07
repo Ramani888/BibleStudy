@@ -22,6 +22,10 @@ const envSchema = z.object({
   PORT: z.string().transform(Number).default('3001'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
 
+  // Social auth (optional — Google/Apple sign-in disabled when absent)
+  GOOGLE_CLIENT_ID: z.string().optional().default(''),
+  APPLE_BUNDLE_ID:  z.string().optional().default(''),
+
   // Firebase (optional — push notifications disabled when absent)
   FIREBASE_PROJECT_ID: z.string().optional().default(''),
   FIREBASE_PRIVATE_KEY: z.string().optional().default(''),

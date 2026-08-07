@@ -15,15 +15,11 @@ import type { AuthScreenProps } from '../../navigation/types';
 
 export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'VerifyEmail'>) {
   const { colors, spacing } = useTheme();
-  const { email } = route.params;
-  const verifyEmail = useAuthStore(s => s.verifyEmail);
+  const { email }      = route.params;
+  const verifyEmail    = useAuthStore(s => s.verifyEmail);
   const [resending, setResending] = useState(false);
 
-  const {
-    control,
-    handleSubmit,
-    formState: { isSubmitting },
-  } = useForm<VerifyEmailFormData>({
+  const { control, handleSubmit, formState: { isSubmitting } } = useForm<VerifyEmailFormData>({
     resolver: zodResolver(verifyEmailSchema),
     defaultValues: { otp: '' },
   });
@@ -31,13 +27,8 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
   const onSubmit = useCallback(async (data: VerifyEmailFormData) => {
     try {
       await verifyEmail({ email, otp: data.otp });
-      // RootNavigator auto-switches to AppNavigator
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Verification failed',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Verification failed', text2: getErrorMessage(err) });
     }
   }, [email, verifyEmail]);
 
@@ -45,17 +36,9 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     setResending(true);
     try {
       await authApi.resendVerification({ email });
-      Toast.show({
-        type: 'success',
-        text1: 'Code resent',
-        text2: 'Check your inbox for a new verification code.',
-      });
+      Toast.show({ type: 'success', text1: 'Code resent', text2: 'Check your inbox.' });
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Could not resend',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Could not resend', text2: getErrorMessage(err) });
     } finally {
       setResending(false);
     }
@@ -63,33 +46,29 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
 
   const subtitle = useMemo(() => `We sent a 6-digit code to\n${email}`, [email]);
 
-  const footer = useMemo(
-    () => (
-      <>
-        <Pressable onPress={handleResend} disabled={resending}>
-          <Typography preset="label" color={resending ? colors.textDisabled : colors.primary}>
-            {resending ? 'Sending…' : 'Resend code'}
-          </Typography>
-        </Pressable>
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Typography preset="body" color={colors.textSecondary}>
-            Back to{' '}
-            <Typography preset="body" color={colors.primary}>
-              Sign in
-            </Typography>
-          </Typography>
-        </Pressable>
-      </>
-    ),
-    [handleResend, resending, navigation],
-  );
-
   return (
-    <AuthLayout title="Check your email" subtitle={subtitle} footer={footer}>
+    <AuthLayout
+      title="Check your email"
+      subtitle={subtitle}
+      footer={
+        <>
+          <Button label="Verify Email" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Pressable onPress={handleResend} disabled={resending}>
+            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.primary} align="center">
+              {resending ? 'Sending…' : 'Resend code'}
+            </Typography>
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('Login')}>
+            <Typography preset="bodySm" color={colors.textSecondary} align="center">
+              Back to{' '}
+              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
+            </Typography>
+          </Pressable>
+        </>
+      }
+    >
       <View style={{ gap: spacing[2] }}>
-        <Typography preset="label" color={colors.textSecondary}>
-          Verification code
-        </Typography>
+        <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
         <Controller
           name="otp"
           control={control}
@@ -98,13 +77,6 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
           )}
         />
       </View>
-
-      <Button
-        label="Verify Email"
-        onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        fullWidth
-      />
     </AuthLayout>
   );
 }

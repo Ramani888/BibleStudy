@@ -65,6 +65,10 @@ export async function changePassword(userId: string, dto: ChangePasswordDtoType)
     throw new NotFoundError('User not found');
   }
 
+  if (!user.password) {
+    throw new UnauthorizedError('This account uses social login and has no password to change.');
+  }
+
   const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
   if (!isPasswordValid) {
     throw new UnauthorizedError('Current password is incorrect');

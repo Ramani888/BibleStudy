@@ -11,9 +11,11 @@ import { queryClient } from './src/lib/queryClient';
 import { useAuthStore } from './src/store';
 import { useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
+import { configureGoogleSignIn } from './src/utils/socialAuth';
 
 // Enable native screens for better performance
 enableScreens(true);
+configureGoogleSignIn();
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);

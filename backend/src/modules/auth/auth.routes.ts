@@ -12,6 +12,8 @@ import {
   ResendVerificationDto,
   ForgotPasswordDto,
   ResetPasswordDto,
+  GoogleAuthDto,
+  AppleAuthDto,
 } from './auth.dto';
 
 const router = Router();
@@ -25,5 +27,7 @@ router.post('/logout', authMiddleware, validate(LogoutDto), authController.logou
 router.post('/forgot-password', authRateLimit, validate(ForgotPasswordDto), authController.forgotPassword);
 router.post('/reset-password', authRateLimit, validate(ResetPasswordDto), authController.resetPassword);
 router.get('/me', authMiddleware, authController.getMe);
+router.post('/google', authRateLimit, validate(GoogleAuthDto), authController.googleAuth);
+router.post('/apple',  authRateLimit, validate(AppleAuthDto),  authController.appleAuth);
 
 export default router;

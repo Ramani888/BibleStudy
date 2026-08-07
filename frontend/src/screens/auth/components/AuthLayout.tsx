@@ -9,21 +9,26 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SparklesIcon } from '../../../components/icons';
-import { Typography } from '../../../components/ui';
+import { Divider, Typography } from '../../../components/ui';
 import { type Theme, useTheme } from '../../../theme';
+import { SocialButtons } from './SocialButtons';
 
 interface AuthLayoutProps {
   title: string;
   subtitle?: string;
   children: React.ReactNode;
-  footer?: React.ReactNode;
+  footer: React.ReactNode;
+  /** Pass handlers to show social buttons + "or" divider. Omit on OTP / reset screens. */
+  onGoogle?: () => void;
+  onApple?: () => void;
+  socialLoading?: 'google' | 'apple' | null;
 }
 
 function BrandLogo({ colors }: { colors: Theme['colors'] }) {
   return (
     <View style={logoStyles.wrap}>
       <View style={[logoStyles.mark, { backgroundColor: colors.primary }]}>
-        <SparklesIcon size={28} color={colors.textOnPrimary} />
+        <SparklesIcon size={26} color={colors.textOnPrimary} />
       </View>
       <Typography preset="h4" color={colors.primary} style={logoStyles.text}>
         BibleStudy Pro
@@ -33,17 +38,26 @@ function BrandLogo({ colors }: { colors: Theme['colors'] }) {
 }
 
 const logoStyles = StyleSheet.create({
-  wrap: { alignItems: 'center', marginBottom: 32, gap: 8 },
-  mark: { width: 64, height: 64, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  text: { letterSpacing: 0.5 },
+  wrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32 },
+  mark: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+  text: { letterSpacing: 0.3 },
 });
 
-export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
+export function AuthLayout({
+  title,
+  subtitle,
+  children,
+  footer,
+  onGoogle,
+  onApple,
+  socialLoading,
+}: AuthLayoutProps) {
   const { colors, spacing, layout } = useTheme();
   const styles = makeStyles({ colors, spacing, layout });
+  const hasSocial = !!(onGoogle && onApple);
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -56,20 +70,35 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
         >
           <BrandLogo colors={colors} />
 
-          <View style={styles.card}>
-            <Typography preset="h2" style={styles.title}>
-              {title}
+          <Typography preset="h2" style={styles.title}>{title}</Typography>
+          {subtitle && (
+            <Typography preset="body" color={colors.textSecondary} style={styles.subtitle}>
+              {subtitle}
             </Typography>
-            {subtitle && (
-              <Typography preset="body" color={colors.textSecondary} style={styles.subtitle}>
-                {subtitle}
-              </Typography>
-            )}
-            <View style={styles.form}>{children}</View>
-          </View>
+          )}
 
-          {footer && <View style={styles.footer}>{footer}</View>}
+          <View style={styles.form}>{children}</View>
+
+          {hasSocial && (
+            <>
+              <View style={styles.dividerRow}>
+                <Divider style={styles.dividerLine} />
+                <Typography preset="bodySm" color={colors.textSecondary} style={styles.orText}>
+                  or
+                </Typography>
+                <Divider style={styles.dividerLine} />
+              </View>
+
+              <SocialButtons
+                onGoogle={onGoogle!}
+                onApple={onApple!}
+                loading={socialLoading}
+              />
+            </>
+          )}
         </ScrollView>
+
+        <View style={styles.footer}>{footer}</View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -77,23 +106,31 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
 
 const makeStyles = ({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) =>
   StyleSheet.create({
-    safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
-    kav:  { flex: 1 },
+    safe:   { flex: 1, backgroundColor: colors.background },
+    kav:    { flex: 1 },
     scroll: {
       flexGrow: 1,
       paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[6],
-      justifyContent: 'center',
-    },
-    card: {
-      backgroundColor: colors.background,
-      borderRadius: layout.cardRadius,
-      padding: spacing[6],
-      borderWidth: 1,
-      borderColor: colors.border,
+      paddingTop: spacing[6],
+      paddingBottom: spacing[4],
     },
     title:    { marginBottom: spacing[1] },
-    subtitle: { marginBottom: spacing[5] },
-    form:     { gap: spacing[4], marginTop: spacing[4] },
-    footer:   { marginTop: spacing[6], alignItems: 'center', gap: spacing[3] },
+    subtitle: { marginBottom: spacing[6] },
+    form:     { gap: spacing[4], marginBottom: spacing[6] },
+    dividerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      marginBottom: spacing[4],
+    },
+    dividerLine: { flex: 1 },
+    orText:      { lineHeight: 18 },
+    footer: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingBottom: spacing[4],
+      paddingTop: spacing[3],
+      gap: spacing[3],
+      borderTopWidth: StyleSheet.hairlineWidth,
+      borderTopColor: colors.border,
+    },
   });

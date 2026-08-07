@@ -3,6 +3,7 @@ import axios from 'axios';
 import { authApi } from '../api/auth.api';
 import { usersApi } from '../api/users.api';
 import { storage } from '../utils/storage';
+import { getGoogleIdToken, getAppleCredentials } from '../utils/socialAuth';
 import { removeDeviceToken } from '../utils/notifications';
 import { queryClient } from '../lib/queryClient';
 import type {
@@ -24,6 +25,8 @@ interface AuthState {
   register: (payload: RegisterPayload) => Promise<void>;
   verifyEmail: (payload: VerifyEmailPayload) => Promise<void>;
   login: (payload: LoginPayload) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
+  loginWithApple: () => Promise<void>;
   logout: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   forgotPassword: (payload: ForgotPasswordPayload) => Promise<void>;
@@ -76,6 +79,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
   login: async (payload: LoginPayload) => {
     const result = await authApi.login(payload);
+    await storage.setTokens(result.accessToken, result.refreshToken);
+    queryClient.clear();
+    set({ user: result.user, isAuthenticated: true });
+  },
+
+  loginWithGoogle: async () => {
+    const idToken = await getGoogleIdToken();
+    const result  = await authApi.googleSignIn({ idToken });
+    await storage.setTokens(result.accessToken, result.refreshToken);
+    queryClient.clear();
+    set({ user: result.user, isAuthenticated: true });
+  },
+
+  loginWithApple: async () => {
+    const credentials = await getAppleCredentials();
+    const result      = await authApi.appleSignIn(credentials);
     await storage.setTokens(result.accessToken, result.refreshToken);
     queryClient.clear();
     set({ user: result.user, isAuthenticated: true });

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Pressable, TextInput } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -11,20 +11,19 @@ import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { registerSchema, type RegisterFormData } from '../../utils/validators';
 import { useTheme } from '../../theme';
+import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
   const { colors } = useTheme();
-  const register = useAuthStore(s => s.register);
-  const emailRef = useRef<TextInput>(null);
-  const passwordRef = useRef<TextInput>(null);
+  const register        = useAuthStore(s => s.register);
+  const loginWithGoogle  = useAuthStore(s => s.loginWithGoogle);
+  const loginWithApple   = useAuthStore(s => s.loginWithApple);
+  const emailRef        = useRef<TextInput>(null);
+  const passwordRef     = useRef<TextInput>(null);
+  const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
 
-  const {
-    control,
-    handleSubmit,
-    getValues,
-    formState: { isSubmitting },
-  } = useForm<RegisterFormData>({
+  const { control, handleSubmit, getValues, formState: { isSubmitting } } = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
     defaultValues: { name: '', email: '', password: '' },
   });
@@ -32,18 +31,34 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
   const onSubmit = async (data: RegisterFormData) => {
     try {
       await register(data);
-      Toast.show({
-        type: 'success',
-        text1: 'Account created!',
-        text2: 'Check your email for a verification code.',
-      });
+      Toast.show({ type: 'success', text1: 'Account created!', text2: 'Check your email for a verification code.' });
       navigation.navigate('VerifyEmail', { email: getValues('email') });
     } catch (err) {
-      Toast.show({
-        type: 'error',
-        text1: 'Registration failed',
-        text2: getErrorMessage(err),
-      });
+      Toast.show({ type: 'error', text1: 'Registration failed', text2: getErrorMessage(err) });
+    }
+  };
+
+  const handleGoogle = async () => {
+    setSocialLoading('google');
+    try {
+      await loginWithGoogle();
+    } catch (err: any) {
+      if (err?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
+        Toast.show({ type: 'error', text1: 'Google sign-in failed', text2: getErrorMessage(err) });
+      }
+    } finally {
+      setSocialLoading(null);
+    }
+  };
+
+  const handleApple = async () => {
+    setSocialLoading('apple');
+    try {
+      await loginWithApple();
+    } catch (err) {
+      Toast.show({ type: 'error', text1: 'Apple sign-in failed', text2: getErrorMessage(err) });
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -51,15 +66,19 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     <AuthLayout
       title="Create account"
       subtitle="Start your Bible study journey today"
+      onGoogle={handleGoogle}
+      onApple={handleApple}
+      socialLoading={socialLoading}
       footer={
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Typography preset="body" color={colors.textSecondary}>
-            Already have an account?{' '}
-            <Typography preset="body" color={colors.primary}>
-              Sign in
+        <>
+          <Button label="Create Account" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Pressable onPress={() => navigation.navigate('Login')}>
+            <Typography preset="bodySm" color={colors.textSecondary} align="center">
+              Already have an account?{' '}
+              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
             </Typography>
-          </Typography>
-        </Pressable>
+          </Pressable>
+        </>
       }
     >
       <FormField
@@ -71,7 +90,6 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         returnKeyType="next"
         onSubmitEditing={() => emailRef.current?.focus()}
       />
-
       <FormField
         name="email"
         control={control}
@@ -82,7 +100,6 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         inputRef={emailRef}
         onSubmitEditing={() => passwordRef.current?.focus()}
       />
-
       <FormField
         name="password"
         control={control}
@@ -92,13 +109,6 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         inputRef={passwordRef}
         returnKeyType="done"
         onSubmitEditing={handleSubmit(onSubmit)}
-      />
-
-      <Button
-        label="Create Account"
-        onPress={handleSubmit(onSubmit)}
-        loading={isSubmitting}
-        fullWidth
       />
     </AuthLayout>
   );
