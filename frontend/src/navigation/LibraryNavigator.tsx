@@ -20,6 +20,8 @@ export function LibraryNavigator() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
       const tabState = navigation.getState();
+      const selectedRoute = tabState?.routes?.[tabState.index ?? 0];
+      if (selectedRoute?.name === 'LibraryTab') return; // root overlay, not a tab switch
       const route = tabState?.routes?.find(r => r.name === 'LibraryTab');
       const stackState = route?.state;
       if (stackState && (stackState.index ?? 0) > 0) {

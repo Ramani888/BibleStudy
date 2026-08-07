@@ -11,10 +11,15 @@ const Stack = createNativeStackNavigator<QuizStackParamList>();
 export function QuizNavigator() {
   const navigation = useNavigation();
 
-  // Reset the Quiz stack to its root when the tab loses focus (matches other tabs).
+  // Reset the Quiz stack to its root only when the user actually switches to
+  // another tab — not when a root-stack screen (Quiz, QuizSummary) overlays App.
+  // We detect a real tab switch by checking that QuizTab is no longer the
+  // selected tab at the time the blur fires.
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
       const tabState = navigation.getState();
+      const selectedRoute = tabState?.routes?.[tabState.index ?? 0];
+      if (selectedRoute?.name === 'QuizTab') return; // root overlay, not a tab switch
       const route = tabState?.routes?.find(r => r.name === 'QuizTab');
       const stackState = route?.state;
       if (stackState && (stackState.index ?? 0) > 0) {
