@@ -160,6 +160,6 @@ const styles = StyleSheet.create({
   timer:         { fontVariant: ['tabular-nums'] },
   title:         { flex: 1, textAlign: 'center' },
   counterWrap:   { width: 56, alignItems: 'flex-end' },
-  progressTrack: { height: 4, width: '100%' },
-  progressFill:  { height: 4 },
+  progressTrack: { height: layout.progressBarHeight, width: '100%' },
+  progressFill:  { height: layout.progressBarHeight },
 });

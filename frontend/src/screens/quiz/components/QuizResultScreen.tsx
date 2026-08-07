@@ -148,9 +148,9 @@ const styles = StyleSheet.create({
   scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
   reviewBtn: { alignItems: 'center', gap: spacing[1] },
   reviewIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: layout.avatarMd,
+    height: layout.avatarMd,
+    borderRadius: layout.avatarMd / 2,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
     gap: spacing[1],
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[1],
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
 });

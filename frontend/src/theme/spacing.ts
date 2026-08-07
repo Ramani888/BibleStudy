@@ -33,6 +33,9 @@ export const layout = {
   screenPaddingV: spacing[6],
   cardPadding: spacing[4],
   cardRadius: 12,
+  cardRadiusSm: 14,
+  cardRadiusLg: 16,
+  pillRadius: 999,
   inputHeight: 52,
   buttonHeight: 52,
   buttonHeightSm: 40,
@@ -41,4 +44,6 @@ export const layout = {
   avatarSm: 32,
   avatarMd: 48,
   avatarLg: 80,
+  iconCircleLg: 52,
+  progressBarHeight: 4,
 } as const;

@@ -220,14 +220,14 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     chip: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[1],
-      borderRadius: 999,
+      borderRadius: layout.pillRadius,
       borderWidth: 1,
     },
 
     // Info card
     card: {
       width: '100%',
-      borderRadius: 16,
+      borderRadius: layout.cardRadiusLg,
       borderWidth: 1,
       overflow: 'hidden',
     },

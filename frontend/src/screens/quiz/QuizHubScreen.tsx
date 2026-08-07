@@ -9,7 +9,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { type Theme, useTheme } from '../../theme';
+import { fontSizes, type Theme, useTheme } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
@@ -212,21 +212,21 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       alignItems: 'center',
       gap: spacing[3],
       padding: spacing[4],
-      borderRadius: 14,
+      borderRadius: layout.cardRadiusSm,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.backgroundCard,
     },
     scoreCircle: {
-      width: 52,
-      height: 52,
-      borderRadius: 26,
+      width: layout.iconCircleLg,
+      height: layout.iconCircleLg,
+      borderRadius: layout.iconCircleLg / 2,
       borderWidth: 2,
       alignItems: 'center',
       justifyContent: 'center',
     },
     scoreText: {
-      fontSize: 13,
+      fontSize: fontSizes.sm,
       fontWeight: '700' as const,
     },
     rowText: { flex: 1, gap: spacing[0.5] },

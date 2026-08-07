@@ -151,7 +151,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     list:        { padding: layout.screenPaddingH, gap: spacing[3] },
     empty:       { paddingTop: spacing[12] },
     card: {
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       borderWidth: 1,
       padding: spacing[4],
       gap: spacing[2],
