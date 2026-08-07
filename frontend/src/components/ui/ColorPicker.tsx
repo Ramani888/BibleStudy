@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Theme, useTheme } from '../../theme';
+import { layout, Theme, useTheme } from '../../theme';
 
 const CHECK_SIZE = 16;
 
@@ -49,7 +49,7 @@ const makeStyles = ({ colors, spacing }: Theme) =>
     swatch: {
       width: 32,
       height: 32,
-      borderRadius: 16,
+      borderRadius: layout.pillRadius,
       alignItems: 'center',
       justifyContent: 'center',
     },

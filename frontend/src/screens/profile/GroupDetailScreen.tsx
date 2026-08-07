@@ -202,7 +202,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       justifyContent: 'space-between',
       padding: spacing[3],
       backgroundColor: colors.backgroundSecondary,
-      borderRadius: 8,
+      borderRadius: spacing[2],
     },
     inviteInfo: { gap: spacing[1] },
     sectionTitle: { marginTop: spacing[2] },
@@ -217,7 +217,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     adminBadge: {
       paddingHorizontal: spacing[2],
       paddingVertical: spacing[0.5],
-      borderRadius: 4,
+      borderRadius: spacing[1],
       backgroundColor: colors.primarySurface,
     },
     memberActions: { flexDirection: 'row', gap: spacing[2] },

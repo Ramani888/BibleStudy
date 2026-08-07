@@ -44,8 +44,7 @@ import {
   useUpdateSessionTags,
 } from '../../hooks';
 import { formatDate } from '../../utils/formatters';
-import { useTheme, fontSizes, layout, spacing } from '../../theme';
-import type { ThemeColors } from '../../theme';
+import { useTheme, fontSizes, fontWeights, layout, spacing, type Theme } from '../../theme';
 import type { AIChat, BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
 
@@ -63,8 +62,9 @@ const ListSeparator = () => <Spacer size={spacing[3]} />;
 
 // ─── Individual Q&A pair inside an expanded session ──────────────────────────
 function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   return (
     <>
       {index > 0 && <Divider marginV={spacing[3]} />}
@@ -88,8 +88,9 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
 
 // ─── Bookmarked message card ──────────────────────────────────────────────────
 function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [expanded, setExpanded] = useState(false);
   return (
     <Pressable onPress={() => setExpanded(e => !e)}>
@@ -136,8 +137,9 @@ interface SessionCardProps {
 }
 
 function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [expanded, setExpanded] = useState(false);
   const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
   const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
@@ -217,8 +219,9 @@ function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const {
     data,
     isLoading,
@@ -639,7 +642,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   );
 }
 
-const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   safe: { flex: 1 },
   fill: { flex: 1 },
 
@@ -678,7 +681,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.backgroundSecondary,
-    borderRadius: 10,
+    borderRadius: spacing[2.5],
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
     gap: spacing[2],
@@ -704,7 +707,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   tagFilter: {
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[1],
-    borderRadius: 20,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.backgroundSecondary,
@@ -732,14 +735,14 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   sessionIcon: {
     width: 26,
     height: 26,
-    borderRadius: 8,
+    borderRadius: spacing[2],
     backgroundColor: colors.primarySurface,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 1,
     flexShrink: 0,
   },
-  sessionTitle: { fontWeight: '500' },
+  sessionTitle: { fontWeight: fontWeights.medium },
 
   tagRow: {
     flexDirection: 'row',
@@ -748,9 +751,9 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   },
   tagPill: {
     backgroundColor: colors.primarySurface,
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     paddingHorizontal: spacing[2],
-    paddingVertical: 2,
+    paddingVertical: spacing[0.5],
   },
 
   metaRow: {
@@ -771,31 +774,31 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   dot: {
     width: 3,
     height: 3,
-    borderRadius: 2,
+    borderRadius: spacing[0.5],
     backgroundColor: colors.textDisabled,
   },
   creditPill: {
     backgroundColor: colors.primarySurface,
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     paddingHorizontal: spacing[2],
-    paddingVertical: 2,
+    paddingVertical: spacing[0.5],
   },
 
   qRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
   aRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
   qBadge: {
-    width: 22, height: 22, borderRadius: 6,
+    width: 22, height: 22, borderRadius: spacing[1.5],
     backgroundColor: colors.infoSurface,
     alignItems: 'center', justifyContent: 'center',
     marginTop: 1, flexShrink: 0,
   },
   aBadge: {
-    width: 22, height: 22, borderRadius: 6,
+    width: 22, height: 22, borderRadius: spacing[1.5],
     backgroundColor: colors.primarySurface,
     alignItems: 'center', justifyContent: 'center',
     marginTop: 1, flexShrink: 0,
   },
-  badgeLabel: { fontWeight: '700', fontSize: fontSizes.xs2 },
+  badgeLabel: { fontWeight: fontWeights.bold, fontSize: fontSizes.xs2 },
   flex: { flex: 1 },
 
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing[20] },
@@ -804,7 +807,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   renameInput: {
     borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[3],
     fontSize: fontSizes.md,
@@ -819,7 +822,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   tagOption: {
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[2],
-    borderRadius: 20,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.backgroundSecondary,

@@ -58,7 +58,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     grabber: {
       width: 40,
       height: 4,
-      borderRadius: 2,
+      borderRadius: spacing[0.5],
       backgroundColor: colors.border,
       alignSelf: 'center',
       marginTop: spacing[2],

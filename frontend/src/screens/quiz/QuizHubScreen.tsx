@@ -9,7 +9,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { fontSizes, type Theme, useTheme } from '../../theme';
+import { fontSizes, fontWeights, type Theme, useTheme } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
@@ -227,7 +227,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     },
     scoreText: {
       fontSize: fontSizes.sm,
-      fontWeight: '700' as const,
+      fontWeight: fontWeights.bold,
     },
     rowText: { flex: 1, gap: spacing[0.5] },
     footerBar: {

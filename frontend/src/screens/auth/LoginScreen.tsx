@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Pressable, TextInput } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -11,17 +11,18 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
-import { useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
-  const { colors } = useTheme();
+  const { colors, layout } = useTheme();
   const login          = useAuthStore(s => s.login);
   const loginWithGoogle = useAuthStore(s => s.loginWithGoogle);
   const loginWithApple  = useAuthStore(s => s.loginWithApple);
   const passwordRef    = useRef<TextInput>(null);
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
+  const [socialOnly, setSocialOnly] = useState(false);
 
   const { control, handleSubmit, getValues, formState: { isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -29,13 +30,21 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   });
 
   const onSubmit = async (data: LoginFormData) => {
+    setSocialOnly(false);
     try {
       await login(data);
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.data?.error?.code === 'EMAIL_NOT_VERIFIED') {
-        Toast.show({ type: 'info', text1: 'Email not verified', text2: 'Redirecting to verify your email…' });
-        navigation.navigate('VerifyEmail', { email: getValues('email') });
-        return;
+      if (axios.isAxiosError(err)) {
+        const code = err.response?.data?.error?.code;
+        if (code === 'EMAIL_NOT_VERIFIED') {
+          Toast.show({ type: 'info', text1: 'Email not verified', text2: 'Redirecting to verify your email…' });
+          navigation.navigate('VerifyEmail', { email: getValues('email') });
+          return;
+        }
+        if (code === 'SOCIAL_LOGIN_ONLY') {
+          setSocialOnly(true);
+          return;
+        }
       }
       Toast.show({ type: 'error', text1: 'Login failed', text2: getErrorMessage(err) });
     }
@@ -84,6 +93,13 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         </>
       }
     >
+      {socialOnly && (
+        <View style={{ backgroundColor: colors.primarySurface, borderRadius: layout.cardRadius, padding: spacing[3], marginBottom: spacing[2] }}>
+          <Typography preset="bodySm" color={colors.primaryDark} align="center">
+            This account was created with Google. Use the "Continue with Google" button above to sign in.
+          </Typography>
+        </View>
+      )}
       <FormField
         name="email"
         control={control}

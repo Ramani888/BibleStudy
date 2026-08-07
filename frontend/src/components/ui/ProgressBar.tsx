@@ -5,7 +5,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { colors } from '../../theme';
+import { layout, useTheme } from '../../theme';
 
 interface ProgressBarProps {
   progress: number; // 0 to 1
@@ -16,10 +16,11 @@ interface ProgressBarProps {
 
 export function ProgressBar({
   progress,
-  color = colors.primary,
+  color,
   height = 6,
   style,
 }: ProgressBarProps) {
+  const { colors } = useTheme();
   const width = useSharedValue(0);
 
   useEffect(() => {
@@ -31,8 +32,8 @@ export function ProgressBar({
   }));
 
   return (
-    <View style={[styles.track, { height }, style]}>
-      <Animated.View style={[styles.fill, barStyle, { backgroundColor: color, height }]} />
+    <View style={[styles.track, { height, backgroundColor: colors.gray200 }, style]}>
+      <Animated.View style={[styles.fill, barStyle, { backgroundColor: color ?? colors.primary, height }]} />
     </View>
   );
 }
@@ -40,11 +41,10 @@ export function ProgressBar({
 const styles = StyleSheet.create({
   track: {
     width: '100%',
-    backgroundColor: colors.gray200,
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     overflow: 'hidden',
   },
   fill: {
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
   },
 });

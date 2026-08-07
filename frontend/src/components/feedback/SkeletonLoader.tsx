@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
-import { Theme, useTheme } from '../../theme';
+import { layout, Theme, useTheme } from '../../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SHIMMER_COLORS: [string, string, string] = [
@@ -85,7 +85,7 @@ const makeStyles = ({ colors, spacing }: Theme) =>
     },
     card: {
       backgroundColor: colors.backgroundCard,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       padding: spacing[4],
       borderWidth: 1,
       borderColor: colors.border,

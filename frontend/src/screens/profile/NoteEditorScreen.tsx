@@ -20,7 +20,7 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { type Theme, fontSizes, fontWeights, lineHeights, useTheme } from '../../theme';
+import { type Theme, fontSizes, fontWeights, layout, lineHeights, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'NoteEditor'>;
 
@@ -212,7 +212,7 @@ function makeStyles({ colors, spacing, layout }: Theme) {
     tagPill: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[1],
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       backgroundColor: colors.primaryLight,
       borderWidth: 1,
       borderColor: colors.primary,
@@ -234,7 +234,7 @@ function makeStyles({ colors, spacing, layout }: Theme) {
     tagChip: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[2],
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.backgroundSecondary,
@@ -242,7 +242,7 @@ function makeStyles({ colors, spacing, layout }: Theme) {
     tagChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
     tagDoneBtn: {
       backgroundColor: colors.primary,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       paddingVertical: spacing[3],
       alignItems: 'center',
       marginTop: spacing[2],

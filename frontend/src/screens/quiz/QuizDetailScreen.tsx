@@ -7,7 +7,7 @@ import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
-import { type Theme, useTheme } from '../../theme';
+import { fontWeights, type Theme, useTheme } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
@@ -211,7 +211,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
 
     // Hero
     hero: { alignItems: 'center', gap: spacing[2] },
-    scoreNumber: { fontSize: 72, fontWeight: '700' as const, lineHeight: 80, includeFontPadding: false },
+    scoreNumber: { fontSize: 72, fontWeight: fontWeights.bold, lineHeight: 80, includeFontPadding: false },
     correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
 
     // Chips

@@ -8,7 +8,7 @@ import {
   View,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { fontSizes, spacing, useTheme, type ThemeColors } from '../../../theme';
+import { fontSizes, layout, spacing, useTheme, type Theme } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { StarIcon, ArrowUpIcon } from '../../../components/icons';
 
@@ -24,8 +24,9 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [text, setText] = useState('');
   const insets = useSafeAreaInsets();
 
@@ -103,7 +104,7 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
   );
 }
 
-const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   container: {
     backgroundColor: colors.background,
     borderTopWidth: 1,
@@ -130,7 +131,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     backgroundColor: colors.backgroundSecondary,
     borderWidth: 1.5,
     borderColor: colors.border,
-    borderRadius: 22,
+    borderRadius: layout.pillRadius,
     paddingHorizontal: spacing[4],
     paddingVertical: spacing[2.5],
     fontSize: fontSizes.md,
@@ -142,7 +143,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   sendBtn: {
     width: 44,
     height: 44,
-    borderRadius: 22,
+    borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },

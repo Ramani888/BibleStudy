@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { Theme, useTheme } from '../../../theme';
+import { layout, Theme, useTheme } from '../../../theme';
 
 interface CardPreviewProps {
   question: string;
@@ -37,10 +37,10 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
   );
 }
 
-const makeStyles = ({ colors, spacing }: Theme) =>
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
   StyleSheet.create({
     preview: {
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       overflow: 'hidden',
     },
     previewTop: {

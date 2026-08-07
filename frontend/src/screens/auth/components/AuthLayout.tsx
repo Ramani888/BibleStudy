@@ -24,24 +24,18 @@ interface AuthLayoutProps {
   socialLoading?: 'google' | 'apple' | null;
 }
 
-function BrandLogo({ colors }: { colors: Theme['colors'] }) {
+function BrandLogo({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) {
   return (
-    <View style={logoStyles.wrap}>
-      <View style={[logoStyles.mark, { backgroundColor: colors.primary }]}>
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2.5], marginBottom: spacing[8] }}>
+      <View style={{ width: spacing[10], height: spacing[10], borderRadius: layout.cardRadius, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary }}>
         <SparklesIcon size={26} color={colors.textOnPrimary} />
       </View>
-      <Typography preset="h4" color={colors.primary} style={logoStyles.text}>
+      <Typography preset="h4" color={colors.primary} style={{ letterSpacing: 0.3 }}>
         BibleStudy Pro
       </Typography>
     </View>
   );
 }
-
-const logoStyles = StyleSheet.create({
-  wrap: { flexDirection: 'row', alignItems: 'center', gap: 10, marginBottom: 32 },
-  mark: { width: 40, height: 40, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-  text: { letterSpacing: 0.3 },
-});
 
 export function AuthLayout({
   title,
@@ -68,7 +62,7 @@ export function AuthLayout({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <BrandLogo colors={colors} />
+          <BrandLogo colors={colors} spacing={spacing} layout={layout} />
 
           <Typography preset="h2" style={styles.title}>{title}</Typography>
           {subtitle && (

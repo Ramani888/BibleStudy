@@ -128,8 +128,8 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
   StyleSheet.create({
     background: {
       backgroundColor: colors.backgroundCard,
-      borderTopLeftRadius: 14,
-      borderTopRightRadius: 14,
+      borderTopLeftRadius: layout.cardRadiusSm,
+      borderTopRightRadius: layout.cardRadiusSm,
     },
     handle: { backgroundColor: colors.primaryLight, width: 40, height: 4 },
     content: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[8] },
@@ -144,7 +144,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     },
     mixRow: {
       backgroundColor: colors.primarySurface,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       paddingHorizontal: spacing[3],
       marginBottom: spacing[2],
     },

@@ -48,14 +48,14 @@ export function ListCard({ leading, title, meta, subtitle, onPress, onLongPress,
   );
 }
 
-const makeStyles = ({ colors, spacing }: Theme) =>
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
   StyleSheet.create({
     card: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: spacing[3],
       backgroundColor: colors.backgroundCard,
-      borderRadius: 14,
+      borderRadius: layout.cardRadiusSm,
       padding: spacing[4],
     },
     content: { flex: 1, gap: spacing[0.5] },

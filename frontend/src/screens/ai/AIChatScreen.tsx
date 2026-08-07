@@ -21,7 +21,7 @@ import { useAuthStore } from '../../store';
 import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
 import { detectTags } from '../../utils/tagDetector';
 import { getErrorMessage } from '../../api';
-import { layout, spacing, useTheme, type ThemeColors } from '../../theme';
+import { layout, spacing, useTheme, type Theme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, SuggestedCard } from '../../types';
 
@@ -58,8 +58,9 @@ const SUGGESTIONS = [
 ];
 
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const user = useAuthStore(s => s.user);
 
   // When navigated from Chat History, pre-populate with the existing session.
@@ -541,7 +542,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
 }
 
-const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
 
   header: {
@@ -600,7 +601,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   },
 
   followUps: {
-    paddingLeft: 40,
+    paddingLeft: spacing[10],
     paddingRight: spacing[4],
     gap: spacing[2],
     marginTop: -spacing[1],
@@ -611,7 +612,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     gap: spacing[1],
     backgroundColor: colors.primarySurface,
-    borderRadius: 20,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
     borderColor: colors.primaryLight,
     paddingHorizontal: spacing[3],
@@ -625,13 +626,13 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     alignItems: 'center',
     gap: spacing[2],
     marginTop: spacing[2],
-    marginLeft: 40,
+    marginLeft: spacing[10],
     marginRight: spacing[4],
     marginBottom: spacing[3],
     paddingVertical: spacing[2],
     paddingHorizontal: spacing[3],
     backgroundColor: colors.primarySurface,
-    borderRadius: 10,
+    borderRadius: spacing[2.5],
     borderWidth: 1,
     borderColor: colors.primaryLight,
   },
@@ -639,7 +640,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
   saveToSetBtn: {
     backgroundColor: colors.primary,
-    borderRadius: 8,
+    borderRadius: spacing[2],
     paddingVertical: spacing[1.5],
     paddingHorizontal: spacing[3],
   },

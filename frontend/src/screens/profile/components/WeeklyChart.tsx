@@ -29,7 +29,7 @@ import {
   type IconComponent,
 } from '../../../components/icons';
 import { useCreditBalance, useCreditStats } from '../../../hooks';
-import { spacing, useTheme } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 import type { CreditStatsPeriod, CreditInterval, DayStat } from '../../../hooks/useCredits';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
@@ -666,7 +666,7 @@ const s = StyleSheet.create({
   emptyText:   { textAlign: 'center' },
   barBars:     { flexDirection: 'row', gap: spacing[2] },
   barCol:      { flex: 1, alignItems: 'center', gap: spacing[1] },
-  barTrack:    { width: '100%', borderRadius: 4, justifyContent: 'flex-end', overflow: 'hidden' },
+  barTrack:    { width: '100%', borderRadius: spacing[1], justifyContent: 'flex-end', overflow: 'hidden' },
   barStack:    { width: '100%' },
   barSeg:      { width: '100%' },
   donutWrap:   { alignItems: 'center' },
@@ -679,13 +679,13 @@ const s = StyleSheet.create({
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     card: { backgroundColor: colors.background, gap: spacing[3] },
-    iconBtn:       { padding: spacing[1.5], borderRadius: 6 },
+    iconBtn:       { padding: spacing[1.5], borderRadius: spacing[1.5] },
     iconBtnActive: { backgroundColor: colors.primarySurface },
     iconDivider:   { width: 1, height: 16, backgroundColor: colors.border, marginHorizontal: spacing[1] },
     chip: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[1.5],
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       backgroundColor: colors.backgroundSecondary,
       borderWidth: 1,
       borderColor: colors.border,
@@ -700,9 +700,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       paddingVertical: spacing[2],
       marginTop: spacing[2],
       backgroundColor: colors.backgroundSecondary,
-      borderRadius: 8,
+      borderRadius: spacing[2],
     },
-    detailDot:     { width: 3, height: 3, borderRadius: 2, backgroundColor: colors.border },
+    detailDot:     { width: 3, height: 3, borderRadius: spacing[0.5], backgroundColor: colors.border },
     summaryRow:    { flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing[3], marginTop: spacing[1] },
     summaryDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[1] },
     fsContainer:   { flex: 1, backgroundColor: colors.background, padding: spacing[4], gap: spacing[3] },

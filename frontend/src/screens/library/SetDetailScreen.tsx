@@ -14,7 +14,7 @@ import {
 
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { fontWeights, Theme, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
@@ -447,7 +447,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
-    reorderTitle: { fontWeight: '600' },
+    reorderTitle: { fontWeight: fontWeights.semiBold },
     count: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[2] },
     searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
     searchInput: { marginBottom: 0 },
@@ -471,7 +471,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
     },
-    question: { flex: 1, fontWeight: '500', lineHeight: 22 },
+    question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: 22 },
     cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
     iconBtn: { padding: spacing[1] },
     answerSection: {
@@ -491,7 +491,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     answerSectionGrid: { padding: spacing[3] },
     notePopupInput: {
       borderWidth: 1.5,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       borderColor: colors.border,
       backgroundColor: colors.backgroundSecondary,
       paddingHorizontal: spacing[4],

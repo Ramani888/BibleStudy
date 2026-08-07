@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const STAR_SIZE = 10;
@@ -11,8 +11,9 @@ interface CreditBadgeProps {
 }
 
 export function CreditBadge({ balance }: CreditBadgeProps) {
+  const { colors } = useTheme();
   return (
-    <View style={styles.pill}>
+    <View style={[styles.pill, { backgroundColor: colors.primarySurface, borderColor: colors.primaryLight }]}>
       <Icon name="star" size={STAR_SIZE} color={colors.primaryDark} />
       <Typography preset="label" color={colors.primaryDark}>
         {balance}
@@ -26,11 +27,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing[1],
-    backgroundColor: colors.primarySurface,
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     paddingHorizontal: spacing[3],
     paddingVertical: spacing[1],
     borderWidth: 1,
-    borderColor: colors.primaryLight,
   },
 });

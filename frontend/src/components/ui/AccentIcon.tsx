@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import type { IconComponent } from '../icons';
-import { useTheme } from '../../theme';
+import { layout, useTheme } from '../../theme';
 
 interface AccentIconProps {
   icon: IconComponent;
@@ -22,7 +22,7 @@ export function AccentIcon({ icon: Icon, color, size = 44 }: AccentIconProps) {
 
 const styles = StyleSheet.create({
   chip: {
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },

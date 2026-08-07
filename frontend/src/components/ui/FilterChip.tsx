@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Typography } from './Typography';
-import { useTheme } from '../../theme';
+import { layout, useTheme } from '../../theme';
 import type { IconComponent } from '../icons';
 
 interface FilterChipProps {
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderRadius: 999,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
 });

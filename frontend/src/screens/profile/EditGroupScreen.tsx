@@ -96,7 +96,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       gap: spacing[2],
       padding: spacing[3],
       backgroundColor: colors.backgroundSecondary,
-      borderRadius: 8,
+      borderRadius: spacing[2],
     },
     footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
   });

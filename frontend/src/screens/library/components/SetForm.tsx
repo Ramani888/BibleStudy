@@ -218,7 +218,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
   );
 });
 
-const makeStyles = ({ colors, spacing }: Theme) =>
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
   StyleSheet.create({
     container: { gap: spacing[4] },
     fieldLabel: { marginBottom: spacing[1.5] },
@@ -226,15 +226,15 @@ const makeStyles = ({ colors, spacing }: Theme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      height: 52,
-      borderRadius: 12,
+      height: layout.inputHeight,
+      borderRadius: layout.cardRadius,
       backgroundColor: colors.backgroundSecondary,
       paddingHorizontal: spacing[4],
     },
     optionRow: { flexDirection: 'row', gap: spacing[2] },
     optionChip: {
       flex: 1,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       padding: spacing[3],
       alignItems: 'center',
       gap: spacing[0.5],
@@ -242,7 +242,7 @@ const makeStyles = ({ colors, spacing }: Theme) =>
     },
     layoutChip: {
       flex: 1,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       paddingVertical: spacing[3],
       alignItems: 'center',
       backgroundColor: colors.backgroundSecondary,

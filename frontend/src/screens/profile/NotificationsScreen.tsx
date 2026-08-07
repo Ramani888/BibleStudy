@@ -141,7 +141,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     iconWrapper: {
       width: 40,
       height: 40,
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       backgroundColor: colors.backgroundSecondary,
       alignItems: 'center',
       justifyContent: 'center',

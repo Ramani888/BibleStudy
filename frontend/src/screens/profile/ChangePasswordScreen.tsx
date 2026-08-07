@@ -11,12 +11,16 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { useChangePassword } from '../../hooks';
 import { getErrorMessage } from '../../api';
+import { useAuthStore } from '../../store';
 import { changePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
 import { layout, spacing, useTheme } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
+  const hasPassword = useAuthStore(s => s.user?.hasPassword ?? true);
+  const updateUser = useAuthStore(s => s.updateUser);
+  const user = useAuthStore(s => s.user);
   const { mutateAsync: changePassword } = useChangePassword();
   const newRef = useRef<TextInput>(null);
   const confirmRef = useRef<TextInput>(null);
@@ -29,10 +33,11 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   const onSubmit = async (data: ChangePasswordFormData) => {
     try {
       await changePassword({
-        currentPassword: data.currentPassword,
+        currentPassword: hasPassword ? data.currentPassword : undefined,
         newPassword: data.newPassword,
       });
-      Toast.show({ type: 'success', text1: 'Password changed!' });
+      if (!hasPassword && user) updateUser({ ...user, hasPassword: true });
+      Toast.show({ type: 'success', text1: hasPassword ? 'Password changed!' : 'Password added!' });
       reset();
       navigation.goBack();
     } catch (err) {
@@ -46,25 +51,23 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
       header={<ScreenHeader title="Change Password" onBack={() => navigation.goBack()} />}
       footer={
         <View style={styles.footer}>
-          <Button label="Change Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label="Save" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
         </View>
       }
     >
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={styles.form}>
-          <FormField
-            name="currentPassword"
-            control={control}
-            label="Current password"
-            placeholder="Enter current password"
-            isPassword
-            returnKeyType="next"
-            onSubmitEditing={() => newRef.current?.focus()}
-          />
+          {hasPassword && (
+            <FormField
+              name="currentPassword"
+              control={control}
+              label="Current password"
+              placeholder="Enter current password"
+              isPassword
+              returnKeyType="next"
+              onSubmitEditing={() => newRef.current?.focus()}
+            />
+          )}
           <FormField
             name="newPassword"
             control={control}

@@ -1,18 +1,18 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Typography } from '../../../components/ui';
-import { type Theme, useTheme } from '../../../theme';
+import { type Theme, useTheme, fontSizes, lineHeights } from '../../../theme';
 
 // Inline SVG-style Google 'G' logo as a Unicode character is not enough — use a minimal SVG path
 function GoogleIcon() {
   return (
-    <Typography preset="label" style={{ fontSize: 15, lineHeight: 18 }}>{'G'}</Typography>
+    <Typography preset="label" style={{ fontSize: fontSizes.md, lineHeight: fontSizes.md * lineHeights.tight }}>{'G'}</Typography>
   );
 }
 
 function AppleIcon({ color }: { color: string }) {
   return (
-    <Typography preset="label" color={color} style={{ fontSize: 17, lineHeight: 18 }}>{'\u{F8FF}'}</Typography>
+    <Typography preset="label" color={color} style={{ fontSize: fontSizes.lg, lineHeight: fontSizes.md * lineHeights.tight }}>{'\u{F8FF}'}</Typography>
   );
 }
 

@@ -99,7 +99,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       gap: spacing[3],
     },
     groupIcon: {
-      width: 44, height: 44, borderRadius: 22,
+      width: 44, height: 44, borderRadius: layout.pillRadius,
       backgroundColor: colors.primarySurface,
       alignItems: 'center', justifyContent: 'center',
     },

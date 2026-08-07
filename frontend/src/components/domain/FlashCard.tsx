@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, {
   Extrapolation,
@@ -7,7 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { colors, spacing } from '../../theme';
+import { layout, spacing, Theme, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const FLASH_CARD_HEIGHT = 320;
@@ -22,6 +22,9 @@ interface FlashCardProps {
 const DURATION = 300;
 
 export function FlashCard({ question, answer, isBlurred, onFlip }: FlashCardProps) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const flip = useSharedValue(0); // 0 = question side, 1 = answer side
 
   const handlePress = () => {
@@ -91,52 +94,53 @@ export function FlashCard({ question, answer, isBlurred, onFlip }: FlashCardProp
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    height: FLASH_CARD_HEIGHT,
-    width: '100%',
-  },
-  face: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: colors.background,
-    borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    padding: spacing[6],
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[4],
-  },
-  front: {
-    borderTopColor: colors.info,
-    borderTopWidth: 3,
-  },
-  back: {
-    borderTopColor: colors.success,
-    borderTopWidth: 3,
-  },
-  labelRow: {
-    position: 'absolute',
-    top: spacing[4],
-    left: spacing[5],
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[1.5],
-  },
-  labelDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-  text: {
-    lineHeight: 28,
-    paddingHorizontal: spacing[2],
-  },
-  blurred: {
-    opacity: 0.08,
-  },
-  tapHint: {
-    position: 'absolute',
-    bottom: spacing[4],
-  },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    container: {
+      height: FLASH_CARD_HEIGHT,
+      width: '100%',
+    },
+    face: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: colors.background,
+      borderRadius: layout.cardRadiusSm,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      padding: spacing[6],
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: spacing[4],
+    },
+    front: {
+      borderTopColor: colors.info,
+      borderTopWidth: 3,
+    },
+    back: {
+      borderTopColor: colors.success,
+      borderTopWidth: 3,
+    },
+    labelRow: {
+      position: 'absolute',
+      top: spacing[4],
+      left: spacing[5],
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[1.5],
+    },
+    labelDot: {
+      width: 6,
+      height: 6,
+      borderRadius: spacing[0.5],
+    },
+    text: {
+      lineHeight: 28,
+      paddingHorizontal: spacing[2],
+    },
+    blurred: {
+      opacity: 0.08,
+    },
+    tapHint: {
+      position: 'absolute',
+      bottom: spacing[4],
+    },
+  });

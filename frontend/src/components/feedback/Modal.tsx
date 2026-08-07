@@ -86,15 +86,15 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     },
     sheet: {
       backgroundColor: colors.background,
-      borderTopLeftRadius: 24,
-      borderTopRightRadius: 24,
+      borderTopLeftRadius: spacing[6],
+      borderTopRightRadius: spacing[6],
       paddingTop: spacing[4],
       paddingHorizontal: layout.screenPaddingH,
     },
     handle: {
       width: 40,
       height: 4,
-      borderRadius: 2,
+      borderRadius: spacing[0.5],
       backgroundColor: colors.border,
       alignSelf: 'center',
       marginBottom: spacing[4],

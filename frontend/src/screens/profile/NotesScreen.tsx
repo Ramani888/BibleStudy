@@ -236,7 +236,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.background,
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       borderWidth: 1,
       borderColor: colors.border,
       paddingHorizontal: spacing[3],
@@ -259,7 +259,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     tagFilterPill: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[1],
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       borderWidth: 1,
       borderColor: colors.border,
       backgroundColor: colors.background,
@@ -269,7 +269,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     separator: { height: spacing[3] },
     noteCard: {
       backgroundColor: colors.background,
-      borderRadius: 14,
+      borderRadius: layout.cardRadiusSm,
       padding: spacing[4],
       gap: spacing[1],
     },
@@ -285,7 +285,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     tagPill: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[1],
-      borderRadius: 20,
+      borderRadius: layout.pillRadius,
       backgroundColor: colors.primaryLight,
       borderWidth: 1,
       borderColor: colors.primary,

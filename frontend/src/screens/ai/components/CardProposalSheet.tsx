@@ -5,7 +5,7 @@ import { CheckCircleIcon } from '../../../components/icons';
 import { AppModal } from '../../../components/feedback';
 import { Button, Typography } from '../../../components/ui';
 import { useSets } from '../../../hooks';
-import { spacing, useTheme, type ThemeColors } from '../../../theme';
+import { layout, spacing, useTheme, type Theme } from '../../../theme';
 import type { SuggestedCard } from '../../../types';
 
 interface CardProposalSheetProps {
@@ -16,8 +16,9 @@ interface CardProposalSheetProps {
 }
 
 export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = useMemo(() => makeStyles(theme), [theme]);
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const { data: sets = [], isLoading: setsLoading } = useSets();
@@ -104,7 +105,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
   );
 }
 
-const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   subheader: { marginBottom: spacing[3] },
   previewScroll: { maxHeight: 180, marginBottom: spacing[4] },
   cardRow: {
@@ -124,7 +125,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     gap: spacing[3],
     paddingVertical: spacing[3],
     paddingHorizontal: spacing[3],
-    borderRadius: 10,
+    borderRadius: spacing[2.5],
     borderWidth: 1.5,
     borderColor: colors.border,
     marginBottom: spacing[2],
@@ -133,7 +134,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     borderColor: colors.primary,
     backgroundColor: colors.primarySurface,
   },
-  setColor: { width: 12, height: 12, borderRadius: 6 },
+  setColor: { width: 12, height: 12, borderRadius: spacing[1.5] },
   setInfo: { flex: 1 },
   footer: { marginTop: spacing[2] },
 });

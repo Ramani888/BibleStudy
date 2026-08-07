@@ -99,7 +99,7 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing[5],

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, StyleSheet, View } from 'react-native';
 import LottieView from 'lottie-react-native';
-import { colors, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const LOADING_ANIMATION = require('../../assets/animations/loading.json');
 
@@ -10,10 +10,11 @@ interface LoadingOverlayProps {
 }
 
 export function LoadingOverlay({ visible }: LoadingOverlayProps) {
+  const { colors } = useTheme();
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <View style={styles.backdrop}>
-        <View style={styles.box}>
+      <View style={[styles.backdrop, { backgroundColor: colors.overlay }]}>
+        <View style={[styles.box, { backgroundColor: colors.backgroundCard }]}>
           <LottieView
             source={LOADING_ANIMATION}
             autoPlay
@@ -29,17 +30,15 @@ export function LoadingOverlay({ visible }: LoadingOverlayProps) {
 const styles = StyleSheet.create({
   backdrop: {
     flex: 1,
-    backgroundColor: colors.overlay,
     alignItems: 'center',
     justifyContent: 'center',
   },
   box: {
-    backgroundColor: colors.backgroundCard,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     padding: spacing[6],
   },
   lottie: {
-    width: 80,
-    height: 80,
+    width: spacing[20],
+    height: spacing[20],
   },
 });

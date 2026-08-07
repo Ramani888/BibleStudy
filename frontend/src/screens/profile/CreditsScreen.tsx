@@ -165,7 +165,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     streakBadge: {
       paddingHorizontal: spacing[2],
       paddingVertical: spacing[0.5],
-      borderRadius: 12,
+      borderRadius: layout.cardRadius,
       backgroundColor: colors.primarySurface,
       borderWidth: 1,
       borderColor: colors.primaryLight,

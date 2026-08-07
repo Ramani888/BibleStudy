@@ -475,32 +475,32 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     greetingCol: { flex: 1 },
     headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
     headerIconBtn: {
-      width: 40, height: 40, borderRadius: 20,
+      width: 40, height: 40, borderRadius: layout.pillRadius,
       alignItems: 'center', justifyContent: 'center',
       backgroundColor: colors.backgroundSecondary,
     },
     bellBadge: {
-      position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: 8, paddingHorizontal: 3,
+      position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: spacing[2], paddingHorizontal: spacing[0.5],
       backgroundColor: colors.error, alignItems: 'center', justifyContent: 'center',
     },
 
     // Featured card
     featured: {
       backgroundColor: colors.featuredSurface,
-      borderRadius: 20, padding: spacing[5], gap: spacing[2],
+      borderRadius: layout.cardRadiusLg, padding: spacing[5], gap: spacing[2],
     },
     featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    badge: { backgroundColor: colors.success, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
+    badge: { backgroundColor: colors.success, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
     featuredTitle: { marginTop: spacing[1] },
-    progressTrack: { height: 6, borderRadius: 3, backgroundColor: colors.overlayLight, marginTop: spacing[2], overflow: 'hidden' },
-    progressFill: { height: 6, borderRadius: 3, backgroundColor: colors.success },
+    progressTrack: { height: 6, borderRadius: spacing[0.5], backgroundColor: colors.overlayLight, marginTop: spacing[2], overflow: 'hidden' },
+    progressFill: { height: 6, borderRadius: spacing[0.5], backgroundColor: colors.success },
     featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing[1], marginTop: spacing[1] },
 
     // Quick actions
     quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing[5] },
     quickAction: { width: '25%', alignItems: 'center', gap: spacing[2] },
     quickCircle: {
-      width: 56, height: 56, borderRadius: 28,
+      width: 56, height: 56, borderRadius: layout.pillRadius,
       borderWidth: 1, borderColor: colors.border,
       alignItems: 'center', justifyContent: 'center',
     },
@@ -512,22 +512,22 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     setsList: { gap: spacing[3] },
     setRow: {
       flexDirection: 'row', alignItems: 'center', gap: spacing[3],
-      backgroundColor: colors.backgroundCard, borderRadius: 14, padding: spacing[4],
+      backgroundColor: colors.backgroundCard, borderRadius: layout.cardRadiusSm, padding: spacing[4],
     },
     setIcon: {
-      width: 40, height: 40, borderRadius: 20,
+      width: 40, height: 40, borderRadius: layout.pillRadius,
       borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
     },
-    dueBadge: { backgroundColor: colors.successSurface, borderRadius: 8, paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
+    dueBadge: { backgroundColor: colors.successSurface, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
 
     // Horizontal rails (friends / groups / discover)
     railContent: { gap: spacing[3], paddingRight: spacing[2] },
     miniCard: {
-      width: 140, gap: spacing[2], padding: spacing[4], borderRadius: 14,
+      width: 140, gap: spacing[2], padding: spacing[4], borderRadius: layout.cardRadiusSm,
       backgroundColor: colors.backgroundCard, borderWidth: 1, borderColor: colors.border,
     },
     miniIcon: {
-      width: 36, height: 36, borderRadius: 18,
+      width: 36, height: 36, borderRadius: layout.pillRadius,
       borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
     },
     miniTitle: { minHeight: 34 },
@@ -537,7 +537,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     summaryStat: {
       width: '31%', aspectRatio: 1.4,
       alignItems: 'center', justifyContent: 'center', gap: spacing[1],
-      backgroundColor: colors.backgroundCard, borderRadius: 16,
+      backgroundColor: colors.backgroundCard, borderRadius: layout.cardRadiusLg,
     },
 
     // Activity feed
@@ -546,7 +546,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
 
     // Verse card
     verseCard: {
-      backgroundColor: colors.primary, borderRadius: 16, minHeight: 190,
+      backgroundColor: colors.primary, borderRadius: layout.cardRadiusLg, minHeight: 190,
       paddingHorizontal: spacing[6], paddingVertical: spacing[7],
       justifyContent: 'center', gap: spacing[3], overflow: 'hidden',
     },

@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
-import { colors, fontSizes, fontWeights, spacing } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, Theme, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const OTP_LENGTH = 6;
@@ -14,6 +14,8 @@ interface OTPInputProps {
 }
 
 export function OTPInput({ value, onChange, error }: OTPInputProps) {
+  const theme = useTheme();
+  const { colors } = theme;
   const inputRefs = useRef<(TextInput | null)[]>([]);
   const [focused, setFocused] = useState<number | null>(null);
 
@@ -53,9 +55,10 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
               ref={el => { inputRefs.current[i] = el; }}
               style={[
                 styles.box,
-                isFocused && styles.boxFocused,
-                hasValue && styles.boxFilled,
-                !!error && styles.boxError,
+                { borderColor: colors.border, backgroundColor: colors.backgroundSecondary, color: colors.textPrimary },
+                isFocused && { borderColor: colors.borderFocus, backgroundColor: colors.background },
+                hasValue && { borderColor: colors.primary, backgroundColor: colors.primarySurface },
+                !!error && { borderColor: colors.error },
               ]}
               value={digits[i]?.trim() || ''}
               onChangeText={text => handleChange(text, i)}
@@ -88,25 +91,11 @@ const styles = StyleSheet.create({
   box: {
     width: OTP_BOX_WIDTH,
     height: OTP_BOX_HEIGHT,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
     borderWidth: 1.5,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
     fontSize: fontSizes.xl,
     fontWeight: fontWeights.bold,
-    color: colors.textPrimary,
     textAlign: 'center',
-  },
-  boxFocused: {
-    borderColor: colors.borderFocus,
-    backgroundColor: colors.background,
-  },
-  boxFilled: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySurface,
-  },
-  boxError: {
-    borderColor: colors.error,
   },
   error: {
     marginTop: spacing[1.5],

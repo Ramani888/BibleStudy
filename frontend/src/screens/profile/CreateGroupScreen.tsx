@@ -95,7 +95,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     chip: {
       flex: 1,
       paddingVertical: spacing[2],
-      borderRadius: 8,
+      borderRadius: spacing[2],
       borderWidth: 1,
       borderColor: colors.border,
       alignItems: 'center',

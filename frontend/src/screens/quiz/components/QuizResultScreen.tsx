@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Button, Typography } from '../../../components/ui';
 import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useQuizAttemptSave } from '../../../hooks';
-import { layout, spacing, useTheme } from '../../../theme';
+import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import type { SummaryItem } from '../../../types';
 
 const RESULT_ICON_SIZE = 56;
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   },
   sub:       { marginTop: -spacing[2] },
   scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
-  scoreNumber: { fontSize: 52, fontWeight: '700' as const, lineHeight: 64 },
+  scoreNumber: { fontSize: 52, fontWeight: fontWeights.bold, lineHeight: 64 },
   reviewBtn: { alignItems: 'center', gap: spacing[1] },
   reviewIcon: {
     width: layout.avatarMd,
