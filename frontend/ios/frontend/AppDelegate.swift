@@ -33,7 +33,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     window = UIWindow(frame: UIScreen.main.bounds)
 
     factory.startReactNative(
-      withModuleName: "frontend",
+      withModuleName: "BibleStudyPro",
       in: window,
       launchOptions: launchOptions
     )
