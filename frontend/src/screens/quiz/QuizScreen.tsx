@@ -4,7 +4,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
-import { useCardsForSets, useUpdateQuizAttempt } from '../../hooks';
+import { useCardsForSets } from '../../hooks';
 import { useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
@@ -25,7 +25,6 @@ export function QuizScreen() {
 
   const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
   const s = useQuizSession(cards, mode);
-  const { mutate: updateAttempt } = useUpdateQuizAttempt();
   const [responses, setResponses] = useState<Record<number, unknown>>({});
   const saveResponse = (idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r }));
   const goBack = () => (navigation as any).popToTop();
@@ -40,10 +39,7 @@ export function QuizScreen() {
 
   const finish = () => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-    if (retakeAttemptId) {
-      updateAttempt({ attemptId: retakeAttemptId, payload: { setIds, total: 0, correct: 0, mode, quizName } });
-    }
-    s.next(); // marks isComplete → renders result screen
+    s.next(); // marks isComplete → renders result screen; saving is handled there
   };
 
   const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : `${setTitles.length} Sets`);
@@ -70,9 +66,10 @@ export function QuizScreen() {
     <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <QuizResultScreen
         setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
-        total={0} correct={0} scorePct={0}
+        total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
+        timeSecs={elapsed}
         retakeAttemptId={retakeAttemptId}
-        onRetake={s.restart} onExit={goBack}
+        onExit={goBack}
       />
     </View>
   );

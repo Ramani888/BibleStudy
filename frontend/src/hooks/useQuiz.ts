@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { quizApi } from '../api';
 import { cardsApi } from '../api';
@@ -6,8 +7,6 @@ import type { Card } from '../types/card.types';
 
 /** Fetch cards from multiple sets in parallel, merged into one stable array. */
 export function useCardsForSets(setIds: string[]) {
-  // `combine` is memoized by React Query — avoids variable-length dep array bug
-  // that caused stale empty data when adding/removing sets.
   return useQueries({
     queries: setIds.map(id => ({
       queryKey: ['cards', id],
@@ -22,7 +21,7 @@ export function useCardsForSets(setIds: string[]) {
   });
 }
 
-/** Recent quiz attempts with set titles — powers the Quiz hub history list. */
+/** Recent quiz attempts — powers the Quiz hub list. */
 export function useRecentQuizAttempts(limit = 20) {
   return useQuery({
     queryKey: ['quiz', 'attempts', 'recent', limit],
@@ -30,7 +29,7 @@ export function useRecentQuizAttempts(limit = 20) {
   });
 }
 
-/** Best score + attempt count per set — powers the Quiz hub badges. */
+/** Best score + attempt count per set — powers Quiz hub badges. */
 export function useAllQuizBest() {
   return useQuery({
     queryKey: ['quiz', 'best'],
@@ -47,13 +46,44 @@ export function useQuizBest(setId: string) {
   });
 }
 
-/** Persist a finished quiz attempt; refreshes best-score queries on success. */
-export function useRecordQuizAttempt() {
+/**
+ * Unified save hook for quiz completion.
+ * - No retakeAttemptId → creates a new attempt (POST)
+ * - retakeAttemptId present → updates the existing attempt (PUT)
+ * Both paths invalidate all ['quiz'] queries on success.
+ */
+export function useQuizAttemptSave(retakeAttemptId?: string) {
   const qc = useQueryClient();
-  return useMutation({
+  const invalidate = useCallback(() => qc.invalidateQueries({ queryKey: ['quiz'] }), [qc]);
+
+  const create = useMutation({
     mutationFn: (payload: RecordAttemptPayload) => quizApi.recordAttempt(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['quiz'] }),
+    onSuccess: invalidate,
   });
+
+  const update = useMutation({
+    mutationFn: (payload: RecordAttemptPayload) =>
+      quizApi.updateAttempt(retakeAttemptId!, payload),
+    onSuccess: invalidate,
+  });
+
+  const active = retakeAttemptId ? update : create;
+
+  const save = useCallback(
+    (payload: RecordAttemptPayload) =>
+      retakeAttemptId
+        ? update.mutateAsync(payload)
+        : create.mutateAsync(payload),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [retakeAttemptId],
+  );
+
+  return {
+    save,
+    isPending: active.isPending,
+    isError: active.isError,
+    error: active.error,
+  };
 }
 
 /** Delete a quiz attempt; refreshes the hub list on success. */
@@ -61,16 +91,6 @@ export function useDeleteQuizAttempt() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (attemptId: string) => quizApi.deleteAttempt(attemptId),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['quiz'] }),
-  });
-}
-
-/** Overwrite an existing attempt (Re-Quiz flow); refreshes all quiz queries on success. */
-export function useUpdateQuizAttempt() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: ({ attemptId, payload }: { attemptId: string; payload: RecordAttemptPayload }) =>
-      quizApi.updateAttempt(attemptId, payload),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['quiz'] }),
   });
 }

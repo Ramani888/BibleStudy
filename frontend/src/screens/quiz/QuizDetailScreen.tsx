@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
-import { Alert, Pressable, StyleSheet, View } from 'react-native';
+import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { TrashIcon } from '../../components/icons';
+import { CalendarIcon, CheckCircleIcon, ClockIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { type Theme, useTheme } from '../../theme';
-import { formatDate } from '../../utils/formatters';
+import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 
 type Params = QuizStackParamList['QuizDetail'];
@@ -27,7 +28,6 @@ export function QuizDetailScreen() {
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
   const { data: attempts = [] } = useRecentQuizAttempts(50);
 
-  // Prefer live data from cache; fall back to nav params (covers first render before fetch)
   const live = attempts.find(a => a.id === params.id);
   const id        = params.id;
   const setIds    = live?.setIds    ?? params.setIds;
@@ -39,10 +39,14 @@ export function QuizDetailScreen() {
   const createdAt   = live?.createdAt   ?? params.createdAt;
   const practicedAt = live?.practicedAt ?? params.practicedAt ?? createdAt;
   const quizName    = live?.quizName    ?? params.quizName;
+  const timeSecs    = live?.timeSecs    ?? params.timeSecs;
+
   const scored = total > 0;
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
   const modeLabel = mode ? (MODE_LABEL[mode] ?? mode) : '—';
-  const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(', ');
+  const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(' · ');
+  const isPerfect = scored && scorePct === 100;
+  const isRetaken = practicedAt !== createdAt;
 
   const handleDelete = () => {
     Alert.alert('Delete Quiz', 'Remove this attempt from your history?', [
@@ -54,11 +58,29 @@ export function QuizDetailScreen() {
     ]);
   };
 
+  const footer = (
+    <Animated.View
+      entering={FadeInDown.delay(320).springify().damping(20)}
+      style={[styles.footer, { borderTopColor: colors.border }]}
+    >
+      <Button
+        label="Re-Quiz"
+        onPress={() => navigation.navigate('Quiz', {
+          setIds,
+          setTitles,
+          mode: mode ?? 'mix',
+          retakeAttemptId: id,
+        })}
+        fullWidth
+      />
+    </Animated.View>
+  );
+
   return (
     <Screen
       header={
         <ScreenHeader
-          title="Quiz Details"
+          title={quizName ?? setsLabel ?? 'Quiz Details'}
           onBack={() => navigation.goBack()}
           right={
             <Pressable onPress={handleDelete} hitSlop={12} disabled={isPending} accessibilityRole="button">
@@ -67,66 +89,141 @@ export function QuizDetailScreen() {
           }
         />
       }
+      footer={footer}
     >
-      <View style={styles.container}>
+      <ScrollView
+        contentContainerStyle={styles.scroll}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* ── Hero ── */}
+        <Animated.View entering={FadeInDown.delay(0).springify().damping(20)} style={styles.hero}>
+          {isPerfect && <TrophyIcon size={32} color={colors.warning} />}
+          {scored ? (
+            <Typography style={[styles.scoreNumber, { color: scoreColor }]}>
+              {scorePct}%
+            </Typography>
+          ) : (
+            <Typography style={[styles.scoreNumber, { color: colors.textSecondary }]}>—</Typography>
+          )}
+          {scored && (
+            <View style={styles.correctRow}>
+              <CheckCircleIcon size={14} color={colors.textSecondary} />
+              <Typography preset="caption" color={colors.textSecondary}>
+                {correct} / {total} correct
+              </Typography>
+            </View>
+          )}
+        </Animated.View>
 
-        <View style={[styles.scoreCircle, { borderColor: scored ? scoreColor : colors.border }]}>
-          {scored
-            ? <Typography style={[styles.scoreText, { color: scoreColor }]}>{scorePct}%</Typography>
-            : <Typography preset="caption" color={colors.textSecondary}>—</Typography>
-          }
-        </View>
+        {/* ── Mode + sets chips ── */}
+        <Animated.View entering={FadeInDown.delay(80).springify().damping(20)} style={styles.chips}>
+          <View style={[styles.chip, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+            <Typography preset="caption" color={colors.textSecondary}>{modeLabel}</Typography>
+          </View>
+          {setIds.length > 1 && (
+            <View style={[styles.chip, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+              <Typography preset="caption" color={colors.textSecondary}>{setIds.length} sets</Typography>
+            </View>
+          )}
+        </Animated.View>
 
-        <View style={styles.infoGroup}>
-          {quizName && <Row label="Name" value={quizName} colors={colors} styles={styles} />}
-          <Row label={setIds.length > 1 ? 'Sets' : 'Set'} value={setsLabel} colors={colors} styles={styles} />
-          <Row label="Mode" value={modeLabel} colors={colors} styles={styles} />
-          {scored && <Row label="Score" value={`${correct} / ${total} correct`} colors={colors} styles={styles} />}
-          <Row label="Created" value={formatDate(createdAt)} colors={colors} styles={styles} />
-          {practicedAt !== createdAt && <Row label="Last Practiced" value={formatDate(practicedAt)} colors={colors} styles={styles} />}
-        </View>
+        {/* ── Date info card ── */}
+        <Animated.View
+          entering={FadeInDown.delay(240).springify().damping(20)}
+          style={[styles.card, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}
+        >
+          <View style={styles.cardRow}>
+            <View style={styles.cardRowLeft}>
+              <ClockIcon size={16} color={colors.textSecondary} />
+              <Typography preset="caption" color={colors.textSecondary}>
+                {isRetaken ? 'Last practiced' : 'Practiced'}
+              </Typography>
+            </View>
+            <Typography preset="body" color={colors.textPrimary}>
+              {formatDateWithTime(practicedAt)}
+            </Typography>
+          </View>
 
-        <Button
-          label="Re-Quiz"
-          onPress={() => navigation.navigate('Quiz', {
-            setIds,
-            setTitles,
-            mode: mode ?? 'mix',
-            retakeAttemptId: id,
-          })}
-          fullWidth
-        />
-      </View>
+          {timeSecs != null && (
+            <>
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
+              <View style={styles.cardRow}>
+                <View style={styles.cardRowLeft}>
+                  <RefreshIcon size={16} color={colors.textSecondary} />
+                  <Typography preset="caption" color={colors.textSecondary}>Time spent</Typography>
+                </View>
+                <Typography preset="body" color={colors.textPrimary}>
+                  {formatDuration(timeSecs)}
+                </Typography>
+              </View>
+            </>
+          )}
+
+          {isRetaken && (
+            <>
+              <View style={[styles.divider, { backgroundColor: colors.border }]} />
+              <View style={styles.cardRow}>
+                <View style={styles.cardRowLeft}>
+                  <CalendarIcon size={16} color={colors.textSecondary} />
+                  <Typography preset="caption" color={colors.textSecondary}>First attempt</Typography>
+                </View>
+                <Typography preset="body" color={colors.textPrimary}>
+                  {formatDate(createdAt)}
+                </Typography>
+              </View>
+            </>
+          )}
+        </Animated.View>
+      </ScrollView>
     </Screen>
-  );
-}
-
-function Row({ label, value, colors, styles }: { label: string; value: string; colors: any; styles: any }) {
-  return (
-    <View style={styles.row}>
-      <Typography preset="caption" color={colors.textSecondary} style={styles.rowLabel}>{label}</Typography>
-      <Typography preset="body" color={colors.textPrimary} style={styles.rowValue} numberOfLines={2}>{value}</Typography>
-    </View>
   );
 }
 
 const makeStyles = ({ colors, spacing, layout }: Theme) =>
   StyleSheet.create({
-    container: { flex: 1, padding: layout.screenPaddingH, alignItems: 'center', gap: spacing[4] },
-    scoreCircle: {
-      width: 140, height: 140, borderRadius: 70, borderWidth: 4,
-      alignItems: 'center', justifyContent: 'center', marginTop: spacing[6],
+    scroll: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingTop: spacing[8],
+      paddingBottom: spacing[6],
+      gap: spacing[6],
+      alignItems: 'center',
     },
-    scoreText: { fontSize: 28, fontWeight: '700' as const, lineHeight: 34, includeFontPadding: false },
-    infoGroup: {
-      width: '100%', borderRadius: 14, borderWidth: 1,
-      borderColor: colors.border, backgroundColor: colors.backgroundCard, overflow: 'hidden',
+
+    // Hero
+    hero: { alignItems: 'center', gap: spacing[2] },
+    scoreNumber: { fontSize: 72, fontWeight: '700' as const, lineHeight: 80, includeFontPadding: false },
+    correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+
+    // Chips
+    chips: { flexDirection: 'row', gap: spacing[2], flexWrap: 'wrap', justifyContent: 'center' },
+    chip: {
+      paddingHorizontal: spacing[3],
+      paddingVertical: spacing[1],
+      borderRadius: 999,
+      borderWidth: 1,
     },
-    row: {
-      flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-      paddingHorizontal: spacing[4], paddingVertical: spacing[3],
-      borderBottomWidth: 1, borderBottomColor: colors.border,
+
+    // Info card
+    card: {
+      width: '100%',
+      borderRadius: 16,
+      borderWidth: 1,
+      overflow: 'hidden',
     },
-    rowLabel: { flex: 0 },
-    rowValue: { flex: 1, textAlign: 'right' },
+    cardRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: spacing[5],
+      paddingVertical: spacing[4],
+    },
+    cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    divider: { height: 1 },
+
+    // Footer
+    footer: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[4],
+      borderTopWidth: 1,
+    },
   });

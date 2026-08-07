@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ActionSheet, EmptyState, ErrorState, Skeleton } from '../../components/feedback';
@@ -36,6 +36,8 @@ export function QuizHubScreen() {
   const { data: attempts = [], isLoading, isError, error, refetch, isFetching } = useRecentQuizAttempts(20);
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
 
+  useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
+
   const [activeItem, setActiveItem] = useState<QuizAttemptWithSet | null>(null);
 
   const openSheet = (item: QuizAttemptWithSet) => setActiveItem(item);
@@ -62,6 +64,7 @@ export function QuizHubScreen() {
       createdAt: item.createdAt,
       practicedAt: item.practicedAt,
       quizName: item.quizName,
+      timeSecs: item.timeSecs,
     });
   };
 

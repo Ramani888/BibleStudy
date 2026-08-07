@@ -100,16 +100,25 @@ function buildItems(cards: Card[], selected: QuizSelectableMode): QuizItem[] {
   for (const card of shuffle(cards)) {
     const modes = cardModes(card, cards);
     if (modes.length === 0) continue;
-    let mode: QuizMode;
+
+    // Priority order: preferred mode first, then all other supported modes as fallback.
+    // This guarantees every card produces at least one question even if the
+    // selected mode doesn't apply to its card type.
+    let preferred: QuizMode;
     if (selected === 'mix') {
       const scored = modes.filter(m => MODE_META[m].scored);
-      mode = shuffle(scored.length ? scored : modes)[0];
+      preferred = shuffle(scored.length ? scored : modes)[0];
     } else {
-      if (!modes.includes(selected)) continue;
-      mode = selected;
+      preferred = modes.includes(selected as QuizMode)
+        ? (selected as QuizMode)
+        : (modes.filter(m => MODE_META[m].scored)[0] ?? modes[0]);
     }
-    const item = buildItem(card, mode, cards);
-    if (item) items.push(item);
+
+    const orderedModes = [preferred, ...modes.filter(m => m !== preferred)];
+    for (const m of orderedModes) {
+      const item = buildItem(card, m, cards);
+      if (item) { items.push(item); break; }
+    }
   }
   return items;
 }

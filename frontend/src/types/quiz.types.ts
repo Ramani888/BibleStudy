@@ -15,6 +15,7 @@ export interface RecordAttemptPayload {
   correct: number;
   mode?: string;
   quizName?: string;
+  timeSecs?: number;
 }
 
 export interface RecordAttemptResult {
@@ -32,6 +33,7 @@ export interface QuizAttemptWithSet {
   mode: string | null;
   quizName?: string;
   practicedAt?: string;
+  timeSecs?: number;
   scorePct: number;
   total: number;
   correct: number;
