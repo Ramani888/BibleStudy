@@ -10,10 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { verifyEmailSchema, type VerifyEmailFormData } from '../../utils/validators';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'VerifyEmail'>) {
+  const { colors, spacing } = useTheme();
   const { email } = route.params;
   const verifyEmail = useAuthStore(s => s.verifyEmail);
   const [resending, setResending] = useState(false);

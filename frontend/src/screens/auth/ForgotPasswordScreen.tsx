@@ -10,10 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '../../utils/validators';
-import { colors } from '../../theme';
+import { useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPassword'>) {
+  const { colors } = useTheme();
   const forgotPassword = useAuthStore(s => s.forgotPassword);
 
   const {

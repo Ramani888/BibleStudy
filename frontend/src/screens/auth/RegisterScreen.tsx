@@ -10,10 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { registerSchema, type RegisterFormData } from '../../utils/validators';
-import { colors } from '../../theme';
+import { useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
+  const { colors } = useTheme();
   const register = useAuthStore(s => s.register);
   const emailRef = useRef<TextInput>(null);
   const passwordRef = useRef<TextInput>(null);

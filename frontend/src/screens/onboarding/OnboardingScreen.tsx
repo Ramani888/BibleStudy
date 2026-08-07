@@ -9,17 +9,20 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Icon from 'react-native-vector-icons/Ionicons';
 
+import { BookIcon, LibraryIcon, SparklesIcon } from '../../components/icons';
 import { Button, Spacer, Typography } from '../../components/ui';
-import { colors, layout, spacing } from '../../theme';
+import { type Theme, useTheme } from '../../theme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
+const ICON_WRAP = 136;
+const DOT_H = 8;
 
-// ─── Slide data ───────────────────────────────────────────────────────────────
+type IconComponent = React.FC<{ size: number; color: string }>;
+
 interface Slide {
   key: string;
-  icon: string;
+  Icon: IconComponent;
   title: string;
   subtitle: string;
 }
@@ -27,37 +30,38 @@ interface Slide {
 const SLIDES: Slide[] = [
   {
     key: 'welcome',
-    icon: 'book-outline',
+    Icon: BookIcon,
     title: 'Welcome to BibleStudy Pro',
     subtitle:
       'Your Christian learning ecosystem — study Scripture, grow in faith, and connect with your community.',
   },
   {
     key: 'flashcards',
-    icon: 'layers-outline',
+    Icon: LibraryIcon,
     title: 'Master Scripture with Flashcards',
     subtitle:
       'Organize your study with Folders, Sets & Cards. Track your progress with spaced repetition.',
   },
   {
     key: 'ai',
-    icon: 'chatbubble-ellipses-outline',
+    Icon: SparklesIcon,
     title: 'AI Bible Study Assistant',
     subtitle:
       'Ask Claude AI questions, get verse explanations, and deepen your understanding of Scripture.',
   },
 ];
 
-// ─── Props ────────────────────────────────────────────────────────────────────
 interface Props {
   onComplete: () => void;
 }
 
-// ─── Screen ───────────────────────────────────────────────────────────────────
 export function OnboardingScreen({ onComplete }: Props) {
+  const theme = useTheme();
+  const styles = makeStyles(theme);
+  const { colors, spacing } = theme;
+
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<Slide>>(null);
-
   const isLast = activeIndex === SLIDES.length - 1;
 
   const markAndComplete = async () => {
@@ -73,8 +77,8 @@ export function OnboardingScreen({ onComplete }: Props) {
 
   const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => (
     <View style={styles.slide}>
-      <View style={styles.iconWrap}>
-        <Icon name={item.icon} size={72} color={colors.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: colors.primarySurface }]}>
+        <item.Icon size={56} color={colors.primary} />
       </View>
       <Spacer size={spacing[8]} />
       <Typography preset="h2" align="center">
@@ -89,7 +93,6 @@ export function OnboardingScreen({ onComplete }: Props) {
 
   return (
     <SafeAreaView style={styles.safe}>
-      {/* Skip — top right, hidden on last slide */}
       <View style={styles.skipRow}>
         {!isLast && (
           <Pressable onPress={markAndComplete} hitSlop={12}>
@@ -100,7 +103,6 @@ export function OnboardingScreen({ onComplete }: Props) {
         )}
       </View>
 
-      {/* Slides */}
       <FlatList
         ref={listRef}
         data={SLIDES}
@@ -113,15 +115,14 @@ export function OnboardingScreen({ onComplete }: Props) {
         style={styles.list}
       />
 
-      {/* Bottom bar */}
       <View style={styles.bottom}>
-        {/* Dot indicators */}
         <View style={styles.dotsRow}>
           {SLIDES.map((_, i) => (
             <View
               key={i}
               style={[
                 styles.dot,
+                { backgroundColor: colors.primary },
                 i === activeIndex ? styles.dotActive : styles.dotInactive,
               ]}
             />
@@ -151,54 +152,37 @@ export function OnboardingScreen({ onComplete }: Props) {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-
-  skipRow: {
-    alignItems: 'flex-end',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    minHeight: 44,
-  },
-
-  list: { flex: 1 },
-
-  slide: {
-    width: SCREEN_W,
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: layout.screenPaddingH * 1.5,
-  },
-
-  iconWrap: {
-    width: 136,
-    height: 136,
-    borderRadius: 68,
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  subtitle: {
-    lineHeight: 26,
-  },
-
-  bottom: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: spacing[8],
-  },
-
-  dotsRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: spacing[2],
-  },
-  dot: {
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: colors.primary,
-  },
-  dotActive: { width: 24, opacity: 1 },
-  dotInactive: { width: 8, opacity: 0.3 },
-});
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    safe:    { flex: 1, backgroundColor: colors.background },
+    skipRow: {
+      alignItems: 'flex-end',
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[3],
+      minHeight: 44,
+    },
+    list:    { flex: 1 },
+    slide: {
+      width: SCREEN_W,
+      flex: 1,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing[6],
+    },
+    iconWrap: {
+      width: ICON_WRAP,
+      height: ICON_WRAP,
+      borderRadius: ICON_WRAP / 2,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    subtitle: { lineHeight: 26 },
+    bottom: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingBottom: spacing[8],
+    },
+    dotsRow:     { flexDirection: 'row', justifyContent: 'center', gap: spacing[2] },
+    dot:         { height: DOT_H, borderRadius: DOT_H / 2 },
+    dotActive:   { width: 24, opacity: 1 },
+    dotInactive: { width: DOT_H, opacity: 0.3 },
+  });

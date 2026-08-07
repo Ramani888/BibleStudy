@@ -10,10 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { resetPasswordSchema, type ResetPasswordFormData } from '../../utils/validators';
-import { colors, spacing } from '../../theme';
+import { useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'ResetPassword'>) {
+  const { colors, spacing } = useTheme();
   const { email } = route.params;
   const resetPassword = useAuthStore(s => s.resetPassword);
   const [resending, setResending] = useState(false);

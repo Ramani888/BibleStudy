@@ -11,10 +11,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
-import { colors } from '../../theme';
+import { useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
+  const { colors } = useTheme();
   const login = useAuthStore(s => s.login);
   const passwordRef = useRef<TextInput>(null);
 

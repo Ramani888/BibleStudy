@@ -7,11 +7,10 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { colors, layout, spacing } from '../../../theme';
-import { Typography } from '../../../components/ui';
 
-const LOGO_ICON_SIZE = 28;
+import { SparklesIcon } from '../../../components/icons';
+import { Typography } from '../../../components/ui';
+import { type Theme, useTheme } from '../../../theme';
 
 interface AuthLayoutProps {
   title: string;
@@ -20,20 +19,29 @@ interface AuthLayoutProps {
   footer?: React.ReactNode;
 }
 
-function BrandLogo() {
+function BrandLogo({ colors }: { colors: Theme['colors'] }) {
   return (
-    <View style={styles.logoWrap}>
-      <View style={styles.logoMark}>
-        <Icon name="sparkles" size={LOGO_ICON_SIZE} color={colors.textOnPrimary} />
+    <View style={logoStyles.wrap}>
+      <View style={[logoStyles.mark, { backgroundColor: colors.primary }]}>
+        <SparklesIcon size={28} color={colors.textOnPrimary} />
       </View>
-      <Typography preset="h4" color={colors.primary} style={styles.logoText}>
+      <Typography preset="h4" color={colors.primary} style={logoStyles.text}>
         BibleStudy Pro
       </Typography>
     </View>
   );
 }
 
+const logoStyles = StyleSheet.create({
+  wrap: { alignItems: 'center', marginBottom: 32, gap: 8 },
+  mark: { width: 64, height: 64, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  text: { letterSpacing: 0.5 },
+});
+
 export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProps) {
+  const { colors, spacing, layout } = useTheme();
+  const styles = makeStyles({ colors, spacing, layout });
+
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView
@@ -46,7 +54,7 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <BrandLogo />
+          <BrandLogo colors={colors} />
 
           <View style={styles.card}>
             <Typography preset="h2" style={styles.title}>
@@ -67,54 +75,25 @@ export function AuthLayout({ title, subtitle, children, footer }: AuthLayoutProp
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: colors.backgroundSecondary,
-  },
-  kav: { flex: 1 },
-  scroll: {
-    flexGrow: 1,
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[6],
-    justifyContent: 'center',
-  },
-  logoWrap: {
-    alignItems: 'center',
-    marginBottom: spacing[8],
-    gap: spacing[2],
-  },
-  logoMark: {
-    width: 64,
-    height: 64,
-    borderRadius: 14,
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  logoText: {
-    letterSpacing: 0.5,
-  },
-  card: {
-    backgroundColor: colors.background,
-    borderRadius: 12,
-    padding: spacing[6],
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  title: {
-    marginBottom: spacing[1],
-  },
-  subtitle: {
-    marginBottom: spacing[5],
-  },
-  form: {
-    gap: spacing[4],
-    marginTop: spacing[4],
-  },
-  footer: {
-    marginTop: spacing[6],
-    alignItems: 'center',
-    gap: spacing[3],
-  },
-});
+const makeStyles = ({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) =>
+  StyleSheet.create({
+    safe: { flex: 1, backgroundColor: colors.backgroundSecondary },
+    kav:  { flex: 1 },
+    scroll: {
+      flexGrow: 1,
+      paddingHorizontal: layout.screenPaddingH,
+      paddingVertical: spacing[6],
+      justifyContent: 'center',
+    },
+    card: {
+      backgroundColor: colors.background,
+      borderRadius: layout.cardRadius,
+      padding: spacing[6],
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    title:    { marginBottom: spacing[1] },
+    subtitle: { marginBottom: spacing[5] },
+    form:     { gap: spacing[4], marginTop: spacing[4] },
+    footer:   { marginTop: spacing[6], alignItems: 'center', gap: spacing[3] },
+  });
