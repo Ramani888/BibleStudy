@@ -2,6 +2,19 @@ import { prisma } from '../../config/db';
 import { RecordAttemptDtoType } from './quiz.dto';
 import { NotFoundError } from '../../utils/errors';
 import { triggerAchievementCheck } from '../../utils/achievementCheck';
+import { applyReviews } from '../cards/cards.service';
+
+/**
+ * Feed a quiz's per-card results into spaced repetition. Skips unscored
+ * 'read' items (their isCorrect is always true) and items without a cardId.
+ */
+async function applySpacedRepetition(userId: string, dto: RecordAttemptDtoType) {
+  if (!dto.responses) return;
+  const reviews = dto.responses
+    .filter(r => r.mode !== 'read' && r.cardId)
+    .map(r => ({ cardId: r.cardId as string, correct: r.isCorrect }));
+  await applyReviews(userId, reviews);
+}
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   const primarySetId = dto.setIds[0];
@@ -25,6 +38,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   });
 
   triggerAchievementCheck(userId); // quiz count / perfect score / modes
+  await applySpacedRepetition(userId, dto);
   const best = await getBestForSet(userId, primarySetId);
   return { attempt, best };
 }
@@ -36,6 +50,7 @@ export async function updateAttempt(userId: string, attemptId: string, dto: Reco
     data: { total: dto.total, correct: dto.correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
   });
   if (updated.count === 0) throw new NotFoundError('Attempt not found');
+  await applySpacedRepetition(userId, dto);
   const best = await getBestForSet(userId, dto.setIds[0]);
   return { best };
 }

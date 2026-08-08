@@ -136,6 +136,8 @@ model Card {
   difficulty    Difficulty @default(MEDIUM)
   lastStudiedAt DateTime?
   nextReviewAt  DateTime?
+  interval      Int        @default(0)   // spaced-rep: days until next review
+  ease          Float      @default(2.5) // spaced-rep: SM-2 ease factor
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   set           Set        @relation(fields: [setId], references: [id], onDelete: Cascade)

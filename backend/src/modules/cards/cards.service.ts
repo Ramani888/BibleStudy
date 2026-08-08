@@ -36,6 +36,53 @@ export async function getDueSummary(userId: string) {
   return { dueCount, dueSets, topSet };
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Spaced-repetition update (SM-2). The quiz grade is binary, so map
+ * correct→quality 5, wrong→quality 2 into the classic SM-2 ease/interval
+ * formula. Only the user's own cards are touched (skips friend/public-set
+ * cards a quiz may include).
+ *
+ * ponytail: no sub-day learning steps — a wrong card reschedules +1 day, not
+ * "+10 min". Add Anki-style learning steps only if users start cramming.
+ */
+export async function applyReviews(
+  userId: string,
+  results: { cardId: string; correct: boolean }[],
+) {
+  if (results.length === 0) return;
+  const cards = await prisma.card.findMany({
+    where: { id: { in: results.map(r => r.cardId) }, set: { userId } },
+    select: { id: true, interval: true, ease: true },
+  });
+  const byId = new Map(cards.map(c => [c.id, c]));
+  const now = new Date();
+
+  const updates = results.flatMap(({ cardId, correct }) => {
+    const card = byId.get(cardId);
+    if (!card) return [];
+    const q = correct ? 5 : 2;
+    const ease = Math.max(1.3, card.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+    const interval = !correct
+      ? 0
+      : card.interval === 0
+        ? 1
+        : card.interval === 1
+          ? 6
+          : Math.round(card.interval * ease);
+    const nextReviewAt = new Date(now.getTime() + Math.max(1, interval) * DAY_MS);
+    return [
+      prisma.card.update({
+        where: { id: cardId },
+        data: { interval, ease, nextReviewAt, lastStudiedAt: now },
+      }),
+    ];
+  });
+
+  if (updates.length > 0) await prisma.$transaction(updates);
+}
+
 async function verifySetOwnership(userId: string, setId: string) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {

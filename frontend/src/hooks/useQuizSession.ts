@@ -192,6 +192,7 @@ export function buildSummaryItems(items: QuizItem[], responses: Record<number, u
     const isCorrect = MODE_META[item.mode].scored ? gradeItem(item, response) : true;
     return {
       index,
+      cardId: item.cardId,
       mode: item.mode,
       prompt: item.prompt,
       isCorrect,

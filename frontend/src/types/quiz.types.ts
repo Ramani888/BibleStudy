@@ -12,6 +12,7 @@ export interface QuizAttempt {
 // One item in a quiz summary — human-readable, stored with the attempt.
 export interface SummaryItem {
   index: number;
+  cardId: string;
   mode: string;
   prompt: string;
   isCorrect: boolean;

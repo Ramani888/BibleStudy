@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 const SummaryItemDto = z.object({
   index:         z.number().int(),
+  cardId:        z.string().optional(),
   mode:          z.string(),
   prompt:        z.string(),
   isCorrect:     z.boolean(),
