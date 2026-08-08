@@ -1,8 +1,9 @@
 import { apiGet, apiPost, apiPut, apiDelete } from './client';
-import type { Friendship, FriendRequest, BlockedUser, UserProfile } from '../types/friends.types';
+import type { Friendship, FriendRequest, BlockedUser, UserProfile, LeaderboardEntry } from '../types/friends.types';
 
 const friendsApi = {
   list:          ()                                    => apiGet<Friendship[]>('/friends'),
+  leaderboard:   ()                                    => apiGet<LeaderboardEntry[]>('/friends/leaderboard'),
   listRequests:  (type: 'incoming' | 'outgoing')       => apiGet<FriendRequest[]>('/friends/requests', { type }),
   sendRequest:   (receiverId: string)                  => apiPost<FriendRequest>('/friends/request', { receiverId }),
   acceptRequest: (requestId: string)                   => apiPut<{ message: string }>(`/friends/request/${requestId}/accept`),

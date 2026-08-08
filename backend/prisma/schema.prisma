@@ -55,6 +55,10 @@ model User {
   notes                   Note[]
   mediaFiles              MediaFile[]
   quizAttempts            QuizAttempt[]
+  achievements            UserAchievement[]
+  studyPlans              StudyPlan[]
+  planProgress            StudyPlanProgress[]
+  subscription            Subscription?
 }
 
 model RefreshToken {
@@ -112,6 +116,7 @@ model Set {
   folder      Folder?    @relation(fields: [folderId], references: [id], onDelete: SetNull)
   cards       Card[]
   quizAttempts QuizAttempt[]
+  planSteps   StudyPlanStep[]
 
   @@index([userId])
   @@index([folderId])
@@ -141,6 +146,78 @@ model Card {
   @@index([userId])
 }
 
+// Records that a user unlocked an achievement. Definitions live in code
+// (achievements.defs.ts) — only the unlock event is persisted here.
+model UserAchievement {
+  userId     String
+  key        String
+  unlockedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([userId, key])
+  @@index([userId])
+}
+
+// Personal (and later group) study plan: an ordered list of Sets to work through.
+model StudyPlan {
+  id          String          @id @default(uuid())
+  userId      String
+  title       String
+  description String?
+  groupId     String?         // null = personal (D1); set = group plan (D2)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  steps       StudyPlanStep[]
+
+  @@index([userId])
+  @@index([groupId])
+}
+
+model StudyPlanStep {
+  id       String              @id @default(uuid())
+  planId   String
+  setId    String
+  order    Int                 @default(0)
+  title    String?
+  plan     StudyPlan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  set      Set                 @relation(fields: [setId], references: [id], onDelete: Cascade)
+  progress StudyPlanProgress[]
+
+  @@index([planId])
+  @@index([setId])
+}
+
+// Per-user step completion — separate table so group plans (D2) track each
+// member independently with no migration.
+model StudyPlanProgress {
+  userId      String
+  stepId      String
+  completedAt DateTime      @default(now())
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  step        StudyPlanStep @relation(fields: [stepId], references: [id], onDelete: Cascade)
+
+  @@id([userId, stepId])
+  @@index([userId])
+}
+
+// Active IAP subscription — one row per user, upserted on verify.
+// originalTransactionId is stable across renewals (dedup key); lastTransactionId
+// is the most recent processed transaction so renewal credit grants stay idempotent.
+model Subscription {
+  id                    String   @id @default(uuid())
+  userId                String   @unique
+  plan                  Plan
+  store                 Store
+  productId             String
+  expiresAt             DateTime
+  originalTransactionId String   @unique
+  lastTransactionId     String
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
 model CreditTransaction {
   id          String          @id @default(uuid())
   userId      String
@@ -161,6 +238,8 @@ model AIChat {
   question        String
   answer          String
   suggestedCards  Json       @default("[]")
+  followUps       String[]   @default([])
+  cardsSaved      Boolean    @default(false)
   creditsUsed     Int        @default(1)
   createdAt       DateTime   @default(now())
   user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -401,6 +480,11 @@ enum Plan {
   FREE
   STARTER
   PRO
+}
+
+enum Store {
+  APPLE
+  GOOGLE
 }
 
 enum Platform {

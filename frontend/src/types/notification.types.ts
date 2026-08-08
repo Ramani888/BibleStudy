@@ -3,7 +3,7 @@ export interface Notification {
   userId: string;
   title: string;
   body: string;
-  type: 'friend_request' | 'friend_accepted' | 'group' | 'gathering' | 'gathering_rsvp' | 'system';
+  type: 'friend_request' | 'friend_accepted' | 'group' | 'gathering' | 'gathering_rsvp' | 'achievement' | 'system';
   referenceId: string | null;
   read: boolean;
   createdAt: string;

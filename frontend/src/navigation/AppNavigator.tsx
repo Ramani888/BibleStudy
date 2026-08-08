@@ -18,6 +18,7 @@ import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
+import { useSubscriptionSync } from '../hooks';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
@@ -33,6 +34,8 @@ export function AppNavigator() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
+
+  useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
 
   return (
     <Tab.Navigator
@@ -52,7 +55,9 @@ export function AppNavigator() {
       <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
       <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
       <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
-      <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile' }} />
+      {/* popToTopOnBlur: leaving Profile resets its stack to the Profile root, so a
+          deep-link (e.g. Home bell → Notifications) doesn't leave the tab stuck there. */}
+      <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile', popToTopOnBlur: true }} />
     </Tab.Navigator>
   );
 }

@@ -11,15 +11,17 @@ import {
   BellIcon,
   BuildingIcon,
   FileTextIcon,
+  FlameIcon,
   LockIcon,
   LogOutIcon,
   SettingsIcon,
   StarOutlineIcon,
+  TrophyIcon,
   UserIcon,
   UsersIcon,
 } from '../../components/icons';
 import { useAuthStore } from '../../store';
-import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage } from '../../hooks';
+import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage, useStreak } from '../../hooks';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { layout, spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -43,11 +45,14 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
 
   const { data: stats } = useSetStats();
   const { data: creditData } = useCreditBalance();
+  const { data: streakData } = useStreak();
   const { totalNotes } = useNoteStats();
   const { data: storage } = useStorageUsage();
 
   const usedMB  = ((storage?.used  ?? 0) / 1048576).toFixed(1);
   const limitMB = ((storage?.limit ?? 262144000) / 1048576).toFixed(0);
+  // G2: over quota (e.g. after a downgrade) — nudge to upgrade. Nothing is deleted (#7).
+  const overQuota = !!storage && storage.used > storage.limit;
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -85,6 +90,14 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── Stats row ── */}
         <View style={styles.statsRow}>
           <View style={styles.statBox}>
+            <View style={styles.streakValue}>
+              <FlameIcon size={16} color={colors.warning} />
+              <Typography preset="h4" color={colors.warning}>{streakData?.streak ?? 0}</Typography>
+            </View>
+            <Typography preset="caption" color={colors.textSecondary}>Streak</Typography>
+          </View>
+          <View style={styles.statDivider} />
+          <View style={styles.statBox}>
             <Typography preset="h4" color={colors.primary}>{creditData?.balance ?? 0}</Typography>
             <Typography preset="caption" color={colors.textSecondary}>Credits</Typography>
           </View>
@@ -108,19 +121,26 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── Storage bar ── */}
         <Pressable
           style={({ pressed }) => [styles.storageSection, pressed && { opacity: 0.7 }]}
-          onPress={() => navigation.navigate('Media')}
+          onPress={() => navigation.navigate(overQuota ? 'Paywall' : 'Media')}
         >
           <View style={styles.storageRow}>
-            <Typography preset="caption" color={colors.textSecondary}>Storage</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>
+            <Typography preset="caption" color={overQuota ? colors.error : colors.textSecondary}>
+              {overQuota ? 'Over storage limit — Upgrade' : 'Storage'}
+            </Typography>
+            <Typography preset="caption" color={overQuota ? colors.error : colors.textSecondary}>
               {usedMB} MB of {limitMB} MB
             </Typography>
           </View>
-          <ProgressBar progress={(storage?.percent ?? 0) / 100} color={colors.primary} />
+          <ProgressBar
+            progress={Math.min((storage?.percent ?? 0) / 100, 1)}
+            color={overQuota ? colors.error : colors.primary}
+          />
         </Pressable>
 
         {/* ── My Study ── */}
         <MenuSection label="My Study">
+          <MenuItem icon={TrophyIcon} label="Achievements" onPress={() => navigation.navigate('Achievements')} />
+          <Divider marginV={0} />
           <MenuItem icon={FileTextIcon} label="My Notes" onPress={() => navigation.navigate('Notes')} />
           <Divider marginV={0} />
           <MenuItem icon={AlbumsIcon} label="My Media" onPress={() => navigation.navigate('Media')} />
@@ -144,6 +164,13 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             label="My Credits"
             value={`${creditData?.balance ?? 0} credits`}
             onPress={() => navigation.navigate('Credits')}
+          />
+          <Divider marginV={0} />
+          <MenuItem
+            icon={StarOutlineIcon}
+            label={user?.plan && user.plan !== 'FREE' ? 'Manage Plan' : 'Upgrade to Premium'}
+            value={user?.plan ?? 'FREE'}
+            onPress={() => navigation.navigate('Paywall')}
           />
           <Divider marginV={0} />
           <MenuItem icon={LockIcon} label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
@@ -217,6 +244,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       paddingVertical: spacing[4],
       gap: spacing[0.5],
     },
+    streakValue: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
     statDivider: {
       width: 1,
       backgroundColor: colors.border,

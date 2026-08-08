@@ -17,3 +17,6 @@ export { notificationsApi } from './notifications.api';
 export { notesApi } from './notes.api';
 export { mediaApi } from './media.api';
 export { quizApi } from './quiz.api';
+export { achievementsApi } from './achievements.api';
+export { plansApi } from './plans.api';
+export { subscriptionsApi } from './subscriptions.api';

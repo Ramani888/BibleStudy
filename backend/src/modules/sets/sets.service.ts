@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
+import { memberHasGroupPlanAccess } from '../../utils/planAccess';
 import { CreateSetDtoType, UpdateSetDtoType } from './sets.dto';
 import { NotFoundError } from '../../utils/errors';
 
@@ -50,7 +51,7 @@ export async function listSets(userId: string, folderId?: string) {
 
 export async function getSetById(userId: string, setId: string) {
   const set = await prisma.set.findFirst({
-    where: { id: setId, userId },
+    where: { id: setId },
     include: {
       cards: { orderBy: { order: 'asc' } },
       folder: { select: { id: true, name: true } },
@@ -59,6 +60,11 @@ export async function getSetById(userId: string, setId: string) {
   });
 
   if (!set) {
+    throw new NotFoundError('Set not found');
+  }
+
+  // Owner always; otherwise allow members studying this set via a group plan (D2).
+  if (set.userId !== userId && !(await memberHasGroupPlanAccess(userId, setId))) {
     throw new NotFoundError('Set not found');
   }
 

@@ -44,6 +44,7 @@ import {
   useUpdateSessionTags,
 } from '../../hooks';
 import { formatDate } from '../../utils/formatters';
+import { useAIChatStore } from '../../store';
 import { useTheme, fontSizes, fontWeights, layout, spacing, type Theme } from '../../theme';
 import type { AIChat, BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
@@ -284,10 +285,10 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   });
 
   const handleContinue = useCallback((session: ChatSession) => {
-    // push() always creates a new screen instance. navigate() would go back to
-    // the existing root AIChat (already mounted) where useState/useRef won't
-    // re-run, so the session would never load.
-    navigation.push('AIChat', { session });
+    // Load the session into the shared store (single source of truth), then just
+    // navigate back to the chat screen — no need to spawn a new screen instance.
+    useAIChatStore.getState().loadSession(session);
+    navigation.navigate('AIChat');
   }, [navigation]);
 
   const handleLongPress = useCallback((session: ChatSession) => {

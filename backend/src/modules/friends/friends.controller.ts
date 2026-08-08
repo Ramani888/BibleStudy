@@ -9,6 +9,13 @@ export async function listFriends(req: Request, res: Response): Promise<void> {
   } catch (error) { handleControllerError(res, error, 'Failed to list friends'); }
 }
 
+export async function getLeaderboard(req: Request, res: Response): Promise<void> {
+  try {
+    const rows = await friendsService.getLeaderboard(req.user!.id);
+    sendSuccess(res, rows, 'Leaderboard retrieved successfully');
+  } catch (error) { handleControllerError(res, error, 'Failed to get leaderboard'); }
+}
+
 export async function listRequests(req: Request, res: Response): Promise<void> {
   try {
     const type = (req.query.type as 'incoming' | 'outgoing') || 'incoming';

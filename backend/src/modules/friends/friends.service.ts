@@ -2,6 +2,7 @@ import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
 import { NotFoundError, ConflictError, ValidationError } from '../../utils/errors';
+import { getStreak } from '../credits/credits.service';
 
 const friendSelect = {
   id: true,
@@ -18,6 +19,48 @@ export async function listFriends(userId: string) {
     orderBy: { createdAt: 'desc' },
   });
   return friendships;
+}
+
+// C3: friends leaderboard — you + all your friends ranked by current streak
+// (tiebreak: longest streak, then name). Shows longest streak + achievements unlocked
+// as secondary stats so there's something to display when streaks are low.
+export async function getLeaderboard(userId: string) {
+  const [me, friendships] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: friendSelect }),
+    prisma.friendship.findMany({ where: { userId }, include: { friend: { select: friendSelect } } }),
+  ]);
+  if (!me) throw new NotFoundError('User not found');
+
+  const people = [me, ...friendships.map(f => f.friend)];
+  const ids = people.map(p => p.id);
+
+  // Achievements unlocked per user — one grouped query for the whole board.
+  const achCounts = await prisma.userAchievement.groupBy({
+    by: ['userId'],
+    where: { userId: { in: ids } },
+    _count: { _all: true },
+  });
+  const achMap = new Map(achCounts.map(a => [a.userId, a._count._all]));
+
+  // ponytail: getStreak runs one REWARD query per person — fine for normal friend
+  // counts; batch into a single grouped query if someone racks up hundreds of friends.
+  const rows = await Promise.all(
+    people.map(async p => {
+      const { streak, longestStreak } = await getStreak(p.id);
+      return {
+        userId: p.id,
+        name: p.name,
+        profileImage: p.profileImage,
+        streak,
+        longestStreak,
+        achievements: achMap.get(p.id) ?? 0,
+        isMe: p.id === userId,
+      };
+    }),
+  );
+
+  rows.sort((a, b) => b.streak - a.streak || b.longestStreak - a.longestStreak || a.name.localeCompare(b.name));
+  return rows;
 }
 
 export async function listRequests(userId: string, type: 'incoming' | 'outgoing') {

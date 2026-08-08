@@ -4,8 +4,92 @@ import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { AskQuestionDtoType } from './ai.dto';
 import { AppError, NotFoundError, PaymentRequiredError } from '../../utils/errors';
+import { triggerAchievementCheck } from '../../utils/achievementCheck';
 
 const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
+
+const CLAUDE_MODEL = 'claude-haiku-4-5-20251001';
+const MAX_TOKENS = 3072;
+
+// Variable credit cost per AI action (Phase B + F). Media dominates: a PDF/image
+// chat is charged the media rate even if it also returns cards (locked F decision #3).
+const CREDIT_COST = { text: 1, cards: 2, image: 3, pdf: 5 } as const;
+
+type ChatMessage = { role: 'user' | 'assistant'; content: string };
+
+// A media attachment for the latest user turn (Phase F). PDF now; image later.
+// Files are public-read on S3, so Claude ingests them by URL (no base64).
+type MediaBlock = Anthropic.DocumentBlockParam | Anthropic.ImageBlockParam;
+
+// Provider seam: text chat routes to AI_PROVIDER (anthropic | openrouter).
+// Media ALWAYS routes to Claude (vision/docs) regardless of AI_PROVIDER (Phase F).
+// When media is present it is attached to the latest user turn as content blocks.
+async function generateAnswer(system: string, messages: ChatMessage[], media?: MediaBlock[]): Promise<string> {
+  const hasMedia = !!media && media.length > 0;
+
+  if (env.AI_PROVIDER === 'openrouter' && !hasMedia) {
+    if (!env.OPENROUTER_API_KEY) throw new AppError('OpenRouter not configured.', 500, 'AI_CONFIG_ERROR');
+    if (!env.AI_MODEL) throw new AppError('AI_MODEL is required for OpenRouter.', 500, 'AI_CONFIG_ERROR');
+
+    // Free models cold-start slowly and share a rate-limited pool — the first hit
+    // often 429s or stalls, then succeeds. Retry transient failures (429 / 5xx)
+    // with a short backoff so the flakiness self-heals before the user sees it.
+    const MAX_ATTEMPTS = 3;
+    let lastStatus = 0;
+    let lastDetail = '';
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: env.AI_MODEL,
+          max_tokens: MAX_TOKENS,
+          messages: [{ role: 'system', content: system }, ...messages],
+        }),
+      });
+
+      if (res.ok) {
+        const data = (await res.json()) as { choices?: { message?: { content?: string } }[] };
+        return data.choices?.[0]?.message?.content ?? '';
+      }
+
+      lastStatus = res.status;
+      lastDetail = await res.text().catch(() => '');
+      const retryable = res.status === 429 || res.status >= 500;
+      if (!retryable || attempt === MAX_ATTEMPTS) break;
+      await new Promise(r => setTimeout(r, 1000 * attempt)); // 1s, then 2s
+    }
+
+    throw new AppError(`AI provider error (${lastStatus}). No credit was charged. ${lastDetail.slice(0, 200)}`, 502, 'AI_PROVIDER_ERROR');
+  }
+
+  // Anthropic Claude (default provider, or forced by media).
+  // env.AI_MODEL may hold an OpenRouter model id when provider=openrouter, so for the
+  // media-forced path we pin CLAUDE_MODEL rather than trust AI_MODEL.
+  const model = hasMedia ? CLAUDE_MODEL : (env.AI_MODEL || CLAUDE_MODEL);
+
+  // Attach media to the latest user turn; earlier history stays plain text.
+  const claudeMessages: Anthropic.MessageParam[] = hasMedia
+    ? [
+        ...messages.slice(0, -1).map(m => ({ role: m.role, content: m.content })),
+        { role: 'user', content: [...media!, { type: 'text', text: messages[messages.length - 1].content }] },
+      ]
+    : messages;
+
+  let response: Anthropic.Message;
+  try {
+    response = await anthropic.messages.create({ model, max_tokens: MAX_TOKENS, system, messages: claudeMessages });
+  } catch (e) {
+    // Includes an unfunded/misconfigured Claude account — thrown BEFORE any credit charge.
+    const status = (e as { status?: number }).status;
+    throw new AppError(`AI provider error${status ? ` (${status})` : ''}. No credit was charged.`, 502, 'AI_PROVIDER_ERROR');
+  }
+  const textBlock = response.content[0];
+  return textBlock && textBlock.type === 'text' ? textBlock.text : '';
+}
 
 const FOLLOWUP_DELIMITER = '|||';
 const CARD_DELIMITER = '---CARD---';
@@ -70,8 +154,12 @@ function parseAIResponse(raw: string): {
     }
   }
 
+  // Some models emit cards with no intro text before the first ---CARD---,
+  // leaving answerText empty. Fall back so the chat bubble is never blank.
+  const answer = answerText || (suggestedCards.length > 0 ? 'Here are your flashcards:' : answerText);
+
   return {
-    answer: answerText,
+    answer,
     followUps: followUpLines.filter(q => q.length > 0).slice(0, 3),
     suggestedCards: suggestedCards.slice(0, 10),
   };
@@ -88,7 +176,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     throw new PaymentRequiredError('Insufficient credits. Please earn more credits to use AI chat.');
   }
 
-  const messages: Anthropic.MessageParam[] = [
+  const messages: ChatMessage[] = [
     ...(dto.history ?? []).map(m => ({
       role: m.role as 'user' | 'assistant',
       content: m.content,
@@ -96,19 +184,52 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     { role: 'user', content: dto.question },
   ];
 
-  const response = await anthropic.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 3072,
-    system: SYSTEM_PROMPT,
-    messages,
-  });
+  // Phase F: attach a PDF (F.1) or image (F.2) from the user's media library —
+  // routes this turn to Claude. PDFs → document blocks, images → image blocks.
+  let mediaBlocks: MediaBlock[] | undefined;
+  let hasPdf = false;
+  let hasImage = false;
+  if (dto.mediaIds && dto.mediaIds.length > 0) {
+    const files = await prisma.mediaFile.findMany({
+      where: { id: { in: dto.mediaIds }, userId },
+      select: { url: true, type: true },
+    });
+    if (files.length !== dto.mediaIds.length) throw new AppError('One or more files not found', 400, 'INVALID_MEDIA');
+    mediaBlocks = files.map(f =>
+      f.type === 'PDF'
+        ? { type: 'document' as const, source: { type: 'url' as const, url: f.url } }
+        : { type: 'image' as const, source: { type: 'url' as const, url: f.url } },
+    );
+    hasPdf = files.some(f => f.type === 'PDF');
+    hasImage = files.some(f => f.type === 'IMAGE');
+  }
 
-  const textBlock = response.content[0];
-  if (!textBlock || textBlock.type !== 'text') {
+  // G1: media routes to paid Claude, so require the FULL cost upfront (no floor) —
+  // reject before the Claude call so we never make a paid request we can't charge for.
+  const mediaCost = hasPdf ? CREDIT_COST.pdf : hasImage ? CREDIT_COST.image : 0;
+  if (mediaCost > 0 && user.creditBalance < mediaCost) {
+    throw new PaymentRequiredError(`This needs ${mediaCost} credits. Earn more or upgrade to keep using media in chat.`);
+  }
+
+  const rawText = await generateAnswer(SYSTEM_PROMPT, messages, mediaBlocks);
+  if (!rawText) {
     throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
   }
 
-  const { answer, followUps, suggestedCards } = parseAIResponse(textBlock.text);
+  const { answer, followUps, suggestedCards } = parseAIResponse(rawText);
+
+  // Variable cost by what the AI did. Media dominates (Claude PDF/vision is the paid perk):
+  // PDF > image > cards > text, even if a media chat also returned cards.
+  // Charge is floored at the user's balance so it can't go negative — the AI already ran.
+  const cost = hasPdf ? CREDIT_COST.pdf
+    : hasImage ? CREDIT_COST.image
+    : suggestedCards.length > 0 ? CREDIT_COST.cards
+    : CREDIT_COST.text;
+  const charge = Math.min(cost, user.creditBalance);
+  const description = hasPdf ? 'AI PDF chat'
+    : hasImage ? 'AI image chat'
+    : suggestedCards.length > 0 ? 'AI flashcard generation'
+    : 'AI chat question';
 
   // Upsert session record when sessionId is provided
   const sessionOp = dto.sessionId
@@ -122,10 +243,10 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
   const [, , aiChat] = await prisma.$transaction([
     prisma.user.update({
       where: { id: userId },
-      data: { creditBalance: { decrement: 1 } },
+      data: { creditBalance: { decrement: charge } },
     }),
     prisma.creditTransaction.create({
-      data: { userId, type: 'USAGE', amount: -1, description: 'AI chat question' },
+      data: { userId, type: 'USAGE', amount: -charge, description },
     }),
     prisma.aIChat.create({
       data: {
@@ -134,7 +255,8 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
         question: dto.question,
         answer,
         suggestedCards: suggestedCards as unknown as Prisma.InputJsonValue,
-        creditsUsed: 1,
+        followUps,
+        creditsUsed: charge,
       },
     }),
   ]);
@@ -144,15 +266,25 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     await sessionOp.catch(() => {});
   }
 
+  triggerAchievementCheck(userId); // AI question count
+
   return {
     id: aiChat.id,
     question: dto.question,
     answer,
     followUps,
     suggestedCards,
-    creditsUsed: 1,
+    creditsUsed: charge,
     createdAt: aiChat.createdAt,
   };
+}
+
+export async function markCardsSaved(userId: string, chatId: string) {
+  const result = await prisma.aIChat.updateMany({
+    where: { id: chatId, userId },
+    data: { cardsSaved: true },
+  });
+  if (result.count === 0) throw new NotFoundError('Message not found');
 }
 
 export async function getChatHistory(userId: string, page = 1, limit = 10) {
@@ -212,6 +344,8 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
     question: true,
     answer: true,
     suggestedCards: true,
+    followUps: true,
+    cardsSaved: true,
     creditsUsed: true,
     createdAt: true,
   } as const;
@@ -240,10 +374,10 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
 
   // Build lookup maps
   const metaMap = new Map((sessionMeta as { id: string; title: string | null; tags: string[] }[]).map(s => [s.id, s]));
-  const standaloneMsgMap = new Map((standaloneMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[]).map(m => [m.id, m]));
+  const standaloneMsgMap = new Map((standaloneMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; followUps: string[]; cardsSaved: boolean; creditsUsed: number; createdAt: Date }[]).map(m => [m.id, m]));
 
-  const sessionMsgMap = new Map<string, { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[]>();
-  for (const msg of (sessionMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[])) {
+  const sessionMsgMap = new Map<string, { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; followUps: string[]; cardsSaved: boolean; creditsUsed: number; createdAt: Date }[]>();
+  for (const msg of (sessionMessages as { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; followUps: string[]; cardsSaved: boolean; creditsUsed: number; createdAt: Date }[])) {
     const key = msg.sessionId!;
     if (!sessionMsgMap.has(key)) sessionMsgMap.set(key, []);
     sessionMsgMap.get(key)!.push(msg);
@@ -257,7 +391,7 @@ export async function getChatHistory(userId: string, page = 1, limit = 10) {
     messageCount: number;
     totalCreditsUsed: number;
     startedAt: Date;
-    messages: { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; creditsUsed: number; createdAt: Date }[];
+    messages: { id: string; sessionId: string | null; question: string; answer: string; suggestedCards: Prisma.JsonValue; followUps: string[]; cardsSaved: boolean; creditsUsed: number; createdAt: Date }[];
   };
 
   // Assemble result in the same order as pageSlots

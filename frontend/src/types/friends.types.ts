@@ -8,6 +8,16 @@ export interface UserProfile {
   pendingRequest?: { id: string; direction: 'incoming' | 'outgoing' } | null;
 }
 
+export interface LeaderboardEntry {
+  userId: string;
+  name: string;
+  profileImage: string | null;
+  streak: number;
+  longestStreak: number;
+  achievements: number;
+  isMe: boolean;
+}
+
 export interface FriendRequest {
   id: string;
   senderId: string;

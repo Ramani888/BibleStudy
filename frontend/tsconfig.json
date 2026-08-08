@@ -12,7 +12,8 @@
       "@api/*": ["src/api/*"],
       "@hooks/*": ["src/hooks/*"],
       "@utils/*": ["src/utils/*"],
-      "@types/*": ["src/types/*"]
+      "@types/*": ["src/types/*"],
+      "react-native-iap": ["node_modules/react-native-iap/lib/typescript/src/index.d.ts"]
     }
   },
   "include": ["**/*.ts", "**/*.tsx"],

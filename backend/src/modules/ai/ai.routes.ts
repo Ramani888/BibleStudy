@@ -23,6 +23,9 @@ router.delete('/history/:sessionId',                aiController.deleteSession);
 router.patch('/history/:sessionId/title',  validate(RenameSessionDto),  aiController.renameSession);
 router.patch('/history/:sessionId/tags',   validate(UpdateTagsDto),     aiController.updateSessionTags);
 
+// Mark a chat's suggested cards as saved (persists the "Saved" state)
+router.patch('/chats/:chatId/cards-saved', aiController.markCardsSaved);
+
 // Bookmarks
 router.get('/bookmarks',              aiController.getBookmarks);
 router.post('/bookmarks',  validate(BookmarkDto),  aiController.addBookmark);

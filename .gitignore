@@ -33,3 +33,4 @@ frontend/android/app/*.keystore
 
 # Claude Code local settings — machine-specific, may contain secrets
 .claude/settings.local.json
+.claude/worktrees/

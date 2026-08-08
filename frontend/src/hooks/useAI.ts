@@ -13,6 +13,16 @@ export function useAIChat() {
   });
 }
 
+export function useMarkCardsSaved() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (chatId: string) => aiApi.markCardsSaved(chatId),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['ai-history'] });
+    },
+  });
+}
+
 export function useAIChatHistory() {
   return useInfiniteQuery({
     queryKey: ['ai-history'],

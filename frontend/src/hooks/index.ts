@@ -9,6 +9,7 @@ export {
   useBookmarks,
   useAddBookmark,
   useRemoveBookmark,
+  useMarkCardsSaved,
 } from './useAI';
 export { useSets, useSet, useCreateSet, useUpdateSet, useDeleteSet, useCloneSet, usePublicSets, useFriendsSets } from './useSets';
 export { useFolders, useFolder, useCreateFolder, useUpdateFolder, useDeleteFolder } from './useFolders';
@@ -27,6 +28,9 @@ export {
 export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak } from './useCredits';
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
+export { useAchievements } from './useAchievements';
+export { usePlans, usePlan, useGroupPlans, useMembersProgress, useCreatePlan, useDeletePlan, useToggleStep } from './usePlans';
+export { useSubscriptionStatus, useSubscriptionSync, useIapSubscriptions } from './useSubscription';
 export { useConfirmDialog } from './useConfirmDialog';
 export { useDebouncedValue } from './useDebouncedValue';
 export { useSearchToggle } from './useSearchToggle';
@@ -39,6 +43,7 @@ export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, 
 // Phase 2 — Community
 export {
   useFriends,
+  useLeaderboard,
   useFriendRequests,
   useSearchUsers,
   useBlockedUsers,
@@ -85,3 +90,4 @@ export {
 export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from './useNotes';
 export { useNoteStats } from './useNoteStats';
 export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';
+export { usePickMedia } from './usePickMedia';

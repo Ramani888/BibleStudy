@@ -15,6 +15,7 @@ export interface AIChatPayload {
   question: string;
   history?: ChatMessage[];
   sessionId?: string;
+  mediaIds?: string[]; // Phase F.1: attach one PDF from My Media (routes to Claude)
 }
 
 export interface AIChat {
@@ -23,6 +24,8 @@ export interface AIChat {
   question: string;
   answer: string;
   suggestedCards?: SuggestedCard[];
+  followUps?: string[];
+  cardsSaved?: boolean;
   creditsUsed: number;
   createdAt: string;
 }

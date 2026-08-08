@@ -11,6 +11,9 @@ import { CreateCardScreen } from '../screens/library/CreateCardScreen';
 import { EditCardScreen } from '../screens/library/EditCardScreen';
 import { PublicSetsScreen } from '../screens/library/PublicSetsScreen';
 import { FriendsSetsScreen } from '../screens/library/FriendsSetsScreen';
+import { StudyPlansScreen } from '../screens/library/StudyPlansScreen';
+import { PlanDetailScreen } from '../screens/library/PlanDetailScreen';
+import { CreatePlanScreen } from '../screens/library/CreatePlanScreen';
 
 const Stack = createNativeStackNavigator<LibraryStackParamList>();
 
@@ -61,6 +64,9 @@ export function LibraryNavigator() {
       />
       <Stack.Screen name="PublicSets" component={PublicSetsScreen} />
       <Stack.Screen name="FriendsSets" component={FriendsSetsScreen} />
+      <Stack.Screen name="StudyPlans" component={StudyPlansScreen} />
+      <Stack.Screen name="PlanDetail" component={PlanDetailScreen} />
+      <Stack.Screen name="CreatePlan" component={CreatePlanScreen} options={{ presentation: 'modal' }} />
     </Stack.Navigator>
   );
 }

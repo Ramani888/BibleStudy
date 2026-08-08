@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
 import { Button, ColorPicker, Input, Screen, Spacer, Typography } from '../../components/ui';
-import { GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
+import { BookIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
 
 import {
   useConfirmDialog,
@@ -164,6 +164,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           </Pressable>
           <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
             <GlobeIcon size={ICON_SIZE} color={colors.primary} />
+          </Pressable>
+          <Pressable onPress={() => navigation.navigate('StudyPlans')} hitSlop={8}>
+            <BookIcon size={ICON_SIZE} color={colors.primary} />
           </Pressable>
         </View>
 

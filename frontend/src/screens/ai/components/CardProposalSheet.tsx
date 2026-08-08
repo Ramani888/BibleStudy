@@ -3,8 +3,10 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'reac
 import { CheckCircleIcon } from '../../../components/icons';
 
 import { AppModal } from '../../../components/feedback';
-import { Button, Typography } from '../../../components/ui';
-import { useSets } from '../../../hooks';
+import { Button, Input, Typography } from '../../../components/ui';
+import { useCreateSet, useSets } from '../../../hooks';
+import { getErrorMessage } from '../../../api';
+import Toast from 'react-native-toast-message';
 import { layout, spacing, useTheme, type Theme } from '../../../theme';
 import type { SuggestedCard } from '../../../types';
 
@@ -21,7 +23,25 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [newSetName, setNewSetName] = useState('');
+  const [isCreating, setIsCreating] = useState(false);
   const { data: sets = [], isLoading: setsLoading } = useSets();
+  const { mutateAsync: createSet } = useCreateSet();
+
+  const handleCreateSet = async () => {
+    const title = newSetName.trim();
+    if (!title || isCreating) return;
+    setIsCreating(true);
+    try {
+      const set = await createSet({ title });
+      setSelectedSetId(set.id);   // auto-select the new set, ready to save into it
+      setNewSetName('');
+    } catch (e) {
+      Toast.show({ type: 'error', text1: 'Could not create set', text2: getErrorMessage(e) });
+    } finally {
+      setIsCreating(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!selectedSetId) return;
@@ -38,6 +58,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
 
   const handleClose = () => {
     setSelectedSetId(null);
+    setNewSetName('');
     onClose();
   };
 
@@ -63,11 +84,35 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
       <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>
         Choose a Set
       </Typography>
+
+      {/* Inline create — only when the user has no sets to pick from */}
+      {!setsLoading && sets.length === 0 && (
+        <View style={styles.createRow}>
+          <View style={styles.createInput}>
+            <Input
+              placeholder="New set name…"
+              value={newSetName}
+              onChangeText={setNewSetName}
+              onSubmitEditing={handleCreateSet}
+              returnKeyType="done"
+              editable={!isCreating}
+            />
+          </View>
+          <Button
+            label="Create"
+            variant="secondary"
+            onPress={handleCreateSet}
+            disabled={!newSetName.trim() || isCreating}
+            loading={isCreating}
+          />
+        </View>
+      )}
+
       {setsLoading ? (
         <ActivityIndicator color={colors.primary} style={styles.loader} />
       ) : sets.length === 0 ? (
         <Typography preset="bodySm" color={colors.textSecondary} style={styles.emptyText}>
-          No sets yet. Create one in the Library tab first.
+          No sets yet — create one above.
         </Typography>
       ) : (
         <ScrollView style={styles.setList} showsVerticalScrollIndicator={false}>
@@ -96,7 +141,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
         <Button
           label={`Save ${cards.length} Card${cards.length !== 1 ? 's' : ''}`}
           onPress={handleSave}
-          disabled={!selectedSetId || isSaving || sets.length === 0}
+          disabled={!selectedSetId || isSaving}
           loading={isSaving}
           fullWidth
         />
@@ -116,6 +161,8 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   },
   answerText: { paddingLeft: spacing[2] },
   sectionLabel: { marginBottom: spacing[2] },
+  createRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2], marginBottom: spacing[3] },
+  createInput: { flex: 1 },
   loader: { marginVertical: spacing[4] },
   emptyText: { textAlign: 'center', marginVertical: spacing[4] },
   setList: { maxHeight: 220, marginBottom: spacing[4] },

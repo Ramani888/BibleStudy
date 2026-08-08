@@ -21,7 +21,8 @@ export const aiApi = {
     apiGet<DailyVerse>('/ai/daily-verse'),
 
   chat: (payload: AIChatPayload) =>
-    apiPost<AIChatResponse>('/ai/chat', payload),
+    // AI generation (esp. flashcards on free models) can exceed the default 15s.
+    apiPost<AIChatResponse>('/ai/chat', payload, { timeout: 60_000 }),
 
   getHistory: (params?: ChatHistoryParams) =>
     apiGet<PaginatedSessions>('/ai/history', params),
@@ -46,4 +47,7 @@ export const aiApi = {
 
   removeBookmark: (chatId: string) =>
     apiDelete(`/ai/bookmarks/${chatId}`),
+
+  markCardsSaved: (chatId: string) =>
+    apiPatch<void>(`/ai/chats/${chatId}/cards-saved`),
 };

@@ -13,7 +13,7 @@
     "db:studio": "prisma studio"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.20.0",
+    "@anthropic-ai/sdk": "^0.116.0",
     "@aws-sdk/client-s3": "^3.1053.0",
     "@invertase/react-native-apple-authentication": "^2.5.1",
     "@prisma/client": "^5.0.0",

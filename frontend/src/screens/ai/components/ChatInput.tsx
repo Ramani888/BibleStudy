@@ -10,10 +10,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { fontSizes, layout, spacing, useTheme, type Theme } from '../../../theme';
 import { Typography } from '../../../components/ui';
-import { StarIcon, ArrowUpIcon } from '../../../components/icons';
+import { StarIcon, ArrowUpIcon, FileTextIcon, PlusIcon, CloseIcon } from '../../../components/icons';
 
 const SEND_ICON_SIZE = 20;
 const CREDIT_ICON_SIZE = 12;
+const ATTACH_ICON_SIZE = 20;
 const MAX_LENGTH = 1000;
 const WARN_THRESHOLD = 900;
 
@@ -21,9 +22,13 @@ interface ChatInputProps {
   onSend: (text: string) => void;
   disabled?: boolean;
   creditBalance?: number;
+  attachmentName?: string | null;      // Phase F.1: currently attached PDF name
+  onAttachPress?: () => void;
+  onClearAttachment?: () => void;
+  onUpgrade?: () => void;               // G3: shown when out of credits
 }
 
-export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
+export function ChatInput({ onSend, disabled, creditBalance, attachmentName, onAttachPress, onClearAttachment, onUpgrade }: ChatInputProps) {
   const theme = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -52,12 +57,39 @@ export function ChatInput({ onSend, disabled, creditBalance }: ChatInputProps) {
           <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.error}>
             {creditBalance > 0
               ? `${creditBalance} credits remaining`
-              : 'No credits — claim your daily credit first'}
+              : 'No credits — claim your daily credit or'}
           </Typography>
+          {creditBalance <= 0 && onUpgrade && (
+            <Pressable onPress={onUpgrade} hitSlop={8}>
+              <Typography preset="caption" color={colors.primary}> Upgrade</Typography>
+            </Pressable>
+          )}
         </View>
       )}
 
+      {attachmentName ? (
+        <View style={styles.attachChip}>
+          <FileTextIcon size={14} color={colors.primary} />
+          <Typography preset="caption" color={colors.primary} style={styles.attachName} numberOfLines={1}>
+            {attachmentName}
+          </Typography>
+          <Pressable onPress={onClearAttachment} hitSlop={8}>
+            <CloseIcon size={14} color={colors.textSecondary} />
+          </Pressable>
+        </View>
+      ) : null}
+
       <View style={styles.inputRow}>
+        {onAttachPress && (
+          <Pressable
+            style={[styles.attachBtn, disabled && styles.inputDisabled]}
+            onPress={onAttachPress}
+            disabled={disabled}
+            hitSlop={8}
+          >
+            <PlusIcon size={ATTACH_ICON_SIZE} color={colors.textSecondary} />
+          </Pressable>
+        )}
         <TextInput
           style={[styles.input, disabled && styles.inputDisabled]}
           placeholder="Ask a Bible question…"
@@ -123,6 +155,30 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-end',
     gap: spacing[2],
+  },
+  attachChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[1.5],
+    alignSelf: 'flex-start',
+    maxWidth: '80%',
+    backgroundColor: colors.primarySurface,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    borderRadius: layout.pillRadius,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1.5],
+  },
+  attachName: { flexShrink: 1 },
+  attachBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: layout.pillRadius,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.backgroundSecondary,
+    borderWidth: 1.5,
+    borderColor: colors.border,
   },
   input: {
     flex: 1,

@@ -12,7 +12,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { useChangePassword } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useAuthStore } from '../../store';
-import { changePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
+import { makeChangePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
 import { layout, spacing, useTheme } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
@@ -26,7 +26,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   const confirmRef = useRef<TextInput>(null);
 
   const { control, handleSubmit, reset, formState: { isSubmitting } } = useForm<ChangePasswordFormData>({
-    resolver: zodResolver(changePasswordSchema),
+    resolver: zodResolver(makeChangePasswordSchema(hasPassword)),
     defaultValues: { currentPassword: '', newPassword: '', confirmPassword: '' },
   });
 

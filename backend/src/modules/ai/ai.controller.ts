@@ -46,6 +46,13 @@ export async function updateSessionTags(req: Request, res: Response): Promise<vo
   } catch (error) { handleControllerError(res, error, 'Failed to update tags'); }
 }
 
+export async function markCardsSaved(req: Request, res: Response): Promise<void> {
+  try {
+    await aiService.markCardsSaved(req.user!.id, req.params.chatId);
+    sendSuccess(res, null, 'Cards marked as saved');
+  } catch (error) { handleControllerError(res, error, 'Failed to mark cards as saved'); }
+}
+
 export async function addBookmark(req: Request, res: Response): Promise<void> {
   try {
     await aiService.addBookmark(req.user!.id, req.body.chatId);

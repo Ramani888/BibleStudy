@@ -15,6 +15,7 @@ import {
   CalendarIcon,
   ClockIcon,
   TrashIcon,
+  TrophyIcon,
   UserPlusIcon,
   UsersIcon,
   type IconComponent,
@@ -36,7 +37,11 @@ function getNotificationIcon(type: Notification['type']): IconComponent {
     case 'group':           return UsersIcon;
     case 'gathering':       return CalendarIcon;
     case 'gathering_rsvp':  return ClockIcon;
-    case 'system':          return BellIcon;
+    case 'achievement':     return TrophyIcon;
+    // default guards against any backend type the app doesn't know yet —
+    // returning undefined here would crash the whole list.
+    case 'system':
+    default:                return BellIcon;
   }
 }
 

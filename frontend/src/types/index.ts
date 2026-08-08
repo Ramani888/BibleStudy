@@ -9,3 +9,6 @@ export * from './credits.types';
 export * from './notes.types';
 export * from './media.types';
 export * from './quiz.types';
+export * from './achievement.types';
+export * from './plan.types';
+export * from './subscription.types';

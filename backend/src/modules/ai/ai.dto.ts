@@ -9,6 +9,8 @@ export const AskQuestionDto = z.object({
   question: z.string().min(1, 'Question is required').max(2000),
   history: z.array(ChatMessageSchema).max(20).optional(),
   sessionId: z.string().uuid().optional(),
+  // Phase F.1: attach one PDF from My Media (routes the turn to Claude). Images (F.2) later.
+  mediaIds: z.array(z.string().uuid()).max(1).optional(),
 });
 
 export const RenameSessionDto = z.object({

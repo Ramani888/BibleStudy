@@ -1,4 +1,4 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
@@ -89,8 +89,8 @@ export async function apiGet<T>(url: string, params?: object): Promise<T> {
   return res.data.data;
 }
 
-export async function apiPost<T>(url: string, body?: object): Promise<T> {
-  const res = await apiClient.post<{ data: T }>(url, body);
+export async function apiPost<T>(url: string, body?: object, config?: AxiosRequestConfig): Promise<T> {
+  const res = await apiClient.post<{ data: T }>(url, body, config);
   return res.data.data;
 }
 

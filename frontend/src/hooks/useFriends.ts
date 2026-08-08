@@ -8,6 +8,13 @@ export function useFriends() {
   });
 }
 
+export function useLeaderboard() {
+  return useQuery({
+    queryKey: ['friends', 'leaderboard'],
+    queryFn: friendsApi.leaderboard,
+  });
+}
+
 export function useFriendRequests(type: 'incoming' | 'outgoing' = 'incoming') {
   return useQuery({
     queryKey: ['friends', 'requests', type],

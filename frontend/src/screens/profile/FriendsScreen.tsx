@@ -10,7 +10,7 @@ import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { UserMinusIcon, UserPlusIcon, BellIcon } from '../../components/icons';
+import { UserMinusIcon, UserPlusIcon, BellIcon, TrophyIcon } from '../../components/icons';
 import { useFriends, useRemoveFriend } from '../../hooks/useFriends';
 import type { Friendship } from '../../types/friends.types';
 import { getErrorMessage } from '../../api/client';
@@ -58,6 +58,9 @@ export function FriendsScreen({ navigation }: Props) {
           onBack={() => navigation.goBack()}
           right={
             <View style={styles.headerActions}>
+              <Pressable onPress={() => navigation.navigate('Leaderboard')} hitSlop={8}>
+                <TrophyIcon size={22} color={colors.primary} />
+              </Pressable>
               <Pressable onPress={() => navigation.navigate('SearchUsers')} hitSlop={8}>
                 <UserPlusIcon size={22} color={colors.primary} />
               </Pressable>

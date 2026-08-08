@@ -1,6 +1,7 @@
 import { prisma } from '../../config/db';
 import { RecordAttemptDtoType } from './quiz.dto';
 import { NotFoundError } from '../../utils/errors';
+import { triggerAchievementCheck } from '../../utils/achievementCheck';
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   const primarySetId = dto.setIds[0];
@@ -23,6 +24,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
     },
   });
 
+  triggerAchievementCheck(userId); // quiz count / perfect score / modes
   const best = await getBestForSet(userId, primarySetId);
   return { attempt, best };
 }

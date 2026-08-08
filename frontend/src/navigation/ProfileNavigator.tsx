@@ -1,13 +1,15 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { ProfileStackParamList } from './types';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
 import { CreditsScreen } from '../screens/profile/CreditsScreen';
+import { PaywallScreen } from '../screens/profile/PaywallScreen';
+import { AchievementsScreen } from '../screens/profile/AchievementsScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
 import { FriendsScreen } from '../screens/profile/FriendsScreen';
+import { LeaderboardScreen } from '../screens/profile/LeaderboardScreen';
 import { FriendRequestsScreen } from '../screens/profile/FriendRequestsScreen';
 import { SearchUsersScreen } from '../screens/profile/SearchUsersScreen';
 import { UserProfileScreen } from '../screens/profile/UserProfileScreen';
@@ -18,6 +20,8 @@ import { CreateGroupScreen } from '../screens/profile/CreateGroupScreen';
 import { EditGroupScreen } from '../screens/profile/EditGroupScreen';
 import { JoinGroupScreen } from '../screens/profile/JoinGroupScreen';
 import { PublicGroupsScreen } from '../screens/profile/PublicGroupsScreen';
+import { GroupPlanDetailScreen } from '../screens/profile/GroupPlanDetailScreen';
+import { CreatePlanScreen } from '../screens/library/CreatePlanScreen';
 import { NotificationsScreen } from '../screens/profile/NotificationsScreen';
 import { NotesScreen } from '../screens/profile/NotesScreen';
 import { NoteEditorScreen } from '../screens/profile/NoteEditorScreen';
@@ -27,32 +31,17 @@ import { MediaPDFViewerScreen } from '../screens/profile/MediaPDFViewerScreen';
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export function ProfileNavigator() {
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    const unsubscribe = navigation.addListener('blur', () => {
-      const tabState = navigation.getState();
-      const profileTabRoute = tabState?.routes?.find(r => r.name === 'ProfileTab');
-      const profileStackState = profileTabRoute?.state;
-
-      if (profileStackState && (profileStackState.index ?? 0) > 0) {
-        navigation.dispatch({
-          ...CommonActions.reset({ index: 0, routes: [{ name: 'Profile' }] }),
-          target: profileStackState.key,
-        });
-      }
-    });
-    return unsubscribe;
-  }, [navigation]);
-
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Profile"         component={ProfileScreen}         />
       <Stack.Screen name="EditProfile"     component={EditProfileScreen}     />
       <Stack.Screen name="ChangePassword"  component={ChangePasswordScreen}  />
       <Stack.Screen name="Credits"         component={CreditsScreen}         />
+      <Stack.Screen name="Paywall"         component={PaywallScreen}         />
+      <Stack.Screen name="Achievements"    component={AchievementsScreen}    />
       <Stack.Screen name="Settings"        component={SettingsScreen}        />
       <Stack.Screen name="Friends"         component={FriendsScreen}         />
+      <Stack.Screen name="Leaderboard"     component={LeaderboardScreen}     />
       <Stack.Screen name="FriendRequests"  component={FriendRequestsScreen}  />
       <Stack.Screen name="SearchUsers"     component={SearchUsersScreen}     />
       <Stack.Screen name="UserProfile"     component={UserProfileScreen}     />
@@ -63,6 +52,8 @@ export function ProfileNavigator() {
       <Stack.Screen name="EditGroup"       component={EditGroupScreen}       options={{ presentation: 'modal' }} />
       <Stack.Screen name="JoinGroup"       component={JoinGroupScreen}       options={{ presentation: 'modal' }} />
       <Stack.Screen name="PublicGroups"    component={PublicGroupsScreen}    />
+      <Stack.Screen name="GroupPlanDetail" component={GroupPlanDetailScreen} />
+      <Stack.Screen name="CreateGroupPlan" component={CreatePlanScreen}      options={{ presentation: 'modal' }} />
       <Stack.Screen name="Notifications"   component={NotificationsScreen}   />
       <Stack.Screen name="Notes"           component={NotesScreen}           />
       <Stack.Screen name="NoteEditor"      component={NoteEditorScreen}      options={{ presentation: 'modal' }} />

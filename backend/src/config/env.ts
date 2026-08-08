@@ -11,6 +11,11 @@ const envSchema = z.object({
   JWT_REFRESH_EXPIRES: z.string().default('30d'),
   // Anthropic & Cloudinary (optional — AI chat and image upload disabled when absent)
   ANTHROPIC_API_KEY: z.string().optional().default(''),
+  // AI provider seam: 'anthropic' (default) or 'openrouter' for text chat.
+  // Media always routes to Claude regardless of this setting.
+  AI_PROVIDER: z.enum(['anthropic', 'openrouter']).default('anthropic'),
+  AI_MODEL: z.string().optional().default(''),
+  OPENROUTER_API_KEY: z.string().optional().default(''),
   CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),
   CLOUDINARY_API_KEY: z.string().optional().default(''),
   CLOUDINARY_API_SECRET: z.string().optional().default(''),
@@ -25,6 +30,10 @@ const envSchema = z.object({
   // Social auth (optional — Google/Apple sign-in disabled when absent)
   GOOGLE_CLIENT_ID: z.string().optional().default(''),
   APPLE_BUNDLE_ID:  z.string().optional().default(''),
+
+  // IAP subscriptions (optional — receipt verification disabled per-store when absent)
+  APPLE_IAP_SHARED_SECRET: z.string().optional().default(''), // App Store Connect → app-specific shared secret
+  GOOGLE_PLAY_SA_JSON:     z.string().optional().default(''), // Play service-account JSON (stringified); enables Google verify
 
   // Firebase (optional — push notifications disabled when absent)
   FIREBASE_PROJECT_ID: z.string().optional().default(''),

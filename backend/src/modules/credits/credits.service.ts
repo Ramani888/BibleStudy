@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { NotFoundError, ConflictError } from '../../utils/errors';
+import { triggerAchievementCheck } from '../../utils/achievementCheck';
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 
@@ -275,6 +276,8 @@ export async function claimDailyLogin(userId: string) {
       },
     }),
   ]);
+
+  triggerAchievementCheck(userId); // streak milestones
 
   return {
     balance: updatedUser.creditBalance,

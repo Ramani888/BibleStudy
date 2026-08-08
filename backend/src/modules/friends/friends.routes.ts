@@ -9,6 +9,7 @@ const router = Router();
 router.use(authMiddleware);
 
 router.get('/search', friendsController.searchUsers);
+router.get('/leaderboard', friendsController.getLeaderboard);
 router.get('/requests', friendsController.listRequests);
 router.get('/blocked', friendsController.listBlocked);
 router.get('/', friendsController.listFriends);

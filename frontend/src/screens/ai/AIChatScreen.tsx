@@ -12,41 +12,21 @@ import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { ChatBubble } from '../../components/domain';
-import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
+import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CameraIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 import { ChatInput } from './components/ChatInput';
 import { CardProposalSheet } from './components/CardProposalSheet';
-import { useAuthStore } from '../../store';
-import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
+import { useAuthStore, useAIChatStore, type ChatUIMessage } from '../../store';
+import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useMarkCardsSaved, useMediaFiles, usePickMedia, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
 import { detectTags } from '../../utils/tagDetector';
 import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme, type Theme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
-import type { ChatMessage, SuggestedCard } from '../../types';
+import type { ChatMessage, MediaFile, MediaFileType, SuggestedCard } from '../../types';
 
 const ICON_SIZE = 20;
 const EMPTY_ICON_SIZE = 48;
-
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-    const r = (Math.random() * 16) | 0;
-    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
-  });
-}
-
-interface Message {
-  id: string;
-  chatId?: string;       // actual AIChat.id from DB (AI messages only)
-  role: 'user' | 'ai';
-  text: string;
-  timestamp: number;
-  creditsUsed?: number;
-  followUps?: string[];
-  suggestedCards?: SuggestedCard[];
-  isHistorical?: boolean;    // true for messages loaded from Chat History (banner suppressed)
-  userQuestion?: string;     // the user question that prompted this AI response (for Save as Card)
-}
 
 const TYPING_INDICATOR = '__typing__' as const;
 
@@ -63,55 +43,47 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const user = useAuthStore(s => s.user);
 
-  // When navigated from Chat History, pre-populate with the existing session.
-  const existingSession = route.params?.session;
   const autoSend = route.params?.autoSend;
 
-  const [messages, setMessages] = useState<Message[]>(() => {
-    if (!existingSession) return [];
-    // Each AIChat record is one Q&A pair — expand into two Message objects.
-    return existingSession.messages.flatMap(chat => [
-      {
-        id: `${chat.id}_user`,
-        role: 'user' as const,
-        text: chat.question,
-        timestamp: new Date(chat.createdAt).getTime(),
-        creditsUsed: 1,
-      },
-      {
-        id: `${chat.id}_ai`,
-        chatId: chat.id,
-        role: 'ai' as const,
-        text: chat.answer,
-        timestamp: new Date(chat.createdAt).getTime(),
-        suggestedCards: chat.suggestedCards ?? undefined,
-        isHistorical: true,
-        userQuestion: chat.question,
-      },
-    ]);
-  });
+  // Active conversation lives in the store, so it survives navigation. The chat
+  // shown is always what's here until cleared or a history session is loaded.
+  const messages = useAIChatStore(s => s.messages);
+  const setMessages = useAIChatStore(s => s.setMessages);
+  const sessionId = useAIChatStore(s => s.sessionId);
+  const tags = useAIChatStore(s => s.tags);
+  const setTags = useAIChatStore(s => s.setTags);
+  const savedMessageIds = useAIChatStore(s => s.savedMessageIds);
+  const markSaved = useAIChatStore(s => s.markSaved);
+  const unmarkSaved = useAIChatStore(s => s.unmarkSaved);
+  const clearChat = useAIChatStore(s => s.clear);
 
   const listRef = useRef<FlatList>(null);
-  const sessionIdRef = useRef<string>(existingSession?.sessionId ?? generateUUID());
   const lastAutoSendRef = useRef<string | undefined>(undefined);
-  const sessionTagsRef = useRef<string[]>(existingSession?.tags ?? []);
   const { show, dialogProps } = useConfirmDialog();
 
   const [saveModal, setSaveModal] = useState<{
     visible: boolean;
     cards: SuggestedCard[];
     messageId: string;
+    chatId?: string;
   }>({ visible: false, cards: [], messageId: '' });
-  const [savedMessageIds, setSavedMessageIds] = useState<Set<string>>(new Set());
 
   // ActionSheet state for long-press on messages
-  const [sheet, setSheet] = useState<{ visible: boolean; message: Message | null }>({
+  const [sheet, setSheet] = useState<{ visible: boolean; message: ChatUIMessage | null }>({
     visible: false,
     message: null,
   });
 
+  // Phase F: PDF (F.1) or image (F.2) attached — from My Media or straight from the device.
+  const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType } | null>(null);
+  const [attachMenuVisible, setAttachMenuVisible] = useState(false); // source chooser
+  const [pickerVisible, setPickerVisible] = useState(false);         // My Media list
+  const { data: media = [] } = useMediaFiles();
+  const { pickImage, takePhoto, pickPdf, isUploading } = usePickMedia();
+
   const { mutate: sendMessage, isPending } = useAIChat();
   const { mutateAsync: bulkCreateCards } = useBulkCreateCards();
+  const { mutate: markCardsSaved } = useMarkCardsSaved();
   const { mutate: updateTags } = useUpdateSessionTags();
   const { data: creditData, isLoading: isBalanceLoading } = useCreditBalance();
   // Only fetch bookmarks once the user has received at least one AI response
@@ -160,20 +132,26 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       }
       const history = rawHistory.slice(-20);
 
+      // Snapshot + clear the attachment now so it's sent once and the composer resets.
+      const att = attachment;
+      setAttachment(null);
+
       const userMsgId = Date.now().toString();
       setMessages(prev => [
         ...prev,
-        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: 1 },
+        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: att ? (att.type === 'PDF' ? 5 : 3) : 1, attachmentName: att?.name },
         { id: `${userMsgId}_typing`, role: 'ai', text: TYPING_INDICATOR, timestamp: Date.now() },
       ]);
 
       sendMessage(
-        { question, history, sessionId: sessionIdRef.current },
+        { question, history, sessionId, mediaIds: att ? [att.id] : undefined },
         {
           onSuccess: data => {
             setMessages(prev =>
               prev
                 .filter(m => m.id !== `${userMsgId}_typing`)
+                // Reflect the actual charge (flashcards cost more than a text question).
+                .map(m => (m.id === userMsgId ? { ...m, creditsUsed: data.creditsUsed } : m))
                 .concat({
                   id: `${userMsgId}_ai`,
                   chatId: data.id,
@@ -185,11 +163,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
                   userQuestion: question,
                 }),
             );
-            const newTags = detectTags(data.answer, sessionTagsRef.current);
+            const newTags = detectTags(data.answer, tags);
             if (newTags.length > 0) {
-              const merged = [...sessionTagsRef.current, ...newTags];
-              sessionTagsRef.current = merged;
-              updateTags({ sessionId: sessionIdRef.current, tags: merged });
+              const merged = [...tags, ...newTags];
+              setTags(merged);
+              updateTags({ sessionId, tags: merged });
             }
           },
           onError: err => {
@@ -203,7 +181,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, attachment],
   );
 
   useEffect(() => {
@@ -213,7 +191,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   }, [autoSend, isBalanceLoading, handleSend]);
 
   const handleRegenerate = useCallback(
-    (item: Message) => {
+    (item: ChatUIMessage) => {
       const idx = messages.findIndex(m => m.id === item.id);
       if (idx < 1) return;
 
@@ -242,7 +220,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       );
 
       sendMessage(
-        { question: userMsg.text, history, sessionId: sessionIdRef.current },
+        { question: userMsg.text, history, sessionId },
         {
           onSuccess: data => {
             setMessages(prev =>
@@ -252,11 +230,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
                   : m,
               ),
             );
-            setSavedMessageIds(prev => {
-              const next = new Set(prev);
-              next.delete(item.id);
-              return next;
-            });
+            unmarkSaved(item.id);
           },
           onError: err => {
             setMessages(prev => prev.map(m => m.id === item.id ? item : m));
@@ -269,10 +243,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         },
       );
     },
-    [messages, sendMessage],
+    [messages, sendMessage, sessionId, unmarkSaved, setMessages],
   );
 
-  const handleLongPress = useCallback((item: Message) => {
+  const handleLongPress = useCallback((item: ChatUIMessage) => {
     if (item.text === TYPING_INDICATOR) return;
     setSheet({ visible: true, message: item });
   }, []);
@@ -320,11 +294,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       message: 'Clear the current chat and start fresh?',
       confirmLabel: 'Clear',
       variant: 'danger',
-      onConfirm: () => {
-        setMessages([]);
-        sessionIdRef.current = generateUUID();
-        sessionTagsRef.current = [];
-      },
+      onConfirm: () => clearChat(),
     });
   };
 
@@ -332,13 +302,46 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     try {
       await bulkCreateCards({ setId, cards: saveModal.cards });
       Toast.show({ type: 'success', text1: `${saveModal.cards.length} card${saveModal.cards.length !== 1 ? 's' : ''} saved!` });
-      setSavedMessageIds(prev => new Set([...prev, saveModal.messageId]));
+      markSaved(saveModal.messageId);
+      // Persist saved-state so the "Saved" chip survives reopening from history.
+      if (saveModal.chatId) markCardsSaved(saveModal.chatId);
       setSaveModal({ visible: false, cards: [], messageId: '' });
     } catch (e) {
       Toast.show({ type: 'error', text1: 'Failed to save cards', text2: getErrorMessage(e) });
       throw e;
     }
-  }, [bulkCreateCards, saveModal]);
+  }, [bulkCreateCards, saveModal, markCardsSaved, markSaved]);
+
+  // Attach flow (Phase F). Media is credit-metered (min image cost 3); if the user can't
+  // afford it, the source menu becomes an Upgrade nudge instead of a picker.
+  const MIN_MEDIA_COST = 3;
+  const goPaywall = () => navigation.navigate('ProfileTab', { screen: 'Paywall' });
+
+  const attachFromDevice = async (pick: () => Promise<MediaFile | null>) => {
+    const file = await pick();
+    if (file) setAttachment({ id: file.id, name: file.name, type: file.type });
+  };
+
+  const attachMenuActions = creditBalance < MIN_MEDIA_COST
+    ? [
+        { label: 'Media costs 3–5 credits', icon: StarOutlineIcon, onPress: () => {}, disabled: true },
+        { label: 'Upgrade to Premium', icon: StarIcon, onPress: goPaywall },
+      ]
+    : [
+        { label: 'Choose from My Media', icon: AlbumsIcon, onPress: () => setPickerVisible(true) },
+        { label: 'Photo Library', icon: AlbumsIcon, onPress: () => attachFromDevice(pickImage) },
+        { label: 'Take Photo', icon: CameraIcon, onPress: () => attachFromDevice(takePhoto) },
+        { label: 'Choose PDF', icon: FileTextIcon, onPress: () => attachFromDevice(pickPdf) },
+      ];
+
+  // My Media list — PDFs + images already uploaded.
+  const pickerActions = media.length > 0
+    ? media.map(f => ({
+        label: f.name,
+        icon: f.type === 'PDF' ? FileTextIcon : AlbumsIcon,
+        onPress: () => setAttachment({ id: f.id, name: f.name, type: f.type }),
+      }))
+    : [{ label: 'No files in My Media', icon: FileTextIcon, onPress: () => {}, disabled: true }];
 
   const isCurrentMessageBookmarked = sheet.message?.chatId
     ? bookmarkedChatIds.has(sheet.message.chatId)
@@ -377,14 +380,24 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             visible: true,
             cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }],
             messageId: sheet.message.id,
+            chatId: sheet.message.chatId,
           });
         },
       },
     ] : []),
   ] : [];
 
-  const renderItem = useCallback(({ item }: { item: Message }) => (
+  const renderItem = useCallback(({ item }: { item: ChatUIMessage }) => (
     <View>
+      {/* Attached-PDF chip on the user's message (Phase F.1) */}
+      {item.role === 'user' && item.attachmentName && (
+        <View style={styles.attachmentChip}>
+          <FileTextIcon size={14} color={colors.primary} />
+          <Typography preset="caption" color={colors.primary} numberOfLines={1} style={styles.attachmentChipText}>
+            {item.attachmentName}
+          </Typography>
+        </View>
+      )}
       <Pressable onLongPress={() => handleLongPress(item)}>
         <ChatBubble
           role={item.role}
@@ -416,8 +429,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         </Animated.View>
       )}
 
-      {/* Flashcard proposal banner — shown when AI generated cards */}
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && !item.isHistorical && item.suggestedCards && item.suggestedCards.length > 0 && (
+      {/* Flashcard proposal banner — shown when AI generated cards (incl. history) */}
+      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
         <Animated.View entering={FadeIn.duration(200)} style={styles.cardBanner}>
           <AlbumsIcon size={16} color={colors.primary} />
           <Typography preset="bodySm" color={colors.primary} style={styles.cardBannerText}>
@@ -431,7 +444,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           ) : (
             <Pressable
               style={styles.saveToSetBtn}
-              onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id })}
+              onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id, chatId: item.chatId })}
               hitSlop={8}
             >
               <Typography preset="caption" color={colors.background}>Save to Set</Typography>
@@ -520,6 +533,26 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onSend={handleSend}
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
+        attachmentName={attachment?.name ?? null}
+        onAttachPress={() => setAttachMenuVisible(true)}
+        onClearAttachment={() => setAttachment(null)}
+        onUpgrade={goPaywall}
+      />
+
+      {/* ── Attach source chooser (My Media / device) ── */}
+      <ActionSheet
+        visible={attachMenuVisible}
+        title={isUploading ? 'Uploading…' : 'Attach a file'}
+        actions={attachMenuActions}
+        onClose={() => setAttachMenuVisible(false)}
+      />
+
+      {/* ── My Media list ── */}
+      <ActionSheet
+        visible={pickerVisible}
+        title="Choose from My Media"
+        actions={pickerActions}
+        onClose={() => setPickerVisible(false)}
       />
 
       {/* ── Long-press ActionSheet ── */}
@@ -599,6 +632,23 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     borderColor: colors.primaryLight,
     padding: spacing[3],
   },
+
+  attachmentChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[1.5],
+    alignSelf: 'flex-end',
+    maxWidth: '80%',
+    marginRight: spacing[4],
+    marginBottom: spacing[1],
+    backgroundColor: colors.primarySurface,
+    borderWidth: 1,
+    borderColor: colors.primaryLight,
+    borderRadius: layout.pillRadius,
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1.5],
+  },
+  attachmentChipText: { flexShrink: 1 },
 
   followUps: {
     paddingLeft: spacing[10],

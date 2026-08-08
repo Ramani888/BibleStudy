@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
-import type { ChatSession, QuizSelectableMode } from '../types';
+import type { QuizSelectableMode } from '../types';
 
 // ─── Root Stack (above tabs — full-screen overlays) ───────────────────────────
 export type RootStackParamList = {
@@ -30,6 +30,9 @@ export type LibraryStackParamList = {
   EditCard: { cardId: string; setId: string };
   PublicSets: undefined;
   FriendsSets: undefined;
+  StudyPlans: undefined;
+  PlanDetail: { planId: string };
+  CreatePlan: undefined;
   Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode };
 };
 
@@ -43,10 +46,9 @@ export type QuizStackParamList = {
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
 export type AIStackParamList = {
-  // Pass an existing session to pre-populate and continue that conversation.
+  // The active conversation lives in the AI chat store (survives navigation).
   // Pass autoSend to open the screen and immediately send a pre-formed question.
-  // Omit or pass undefined to start a fresh conversation.
-  AIChat: { session?: ChatSession; autoSend?: string } | undefined;
+  AIChat: { autoSend?: string } | undefined;
   ChatHistory: undefined;
 };
 
@@ -56,9 +58,12 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   ChangePassword: undefined;
   Credits: undefined;
+  Paywall: undefined;
+  Achievements: undefined;
   Settings: undefined;
   // Friends
   Friends: undefined;
+  Leaderboard: undefined;
   FriendRequests: undefined;
   SearchUsers: undefined;
   UserProfile: { userId: string };
@@ -69,6 +74,9 @@ export type ProfileStackParamList = {
   CreateGroup: undefined;
   EditGroup: { groupId: string };
   JoinGroup: undefined;
+  // Group study plans (D2)
+  GroupPlanDetail: { planId: string; groupTitle?: string };
+  CreateGroupPlan: { groupId: string };
   // Public groups
   PublicGroups: undefined;
   // Notifications

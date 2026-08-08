@@ -7,13 +7,15 @@ import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
+import { ProgressBar } from '../../components/ui/ProgressBar';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, ShareIcon, SwapIcon, UserMinusIcon, UsersIcon } from '../../components/icons';
+import { CalendarIcon, PlusIcon, ShareIcon, SwapIcon, UserMinusIcon, UsersIcon } from '../../components/icons';
 import { useGroup, useLeaveGroup, useDeleteGroup, useUpdateMemberRole, useRemoveMember } from '../../hooks/useGroups';
+import { useGroupPlans } from '../../hooks/usePlans';
 import { useConfirmDialog } from '../../hooks';
 import { useAuthStore } from '../../store/auth.store';
 import { getErrorMessage } from '../../api/client';
@@ -27,6 +29,7 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   const { groupId } = route.params;
   const user = useAuthStore(s => s.user);
   const { data: group, isLoading, isFetching, error, refetch } = useGroup(groupId);
+  const { data: plans = [] } = useGroupPlans(groupId);
   const leaveGroup = useLeaveGroup();
   const deleteGroup = useDeleteGroup();
   const updateRole = useUpdateMemberRole();
@@ -169,6 +172,39 @@ export function GroupDetailScreen({ route, navigation }: Props) {
           <Button label="Edit Group" variant="outline" onPress={() => navigation.navigate('EditGroup', { groupId })} />
         )}
 
+        <View style={styles.sectionHeader}>
+          <Typography preset="label">Study Plans</Typography>
+          {isAdmin && (
+            <Pressable onPress={() => navigation.navigate('CreateGroupPlan', { groupId })} hitSlop={8} style={styles.addPlan}>
+              <PlusIcon size={16} color={colors.primary} />
+              <Typography preset="caption" color={colors.primary}>New</Typography>
+            </Pressable>
+          )}
+        </View>
+        {plans.length === 0 ? (
+          <Typography preset="caption" color={colors.textSecondary}>
+            No study plans yet{isAdmin ? ' — tap New to create one.' : '.'}
+          </Typography>
+        ) : (
+          plans.map(plan => (
+            <Pressable
+              key={plan.id}
+              style={styles.planRow}
+              onPress={() => navigation.navigate('GroupPlanDetail', { planId: plan.id, groupTitle: group.name })}
+            >
+              <View style={styles.flex}>
+                <Typography preset="label" numberOfLines={1}>{plan.title}</Typography>
+                <ProgressBar
+                  progress={plan.totalSteps > 0 ? plan.completedSteps / plan.totalSteps : 0}
+                  color={colors.primary}
+                  style={styles.planBar}
+                />
+              </View>
+              <Typography preset="caption" color={colors.textSecondary}>{plan.completedSteps}/{plan.totalSteps}</Typography>
+            </Pressable>
+          ))
+        )}
+
         <Typography preset="label" style={styles.sectionTitle}>Members</Typography>
         {group.members?.map(member => (
           <React.Fragment key={member.userId}>
@@ -206,6 +242,17 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     inviteInfo: { gap: spacing[1] },
     sectionTitle: { marginTop: spacing[2] },
+    sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing[2] },
+    addPlan: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    planRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      paddingVertical: spacing[3],
+      borderBottomWidth: StyleSheet.hairlineWidth,
+      borderBottomColor: colors.border,
+    },
+    planBar: { marginTop: spacing[1] },
     memberRow: {
       flexDirection: 'row',
       alignItems: 'center',
