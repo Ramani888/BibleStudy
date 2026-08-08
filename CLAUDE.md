@@ -1,253 +1,123 @@
-<!-- code-review-graph MCP tools -->
-## MCP Tools: code-review-graph
+# BibleStudyPro — Project Rules
 
-**IMPORTANT: This project has a knowledge graph. ALWAYS use the
-code-review-graph MCP tools BEFORE using Grep/Glob/Read to explore
-the codebase.** The graph is faster, cheaper (fewer tokens), and gives
-you structural context (callers, dependents, test coverage) that file
-scanning cannot.
+AI-assisted Bible-study flashcard app. Full-stack: **Node/Express/Prisma/PostgreSQL**
+backend + **React Native 0.84 / React 19** app (NO Expo). Full feature docs live in the
+Obsidian vault at `obsidian/` — open `obsidian/Home.md` (MOC) → `obsidian/Features/`.
 
-### When to use graph tools FIRST
+## Exploration tooling (use BEFORE Grep/Glob/Read)
+This repo has two knowledge graphs — prefer them for exploration; they're cheaper and give structure.
+- **code-review-graph MCP**: `semantic_search_nodes`/`query_graph` (callers/callees/imports/tests),
+  `get_impact_radius` (blast radius), `detect_changes`+`get_review_context` (review), `get_affected_flows`.
+- **graphify** (`graphify-out/`): read `graphify-out/GRAPH_REPORT.md` for architecture questions;
+  use `graphify query/path/explain` for cross-module "how does X relate to Y"; run `graphify update .`
+  after code changes (AST-only, no API cost). Fall back to Grep/Read only when the graph lacks it.
 
-- **Exploring code**: `semantic_search_nodes` or `query_graph` instead of Grep
-- **Understanding impact**: `get_impact_radius` instead of manually tracing imports
-- **Code review**: `detect_changes` + `get_review_context` instead of reading entire files
-- **Finding relationships**: `query_graph` with callers_of/callees_of/imports_of/tests_for
-- **Architecture questions**: `get_architecture_overview` + `list_communities`
-
-Fall back to Grep/Glob/Read **only** when the graph doesn't cover what you need.
-
-### Key Tools
-
-| Tool | Use when |
-|------|----------|
-| `detect_changes` | Reviewing code changes — gives risk-scored analysis |
-| `get_review_context` | Need source snippets for review — token-efficient |
-| `get_impact_radius` | Understanding blast radius of a change |
-| `get_affected_flows` | Finding which execution paths are impacted |
-| `query_graph` | Tracing callers, callees, imports, tests, dependencies |
-| `semantic_search_nodes` | Finding functions/classes by name or keyword |
-| `get_architecture_overview` | Understanding high-level codebase structure |
-| `refactor_tool` | Planning renames, finding dead code |
-
-### Workflow
-
-1. The graph auto-updates on file changes (via hooks).
-2. Use `detect_changes` for code review.
-3. Use `get_affected_flows` to understand impact.
-4. Use `query_graph` pattern="tests_for" to check coverage.
-
----
-
-## Project: BibleStudyPro
-
-A Bible study flashcard app with AI assistant features.
-
-### Stack
-
+## Stack
 | Layer | Tech |
 |-------|------|
 | Backend | Node.js, Express, TypeScript, Prisma, PostgreSQL |
 | Frontend | React Native CLI 0.84 (NO Expo), TypeScript, React 19 |
-| State | Zustand (auth), React Query v5 (server state) |
+| State | Zustand (auth + AI chat session), React Query v5 (server state) |
 | Navigation | React Navigation v7 (native-stack + bottom-tabs) |
 | Forms | react-hook-form + zod |
-| HTTP | axios with token-refresh interceptor (`frontend/src/api/client.ts`) |
-| UI | Custom component library (`frontend/src/components/`) |
+| HTTP | axios w/ token-refresh interceptor (`frontend/src/api/client.ts`) |
+| AI | OpenRouter (free text) ↔ Claude (media + fallback), env-switched |
+| IAP | react-native-iap v16 (+ react-native-nitro-modules) |
 
-### Backend Base URL
+## Backend
+Base URL `/api/v1`. **19 modules**, each `backend/src/modules/<m>/` with the same 4 files:
+`<m>.routes.ts` · `<m>.controller.ts` · `<m>.service.ts` (owns ALL Prisma) · `<m>.dto.ts` (zod):
+`auth`, `users`, `folders`, `sets`, `cards`, `ai`, `credits`, `friends`, `groups`, `gatherings`,
+`map`, `activities`, `notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`.
 
-`/api/v1` — 16 modules: `auth`, `users`, `folders`, `sets`, `cards`, `ai`,
-`credits`, `friends`, `groups`, `gatherings`, `map`, `activities`,
-`notifications`, `notes`, `media`, `quiz`.
+- Prisma access lives ONLY in `*.service.ts` — controllers/routes never call Prisma directly.
+- Every new module must be mounted in `backend/src/app.ts` and get a migration via `prisma migrate dev`.
+- Achievements are **code-defined** in `achievements.defs.ts` (no catalogue table); only unlocks persist
+  (`UserAchievement`). Add a def there + a metric in `computeMetrics`, never a DB row.
 
-Each module under `backend/src/modules/<feature>/` has the same 4 files:
-`<f>.routes.ts` · `<f>.controller.ts` · `<f>.service.ts` (owns all Prisma) ·
-`<f>.dto.ts` (zod). Beyond the study core (folders/sets/cards/ai/credits) there
-is a full **social layer**: friends, groups, in-person gatherings on a map,
-an activity feed, and notifications.
-
----
-
-## Frontend Architecture
-
-### Directory Map
-
+## Frontend
 ```
 frontend/src/
-  api/          # axios client + per-module API functions
-  components/
-    ui/         # Button, Card, Input, Typography, Avatar, Badge, Divider, ProgressBar, Spacer
-    feedback/   # Modal, ActionSheet, EmptyState, ErrorState, LoadingOverlay, SkeletonLoader
-    forms/      # FormField, OTPInput
-    domain/     # ChatBubble, CreditBadge, DailyVerseCard, DifficultyBadge, FlashCard, FolderCard, SetCard
-  hooks/        # useAI, useCards, useCredits, useDailyVerse, useFolders, useSets, useNotes,
-                #   useMedia, useFriends, useGroups, useGatherings, useMap, useActivities,
-                #   useNotifications, useProfile, useUser, useStudySession, ... (23 hooks)
-  navigation/   # RootNavigator → AuthNavigator | AppNavigator (tabs)
-  screens/
-    auth/       # Login, Register, VerifyEmail, ForgotPassword, ResetPassword
-    onboarding/ # OnboardingScreen
-    home/       # HomeScreen
-    library/    # LibraryScreen, FolderDetail, SetDetail, CreateSet, EditSet, CreateCard, EditCard, PublicSets, FriendsSets
-    ai/         # AIChatScreen, ChatHistoryScreen
-    study/      # StudyScreen
-    map/        # MapScreen, GatheringDetail, CreateGathering, EditGathering
-    profile/    # ProfileScreen, EditProfile, ChangePassword, Credits, Settings + social:
-                #   Notes/NoteEditor, Media/MediaPDFViewer, Notifications,
-                #   Friends/FriendRequests/SearchUsers/UserProfile/BlockedUsers,
-                #   Groups/GroupDetail/CreateGroup/EditGroup/JoinGroup/PublicGroups
-  store/        # auth.store.ts (Zustand)
-  theme/        # colors, spacing, typography, shadows
-  types/        # per-domain TypeScript types
-  utils/        # formatters, storage, validators
+  api/         # axios client + per-module <module>.api.ts (typed fns, return raw data)
+  components/  # ui/ feedback/ forms/ domain/  (custom lib — no 3rd-party UI kit)
+  hooks/       # use<Feature>.ts — React Query wrappers (one per module + usePickMedia, useSubscription…)
+  navigation/  # RootNavigator → AuthNavigator | AppNavigator (5 tabs)
+  screens/     # auth/ onboarding/ home/ library/ ai/ profile/  (~45 screens)
+  store/       # auth.store.ts, aiChat.store.ts (Zustand)
+  theme/ types/ utils/
 ```
+Tabs: **Home**, **Library** (sets/cards/study/quiz + study plans), **Quiz**, **AI**, **Profile**
+(hosts social + credits/subscriptions + gamification). Studying = FlashCard flip inside `SetDetail`
+(there is **no** separate StudyScreen). Group plan detail + Paywall + Leaderboard + Achievements live
+under the Profile stack.
 
-### Navigation Structure
+**Safe-area:** stack navigators use `headerShown:false` + custom in-screen header. Tab-hosted screens
+wrap content in `<SafeAreaView edges={['top']}>` (top only — the tab bar owns the bottom inset). Never
+use `edges={['bottom']}`/all-edges on a tab-hosted screen.
 
-```
-RootNavigator
-  AuthNavigator (stack)
-    Login → Register → VerifyEmail → ForgotPassword → ResetPassword
-  AppNavigator (bottom tabs)   # 5 tabs
-    HomeTab        → HomeScreen
-    LibraryTab     → LibraryNavigator (stack)
-                       Library → FolderDetail → SetDetail
-                                              → CreateSet / EditSet
-                                              → CreateCard / EditCard
-                              → PublicSets / FriendsSets
-                              → Study / Quiz     # study & quiz live INSIDE LibraryTab
-    QuizTab        → QuizNavigator (stack)
-                       QuizHub → Quiz            # quiz reachable via tab hub OR per-set
-    AITab          → AINavigator (stack)
-                       AIChat → ChatHistory
-    ProfileTab     → ProfileNavigator (stack)   # hosts the social layer
-                       Profile → EditProfile → ChangePassword → Credits → Settings
-                               → Notes → NoteEditor
-                               → Media → MediaPDFViewer
-                               → Notifications
-                               → Friends → FriendRequests / SearchUsers / UserProfile / BlockedUsers
-                               → Groups → GroupDetail / CreateGroup / EditGroup / JoinGroup / PublicGroups
-```
+**Cross-tab nav:** navigate to another tab's screen with `navigation.navigate('ProfileTab', { screen: 'Paywall' })`
+— convenience prop types are `CompositeScreenProps` so this type-checks. `ProfileTab` has
+`popToTopOnBlur:true`, so it always reopens at the Profile root.
 
-> **Note:** `MapNavigator` + the `map/` screens (Map, Gatherings) exist in the
-> code but are **not mounted** in any navigator yet — the Map feature is
-> currently unreachable.
+## Coding conventions (all falsifiable)
+- Functional components only; **named exports** from screens (no default exports).
+- `StyleSheet.create` at file bottom, named `styles` (or `makeStyles(theme)` when theme-dependent).
+- Import order: React → RN core → 3rd-party → internal.
+- Screen props typed via `navigation/types.ts` convenience types (e.g. `LibraryScreenProps<'Library'>`).
+- Add a nav route to `navigation/types.ts` FIRST, then register in the navigator, then the screen.
+- Hooks: `hooks/use<Feature>.ts`, React Query. Query keys are string arrays (`['sets', setId]`).
+  Mutations `invalidateQueries` the affected keys in `onSuccess`. NEVER call the api layer from a screen —
+  always via a hook.
+- API: `<module>.api.ts` imports from `./client`, returns raw response data.
+- TS strict is on. No `any` without an inline comment justifying it. Types in `src/types/<domain>.types.ts`.
+- Theme: never hardcode colors/spacing/text — use `colors.*`, `spacing[n]`, `<Typography preset="…">`.
+  No raw `<Text>` in screens. No magic numbers for style values.
 
-**Safe-area convention:** all stack navigators use `headerShown: false` with a
-custom in-screen header. Tab-hosted screens therefore wrap content in
-`<SafeAreaView edges={['top']}>` — **top only**; the bottom tab bar owns the
-bottom inset (it adds `insets.bottom` to its height in `AppNavigator`). Do **not**
-use `edges={['bottom']}` / all-edges on a tab-hosted screen — it double-counts the
-bottom inset and leaves a gap above the tab bar. Screens outside the tabs (auth,
-onboarding) manage their own insets.
+## Process rules
+- **Commit per feature as it lands** (don't let work pile up — the A–G arc became one giant commit `621bfdd`
+  because this rule didn't exist yet).
+- **Type-check both ends before every commit**: `cd backend && npx tsc --noEmit` AND `cd frontend && npx tsc --noEmit`.
+- **Verify money/DB/permission logic with a runnable check** before claiming done — a throwaway ts-node
+  script against the dev DB (run inside `backend/` with `--compiler-options '{"module":"commonjs","moduleResolution":"node"}'`),
+  asserting the outcome (e.g. "no credit charged on reject"). Delete the script after.
+- **After a feature/phase lands**, update `APP_SCOPE.md`, the relevant `obsidian/Features/` note, and memory.
+- **Backend restart required** after `.env` or `schema.prisma` changes (ts-node-dev won't pick them up live).
+- **Physical-device API base URL** must be the Mac's LAN IP (react-native-config `.env`), not `localhost`.
 
-> Full architecture is documented in the Obsidian brain at `obsidian/` (open
-> `obsidian/Home.md`) — kept in sync with this file.
+## Do NOT touch without a full review
+- `frontend/src/api/client.ts` token-refresh/queue logic.
+- `backend/src/modules/ai/ai.service.ts` `generateAnswer` provider seam (media MUST force Claude + pin `CLAUDE_MODEL`).
+- `backend/src/modules/subscriptions/` receipt-verification + idempotent grant.
+- `backend/src/config/plans.ts` — single source of truth for tiers/prices/product IDs; product IDs must
+  match App Store Connect AND `frontend/src/types/subscription.types.ts`.
+- Never force-push; never `prisma migrate reset` on a real DB; never hardcode keys (use `.env`).
+- Before deleting any file, check `get_impact_radius` on it first.
 
----
+## Known gaps & gotchas (facts, keep current)
+- **Spaced repetition is dormant**: `Card.nextReviewAt` is only ever READ (`getDueSummary`), never written,
+  so Home's "due" count is effectively always 0. Wiring it up is unbuilt work, not a bug to "fix" silently.
+- **Map + Gatherings**: backend modules + unused `useMap`/`useGatherings` hooks exist, but there are NO
+  `screens/map/` and NO Map/Gathering nav routes — the feature is unreachable by design.
+- **Media chat needs a funded Anthropic account** (media routes to paid Claude); errors cleanly, charges nothing, when unfunded.
+- **IAP purchases** need App Store Connect products + `APPLE_IAP_SHARED_SECRET` before they work (see `IAP_SETUP.md`). Google verify is a stub.
+- Credit costs are centralized in `ai.service.ts` `CREDIT_COST` (text1/cards2/image3/pdf5); media dominates + is charged full-cost-upfront.
+- Refresh tokens are not rotated; access tokens stay valid up to 15m after logout.
 
-## Coding Conventions
-
-### Components
-
-- Functional components only, named exports (no default exports from screens).
-- Co-locate screen-specific sub-components in `screens/<domain>/components/`.
-- Use `StyleSheet.create` at the bottom of each file, named `styles`.
-- Import order: React → RN core → 3rd-party → internal (`../../components`, `../../hooks`, etc.).
-- Type screen props with the convenience types from `navigation/types.ts` (e.g. `LibraryScreenProps<'Library'>`).
-
-### Hooks
-
-- Each hook lives in `hooks/use<Feature>.ts` and uses React Query.
-- Query keys are string arrays: `['sets']`, `['sets', setId]`, `['cards', setId]`.
-- Mutations invalidate the relevant query key on `onSuccess`.
-- Never put API calls directly in screen components — always go through a hook.
-
-### API Layer
-
-- Each module has `<module>.api.ts` with typed functions.
-- All API functions import from `./client` (the axios instance with auth interceptors).
-- Return raw response data, let React Query handle caching/loading states.
-
-### TypeScript
-
-- Strict mode is on. No `any` unless absolutely required (add a comment explaining why).
-- Use types from `src/types/<domain>.types.ts`; extend there if new fields are needed.
-- Navigation params are defined in `navigation/types.ts` — update there first, then the screen.
-
-### Theme
-
-- Never hardcode colors — always use `colors.*` from `theme/colors.ts`.
-- Spacing uses the `spacing` scale object — e.g. `spacing[4]`, not `16`.
-- Typography uses `<Typography preset="...">` — never raw `<Text>` in screens.
-
----
-
-## Agent & Skill Usage Guide
-
-### When to use which skill
-
-| Task | Use |
-|------|-----|
-| Build a new screen or component | `/feature-dev` |
-| Review code for bugs before committing | `/code-review` |
-| Clean up messy code after implementation | `/simplify` |
-| UI styling pass for polish | `/frontend-design` (note: web-focused, adapt to RN) |
-| Create a new MCP tool | `/mcp-builder` (via `claude skill install`) |
-| Write Claude API integration | `/claude-api` |
-
-### Subagent roles
-
-When delegating to subagents, assign roles clearly:
-
-- **`feature-dev:code-architect`** — design the screen's data flow, props, and hook dependencies before writing code
-- **`feature-dev:code-explorer`** — trace how an existing screen/hook works before modifying it
-- **`feature-dev:code-reviewer`** — catch bugs and logic errors after implementing a screen
-- **`Explore`** — fast codebase search when you know the keyword but not the file
-
-### Safe development workflow
-
-1. Use `semantic_search_nodes` or `query_graph` to understand existing code before touching it.
-2. Plan with `feature-dev:code-architect` for any screen that has > 2 dependent hooks.
-3. After implementing, run `/simplify` to clean up any accidental complexity.
-4. After simplify, run `/code-review` to catch bugs.
-5. TypeScript errors are shown automatically after every file save (via PostToolUse hook).
-
----
-
-## Common Commands
-
+## Commands
 ```bash
 # Frontend
-cd frontend && npx react-native start          # Metro bundler
-cd frontend && npx react-native run-ios        # iOS simulator
-cd frontend && npx react-native run-android    # Android emulator
-cd frontend && npx tsc --noEmit               # Type check
-cd frontend && npm run lint                   # ESLint
-
+cd frontend && npx react-native start           # Metro
+cd frontend && npx react-native run-ios         # build to device/sim
+cd frontend && npx tsc --noEmit                 # type check
+cd frontend && npm run lint                     # ESLint
 # Backend
-cd backend && npm run dev                     # Dev server (ts-node-dev)
-cd backend && npx prisma studio               # DB GUI
-cd backend && npx prisma migrate dev          # Run migrations
+cd backend && npm run dev                        # ts-node-dev
+cd backend && npx prisma studio                  # DB GUI
+cd backend && npx prisma migrate dev             # run migrations
 ```
 
----
-
-## Safety Rules
-
-- **Never** force-push (`git push --force`) — blocked by settings.
-- **Never** run `prisma migrate reset` in production — blocked by settings.
-- **Never** hardcode API keys or tokens — use `react-native-config` (`.env`).
-- Before deleting any file, check `get_impact_radius` on it first.
-- Do not change `frontend/src/api/client.ts` token-refresh logic without a full review.
-
-## graphify
-
-This project has a graphify knowledge graph at graphify-out/.
-
-Rules:
-- Before answering architecture or codebase questions, read graphify-out/GRAPH_REPORT.md for god nodes and community structure
-- If graphify-out/wiki/index.md exists, navigate it instead of reading raw files
-- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+## Skills
+`/feature-dev` (new screen/component) · `/code-review` (bugs pre-commit) · `/simplify` (cleanup) ·
+`/frontend-design` (styling, web-focused — adapt to RN) · `/claude-api` (Claude integration).
+Subagent roles: `feature-dev:code-architect` (design), `code-explorer` (trace), `code-reviewer` (review),
+`rn-screen-builder`/`rn-reviewer` (RN-specific), `Explore` (fast search), `safe-committer` (commit).

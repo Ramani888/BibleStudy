@@ -1,5 +1,6 @@
 ---
 tags: [frontend, screens]
+updated: 2026-08-08
 ---
 
 # Screen Map
@@ -28,6 +29,10 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 - CreateCardScreen / EditCardScreen → `useCards`
 - PublicSetsScreen → public/shared sets
 - FriendsSetsScreen → sets shared by friends (`useFriends` + `useSets`)
+- **Study Plans** (see [[Study Plans]]):
+  - StudyPlansScreen → `usePlans` (list of personal plans)
+  - PlanDetailScreen → `usePlan` (ordered steps + per-step progress)
+  - CreatePlanScreen → `usePlans` (create/edit; also reused as `CreateGroupPlan`)
 
 ## quiz/  (see [[Quiz Feature v2 Plan]])
 - QuizHubScreen → `useRecentQuizAttempts` (history list of recent attempts + "Start New Quiz" footer CTA)
@@ -46,9 +51,13 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 Frontend screens (`screens/map/`) and `MapNavigator.tsx` removed. Backend `map` +
 `gatherings` modules still exist. Resurrect from git history if needed.
 
-## profile/  (also hosts the social layer)
+## profile/  (also hosts social, monetization & gamification)
 - ProfileScreen · EditProfileScreen · ChangePasswordScreen · SettingsScreen → `useProfile` / `useUser`
 - CreditsScreen → `useCredits`
+- **Monetization:** PaywallScreen → `useSubscription` (IAP plans) — see [[Credits & Subscriptions]]
+- **Gamification** (see [[Gamification]]):
+  - AchievementsScreen → `useAchievements` (unlocked/locked grid)
+  - LeaderboardScreen → leaderboard ranking
 - NotesScreen / NoteEditorScreen → `useNotes`
 - MediaScreen / MediaPDFViewerScreen → `useMedia`
 - NotificationsScreen → `useNotifications`
@@ -56,6 +65,8 @@ Frontend screens (`screens/map/`) and `MapNavigator.tsx` removed. Backend `map` 
   UserProfileScreen · BlockedUsersScreen → `useFriends`
 - **Groups:** GroupsScreen · GroupDetailScreen · CreateGroupScreen ·
   EditGroupScreen · JoinGroupScreen · PublicGroupsScreen → `useGroups`
+- **Group study plans:** GroupPlanDetailScreen → `usePlan` / `useGroups`;
+  `CreateGroupPlan` route reuses CreatePlanScreen. See [[Study Plans]].
 
 ## Notes
 - Study feature fully removed (front + back) — replaced by Quiz with 7 modes.

@@ -1,5 +1,6 @@
 ---
 tags: [architecture]
+updated: 2026-08-08
 ---
 
 # Architecture Overview
@@ -8,11 +9,16 @@ tags: [architecture]
 client (no Expo) talking to a **Node.js + Express 4 + TypeScript** API backed by
 **PostgreSQL 16** via **Prisma 5**. Base API path: `/api/v1`.
 
-It is two products in one codebase:
+It is three products in one codebase:
 1. **Study core** — flashcard sets/cards organised in folders, an AI Bible
-   assistant, a credit economy, notes, and media uploads.
-2. **Social layer** — friends, groups, in-person "gatherings" plotted on a map,
-   an activity feed, and push notifications.
+   assistant, a credit economy, quiz, study plans, notes, and media uploads.
+2. **Social layer** — friends, groups, an activity feed, and push notifications.
+   (An in-person "gatherings on a map" feature exists in the backend but its
+   frontend was deleted — see below.)
+3. **Monetization arc** — a free-tier credit economy that graduates into IAP
+   subscriptions (`STARTER`/`PRO`), plus gamification (achievements, streaks,
+   leaderboard) and study plans to drive retention and church/group revenue.
+   See [[Credits & Subscriptions]], [[Gamification]], [[Study Plans]].
 
 ## The stack
 
@@ -41,11 +47,17 @@ Return path is the reverse; services return raw data, controllers wrap it via
 
 ## Backend module inventory
 
-16 feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
+**19** feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
 
 `auth` · `users` · `folders` · `sets` · `cards` · `ai` · `credits` ·
-`friends` · `groups` · `gatherings` · `map` · `activities` · `notifications` ·
-`notes` · `media` · `quiz`
+`subscriptions` · `achievements` · `plans` · `friends` · `groups` ·
+`gatherings` · `map` · `activities` · `notifications` · `notes` · `media` ·
+`quiz`
+
+The three additions since the 16-module baseline are `subscriptions` (IAP
+entitlements — [[Credits & Subscriptions]]), `achievements`
+([[Gamification]]), and `plans` (personal & group study plans —
+[[Study Plans]]). `map` + `gatherings` remain backend-only (no frontend).
 
 Grouped in this brain as: [[Module - Auth & Users]],
 [[Module - Library (Folders, Sets, Cards)]], [[Module - AI & Credits]],
@@ -53,13 +65,17 @@ Grouped in this brain as: [[Module - Auth & Users]],
 
 ## Frontend surface
 
-5-tab shell (Home · Library · Quiz · AI · Profile) plus a large Profile stack
-that hosts the social features. Map feature deleted (2026-08-06). Full list in [[Screen Map]].
+5-tab shell (Home · Library · Quiz · AI · Profile), **~45 screens**, plus a
+large Profile stack that hosts social, monetization (Paywall), and gamification
+(Achievements, Leaderboard) features. Study Plans live under LibraryTab; the
+Quiz runner is a root-level screen above the tabs. Map feature deleted
+(2026-08-06) — backend-only now. Full list in [[Screen Map]] · [[Navigation]].
 
 ## Notable facts / gotchas
 
-- **CLAUDE.md is slightly out of date** on module count — it lists 16 modules
-  but omits the `map` backend module (still exists as BE, frontend screens deleted).
+- **CLAUDE.md is out of date** on module count — it still lists 16 modules; the
+  actual backend has 19 (adds `subscriptions`, `achievements`, `plans`) and
+  `map`/`gatherings` are backend-only (frontend deleted 2026-08-06).
 - The client is **mobile-only** — Express CORS allows requests with no `Origin`
   header unconditionally (RN isn't a browser). See `backend/src/app.ts`.
 - Body limit is **10mb** (media metadata + base64 edge cases).

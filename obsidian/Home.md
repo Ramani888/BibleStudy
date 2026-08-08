@@ -1,18 +1,27 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-08-07
+updated: 2026-08-08
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
 
-Knowledge vault for **BibleStudyPro** — a Bible-study flashcard app with an AI
-assistant and a social/community layer (friends, groups, in-person gatherings on
-a map). Full-stack: **Node/Express/Prisma/PostgreSQL** backend + **React Native
-0.84 / React 19** app.
+Knowledge vault for **BibleStudyPro** — an AI-assisted Bible-study flashcard app
+with a monetization layer (credits + IAP subscriptions), gamification, study
+plans, and a social/community layer. Full-stack: **Node/Express/Prisma/PostgreSQL**
+backend (19 modules) + **React Native 0.84 / React 19** app (~45 screens).
 
 > This is a *code brain*, not a design vault — it documents how the system is
-> built. Notes are cross-linked; open the graph view to navigate.
+> built, feature by feature, including edge cases. Notes are cross-linked; open
+> the graph view to navigate.
+
+## 📐 Rules first
+- [[Rules]] — project conventions + process (source of truth: repo `CLAUDE.md`)
+
+## ⭐ Features (screens · functionality · edge cases)
+- [[Auth & Account]] · [[Home Dashboard]] · [[Study Core]] · [[Quiz]]
+- [[AI Chat]] · [[Credits & Subscriptions]] · [[Gamification]] · [[Study Plans]]
+- [[Social]] · [[Notes & Media]]
 
 ## 🧭 Start here
 - [[Architecture Overview]] — the whole system on one page
@@ -28,6 +37,9 @@ a map). Full-stack: **Node/Express/Prisma/PostgreSQL** backend + **React Native
   - [[Module - AI & Credits]]
   - [[Module - Social (Friends, Groups, Gatherings, Map)]]
   - [[Module - Media & Notes]]
+  - [[Module - Study Plans]]
+  - [[Module - Gamification]]
+  - [[Module - Subscriptions]]
 
 ## 📱 Frontend
 - [[Frontend Architecture]] — directory map, conventions
