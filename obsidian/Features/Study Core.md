@@ -13,10 +13,10 @@ updated: 2026-08-08
 
 ## Screens
 All study-core screens live in the **Library** tab's stack (`LibraryStack`).
-There is **no dedicated `Study`/`StudyScreen`** — studying is done in-place by
-flipping cards inside [[#SetDetailScreen]] via the `FlashCard` component. (The
-CLAUDE.md map still references a `study/StudyScreen.tsx` + `useStudySession`
-hook; neither exists in the codebase.)
+There is **no dedicated `Study`/`StudyScreen`** — review/study happens in the
+**Quiz** flow (see [[Quiz]]); `SetDetail` is a card *manager*. The `FlashCard`
+component exists but is **dead code** (never rendered by any screen), and the
+CLAUDE.md map's `study/StudyScreen.tsx` + `useStudySession` never existed.
 
 | Screen | Route | Nav stack | Purpose |
 |--------|-------|-----------|---------|
@@ -55,7 +55,7 @@ hook; neither exists in the codebase.)
 ### SetDetailScreen (`SetDetail`) — the study surface
 Params: `{ setId, setTitle, isOwner = true }`. `isOwner` is passed `false` when
 arriving from public/friends browse, which hides all mutating controls.
-- **Study / flip**: each card renders `FlashCard` — tap to flip (question ↔ answer) with a shared-value rotation animation; `onFlip(revealed)` callback.
+- **Card list/grid**: cards render as rows/tiles (`cardLayout` = `'list' | 'grid'`) for management (search, reorder, blur, copy/move/edit/delete) — **not** a flip surface. The `FlashCard` flip component is not used here (dead code). Actual review = the [[Quiz]] flow.
 - **Blur**: `isBlurred` cards render blurred answer (fill-in-the-blank style); blur only shown/toggleable when `isOwner`. Per-card blur toggle (`handleBlurToggle`) and **blur-all / unblur-all** (`handleBlurAll`) — persisted via `useUpdateCard`.
 - **Reorder mode** (`reorderMode`): `DraggableFlatList` drag-to-reorder; save (`handleSaveReorder` → `useReorderCards`) / cancel. Owner only.
 - **Card layout** toggle: `list` ↔ `grid` (`cardLayout`, local-only UI state).
@@ -174,7 +174,7 @@ Set     id, title, description?, color?, folderId?, userId, visibility(PRIVATE),
 
 Card    id, setId, type(QA), question, answer, note?, imageId?, order(0),
         isBlurred(false), difficulty(MEDIUM),
-        lastStudiedAt?, nextReviewAt?, timestamps
+        lastStudiedAt?, nextReviewAt?, interval(0), ease(2.5), timestamps  // SR: SM-2
         set  Set  @relation(onDelete: Cascade)         // deleting set deletes cards
         user User? @relation(onDelete: SetNull)        // @@index setId, userId
 ```
@@ -187,8 +187,8 @@ DETAILED}` · `CardType {QA, STORY}` · `Difficulty {EASY, MEDIUM, HARD}`.
   - `GET /cards/set/:setId` (`listCardsBySet`) is the endpoint that honors the full matrix (owner | PUBLIC any | FRIENDS w/ friendship | group-plan). So the browse/read flow fetches set metadata from the paginated list responses and cards from `listCardsBySet`, not from `getSetById`.
 - **Group-plan access (D2)** — `memberHasGroupPlanAccess(userId, setId)`: true iff a `StudyPlanStep` references the set inside a plan whose `plan.groupId` is set **and** the user is a `GroupMember` of that group. Lets group members study a set without cloning it. Applies to both `getSetById` and `listCardsBySet` (PRIVATE and FRIENDS branches).
 - **Clone** always lands as PRIVATE; `folderId` is preserved only when cloning your own set (someone else's folder id would be meaningless). PRIVATE sets can't be cloned by non-owners (404). Cards deep-copied with question/answer/note/imageId/order/difficulty/isBlurred; `nextReviewAt`/`lastStudiedAt` are **not** copied (fresh review state).
-- **Spaced repetition is currently read-only / inert.** `nextReviewAt` and `lastStudiedAt` exist on `Card` and are *read* by `getDueSummary`, but **no endpoint ever writes them** (grep confirms the only reference to `nextReviewAt` in the backend is the read in `getDueSummary`). So `dueCount` will effectively stay 0 / whatever seed data sets — flipping a card in `SetDetail` does not schedule a next review. This is the main known limitation / TODO for the study core. `FlashCard.onFlip` is UI-only; there is no review-grading mutation.
-- **`difficulty` is metadata only** — stored/editable per card but not consumed by any scheduling algorithm (no SM-2 / interval logic exists).
+- **Spaced repetition is LIVE (SM-2), driven by Quiz.** `Card` now has `interval` + `ease` alongside `nextReviewAt`/`lastStudiedAt`. On every quiz record/retake, `quiz.service` feeds each scored response into `cards.service.applyReviews(userId, [{cardId, correct}])`, which runs the classic SM-2 update (correct→quality 5, wrong→quality 2), writing `interval`/`ease`/`nextReviewAt`/`lastStudiedAt` for the user's own cards only. `getDueSummary` reads `nextReviewAt <= now`, so Home's due count is real. **Ceilings (v1):** cards never quizzed keep `nextReviewAt=null` (not counted as due — study fresh sets by picking them); a missed card reschedules `+1 day` (no sub-day learning steps); grade is binary (quiz correctness), not a 4-button Again/Hard/Good/Easy.
+- **`difficulty` is metadata only** — the SR schedule is driven by SM-2 `ease`/`interval`, not the per-card `difficulty` enum.
 - **`type: STORY`** relaxes the question requirement (question optional, treated as a reference); single-create defaults question to `''`. **Bulk-create does NOT support STORY** — it still requires a non-empty question per item.
 - **Reorder is all-or-nothing**: `reorderCards` rejects unless `cardIds` contains *every* card in the set (count check) and all belong to the user+set; partial reorders error.
 - **Folder deletion guardrails**: cannot delete a folder with sub-folders (must move/delete them first); deleting a folder `SetNull`s its sets' `folderId` (sets survive, become unfiled) and returns `affectedSets`. Folder→folder cascade only fires on the DB relation, but the app-level guard blocks it first.
@@ -197,14 +197,20 @@ DETAILED}` · `CardType {QA, STORY}` · `Difficulty {EASY, MEDIUM, HARD}`.
 - **Empty states** everywhere: no sets / no folders (Library), no sets in folder (FolderDetail), no cards / no search match (SetDetail — CTA only for owners), empty friends list (FriendsSets returns an empty page immediately when the user has no friendships).
 - **Card `move`** targets must be owned by the user (`verifySetOwnership` on target); moving invalidates both source and target `['cards', …]` query keys.
 - **Search**: Library set search is client-side; PublicSets search is server-side (`title contains`, case-insensitive); FriendsSets has no search.
-- **No standalone Study route** — despite the CLAUDE.md architecture map. Studying = flipping `FlashCard`s in `SetDetail`; quizzing = `QuizModeSheet` → `Quiz` (see [[Quiz]]).
+- **No standalone Study route.** Review/study = the [[Quiz]] flow (`QuizModeSheet`/`QuizSetup` → `Quiz`); `SetDetail` only manages cards. `FlashCard` is dead code.
 
-## This session's additions (A–G arc)
-No direct changes to the study core in this session. The relevant seam is **D2
-(group study plans)**: `memberHasGroupPlanAccess` was added and wired into
+## Spaced repetition (2026-08-08, commit `d1c2da9`)
+Wired SR onto the quiz flow. `Card.interval`/`ease` added (migration
+`add_spaced_repetition_fields`); `cards.service.applyReviews` runs SM-2;
+`quiz.service.recordAttempt`/`updateAttempt` feed scored responses into it;
+`cardId` now flows through `SummaryItem` (frontend type + `buildSummaryItems`
++ backend `SummaryItemDto`). Verified via throwaway script (interval 1→6→17,
+ease climbs, miss resets to 0/+1d/ease-drop, non-owner cannot mutate).
+
+## Earlier this session (A–G arc)
+**D2 (group study plans)**: `memberHasGroupPlanAccess` added and wired into
 `getSetById` + `listCardsBySet` so group members can study a plan's sets without
-cloning. Spaced-repetition *writing* remains unimplemented (candidate future
-work; `getDueSummary` already reads `nextReviewAt`).
+cloning.
 
 ## Related
 [[Study Plans]] · [[Quiz]] · [[Auth & Account]] · [[Architecture Overview]] · [[Database Schema]]

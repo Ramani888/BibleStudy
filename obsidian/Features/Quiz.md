@@ -151,10 +151,16 @@ All mutations invalidate the whole `['quiz']` query key on success.
   - `recordAttempt(userId, dto)` — verifies all `setIds` exist (else `NotFoundError`),
     computes `scorePct`, creates `QuizAttempt` (stores `setIds[]`, primary `setId`,
     optional `mode`/`quizName`/`timeSecs`/`responses`), calls
-    `triggerAchievementCheck(userId)`, returns attempt + best for the primary set.
+    `triggerAchievementCheck(userId)`, then **feeds spaced repetition** via
+    `applySpacedRepetition` → `cards.service.applyReviews` (each scored response's
+    `cardId`+`isCorrect`; skips unscored `read` items). Returns attempt + best.
   - `updateAttempt(userId, id, dto)` — `updateMany` scoped to `{ id, userId }`
-    (ownership guard); throws if `count === 0`. Recomputes `scorePct`. Returns new best.
+    (ownership guard); throws if `count === 0`. Recomputes `scorePct`. **Also feeds
+    spaced repetition** (retakes are real reviews). Returns new best.
     Does **not** re-trigger achievements.
+  - **SR link**: `SummaryItem` now carries `cardId` (frontend `buildSummaryItems`
+    + backend `SummaryItemDto`), so a quiz doubles as a review session — see the
+    SR section of [[Study Core]] for the SM-2 algorithm.
   - `deleteAttempt(userId, id)` — `deleteMany` scoped to `{ id, userId }`; throws if none deleted.
   - `getBestForSet(userId, setId)` — `_max scorePct` (null if none).
   - `getRecentAttempts(userId, limit=20)` — recent attempts joined with set titles;

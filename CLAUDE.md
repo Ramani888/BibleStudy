@@ -47,8 +47,8 @@ frontend/src/
   theme/ types/ utils/
 ```
 Tabs: **Home**, **Library** (sets/cards/study/quiz + study plans), **Quiz**, **AI**, **Profile**
-(hosts social + credits/subscriptions + gamification). Studying = FlashCard flip inside `SetDetail`
-(there is **no** separate StudyScreen). Group plan detail + Paywall + Leaderboard + Achievements live
+(hosts social + credits/subscriptions + gamification). Studying/review = **Quiz** (`SetDetail` is a card
+manager; there is **no** StudyScreen and `FlashCard.tsx` is dead code). Group plan detail + Paywall + Leaderboard + Achievements live
 under the Profile stack.
 
 **Safe-area:** stack navigators use `headerShown:false` + custom in-screen header. Tab-hosted screens
@@ -94,8 +94,11 @@ use `edges={['bottom']}`/all-edges on a tab-hosted screen.
 - Before deleting any file, check `get_impact_radius` on it first.
 
 ## Known gaps & gotchas (facts, keep current)
-- **Spaced repetition is dormant**: `Card.nextReviewAt` is only ever READ (`getDueSummary`), never written,
-  so Home's "due" count is effectively always 0. Wiring it up is unbuilt work, not a bug to "fix" silently.
+- **Spaced repetition is LIVE (SM-2)**: driven by the quiz flow — `quiz.service` feeds each attempt's scored
+  responses into `cards.service.applyReviews` (correct→q5, wrong→q2), which writes `Card.interval`/`ease`/
+  `nextReviewAt`/`lastStudiedAt`. `getDueSummary` reads it, so Home's "due" count works. Ceilings: cards that
+  were never quizzed have `nextReviewAt=null` (not counted as due); a wrong card reschedules +1 day (no sub-day
+  learning steps yet). `FlashCard.tsx` is dead code — review happens in Quiz, not a flip screen.
 - **Map + Gatherings**: backend modules + unused `useMap`/`useGatherings` hooks exist, but there are NO
   `screens/map/` and NO Map/Gathering nav routes — the feature is unreachable by design.
 - **Media chat needs a funded Anthropic account** (media routes to paid Claude); errors cleanly, charges nothing, when unfunded.

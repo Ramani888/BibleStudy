@@ -14,7 +14,7 @@ updated: 2026-08-08
 - Backend: 19 modules, each `modules/<m>/` with `routes`/`controller`/`service`/`dto`. **Prisma lives only in `service.ts`.**
 - New module ⇒ mount in `app.ts` + a Prisma migration.
 - Achievements are **code-defined** (`achievements.defs.ts` + `computeMetrics`); only unlocks persist (`UserAchievement`).
-- Studying = FlashCard flip inside `SetDetail` — there is no StudyScreen.
+- Studying/review = **Quiz** (Home "DUE" → `QuizSetup` preselected). `SetDetail` is a card *manager*; there is no StudyScreen and `FlashCard.tsx` is dead code.
 
 ## Frontend conventions (falsifiable)
 - Functional components, named exports; `styles`/`makeStyles(theme)` at file bottom.
@@ -36,7 +36,7 @@ updated: 2026-08-08
 no `prisma migrate reset` on real DB, no hardcoded keys.
 
 ## Known gaps (facts)
-- Spaced repetition dormant (`nextReviewAt` never written → due count ~0).
+- Spaced repetition LIVE (SM-2 via quiz flow → `cards.service.applyReviews` writes `interval`/`ease`/`nextReviewAt`). Never-quizzed cards aren't "due"; wrong → +1 day (no sub-day steps). `FlashCard.tsx` is dead code — review = Quiz.
 - Map/Gatherings: backend-only, no frontend screens/routes.
 - Media chat needs funded Claude; IAP needs App Store Connect products + `APPLE_IAP_SHARED_SECRET` (`IAP_SETUP.md`).
 - Refresh tokens not rotated.
