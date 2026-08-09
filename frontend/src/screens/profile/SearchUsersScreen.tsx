@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -7,11 +7,12 @@ import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
-import { Input } from '../../components/ui/Input';
+import { SearchBar } from '../../components/ui/SearchBar';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ClockIcon, UserPlusIcon } from '../../components/icons';
 import { useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
+import { useDebouncedValue } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import type { UserProfile } from '../../types/friends.types';
 
@@ -21,17 +22,13 @@ export function SearchUsersScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, 300);
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
   const { data: users = [], isFetching } = useSearchUsers(debouncedQuery);
   const sendRequest = useSendFriendRequest();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 300);
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  useEffect(() => {
+  // Reset sent-request highlights when a new search result arrives
+  React.useEffect(() => {
     if (!isFetching) setSentIds(new Set());
   }, [isFetching]);
 
@@ -79,7 +76,7 @@ export function SearchUsersScreen({ navigation }: Props) {
       header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}
     >
       <View style={styles.searchBar}>
-        <Input
+        <SearchBar
           placeholder="Search by name..."
           value={query}
           onChangeText={setQuery}

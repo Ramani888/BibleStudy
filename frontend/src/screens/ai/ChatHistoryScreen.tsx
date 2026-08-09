@@ -14,9 +14,7 @@ import {
   ChatIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  CloseCircleIcon,
   PencilIcon,
-  SearchIcon,
   SparklesIcon,
   StarIcon,
   TagIcon,
@@ -32,7 +30,7 @@ import {
   ErrorState,
   LoadingOverlay,
 } from '../../components/feedback';
-import { Button, Card, Divider, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { Button, Card, Divider, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import {
   useAIChatHistory,
@@ -456,22 +454,12 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         <>
           {/* ── Search + Clear ── */}
           <View style={styles.topBar}>
-            <View style={styles.searchRow}>
-              <SearchIcon size={16} color={colors.textSecondary} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search conversations…"
-                placeholderTextColor={colors.textSecondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                returnKeyType="search"
-              />
-              {searchQuery.length > 0 && (
-                <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
-                  <CloseCircleIcon size={16} color={colors.textSecondary} />
-                </Pressable>
-              )}
-            </View>
+            <SearchBar
+              placeholder="Search conversations…"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              containerStyle={styles.searchBarContainer}
+            />
             {allSessions.length > 0 && (
               <Pressable onPress={handleClearAll} hitSlop={8} style={styles.clearBtn}>
                 <TrashIcon size={18} color={colors.error} />
@@ -677,22 +665,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
-  searchRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: spacing[2.5],
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[2],
-    gap: spacing[2],
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    padding: 0,
-  },
+  searchBarContainer: { flex: 1, marginBottom: 0 },
   clearBtn: { padding: spacing[1] },
 
   tagBarWrapper: {

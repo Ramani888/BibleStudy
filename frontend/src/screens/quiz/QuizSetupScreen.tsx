@@ -3,7 +3,7 @@ import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native'
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
 import { AppModal, EmptyState } from '../../components/feedback';
-import { Button, FilterChip, Input, Screen, Typography } from '../../components/ui';
+import { Button, FilterChip, Input, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon } from '../../components/icons';
 import { useSearchToggle, useSets } from '../../hooks';
@@ -196,12 +196,10 @@ export function QuizSetupScreen() {
         </View>
 
         {searchVisible && (
-          <Input
+          <SearchBar
             placeholder="Search sets…"
             value={search}
             onChangeText={setSearch}
-            leftIcon={<SearchIcon size={16} color={colors.textSecondary} />}
-            autoCapitalize="none"
             autoFocus
             containerStyle={styles.sheetSearch}
           />

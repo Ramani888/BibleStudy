@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -6,13 +6,14 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { ListCard } from '../../components/ui/ListCard';
-import { Input } from '../../components/ui/Input';
+import { SearchBar } from '../../components/ui/SearchBar';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { LogOutIcon, UsersIcon } from '../../components/icons';
 import { usePublicGroups, useJoinGroup } from '../../hooks/useGroups';
+import { useDebouncedValue } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import type { Group } from '../../types/groups.types';
 
@@ -22,14 +23,9 @@ export function PublicGroupsScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const debouncedQuery = useDebouncedValue(query, 300);
   const { data, isFetching, error, refetch } = usePublicGroups(debouncedQuery || undefined);
   const joinGroup = useJoinGroup();
-
-  useEffect(() => {
-    const timer = setTimeout(() => setDebouncedQuery(query), 300);
-    return () => clearTimeout(timer);
-  }, [query]);
 
   const groups = data?.groups ?? [];
 
@@ -62,7 +58,7 @@ export function PublicGroupsScreen({ navigation }: Props) {
       header={<ScreenHeader title="Discover Groups" onBack={() => navigation.goBack()} />}
     >
       <View style={styles.searchBar}>
-        <Input placeholder="Search public groups..." value={query} onChangeText={setQuery} autoFocus />
+        <SearchBar placeholder="Search public groups..." value={query} onChangeText={setQuery} autoFocus />
       </View>
       {isFetching && (
         <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />

@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 
 import { QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
-import { Button, Input, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { Button, Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { SearchIcon } from '../../components/icons';
 
 import { useConfirmDialog, useFolderModal, useFolders, useManualRefresh, useSearchToggle, useSets, useDeleteSet, useUpdateSet } from '../../hooks';
@@ -97,7 +97,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       {folderColor && <View style={[styles.colorBar, { backgroundColor: folderColor }]} />}
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <Input
+          <SearchBar
             placeholder="Search sets…"
             value={search}
             onChangeText={setSearch}

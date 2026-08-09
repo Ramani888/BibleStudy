@@ -1,12 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
   FlatList,
-  Platform,
   Pressable,
   RefreshControl,
   ScrollView,
   StyleSheet,
-  TextInput,
   View,
 } from 'react-native';
 import Toast from 'react-native-toast-message';
@@ -14,18 +12,18 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNotes, useDeleteNote, useConfirmDialog } from '../../hooks';
+import { SearchBar } from '../../components/ui/SearchBar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CloseCircleIcon, PlusIcon, SearchIcon, SwapIcon } from '../../components/icons';
+import { PlusIcon, SwapIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
+import { fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
 
 const FAB_SIZE = 56;
-const SEARCH_ICON_SIZE = 18;
 
 type SortOrder = 'newest' | 'oldest' | 'alpha';
 
@@ -150,25 +148,11 @@ export function NotesScreen({ navigation }: Props) {
     >
       {/* Search */}
       <View style={styles.searchRow}>
-        <View style={styles.searchWrap}>
-          <View style={styles.searchIcon}>
-            <SearchIcon size={SEARCH_ICON_SIZE} color={colors.textDisabled} />
-          </View>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search notes…"
-            placeholderTextColor={colors.textSecondary}
-            value={search}
-            onChangeText={setSearch}
-            returnKeyType="search"
-            clearButtonMode="while-editing"
-          />
-          {Platform.OS === 'android' && search.length > 0 && (
-            <Pressable onPress={() => setSearch('')} hitSlop={8}>
-              <CloseCircleIcon size={18} color={colors.textDisabled} />
-            </Pressable>
-          )}
-        </View>
+        <SearchBar
+          placeholder="Search notes…"
+          value={search}
+          onChangeText={setSearch}
+        />
       </View>
 
       {/* Tag filter bar */}
@@ -231,23 +215,6 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       marginHorizontal: layout.screenPaddingH,
       marginTop: spacing[3],
       marginBottom: spacing[2],
-    },
-    searchWrap: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.background,
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      paddingHorizontal: spacing[3],
-      height: 44,
-    },
-    searchIcon: { marginRight: spacing[2] },
-    searchInput: {
-      flex: 1,
-      color: colors.textPrimary,
-      fontSize: fontSizes.md,
-      paddingVertical: 0,
     },
     sortBtn: {
       flexDirection: 'row',
