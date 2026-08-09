@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
+import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
 import { Screen } from '../../components/ui/Screen';
@@ -48,34 +49,28 @@ export function SearchUsersScreen({ navigation }: Props) {
     const isFriend = !!item.isFriend;
     const isPending = !!item.pendingRequest || sentIds.has(item.id);
     return (
-      <View style={styles.userRow}>
-        <Pressable
-          style={styles.userInfo}
-          onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
-        >
-          <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
-          <View>
-            <Typography preset="label">{item.name}</Typography>
-            {item.church ? (
-              <Typography preset="caption" color={colors.textSecondary}>{item.church}</Typography>
-            ) : null}
-          </View>
-        </Pressable>
-        {isFriend ? (
-          <CheckCircleIcon size={24} color={colors.success} />
-        ) : isPending ? (
-          <ClockIcon size={24} color={colors.textSecondary} />
-        ) : (
-          <Pressable
-            style={styles.addBtn}
-            onPress={() => handleAdd(item)}
-            hitSlop={8}
-            disabled={sendRequest.isPending}
-          >
-            <UserPlusIcon size={20} color={colors.primary} />
-          </Pressable>
-        )}
-      </View>
+      <ListCard
+        leading={<Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />}
+        title={item.name}
+        subtitle={item.church ?? undefined}
+        onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
+        trailing={
+          isFriend ? (
+            <CheckCircleIcon size={24} color={colors.success} />
+          ) : isPending ? (
+            <ClockIcon size={24} color={colors.textSecondary} />
+          ) : (
+            <Pressable
+              style={styles.addBtn}
+              onPress={() => handleAdd(item)}
+              hitSlop={8}
+              disabled={sendRequest.isPending}
+            >
+              <UserPlusIcon size={20} color={colors.primary} />
+            </Pressable>
+          )
+        }
+      />
     );
   }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, styles]);
 
@@ -99,6 +94,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         extraData={sentIds}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           debouncedQuery.length > 1 && !isFetching ? (
@@ -115,15 +111,8 @@ export function SearchUsersScreen({ navigation }: Props) {
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     searchBar: { padding: layout.screenPaddingH },
-    list: { paddingHorizontal: layout.screenPaddingH },
-    userRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-    },
-    userInfo: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
+    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     addBtn: { padding: spacing[1] },
     loader: { paddingVertical: spacing[2] },
     empty: { padding: layout.screenPaddingH, alignItems: 'center' },

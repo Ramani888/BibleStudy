@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
+import { ListCard } from '../../components/ui/ListCard';
 import { Input } from '../../components/ui/Input';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -43,18 +44,17 @@ export function PublicGroupsScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: Group }) => (
-    <Pressable style={styles.groupRow} onPress={() => handleJoin(item)}>
-      <View style={styles.groupIcon}>
-        <UsersIcon size={22} color={colors.primary} />
-      </View>
-      <View style={styles.info}>
-        <Typography preset="label">{item.name}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {item._count?.members ?? 0} members
-        </Typography>
-      </View>
-      <LogOutIcon size={20} color={colors.primary} />
-    </Pressable>
+    <ListCard
+      leading={
+        <View style={styles.groupIcon}>
+          <UsersIcon size={22} color={colors.primary} />
+        </View>
+      }
+      title={item.name}
+      subtitle={`${item._count?.members ?? 0} members`}
+      trailing={<LogOutIcon size={20} color={colors.primary} />}
+      onPress={() => handleJoin(item)}
+    />
   );
 
   return (
@@ -76,6 +76,7 @@ export function PublicGroupsScreen({ navigation }: Props) {
           renderItem={renderItem}
           refreshing={isFetching}
           onRefresh={refetch}
+          ItemSeparatorComponent={() => <View style={styles.separator} />}
           contentContainerStyle={groups.length === 0 ? styles.emptyContainer : styles.list}
           ListEmptyComponent={
             !isFetching ? (
@@ -92,22 +93,13 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     searchBar: { padding: layout.screenPaddingH },
     loader: { paddingVertical: spacing[2] },
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { padding: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    groupRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-      gap: spacing[3],
-    },
     groupIcon: {
       width: 44, height: 44, borderRadius: layout.pillRadius,
       backgroundColor: colors.primarySurface,
       alignItems: 'center', justifyContent: 'center',
     },
-    info: { flex: 1 },
   });
 }

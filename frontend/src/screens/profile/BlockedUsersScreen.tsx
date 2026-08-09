@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
-import { Typography } from '../../components/ui/Typography';
+import { ListCard } from '../../components/ui/ListCard';
 import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -31,16 +31,18 @@ export function BlockedUsersScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: BlockedUser }) => (
-    <View style={styles.row}>
-      <Avatar uri={item.blocked.profileImage ?? null} name={item.blocked.name ?? ''} size="sm" />
-      <Typography preset="label" style={styles.name}>{item.blocked.name}</Typography>
-      <Button
-        label="Unblock"
-        variant="outline"
-        onPress={() => handleUnblock(item.blockedId, item.blocked.name)}
-        style={styles.unblockBtn}
-      />
-    </View>
+    <ListCard
+      leading={<Avatar uri={item.blocked.profileImage ?? null} name={item.blocked.name ?? ''} size="sm" />}
+      title={item.blocked.name}
+      trailing={
+        <Button
+          label="Unblock"
+          variant="outline"
+          onPress={() => handleUnblock(item.blockedId, item.blocked.name)}
+          style={styles.unblockBtn}
+        />
+      }
+    />
   );
 
   if (error) return <ErrorState message="Could not load blocked users" onRetry={refetch} />;
@@ -55,6 +57,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
         renderItem={renderItem}
         refreshing={isFetching}
         onRefresh={refetch}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={blocked.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState title="No Blocked Users" subtitle="Users you block will appear here" />
@@ -66,18 +69,9 @@ export function BlockedUsersScreen({ navigation }: Props) {
 
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { padding: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-      gap: spacing[3],
-    },
-    name: { flex: 1 },
     unblockBtn: { paddingHorizontal: spacing[3] },
   });
 }

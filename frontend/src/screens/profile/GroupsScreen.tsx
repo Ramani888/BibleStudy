@@ -4,6 +4,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, shadows, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
+import { ListCard } from '../../components/ui/ListCard';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
@@ -22,21 +23,17 @@ export function GroupsScreen({ navigation }: Props) {
   const { data: groups = [], isFetching, error, refetch } = useGroups();
 
   const renderItem = useCallback(({ item }: { item: Group }) => (
-    <Pressable
-      style={styles.groupRow}
+    <ListCard
+      leading={
+        <View style={styles.groupIcon}>
+          <UsersIcon size={22} color={colors.primary} />
+        </View>
+      }
+      title={item.name}
+      subtitle={`${item._count?.members ?? 0} members · ${item.visibility.toLowerCase()}`}
+      trailing={<ChevronRightIcon size={20} color={colors.textSecondary} />}
       onPress={() => navigation.navigate('GroupDetail', { groupId: item.id })}
-    >
-      <View style={styles.groupIcon}>
-        <UsersIcon size={22} color={colors.primary} />
-      </View>
-      <View style={styles.info}>
-        <Typography preset="label">{item.name}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {item._count?.members ?? 0} members · {item.visibility.toLowerCase()}
-        </Typography>
-      </View>
-      <ChevronRightIcon size={20} color={colors.textSecondary} />
-    </Pressable>
+    />
   ), [navigation, colors, styles]);
 
   if (error) return <ErrorState message="Could not load groups" onRetry={refetch} />;
@@ -66,6 +63,7 @@ export function GroupsScreen({ navigation }: Props) {
         renderItem={renderItem}
         refreshing={isFetching}
         onRefresh={refetch}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={groups.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState
@@ -87,23 +85,14 @@ export function GroupsScreen({ navigation }: Props) {
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     headerActions: { flexDirection: 'row', gap: spacing[3] },
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { padding: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    groupRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-      gap: spacing[3],
-    },
     groupIcon: {
       width: 44, height: 44, borderRadius: layout.pillRadius,
       backgroundColor: colors.primarySurface,
       alignItems: 'center', justifyContent: 'center',
     },
-    info: { flex: 1 },
     fab: {
       position: 'absolute',
       bottom: spacing[6],
