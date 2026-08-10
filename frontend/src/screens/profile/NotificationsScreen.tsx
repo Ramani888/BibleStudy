@@ -4,7 +4,7 @@ import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { formatDateTime } from '../../utils/formatters';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, palette, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -27,7 +27,6 @@ import {
 import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
-type Colors = ReturnType<typeof useTheme>['colors'];
 
 function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
@@ -64,7 +63,6 @@ function groupByDate(notifications: Notification[]): { title: string; data: Noti
 
 export function NotificationsScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -87,13 +85,13 @@ export function NotificationsScreen({ navigation, route }: Props) {
           openSwipeableRef.current = thisSwipeable;
         }}
         renderRightActions={() => (
-          <Pressable style={styles.deleteAction} onPress={() => deleteNotification.mutate(item.id)}>
-            <TrashIcon size={20} color="#fff" />
+          <Pressable style={[styles.deleteAction, { backgroundColor: colors.alert }]} onPress={() => deleteNotification.mutate(item.id)}>
+            <TrashIcon size={20} color={palette.white} />
           </Pressable>
         )}
       >
         <Pressable
-          style={[styles.notificationRow, !item.read && styles.unread]}
+          style={[styles.notificationRow, { backgroundColor: colors.background }, !item.read && { backgroundColor: colors.accentSoft }]}
           onPress={() => {
             if (!item.read) markRead.mutate(item.id);
             if (item.type === 'friend_request') navigation.navigate('FriendRequests');
@@ -101,8 +99,8 @@ export function NotificationsScreen({ navigation, route }: Props) {
             else if (item.type === 'achievement') navigation.navigate('Achievements');
           }}
         >
-          <View style={styles.iconWrapper}>
-            <NotifIcon size={20} color={item.read ? colors.textSecondary : colors.primary} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.surfaceMuted }]}>
+            <NotifIcon size={20} color={item.read ? colors.textSecondary : colors.accent} />
           </View>
           <View style={styles.info}>
             <Typography preset="label" numberOfLines={1}>{item.title}</Typography>
@@ -116,22 +114,22 @@ export function NotificationsScreen({ navigation, route }: Props) {
         </Pressable>
       </Swipeable>
     );
-  }, [colors, styles, markRead, deleteNotification]);
+  }, [colors, markRead, deleteNotification, navigation]);
 
   const renderSectionHeader = useCallback(
     ({ section: { title } }: { section: { title: string } }) => (
-      <View style={styles.sectionHeader}>
+      <View style={[styles.sectionHeader, { backgroundColor: colors.background }]}>
         <Typography preset="caption" color={colors.textSecondary}>{title}</Typography>
       </View>
     ),
-    [colors.textSecondary, styles.sectionHeader],
+    [colors.textSecondary, colors.background],
   );
 
   if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
 
   const headerRight = unreadCount > 0 ? (
     <Pressable onPress={() => markAllRead.mutate()} hitSlop={8}>
-      <Typography preset="label" color={colors.primary}>Mark all read</Typography>
+      <Typography preset="label" color={colors.accent}>Mark all read</Typography>
     </Pressable>
   ) : undefined;
 
@@ -166,39 +164,32 @@ export function NotificationsScreen({ navigation, route }: Props) {
   );
 }
 
-function makeStyles(colors: Colors) {
-  return StyleSheet.create({
-    list: { paddingBottom: spacing[4] },
-    emptyContainer: { flex: 1, justifyContent: 'center' },
-    sectionHeader: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingTop: spacing[4],
-      paddingBottom: spacing[1],
-      backgroundColor: colors.background,
-    },
-    notificationRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      backgroundColor: colors.background,
-      gap: spacing[3],
-    },
-    unread: { backgroundColor: colors.primarySurface },
-    iconWrapper: {
-      width: 40,
-      height: 40,
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.backgroundSecondary,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    info: { flex: 1, gap: spacing[0.5] },
-    deleteAction: {
-      width: 72,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.error,
-    },
-  });
-}
+const styles = StyleSheet.create({
+  list: { paddingBottom: spacing.lg },
+  emptyContainer: { flex: 1, justifyContent: 'center' },
+  sectionHeader: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.xs,
+  },
+  notificationRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.md,
+    paddingHorizontal: layout.screenPaddingH,
+    gap: spacing.md,
+  },
+  iconWrapper: {
+    width: 40,
+    height: 40,
+    borderRadius: layout.pillRadius,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  info: { flex: 1, gap: spacing.s2 },
+  deleteAction: {
+    width: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

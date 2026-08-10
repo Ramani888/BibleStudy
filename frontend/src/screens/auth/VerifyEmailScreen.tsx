@@ -54,21 +54,21 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
         <>
           <Button label="Verify Email" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending}>
-            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.primary} align="center">
+            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
               {resending ? 'Sending…' : 'Resend code'}
             </Typography>
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Login')}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Back to{' '}
-              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
+              <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
             </Typography>
           </Pressable>
         </>
       }
     >
       <View>
-        <View style={{ gap: spacing[2] }}>
+        <View style={{ gap: spacing.sm }}>
           <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
           <Controller
             name="otp"

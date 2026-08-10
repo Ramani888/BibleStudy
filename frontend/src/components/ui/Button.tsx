@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { layout, spacing, Theme, useTheme } from '../../theme';
+import { layout, spacing, Theme, useTheme , palette } from '../../theme';
 import { Typography } from './Typography';
 import { triggerHaptic } from '../../utils/haptics';
 
@@ -27,28 +27,28 @@ const makeVariantStyles = (
   colors: Theme['colors'],
 ): Record<ButtonVariant, { container: ViewStyle; labelColor: string }> => ({
   primary: {
-    container: { backgroundColor: colors.primary },
-    labelColor: colors.textOnPrimary,
+    container: { backgroundColor: colors.accent },
+    labelColor: colors.textOnAccent,
   },
   secondary: {
-    container: { backgroundColor: colors.primarySurface },
-    labelColor: colors.primaryDark,
+    container: { backgroundColor: colors.accentSoft },
+    labelColor: palette.indigo800,
   },
   outline: {
     container: {
       backgroundColor: colors.transparent,
       borderWidth: 1.5,
-      borderColor: colors.primary,
+      borderColor: colors.accent,
     },
-    labelColor: colors.primary,
+    labelColor: colors.accent,
   },
   ghost: {
     container: { backgroundColor: colors.transparent },
-    labelColor: colors.primary,
+    labelColor: colors.accent,
   },
   danger: {
-    container: { backgroundColor: colors.error },
-    labelColor: colors.textOnPrimary,
+    container: { backgroundColor: colors.alert },
+    labelColor: colors.textOnAccent,
   },
 });
 
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadius,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing[5],
+    paddingHorizontal: spacing.xl,
   },
   fullWidth: {
     width: '100%',

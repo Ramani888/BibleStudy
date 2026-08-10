@@ -9,7 +9,7 @@ import {
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Divider, Typography } from '../ui';
 import type { IconComponent } from '../icons';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme, palette } from '../../theme';
 
 const ACTION_ICON_SIZE = 20;
 
@@ -32,9 +32,7 @@ interface ActionSheetProps {
 }
 
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
   const isOpenRef = useRef(false);
 
@@ -82,7 +80,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
       onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={styles.handle}
-      backgroundStyle={styles.background}
+      backgroundStyle={[styles.background, { backgroundColor: colors.surface }]}
     >
       <BottomSheetView style={styles.content}>
         {title && (
@@ -108,18 +106,18 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
                   {action.icon ? (
                     <action.icon
                       size={ACTION_ICON_SIZE}
-                      color={action.destructive ? colors.error : colors.textSecondary}
+                      color={action.destructive ? colors.alert : colors.textSecondary}
                     />
                   ) : action.iconName ? (
                     <Icon
                       name={action.iconName}
                       size={ACTION_ICON_SIZE}
-                      color={action.destructive ? colors.error : colors.textSecondary}
+                      color={action.destructive ? colors.alert : colors.textSecondary}
                     />
                   ) : null}
                   <Typography
                     preset="bodyLg"
-                    color={action.destructive ? colors.error : colors.textPrimary}
+                    color={action.destructive ? colors.alert : colors.textPrimary}
                   >
                     {action.label}
                   </Typography>
@@ -142,36 +140,34 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    background: {
-      backgroundColor: colors.backgroundCard,
-      borderTopLeftRadius: 14,
-      borderTopRightRadius: 14,
-    },
-    handle: {
-      backgroundColor: colors.primaryLight,
-      width: 40,
-      height: 4,
-    },
-    content: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingBottom: spacing[6],
-    },
-    title: {
-      marginBottom: spacing[4],
-      marginTop: spacing[2],
-    },
-    list: { gap: 0 },
-    item: {
-      paddingVertical: spacing[4],
-    },
-    actionRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-    },
-    cancel: {
-      paddingVertical: spacing[3],
-    },
-  });
+const styles = StyleSheet.create({
+  background: {
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+  },
+  handle: {
+    backgroundColor: palette.indigo300,
+    width: 40,
+    height: 4,
+  },
+  content: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingBottom: spacing.xxl,
+  },
+  title: {
+    marginBottom: spacing.lg,
+    marginTop: spacing.sm,
+  },
+  list: { gap: 0 },
+  item: {
+    paddingVertical: spacing.lg,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+  },
+  cancel: {
+    paddingVertical: spacing.md,
+  },
+});

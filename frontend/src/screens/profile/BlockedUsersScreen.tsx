@@ -19,7 +19,6 @@ type Props = ProfileScreenProps<'BlockedUsers'>;
 
 export function BlockedUsersScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { data: blocked = [], isFetching, error, refetch } = useBlockedUsers();
   const unblock = useUnblockUser();
 
@@ -69,11 +68,9 @@ export function BlockedUsersScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    list: { padding: layout.screenPaddingH },
-    separator: { height: spacing[3] },
-    emptyContainer: { flex: 1, justifyContent: 'center' },
-    unblockBtn: { paddingHorizontal: spacing[3] },
-  });
-}
+const styles = StyleSheet.create({
+  list: { padding: layout.screenPaddingH },
+  separator: { height: spacing.md },
+  emptyContainer: { flex: 1, justifyContent: 'center' },
+  unblockBtn: { paddingHorizontal: spacing.md },
+});

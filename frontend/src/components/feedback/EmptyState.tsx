@@ -54,21 +54,21 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing[8],
+    paddingHorizontal: spacing.xxxl,
   },
   lottie: {
     width: 120,
     height: 120,
-    marginBottom: spacing[3],
+    marginBottom: spacing.md,
   },
   icon: {
-    marginBottom: spacing[4],
+    marginBottom: spacing.lg,
   },
   subtitle: {
-    marginTop: spacing[2],
+    marginTop: spacing.sm,
   },
   cta: {
-    marginTop: spacing[6],
+    marginTop: spacing.xxl,
     minWidth: 160,
   },
 });

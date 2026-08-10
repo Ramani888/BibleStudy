@@ -40,13 +40,13 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: spacing[8],
+    paddingHorizontal: spacing.xxxl,
   },
   message: {
-    marginTop: spacing[2],
+    marginTop: spacing.sm,
   },
   btn: {
-    marginTop: spacing[6],
+    marginTop: spacing.xxl,
     minWidth: 140,
   },
 });

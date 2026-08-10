@@ -20,7 +20,6 @@ type Props = ProfileScreenProps<'Friends'>;
 
 export function FriendsScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { data: friends = [], isFetching, error, refetch } = useFriends();
   const { data: leaderboard = [] } = useLeaderboard();
   const removeFriend = useRemoveFriend();
@@ -45,7 +44,7 @@ export function FriendsScreen({ navigation }: Props) {
 
     return (
       <Pressable
-        style={styles.card}
+        style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}
         onPress={() => navigation.navigate('UserProfile', { userId: item.friendId })}
       >
         <Avatar uri={item.friend.profileImage ?? null} name={item.friend.name ?? ''} size="sm" />
@@ -79,13 +78,13 @@ export function FriendsScreen({ navigation }: Props) {
           right={
             <View style={styles.headerActions}>
               <Pressable onPress={() => navigation.navigate('Leaderboard')} hitSlop={8}>
-                <TrophyIcon size={22} color={colors.primary} />
+                <TrophyIcon size={22} color={colors.accent} />
               </Pressable>
               <Pressable onPress={() => navigation.navigate('SearchUsers')} hitSlop={8}>
-                <UserPlusIcon size={22} color={colors.primary} />
+                <UserPlusIcon size={22} color={colors.accent} />
               </Pressable>
               <Pressable onPress={() => navigation.navigate('FriendRequests')} hitSlop={8}>
-                <BellIcon size={22} color={colors.primary} />
+                <BellIcon size={22} color={colors.accent} />
               </Pressable>
             </View>
           }
@@ -115,23 +114,19 @@ export function FriendsScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    headerActions: { flexDirection: 'row', gap: spacing[3] },
-    list: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
-    separator: { height: spacing[2] },
-    emptyContainer: { flex: 1, justifyContent: 'center' },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[3],
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-    },
-    cardInfo: { flex: 1, gap: spacing[0.5] },
-    removeBtn: { padding: spacing[1] },
-  });
-}
+const styles = StyleSheet.create({
+  headerActions: { flexDirection: 'row', gap: spacing.md },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
+  separator: { height: spacing.sm },
+  emptyContainer: { flex: 1, justifyContent: 'center' },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+  },
+  cardInfo: { flex: 1, gap: spacing.s2 },
+  removeBtn: { padding: spacing.xs },
+});

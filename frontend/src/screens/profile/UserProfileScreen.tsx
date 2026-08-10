@@ -35,7 +35,6 @@ const VISIBILITY_LABEL: Record<string, string> = {
 
 export function UserProfileScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, error, refetch } = useUser(userId);
@@ -126,7 +125,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
           {user.profileImage ? (
             <Image source={{ uri: user.profileImage }} style={styles.avatar} />
           ) : (
-            <View style={styles.avatarPlaceholder}>
+            <View style={[styles.avatarPlaceholder, { backgroundColor: colors.surfaceMuted }]}>
               <UserIcon size={48} color={colors.textSecondary} />
             </View>
           )}
@@ -189,9 +188,9 @@ export function UserProfileScreen({ route, navigation }: Props) {
           <View style={styles.setsSection}>
             <Typography preset="label" style={styles.setsTitle}>Their Sets</Typography>
             {sets.map(set => (
-              <Pressable key={set.id} style={styles.setCard} onPress={() => openSet(set)}>
-                <View style={styles.setIcon}>
-                  <BookIcon size={18} color={colors.primary} />
+              <Pressable key={set.id} style={[styles.setCard, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]} onPress={() => openSet(set)}>
+                <View style={[styles.setIcon, { backgroundColor: colors.accentSoft }]}>
+                  <BookIcon size={18} color={colors.accent} />
                 </View>
                 <View style={styles.setInfo}>
                   <Typography preset="label" numberOfLines={1}>{set.title}</Typography>
@@ -208,53 +207,47 @@ export function UserProfileScreen({ route, navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    content: {
-      padding: layout.screenPaddingH,
-      paddingTop: spacing[6],
-      gap: spacing[3],
-      alignItems: 'stretch',
-    },
-    avatarContainer: { alignItems: 'center', marginBottom: spacing[2] },
-    avatar: { width: layout.avatarLg, height: layout.avatarLg, borderRadius: layout.avatarLg / 2 },
-    avatarPlaceholder: {
-      width: layout.avatarLg,
-      height: layout.avatarLg,
-      borderRadius: layout.avatarLg / 2,
-      backgroundColor: colors.backgroundSecondary,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    metaRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing[2],
-    },
-    bio: { marginVertical: spacing[1] },
-    actions: { gap: spacing[2], marginTop: spacing[4] },
-    blockBtn: { marginTop: spacing[2] },
-    setsSection: { marginTop: spacing[4], gap: spacing[2] },
-    setsTitle: { marginBottom: spacing[1] },
-    setCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[3],
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-    },
-    setIcon: {
-      width: 36,
-      height: 36,
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.primarySurface,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    setInfo: { flex: 1, gap: spacing[0.5] },
-  });
-}
+const styles = StyleSheet.create({
+  content: {
+    padding: layout.screenPaddingH,
+    paddingTop: spacing.xxl,
+    gap: spacing.md,
+    alignItems: 'stretch',
+  },
+  avatarContainer: { alignItems: 'center', marginBottom: spacing.sm },
+  avatar: { width: layout.avatarLg, height: layout.avatarLg, borderRadius: layout.avatarLg / 2 },
+  avatarPlaceholder: {
+    width: layout.avatarLg,
+    height: layout.avatarLg,
+    borderRadius: layout.avatarLg / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+  },
+  bio: { marginVertical: spacing.xs },
+  actions: { gap: spacing.sm, marginTop: spacing.lg },
+  blockBtn: { marginTop: spacing.sm },
+  setsSection: { marginTop: spacing.lg, gap: spacing.sm },
+  setsTitle: { marginBottom: spacing.xs },
+  setCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+  },
+  setIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: layout.pillRadius,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  setInfo: { flex: 1, gap: spacing.s2 },
+});

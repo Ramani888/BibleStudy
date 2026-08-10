@@ -1,4 +1,4 @@
-import React, { forwardRef, useMemo, useState } from 'react';
+import React, { forwardRef, useState } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, textPresets, useTheme } from '../../theme';
 import { Typography } from './Typography';
 
 const EYE_SIZE = 20;
@@ -35,9 +35,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
   style,
   ...rest
 }, ref) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const [secure, setSecure] = useState(isPassword);
 
   return (
@@ -48,12 +46,12 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
         </Typography>
       )}
 
-      <View style={[styles.inputRow, rest.multiline && styles.inputRowMultiline]}>
+      <View style={[styles.inputRow, { backgroundColor: colors.surfaceMuted }, rest.multiline && styles.inputRowMultiline]}>
         {leftIcon && <View style={styles.iconLeft}>{leftIcon}</View>}
 
         <TextInput
           ref={ref}
-          style={[styles.input, leftIcon ? styles.inputWithLeft : null, rest.multiline ? styles.inputMultiline : null, style]}
+          style={[styles.input, { color: colors.textPrimary }, leftIcon ? styles.inputWithLeft : null, rest.multiline ? styles.inputMultiline : null, style]}
           placeholderTextColor={colors.textSecondary}
           secureTextEntry={secure}
           autoCapitalize="none"
@@ -78,7 +76,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
       </View>
 
       {error ? (
-        <Typography preset="caption" color={colors.error} style={styles.hint}>
+        <Typography preset="caption" color={colors.alert} style={styles.hint}>
           {error}
         </Typography>
       ) : hint ? (
@@ -90,51 +88,48 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
   );
 });
 
-const makeStyles = ({ colors, spacing, layout, textPresets }: Theme) =>
-  StyleSheet.create({
-    container: {
-      width: '100%',
-    },
-    label: {
-      marginBottom: spacing[1.5],
-    },
-    inputRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: layout.inputHeight,
-      borderRadius: layout.cardRadius,
-      backgroundColor: colors.backgroundSecondary,
-      paddingHorizontal: spacing[4],
-      overflow: 'hidden',
-    },
-    // Multiline: let the row grow with content instead of clipping to one line.
-    inputRowMultiline: {
-      height: undefined,
-      minHeight: layout.inputHeight,
-      alignItems: 'flex-start',
-      paddingVertical: spacing[3],
-    },
-    input: {
-      flex: 1,
-      ...textPresets.body,
-      lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
-      color: colors.textPrimary,
-      paddingVertical: 0,
-    },
-    inputMultiline: {
-      textAlignVertical: 'top',
-    },
-    inputWithLeft: {
-      paddingLeft: spacing[2],
-    },
-    iconLeft: {
-      marginRight: spacing[2],
-    },
-    iconRight: {
-      marginLeft: spacing[2],
-    },
-    hint: {
-      marginTop: spacing[1],
-      marginLeft: spacing[1],
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  label: {
+    marginBottom: spacing.s6,
+  },
+  inputRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: layout.inputHeight,
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg,
+    overflow: 'hidden',
+  },
+  // Multiline: let the row grow with content instead of clipping to one line.
+  inputRowMultiline: {
+    height: undefined,
+    minHeight: layout.inputHeight,
+    alignItems: 'flex-start',
+    paddingVertical: spacing.md,
+  },
+  input: {
+    flex: 1,
+    ...textPresets.body,
+    lineHeight: undefined, // lineHeight on TextInput clips descenders (g,y,p) at the bottom
+    paddingVertical: 0,
+  },
+  inputMultiline: {
+    textAlignVertical: 'top',
+  },
+  inputWithLeft: {
+    paddingLeft: spacing.sm,
+  },
+  iconLeft: {
+    marginRight: spacing.sm,
+  },
+  iconRight: {
+    marginLeft: spacing.sm,
+  },
+  hint: {
+    marginTop: spacing.xs,
+    marginLeft: spacing.xs,
+  },
+});

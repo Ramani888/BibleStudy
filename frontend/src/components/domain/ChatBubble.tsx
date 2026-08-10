@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { fontSizes, fontWeights, layout, spacing, Theme, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 import { Avatar } from '../ui/Avatar';
 
@@ -122,25 +122,23 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
 // ── ChatBubble ────────────────────────────────────────────────────────────────
 
 export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyping = false, timestamp }: ChatBubbleProps) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const isUser = role === 'user';
 
   return (
     <View style={[styles.row, isUser ? styles.rowUser : styles.rowAI]}>
       {!isUser && (
-        <View style={styles.aiBadge}>
-          <Icon name="sparkles" size={AI_BADGE_ICON_SIZE} color={colors.textOnPrimary} />
+        <View style={[styles.aiBadge, { backgroundColor: colors.accent }]}>
+          <Icon name="sparkles" size={AI_BADGE_ICON_SIZE} color={colors.textOnAccent} />
         </View>
       )}
 
       <View style={styles.bubbleCol}>
-        <View style={[styles.bubble, isUser ? styles.bubbleUser : styles.bubbleAI]}>
+        <View style={[styles.bubble, isUser ? [styles.bubbleUser, { backgroundColor: colors.accent }] : [styles.bubbleAI, { backgroundColor: colors.background, borderColor: colors.border }]]}>
           {isTyping ? (
             <TypingDots />
           ) : isUser ? (
-            <Typography preset="body" color={colors.textOnPrimary} style={styles.text}>
+            <Typography preset="body" color={colors.textOnAccent} style={styles.text}>
               {text}
             </Typography>
           ) : (
@@ -172,63 +170,58 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyp
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    row: {
-      flexDirection: 'row',
-      alignItems: 'flex-end',
-      gap: spacing[2],
-      marginBottom: spacing[3],
-    },
-    rowUser: { justifyContent: 'flex-end' },
-    rowAI: { justifyContent: 'flex-start' },
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  rowUser: { justifyContent: 'flex-end' },
+  rowAI: { justifyContent: 'flex-start' },
 
-    bubbleCol: {
-      maxWidth: '78%',
-      gap: spacing[0.5],
-    },
+  bubbleCol: {
+    maxWidth: '78%',
+    gap: spacing.s2,
+  },
 
-    bubble: {
-      borderRadius: layout.cardRadiusSm,
-      paddingHorizontal: spacing[4],
-      paddingVertical: spacing[3],
-      gap: spacing[1],
-    },
-    bubbleUser: {
-      backgroundColor: colors.primary,
-      borderBottomRightRadius: spacing[1],
-    },
-    bubbleAI: {
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
-      borderBottomLeftRadius: spacing[1],
-    },
+  bubble: {
+    borderRadius: layout.cardRadiusSm,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.xs,
+  },
+  bubbleUser: {
+    borderBottomRightRadius: spacing.xs,
+  },
+  bubbleAI: {
+    borderWidth: 1,
+    borderBottomLeftRadius: spacing.xs,
+  },
 
-    text: { lineHeight: BODY_LINE_HEIGHT },
-    credit: { marginTop: spacing[0.5] },
+  text: { lineHeight: BODY_LINE_HEIGHT },
+  credit: { marginTop: spacing.s2 },
 
-    timestamp: { fontSize: fontSizes.xs2 },
-    timestampUser: { textAlign: 'right' },
-    timestampAI: { textAlign: 'left' },
+  timestamp: { fontSize: fontSizes.xs2 },
+  timestampUser: { textAlign: 'right' },
+  timestampAI: { textAlign: 'left' },
 
-    aiBadge: {
-      width: layout.avatarSm,
-      height: layout.avatarSm,
-      borderRadius: layout.cardRadius,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    userAvatar: { marginBottom: spacing[0.5] },
-  });
+  aiBadge: {
+    width: layout.avatarSm,
+    height: layout.avatarSm,
+    borderRadius: layout.cardRadius,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  userAvatar: { marginBottom: spacing.s2 },
+});
 
 const mdStyles = StyleSheet.create({
-  root: { gap: spacing[2] },
+  root: { gap: spacing.sm },
   para: { lineHeight: BODY_LINE_HEIGHT },
   bulletBlock: {},
-  bulletRow: { flexDirection: 'row', gap: spacing[2] },
-  bulletRowGap: { marginTop: spacing[1] },
+  bulletRow: { flexDirection: 'row', gap: spacing.sm },
+  bulletRowGap: { marginTop: spacing.xs },
   bulletDot: { lineHeight: BODY_LINE_HEIGHT, width: 12 },
   bulletText: { flex: 1, lineHeight: BODY_LINE_HEIGHT },
 });
@@ -236,13 +229,13 @@ const mdStyles = StyleSheet.create({
 const dotStyles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    gap: spacing[1.5],
-    paddingVertical: spacing[1],
-    paddingHorizontal: spacing[1],
+    gap: spacing.s6,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.xs,
   },
   dot: {
     width: 7,
     height: 7,
-    borderRadius: spacing[1],
+    borderRadius: spacing.xs,
   },
 });

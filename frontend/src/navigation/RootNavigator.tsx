@@ -27,7 +27,7 @@ const ONBOARDING_KEY = '@onboarding_seen';
 function SplashScreen() {
   return (
     <View style={styles.splash}>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={colors.accent} />
     </View>
   );
 }

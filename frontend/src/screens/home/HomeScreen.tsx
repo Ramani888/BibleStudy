@@ -37,7 +37,7 @@ import {
   useDueSummary,
   useNotifications,
 } from '../../hooks';
-import { useTheme, type Theme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
 import type { DueSummary, StudySet } from '../../types';
@@ -58,11 +58,9 @@ function getGreeting(): string {
 function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
   greeting: string; name: string; avatarUri?: string | null; unread: number; onAI: () => void; onBell: () => void; onAvatar: () => void;
 }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
       <Pressable style={styles.headerLeft} onPress={onAvatar} accessibilityRole="button" accessibilityLabel="Go to profile">
         <Avatar uri={avatarUri} name={name} size="sm" />
         <View style={styles.greetingCol}>
@@ -71,14 +69,14 @@ function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvata
         </View>
       </Pressable>
       <View style={styles.headerActions}>
-        <Pressable onPress={onAI} hitSlop={8} style={styles.headerIconBtn} accessibilityRole="button" accessibilityLabel="AI Chat">
+        <Pressable onPress={onAI} hitSlop={8} style={[styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }]} accessibilityRole="button" accessibilityLabel="AI Chat">
           <SparklesIcon size={20} color={colors.textPrimary} />
         </Pressable>
-        <Pressable onPress={onBell} hitSlop={8} style={styles.headerIconBtn} accessibilityRole="button" accessibilityLabel="Notifications">
+        <Pressable onPress={onBell} hitSlop={8} style={[styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }]} accessibilityRole="button" accessibilityLabel="Notifications">
           <BellIcon size={20} color={colors.textPrimary} />
           {unread > 0 && (
-            <View style={styles.bellBadge}>
-              <Typography preset="caption" color={colors.textOnPrimary}>{unread > 9 ? '9+' : unread}</Typography>
+            <View style={[styles.bellBadge, { backgroundColor: colors.alert }]}>
+              <Typography preset="caption" color={colors.textOnAccent}>{unread > 9 ? '9+' : unread}</Typography>
             </View>
           )}
         </Pressable>
@@ -92,9 +90,7 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
   due?: DueSummary; continueSet: StudySet | null; streak: number;
   onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
 }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
 
   const hasDue = !!due && due.dueCount > 0 && !!due.topSet;
   const weekProgress = Math.min(streak, 7) / 7;
@@ -113,18 +109,18 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
   }
 
   return (
-    <AnimatedPressable style={styles.featured} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
+    <AnimatedPressable style={[styles.featured, { backgroundColor: colors.featuredSurface }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
       <View style={styles.featuredTop}>
-        <View style={styles.badge}>
-          <Typography preset="caption" color={colors.textOnPrimary}>{badge}</Typography>
+        <View style={[styles.badge, { backgroundColor: colors.success }]}>
+          <Typography preset="caption" color={colors.textOnAccent}>{badge}</Typography>
         </View>
-        <ArrowRightIcon size={18} color={colors.textOnPrimary} />
+        <ArrowRightIcon size={18} color={colors.textOnAccent} />
       </View>
-      <Typography preset="h4" color={colors.textOnPrimary} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
+      <Typography preset="h4" color={colors.textOnAccent} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
       <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
 
-      <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%` }]} />
+      <View style={[styles.progressTrack, { backgroundColor: colors.overlayLight }]}>
+        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.success }]} />
       </View>
       <View style={styles.featuredFooter}>
         <FlameIcon size={14} color={colors.warning} />
@@ -136,12 +132,10 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
 
 // ─── Circular quick action ────────────────────────────────────────────────────
 function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <AnimatedPressable style={styles.quickAction} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
-      <View style={styles.quickCircle}>
+      <View style={[styles.quickCircle, { borderColor: colors.border }]}>
         <Icon size={22} color={colors.textPrimary} />
       </View>
       <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
@@ -151,13 +145,11 @@ function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: str
 
 // ─── Recent set row ───────────────────────────────────────────────────────────
 function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: () => void }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={styles.setRow} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
-      <View style={styles.setIcon}>
+    <AnimatedPressable style={[styles.setRow, { backgroundColor: colors.surface }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+      <View style={[styles.setIcon, { borderColor: colors.border }]}>
         <LibraryIcon size={18} color={colors.textPrimary} />
       </View>
       <View style={styles.flex1}>
@@ -165,7 +157,7 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
         <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
       </View>
       {due ? (
-        <View style={styles.dueBadge}><Typography preset="caption" color={colors.success}>DUE</Typography></View>
+        <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}><Typography preset="caption" color={colors.success}>DUE</Typography></View>
       ) : (
         <ChevronRightIcon size={18} color={colors.textSecondary} />
       )}
@@ -175,13 +167,11 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
 
 // ─── Reusable mini set card (for the horizontal rails) ────────────────────────
 function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponent; onPress: () => void }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={styles.miniCard} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
-      <View style={styles.miniIcon}>
+    <AnimatedPressable style={[styles.miniCard, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+      <View style={[styles.miniIcon, { borderColor: colors.border }]}>
         <Icon size={18} color={colors.textPrimary} />
       </View>
       <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{set.title}</Typography>
@@ -205,9 +195,7 @@ function activityText(a: Activity): string {
 }
 
 function ActivityItem({ activity }: { activity: Activity }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <View style={styles.activityItem}>
       <Avatar uri={activity.user?.profileImage} name={activity.user?.name} size="sm" />
@@ -221,13 +209,11 @@ function ActivityItem({ activity }: { activity: Activity }) {
 
 // ─── Summary card (Friends · Folders · Sets · Cards · Credits · Groups) ────────
 function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <View style={styles.summaryCard}>
       {stats.map(s => (
-        <View key={s.label} style={styles.summaryStat}>
+        <View key={s.label} style={[styles.summaryStat, { backgroundColor: colors.surface }]}>
           <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>{s.label}</Typography>
         </View>
@@ -238,31 +224,27 @@ function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }>
 
 // ─── Verse card (purple box with big corner quote marks) ──────────────────────
 function VerseCard({ text, reference }: { text?: string; reference?: string }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   if (!text || !reference) return null;
   return (
-    <View style={styles.verseCard}>
-      <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>“</Typography>
-      <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>”</Typography>
-      <Typography preset="verse" color={colors.textOnPrimary} style={styles.verseText}>{text}</Typography>
+    <View style={[styles.verseCard, { backgroundColor: colors.accent }]}>
+      <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
+      <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
+      <Typography preset="verse" color={colors.textOnAccent} style={styles.verseText}>{text}</Typography>
       <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.verseRef}>— {reference}</Typography>
     </View>
   );
 }
 
 function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <View style={styles.sectionRow}>
       <Typography preset="h4" color={colors.textPrimary}>{title}</Typography>
       {actionLabel && onAction && (
         <Pressable onPress={onAction} hitSlop={8} style={styles.rowCenter} accessibilityRole="button" accessibilityLabel={actionLabel}>
-          <Typography preset="label" color={colors.primary}>{actionLabel}</Typography>
-          <ChevronRightIcon size={16} color={colors.primary} />
+          <Typography preset="label" color={colors.accent}>{actionLabel}</Typography>
+          <ChevronRightIcon size={16} color={colors.accent} />
         </Pressable>
       )}
     </View>
@@ -273,9 +255,7 @@ function SectionRow({ title, actionLabel, onAction }: { title: string; actionLab
 export function HomeScreen() {
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { spacing } = theme;
+  const { colors } = useTheme();
 
   const { data: sets } = useSets();
   const { data: publicData } = usePublicSets();
@@ -320,7 +300,7 @@ export function HomeScreen() {
   ];
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <StickyHeader
         greeting={getGreeting()}
         name={firstName}
@@ -334,7 +314,7 @@ export function HomeScreen() {
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
         <FeaturedCard due={dueSummary} continueSet={continueSet} streak={streak} onReview={goReview} onContinue={goContinue} onCreate={goCreate} />
 
-        <Spacer size={spacing[6]} />
+        <Spacer size={spacing.xxl} />
         <View style={styles.quickGrid}>
           {quickActions.map(a => (
             <QuickAction key={a.label} Icon={a.Icon} label={a.label} onPress={a.onPress} />
@@ -343,9 +323,9 @@ export function HomeScreen() {
 
         {recentSets.length > 0 && (
           <>
-            <Spacer size={spacing[6]} />
+            <Spacer size={spacing.xxl} />
             <SectionRow title="My Sets" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'Library' })} />
-            <Spacer size={spacing[3]} />
+            <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
                 <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onPress={() => goContinue(s)} />
@@ -355,7 +335,7 @@ export function HomeScreen() {
         )}
 
         {/* Summary */}
-        <Spacer size={spacing[6]} />
+        <Spacer size={spacing.xxl} />
         <SummaryCard stats={[
           { value: friends?.length ?? 0, label: 'Friends' },
           { value: folders?.length ?? 0, label: 'Folders' },
@@ -368,9 +348,9 @@ export function HomeScreen() {
         {/* From your friends */}
         {friendsSets.length > 0 && (
           <>
-            <Spacer size={spacing[6]} />
+            <Spacer size={spacing.xxl} />
             <SectionRow title="From your friends" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' })} />
-            <Spacer size={spacing[3]} />
+            <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {friendsSets.map(s => (
                 <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
@@ -383,9 +363,9 @@ export function HomeScreen() {
         {/* Recent activity */}
         {activities.length > 0 && (
           <>
-            <Spacer size={spacing[6]} />
+            <Spacer size={spacing.xxl} />
             <SectionRow title="Recent activity" />
-            <Spacer size={spacing[3]} />
+            <Spacer size={spacing.md} />
             <View style={styles.activityList}>
               {activities.map(a => <ActivityItem key={a.id} activity={a} />)}
             </View>
@@ -395,9 +375,9 @@ export function HomeScreen() {
         {/* Discover */}
         {publicSets.length > 0 && (
           <>
-            <Spacer size={spacing[6]} />
+            <Spacer size={spacing.xxl} />
             <SectionRow title="Discover" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'PublicSets' })} />
-            <Spacer size={spacing[3]} />
+            <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {publicSets.map(s => (
                 <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
@@ -407,117 +387,112 @@ export function HomeScreen() {
         )}
 
         {/* Daily verse */}
-        <Spacer size={spacing[6]} />
+        <Spacer size={spacing.xxl} />
         <VerseCard text={verse?.text} reference={verse?.reference} />
 
-        <Spacer size={spacing[8]} />
+        <Spacer size={spacing.xxxl} />
       </ScrollView>
 
     </SafeAreaView>
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    safe: { flex: 1, backgroundColor: colors.background },
-    scrollView: { flex: 1 },
-    scroll: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
-    flex1: { flex: 1 },
-    rowCenter: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
+  scrollView: { flex: 1 },
+  scroll: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
+  flex1: { flex: 1 },
+  rowCenter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 
-    // Header
-    header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[3],
-      backgroundColor: colors.background,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-    },
-    headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing[3], flex: 1 },
-    greetingCol: { flex: 1 },
-    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-    headerIconBtn: {
-      width: 40, height: 40, borderRadius: layout.pillRadius,
-      alignItems: 'center', justifyContent: 'center',
-      backgroundColor: colors.backgroundSecondary,
-    },
-    bellBadge: {
-      position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: spacing[2], paddingHorizontal: spacing[0.5],
-      backgroundColor: colors.error, alignItems: 'center', justifyContent: 'center',
-    },
+  // Header
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.md,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
+  greetingCol: { flex: 1 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  headerIconBtn: {
+    width: 40, height: 40, borderRadius: layout.pillRadius,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  bellBadge: {
+    position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: spacing.sm, paddingHorizontal: spacing.s2,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
-    // Featured card
-    featured: {
-      backgroundColor: colors.featuredSurface,
-      borderRadius: layout.cardRadiusLg, padding: spacing[5], gap: spacing[2],
-    },
-    featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    badge: { backgroundColor: colors.success, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
-    featuredTitle: { marginTop: spacing[1] },
-    progressTrack: { height: 6, borderRadius: spacing[0.5], backgroundColor: colors.overlayLight, marginTop: spacing[2], overflow: 'hidden' },
-    progressFill: { height: 6, borderRadius: spacing[0.5], backgroundColor: colors.success },
-    featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing[1], marginTop: spacing[1] },
+  // Featured card
+  featured: {
+    borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm,
+  },
+  featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  badge: { borderRadius: spacing.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
+  featuredTitle: { marginTop: spacing.xs },
+  progressTrack: { height: 6, borderRadius: spacing.s2, marginTop: spacing.sm, overflow: 'hidden' },
+  progressFill: { height: 6, borderRadius: spacing.s2 },
+  featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
 
-    // Quick actions
-    quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing[5] },
-    quickAction: { width: '25%', alignItems: 'center', gap: spacing[2] },
-    quickCircle: {
-      width: 56, height: 56, borderRadius: layout.pillRadius,
-      borderWidth: 1, borderColor: colors.border,
-      alignItems: 'center', justifyContent: 'center',
-    },
+  // Quick actions
+  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing.xl },
+  quickAction: { width: '25%', alignItems: 'center', gap: spacing.sm },
+  quickCircle: {
+    width: 56, height: 56, borderRadius: layout.pillRadius,
+    borderWidth: 1,
+    alignItems: 'center', justifyContent: 'center',
+  },
 
-    // Section
-    sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  // Section
+  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
 
-    // Recent sets
-    setsList: { gap: spacing[3] },
-    setRow: {
-      flexDirection: 'row', alignItems: 'center', gap: spacing[3],
-      backgroundColor: colors.backgroundCard, borderRadius: layout.cardRadiusSm, padding: spacing[4],
-    },
-    setIcon: {
-      width: 40, height: 40, borderRadius: layout.pillRadius,
-      borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
-    },
-    dueBadge: { backgroundColor: colors.successSurface, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
+  // Recent sets
+  setsList: { gap: spacing.md },
+  setRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    borderRadius: layout.cardRadiusSm, padding: spacing.lg,
+  },
+  setIcon: {
+    width: 40, height: 40, borderRadius: layout.pillRadius,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
+  },
+  dueBadge: { borderRadius: spacing.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
 
-    // Horizontal rails
-    railContent: { gap: spacing[3], paddingRight: spacing[2] },
-    miniCard: {
-      width: 140, gap: spacing[2], padding: spacing[4], borderRadius: layout.cardRadiusSm,
-      backgroundColor: colors.backgroundCard, borderWidth: 1, borderColor: colors.border,
-    },
-    miniIcon: {
-      width: 36, height: 36, borderRadius: layout.pillRadius,
-      borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
-    },
-    miniTitle: { minHeight: 34 },
+  // Horizontal rails
+  railContent: { gap: spacing.md, paddingRight: spacing.sm },
+  miniCard: {
+    width: 140, gap: spacing.sm, padding: spacing.lg, borderRadius: layout.cardRadiusSm,
+    borderWidth: 1,
+  },
+  miniIcon: {
+    width: 36, height: 36, borderRadius: layout.pillRadius,
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
+  },
+  miniTitle: { minHeight: 34 },
 
-    // Summary — separate square boxes, 3 per row
-    summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing[3] },
-    summaryStat: {
-      width: '31%', aspectRatio: 1.4,
-      alignItems: 'center', justifyContent: 'center', gap: spacing[1],
-      backgroundColor: colors.backgroundCard, borderRadius: layout.cardRadiusLg,
-    },
+  // Summary — separate square boxes, 3 per row
+  summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing.md },
+  summaryStat: {
+    width: '31%', aspectRatio: 1.4,
+    alignItems: 'center', justifyContent: 'center', gap: spacing.xs,
+    borderRadius: layout.cardRadiusLg,
+  },
 
-    // Activity feed
-    activityList: { gap: spacing[4] },
-    activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing[3] },
+  // Activity feed
+  activityList: { gap: spacing.lg },
+  activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 
-    // Verse card
-    verseCard: {
-      backgroundColor: colors.primary, borderRadius: layout.cardRadiusLg, minHeight: 190,
-      paddingHorizontal: spacing[6], paddingVertical: spacing[7],
-      justifyContent: 'center', gap: spacing[3], overflow: 'hidden',
-    },
-    verseText: { fontStyle: 'italic', textAlign: 'center' },
-    verseRef: { textAlign: 'center' },
-    quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
-    quoteTopLeft: { top: spacing[2], left: spacing[4] },
-    quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
-  });
+  // Verse card
+  verseCard: {
+    borderRadius: layout.cardRadiusLg, minHeight: 190,
+    paddingHorizontal: spacing.xxl, paddingVertical: spacing.s28,
+    justifyContent: 'center', gap: spacing.md, overflow: 'hidden',
+  },
+  verseText: { fontStyle: 'italic', textAlign: 'center' },
+  verseRef: { textAlign: 'center' },
+  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
+  quoteTopLeft: { top: spacing.sm, left: spacing.lg },
+  quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
+});

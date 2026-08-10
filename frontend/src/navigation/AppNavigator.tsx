@@ -41,7 +41,7 @@ export function AppNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
+        tabBarActiveTintColor: colors.accent,
         tabBarInactiveTintColor: colors.textDisabled,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
@@ -69,8 +69,8 @@ const makeStyles = (colors: ThemeColors, bottomInset: number) =>
       borderTopColor: colors.border,
       borderTopWidth: StyleSheet.hairlineWidth,
       height: layout.tabBarHeight + bottomInset,
-      paddingTop: spacing[1],
-      paddingBottom: bottomInset + spacing[1],
+      paddingTop: spacing.xs,
+      paddingBottom: bottomInset + spacing.xs,
     },
     tabLabel: {
       fontSize: fontSizes.xs,

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, StyleSheet, View, ViewStyle } from 'react-native';
 import Animated, {
   Easing,
@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
-import { layout, Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SHIMMER_COLORS: [string, string, string] = [
@@ -26,8 +26,7 @@ interface SkeletonProps {
 }
 
 export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style }: SkeletonProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const progress = useSharedValue(0);
 
   useEffect(() => {
@@ -47,7 +46,7 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
     <View
       style={[
         styles.base,
-        { width: width as number, height, borderRadius, overflow: 'hidden' },
+        { backgroundColor: colors.surfaceMuted, width: width as number, height, borderRadius, overflow: 'hidden' },
         style,
       ]}
     >
@@ -65,10 +64,9 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
 
 /** Pre-built skeleton for a set card */
 export function SetCardSkeleton() {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   return (
-    <View style={styles.card}>
+    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <Skeleton height={18} width="60%" borderRadius={6} />
       <View style={{ height: 8 }} />
       <Skeleton height={13} width="80%" borderRadius={6} />
@@ -78,17 +76,12 @@ export function SetCardSkeleton() {
   );
 }
 
-const makeStyles = ({ colors, spacing }: Theme) =>
-  StyleSheet.create({
-    base: {
-      backgroundColor: colors.backgroundSecondary,
-    },
-    card: {
-      backgroundColor: colors.backgroundCard,
-      borderRadius: layout.cardRadius,
-      padding: spacing[4],
-      borderWidth: 1,
-      borderColor: colors.border,
-      marginBottom: spacing[3],
-    },
-  });
+const styles = StyleSheet.create({
+  base: {},
+  card: {
+    borderRadius: layout.cardRadius,
+    padding: spacing.lg,
+    borderWidth: 1,
+    marginBottom: spacing.md,
+  },
+});

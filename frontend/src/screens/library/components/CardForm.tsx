@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { PlusCircleIcon } from '../../../components/icons';
 import { FormField } from '../../../components/forms';
 import { Typography } from '../../../components/ui';
-import { Theme, useTheme } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 import type { CardType } from '../../../types';
 
 const ICON_SIZE = 20;
@@ -57,9 +57,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   { defaultValues, onSubmit, onSubmittingChange },
   ref,
 ) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
 
   const answerRef = useRef<TextInput>(null);
   const [note, setNote] = useState(defaultValues?.note ?? '');
@@ -88,14 +86,14 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   return (
     <View style={styles.flex}>
       {/* ── Card type switcher ── */}
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         {(['QA', 'STORY'] as CardType[]).map(t => (
           <Pressable
             key={t}
-            style={[styles.tab, type === t && styles.tabActive]}
+            style={[styles.tab, { borderBottomColor: colors.transparent }, type === t && { borderBottomColor: colors.accent }]}
             onPress={() => setValue('type', t)}
           >
-            <Typography preset="label" color={type === t ? colors.primary : colors.textSecondary}>
+            <Typography preset="label" color={type === t ? colors.accent : colors.textSecondary}>
               {t === 'QA' ? 'Q&A Card' : 'Story Card'}
             </Typography>
           </Pressable>
@@ -140,7 +138,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
                 </Pressable>
               </View>
               <TextInput
-                style={styles.noteInput}
+                style={[styles.noteInput, { backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
                 placeholder={copy.notePlaceholder}
                 value={note}
                 onChangeText={setNote}
@@ -152,7 +150,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
               />
             </View>
           ) : (
-            <Pressable style={styles.addNoteBtn} onPress={() => setNoteExpanded(true)}>
+            <Pressable style={[styles.addNoteBtn, { borderColor: colors.border }]} onPress={() => setNoteExpanded(true)}>
               <View style={styles.addNoteBtnContent}>
                 <PlusCircleIcon size={ICON_SIZE} color={colors.textSecondary} />
                 <Typography preset="label" color={colors.textSecondary}>{copy.noteBtn}</Typography>
@@ -165,16 +163,14 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   );
 });
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    flex: { flex: 1 },
-    tabs: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: colors.border },
-    tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center', borderBottomWidth: 2, borderBottomColor: colors.transparent },
-    tabActive: { borderBottomColor: colors.primary },
-    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[8] },
-    formGap: { gap: spacing[4] },
-    noteLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing[2] },
-    addNoteBtn: { borderWidth: 1.5, borderRadius: layout.cardRadius, borderColor: colors.border, borderStyle: 'dashed', paddingVertical: spacing[3], alignItems: 'center' },
-    noteInput: { borderRadius: layout.cardRadius, backgroundColor: colors.backgroundSecondary, paddingHorizontal: spacing[4], paddingVertical: spacing[3], minHeight: 80, color: colors.textPrimary, textAlignVertical: 'top' },
-    addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  });
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  tabs: { flexDirection: 'row', borderBottomWidth: 1 },
+  tab: { flex: 1, paddingVertical: spacing.md, alignItems: 'center', borderBottomWidth: 2 },
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxxl },
+  formGap: { gap: spacing.lg },
+  noteLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
+  addNoteBtn: { borderWidth: 1.5, borderRadius: layout.cardRadius, borderStyle: 'dashed', paddingVertical: spacing.md, alignItems: 'center' },
+  noteInput: { borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: 80, textAlignVertical: 'top' },
+  addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+});

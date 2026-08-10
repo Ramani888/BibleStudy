@@ -42,7 +42,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
           <Pressable onPress={() => navigation.navigate('Login')}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Remember your password?{' '}
-              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
+              <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
             </Typography>
           </Pressable>
         </>

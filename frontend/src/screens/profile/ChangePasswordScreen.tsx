@@ -17,7 +17,6 @@ import { layout, spacing, useTheme } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const hasPassword = useAuthStore(s => s.user?.hasPassword ?? true);
   const updateUser = useAuthStore(s => s.updateUser);
   const user = useAuthStore(s => s.user);
@@ -100,10 +99,8 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   );
 }
 
-function makeStyles(_colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
-    form: { gap: spacing[4] },
-    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
-  });
-}
+const styles = StyleSheet.create({
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
+  form: { gap: spacing.lg },
+  footer: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
+});

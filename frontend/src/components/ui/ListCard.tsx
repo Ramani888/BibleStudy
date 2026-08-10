@@ -1,9 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { AnimatedPressable } from './AnimatedPressable';
 import { Typography } from './Typography';
 import { MoreVerticalIcon } from '../icons';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const MENU_ICON_SIZE = 20;
 
@@ -23,12 +23,10 @@ interface ListCardProps {
 
 /** Reusable list row: leading · title/subtitle · (meta + trailing + ⋮ menu). */
 export function ListCard({ leading, title, meta, subtitle, trailing, onPress, onLongPress, onMenuPress }: ListCardProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
 
   return (
-    <AnimatedPressable style={styles.card} onPress={onPress} onLongPress={onLongPress} accessibilityRole="button">
+    <AnimatedPressable style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress} onLongPress={onLongPress} accessibilityRole="button">
       {leading}
       <View style={styles.content}>
         <Typography preset="label" numberOfLines={1}>{title}</Typography>
@@ -51,16 +49,14 @@ export function ListCard({ leading, title, meta, subtitle, trailing, onPress, on
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      backgroundColor: colors.backgroundCard,
-      borderRadius: layout.cardRadiusSm,
-      padding: spacing[4],
-    },
-    content: { flex: 1, gap: spacing[0.5] },
-    trailing: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  });
+const styles = StyleSheet.create({
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    borderRadius: layout.cardRadiusSm,
+    padding: spacing.lg,
+  },
+  content: { flex: 1, gap: spacing.s2 },
+  trailing: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+});

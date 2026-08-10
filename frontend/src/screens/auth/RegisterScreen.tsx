@@ -75,7 +75,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
           <Pressable onPress={() => navigation.navigate('Login')}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Already have an account?{' '}
-              <Typography preset="bodySm" color={colors.primary}>Sign in</Typography>
+              <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
             </Typography>
           </Pressable>
         </>

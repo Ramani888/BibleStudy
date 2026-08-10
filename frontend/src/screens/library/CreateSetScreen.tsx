@@ -1,16 +1,15 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetForm, type SetFormHandle } from './components/SetForm';
 import { Button, Screen, ScreenHeader } from '../../components/ui';
 import { useCreateSet } from '../../hooks';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'CreateSet'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { mutateAsync: createSet } = useCreateSet();
 
   const formRef = useRef<SetFormHandle>(null);
@@ -18,7 +17,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
 
   const header = <ScreenHeader title="New Set" handle />;
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Create Set" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
@@ -47,14 +46,12 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    flex: { flex: 1 },
-    scroll: { padding: layout.screenPaddingH, gap: spacing[4] },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[2],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  scroll: { padding: layout.screenPaddingH, gap: spacing.lg },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+  },
+});

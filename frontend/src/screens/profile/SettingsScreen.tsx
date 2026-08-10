@@ -6,25 +6,25 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
-import { Divider, Typography } from '../../components/ui';
+import { Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { BookIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
 import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { spacing, useTheme, useThemeName, useThemeStore } from '../../theme';
+import { spacing, useTheme, useThemeStore } from '../../theme';
 
 const APP_VERSION = '1.0.0';
 
 export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
-  const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const theme = useTheme();
+  const { colors } = theme;
 
   const logout = useAuthStore(s => s.logout);
   const deleteAccount = useAuthStore(s => s.deleteAccount);
   const { show, dialogProps } = useConfirmDialog();
-  const isDark = useThemeName() === 'dark';
+  const isDark = theme.name === 'dark';
   const setMode = useThemeStore(s => s.setMode);
 
   const handleSignOut = () => {
@@ -67,7 +67,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
               <Switch
                 value={isDark}
                 onValueChange={v => setMode(v ? 'dark' : 'light')}
-                trackColor={{ true: colors.primary, false: colors.border }}
+                trackColor={{ true: colors.accent, false: colors.border }}
               />
             </View>
           </MenuSection>
@@ -76,7 +76,6 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         <View>
           <MenuSection label="Account">
             <MenuItem icon={LogOutIcon} label="Sign Out" showChevron={false} onPress={handleSignOut} />
-            <Divider marginV={0} />
             <MenuItem icon={TrashIcon} label="Delete Account" destructive showChevron={false} onPress={handleDeleteAccount} />
           </MenuSection>
         </View>
@@ -84,7 +83,6 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         <View>
           <MenuSection label="App Info">
             <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
-            <Divider marginV={0} />
             <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
           </MenuSection>
         </View>
@@ -95,15 +93,13 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    safe: { flex: 1 },
-    scroll: { paddingBottom: spacing[12] },
-    themeRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: spacing[4],
-    },
-  });
-}
+const styles = StyleSheet.create({
+  scroll: { paddingBottom: spacing.s48 },
+  themeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.s17,
+    paddingHorizontal: spacing.lg,
+  },
+});

@@ -1,61 +1,52 @@
-import React, { useMemo } from 'react';
-import { Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
-import { shadows, ShadowKey, Theme, useTheme } from '../../theme';
+import React from 'react';
+import { Platform, Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
+import { layout, spacing, useTheme } from '../../theme';
+
+type ShadowLevel = 'none' | 'sm' | 'md' | 'lg' | 'xl';
+
+const shadow = (elevation: number, opacity: number, radius: number, offsetY: number) =>
+  Platform.select({
+    ios:     { shadowColor: '#000', shadowOpacity: opacity, shadowRadius: radius, shadowOffset: { width: 0, height: offsetY } },
+    android: { elevation },
+    default: {},
+  });
+
+const shadows: Record<ShadowLevel, object> = {
+  none: {},
+  sm:   shadow(2,  0.06, 4,  1),
+  md:   shadow(4,  0.08, 8,  2),
+  lg:   shadow(8,  0.10, 16, 4),
+  xl:   shadow(12, 0.12, 24, 6),
+};
 
 interface CardProps extends ViewProps {
   children: React.ReactNode;
-  shadow?: ShadowKey;
-  /** Pass a value from the spacing scale: spacing[N] */
+  shadow?: ShadowLevel;
   padding?: number;
   style?: ViewStyle;
 }
 
 interface PressableCardProps extends Omit<PressableProps, 'style'> {
   children: React.ReactNode;
-  shadow?: ShadowKey;
-  /** Pass a value from the spacing scale: spacing[N] */
+  shadow?: ShadowLevel;
   padding?: number;
   style?: ViewStyle;
 }
 
-/** Static card container */
-export function Card({ children, shadow = 'none', padding, style, ...rest }: CardProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+export function Card({ children, shadow: s = 'none', padding, style, ...rest }: CardProps) {
+  const { colors } = useTheme();
   return (
-    <View
-      style={[
-        styles.base,
-        shadows[shadow],
-        padding !== undefined ? { padding } : null,
-        style,
-      ]}
-      {...rest}
-    >
+    <View style={[styles.base, { backgroundColor: colors.surface, borderColor: colors.border }, shadows[s], padding !== undefined ? { padding } : null, style]} {...rest}>
       {children}
     </View>
   );
 }
 
-/** Tappable card — use for list items, set cards, folder cards, etc. */
-export function PressableCard({
-  children,
-  shadow = 'none',
-  padding,
-  style,
-  ...rest
-}: PressableCardProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+export function PressableCard({ children, shadow: s = 'none', padding, style, ...rest }: PressableCardProps) {
+  const { colors } = useTheme();
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.base,
-        shadows[shadow],
-        padding !== undefined ? { padding } : null,
-        { opacity: pressed ? 0.85 : 1 },
-        style,
-      ]}
+      style={({ pressed }) => [styles.base, { backgroundColor: colors.surface, borderColor: colors.border }, shadows[s], padding !== undefined ? { padding } : null, { opacity: pressed ? 0.85 : 1 }, style]}
       {...rest}
     >
       {children}
@@ -63,13 +54,10 @@ export function PressableCard({
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    base: {
-      backgroundColor: colors.backgroundCard,
-      borderRadius: layout.cardRadius,
-      padding: spacing[4],
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  base: {
+    borderRadius: layout.cardRadius,
+    padding: spacing.lg,
+    borderWidth: 1,
+  },
+});

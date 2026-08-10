@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -9,7 +9,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { fontSizes, fontWeights, type Theme, useTheme } from '../../theme';
+import { fontSizes, fontWeights, useTheme, spacing, layout } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
@@ -28,9 +28,7 @@ const MODE_DISPLAY: Record<string, string> = {
 };
 
 export function QuizHubScreen() {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const navigation = useNavigation<Nav>();
 
   const { data: attempts = [], isLoading, isError, error, refetch, isFetching } = useRecentQuizAttempts(20);
@@ -70,11 +68,11 @@ export function QuizHubScreen() {
 
   const renderItem = ({ item }: { item: QuizAttemptWithSet }) => {
     const scored = item.total > 0;
-    const scoreColor = item.scorePct >= 80 ? colors.success : item.scorePct >= 50 ? colors.warning : colors.error;
+    const scoreColor = item.scorePct >= 80 ? colors.success : item.scorePct >= 50 ? colors.warning : colors.alert;
 
     return (
       <Pressable
-        style={styles.row}
+        style={[styles.row, { borderColor: colors.border, backgroundColor: colors.surface }]}
         onPress={() => handleDetails(item)}
         accessibilityRole="button"
       >
@@ -114,7 +112,7 @@ export function QuizHubScreen() {
   };
 
   const footer = !isLoading && !isError ? (
-    <View style={styles.footerBar}>
+    <View style={[styles.footerBar, { borderTopColor: colors.border }]}>
       <Button
         label="+ Start New Quiz"
         onPress={() => navigation.navigate('QuizSetup', undefined)}
@@ -200,39 +198,34 @@ export function QuizHubScreen() {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    flex: { flex: 1 },
-    pad: { padding: layout.screenPaddingH, gap: spacing[3] },
-    list: { padding: layout.screenPaddingH, gap: spacing[2], flexGrow: 1 },
-    listHeader: { marginBottom: spacing[3] },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[4],
-      borderRadius: layout.cardRadiusSm,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundCard,
-    },
-    scoreCircle: {
-      width: layout.iconCircleLg,
-      height: layout.iconCircleLg,
-      borderRadius: layout.iconCircleLg / 2,
-      borderWidth: 2,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    scoreText: {
-      fontSize: fontSizes.sm,
-      fontWeight: fontWeights.bold,
-    },
-    rowText: { flex: 1, gap: spacing[0.5] },
-    footerBar: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
+  listHeader: { marginBottom: spacing.md },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: layout.cardRadiusSm,
+    borderWidth: 1,
+  },
+  scoreCircle: {
+    width: layout.iconCircleLg,
+    height: layout.iconCircleLg,
+    borderRadius: layout.iconCircleLg / 2,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scoreText: {
+    fontSize: fontSizes.sm,
+    fontWeight: fontWeights.bold,
+  },
+  rowText: { flex: 1, gap: spacing.s2 },
+  footerBar: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+  },
+});

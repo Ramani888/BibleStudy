@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import {
@@ -10,7 +10,7 @@ import {
   StarIcon,
 } from '../../../components/icons';
 import { Card, Divider, Typography } from '../../../components/ui';
-import { useTheme, fontSizes, fontWeights, layout, spacing, type Theme } from '../../../theme';
+import { useTheme, fontSizes, fontWeights, layout, spacing, palette } from '../../../theme';
 import { formatDate } from '../../../utils/formatters';
 import type { AIChat, BookmarkedChat, ChatSession } from '../../../types';
 
@@ -19,21 +19,19 @@ const CHEVRON_SIZE = 16;
 const SESSION_ICON_SIZE = 14;
 
 function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   return (
     <>
-      {index > 0 && <Divider marginV={spacing[3]} />}
+      {index > 0 && <Divider marginV={spacing.md} />}
       <View style={styles.qRow}>
-        <View style={styles.qBadge}>
+        <View style={[styles.qBadge, { backgroundColor: colors.infoSurface }]}>
           <Typography preset="caption" color={colors.info} style={styles.badgeLabel}>Q</Typography>
         </View>
         <Typography preset="body" style={styles.flex}>{chat.question}</Typography>
       </View>
-      <View style={[styles.aRow, { marginTop: spacing[2] }]}>
-        <View style={styles.aBadge}>
-          <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
+      <View style={[styles.aRow, { marginTop: spacing.sm }]}>
+        <View style={[styles.aBadge, { backgroundColor: colors.accentSoft }]}>
+          <SparklesIcon size={BADGE_ICON_SIZE} color={colors.accent} />
         </View>
         <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
           {chat.answer}
@@ -44,13 +42,11 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
 }
 
 export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
   return (
     <Pressable onPress={() => setExpanded(e => !e)}>
-      <Card style={styles.card}>
+      <Card style={{ ...styles.card, backgroundColor: colors.background }}>
         <View style={styles.titleRow}>
           <View style={[styles.sessionIcon, { backgroundColor: colors.warningSurface }]}>
             <StarIcon size={SESSION_ICON_SIZE} color={colors.warning} />
@@ -64,10 +60,10 @@ export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
         </View>
         {expanded && (
           <Animated.View entering={FadeIn.duration(200)}>
-            <Divider marginV={spacing[3]} />
+            <Divider marginV={spacing.md} />
             <View style={styles.aRow}>
-              <View style={styles.aBadge}>
-                <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
+              <View style={[styles.aBadge, { backgroundColor: colors.accentSoft }]}>
+                <SparklesIcon size={BADGE_ICON_SIZE} color={colors.accent} />
               </View>
               <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
                 {chat.answer}
@@ -75,7 +71,7 @@ export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
             </View>
           </Animated.View>
         )}
-        <Typography preset="caption" color={colors.textDisabled} style={{ marginTop: spacing[1] }}>
+        <Typography preset="caption" color={colors.textDisabled} style={{ marginTop: spacing.xs }}>
           Bookmarked {formatDate(chat.bookmarkedAt)}
         </Typography>
       </Card>
@@ -90,9 +86,7 @@ export interface SessionCardProps {
 }
 
 export function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
   const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
   const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
@@ -103,10 +97,10 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
       onPress={() => setExpanded(e => !e)}
       onLongPress={() => onLongPress(session)}
     >
-      <Card style={styles.card}>
+      <Card style={{ ...styles.card, backgroundColor: colors.background }}>
         <View style={styles.titleRow}>
-          <View style={styles.sessionIcon}>
-            <ChatIcon size={SESSION_ICON_SIZE} color={colors.primary} />
+          <View style={[styles.sessionIcon, { backgroundColor: colors.accentSoft }]}>
+            <ChatIcon size={SESSION_ICON_SIZE} color={colors.accent} />
           </View>
           <Typography
             preset="body"
@@ -123,8 +117,8 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
         {session.tags && session.tags.length > 0 && (
           <View style={styles.tagRow}>
             {session.tags.map(tag => (
-              <View key={tag} style={styles.tagPill}>
-                <Typography preset="caption" color={colors.primaryDark}>{tag}</Typography>
+              <View key={tag} style={[styles.tagPill, { backgroundColor: colors.accentSoft }]}>
+                <Typography preset="caption" color={palette.indigo800}>{tag}</Typography>
               </View>
             ))}
           </View>
@@ -134,29 +128,29 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
           <Typography preset="caption" color={colors.textDisabled}>
             {session.messageCount} {questionLabel}
           </Typography>
-          <View style={styles.dot} />
-          <View style={styles.creditPill}>
-            <Typography preset="caption" color={colors.primaryDark}>
+          <View style={[styles.dot, { backgroundColor: colors.textDisabled }]} />
+          <View style={[styles.creditPill, { backgroundColor: colors.accentSoft }]}>
+            <Typography preset="caption" color={palette.indigo800}>
               −{session.totalCreditsUsed} {creditLabel}
             </Typography>
           </View>
-          <View style={styles.dot} />
+          <View style={[styles.dot, { backgroundColor: colors.textDisabled }]} />
           <Typography preset="caption" color={colors.textDisabled}>
             {formatDate(session.startedAt)}
           </Typography>
         </View>
 
         <Pressable
-          style={({ pressed }) => [styles.continueRow, { opacity: pressed ? 0.7 : 1 }]}
+          style={({ pressed }) => [styles.continueRow, { borderTopColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
           onPress={() => onContinue(session)}
         >
-          <Typography preset="label" color={colors.primary}>Continue conversation</Typography>
-          <ArrowRightIcon size={14} color={colors.primary} />
+          <Typography preset="label" color={colors.accent}>Continue conversation</Typography>
+          <ArrowRightIcon size={14} color={colors.accent} />
         </Pressable>
 
         {expanded && (
           <Animated.View entering={FadeIn.duration(200)}>
-            <Divider marginV={spacing[3]} />
+            <Divider marginV={spacing.md} />
             {session.messages.map((msg, i) => (
               <MessagePair key={msg.id} chat={msg} index={i} />
             ))}
@@ -167,51 +161,46 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
   );
 }
 
-const makeStyles = ({ colors }: Theme) => StyleSheet.create({
-  card: { gap: spacing[2], backgroundColor: colors.background },
+const styles = StyleSheet.create({
+  card: { gap: spacing.sm },
 
-  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2] },
+  titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
   sessionIcon: {
-    width: 26, height: 26, borderRadius: spacing[2],
-    backgroundColor: colors.primarySurface,
+    width: 26, height: 26, borderRadius: spacing.sm,
     alignItems: 'center', justifyContent: 'center',
     marginTop: 1, flexShrink: 0,
   },
   sessionTitle: { fontWeight: fontWeights.medium },
 
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1] },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs },
   tagPill: {
-    backgroundColor: colors.primarySurface,
     borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[0.5],
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.s2,
   },
 
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2], flexWrap: 'wrap' },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, flexWrap: 'wrap' },
   continueRow: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    borderTopWidth: 1, borderTopColor: colors.border,
-    paddingTop: spacing[3], marginTop: spacing[1],
+    borderTopWidth: 1,
+    paddingTop: spacing.md, marginTop: spacing.xs,
   },
-  dot: { width: 3, height: 3, borderRadius: spacing[0.5], backgroundColor: colors.textDisabled },
+  dot: { width: 3, height: 3, borderRadius: spacing.s2 },
   creditPill: {
-    backgroundColor: colors.primarySurface,
     borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[0.5],
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.s2,
   },
 
-  qRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
-  aRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
+  qRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
+  aRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
   qBadge: {
-    width: 22, height: 22, borderRadius: spacing[1.5],
-    backgroundColor: colors.infoSurface,
+    width: 22, height: 22, borderRadius: spacing.s6,
     alignItems: 'center', justifyContent: 'center',
     marginTop: 1, flexShrink: 0,
   },
   aBadge: {
-    width: 22, height: 22, borderRadius: spacing[1.5],
-    backgroundColor: colors.primarySurface,
+    width: 22, height: 22, borderRadius: spacing.s6,
     alignItems: 'center', justifyContent: 'center',
     marginTop: 1, flexShrink: 0,
   },

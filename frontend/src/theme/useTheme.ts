@@ -1,21 +1,15 @@
 import { useColorScheme } from 'react-native';
 import { useMemo } from 'react';
-import { darkColors, lightColors, type ThemeColors } from './colors';
-import { spacing, layout } from './spacing';
-import { textPresets } from './typography';
+import { darkColors, lightColors } from './colors';
+import { spacing } from './spacing';
+import { radius } from './radius';
+import { typography, textPresets } from './typography';
+import { Theme, ThemeName } from './types';
 import { useThemeStore } from './themeStore';
+import { layout } from '../constants/layout';
 
-export type ThemeName = 'light' | 'dark';
+export type { ThemeName, Theme };
 
-export interface Theme {
-  name: ThemeName;
-  colors: ThemeColors;
-  spacing: typeof spacing;
-  layout: typeof layout;
-  textPresets: typeof textPresets;
-}
-
-/** Resolve the active theme name from the user preference + OS color scheme. */
 export function useThemeName(): ThemeName {
   const mode = useThemeStore(s => s.mode);
   const system = useColorScheme();
@@ -23,16 +17,17 @@ export function useThemeName(): ThemeName {
   return mode;
 }
 
-/** The single hook a migrated screen uses to read design tokens (dark-aware). */
 export function useTheme(): Theme {
   const name = useThemeName();
   return useMemo(
     () => ({
       name,
-      colors: name === 'dark' ? darkColors : lightColors,
+      colors:     name === 'dark' ? darkColors : lightColors,
       spacing,
-      layout,
+      radius,
+      typography,
       textPresets,
+      layout,
     }),
     [name],
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
@@ -9,7 +9,7 @@ import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon } 
 import { useSearchToggle, useSets } from '../../hooks';
 import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
-import { type Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
 import type { QuizStackParamList } from '../../navigation/types';
 
@@ -35,9 +35,7 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
 export function QuizSetupScreen() {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizSetup: Params }, 'QuizSetup'>>();
 
@@ -54,12 +52,12 @@ export function QuizSetupScreen() {
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const { data: sets = [], isLoading } = useSets();
   const { data: cards = [], isLoading: cardsLoading } = useCardsForSets(selectedSetIds);
-  const available = useMemo(() => supportedModes(cards), [cards]);
+  const available = supportedModes(cards);
 
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
 
-  const filteredSets = useMemo(() => {
+  const filteredSets = (() => {
     const q = search.trim().toLowerCase();
     const filtered = q ? sets.filter(s => s.title.toLowerCase().includes(q)) : [...sets];
     return filtered.sort((a, b) => {
@@ -67,14 +65,14 @@ export function QuizSetupScreen() {
       if (sortOrder === 'cards') return (b._count?.cards ?? 0) - (a._count?.cards ?? 0);
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
-  }, [sets, search, sortOrder]);
+  })();
 
-  const chipModes = useMemo<QuizSelectableMode[]>(() => {
-    if (selectedSetIds.length === 0 || cards.length === 0) return [];
+  const chipModes = (() => {
+    if (selectedSetIds.length === 0 || cards.length === 0) return [] as QuizSelectableMode[];
     return ALL_SELECTABLE.filter(m => m === 'mix' || available.includes(m as any));
-  }, [selectedSetIds, cards, available]);
+  })();
 
-  // Fix 5: reset mode when selected sets change and mode is no longer available
+  // reset mode when selected sets change and mode is no longer available
   useEffect(() => {
     if (chipModes.length > 0 && !chipModes.includes(selectedMode)) {
       setSelectedMode('mix');
@@ -104,7 +102,7 @@ export function QuizSetupScreen() {
     <Screen
       header={<ScreenHeader title="New Quiz" onBack={() => navigation.goBack()} />}
       footer={
-        <View style={styles.footer}>
+        <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Button
             label={cardsLoading ? 'Loading cards…' : 'Start Quiz'}
             onPress={() => navigation.navigate('Quiz', {
@@ -131,7 +129,7 @@ export function QuizSetupScreen() {
             value={quizName}
             onChangeText={setQuizName}
             returnKeyType="done"
-            containerStyle={{ marginBottom: spacing[5] }}
+            containerStyle={{ marginBottom: spacing.xl }}
           />
 
           </View>
@@ -139,10 +137,10 @@ export function QuizSetupScreen() {
           {/* ── Choose Sets row ── */}
           <View>
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>CHOOSE SETS</Typography>
-          <Pressable style={styles.selectorRow} onPress={() => setSetPickerOpen(true)} accessibilityRole="button">
+          <Pressable style={[styles.selectorRow, { borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => setSetPickerOpen(true)} accessibilityRole="button">
             <View style={styles.selectorIcon}>
               {selectedSetIds.length > 0
-                ? <CheckCircleIcon size={20} color={colors.primary} />
+                ? <CheckCircleIcon size={20} color={colors.accent} />
                 : <ChevronRightIcon size={20} color={colors.textDisabled} />
               }
             </View>
@@ -161,7 +159,7 @@ export function QuizSetupScreen() {
 
           {/* ── Quiz Type chips ── */}
           {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
-            <View style={{ marginTop: spacing[6] }}>
+            <View style={{ marginTop: spacing.xxl }}>
               <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>QUIZ TYPE</Typography>
               {cardsLoading ? (
                 <Typography preset="body" color={colors.textSecondary}>Loading modes…</Typography>
@@ -193,11 +191,11 @@ export function QuizSetupScreen() {
         <View style={styles.sheetToolbar}>
           <Typography preset="h4" style={styles.flex}>Choose Sets</Typography>
           <Pressable onPress={toggleSearch} hitSlop={8} accessibilityRole="button">
-            <SearchIcon size={20} color={searchVisible ? colors.primary : colors.textSecondary} />
+            <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
           </Pressable>
           <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn} accessibilityRole="button">
-            <SortIcon size={20} color={colors.primary} />
-            <Typography preset="caption" color={colors.primary}>{SORT_LABEL[sortOrder]}</Typography>
+            <SortIcon size={20} color={colors.accent} />
+            <Typography preset="caption" color={colors.accent}>{SORT_LABEL[sortOrder]}</Typography>
           </Pressable>
         </View>
 
@@ -213,7 +211,7 @@ export function QuizSetupScreen() {
 
         {selectedSetIds.length > 0 && (
           <View style={styles.selectedBadge}>
-            <Typography preset="caption" color={colors.primary}>
+            <Typography preset="caption" color={colors.accent}>
               {selectedSetIds.length} set{selectedSetIds.length > 1 ? 's' : ''} selected
             </Typography>
           </View>
@@ -233,14 +231,18 @@ export function QuizSetupScreen() {
             const selected = selectedSetIds.includes(item.id);
             return (
               <Pressable
-                style={[styles.setRow, selected && styles.setRowSelected]}
+                style={[
+                  styles.setRow,
+                  { borderColor: colors.border, backgroundColor: colors.surface },
+                  selected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                ]}
                 onPress={() => handleToggle(item.id, item.title)}
               >
-                <View style={[styles.checkbox, selected && styles.checkboxSelected]}>
-                  {selected && <CheckCircleIcon size={18} color={colors.primary} />}
+                <View style={[styles.checkbox, { borderColor: colors.border }, selected && { borderColor: colors.accent }]}>
+                  {selected && <CheckCircleIcon size={18} color={colors.accent} />}
                 </View>
                 <View style={styles.flex}>
-                  <Typography preset="h4" color={selected ? colors.primary : colors.textPrimary} numberOfLines={1}>
+                  <Typography preset="h4" color={selected ? colors.accent : colors.textPrimary} numberOfLines={1}>
                     {item.title}
                   </Typography>
                   <Typography preset="caption" color={colors.textSecondary}>
@@ -264,68 +266,56 @@ export function QuizSetupScreen() {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    flex: { flex: 1 },
-    section: { padding: layout.screenPaddingH },
-    sectionLabel: { marginBottom: spacing[3], marginTop: spacing[2] },
-    selectorRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[4],
-      borderRadius: layout.cardRadiusSm,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundCard,
-    },
-    selectorIcon: { width: 28, alignItems: 'center' },
-    chipRow: { flexDirection: 'row', gap: spacing[2], paddingBottom: spacing[1] },
-    modeDesc: { marginTop: spacing[3] },
-    footer: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    sheetContent: { maxHeight: '85%' },
-    sheetToolbar: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      marginBottom: spacing[3],
-    },
-    sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    sheetSearch: { marginBottom: spacing[2] },
-    selectedBadge: {
-      paddingVertical: spacing[1],
-      marginBottom: spacing[2],
-    },
-    sheetList: { flexShrink: 1 },
-    setRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[4],
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundCard,
-      marginBottom: spacing[2],
-    },
-    setRowSelected: {
-      borderColor: colors.primary,
-      backgroundColor: colors.primarySurface,
-    },
-    checkbox: {
-      width: spacing[6],
-      height: spacing[6],
-      borderRadius: layout.cardRadius,
-      borderWidth: 2,
-      borderColor: colors.border,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    checkboxSelected: { borderColor: colors.primary },
-    sheetDone: { marginTop: spacing[3] },
-  });
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  section: { padding: layout.screenPaddingH },
+  sectionLabel: { marginBottom: spacing.md, marginTop: spacing.sm },
+  selectorRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: layout.cardRadiusSm,
+    borderWidth: 1,
+  },
+  selectorIcon: { width: 28, alignItems: 'center' },
+  chipRow: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
+  modeDesc: { marginTop: spacing.md },
+  footer: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+  },
+  sheetContent: { maxHeight: '85%' },
+  sheetToolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.md,
+  },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  sheetSearch: { marginBottom: spacing.sm },
+  selectedBadge: {
+    paddingVertical: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  sheetList: { flexShrink: 1 },
+  setRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+    marginBottom: spacing.sm,
+  },
+  checkbox: {
+    width: spacing.xxl,
+    height: spacing.xxl,
+    borderRadius: layout.cardRadius,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  sheetDone: { marginTop: spacing.md },
+});

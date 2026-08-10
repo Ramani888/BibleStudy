@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { BackIcon, CloseIcon } from '../icons';
 import { Typography } from './Typography';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const NAV_ICON_SIZE = 24;
 
@@ -21,9 +21,7 @@ interface ScreenHeaderProps {
 
 /** Custom in-screen header (SVG nav icon + title + actions) matching Home. */
 export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumberOfLines = 1 }: ScreenHeaderProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
 
   const leading = handle ? null : onBack ? (
     <Pressable onPress={onBack} hitSlop={8} style={styles.navBtn} accessibilityRole="button" accessibilityLabel="Go back">
@@ -37,8 +35,8 @@ export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumbe
 
   return (
     <View>
-      {handle && <View style={styles.grabber} />}
-      <View style={styles.header}>
+      {handle && <View style={[styles.grabber, { backgroundColor: colors.border }]} />}
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
         {leading}
         {title ? (
           <Typography preset="h3" numberOfLines={titleNumberOfLines} style={styles.title}>
@@ -53,26 +51,23 @@ export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumbe
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    grabber: {
-      width: 40,
-      height: 4,
-      borderRadius: spacing[0.5],
-      backgroundColor: colors.border,
-      alignSelf: 'center',
-      marginTop: spacing[2],
-    },
-    header: {
-      minHeight: layout.headerHeight,
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[2],
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[2],
-      backgroundColor: colors.background,
-    },
-    navBtn: { marginLeft: -spacing[1] },
-    title: { flex: 1 },
-    actions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
-  });
+const styles = StyleSheet.create({
+  grabber: {
+    width: 40,
+    height: 4,
+    borderRadius: spacing.s2,
+    alignSelf: 'center',
+    marginTop: spacing.sm,
+  },
+  header: {
+    minHeight: layout.headerHeight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.sm,
+  },
+  navBtn: { marginLeft: -spacing.xs },
+  title: { flex: 1 },
+  actions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+});

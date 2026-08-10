@@ -25,7 +25,7 @@ import {
   useManualRefresh,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
 
@@ -35,9 +35,7 @@ type Tab = 'sets' | 'folders';
 type SortOrder = 'newest' | 'alpha' | 'cards';
 
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch, clear: clearSearch } = useSearchToggle();
   const [activeTab, setActiveTab] = useState<Tab>('sets');
@@ -160,38 +158,38 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         {/* Left: other collections */}
         <View style={styles.headerGroup}>
           <Pressable onPress={() => navigation.navigate('FriendsSets')} hitSlop={8}>
-            <UsersIcon size={ICON_SIZE} color={colors.primary} />
+            <UsersIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
-            <GlobeIcon size={ICON_SIZE} color={colors.primary} />
+            <GlobeIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
           <Pressable onPress={() => navigation.navigate('StudyPlans')} hitSlop={8}>
-            <BookIcon size={ICON_SIZE} color={colors.primary} />
+            <BookIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
         </View>
 
         {/* Right: current-list controls */}
         <View style={styles.headerGroup}>
           <Pressable onPress={toggleSearch} hitSlop={8}>
-            <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
+            <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
           </Pressable>
           <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn}>
-            <SortIcon size={ICON_SIZE} color={colors.primary} />
-            <Typography preset="caption" color={colors.primary}>
+            <SortIcon size={ICON_SIZE} color={colors.accent} />
+            <Typography preset="caption" color={colors.accent}>
               {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : activeTab === 'sets' ? 'Cards' : 'Sets'}
             </Typography>
           </Pressable>
         </View>
       </View>
 
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         {(['sets', 'folders'] as Tab[]).map(tab => (
           <Pressable
             key={tab}
-            style={[styles.tab, activeTab === tab && styles.tabActive]}
+            style={[styles.tab, { borderBottomColor: colors.transparent }, activeTab === tab && { borderBottomColor: colors.accent }]}
             onPress={() => switchTab(tab)}
           >
-            <Typography preset="label" color={activeTab === tab ? colors.primary : colors.textSecondary}>
+            <Typography preset="label" color={activeTab === tab ? colors.accent : colors.textSecondary}>
               {tab === 'sets' ? 'SETS' : 'FOLDERS'}
             </Typography>
           </Pressable>
@@ -214,7 +212,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   // ── Footer (persistent create CTA) ──
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button
         label={activeTab === 'sets' ? 'Create Set' : 'Create Folder'}
         onPress={() =>
@@ -238,12 +236,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListFooterComponent={<Spacer size={spacing[8]} />}
+          ListFooterComponent={<Spacer size={spacing.xxxl} />}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor={colors.primary}
+              tintColor={colors.accent}
             />
           }
           renderItem={({ item }) => (
@@ -276,12 +274,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           contentContainerStyle={styles.scroll}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
-          ListFooterComponent={<Spacer size={spacing[8]} />}
+          ListFooterComponent={<Spacer size={spacing.xxxl} />}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor={colors.primary}
+              tintColor={colors.accent}
             />
           }
           renderItem={({ item }) => (
@@ -447,45 +445,40 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    headerActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: layout.screenPaddingH,
-      paddingTop: spacing[3],
-      paddingBottom: spacing[2],
-    },
-    headerGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
-    tabs: {
-      flexDirection: 'row',
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    tab: {
-      flex: 1,
-      paddingVertical: spacing[3],
-      alignItems: 'center',
-      borderBottomWidth: 2,
-      borderBottomColor: colors.transparent,
-    },
-    tabActive: { borderBottomColor: colors.primary },
-    searchWrap: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingTop: spacing[3],
-    },
-    searchInput: { marginBottom: 0 },
-    scroll: { padding: layout.screenPaddingH },
-    separator: { height: spacing[3] },
-    emptyState: { minHeight: 200 },
-    modalBody: { gap: spacing[4] },
-    colorLabel: { marginBottom: spacing[1.5] },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-  });
+const styles = StyleSheet.create({
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  headerGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  tabs: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    borderBottomWidth: 2,
+  },
+  searchWrap: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.md,
+  },
+  searchInput: { marginBottom: 0 },
+  scroll: { padding: layout.screenPaddingH },
+  separator: { height: spacing.md },
+  emptyState: { minHeight: 200 },
+  modalBody: { gap: spacing.lg },
+  colorLabel: { marginBottom: spacing.s6 },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.lg,
+    borderTopWidth: 1,
+  },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+});

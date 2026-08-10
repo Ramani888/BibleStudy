@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
 import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
@@ -14,16 +14,14 @@ import {
 
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { fontWeights, Theme, useTheme } from '../../theme';
+import { fontWeights, layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
 const ICON_SIZE = 20;
 
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
 
   const { setId, setTitle, isOwner = true } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
@@ -172,15 +170,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   // ── Header (normal vs reorder) ──
   const header = reorderMode ? (
-    <View style={styles.reorderBar}>
+    <View style={[styles.reorderBar, { borderBottomColor: colors.border }]}>
       <Pressable onPress={handleCancelReorder} hitSlop={8}>
         <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
       </Pressable>
       <Typography preset="bodySm" style={styles.reorderTitle}>Reorder Cards</Typography>
       <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8}>
         {isReordering
-          ? <ActivityIndicator size="small" color={colors.primary} />
-          : <Typography preset="bodySm" color={colors.primary} style={styles.reorderTitle}>Save</Typography>
+          ? <ActivityIndicator size="small" color={colors.accent} />
+          : <Typography preset="bodySm" color={colors.accent} style={styles.reorderTitle}>Save</Typography>
         }
       </Pressable>
     </View>
@@ -192,7 +190,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         right={
           <>
             <Pressable onPress={toggleCardSearch} hitSlop={8}>
-              <SearchIcon size={ICON_SIZE} color={cardSearchVisible ? colors.primary : colors.textSecondary} />
+              <SearchIcon size={ICON_SIZE} color={cardSearchVisible ? colors.accent : colors.textSecondary} />
             </Pressable>
             {cards.length > 0 && (
               <Pressable onPress={handleShare} hitSlop={8}>
@@ -233,7 +231,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   // ── Normal card (list / grid) ──
   const renderCard = ({ item }: { item: CardType }) => (
     <View style={[styles.cardItem, cardLayout === 'grid' && styles.cardItemGrid]}>
-      <View style={[styles.questionSection, cardLayout === 'grid' && styles.questionSectionGrid]}>
+      <View style={[styles.questionSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
         <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
           {item.question}
         </Typography>
@@ -252,7 +250,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         ) : null}
       </View>
 
-      <View style={[styles.answerSection, cardLayout === 'grid' && styles.answerSectionGrid]}>
+      <View style={[styles.answerSection, { backgroundColor: colors.surface }, cardLayout === 'grid' && styles.answerSectionGrid]}>
         {item.isBlurred && isOwner ? (
           <View style={styles.blurOverlay}>
             <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
@@ -264,7 +262,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             </Typography>
             {item.note && cardLayout === 'list' ? (
               <>
-                <Divider marginV={spacing[2]} />
+                <Divider marginV={spacing.sm} />
                 <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
                 <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
                   {item.note}
@@ -286,7 +284,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         disabled={isActive}
         style={[styles.cardItem, isActive && styles.cardItemActive]}
       >
-        <View style={styles.questionSection}>
+        <View style={[styles.questionSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           <Typography preset="body" style={styles.question} numberOfLines={2}>
             {item.question}
           </Typography>
@@ -294,7 +292,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
           </View>
         </View>
-        <View style={styles.answerSection}>
+        <View style={[styles.answerSection, { backgroundColor: colors.surface }]}>
           <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={2}>
             {item.answer}
           </Typography>
@@ -332,7 +330,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
             isLoading ? (
-              <ActivityIndicator color={colors.primary} style={styles.listLoader} />
+              <ActivityIndicator color={colors.accent} style={styles.listLoader} />
             ) : (
               <EmptyState
                 title={cardSearch ? 'No results' : 'No cards yet'}
@@ -410,7 +408,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onClose={() => { setNoteCard(null); setNoteText(''); }}
       >
         <TextInput
-          style={styles.notePopupInput}
+          style={[styles.notePopupInput, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
           placeholder="Add a note…"
           value={noteText}
           onChangeText={setNoteText}
@@ -439,69 +437,61 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    reorderBar: {
-      minHeight: layout.headerHeight,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[3],
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    reorderTitle: { fontWeight: fontWeights.semiBold },
-    count: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[2] },
-    searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
-    searchInput: { marginBottom: 0 },
-    list: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[8],
-    },
-    listLoader: { marginTop: spacing[8] },
-    separator: { height: spacing[3] },
-    cardItem: {
-      borderRadius: layout.cardRadius,
-      overflow: 'hidden',
-    },
-    cardItemActive: { opacity: 0.9 },
-    questionSection: {
-      backgroundColor: colors.backgroundCard,
-      padding: spacing[4],
-      flexDirection: 'row',
-      alignItems: 'flex-start',
-      gap: spacing[3],
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: 22 },
-    cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    iconBtn: { padding: spacing[1] },
-    answerSection: {
-      backgroundColor: colors.backgroundCard,
-      padding: spacing[4],
-    },
-    answer: { lineHeight: 22 },
-    note: { lineHeight: 20 },
-    blurOverlay: { alignItems: 'center', paddingVertical: spacing[2] },
-    // space-between + fixed half-width so an odd last card stays half-width
-    // (left column) instead of stretching to fill the row. flex-start keeps each
-    // card at its own content height (default 'stretch' would over-tall the
-    // shorter card, leaving its answer background cut off at the bottom).
-    gridRow: { justifyContent: 'space-between', alignItems: 'flex-start' },
-    cardItemGrid: { width: '48.5%' },
-    questionSectionGrid: { padding: spacing[3] },
-    answerSectionGrid: { padding: spacing[3] },
-    notePopupInput: {
-      borderWidth: 1.5,
-      borderRadius: layout.cardRadius,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-      paddingHorizontal: spacing[4],
-      paddingVertical: spacing[3],
-      minHeight: 80,
-      color: colors.textPrimary,
-      textAlignVertical: 'top',
-    },
-  });
+const styles = StyleSheet.create({
+  reorderBar: {
+    minHeight: layout.headerHeight,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.md,
+    borderBottomWidth: 1,
+  },
+  reorderTitle: { fontWeight: fontWeights.semiBold },
+  count: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.sm },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
+  searchInput: { marginBottom: 0 },
+  list: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.xxxl,
+  },
+  listLoader: { marginTop: spacing.xxxl },
+  separator: { height: spacing.md },
+  cardItem: {
+    borderRadius: layout.cardRadius,
+    overflow: 'hidden',
+  },
+  cardItemActive: { opacity: 0.9 },
+  questionSection: {
+    padding: spacing.lg,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    borderBottomWidth: 1,
+  },
+  question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: 22 },
+  cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  iconBtn: { padding: spacing.xs },
+  answerSection: {
+    padding: spacing.lg,
+  },
+  answer: { lineHeight: 22 },
+  note: { lineHeight: 20 },
+  blurOverlay: { alignItems: 'center', paddingVertical: spacing.sm },
+  // space-between + fixed half-width so an odd last card stays half-width
+  // (left column) instead of stretching to fill the row. flex-start keeps each
+  // card at its own content height (default 'stretch' would over-tall the
+  // shorter card, leaving its answer background cut off at the bottom).
+  gridRow: { justifyContent: 'space-between', alignItems: 'flex-start' },
+  cardItemGrid: { width: '48.5%' },
+  questionSectionGrid: { padding: spacing.md },
+  answerSectionGrid: { padding: spacing.md },
+  notePopupInput: {
+    borderWidth: 1.5,
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+});

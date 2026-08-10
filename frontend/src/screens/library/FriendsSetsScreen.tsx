@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -9,14 +9,12 @@ import { CopyIcon } from '../../components/icons';
 
 import { useCloneSet, useFriendsSets } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSets'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 
@@ -36,7 +34,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   const header = <ScreenHeader title="Friends' Sets" onBack={() => navigation.goBack()} />;
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Typography preset="caption" color={colors.textSecondary} align="center">
         {total} {total === 1 ? 'set' : 'sets'} shared by friends
       </Typography>
@@ -63,7 +61,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         onRefresh={refetch}
         onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
         onEndReachedThreshold={0.3}
-        ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
+        ItemSeparatorComponent={() => <Spacer size={spacing.md} />}
         ListEmptyComponent={
           <EmptyState
             title="No sets from friends"
@@ -73,7 +71,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         ListFooterComponent={
           isFetchingNextPage ? (
             <View style={styles.footerLoader}>
-              <ActivityIndicator color={colors.primary} size="small" />
+              <ActivityIndicator color={colors.accent} size="small" />
             </View>
           ) : null
         }
@@ -115,14 +113,12 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   );
 }
 
-const makeStyles = ({ colors, layout, spacing }: Theme) =>
-  StyleSheet.create({
-    list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
-    footer: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[3],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
-  });
+const styles = StyleSheet.create({
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },
+  footer: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.md,
+    borderTopWidth: 1,
+  },
+  footerLoader: { paddingVertical: spacing.lg, alignItems: 'center' },
+});

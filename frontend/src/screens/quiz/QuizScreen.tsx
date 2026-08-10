@@ -115,7 +115,7 @@ export function QuizScreen() {
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       <StatusBar hidden />
-      <View style={[styles.header, { paddingTop: insets.top + spacing[2] }]}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <View style={styles.timerWrap}>
           <Typography preset="label" color={colors.textSecondary} style={styles.timer}>
             {formatTime(elapsed)}
@@ -129,8 +129,8 @@ export function QuizScreen() {
         </View>
       </View>
 
-      <View style={[styles.progressTrack, { backgroundColor: colors.backgroundSecondary }]}>
-        <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.primary }]} />
+      <View style={[styles.progressTrack, { backgroundColor: colors.surfaceMuted }]}>
+        <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.accent }]} />
       </View>
 
       {s.item && (
@@ -154,8 +154,8 @@ export function QuizScreen() {
 const styles = StyleSheet.create({
   fill:          { flex: 1 },
   center:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
-  safeHeader:    { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[3] },
-  header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3] },
+  safeHeader:    { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md },
+  header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
   timerWrap:     { width: 56, alignItems: 'flex-start' },
   timer:         { fontVariant: ['tabular-nums'] },
   title:         { flex: 1, textAlign: 'center' },

@@ -13,7 +13,7 @@ import {
   AlbumsIcon, BookIcon, BookmarkIcon, BuildingIcon, CheckCircleIcon, CompassIcon,
   FlameIcon, FolderIcon, LockIcon, SparklesIcon, StarIcon, TrophyIcon, UsersIcon,
 } from '../../components/icons';
-import { type Theme, useTheme } from '../../theme';
+import { useTheme, palette, spacing, layout } from '../../theme';
 
 const ICON_BY_KEY: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
   card: BookmarkIcon, cards: AlbumsIcon, folder: FolderIcon, quiz: CompassIcon,
@@ -27,9 +27,7 @@ const CATEGORY_LABELS: Record<AchievementCategory, string> = {
 const CATEGORY_ORDER: AchievementCategory[] = ['streak', 'study', 'quiz', 'ai', 'social'];
 
 export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achievements'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { data: achievements = [], isLoading, error, refetch } = useAchievements();
 
   const unlockedCount = achievements.filter(a => a.unlocked).length;
@@ -46,21 +44,21 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   return (
     <Screen header={<ScreenHeader title="Achievements" onBack={navigation.goBack} />}>
       {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.primary} /></View>
+        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
       ) : error ? (
         <ErrorState onRetry={refetch} />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           {/* Summary */}
-          <View style={styles.summary}>
-            <TrophyIcon size={28} color={colors.primary} />
+          <View style={[styles.summary, { backgroundColor: colors.accentSoft }]}>
+            <TrophyIcon size={28} color={colors.accent} />
             <View style={styles.summaryText}>
               <Typography preset="h3">{unlockedCount} of {achievements.length}</Typography>
               <Typography preset="caption" color={colors.textSecondary}>achievements unlocked</Typography>
             </View>
           </View>
 
-          {grouped.map(({ category, items }, idx) => (
+          {grouped.map(({ category, items }) => (
             <View key={category} style={styles.section}>
               <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>
                 {CATEGORY_LABELS[category]}
@@ -69,9 +67,14 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
                 const Icon = ICON_BY_KEY[a.icon] ?? TrophyIcon;
                 return (
                   <View key={a.key} style={[styles.row, !a.unlocked && styles.rowLocked]}>
-                    <View style={[styles.iconWrap, a.unlocked ? styles.iconWrapUnlocked : styles.iconWrapLocked]}>
+                    <View style={[
+                      styles.iconWrap,
+                      a.unlocked
+                        ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: palette.indigo300 }
+                        : { backgroundColor: colors.surfaceMuted },
+                    ]}>
                       {a.unlocked
-                        ? <Icon size={22} color={colors.primary} />
+                        ? <Icon size={22} color={colors.accent} />
                         : <LockIcon size={18} color={colors.textDisabled} />}
                     </View>
                     <View style={styles.rowBody}>
@@ -99,24 +102,22 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[8] },
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxxl },
   summary: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing[3],
-    backgroundColor: colors.primarySurface, borderRadius: layout.cardRadius,
-    borderWidth: 1, borderColor: colors.primaryLight, padding: spacing[4], marginBottom: spacing[5],
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1, borderColor: palette.indigo300, padding: spacing.lg, marginBottom: spacing.xl,
   },
-  summaryText: { gap: spacing[0.5] },
-  section: { marginBottom: spacing[5] },
-  sectionLabel: { marginBottom: spacing[2], textTransform: 'uppercase' },
-  row: { flexDirection: 'row', gap: spacing[3], paddingVertical: spacing[3], alignItems: 'flex-start' },
+  summaryText: { gap: spacing.s2 },
+  section: { marginBottom: spacing.xl },
+  sectionLabel: { marginBottom: spacing.sm, textTransform: 'uppercase' },
+  row: { flexDirection: 'row', gap: spacing.md, paddingVertical: spacing.md, alignItems: 'flex-start' },
   rowLocked: { opacity: 0.7 },
   iconWrap: { width: 44, height: 44, borderRadius: layout.cardRadius, alignItems: 'center', justifyContent: 'center' },
-  iconWrapUnlocked: { backgroundColor: colors.primarySurface, borderWidth: 1, borderColor: colors.primaryLight },
-  iconWrapLocked: { backgroundColor: colors.backgroundSecondary },
-  rowBody: { flex: 1, gap: spacing[1] },
+  rowBody: { flex: 1, gap: spacing.xs },
   rowTitleLine: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   unlockedTag: { flexDirection: 'row', alignItems: 'center' },
-  progress: { marginTop: spacing[1.5] },
+  progress: { marginTop: spacing.s6 },
 });

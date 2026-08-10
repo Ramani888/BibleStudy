@@ -14,7 +14,7 @@ export function LoadingOverlay({ visible }: LoadingOverlayProps) {
   return (
     <Modal transparent visible={visible} animationType="fade">
       <View style={[styles.backdrop, { backgroundColor: colors.overlay }]}>
-        <View style={[styles.box, { backgroundColor: colors.backgroundCard }]}>
+        <View style={[styles.box, { backgroundColor: colors.surface }]}>
           <LottieView
             source={LOADING_ANIMATION}
             autoPlay
@@ -35,10 +35,10 @@ const styles = StyleSheet.create({
   },
   box: {
     borderRadius: layout.cardRadius,
-    padding: spacing[6],
+    padding: spacing.xxl,
   },
   lottie: {
-    width: spacing[20],
-    height: spacing[20],
+    width: spacing.s80,
+    height: spacing.s80,
   },
 });

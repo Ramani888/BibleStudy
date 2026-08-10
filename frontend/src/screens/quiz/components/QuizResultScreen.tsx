@@ -74,7 +74,7 @@ export function QuizResultScreen({
     return () => clearInterval(id);
   }, [isPending, isFocused, onExit]);
 
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
+  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
   const isNewBest = best !== null && scorePct >= best;
   const quote = getQuote(scorePct);
 
@@ -105,10 +105,10 @@ export function QuizResultScreen({
       </View>
 
       {/* Motivational quote — same style as home screen verse card */}
-      <View style={[styles.quoteCard, { backgroundColor: colors.primary }]}>
-        <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
-        <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
-        <Typography preset="verse" color={colors.textOnPrimary} style={styles.quoteText}>{quote.text}</Typography>
+      <View style={[styles.quoteCard, { backgroundColor: colors.accent }]}>
+        <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
+        <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
+        <Typography preset="verse" color={colors.textOnAccent} style={styles.quoteText}>{quote.text}</Typography>
         <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
       </View>
 
@@ -119,14 +119,14 @@ export function QuizResultScreen({
         accessibilityRole="button"
         accessibilityLabel="View summary"
       >
-        <View style={[styles.reviewIcon, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+        <View style={[styles.reviewIcon, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
           <ListIcon size={22} color={colors.textSecondary} />
         </View>
         <Typography preset="caption" color={colors.textSecondary}>Review</Typography>
       </Pressable>
 
       {best !== null && (
-        <View style={[styles.pill, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
           {isNewBest
             ? <StarIcon size={16} color={colors.warning} />
             : <StarOutlineIcon size={16} color={colors.textSecondary} />
@@ -138,8 +138,8 @@ export function QuizResultScreen({
       )}
 
       {isError && (
-        <View style={[styles.pill, { backgroundColor: colors.backgroundSecondary, borderColor: colors.error }]}>
-          <Typography preset="caption" color={colors.error}>
+        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.alert }]}>
+          <Typography preset="caption" color={colors.alert}>
             Save failed: {(error as any)?.message ?? 'Unknown error'}
           </Typography>
         </View>
@@ -161,12 +161,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: layout.screenPaddingH,
-    gap: spacing[4],
+    gap: spacing.lg,
   },
-  sub:       { marginTop: -spacing[2] },
-  scoreWrap: { alignItems: 'center', gap: spacing[0.5] },
+  sub:       { marginTop: -spacing.sm },
+  scoreWrap: { alignItems: 'center', gap: spacing.s2 },
   scoreNumber: { fontSize: 52, fontWeight: fontWeights.bold, lineHeight: 64 },
-  reviewBtn: { alignItems: 'center', gap: spacing[1] },
+  reviewBtn: { alignItems: 'center', gap: spacing.xs },
   reviewIcon: {
     width: layout.avatarMd,
     height: layout.avatarMd,
@@ -178,24 +178,24 @@ const styles = StyleSheet.create({
   pill: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1],
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
   quoteCard: {
     alignSelf: 'stretch',
     borderRadius: layout.cardRadiusLg,
-    paddingHorizontal: spacing[6],
-    paddingVertical: spacing[5],
+    paddingHorizontal: spacing.xxl,
+    paddingVertical: spacing.xl,
     justifyContent: 'center',
-    gap: spacing[2],
+    gap: spacing.sm,
     overflow: 'hidden',
   },
   quoteText: { fontStyle: 'italic', textAlign: 'center' },
   quoteSub: { textAlign: 'center' },
   quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
-  quoteTopLeft: { top: spacing[2], left: spacing[4] },
-  quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
+  quoteTopLeft: { top: spacing.sm, left: spacing.lg },
+  quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
 });

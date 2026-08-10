@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Button, Spacer, Typography } from '../../components/ui';
-import { colors, layout, spacing } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -57,6 +57,7 @@ interface Props {
 export function OnboardingScreen({ onComplete }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<Slide>>(null);
+  const { colors } = useTheme();
 
   const isLast = activeIndex === SLIDES.length - 1;
 
@@ -73,14 +74,14 @@ export function OnboardingScreen({ onComplete }: Props) {
 
   const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => (
     <View style={styles.slide}>
-      <View style={styles.iconWrap}>
-        <Icon name={item.icon} size={72} color={colors.primary} />
+      <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+        <Icon name={item.icon} size={72} color={colors.accent} />
       </View>
-      <Spacer size={spacing[8]} />
+      <Spacer size={spacing.xxxl} />
       <Typography preset="h2" align="center">
         {item.title}
       </Typography>
-      <Spacer size={spacing[4]} />
+      <Spacer size={spacing.lg} />
       <Typography preset="body" color={colors.textSecondary} align="center" style={styles.subtitle}>
         {item.subtitle}
       </Typography>
@@ -88,7 +89,7 @@ export function OnboardingScreen({ onComplete }: Props) {
   );
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
       {/* Skip — top right, hidden on last slide */}
       <View>
       <View style={styles.skipRow}>
@@ -125,22 +126,23 @@ export function OnboardingScreen({ onComplete }: Props) {
               key={i}
               style={[
                 styles.dot,
+                { backgroundColor: colors.accent },
                 i === activeIndex ? styles.dotActive : styles.dotInactive,
               ]}
             />
           ))}
         </View>
 
-        <Spacer size={spacing[6]} />
+        <Spacer size={spacing.xxl} />
 
         {isLast ? (
           <>
             <Button label="Get Started" onPress={markAndComplete} fullWidth />
-            <Spacer size={spacing[4]} />
+            <Spacer size={spacing.lg} />
             <Pressable onPress={markAndComplete} hitSlop={8}>
               <Typography preset="bodySm" color={colors.textSecondary} align="center">
                 Already have an account?{' '}
-                <Typography preset="bodySm" color={colors.primary}>
+                <Typography preset="bodySm" color={colors.accent}>
                   Log in
                 </Typography>
               </Typography>
@@ -156,12 +158,12 @@ export function OnboardingScreen({ onComplete }: Props) {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1 },
 
   skipRow: {
     alignItems: 'flex-end',
     paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
+    paddingVertical: spacing.md,
     minHeight: 44,
   },
 
@@ -179,7 +181,6 @@ const styles = StyleSheet.create({
     width: 136,
     height: 136,
     borderRadius: layout.pillRadius,
-    backgroundColor: colors.primarySurface,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -190,18 +191,17 @@ const styles = StyleSheet.create({
 
   bottom: {
     paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: spacing[8],
+    paddingBottom: spacing.xxxl,
   },
 
   dotsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: spacing[2],
+    gap: spacing.sm,
   },
   dot: {
     height: 8,
-    borderRadius: spacing[1],
-    backgroundColor: colors.primary,
+    borderRadius: spacing.xs,
   },
   dotActive: { width: 24, opacity: 1 },
   dotInactive: { width: 8, opacity: 0.3 },

@@ -33,7 +33,7 @@ export function ProgressBar({
 
   return (
     <View style={[styles.track, { height, backgroundColor: colors.gray200 }, style]}>
-      <Animated.View style={[styles.fill, barStyle, { backgroundColor: color ?? colors.primary, height }]} />
+      <Animated.View style={[styles.fill, barStyle, { backgroundColor: color ?? colors.accent, height }]} />
     </View>
   );
 }

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -13,13 +13,11 @@ import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { CheckCircleIcon, TrashIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api';
-import { type Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
   const { planId } = route.params;
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { data: plan, isLoading, error, refetch } = usePlan(planId);
   const toggleStep = useToggleStep(planId);
   const deletePlan = useDeletePlan();
@@ -40,7 +38,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
   };
 
   const renderStep = (step: PlanStep, index: number) => (
-    <View key={step.id} style={styles.step}>
+    <View key={step.id} style={[styles.step, { borderBottomColor: colors.border }]}>
       <Pressable
         onPress={() => toggleStep.mutate({ stepId: step.id, completed: step.completed })}
         hitSlop={8}
@@ -48,7 +46,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
       >
         {step.completed
           ? <CheckCircleIcon size={26} color={colors.success} />
-          : <View style={styles.emptyCircle} />}
+          : <View style={[styles.emptyCircle, { borderColor: colors.textDisabled }]} />}
       </Pressable>
       <Pressable
         style={styles.stepBody}
@@ -83,7 +81,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
       }
     >
       {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.primary} /></View>
+        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
       ) : error || !plan ? (
         <ErrorState onRetry={refetch} />
       ) : (
@@ -93,8 +91,8 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
             <Typography preset="body" color={colors.textSecondary} style={styles.desc}>{plan.description}</Typography>
           )}
           <View style={styles.progressRow}>
-            <ProgressBar progress={plan.totalSteps > 0 ? plan.completedSteps / plan.totalSteps : 0} color={colors.primary} style={styles.bar} />
-            <Typography preset="label" color={colors.primary}>{plan.completedSteps}/{plan.totalSteps}</Typography>
+            <ProgressBar progress={plan.totalSteps > 0 ? plan.completedSteps / plan.totalSteps : 0} color={colors.accent} style={styles.bar} />
+            <Typography preset="label" color={colors.accent}>{plan.completedSteps}/{plan.totalSteps}</Typography>
           </View>
           {plan.completedSteps === plan.totalSteps && plan.totalSteps > 0 && (
             <Typography preset="bodySm" color={colors.success} style={styles.done}>🎉 Plan complete!</Typography>
@@ -110,15 +108,15 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[8] },
-  desc: { marginBottom: spacing[3] },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[3], marginBottom: spacing[2] },
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxxl },
+  desc: { marginBottom: spacing.md },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.sm },
   bar: { flex: 1 },
-  done: { marginBottom: spacing[2] },
-  steps: { marginTop: spacing[3], gap: spacing[1] },
-  step: { flexDirection: 'row', alignItems: 'center', gap: spacing[3], paddingVertical: spacing[3], borderBottomWidth: 1, borderBottomColor: colors.border },
-  stepBody: { flex: 1, gap: spacing[0.5] },
-  emptyCircle: { width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: colors.textDisabled },
+  done: { marginBottom: spacing.sm },
+  steps: { marginTop: spacing.md, gap: spacing.xs },
+  step: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1 },
+  stepBody: { flex: 1, gap: spacing.s2 },
+  emptyCircle: { width: 24, height: 24, borderRadius: 12, borderWidth: 2 },
 });

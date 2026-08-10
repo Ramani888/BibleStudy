@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
@@ -10,19 +10,17 @@ import { ProgressBar } from '../../components/ui/ProgressBar';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { PlusIcon, BookIcon } from '../../components/icons';
-import { type Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme, palette } from '../../theme';
 
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { data: plans = [], isLoading, error, refetch } = usePlans();
 
   const renderItem = ({ item }: { item: PlanListItem }) => {
     const pct = item.totalSteps > 0 ? item.completedSteps / item.totalSteps : 0;
     return (
       <Pressable
-        style={({ pressed }) => [styles.card, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [styles.card, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: 0.8 }]}
         onPress={() => navigation.navigate('PlanDetail', { planId: item.id })}
       >
         <Typography preset="h4" numberOfLines={1}>{item.title}</Typography>
@@ -30,7 +28,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>{item.description}</Typography>
         )}
         <View style={styles.progressRow}>
-          <ProgressBar progress={pct} color={colors.primary} style={styles.bar} />
+          <ProgressBar progress={pct} color={colors.accent} style={styles.bar} />
           <Typography preset="caption" color={colors.textSecondary}>
             {item.completedSteps}/{item.totalSteps}
           </Typography>
@@ -47,20 +45,20 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           onBack={navigation.goBack}
           right={
             <Pressable onPress={() => navigation.navigate('CreatePlan')} hitSlop={8}>
-              <PlusIcon size={22} color={colors.primary} />
+              <PlusIcon size={22} color={colors.accent} />
             </Pressable>
           }
         />
       }
     >
       {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.primary} /></View>
+        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
       ) : error ? (
         <ErrorState onRetry={refetch} />
       ) : plans.length === 0 ? (
         <View>
           <EmptyState
-            icon={<BookIcon size={48} color={colors.primaryLight} />}
+            icon={<BookIcon size={48} color={palette.indigo300} />}
             title="No study plans yet"
             subtitle="Create a guided path through your sets — step by step."
             ctaLabel="Create a plan"
@@ -82,13 +80,15 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  list: { padding: layout.screenPaddingH, gap: spacing[3] },
+  list: { padding: layout.screenPaddingH, gap: spacing.md },
   card: {
-    backgroundColor: colors.backgroundCard, borderRadius: layout.cardRadius,
-    borderWidth: 1, borderColor: colors.border, padding: spacing[4], gap: spacing[2],
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2], marginTop: spacing[1] },
+  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs },
   bar: { flex: 1 },
 });

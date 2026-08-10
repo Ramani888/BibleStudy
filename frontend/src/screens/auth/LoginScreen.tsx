@@ -11,7 +11,7 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
-import { spacing, useTheme } from '../../theme';
+import { spacing, useTheme , palette } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
@@ -87,7 +87,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
           <Pressable onPress={() => navigation.navigate('Register')}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Don't have an account?{' '}
-              <Typography preset="bodySm" color={colors.primary}>Register</Typography>
+              <Typography preset="bodySm" color={colors.accent}>Register</Typography>
             </Typography>
           </Pressable>
         </>
@@ -95,8 +95,8 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     >
       <View>
         {socialOnly && (
-          <View style={{ backgroundColor: colors.primarySurface, borderRadius: layout.cardRadius, padding: spacing[3], marginBottom: spacing[2] }}>
-            <Typography preset="bodySm" color={colors.primaryDark} align="center">
+          <View style={{ backgroundColor: colors.accentSoft, borderRadius: layout.cardRadius, padding: spacing.md, marginBottom: spacing.sm }}>
+            <Typography preset="bodySm" color={palette.indigo800} align="center">
               This account was created with Google. Use the "Continue with Google" button above to sign in.
             </Typography>
           </View>
@@ -123,7 +123,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
           onSubmitEditing={handleSubmit(onSubmit)}
         />
         <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
-          <Typography preset="label" color={colors.primary} align="right">
+          <Typography preset="label" color={colors.accent} align="right">
             Forgot password?
           </Typography>
         </Pressable>

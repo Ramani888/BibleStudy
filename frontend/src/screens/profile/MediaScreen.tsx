@@ -10,7 +10,7 @@ import {
   StyleSheet,
   TextInput,
   View,
-} from 'react-native';
+Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
@@ -45,7 +45,7 @@ import {
   type IconComponent,
 } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 import { MediaImageViewer } from './MediaImageViewer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -86,7 +86,7 @@ function FadeImage({ uri, style }: { uri: string; style: object }) {
   const opacity = useSharedValue(0);
   const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
   return (
-    <View style={[style, { backgroundColor: colors.backgroundSecondary }]}>
+    <View style={[style, { backgroundColor: colors.surfaceMuted }]}>
       <AnimatedImage
         source={{ uri }}
         style={[StyleSheet.absoluteFill, animStyle]}
@@ -101,7 +101,7 @@ function FadeImage({ uri, style }: { uri: string; style: object }) {
 
 function StorageBar({ used, limit, percent }: StorageUsage) {
   const { colors } = useTheme();
-  const barColor = percent >= 90 ? colors.error : percent >= 70 ? colors.warning : colors.primary;
+  const barColor = percent >= 90 ? colors.alert : percent >= 70 ? colors.warning : colors.accent;
   const anim = useSharedValue(0);
   useEffect(() => {
     anim.value = withTiming(percent / 100, { duration: 700 });
@@ -113,7 +113,7 @@ function StorageBar({ used, limit, percent }: StorageUsage) {
   }));
   return (
     <View style={sbStyles.wrap}>
-      <View style={[sbStyles.track, { backgroundColor: colors.backgroundSecondary }]}>
+      <View style={[sbStyles.track, { backgroundColor: colors.surfaceMuted }]}>
         <Animated.View style={[sbStyles.fill, barStyle]} />
       </View>
       <Typography preset="caption" color={colors.textSecondary}>
@@ -124,7 +124,7 @@ function StorageBar({ used, limit, percent }: StorageUsage) {
 }
 
 const sbStyles = StyleSheet.create({
-  wrap:  { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3], gap: spacing[1.5] },
+  wrap:  { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md, gap: spacing.s6 },
   track: { height: 4, borderRadius: 2, overflow: 'hidden' },
   fill:  { height: '100%', borderRadius: 2 },
 });
@@ -143,19 +143,19 @@ function UploadToast({ visible, progress, filename }: { visible: boolean; progre
   return (
     <Animated.View style={[
       utStyles.container,
-      { backgroundColor: colors.background, borderColor: colors.border, bottom: insets.bottom + spacing[2] },
+      { backgroundColor: colors.background, borderColor: colors.border, bottom: insets.bottom + spacing.sm },
       animStyle,
     ]}>
-      <ActivityIndicator size="small" color={colors.primary} />
+      <ActivityIndicator size="small" color={colors.accent} />
       <View style={utStyles.info}>
         <Typography preset="caption" numberOfLines={1} color={colors.textPrimary}>
           {filename ? `Uploading ${filename}` : 'Uploading…'}
         </Typography>
-        <View style={[utStyles.track, { backgroundColor: colors.backgroundSecondary }]}>
-          <View style={[utStyles.bar, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+        <View style={[utStyles.track, { backgroundColor: colors.surfaceMuted }]}>
+          <View style={[utStyles.bar, { width: `${progress}%`, backgroundColor: colors.accent }]} />
         </View>
       </View>
-      <Typography preset="caption" color={colors.primary} style={utStyles.pct}>
+      <Typography preset="caption" color={colors.accent} style={utStyles.pct}>
         {progress}%
       </Typography>
     </Animated.View>
@@ -164,13 +164,13 @@ function UploadToast({ visible, progress, filename }: { visible: boolean; progre
 
 const utStyles = StyleSheet.create({
   container: {
-    position: 'absolute', left: spacing[4], right: spacing[4],
-    flexDirection: 'row', alignItems: 'center', gap: spacing[3],
+    position: 'absolute', left: spacing.lg, right: spacing.lg,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     borderWidth: 1, borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing[4], paddingVertical: spacing[3],
-    ...shadows.md,
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }, android: { elevation: 4 }, default: {} }),
   },
-  info:  { flex: 1, gap: spacing[1] },
+  info:  { flex: 1, gap: spacing.xs },
   track: { height: 3, borderRadius: 2, overflow: 'hidden' },
   bar:   { height: '100%', borderRadius: 2 },
   pct:   { minWidth: 32, textAlign: 'right', fontWeight: fontWeights.semiBold },
@@ -183,7 +183,6 @@ type Props = ProfileScreenProps<'Media'>;
 export function MediaScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [activeTab, setActiveTab]         = useState<MediaFileType>('IMAGE');
   const [sortOrder, setSortOrder]         = useState<SortOrder>('newest');
@@ -363,13 +362,13 @@ export function MediaScreen({ navigation }: Props) {
       >
         <FadeImage uri={item.url} style={s.imageFill} />
         {isSelected && (
-          <View style={styles.selectionOverlay}>
-            <CheckCircleIcon size={28} color="#fff" />
+          <View style={[styles.selectionOverlay, { backgroundColor: colors.overlay }]}>
+            <CheckCircleIcon size={28} color={palette.white} />
           </View>
         )}
       </Pressable>
     );
-  }, [selectedIds, selectionMode, handleToggleSelect, handleLongPress, styles]);
+  }, [selectedIds, selectionMode, handleToggleSelect, handleLongPress, colors.overlay]);
 
   const renderPDFItem = useCallback(({ item }: { item: MediaFile }) => {
     const isSelected = selectedIds.has(item.id);
@@ -377,16 +376,17 @@ export function MediaScreen({ navigation }: Props) {
       <Pressable
         style={({ pressed }) => [
           styles.pdfCard,
+          { backgroundColor: colors.background, borderColor: colors.border },
           pressed && styles.pdfCardPressed,
-          isSelected && styles.pdfCardSelected,
+          isSelected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
         ]}
         onPress={() => selectionMode
           ? handleToggleSelect(item.id)
           : navigation.navigate('MediaPDFViewer', { url: item.url, name: item.name })}
         onLongPress={() => handleLongPress(item)}
       >
-        <View style={styles.pdfIconBox}>
-          <FileTextIcon size={26} color={colors.primary} />
+        <View style={[styles.pdfIconBox, { backgroundColor: colors.accentSoft }]}>
+          <FileTextIcon size={26} color={colors.accent} />
         </View>
         <View style={s.pdfInfo}>
           <Typography preset="label" numberOfLines={1} style={s.pdfName}>{item.name}</Typography>
@@ -395,12 +395,12 @@ export function MediaScreen({ navigation }: Props) {
           </Typography>
         </View>
         {isSelected
-          ? <CheckCircleIcon size={22} color={colors.primary} />
+          ? <CheckCircleIcon size={22} color={colors.accent} />
           : <ChevronRightIcon size={18} color={colors.textDisabled} />
         }
       </Pressable>
     );
-  }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress, colors, styles]);
+  }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress, colors]);
 
   return (
     <Screen header={<ScreenHeader title="My Media" onBack={() => navigation.goBack()} />}>
@@ -412,14 +412,14 @@ export function MediaScreen({ navigation }: Props) {
       {selectionMode ? (
         <View style={styles.selectionHeader}>
           <Pressable onPress={exitSelectionMode} hitSlop={8}>
-            <Typography preset="caption" color={colors.primary}>Cancel</Typography>
+            <Typography preset="caption" color={colors.accent}>Cancel</Typography>
           </Pressable>
           <Typography preset="caption" style={s.selectionCount}>
             {selectedIds.size} selected
           </Typography>
           <Pressable onPress={handleBulkDelete} disabled={selectedIds.size === 0} hitSlop={8}
             style={selectedIds.size === 0 ? styles.btnDisabled : undefined}>
-            <TrashIcon size={20} color={colors.error} />
+            <TrashIcon size={20} color={colors.alert} />
           </Pressable>
         </View>
       ) : (
@@ -430,20 +430,29 @@ export function MediaScreen({ navigation }: Props) {
             return (
               <Pressable
                 key={tab}
-                style={[styles.tabPill, active && styles.tabPillActive]}
+                style={[
+                  styles.tabPill,
+                  { borderColor: colors.border, backgroundColor: colors.background },
+                  active && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                ]}
                 onPress={() => setActiveTab(tab)}
               >
                 {tab === 'IMAGE'
-                  ? <AlbumsIcon size={15} color={active ? colors.primary : colors.textSecondary} />
-                  : <FileTextIcon size={15} color={active ? colors.primary : colors.textSecondary} />
+                  ? <AlbumsIcon size={15} color={active ? colors.accent : colors.textSecondary} />
+                  : <FileTextIcon size={15} color={active ? colors.accent : colors.textSecondary} />
                 }
-                <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}
+                <Typography preset="caption" color={active ? colors.accent : colors.textSecondary}
                   style={active ? s.tabLabelActive : undefined}>
                   {tab === 'IMAGE' ? 'Images' : 'PDFs'}
                 </Typography>
                 {!isLoading && count > 0 && (
-                  <View style={[styles.badge, active ? styles.badgeActive : styles.badgeInactive]}>
-                    <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}
+                  <View style={[
+                    styles.badge,
+                    active
+                      ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: palette.indigo300 }
+                      : { backgroundColor: colors.surfaceMuted },
+                  ]}>
+                    <Typography preset="caption" color={active ? colors.accent : colors.textSecondary}
                       style={s.badgeText}>
                       {count}
                     </Typography>
@@ -477,7 +486,7 @@ export function MediaScreen({ navigation }: Props) {
               contentContainerStyle={s.imageListContent}
               refreshControl={
                 <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch}
-                  tintColor={colors.primary} colors={[colors.primary]} />
+                  tintColor={colors.accent} colors={[colors.accent]} />
               }
               ListEmptyComponent={
                 <EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />
@@ -494,7 +503,7 @@ export function MediaScreen({ navigation }: Props) {
               ItemSeparatorComponent={() => <View style={s.separator} />}
               refreshControl={
                 <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch}
-                  tintColor={colors.primary} colors={[colors.primary]} />
+                  tintColor={colors.accent} colors={[colors.accent]} />
               }
               ListEmptyComponent={
                 <EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />
@@ -507,6 +516,7 @@ export function MediaScreen({ navigation }: Props) {
           <Pressable
             style={({ pressed }) => [
               styles.fab,
+              { backgroundColor: colors.accent },
               pressed && styles.fabPressed,
               uploadMedia.isPending && styles.fabDisabled,
             ]}
@@ -569,7 +579,7 @@ export function MediaScreen({ navigation }: Props) {
         <TextInput
           value={renameState.value}
           onChangeText={v => setRenameState(st => ({ ...st, value: v }))}
-          style={styles.renameInput}
+          style={[styles.renameInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceMuted }]}
           autoFocus selectTextOnFocus returnKeyType="done"
           onSubmitEditing={handleRenameConfirm}
           maxLength={255 - (renameState.file?.name.match(/\.[^.]+$/)?.[0]?.length ?? 0)}
@@ -593,82 +603,68 @@ export function MediaScreen({ navigation }: Props) {
 const s = StyleSheet.create({
   contentArea:      { flex: 1 },
   list:             { flex: 1 },
-  imageListContent: { paddingBottom: FAB_SIZE + spacing[12], flexGrow: 1, paddingTop: CELL_GAP },
+  imageListContent: { paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1, paddingTop: CELL_GAP },
   imageRow:         { gap: CELL_GAP },
   imageCell:        { width: CELL_SIZE, height: CELL_SIZE },
   imageFill:        { width: '100%', height: '100%' },
-  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[12], flexGrow: 1 },
-  separator:        { height: spacing[2] },
-  pdfInfo:          { flex: 1, gap: spacing[0.5] },
+  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1 },
+  separator:        { height: spacing.sm },
+  pdfInfo:          { flex: 1, gap: spacing.s2 },
   pdfName:          { fontWeight: fontWeights.medium },
   selectionCount:   { fontWeight: fontWeights.semiBold },
   tabLabelActive:   { fontWeight: fontWeights.semiBold },
   badgeText:        { fontSize: 10, fontWeight: fontWeights.semiBold },
   iconBtn:          { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  gap3:             { height: spacing[3] },
-  gap2:             { height: spacing[2] },
+  gap3:             { height: spacing.md },
+  gap2:             { height: spacing.sm },
 });
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    selectionHeader: {
-      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-      marginHorizontal: layout.screenPaddingH, marginVertical: spacing[3], height: 40,
-    },
-    tabRow: {
-      flexDirection: 'row', alignItems: 'center', gap: spacing[2],
-      marginHorizontal: layout.screenPaddingH, marginBottom: spacing[3],
-    },
-    tabPill: {
-      flexGrow: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-      gap: spacing[1.5], paddingVertical: spacing[2.5],
-      borderRadius: spacing[2.5], borderWidth: 1,
-      borderColor: colors.border, backgroundColor: colors.background,
-    },
-    tabPillActive: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-    badge: {
-      minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: spacing[1],
-      alignItems: 'center', justifyContent: 'center',
-    },
-    badgeActive:   { backgroundColor: colors.primarySurface, borderWidth: 1, borderColor: colors.primaryLight },
-    badgeInactive: { backgroundColor: colors.backgroundSecondary },
-
-    pdfCard: {
-      flexDirection: 'row', alignItems: 'center', gap: spacing[3],
-      backgroundColor: colors.background,
-      borderRadius: layout.cardRadiusSm,
-      borderWidth: 1, borderColor: colors.border,
-      padding: spacing[4],
-    },
-    pdfCardPressed:  { opacity: 0.7 },
-    pdfCardSelected: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-    pdfIconBox: {
-      width: 52, height: 52, borderRadius: layout.cardRadiusSm,
-      backgroundColor: colors.primarySurface,
-      alignItems: 'center', justifyContent: 'center',
-    },
-
-    selectionOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: colors.overlay,
-      alignItems: 'center', justifyContent: 'center',
-    },
-    fab: {
-      position: 'absolute', bottom: spacing[8], right: layout.screenPaddingH,
-      width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,
-      backgroundColor: colors.primary,
-      alignItems: 'center', justifyContent: 'center',
-      ...shadows.lg,
-    },
-    fabPressed:  { opacity: 0.85 },
-    fabDisabled: { opacity: 0.5 },
-    btnDisabled: { opacity: 0.4 },
-    renameInput: {
-      borderWidth: 1, borderColor: colors.border,
-      borderRadius: spacing[2.5],
-      paddingHorizontal: spacing[4], paddingVertical: spacing[3],
-      fontSize: fontSizes.md, color: colors.textPrimary,
-      backgroundColor: colors.backgroundSecondary,
-    },
-  });
-}
+const styles = StyleSheet.create({
+  selectionHeader: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    marginHorizontal: layout.screenPaddingH, marginVertical: spacing.md, height: 40,
+  },
+  tabRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    marginHorizontal: layout.screenPaddingH, marginBottom: spacing.md,
+  },
+  tabPill: {
+    flexGrow: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing.s6, paddingVertical: spacing.s10,
+    borderRadius: spacing.s10, borderWidth: 1,
+  },
+  badge: {
+    minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: spacing.xs,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  pdfCard: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    borderRadius: layout.cardRadiusSm,
+    borderWidth: 1,
+    padding: spacing.lg,
+  },
+  pdfCardPressed:  { opacity: 0.7 },
+  pdfIconBox: {
+    width: 52, height: 52, borderRadius: layout.cardRadiusSm,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  selectionOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  fab: {
+    position: 'absolute', bottom: spacing.xxxl, right: layout.screenPaddingH,
+    width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,
+    alignItems: 'center', justifyContent: 'center',
+    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
+  },
+  fabPressed:  { opacity: 0.85 },
+  fabDisabled: { opacity: 0.5 },
+  btnDisabled: { opacity: 0.4 },
+  renameInput: {
+    borderWidth: 1,
+    borderRadius: spacing.s10,
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    fontSize: fontSizes.md,
+  },
+});

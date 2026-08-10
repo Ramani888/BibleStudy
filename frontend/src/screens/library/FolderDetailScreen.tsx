@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -9,16 +9,14 @@ import { SearchIcon } from '../../components/icons';
 
 import { useConfirmDialog, useFolderModal, useFolders, useManualRefresh, useSearchToggle, useSets, useDeleteSet, useUpdateSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 const ICON_SIZE = 20;
 
 export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'FolderDetail'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors, spacing: sp } = useTheme();
   const { folderId, folderName, folderColor } = route.params;
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [quizSet, setQuizSet] = useState<{ id: string; title: string } | null>(null);
@@ -72,14 +70,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       onBack={() => navigation.goBack()}
       right={
         <Pressable onPress={toggleSearch} hitSlop={8}>
-          <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.primary : colors.textSecondary} />
+          <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
         </Pressable>
       }
     />
   );
 
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Create Set" onPress={() => navigation.navigate('CreateSet', { folderId })} fullWidth />
     </View>
   );
@@ -118,7 +116,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         showsVerticalScrollIndicator={false}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
+        ItemSeparatorComponent={() => <Spacer size={sp.md} />}
         ListEmptyComponent={
           <EmptyState
             title={search ? 'No results' : 'No sets in this folder'}
@@ -180,17 +178,15 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    colorBar: { height: 4 },
-    searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3] },
-    searchInput: { marginBottom: 0 },
-    count: { marginBottom: spacing[3] },
-    list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  colorBar: { height: 4 },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
+  searchInput: { marginBottom: 0 },
+  count: { marginBottom: spacing.md },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.lg,
+    borderTopWidth: 1,
+  },
+});

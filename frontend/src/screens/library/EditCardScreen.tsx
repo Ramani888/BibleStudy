@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -8,13 +8,11 @@ import { Button, Screen, ScreenHeader } from '../../components/ui';
 
 import { useCardById, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCard'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
 
   const { cardId, setId } = route.params;
   const { data: card, isLoading, isError, error, refetch } = useCardById(cardId);
@@ -28,7 +26,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
     return (
       <Screen header={header} edges={['top', 'bottom']}>
         <View style={styles.loading}>
-          <ActivityIndicator color={colors.primary} size="large" />
+          <ActivityIndicator color={colors.accent} size="large" />
         </View>
       </Screen>
     );
@@ -42,7 +40,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   }
 
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Save Changes" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
@@ -69,13 +67,11 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[2],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+  },
+});

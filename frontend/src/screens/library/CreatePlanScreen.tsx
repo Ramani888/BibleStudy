@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -8,14 +8,12 @@ import { Button, Screen, ScreenHeader } from '../../components/ui';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
 import { getErrorMessage } from '../../api';
-import { type Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 
 type Props = LibraryScreenProps<'CreatePlan'>;
 
 export function CreatePlanScreen({ navigation }: Props) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { data: sets = [], isLoading } = useSets();
   const createPlan = useCreatePlan();
 
@@ -43,7 +41,7 @@ export function CreatePlanScreen({ navigation }: Props) {
 
   const header = <ScreenHeader title="New Study Plan" handle />;
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Create Plan" onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
     </View>
   );
@@ -68,7 +66,7 @@ export function CreatePlanScreen({ navigation }: Props) {
         </View>
 
         {isLoading ? (
-          <ActivityIndicator color={colors.primary} style={styles.loader} />
+          <ActivityIndicator color={colors.accent} style={styles.loader} />
         ) : sets.length === 0 ? (
           <Typography preset="bodySm" color={colors.textSecondary} style={styles.empty}>
             No sets yet — create some sets first.
@@ -78,8 +76,24 @@ export function CreatePlanScreen({ navigation }: Props) {
             const idx = selected.indexOf(set.id);
             const isSel = idx >= 0;
             return (
-              <Pressable key={set.id} style={[styles.setRow, isSel && styles.setRowSel]} onPress={() => toggle(set.id)}>
-                <View style={[styles.badge, isSel ? styles.badgeSel : styles.badgeIdle]}>
+              <Pressable
+                key={set.id}
+                style={[
+                  styles.setRow,
+                  { borderColor: colors.border },
+                  isSel && styles.setRowSelStatic,
+                  isSel && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                ]}
+                onPress={() => toggle(set.id)}
+              >
+                <View
+                  style={[
+                    styles.badge,
+                    isSel
+                      ? { backgroundColor: colors.accent }
+                      : { borderWidth: 1.5, borderColor: colors.border },
+                  ]}
+                >
                   <Typography preset="caption" color={isSel ? colors.background : colors.textSecondary}>
                     {isSel ? idx + 1 : ''}
                   </Typography>
@@ -94,26 +108,23 @@ export function CreatePlanScreen({ navigation }: Props) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   flex: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH, gap: spacing[3] },
+  scroll: { padding: layout.screenPaddingH, gap: spacing.md },
   descInput: { minHeight: 72 },
-  label: { marginTop: spacing[2] },
-  loader: { marginVertical: spacing[4] },
-  empty: { textAlign: 'center', marginVertical: spacing[4] },
+  label: { marginTop: spacing.sm },
+  loader: { marginVertical: spacing.lg },
+  empty: { textAlign: 'center', marginVertical: spacing.lg },
   setRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing[3],
-    padding: spacing[3], borderRadius: layout.cardRadius, borderWidth: 1.5, borderColor: colors.border,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    padding: spacing.md, borderRadius: layout.cardRadius, borderWidth: 1.5,
   },
-  setRowSel: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
+  setRowSelStatic: {},
   badge: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
-  badgeSel: { backgroundColor: colors.primary },
-  badgeIdle: { borderWidth: 1.5, borderColor: colors.border },
   setTitle: { flex: 1 },
   footer: {
     padding: layout.screenPaddingH,
-    paddingBottom: spacing[2],
+    paddingBottom: spacing.sm,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
   },
 });

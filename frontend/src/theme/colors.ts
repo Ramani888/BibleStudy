@@ -1,97 +1,69 @@
+import { palette } from './palette';
+
 /**
- * Color palette and semantic tokens for BibleStudyPro.
- *
- * Migrated to the "meditation" indigo/violet design language, now with
- * **light + dark** themes. Read colors via `useTheme()` (see ./useTheme) so a
- * screen responds to dark mode. The static `colors` export below equals the
- * LIGHT theme and stays for screens not yet migrated to the hook — so the whole
- * app re-skins immediately, and dark mode lights up module-by-module.
- *
- * Both theme objects share the exact same keys (the `ThemeColors` contract) so
- * swapping light↔dark is a single object swap.
+ * Semantic color contract — Meditation theme (exact) + BibleStudy extensions.
+ * No aliases, no duplicates. Use `useTheme()` to read tokens.
  */
-
-const palette = {
-  // Indigo (brand) — from the meditation Figma design system
-  indigo100: '#D8E0FF',
-  indigo200: '#C0C1FF',
-  indigo300: '#97A0FF',
-  indigo500: '#6366F1', // primary brand
-  indigo600: '#5D03FF',
-  indigo800: '#30208F',
-
-  // Violet / light purple (dark-mode accent + gradients)
-  violet400: '#A78BFA',
-  violet500: '#8B5CF6',
-  violet700: '#7455FD',
-
-  // Neutrals
-  white: '#FFFFFF',
-  black: '#030303',
-  ink900: '#0F1117',
-  ink800: '#1E2230',
-  ink700: '#24262B',
-  slate600: '#393F53',
-  slate500: '#475569',
-  slate200: '#E2E8F0',
-  gray50: '#F9F9F9',
-  gray100: '#F5F5F5',
-  gray200: '#E6E6E6',
-  gray300: '#D6D6D6',
-  gray400: '#AAAAAA',
-  gray500: '#888888',
-  gray600: '#666666',
-  gray700: '#444444',
-  gray800: '#2A2A2A',
-  gray900: '#1A1A1A',
-
-  // Semantic status — kept meaningful and independent of the indigo brand
-  blue500: '#3B82F6',
-  blue100: '#DBEAFE',
-  green500: '#16972E',
-  green100: '#D6F0D9',
-  greenBright: '#22C55E',
-  red500: '#F0330D',
-  red100: '#FEE2E2',
-  yellow500: '#FBA94C',
-  yellow100: '#FEF3E2',
-} as const;
-
-/** The shared semantic contract. Light and dark both satisfy this shape. */
 export interface ThemeColors {
-  primary: string;
-  primaryLight: string;
-  primaryDark: string;
-  primarySurface: string;
-
+  // ── Meditation tokens (exact) ────────────────────────────────────────────────
   background: string;
-  backgroundSecondary: string;
-  backgroundCard: string;
+  surface: string;
+  surfaceMuted: string;
+  chipIdle: string;
+  chipNeutral: string;
+  bottomBar: string;
 
   textPrimary: string;
   textSecondary: string;
-  textDisabled: string;
-  textInverse: string;
-  textOnPrimary: string;
+  textOnAccent: string;
+  icon: string;
+  tabInactive: string;
+  tabActive: string;
 
+  timerText: string;
+  timerLabel: string;
+  ringTrack: string;
+  ringProgress: string;
+
+  accent: string;
+  accentSoft: string;
   border: string;
-  borderFocus: string;
+  cardBorder: string;
+  divider: string;
+  overlay: string;
 
-  error: string;
-  errorSurface: string;
   success: string;
-  successSurface: string;
+  successSoft: string;
+  alert: string;
+
+  gradientStart: string;
+  gradientEnd: string;
+
+  surfaceTint: string;
+  pillMuted: string;
+  badgeLockedBg: string;
+
+  sliderSurface: string;
+  sliderTrack: string;
+  sliderFill: string;
+  sliderThumb: string;
+
+  transparent: string;
+  statusBar: 'light-content' | 'dark-content';
+
+  // ── BibleStudy extensions (no Meditation equivalent) ─────────────────────────
+  textDisabled: string;
+  textOnPrimaryMuted: string;
+  backgroundOverlay: string;
+  overlayLight: string;
+
+  errorSurface: string;
   warning: string;
   warningSurface: string;
   info: string;
   infoSurface: string;
 
-  difficultyEasy: string;
-  difficultyEasySurface: string;
-  difficultyMedium: string;
-  difficultyMediumSurface: string;
-  difficultyHard: string;
-  difficultyHardSurface: string;
+  featuredSurface: string;
 
   gray100: string;
   gray200: string;
@@ -99,120 +71,149 @@ export interface ThemeColors {
   gray500: string;
   gray700: string;
 
-  overlay: string;
-  backgroundOverlay: string;
-  /** Subtle translucent-white overlay for elements sitting on dark surfaces
-   *  (e.g. progress tracks/dividers on the featured card). */
-  overlayLight: string;
-  textOnPrimaryMuted: string;
-  shadow: string;
-  transparent: string;
-
-  /** Bold dark "featured" card surface (near-black in light, raised in dark). */
-  featuredSurface: string;
-
-  /** Hero / accent gradient endpoints (e.g. the verse-of-the-day card). */
-  gradientStart: string;
-  gradientEnd: string;
-
-  /** Raw palette for one-off use. */
-  palette: typeof palette;
-
-  /** Status-bar content style for this theme. */
-  statusBar: 'light-content' | 'dark-content';
+  difficultyEasy: string;
+  difficultyEasySurface: string;
+  difficultyMedium: string;
+  difficultyMediumSurface: string;
+  difficultyHard: string;
+  difficultyHardSurface: string;
 }
 
 export const lightColors: ThemeColors = {
-  primary: palette.indigo500,
-  primaryLight: palette.indigo300,
-  primaryDark: palette.indigo800,
-  primarySurface: '#EEF0FF',
+  // ── Meditation ────────────────────────────────────────────────────────────────
+  background:  '#FCF8FF',
+  surface:     palette.white,
+  surfaceMuted: palette.grey100,
+  chipIdle:    '#F3EFFF',
+  chipNeutral: '#EBEBEB',
+  bottomBar:   palette.white,
 
-  background: '#FCF8FF',
-  backgroundSecondary: palette.gray100,
-  backgroundCard: palette.white,
-
-  textPrimary: palette.black,
+  textPrimary:   palette.black,
   textSecondary: palette.slate500,
-  textDisabled: palette.gray400,
-  textInverse: palette.white,
-  textOnPrimary: palette.white,
+  textOnAccent:  palette.white,
+  icon:          '#130F26',
+  tabInactive:   '#716F7D',
+  tabActive:     palette.indigo500,
 
-  border: palette.slate200,
-  borderFocus: palette.indigo500,
+  timerText:    palette.indigo500,
+  timerLabel:   palette.slate500,
+  ringTrack:    palette.slate200,
+  ringProgress: palette.indigo500,
 
-  error: palette.red500,
-  errorSurface: palette.red100,
-  success: palette.green500,
-  successSurface: palette.green100,
-  warning: palette.yellow500,
-  warningSurface: palette.yellow100,
-  info: palette.blue500,
-  infoSurface: palette.blue100,
+  accent:     palette.indigo500,
+  accentSoft: '#EEF0FF',
+  border:     palette.slate200,
+  cardBorder: palette.indigo200,
+  divider:    '#EDEDED',
+  overlay:    'rgba(3, 3, 3, 0.45)',
 
-  difficultyEasy: palette.green500,
-  difficultyEasySurface: palette.green100,
-  difficultyMedium: palette.yellow500,
-  difficultyMediumSurface: palette.yellow100,
-  difficultyHard: palette.red500,
-  difficultyHardSurface: palette.red100,
+  success:     palette.success,
+  successSoft: palette.green100,
+  alert:       palette.alert,
 
-  gray100: palette.gray100,
-  gray200: palette.gray200,
-  gray300: palette.gray300,
-  gray500: palette.gray500,
-  gray700: palette.gray700,
+  gradientStart: palette.violet500,
+  gradientEnd:   palette.indigo500,
 
-  overlay: 'rgba(3, 3, 3, 0.45)',
-  backgroundOverlay: 'rgba(255, 255, 255, 0.9)',
-  overlayLight: 'rgba(255, 255, 255, 0.15)',
-  textOnPrimaryMuted: 'rgba(255, 255, 255, 0.65)',
-  shadow: '#000000',
+  surfaceTint:   '#F3EFFF',
+  pillMuted:     '#F3EFFF',
+  badgeLockedBg: '#EBEBEB',
+
+  sliderSurface: palette.grey100,
+  sliderTrack:   '#C0C1FF',
+  sliderFill:    palette.indigo500,
+  sliderThumb:   palette.indigo500,
+
   transparent: 'transparent',
+  statusBar:   'dark-content',
+
+  // ── BibleStudy extensions ────────────────────────────────────────────────────
+  textDisabled:       palette.gray400,
+  textOnPrimaryMuted: 'rgba(255, 255, 255, 0.65)',
+  backgroundOverlay:  'rgba(255, 255, 255, 0.9)',
+  overlayLight:       'rgba(255, 255, 255, 0.15)',
+
+  errorSurface:   palette.red100,
+  warning:        palette.warning,
+  warningSurface: palette.yellow100,
+  info:           palette.blue500,
+  infoSurface:    palette.blue100,
 
   featuredSurface: palette.ink900,
 
-  gradientStart: palette.violet500,
-  gradientEnd: palette.indigo500,
+  gray100: palette.gray100,
+  gray200: palette.gray200,
+  gray300: palette.gray300,
+  gray500: palette.gray500,
+  gray700: palette.gray700,
 
-  palette,
-  statusBar: 'dark-content',
+  difficultyEasy:          palette.success,
+  difficultyEasySurface:   palette.green100,
+  difficultyMedium:        palette.warning,
+  difficultyMediumSurface: palette.yellow100,
+  difficultyHard:          palette.alert,
+  difficultyHardSurface:   palette.red100,
 };
 
 export const darkColors: ThemeColors = {
-  primary: palette.violet400,
-  primaryLight: palette.indigo300,
-  primaryDark: palette.indigo500,
-  primarySurface: '#2A2342',
+  // ── Meditation ────────────────────────────────────────────────────────────────
+  background:  palette.ink900,
+  surface:     palette.ink800,
+  surfaceMuted: palette.ink700,
+  chipIdle:    '#171A23',
+  chipNeutral: '#171A23',
+  bottomBar:   '#171A23',
 
-  background: palette.ink900,
-  backgroundSecondary: palette.ink700,
-  backgroundCard: palette.ink800,
-
-  textPrimary: palette.white,
+  textPrimary:   palette.white,
   textSecondary: '#B6BAC4',
-  textDisabled: palette.slate600,
-  textInverse: palette.gray900,
-  textOnPrimary: palette.white,
+  textOnAccent:  palette.white,
+  icon:          palette.white,
+  tabInactive:   'rgba(255, 255, 255, 0.6)',
+  tabActive:     palette.indigo500,
 
-  border: palette.slate600,
-  borderFocus: palette.violet400,
+  timerText:    palette.violet400,
+  timerLabel:   palette.white,
+  ringTrack:    palette.slate600,
+  ringProgress: palette.violet400,
 
-  error: palette.red500,
-  errorSurface: '#3B1512',
-  success: palette.greenBright,
-  successSurface: '#173B25',
-  warning: palette.yellow500,
+  accent:     palette.violet400,
+  accentSoft: '#2A2342',
+  border:     palette.slate600,
+  cardBorder: 'rgba(192, 193, 255, 0.3)',
+  divider:    palette.ink700,
+  overlay:    'rgba(0, 0, 0, 0.6)',
+
+  success:     palette.successBright,
+  successSoft: '#173B25',
+  alert:       palette.alert,
+
+  gradientStart: palette.violet500,
+  gradientEnd:   palette.indigo500,
+
+  surfaceTint:   'rgba(243, 239, 255, 0.1)',
+  pillMuted:     'rgba(255, 255, 255, 0.15)',
+  badgeLockedBg: '#030303',
+
+  sliderSurface: palette.ink800,
+  sliderTrack:   palette.slate600,
+  sliderFill:    palette.indigo500,
+  sliderThumb:   palette.indigo500,
+
+  transparent: 'transparent',
+  statusBar:   'light-content',
+
+  // ── BibleStudy extensions ────────────────────────────────────────────────────
+  textDisabled:       palette.slate600,
+  textOnPrimaryMuted: 'rgba(255, 255, 255, 0.65)',
+  backgroundOverlay:  'rgba(0, 0, 0, 0.85)',
+  overlayLight:       'rgba(255, 255, 255, 0.15)',
+
+  errorSurface:   '#3B1512',
+  warning:        palette.warning,
   warningSurface: '#3B2E17',
-  info: palette.blue500,
-  infoSurface: '#16233B',
+  info:           palette.blue500,
+  infoSurface:    '#16233B',
 
-  difficultyEasy: palette.greenBright,
-  difficultyEasySurface: '#173B25',
-  difficultyMedium: palette.yellow500,
-  difficultyMediumSurface: '#3B2E17',
-  difficultyHard: palette.red500,
-  difficultyHardSurface: '#3B1512',
+  featuredSurface: palette.ink800,
 
   gray100: palette.gray100,
   gray200: palette.gray200,
@@ -220,27 +221,15 @@ export const darkColors: ThemeColors = {
   gray500: palette.gray500,
   gray700: palette.gray700,
 
-  overlay: 'rgba(0, 0, 0, 0.6)',
-  backgroundOverlay: 'rgba(0, 0, 0, 0.85)',
-  overlayLight: 'rgba(255, 255, 255, 0.15)',
-  textOnPrimaryMuted: 'rgba(255, 255, 255, 0.65)',
-  shadow: '#000000',
-  transparent: 'transparent',
-
-  featuredSurface: palette.ink800,
-
-  gradientStart: palette.violet500,
-  gradientEnd: palette.indigo500,
-
-  palette,
-  statusBar: 'light-content',
+  difficultyEasy:          palette.successBright,
+  difficultyEasySurface:   '#173B25',
+  difficultyMedium:        palette.warning,
+  difficultyMediumSurface: '#3B2E17',
+  difficultyHard:          palette.alert,
+  difficultyHardSurface:   '#3B1512',
 };
 
-/**
- * Static export = the LIGHT theme. Kept so every screen that still does
- * `import { colors } from '../theme'` keeps compiling and re-skins to indigo.
- * Migrate a screen to `useTheme()` to make it dark-mode aware.
- */
+/** Static light theme — for files not yet using useTheme(). */
 export const colors = lightColors;
 
 export type Colors = typeof colors;

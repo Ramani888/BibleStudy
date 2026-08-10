@@ -8,7 +8,7 @@ interface DividerProps {
   style?: ViewStyle;
 }
 
-export function Divider({ marginV = spacing[4], color, style }: DividerProps) {
+export function Divider({ marginV = spacing.lg, color, style }: DividerProps) {
   const { colors } = useTheme();
   return (
     <View

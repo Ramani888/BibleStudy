@@ -6,7 +6,7 @@ import {
   ScrollView,
   StyleSheet,
   View,
-} from 'react-native';
+Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -22,7 +22,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { PlusIcon, SearchIcon, SwapIcon, TrashIcon } from '../../components/icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { getErrorMessage } from '../../api/client';
-import { fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
+import { fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 
 const FAB_SIZE = 56;
 
@@ -50,7 +50,6 @@ type Props = ProfileScreenProps<'Notes'>;
 
 export function NotesScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
@@ -105,8 +104,8 @@ export function NotesScreen({ navigation }: Props) {
   const renderItem = useCallback(({ item }: { item: Note }) => (
     <Swipeable
       renderRightActions={() => (
-        <Pressable style={styles.deleteAction} onPress={() => handleDelete(item)}>
-          <TrashIcon size={20} color="#fff" />
+        <Pressable style={[styles.deleteAction, { backgroundColor: colors.alert }]} onPress={() => handleDelete(item)}>
+          <TrashIcon size={20} color={palette.white} />
         </Pressable>
       )}
       onSwipeableOpen={(_, swipeable) => {
@@ -117,7 +116,7 @@ export function NotesScreen({ navigation }: Props) {
       }}
     >
       <Pressable
-        style={({ pressed }) => [styles.noteCard, pressed && styles.noteCardPressed]}
+        style={({ pressed }) => [styles.noteCard, { backgroundColor: colors.surface }, pressed && styles.noteCardPressed]}
         onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
       >
         <View style={styles.noteHeader}>
@@ -134,15 +133,15 @@ export function NotesScreen({ navigation }: Props) {
         {item.tags.length > 0 && (
           <View style={styles.tagRow}>
             {item.tags.map(tag => (
-              <View key={tag} style={styles.tagPill}>
-                <Typography preset="caption" color={colors.primary}>{tag}</Typography>
+              <View key={tag} style={[styles.tagPill, { borderColor: colors.accent }]}>
+                <Typography preset="caption" color={colors.accent}>{tag}</Typography>
               </View>
             ))}
           </View>
         )}
       </Pressable>
     </Swipeable>
-  ), [navigation, handleDelete, colors, styles]);
+  ), [navigation, handleDelete, colors]);
 
   if (error) return <ErrorState message="Could not load notes" onRetry={refetch} />;
 
@@ -155,7 +154,7 @@ export function NotesScreen({ navigation }: Props) {
           right={
             <View style={styles.headerActions}>
               <Pressable onPress={toggleSearch} hitSlop={8}>
-                <SearchIcon size={20} color={searchVisible ? colors.primary : colors.textSecondary} />
+                <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
               </Pressable>
               <Pressable style={styles.sortBtn} onPress={cycleSortOrder} hitSlop={8}>
                 <SwapIcon size={16} color={colors.textSecondary} />
@@ -184,18 +183,18 @@ export function NotesScreen({ navigation }: Props) {
         <View style={styles.tagBarWrap}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
             <Pressable
-              style={[styles.tagFilterPill, !activeTag && styles.tagFilterPillActive]}
+              style={[styles.tagFilterPill, { borderColor: colors.border, backgroundColor: colors.background }, !activeTag && styles.tagFilterPillActive]}
               onPress={() => setActiveTag(null)}
             >
-              <Typography preset="caption" color={!activeTag ? colors.primary : colors.textSecondary}>All</Typography>
+              <Typography preset="caption" color={!activeTag ? colors.accent : colors.textSecondary}>All</Typography>
             </Pressable>
             {NOTE_PREDEFINED_TAGS.map(tag => (
               <Pressable
                 key={tag}
-                style={[styles.tagFilterPill, activeTag === tag && styles.tagFilterPillActive]}
+                style={[styles.tagFilterPill, { borderColor: colors.border, backgroundColor: colors.background }, activeTag === tag && styles.tagFilterPillActive]}
                 onPress={() => setActiveTag(prev => (prev === tag ? null : tag))}
               >
-                <Typography preset="caption" color={activeTag === tag ? colors.primary : colors.textSecondary}>
+                <Typography preset="caption" color={activeTag === tag ? colors.accent : colors.textSecondary}>
                   {tag}
                 </Typography>
               </Pressable>
@@ -213,7 +212,7 @@ export function NotesScreen({ navigation }: Props) {
         contentContainerStyle={styles.list}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.primary} />
+          <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />
         }
         ListEmptyComponent={
           isLoading ? null : (
@@ -225,10 +224,10 @@ export function NotesScreen({ navigation }: Props) {
       </View>
 
       <Pressable
-        style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
+        style={({ pressed }) => [styles.fab, { backgroundColor: colors.accent }, pressed && styles.fabPressed]}
         onPress={() => navigation.navigate('NoteEditor', {})}
       >
-        <PlusIcon size={28} color={colors.textOnPrimary} />
+        <PlusIcon size={28} color={colors.textOnAccent} />
       </Pressable>
 
       <ConfirmDialog {...dialogProps} />
@@ -236,72 +235,64 @@ export function NotesScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
-    sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    searchWrap: {
-      marginHorizontal: layout.screenPaddingH,
-      marginTop: spacing[2],
-      marginBottom: spacing[1],
-    },
-    tagBarWrap: { height: 40, marginBottom: spacing[2] },
-    tagBar: { paddingHorizontal: layout.screenPaddingH, alignItems: 'center', gap: spacing[2] },
-    tagFilterPill: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1],
-      borderRadius: layout.pillRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.background,
-    },
-    tagFilterPillActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1, paddingTop: spacing[3] },
-    separator: { height: spacing[3] },
-    noteCard: {
-      backgroundColor: colors.backgroundCard,
-      borderRadius: layout.cardRadiusSm,
-      padding: spacing[4],
-      gap: spacing[1],
-      ...shadows.sm,
-    },
-    noteCardPressed: { opacity: 0.7 },
-    noteHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: spacing[2],
-    },
-    noteTitle: { flex: 1, fontWeight: fontWeights.semiBold },
-    tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[1], marginTop: spacing[1] },
-    tagPill: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1],
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.primaryLight,
-      borderWidth: 1,
-      borderColor: colors.primary,
-    },
-    fab: {
-      position: 'absolute',
-      bottom: spacing[8],
-      right: layout.screenPaddingH,
-      width: FAB_SIZE,
-      height: FAB_SIZE,
-      borderRadius: FAB_SIZE / 2,
-      backgroundColor: colors.primary,
-      alignItems: 'center',
-      justifyContent: 'center',
-      ...shadows.lg,
-    },
-    fabPressed: { opacity: 0.85 },
-    deleteAction: {
-      width: 72,
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: colors.error,
-      borderRadius: layout.cardRadiusSm,
-      marginLeft: spacing[2],
-    },
-  });
-}
+const styles = StyleSheet.create({
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  searchWrap: {
+    marginHorizontal: layout.screenPaddingH,
+    marginTop: spacing.sm,
+    marginBottom: spacing.xs,
+  },
+  tagBarWrap: { height: 40, marginBottom: spacing.sm },
+  tagBar: { paddingHorizontal: layout.screenPaddingH, alignItems: 'center', gap: spacing.sm },
+  tagFilterPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: layout.pillRadius,
+    borderWidth: 1,
+  },
+  tagFilterPillActive: { borderColor: palette.indigo300, backgroundColor: palette.indigo300 },
+  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.xxxl, flexGrow: 1, paddingTop: spacing.md },
+  separator: { height: spacing.md },
+  noteCard: {
+    borderRadius: layout.cardRadiusSm,
+    padding: spacing.lg,
+    gap: spacing.xs,
+    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } }, android: { elevation: 2 }, default: {} }),
+  },
+  noteCardPressed: { opacity: 0.7 },
+  noteHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  noteTitle: { flex: 1, fontWeight: fontWeights.semiBold },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.xs },
+  tagPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: layout.pillRadius,
+    backgroundColor: palette.indigo300,
+    borderWidth: 1,
+  },
+  fab: {
+    position: 'absolute',
+    bottom: spacing.xxxl,
+    right: layout.screenPaddingH,
+    width: FAB_SIZE,
+    height: FAB_SIZE,
+    borderRadius: FAB_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
+  },
+  fabPressed: { opacity: 0.85 },
+  deleteAction: {
+    width: 72,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: layout.cardRadiusSm,
+    marginLeft: spacing.sm,
+  },
+});

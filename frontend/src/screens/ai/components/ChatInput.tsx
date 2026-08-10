@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { fontSizes, layout, spacing, useTheme, type Theme } from '../../../theme';
+import { fontSizes, layout, spacing, useTheme, palette } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { StarIcon, ArrowUpIcon, FileTextIcon, PlusIcon, CloseIcon } from '../../../components/icons';
 
@@ -41,9 +41,7 @@ export function ChatInput({
   onClearAttachment,
   onUpgrade,
 }: ChatInputProps) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [text, setText] = useState('');
 
@@ -59,20 +57,20 @@ export function ChatInput({
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
 
       {/* State 6 — credits warning */}
       {creditBalance !== undefined && (
         <View style={styles.creditRow}>
-          <StarIcon size={CREDIT_ICON_SIZE} color={creditBalance > 0 ? colors.textSecondary : colors.error} />
-          <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.error}>
+          <StarIcon size={CREDIT_ICON_SIZE} color={creditBalance > 0 ? colors.textSecondary : colors.alert} />
+          <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.alert}>
             {creditBalance > 0
               ? `${creditBalance} credits remaining`
               : 'No credits — claim your daily credit or'}
           </Typography>
           {creditBalance <= 0 && onUpgrade && (
             <Pressable onPress={onUpgrade} hitSlop={8}>
-              <Typography preset="caption" color={colors.primary}> Upgrade</Typography>
+              <Typography preset="caption" color={colors.accent}> Upgrade</Typography>
             </Pressable>
           )}
         </View>
@@ -86,22 +84,22 @@ export function ChatInput({
             <Image source={{ uri: attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />
             {isUploading ? (
               <View style={styles.thumbOverlay}>
-                <ActivityIndicator size="small" color="#fff" />
+                <ActivityIndicator size="small" color={palette.white} />
               </View>
             ) : (
               <Pressable style={styles.thumbClearBtn} onPress={onClearAttachment} hitSlop={8}>
-                <CloseIcon size={10} color="#fff" />
+                <CloseIcon size={10} color={palette.white} />
               </Pressable>
             )}
           </View>
         ) : (
           // PDF (or unknown type during upload): text chip with spinner or file icon
-          <View style={styles.attachChip}>
+          <View style={[styles.attachChip, { backgroundColor: colors.accentSoft }]}>
             {isUploading
-              ? <ActivityIndicator size="small" color={colors.primary} style={styles.chipSpinner} />
-              : <FileTextIcon size={14} color={colors.primary} />
+              ? <ActivityIndicator size="small" color={colors.accent} style={styles.chipSpinner} />
+              : <FileTextIcon size={14} color={colors.accent} />
             }
-            <Typography preset="caption" color={colors.primary} style={styles.attachName} numberOfLines={1}>
+            <Typography preset="caption" color={colors.accent} style={styles.attachName} numberOfLines={1}>
               {attachmentName ?? 'Uploading…'}
             </Typography>
             {!isUploading && (
@@ -114,11 +112,11 @@ export function ChatInput({
       )}
 
       {/* States 1–4 — single container, always */}
-      <View style={styles.inputBox}>
+      <View style={[styles.inputBox, { backgroundColor: colors.surfaceMuted }]}>
         {/* Text input — grows from minHeight to maxHeight, then scrolls */}
         <TextInput
           ref={inputRef}
-          style={[styles.input, disabled && styles.inputDisabled]}
+          style={[styles.input, { color: colors.textPrimary }, disabled && styles.inputDisabled]}
           placeholder="Ask a Bible question…"
           placeholderTextColor={colors.textSecondary}
           value={text}
@@ -133,7 +131,7 @@ export function ChatInput({
 
         {/* Counter — only near limit */}
         {showCounter && (
-          <Typography preset="caption" color={colors.error} style={styles.counter}>
+          <Typography preset="caption" color={colors.alert} style={styles.counter}>
             {text.length} / {MAX_LENGTH}
           </Typography>
         )}
@@ -152,12 +150,12 @@ export function ChatInput({
           ) : <View style={styles.attachPlaceholder} />}
 
           <Pressable
-            style={[styles.sendBtn, canSend ? styles.sendActive : styles.sendInactive]}
+            style={[styles.sendBtn, { backgroundColor: colors.accent }, canSend ? styles.sendActive : styles.sendInactive]}
             onPress={handleSend}
             disabled={!canSend}
             hitSlop={8}
           >
-            <ArrowUpIcon size={SEND_ICON_SIZE} color={colors.textOnPrimary} />
+            <ArrowUpIcon size={SEND_ICON_SIZE} color={colors.textOnAccent} />
           </Pressable>
         </View>
       </View>
@@ -166,22 +164,20 @@ export function ChatInput({
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing[3],
-    paddingHorizontal: spacing[4],
-    paddingBottom: spacing[3],
-    gap: spacing[2],
+    paddingTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.md,
+    gap: spacing.sm,
   },
 
   creditRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: spacing[1],
+    gap: spacing.xs,
   },
 
   thumbWrap: {
@@ -217,33 +213,30 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   attachChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1.5],
+    gap: spacing.s6,
     alignSelf: 'flex-start',
     maxWidth: '80%',
-    backgroundColor: colors.primarySurface,
     borderWidth: 1,
-    borderColor: colors.primaryLight,
+    borderColor: palette.indigo300,
     borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1.5],
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s6,
   },
   attachName: { flexShrink: 1 },
   chipSpinner: { width: 14, height: 14 },
 
   // One box — filled, no hard border
   inputBox: {
-    backgroundColor: colors.backgroundSecondary,
     borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing[4],
-    paddingTop: spacing[3],
-    paddingBottom: spacing[2],
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
 
   input: {
     minHeight: 24,
     maxHeight: 160,
     fontSize: fontSizes.md,
-    color: colors.textPrimary,
     lineHeight: fontSizes.md * 1.45,
     padding: 0,
     margin: 0,
@@ -252,17 +245,17 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
 
   counter: {
     textAlign: 'right',
-    marginTop: spacing[1],
+    marginTop: spacing.xs,
   },
 
   // [+] icon-only · spacer · [↑] circle  — bottom of the box
   bottomRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: spacing[2],
+    marginTop: spacing.sm,
   },
   attachIconBtn: {
-    padding: spacing[1],
+    padding: spacing.xs,
   },
   attachPlaceholder: {
     width: 30,
@@ -276,6 +269,6 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendActive:   { backgroundColor: colors.primary, opacity: 1 },
-  sendInactive: { backgroundColor: colors.primary, opacity: 0.3 },
+  sendActive:   { opacity: 1 },
+  sendInactive: { opacity: 0.3 },
 });

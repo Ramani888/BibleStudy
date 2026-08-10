@@ -57,7 +57,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         <>
           <Button label="Reset Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending}>
-            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.primary} align="center">
+            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
               {resending ? 'Sending…' : 'Resend code'}
             </Typography>
           </Pressable>
@@ -65,7 +65,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
       }
     >
       <View>
-        <View style={{ gap: spacing[2] }}>
+        <View style={{ gap: spacing.sm }}>
           <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
           <Controller
             name="otp"

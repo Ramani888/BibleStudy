@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -36,7 +36,7 @@ import {
   useUpdateSessionTags,
 } from '../../hooks';
 import { useAIChatStore } from '../../store';
-import { useTheme, fontSizes, layout, spacing, type Theme } from '../../theme';
+import { useTheme, fontSizes, layout, spacing } from '../../theme';
 import type { BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
 import { BookmarkCard, SessionCard } from './components/ChatHistoryCards';
@@ -46,12 +46,10 @@ const PREDEFINED_TAGS = [
   'Prayer', 'History', 'Devotional', 'Prophecy',
 ] as const;
 
-const ListSeparator = () => <Spacer size={spacing[3]} />;
+const ListSeparator = () => <Spacer size={spacing.md} />;
 
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const {
     data,
     isLoading,
@@ -239,21 +237,21 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
     <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />}>
 
       {/* ── View Mode Toggle ── */}
-      <View style={styles.modeToggle}>
+      <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <Pressable
-          style={[styles.modeTab, viewMode === 'all' && styles.modeTabActive]}
+          style={[styles.modeTab, viewMode === 'all' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
           onPress={() => setViewMode('all')}
         >
-          <Typography preset="label" color={viewMode === 'all' ? colors.primary : colors.textSecondary}>
+          <Typography preset="label" color={viewMode === 'all' ? colors.accent : colors.textSecondary}>
             All
           </Typography>
         </Pressable>
         <Pressable
-          style={[styles.modeTab, viewMode === 'bookmarked' && styles.modeTabActive]}
+          style={[styles.modeTab, viewMode === 'bookmarked' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
           onPress={() => setViewMode('bookmarked')}
         >
-          <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary} />
-          <Typography preset="label" color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary}>
+          <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary} />
+          <Typography preset="label" color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary}>
             Bookmarked
           </Typography>
         </Pressable>
@@ -262,7 +260,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
       {viewMode === 'all' && (
         <View>
         <>
-          <View style={styles.topBar}>
+          <View style={[styles.topBar, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
             <SearchBar
               placeholder="Search conversations…"
               value={searchQuery}
@@ -271,29 +269,29 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             />
             {allSessions.length > 0 && (
               <Pressable onPress={handleClearAll} hitSlop={8} style={styles.clearBtn}>
-                <TrashIcon size={18} color={colors.error} />
+                <TrashIcon size={18} color={colors.alert} />
               </Pressable>
             )}
           </View>
 
           {hasAnyTaggedSession && (
-            <View style={styles.tagBarWrapper}>
+            <View style={[styles.tagBarWrapper, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
                 <Pressable
-                  style={[styles.tagFilter, activeTag === null && styles.tagFilterActive]}
+                  style={[styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === null && { backgroundColor: colors.accent, borderColor: colors.accent }]}
                   onPress={() => setActiveTag(null)}
                 >
-                  <Typography preset="caption" color={activeTag === null ? colors.textOnPrimary : colors.textSecondary}>
+                  <Typography preset="caption" color={activeTag === null ? colors.textOnAccent : colors.textSecondary}>
                     All
                   </Typography>
                 </Pressable>
                 {PREDEFINED_TAGS.map(tag => (
                   <Pressable
                     key={tag}
-                    style={[styles.tagFilter, activeTag === tag && styles.tagFilterActive]}
+                    style={[styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === tag && { backgroundColor: colors.accent, borderColor: colors.accent }]}
                     onPress={() => setActiveTag(prev => prev === tag ? null : tag)}
                   >
-                    <Typography preset="caption" color={activeTag === tag ? colors.textOnPrimary : colors.textSecondary}>
+                    <Typography preset="caption" color={activeTag === tag ? colors.textOnAccent : colors.textSecondary}>
                       {tag}
                     </Typography>
                   </Pressable>
@@ -320,7 +318,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             !isBookmarksLoading ? (
               <EmptyState title="No bookmarks yet" subtitle="Long-press any AI response and tap Bookmark to save it here" />
             ) : (
-              <View style={styles.loadingWrap}><ActivityIndicator color={colors.primary} /></View>
+              <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
             )
           }
           renderItem={renderBookmark}
@@ -346,12 +344,12 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
                 subtitle={searchQuery ? 'Try a different search term' : 'Your conversations with the AI assistant will appear here'}
               />
             ) : (
-              <View style={styles.loadingWrap}><ActivityIndicator color={colors.primary} /></View>
+              <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
             )
           }
           ListFooterComponent={
             isFetchingNextPage ? (
-              <View style={styles.footerLoader}><ActivityIndicator color={colors.primary} size="small" /></View>
+              <View style={styles.footerLoader}><ActivityIndicator color={colors.accent} size="small" /></View>
             ) : null
           }
           renderItem={renderSession}
@@ -373,7 +371,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         showHandle
       >
         <TextInput
-          style={styles.renameInput}
+          style={[styles.renameInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceMuted }]}
           value={renameModal.value}
           onChangeText={v => setRenameModal(prev => ({ ...prev, value: v }))}
           placeholder="Conversation name…"
@@ -386,7 +384,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           onPress={handleSaveRename}
           disabled={!renameModal.value.trim() || isRenaming}
           fullWidth
-          style={{ marginTop: spacing[3] }}
+          style={{ marginTop: spacing.md }}
         />
       </AppModal>
 
@@ -402,10 +400,10 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             return (
               <Pressable
                 key={tag}
-                style={[styles.tagOption, active && styles.tagOptionActive]}
+                style={[styles.tagOption, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}
                 onPress={() => handleToggleTag(tag)}
               >
-                <Typography preset="bodySm" color={active ? colors.textOnPrimary : colors.textPrimary}>
+                <Typography preset="bodySm" color={active ? colors.textOnAccent : colors.textPrimary}>
                   {tag}
                 </Typography>
               </Pressable>
@@ -417,7 +415,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           onPress={handleSaveTags}
           disabled={isUpdatingTags}
           fullWidth
-          style={{ marginTop: spacing[4] }}
+          style={{ marginTop: spacing.lg }}
         />
       </AppModal>
 
@@ -427,55 +425,48 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   );
 }
 
-const makeStyles = ({ colors }: Theme) => StyleSheet.create({
+const styles = StyleSheet.create({
   fill: { flex: 1 },
 
   modeToggle: {
     flexDirection: 'row',
-    backgroundColor: colors.background,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   modeTab: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing[1], paddingVertical: spacing[3],
+    gap: spacing.xs, paddingVertical: spacing.md,
     borderBottomWidth: 2, borderBottomColor: 'transparent',
   },
-  modeTabActive: { borderBottomColor: colors.primary },
 
   topBar: {
     flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[3],
-    gap: spacing[2], backgroundColor: colors.background,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
+    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md,
+    gap: spacing.sm,
+    borderBottomWidth: 1,
   },
   searchBarContainer: { flex: 1, marginBottom: 0 },
-  clearBtn: { padding: spacing[1] },
+  clearBtn: { padding: spacing.xs },
 
-  tagBarWrapper: { backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: colors.border },
-  tagBar: { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[2], gap: spacing[2] },
+  tagBarWrapper: { borderBottomWidth: 1 },
+  tagBar: { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.sm, gap: spacing.sm },
   tagFilter: {
-    paddingHorizontal: spacing[3], paddingVertical: spacing[1],
+    paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
     borderRadius: layout.pillRadius, borderWidth: 1,
-    borderColor: colors.border, backgroundColor: colors.backgroundSecondary,
   },
-  tagFilterActive: { backgroundColor: colors.primary, borderColor: colors.primary },
 
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },
 
-  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing[20] },
-  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
+  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing.s80 },
+  footerLoader: { paddingVertical: spacing.lg, alignItems: 'center' },
 
   renameInput: {
-    borderWidth: 1.5, borderColor: colors.border, borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing[4], paddingVertical: spacing[3],
-    fontSize: fontSizes.md, color: colors.textPrimary, backgroundColor: colors.backgroundSecondary,
+    borderWidth: 1.5, borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
+    fontSize: fontSizes.md,
   },
-  tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] },
+  tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   tagOption: {
-    paddingHorizontal: spacing[3], paddingVertical: spacing[2],
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderRadius: layout.pillRadius, borderWidth: 1,
-    borderColor: colors.border, backgroundColor: colors.backgroundSecondary,
   },
-  tagOptionActive: { backgroundColor: colors.primary, borderColor: colors.primary },
 });

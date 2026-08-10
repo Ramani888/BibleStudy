@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -12,12 +12,10 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { CheckCircleIcon } from '../../components/icons';
-import { type Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
   const currentPlan = user?.plan ?? 'FREE';
   const isSubscribed = currentPlan !== 'FREE';
@@ -39,11 +37,11 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
 
         {/* Billing period toggle */}
         <View>
-        <View style={styles.toggle}>
+        <View style={[styles.toggle, { backgroundColor: colors.surfaceMuted }]}>
           {(['monthly', 'annual'] as BillingPeriod[]).map(p => {
             const active = period === p;
             return (
-              <Pressable key={p} style={[styles.toggleBtn, active && styles.toggleBtnActive]} onPress={() => setPeriod(p)}>
+              <Pressable key={p} style={[styles.toggleBtn, active && { backgroundColor: colors.accent }]} onPress={() => setPeriod(p)}>
                 <Typography preset="label" color={active ? colors.background : colors.textSecondary}>
                   {p === 'monthly' ? 'Monthly' : 'Annual'}
                 </Typography>
@@ -64,10 +62,10 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             `${tier.aiPerHour} AI requests / hour`,
           ];
           return (
-            <View key={tier.plan} style={[styles.card, tier.plan === 'PRO' && styles.cardHighlight]}>
+            <View key={tier.plan} style={[styles.card, { borderColor: tier.plan === 'PRO' ? colors.accent : colors.border }]}>
               <View style={styles.cardHead}>
                 <Typography preset="h4">{tier.name}</Typography>
-                <Typography preset="label" color={colors.primary}>{opt.priceLabel}</Typography>
+                <Typography preset="label" color={colors.accent}>{opt.priceLabel}</Typography>
               </View>
               {benefits.map(b => (
                 <View key={b} style={styles.benefit}>
@@ -90,10 +88,10 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
         </View>
 
         <View>
-        {!!error && <Typography preset="bodySm" color={colors.error} style={styles.error}>{error}</Typography>}
+        {!!error && <Typography preset="bodySm" color={colors.alert} style={styles.error}>{error}</Typography>}
 
         <Pressable onPress={restore} disabled={processing} style={styles.link}>
-          <Typography preset="label" color={colors.primary}>Restore Purchases</Typography>
+          <Typography preset="label" color={colors.accent}>Restore Purchases</Typography>
         </Pressable>
         {isSubscribed && (
           <Pressable onPress={openManageSubscriptions} style={styles.link}>
@@ -111,20 +109,18 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[8], gap: spacing[3] },
-  tagline: { marginTop: spacing[2] },
-  sub: { marginBottom: spacing[2] },
-  toggle: { flexDirection: 'row', backgroundColor: colors.backgroundSecondary, borderRadius: layout.cardRadius, padding: spacing[1] },
-  toggleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: spacing[2], borderRadius: layout.cardRadius - 2 },
-  toggleBtnActive: { backgroundColor: colors.primary },
-  card: { borderWidth: 1.5, borderColor: colors.border, borderRadius: layout.cardRadius, padding: spacing[4], gap: spacing[2] },
-  cardHighlight: { borderColor: colors.primary },
+const styles = StyleSheet.create({
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxxl, gap: spacing.md },
+  tagline: { marginTop: spacing.sm },
+  sub: { marginBottom: spacing.sm },
+  toggle: { flexDirection: 'row', borderRadius: layout.cardRadius, padding: spacing.xs },
+  toggleBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.sm, borderRadius: layout.cardRadius - 2 },
+  card: { borderWidth: 1.5, borderRadius: layout.cardRadius, padding: spacing.lg, gap: spacing.sm },
   cardHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  benefit: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  benefit: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   benefitText: { flex: 1 },
-  cta: { marginTop: spacing[2] },
+  cta: { marginTop: spacing.sm },
   error: { textAlign: 'center' },
-  link: { alignSelf: 'center', paddingVertical: spacing[2] },
-  fine: { textAlign: 'center', marginTop: spacing[2] },
+  link: { alignSelf: 'center', paddingVertical: spacing.sm },
+  fine: { textAlign: 'center', marginTop: spacing.sm },
 });

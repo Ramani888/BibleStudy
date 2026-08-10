@@ -26,7 +26,6 @@ type EditProfileForm = z.infer<typeof schema>;
 
 export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const user = useAuthStore(s => s.user);
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const { pickImage, takePhoto, isUploading } = usePickMedia();
@@ -88,8 +87,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
             <View style={styles.cameraRow}>
               {isUploading
-                ? <ActivityIndicator size="small" color={colors.primary} />
-                : <><CameraIcon size={16} color={colors.primary} /><Typography preset="label" color={colors.primary}>Change Photo</Typography></>
+                ? <ActivityIndicator size="small" color={colors.accent} />
+                : <><CameraIcon size={16} color={colors.accent} /><Typography preset="label" color={colors.accent}>Change Photo</Typography></>
               }
             </View>
           </Pressable>
@@ -143,12 +142,10 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
-    avatarSection: { alignItems: 'center', paddingVertical: spacing[6], gap: spacing[3] },
-    cameraRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    form: { gap: spacing[4] },
-    footer: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
-  });
-}
+const styles = StyleSheet.create({
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
+  avatarSection: { alignItems: 'center', paddingVertical: spacing.xxl, gap: spacing.md },
+  cameraRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  form: { gap: spacing.lg },
+  footer: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
+});

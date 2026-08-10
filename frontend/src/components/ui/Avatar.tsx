@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
-import { colors, layout } from '../../theme';
+import { layout, useTheme } from '../../theme';
 import { Typography } from './Typography';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
@@ -26,6 +26,7 @@ function getInitials(name?: string): string {
 }
 
 export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
+  const { colors } = useTheme();
   const dimension = sizeMap[size];
   const fontSize = size === 'lg' ? 28 : size === 'md' ? 18 : 13;
 
@@ -39,16 +40,16 @@ export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
     return (
       <Image
         source={{ uri }}
-        style={[styles.image, circleStyle as ImageStyle, style as ImageStyle]}
+        style={[{ backgroundColor: colors.gray200 }, circleStyle as ImageStyle, style as ImageStyle]}
       />
     );
   }
 
   return (
-    <View style={[styles.fallback, circleStyle, style]}>
+    <View style={[styles.fallback, { backgroundColor: colors.accent }, circleStyle, style]}>
       <Typography
         preset="label"
-        color={colors.textOnPrimary}
+        color={colors.textOnAccent}
         style={{ fontSize, lineHeight: fontSize * 1.2 }}
       >
         {getInitials(name)}
@@ -58,11 +59,7 @@ export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
 }
 
 const styles = StyleSheet.create({
-  image: {
-    backgroundColor: colors.gray200,
-  } as ImageStyle,
   fallback: {
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },

@@ -1,11 +1,14 @@
 import React from 'react';
-import { Pressable, StyleSheet } from 'react-native';
-import { spacing, useTheme } from '../../../theme';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { palette, radius, spacing, useTheme } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { ChevronRightIcon, type IconComponent } from '../../../components/icons';
 
-const ICON_SIZE = 22;
+const ICON_SIZE = 20;
+const TILE_SIZE = 40;
 const CHEVRON_SIZE = 18;
+
+export const MENU_ICON_COLOR = palette.indigo500;
 
 interface MenuItemProps {
   icon: IconComponent;
@@ -25,16 +28,18 @@ export function MenuItem({
   showChevron = true,
 }: MenuItemProps) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
-  const labelColor = destructive ? colors.error : colors.textPrimary;
-  const iconColor = destructive ? colors.error : colors.textSecondary;
+  const labelColor = destructive ? colors.alert : colors.textPrimary;
+  const tileColor = destructive ? colors.errorSurface : colors.surfaceTint;
+  const iconColor = destructive ? colors.alert : MENU_ICON_COLOR;
 
   return (
     <Pressable
       style={({ pressed }) => [styles.row, { opacity: pressed ? 0.6 : 1 }]}
       onPress={onPress}
     >
-      <Icon size={ICON_SIZE} color={iconColor} />
+      <View style={[styles.tile, { backgroundColor: tileColor }]}>
+        <Icon size={ICON_SIZE} color={iconColor} />
+      </View>
       <Typography preset="label" color={labelColor} style={styles.label}>
         {label}
       </Typography>
@@ -50,14 +55,20 @@ export function MenuItem({
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[4],
-      gap: spacing[4],
-    },
-    label: { flex: 1 },
-  });
-}
+const styles = StyleSheet.create({
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing.s17,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.s14,
+  },
+  tile: {
+    width: TILE_SIZE,
+    height: TILE_SIZE,
+    borderRadius: radius.sm,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  label: { flex: 1 },
+});

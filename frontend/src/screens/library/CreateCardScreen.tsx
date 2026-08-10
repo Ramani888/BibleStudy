@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -7,12 +7,11 @@ import { Button, Screen, ScreenHeader } from '../../components/ui';
 
 import { useCreateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'CreateCard'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
 
   const { setId } = route.params;
   const { mutateAsync: createCard } = useCreateCard();
@@ -21,7 +20,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
 
   const header = <ScreenHeader title="Add Cards" handle />;
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Add Card" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
@@ -47,12 +46,10 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[2],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+  },
+});

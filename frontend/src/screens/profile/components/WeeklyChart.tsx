@@ -150,7 +150,7 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
 }) {
   const maxTotal = Math.max(...stats.map(d => d.earned + d.used), 1);
   const hasData  = stats.some(d => d.earned > 0 || d.used > 0);
-  if (!hasData) return <EmptyView height={maxBarH + spacing[6]} message={emptyMsg} colors={colors} />;
+  if (!hasData) return <EmptyView height={maxBarH + spacing.xxl} message={emptyMsg} colors={colors} />;
 
   return (
     <View style={s.barBars}>
@@ -162,15 +162,15 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
         const selected = selectedIdx === idx;
         return (
           <Pressable key={idx} style={s.barCol} onPress={() => onSelect(selected ? null : idx)}>
-            <View style={[s.barTrack, { height: maxBarH, backgroundColor: colors.backgroundSecondary }, selected && { borderWidth: 1, borderColor: colors.primary }]}>
+            <View style={[s.barTrack, { height: maxBarH, backgroundColor: colors.surfaceMuted }, selected && { borderWidth: 1, borderColor: colors.accent }]}>
               {total > 0 && (
                 <View style={[s.barStack, { height: barH }]}>
-                  {usedH   > 0 && <View style={[s.barSeg, { height: usedH,   backgroundColor: colors.error   }]} />}
+                  {usedH   > 0 && <View style={[s.barSeg, { height: usedH,   backgroundColor: colors.alert   }]} />}
                   {earnedH > 0 && <View style={[s.barSeg, { height: earnedH, backgroundColor: colors.success }]} />}
                 </View>
               )}
             </View>
-            <Typography preset="caption" color={selected ? colors.primary : colors.textDisabled}>{day.label}</Typography>
+            <Typography preset="caption" color={selected ? colors.accent : colors.textDisabled}>{day.label}</Typography>
           </Pressable>
         );
       })}
@@ -205,11 +205,11 @@ function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSe
     <View>
       <Svg width={width} height={svgH}>
         <Polyline points={earnedPts} stroke={colors.success} strokeWidth={2} fill="none" strokeLinejoin="round" />
-        <Polyline points={usedPts}   stroke={colors.error}   strokeWidth={2} fill="none" strokeLinejoin="round" />
+        <Polyline points={usedPts}   stroke={colors.alert}   strokeWidth={2} fill="none" strokeLinejoin="round" />
         {pts.map((p, i) => (
           <React.Fragment key={i}>
             <Circle cx={p.x} cy={p.ey} r={selectedIdx === i ? 6 : 4} fill={colors.success} />
-            <Circle cx={p.x} cy={p.uy} r={selectedIdx === i ? 6 : 4} fill={colors.error}   />
+            <Circle cx={p.x} cy={p.uy} r={selectedIdx === i ? 6 : 4} fill={colors.alert}   />
             <Circle cx={p.x} cy={p.ey} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
             <Circle cx={p.x} cy={p.uy} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
           </React.Fragment>
@@ -262,7 +262,7 @@ function DonutChartView({ stats, size = DONUT_SIZE, colors }: {
         {usedDash > 0 && (
           <Circle
             cx={cx} cy={cy} r={r}
-            stroke={colors.error} strokeWidth={sw} fill="none"
+            stroke={colors.alert} strokeWidth={sw} fill="none"
             strokeDasharray={`${usedDash} ${c}`}
             transform={`rotate(${earnedDeg - 90}, ${cx}, ${cy})`}
             strokeLinecap="round"
@@ -313,15 +313,15 @@ function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg
       <Svg width={width} height={svgH}>
         <Defs>
           <LinearGradient id="balGrad" x1="0" y1="0" x2="0" y2="1">
-            <Stop offset="0" stopColor={colors.primary} stopOpacity={0.3} />
-            <Stop offset="1" stopColor={colors.primary} stopOpacity={0.02} />
+            <Stop offset="0" stopColor={colors.accent} stopOpacity={0.3} />
+            <Stop offset="1" stopColor={colors.accent} stopOpacity={0.02} />
           </LinearGradient>
         </Defs>
         <Path d={areaPath} fill="url(#balGrad)" />
-        <Path d={linePath} stroke={colors.primary} strokeWidth={2} fill="none" strokeLinejoin="round" />
+        <Path d={linePath} stroke={colors.accent} strokeWidth={2} fill="none" strokeLinejoin="round" />
         {pts.map((p, i) => (
           <React.Fragment key={i}>
-            <Circle cx={p.x} cy={p.y} r={selectedIdx === i ? 6 : 4} fill={colors.primary} />
+            <Circle cx={p.x} cy={p.y} r={selectedIdx === i ? 6 : 4} fill={colors.accent} />
             <Circle cx={p.x} cy={p.y} r={14} fill="transparent" onPress={() => onSelect(selectedIdx === i ? null : i)} />
           </React.Fragment>
         ))}
@@ -360,7 +360,7 @@ function ChartBody({
     >
       {isLoading ? (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator color={colors.accent} />
         </View>
       ) : chartType === 'bar' ? (
         <BarChartView stats={stats} emptyMsg={emptyMsg} maxBarH={effectiveBarH} selectedIdx={selectedIdx} onSelect={onSelect} colors={colors} />
@@ -372,7 +372,7 @@ function ChartBody({
           : <BalanceChartView stats={stats} currentBalance={currentBalance} width={width} svgH={effectiveSvgH} emptyMsg={emptyMsg} selectedIdx={selectedIdx} onSelect={onSelect} colors={colors} />
       ) : (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
-          <ActivityIndicator color={colors.primary} />
+          <ActivityIndicator color={colors.accent} />
         </View>
       )}
     </View>
@@ -384,7 +384,6 @@ function ChartBody({
 export function WeeklyChart() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const styles = makeStyles(colors);
 
   const [chartType,       setChartType]       = useState<ChartType>('bar');
   const [period,          setPeriod]          = useState<CreditStatsPeriod>('week');
@@ -484,13 +483,13 @@ export function WeeklyChart() {
         {CHART_ICONS.map(({ key, Icon }) => (
           <Pressable
             key={key}
-            style={[styles.iconBtn, chartType === key && styles.iconBtnActive]}
+            style={[styles.iconBtn, chartType === key && { backgroundColor: colors.accentSoft }]}
             onPress={() => { setChartType(key); setSelectedIdx(null); }}
           >
-            <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.primary : colors.textSecondary} />
+            <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.accent : colors.textSecondary} />
           </Pressable>
         ))}
-        <View style={styles.iconDivider} />
+        <View style={[styles.iconDivider, { backgroundColor: colors.border }]} />
         <Pressable
           style={styles.iconBtn}
           onPress={isFullscreenMode ? () => setFullscreen(false) : () => setFullscreen(true)}
@@ -508,12 +507,12 @@ export function WeeklyChart() {
     const sel = selectedIdx !== null ? safeStats[selectedIdx] : null;
     if (!sel) return null;
     return (
-      <View style={styles.detailStrip}>
+      <View style={[styles.detailStrip, { backgroundColor: colors.surfaceMuted, borderRadius: spacing.sm }]}>
         <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
-        <View style={styles.detailDot} />
+        <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
         <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
-        <View style={styles.detailDot} />
-        <Typography preset="label" color={colors.error}>−{sel.used} used</Typography>
+        <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
+        <Typography preset="label" color={colors.alert}>−{sel.used} used</Typography>
       </View>
     );
   }
@@ -526,10 +525,10 @@ export function WeeklyChart() {
         {available.map(iv => (
           <Pressable
             key={iv}
-            style={[styles.chip, chartInterval === iv && styles.chipActive]}
+            style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, chartInterval === iv && { backgroundColor: colors.accent, borderColor: colors.accent }]}
             onPress={() => handleIntervalChange(iv)}
           >
-            <Typography preset="label" color={chartInterval === iv ? colors.textOnPrimary : colors.textSecondary}>
+            <Typography preset="label" color={chartInterval === iv ? colors.textOnAccent : colors.textSecondary}>
               {INTERVAL_LABELS[iv]}
             </Typography>
           </Pressable>
@@ -544,21 +543,21 @@ export function WeeklyChart() {
         {PERIOD_CHIPS.map(({ key, label }) => (
           <Pressable
             key={key}
-            style={[styles.chip, period === key && styles.chipActive]}
+            style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === key && { backgroundColor: colors.accent, borderColor: colors.accent }]}
             onPress={() => handlePeriod(key)}
           >
-            <Typography preset="label" color={period === key ? colors.textOnPrimary : colors.textSecondary}>
+            <Typography preset="label" color={period === key ? colors.textOnAccent : colors.textSecondary}>
               {label}
             </Typography>
           </Pressable>
         ))}
         <Pressable
-          style={[styles.chip, styles.chipCustom, period === 'custom' && styles.chipActive]}
+          style={[styles.chip, styles.chipCustom, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === 'custom' && { backgroundColor: colors.accent, borderColor: colors.accent }]}
           onPress={openCustomPicker}
         >
-          <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnPrimary : colors.textSecondary} />
+          <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnAccent : colors.textSecondary} />
           {customLabel && (
-            <Typography preset="caption" color={period === 'custom' ? colors.textOnPrimary : colors.textSecondary}>
+            <Typography preset="caption" color={period === 'custom' ? colors.textOnAccent : colors.textSecondary}>
               {customLabel}
             </Typography>
           )}
@@ -570,19 +569,19 @@ export function WeeklyChart() {
   function renderSummary() {
     if (!hasSummary) return null;
     return (
-      <View style={styles.summaryRow}>
+      <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
         <View style={s.summaryItem}>
           <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
         </View>
-        <View style={styles.summaryDivider} />
+        <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
         <View style={s.summaryItem}>
-          <Typography preset="h4" color={colors.error}>−{totalUsed}</Typography>
+          <Typography preset="h4" color={colors.alert}>−{totalUsed}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
         </View>
-        <View style={styles.summaryDivider} />
+        <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
         <View style={s.summaryItem}>
-          <Typography preset="h4" color={net >= 0 ? colors.success : colors.error}>
+          <Typography preset="h4" color={net >= 0 ? colors.success : colors.alert}>
             {net >= 0 ? '+' : ''}{net}
           </Typography>
           <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
@@ -618,7 +617,7 @@ export function WeeklyChart() {
 
   return (
     <>
-      <Card style={styles.card} shadow="sm">
+      <Card style={{ ...styles.card, backgroundColor: colors.background }} shadow="sm">
         <View style={s.header}>
           <Typography preset="h4">Credit Activity</Typography>
           {renderChartIcons(false)}
@@ -635,7 +634,7 @@ export function WeeklyChart() {
         animationType="slide"
         onRequestClose={() => setFullscreen(false)}
       >
-        <View style={[styles.fsContainer, { paddingTop: insets.top + spacing[2], paddingBottom: Math.max(insets.bottom, spacing[4]) }]}>
+        <View style={[styles.fsContainer, { backgroundColor: colors.background, paddingTop: insets.top + spacing.sm, paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
           <View style={s.header}>
             <Typography preset="h4">Credit Activity</Typography>
             {renderChartIcons(true)}
@@ -660,51 +659,43 @@ export function WeeklyChart() {
 // Static layout constants that don't depend on theme color
 const s = StyleSheet.create({
   header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-  periodRow:   { flexDirection: 'row', gap: spacing[1.5], flexWrap: 'wrap' },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  periodRow:   { flexDirection: 'row', gap: spacing.s6, flexWrap: 'wrap' },
   centerBox:   { alignItems: 'center', justifyContent: 'center' },
   emptyText:   { textAlign: 'center' },
-  barBars:     { flexDirection: 'row', gap: spacing[2] },
-  barCol:      { flex: 1, alignItems: 'center', gap: spacing[1] },
-  barTrack:    { width: '100%', borderRadius: spacing[1], justifyContent: 'flex-end', overflow: 'hidden' },
+  barBars:     { flexDirection: 'row', gap: spacing.sm },
+  barCol:      { flex: 1, alignItems: 'center', gap: spacing.xs },
+  barTrack:    { width: '100%', borderRadius: spacing.xs, justifyContent: 'flex-end', overflow: 'hidden' },
   barStack:    { width: '100%' },
   barSeg:      { width: '100%' },
   donutWrap:   { alignItems: 'center' },
-  xLabels:     { flexDirection: 'row', marginTop: spacing[1] },
+  xLabels:     { flexDirection: 'row', marginTop: spacing.xs },
   xLabel:      { flex: 1, textAlign: 'center' },
-  summaryItem: { flex: 1, alignItems: 'center', gap: spacing[0.5] },
+  summaryItem: { flex: 1, alignItems: 'center', gap: spacing.s2 },
   fsSpacer: { flex: 1 },
 });
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    card: { backgroundColor: colors.background, gap: spacing[3] },
-    iconBtn:       { padding: spacing[1.5], borderRadius: spacing[1.5] },
-    iconBtnActive: { backgroundColor: colors.primarySurface },
-    iconDivider:   { width: 1, height: 16, backgroundColor: colors.border, marginHorizontal: spacing[1] },
-    chip: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1.5],
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.backgroundSecondary,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    chipActive:  { backgroundColor: colors.primary, borderColor: colors.primary },
-    chipCustom:  { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    detailStrip: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing[2],
-      paddingVertical: spacing[2],
-      marginTop: spacing[2],
-      backgroundColor: colors.backgroundSecondary,
-      borderRadius: spacing[2],
-    },
-    detailDot:     { width: 3, height: 3, borderRadius: spacing[0.5], backgroundColor: colors.border },
-    summaryRow:    { flexDirection: 'row', borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing[3], marginTop: spacing[1] },
-    summaryDivider: { width: 1, backgroundColor: colors.border, marginVertical: spacing[1] },
-    fsContainer:   { flex: 1, backgroundColor: colors.background, padding: spacing[4], gap: spacing[3] },
-  });
-}
+const styles = StyleSheet.create({
+  card:          { gap: spacing.md },
+  iconBtn:       { padding: spacing.s6, borderRadius: spacing.s6 },
+  iconDivider:   { width: 1, height: 16, marginHorizontal: spacing.xs },
+  chip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s6,
+    borderRadius: layout.pillRadius,
+    borderWidth: 1,
+  },
+  chipCustom:    { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  detailStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  detailDot:     { width: 3, height: 3, borderRadius: spacing.s2 },
+  summaryRow:    { flexDirection: 'row', borderTopWidth: 1, paddingTop: spacing.md, marginTop: spacing.xs },
+  summaryDivider: { width: 1, marginVertical: spacing.xs },
+  fsContainer:   { flex: 1, padding: spacing.lg, gap: spacing.md },
+});

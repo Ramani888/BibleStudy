@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { Typography } from '../../../components/ui';
-import { type Theme, useTheme, fontSizes, lineHeights } from '../../../theme';
+import { useTheme, fontSizes, lineHeights, spacing, layout } from '../../../theme';
 
 // Inline SVG-style Google 'G' logo as a Unicode character is not enough — use a minimal SVG path
 function GoogleIcon() {
@@ -23,14 +23,13 @@ interface Props {
 }
 
 export function SocialButtons({ onGoogle, onApple, loading }: Props) {
-  const { colors, spacing, layout } = useTheme();
-  const styles = makeStyles({ colors, spacing, layout });
+  const { colors } = useTheme();
 
   return (
     <View style={styles.row}>
       {/* Google */}
       <Pressable
-        style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
+        style={({ pressed }) => [styles.btn, { borderColor: colors.border, backgroundColor: colors.background }, pressed && styles.pressed]}
         onPress={onGoogle}
         disabled={!!loading}
       >
@@ -47,7 +46,7 @@ export function SocialButtons({ onGoogle, onApple, loading }: Props) {
       {/* Apple — iOS only */}
       {Platform.OS === 'ios' && (
         <Pressable
-          style={({ pressed }) => [styles.btn, pressed && styles.pressed]}
+          style={({ pressed }) => [styles.btn, { borderColor: colors.border, backgroundColor: colors.background }, pressed && styles.pressed]}
           onPress={onApple}
           disabled={!!loading}
         >
@@ -65,21 +64,18 @@ export function SocialButtons({ onGoogle, onApple, loading }: Props) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) =>
-  StyleSheet.create({
-    row: { flexDirection: 'row', gap: spacing[3] },
-    btn: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing[2],
-      height: layout.buttonHeight,
-      borderRadius: layout.cardRadius,
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      backgroundColor: colors.background,
-    },
-    pressed: { opacity: 0.7 },
-    label: { letterSpacing: 0.2 },
-  });
+const styles = StyleSheet.create({
+  row: { flexDirection: 'row', gap: spacing.md },
+  btn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    height: layout.buttonHeight,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1.5,
+  },
+  pressed: { opacity: 0.7 },
+  label: { letterSpacing: 0.2 },
+});

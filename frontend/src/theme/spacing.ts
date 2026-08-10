@@ -1,49 +1,37 @@
 /**
- * 4px base grid spacing system.
- * Use these tokens everywhere — no raw number margins/paddings.
+ * Spacing scale — copied from the Meditation project.
+ * Named keys (xs…huge) are the canonical 4pt scale.
+ * s<n> keys are Figma-exact off-grid values.
  */
 export const spacing = {
-  px: 1,
-  0.5: 2,
-  1: 4,
-  1.5: 6,
-  2: 8,
-  2.5: 10,
-  3: 12,
-  3.5: 14,
-  4: 16,
-  5: 20,
-  6: 24,
-  7: 28,
-  8: 32,
-  9: 36,
-  10: 40,
-  12: 48,
-  14: 56,
-  16: 64,
-  20: 80,
-  24: 96,
+  none: 0,
+
+  xs:   4,
+  sm:   8,
+  md:   12,
+  lg:   16,
+  xl:   20,
+  xxl:  24,
+  xxxl: 32,
+  huge: 40,
+
+  s2:  2,
+  s3:  3,
+  s5:  5,
+  s6:  6,
+  s7:  7,
+  s10: 10,
+  s13: 13,
+  s14: 14,
+  s17: 17,
+  s18: 18,
+  s22: 22,
+  s28: 28,
+  s30: 30,
+  s38: 38,
+  s48: 48,
+  s70: 70,
+  s80: 80,
 } as const;
 
 export type SpacingKey = keyof typeof spacing;
-
-/** Common layout values */
-export const layout = {
-  screenPaddingH: spacing[4],
-  screenPaddingV: spacing[6],
-  cardPadding: spacing[4],
-  cardRadius: 12,
-  cardRadiusSm: 14,
-  cardRadiusLg: 16,
-  pillRadius: 999,
-  inputHeight: 52,
-  buttonHeight: 52,
-  buttonHeightSm: 40,
-  tabBarHeight: 64,
-  headerHeight: 56,
-  avatarSm: 32,
-  avatarMd: 48,
-  avatarLg: 80,
-  iconCircleLg: 52,
-  progressBarHeight: 4,
-} as const;

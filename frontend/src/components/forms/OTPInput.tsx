@@ -55,10 +55,10 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
               ref={el => { inputRefs.current[i] = el; }}
               style={[
                 styles.box,
-                { borderColor: colors.border, backgroundColor: colors.backgroundSecondary, color: colors.textPrimary },
-                isFocused && { borderColor: colors.borderFocus, backgroundColor: colors.background },
-                hasValue && { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-                !!error && { borderColor: colors.error },
+                { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary },
+                isFocused && { borderColor: colors.accent, backgroundColor: colors.background },
+                hasValue && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                !!error && { borderColor: colors.alert },
               ]}
               value={digits[i]?.trim() || ''}
               onChangeText={text => handleChange(text, i)}
@@ -74,7 +74,7 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
         })}
       </View>
       {error && (
-        <Typography preset="caption" color={colors.error} style={styles.error}>
+        <Typography preset="caption" color={colors.alert} style={styles.error}>
           {error}
         </Typography>
       )}
@@ -85,7 +85,7 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    gap: spacing[2],
+    gap: spacing.sm,
     justifyContent: 'center',
   },
   box: {
@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   error: {
-    marginTop: spacing[1.5],
+    marginTop: spacing.s6,
     textAlign: 'center',
   },
 });

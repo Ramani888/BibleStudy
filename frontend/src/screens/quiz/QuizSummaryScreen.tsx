@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
-import { type Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
@@ -26,9 +26,7 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizSummaryScreen() {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
@@ -44,18 +42,16 @@ export function QuizSummaryScreen() {
 
   const [filter, setFilter] = useState<Filter>('all');
 
-  const filtered = useMemo(() => {
-    if (filter === 'correct') return items.filter(i => i.isCorrect);
-    if (filter === 'wrong')   return items.filter(i => !i.isCorrect);
-    return items;
-  }, [items, filter]);
+  const filtered = filter === 'correct' ? items.filter(i => i.isCorrect)
+    : filter === 'wrong' ? items.filter(i => !i.isCorrect)
+    : items;
 
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
+  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
 
   const renderItem = ({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
     return (
-      <View style={[styles.card, { backgroundColor: colors.backgroundCard, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.error }]}>
+      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
         <View style={styles.cardHeader}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.cardIndex}>
             Q{item.index + 1} · {MODE_LABEL[item.mode] ?? item.mode}
@@ -64,7 +60,7 @@ export function QuizSummaryScreen() {
             ? null
             : item.isCorrect
               ? <CheckCircleIcon size={16} color={colors.success} />
-              : <CloseCircleIcon size={16} color={colors.error} />
+              : <CloseCircleIcon size={16} color={colors.alert} />
           }
         </View>
 
@@ -78,7 +74,7 @@ export function QuizSummaryScreen() {
           <>
             <View style={styles.answerRow}>
               <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>Your answer</Typography>
-              <Typography preset="caption" color={item.isCorrect ? colors.success : colors.error} style={styles.answerValue}>
+              <Typography preset="caption" color={item.isCorrect ? colors.success : colors.alert} style={styles.answerValue}>
                 {item.userAnswer}
               </Typography>
             </View>
@@ -103,7 +99,7 @@ export function QuizSummaryScreen() {
       </View>
 
       {/* Score strip */}
-      <View style={[styles.scoreStrip, { backgroundColor: colors.backgroundCard, borderBottomColor: colors.border }]}>
+      <View style={[styles.scoreStrip, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Typography preset="h3" style={{ color: scoreColor }}>{scorePct}%</Typography>
         <Typography preset="caption" color={colors.textSecondary}>{correct}/{total} correct · {title}</Typography>
       </View>
@@ -113,12 +109,12 @@ export function QuizSummaryScreen() {
         {FILTER_LABELS.map(({ key, label }) => (
           <Pressable
             key={key}
-            style={[styles.tab, filter === key && { borderBottomColor: colors.primary, borderBottomWidth: 2 }]}
+            style={[styles.tab, filter === key && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
             onPress={() => setFilter(key)}
           >
             <Typography
               preset="label"
-              color={filter === key ? colors.primary : colors.textSecondary}
+              color={filter === key ? colors.accent : colors.textSecondary}
             >
               {label}
             </Typography>
@@ -131,7 +127,7 @@ export function QuizSummaryScreen() {
         data={filtered}
         keyExtractor={i => String(i.index)}
         renderItem={renderItem}
-        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing[4] }]}
+        contentContainerStyle={[styles.list, { paddingBottom: insets.bottom + spacing.lg }]}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.empty}>
@@ -144,24 +140,23 @@ export function QuizSummaryScreen() {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    root:        { flex: 1 },
-    scoreStrip:  { alignItems: 'center', paddingVertical: spacing[3], gap: spacing[1], borderBottomWidth: StyleSheet.hairlineWidth },
-    tabs:        { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth },
-    tab:         { flex: 1, alignItems: 'center', paddingVertical: spacing[3] },
-    list:        { padding: layout.screenPaddingH, gap: spacing[3] },
-    empty:       { paddingTop: spacing[12] },
-    card: {
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      padding: spacing[4],
-      gap: spacing[2],
-    },
-    cardHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-    cardIndex:   { flex: 1 },
-    prompt:      { lineHeight: 22 },
-    answerRow:   { flexDirection: 'row', gap: spacing[2] },
-    answerLabel: { width: 80 },
-    answerValue: { flex: 1 },
-  });
+const styles = StyleSheet.create({
+  root:        { flex: 1 },
+  scoreStrip:  { alignItems: 'center', paddingVertical: spacing.md, gap: spacing.xs, borderBottomWidth: StyleSheet.hairlineWidth },
+  tabs:        { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth },
+  tab:         { flex: 1, alignItems: 'center', paddingVertical: spacing.md },
+  list:        { padding: layout.screenPaddingH, gap: spacing.md },
+  empty:       { paddingTop: spacing.s48 },
+  card: {
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+    padding: spacing.lg,
+    gap: spacing.sm,
+  },
+  cardHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  cardIndex:   { flex: 1 },
+  prompt:      { lineHeight: 22 },
+  answerRow:   { flexDirection: 'row', gap: spacing.sm },
+  answerLabel: { width: 80 },
+  answerValue: { flex: 1 },
+});

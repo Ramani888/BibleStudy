@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { CheckCircleIcon } from '../../../components/icons';
 
@@ -7,7 +7,7 @@ import { Button, Input, Typography } from '../../../components/ui';
 import { useCreateSet, useSets } from '../../../hooks';
 import { getErrorMessage } from '../../../api';
 import Toast from 'react-native-toast-message';
-import { layout, spacing, useTheme, type Theme } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 import type { SuggestedCard } from '../../../types';
 
 interface CardProposalSheetProps {
@@ -18,9 +18,7 @@ interface CardProposalSheetProps {
 }
 
 export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [newSetName, setNewSetName] = useState('');
@@ -71,7 +69,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
       {/* Card preview */}
       <ScrollView style={styles.previewScroll} showsVerticalScrollIndicator={false}>
         {cards.map((card, i) => (
-          <View key={i} style={styles.cardRow}>
+          <View key={i} style={[styles.cardRow, { borderBottomColor: colors.border }]}>
             <Typography preset="label" color={colors.textSecondary}>Q: {card.question}</Typography>
             <Typography preset="bodySm" color={colors.textPrimary} style={styles.answerText}>
               A: {card.answer}
@@ -109,7 +107,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
       )}
 
       {setsLoading ? (
-        <ActivityIndicator color={colors.primary} style={styles.loader} />
+        <ActivityIndicator color={colors.accent} style={styles.loader} />
       ) : sets.length === 0 ? (
         <Typography preset="bodySm" color={colors.textSecondary} style={styles.emptyText}>
           No sets yet — create one above.
@@ -119,7 +117,11 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
           {sets.map(set => (
             <Pressable
               key={set.id}
-              style={[styles.setRow, selectedSetId === set.id && styles.setRowSelected]}
+              style={[
+                styles.setRow,
+                { borderColor: colors.border },
+                selectedSetId === set.id && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+              ]}
               onPress={() => setSelectedSetId(set.id)}
             >
               {set.color && <View style={[styles.setColor, { backgroundColor: set.color }]} />}
@@ -130,7 +132,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
                 </Typography>
               </View>
               {selectedSetId === set.id && (
-                <CheckCircleIcon size={20} color={colors.primary} />
+                <CheckCircleIcon size={20} color={colors.accent} />
               )}
             </Pressable>
           ))}
@@ -150,38 +152,32 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  subheader: { marginBottom: spacing[3] },
-  previewScroll: { maxHeight: 180, marginBottom: spacing[4] },
+const styles = StyleSheet.create({
+  subheader: { marginBottom: spacing.md },
+  previewScroll: { maxHeight: 180, marginBottom: spacing.lg },
   cardRow: {
-    gap: spacing[1],
-    paddingVertical: spacing[2.5],
+    gap: spacing.xs,
+    paddingVertical: spacing.s10,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
-  answerText: { paddingLeft: spacing[2] },
-  sectionLabel: { marginBottom: spacing[2] },
-  createRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing[2], marginBottom: spacing[3] },
+  answerText: { paddingLeft: spacing.sm },
+  sectionLabel: { marginBottom: spacing.sm },
+  createRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm, marginBottom: spacing.md },
   createInput: { flex: 1 },
-  loader: { marginVertical: spacing[4] },
-  emptyText: { textAlign: 'center', marginVertical: spacing[4] },
-  setList: { maxHeight: 220, marginBottom: spacing[4] },
+  loader: { marginVertical: spacing.lg },
+  emptyText: { textAlign: 'center', marginVertical: spacing.lg },
+  setList: { maxHeight: 220, marginBottom: spacing.lg },
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
-    paddingVertical: spacing[3],
-    paddingHorizontal: spacing[3],
-    borderRadius: spacing[2.5],
+    gap: spacing.md,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+    borderRadius: spacing.s10,
     borderWidth: 1.5,
-    borderColor: colors.border,
-    marginBottom: spacing[2],
+    marginBottom: spacing.sm,
   },
-  setRowSelected: {
-    borderColor: colors.primary,
-    backgroundColor: colors.primarySurface,
-  },
-  setColor: { width: 12, height: 12, borderRadius: spacing[1.5] },
+  setColor: { width: 12, height: 12, borderRadius: spacing.s6 },
   setInfo: { flex: 1 },
-  footer: { marginTop: spacing[2] },
+  footer: { marginTop: spacing.sm },
 });

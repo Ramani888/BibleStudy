@@ -1,11 +1,11 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
-import { fontWeights, type Theme, useTheme } from '../../theme';
+import { fontWeights, useTheme, spacing, layout } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
@@ -19,9 +19,7 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizDetailScreen() {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
@@ -41,7 +39,7 @@ export function QuizDetailScreen() {
   const timeSecs    = live?.timeSecs    ?? params.timeSecs;
 
   const scored = total > 0;
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
+  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
   const modeLabel = mode ? (MODE_LABEL[mode] ?? mode) : '—';
   const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(' · ');
   const isPerfect = scored && scorePct === 100;
@@ -98,7 +96,7 @@ export function QuizDetailScreen() {
                 </Pressable>
               )}
               <Pressable onPress={handleDelete} hitSlop={12} disabled={isPending} accessibilityRole="button">
-                <TrashIcon size={20} color={colors.error} />
+                <TrashIcon size={20} color={colors.alert} />
               </Pressable>
             </View>
           }
@@ -132,18 +130,18 @@ export function QuizDetailScreen() {
 
         {/* ── Mode + sets chips ── */}
         <View style={styles.chips}>
-          <View style={[styles.chip, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+          <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
             <Typography preset="caption" color={colors.textSecondary}>{modeLabel}</Typography>
           </View>
           {setIds.length > 1 && (
-            <View style={[styles.chip, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
+            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
               <Typography preset="caption" color={colors.textSecondary}>{setIds.length} sets</Typography>
             </View>
           )}
         </View>
 
         {/* ── Date info card ── */}
-        <View style={[styles.card, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}>
+        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.cardRow}>
             <View style={styles.cardRowLeft}>
               <ClockIcon size={16} color={colors.textSecondary} />
@@ -191,53 +189,52 @@ export function QuizDetailScreen() {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    scroll: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingTop: spacing[8],
-      paddingBottom: spacing[6],
-      gap: spacing[6],
-      alignItems: 'center',
-    },
+const styles = StyleSheet.create({
+  scroll: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.xxxl,
+    paddingBottom: spacing.xxl,
+    gap: spacing.xxl,
+    alignItems: 'center',
+  },
 
-    // Hero
-    hero: { alignItems: 'center', gap: spacing[2] },
-    scoreNumber: { fontSize: 72, fontWeight: fontWeights.bold, lineHeight: 80, includeFontPadding: false },
-    correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  // Hero
+  hero: { alignItems: 'center', gap: spacing.sm },
+  scoreNumber: { fontSize: 72, fontWeight: fontWeights.bold, lineHeight: 80, includeFontPadding: false },
+  correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 
-    // Chips
-    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
-    chips: { flexDirection: 'row', gap: spacing[2], flexWrap: 'wrap', justifyContent: 'center' },
-    chip: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1],
-      borderRadius: layout.pillRadius,
-      borderWidth: 1,
-    },
+  // Chips
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  chips: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap', justifyContent: 'center' },
+  chip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: layout.pillRadius,
+    borderWidth: 1,
+  },
 
-    // Info card
-    card: {
-      width: '100%',
-      borderRadius: layout.cardRadiusLg,
-      borderWidth: 1,
-      overflow: 'hidden',
-    },
-    cardRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingHorizontal: spacing[5],
-      paddingVertical: spacing[4],
-    },
-    cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-    divider: { height: 1 },
+  // Info card
+  card: {
+    width: '100%',
+    borderRadius: layout.cardRadiusLg,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.lg,
+  },
+  cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  divider: { height: 1 },
 
-    // Footer
-    footer: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[4],
-      borderTopWidth: 1,
-      gap: spacing[3],
-    },
-  });
+  // Footer
+  footer: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+    gap: spacing.md,
+  },
+});

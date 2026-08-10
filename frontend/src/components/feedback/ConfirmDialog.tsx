@@ -65,11 +65,11 @@ const styles = StyleSheet.create({
   wrapper: { justifyContent: 'center' },
   content: {
     borderRadius: layout.cardRadiusSm,
-    marginHorizontal: spacing[6],
-    paddingBottom: spacing[5],
+    marginHorizontal: spacing.xxl,
+    paddingBottom: spacing.xl,
   },
-  title: { marginBottom: spacing[2] },
-  message: { marginBottom: spacing[4], lineHeight: fontSizes.md * lineHeights.normal },
-  btnRow: { flexDirection: 'row', gap: spacing[3], marginTop: spacing[2] },
+  title: { marginBottom: spacing.sm },
+  message: { marginBottom: spacing.lg, lineHeight: fontSizes.md * lineHeights.normal },
+  btnRow: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
   btn: { flex: 1 },
 });

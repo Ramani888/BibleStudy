@@ -14,8 +14,8 @@ interface AccentIconProps {
 export function AccentIcon({ icon: Icon, color, size = 44 }: AccentIconProps) {
   const { colors } = useTheme();
   return (
-    <View style={[styles.chip, { width: size, height: size, backgroundColor: color ?? colors.primary }]}>
-      <Icon size={Math.round(size * 0.5)} color={colors.textOnPrimary} />
+    <View style={[styles.chip, { width: size, height: size, backgroundColor: color ?? colors.accent }]}>
+      <Icon size={Math.round(size * 0.5)} color={colors.textOnAccent} />
     </View>
   );
 }

@@ -1,8 +1,8 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { layout, Theme, useTheme } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 
 interface CardPreviewProps {
   question: string;
@@ -10,12 +10,10 @@ interface CardPreviewProps {
 }
 
 export function CardPreview({ question, answer }: CardPreviewProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <View style={styles.preview}>
-      <View style={styles.previewTop}>
+      <View style={[styles.previewTop, { backgroundColor: colors.surface }]}>
         <Typography
           preset="body"
           color={question ? colors.textPrimary : colors.textDisabled}
@@ -24,7 +22,7 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
           {question || 'Front (question)'}
         </Typography>
       </View>
-      <View style={styles.previewBottom}>
+      <View style={[styles.previewBottom, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
         <Typography
           preset="body"
           color={answer ? colors.textSecondary : colors.textDisabled}
@@ -37,25 +35,21 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    preview: {
-      borderRadius: layout.cardRadius,
-      overflow: 'hidden',
-    },
-    previewTop: {
-      backgroundColor: colors.backgroundCard,
-      padding: spacing[4],
-      minHeight: 72,
-      justifyContent: 'center',
-    },
-    previewBottom: {
-      backgroundColor: colors.background,
-      padding: spacing[4],
-      minHeight: 56,
-      justifyContent: 'center',
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    previewText: { lineHeight: 22 },
-  });
+const styles = StyleSheet.create({
+  preview: {
+    borderRadius: layout.cardRadius,
+    overflow: 'hidden',
+  },
+  previewTop: {
+    padding: spacing.lg,
+    minHeight: 72,
+    justifyContent: 'center',
+  },
+  previewBottom: {
+    padding: spacing.lg,
+    minHeight: 56,
+    justifyContent: 'center',
+    borderTopWidth: 1,
+  },
+  previewText: { lineHeight: 22 },
+});

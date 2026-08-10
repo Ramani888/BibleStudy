@@ -34,7 +34,6 @@ const GOOGLE_DOCS_ERROR_DETECTOR = `
 
 export function MediaPDFViewerScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { url, name } = route.params;
 
   const viewerUrl = Platform.OS === 'android'
@@ -71,8 +70,8 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
           onHttpError={(e) => { if (e.nativeEvent.statusCode >= 400) setError(true); }}
         />
         {loading && (
-          <View style={[StyleSheet.absoluteFill, styles.loadingOverlay]}>
-            <ActivityIndicator size="large" color={colors.primary} />
+          <View style={[StyleSheet.absoluteFill, styles.loadingOverlay, { backgroundColor: colors.background }]}>
+            <ActivityIndicator size="large" color={colors.accent} />
           </View>
         )}
       </View>
@@ -80,22 +79,19 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    pdfWrap: { flex: 1 },
-    pdf: { flex: 1, width: '100%' },
-    loadingOverlay: {
-      backgroundColor: colors.background,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    errorContainer: {
-      flex: 1,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: spacing[8],
-    },
-    errorMessage: { marginTop: spacing[2] },
-    errorBtn: { marginTop: spacing[6], minWidth: 140 },
-  });
-}
+const styles = StyleSheet.create({
+  pdfWrap: { flex: 1 },
+  pdf: { flex: 1, width: '100%' },
+  loadingOverlay: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  errorContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xxxl,
+  },
+  errorMessage: { marginTop: spacing.sm },
+  errorBtn: { marginTop: spacing.xxl, minWidth: 140 },
+});

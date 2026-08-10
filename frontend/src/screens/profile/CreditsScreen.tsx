@@ -5,7 +5,7 @@ import {
   Pressable,
   StyleSheet,
   View,
-} from 'react-native';
+Platform } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Badge, Divider, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
@@ -17,7 +17,7 @@ import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks'
 import { WeeklyChart } from './components/WeeklyChart';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
-import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme , palette } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { TransactionType } from '../../types';
 
@@ -37,7 +37,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
   return (
     <View style={styles.balanceCard}>
       <LinearGradient
-        colors={['#5D03FF', '#6366F1', '#8B5CF6']}
+        colors={[palette.indigo600, palette.indigo500, palette.violet500]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={StyleSheet.absoluteFill}
@@ -48,17 +48,17 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
         </Typography>
         {streak > 0 && (
           <View style={styles.streakPill}>
-            <Typography preset="caption" color="#fff">🔥 {streak}</Typography>
+            <Typography preset="caption" color={palette.white}>🔥 {streak}</Typography>
           </View>
         )}
       </View>
 
       {isLoading ? (
-        <ActivityIndicator color="#fff" />
+        <ActivityIndicator color={palette.white} />
       ) : (
         <View style={styles.balanceRow}>
           <StarIcon size={28} color="rgba(255,255,255,0.9)" />
-          <Typography preset="h2" color="#fff" style={styles.balanceAmount}>
+          <Typography preset="h2" color={palette.white} style={styles.balanceAmount}>
             {data?.balance ?? 0}
           </Typography>
           <Typography preset="bodyLg" color="rgba(255,255,255,0.7)">credits</Typography>
@@ -66,10 +66,10 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
       )}
 
       <Pressable
-        style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.85 }]}
+        style={({ pressed }) => [styles.ctaBtn, { backgroundColor: palette.white }, pressed && { opacity: 0.85 }]}
         onPress={onGetMore}
       >
-        <Typography preset="label" style={styles.ctaBtnText}>Get More Credits</Typography>
+        <Typography preset="label" color={palette.indigo500} style={styles.ctaBtnText}>Get More Credits</Typography>
       </Pressable>
     </View>
   );
@@ -93,10 +93,10 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const transactions = data?.pages.flatMap(p => p.transactions) ?? [];
 
   const amountColor: Record<TransactionType, string> = {
-    USAGE:    colors.error,
+    USAGE:    colors.alert,
     REWARD:   colors.success,
     PURCHASE: colors.info,
-    BONUS:    colors.primary,
+    BONUS:    colors.accent,
   };
 
   return (
@@ -116,11 +116,11 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
             <View>
               <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
             </View>
-            <Spacer size={spacing[4]} />
+            <Spacer size={spacing.lg} />
             <View>
               <WeeklyChart />
             </View>
-            <Spacer size={spacing[6]} />
+            <Spacer size={spacing.xxl} />
             <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
             <Divider marginV={0} />
           </>
@@ -137,14 +137,14 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
             />
           ) : (
             <View style={styles.loadingWrap}>
-              <ActivityIndicator color={colors.primary} />
+              <ActivityIndicator color={colors.accent} />
             </View>
           )
         }
         ListFooterComponent={
           isFetchingNextPage ? (
             <View style={styles.footerLoader}>
-              <ActivityIndicator color={colors.primary} size="small" />
+              <ActivityIndicator color={colors.accent} size="small" />
             </View>
           ) : null
         }
@@ -177,47 +177,46 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
 
 const styles = StyleSheet.create({
   // Single source of horizontal spacing — everything inside FlatList inherits this
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
 
   // Balance card — no extra marginHorizontal, list padding handles alignment
   balanceCard: {
     borderRadius: layout.cardRadiusLg,
     overflow: 'hidden',
-    padding: spacing[5],
-    gap: spacing[4],
-    ...shadows.lg,
+    padding: spacing.xl,
+    gap: spacing.lg,
+    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
   },
   balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
   streakPill: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: layout.pillRadius,
     backgroundColor: 'rgba(255,255,255,0.2)',
   },
-  balanceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  balanceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   balanceAmount: { fontWeight: fontWeights.bold },
   ctaBtn: {
-    backgroundColor: '#fff',
     borderRadius: layout.cardRadius,
-    paddingVertical: spacing[3],
+    paddingVertical: spacing.md,
     alignItems: 'center',
   },
-  ctaBtnText: { color: '#6366F1', fontWeight: fontWeights.semiBold },
+  ctaBtnText: { fontWeight: fontWeights.semiBold },
 
-  historyTitle: { marginBottom: spacing[3] },
+  historyTitle: { marginBottom: spacing.md },
 
   txRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing[3],
-    gap: spacing[3],
+    paddingVertical: spacing.md,
+    gap: spacing.md,
   },
-  txLeft: { flex: 1, gap: spacing[1] },
+  txLeft: { flex: 1, gap: spacing.xs },
   txTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   txAmount: { minWidth: 48, textAlign: 'right' },
 
   emptyState: { minHeight: 160 },
-  loadingWrap: { paddingTop: spacing[10], alignItems: 'center' },
-  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
+  loadingWrap: { paddingTop: spacing.huge, alignItems: 'center' },
+  footerLoader: { paddingVertical: spacing.lg, alignItems: 'center' },
 });

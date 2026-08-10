@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -9,15 +9,13 @@ import { TrashIcon } from '../../components/icons';
 
 import { useConfirmDialog, useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 const ICON_SIZE = 20;
 
 export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet'>) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const { setId } = route.params;
   const { data: set, isLoading, isError, refetch } = useSet(setId);
   const { mutateAsync: updateSet } = useUpdateSet();
@@ -51,7 +49,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
     return (
       <Screen header={header} edges={['top', 'bottom']}>
         <View style={styles.loading}>
-          <ActivityIndicator color={colors.primary} size="large" />
+          <ActivityIndicator color={colors.accent} size="large" />
         </View>
       </Screen>
     );
@@ -66,7 +64,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   }
 
   const footer = (
-    <View style={styles.footer}>
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Save Changes" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
@@ -92,10 +90,10 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
           />
         </View>
         <View>
-          <View style={styles.deleteSection}>
+          <View style={[styles.deleteSection, { borderTopColor: colors.border }]}>
             <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
-              <TrashIcon size={ICON_SIZE} color={colors.error} />
-              <Typography preset="label" color={colors.error}>Delete Set</Typography>
+              <TrashIcon size={ICON_SIZE} color={colors.alert} />
+              <Typography preset="label" color={colors.alert}>Delete Set</Typography>
             </Pressable>
           </View>
         </View>
@@ -106,23 +104,20 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    flex: { flex: 1 },
-    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
-    loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[2],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    deleteSection: {
-      marginTop: spacing[6],
-      alignItems: 'center',
-      paddingVertical: spacing[4],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  });
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
+  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing.sm,
+    borderTopWidth: 1,
+  },
+  deleteSection: {
+    marginTop: spacing.xxl,
+    alignItems: 'center',
+    paddingVertical: spacing.lg,
+    borderTopWidth: 1,
+  },
+  deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+});

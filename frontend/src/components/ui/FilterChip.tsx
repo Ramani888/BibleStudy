@@ -21,12 +21,12 @@ export function FilterChip({ label, active = false, onPress, icon: Icon, disable
       style={({ pressed }) => [
         styles.chip,
         {
-          borderColor: active ? colors.primary : colors.border,
-          backgroundColor: active ? colors.primary : colors.backgroundCard,
+          borderColor: active ? colors.accent : colors.border,
+          backgroundColor: active ? colors.accent : colors.surface,
           opacity: pressed || disabled ? 0.6 : 1,
-          paddingHorizontal: spacing[3],
-          paddingVertical: spacing[2],
-          gap: spacing[1],
+          paddingHorizontal: spacing.md,
+          paddingVertical: spacing.sm,
+          gap: spacing.xs,
         },
       ]}
       accessibilityRole="button"

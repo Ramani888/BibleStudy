@@ -10,7 +10,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { SparklesIcon } from '../../../components/icons';
 import { Divider, Typography } from '../../../components/ui';
-import { type Theme, useTheme } from '../../../theme';
+import { useTheme, spacing, layout } from '../../../theme';
 import { SocialButtons } from './SocialButtons';
 
 interface AuthLayoutProps {
@@ -24,13 +24,14 @@ interface AuthLayoutProps {
   socialLoading?: 'google' | 'apple' | null;
 }
 
-function BrandLogo({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) {
+function BrandLogo() {
+  const { colors } = useTheme();
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing[2.5], marginBottom: spacing[8] }}>
-      <View style={{ width: spacing[10], height: spacing[10], borderRadius: layout.cardRadius, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary }}>
-        <SparklesIcon size={26} color={colors.textOnPrimary} />
+    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.s10, marginBottom: spacing.xxxl }}>
+      <View style={{ width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent }}>
+        <SparklesIcon size={26} color={colors.textOnAccent} />
       </View>
-      <Typography preset="h4" color={colors.primary} style={{ letterSpacing: 0.3 }}>
+      <Typography preset="h4" color={colors.accent} style={{ letterSpacing: 0.3 }}>
         BibleStudy Pro
       </Typography>
     </View>
@@ -46,12 +47,11 @@ export function AuthLayout({
   onApple,
   socialLoading,
 }: AuthLayoutProps) {
-  const { colors, spacing, layout } = useTheme();
-  const styles = makeStyles({ colors, spacing, layout });
+  const { colors } = useTheme();
   const hasSocial = !!(onGoogle && onApple);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'bottom']}>
+    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top', 'bottom']}>
       <KeyboardAvoidingView
         style={styles.kav}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -62,7 +62,7 @@ export function AuthLayout({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <BrandLogo colors={colors} spacing={spacing} layout={layout} />
+          <BrandLogo />
 
           <Typography preset="h2" style={styles.title}>{title}</Typography>
           {subtitle && (
@@ -92,39 +92,37 @@ export function AuthLayout({
           )}
         </ScrollView>
 
-        <View style={styles.footer}>{footer}</View>
+        <View style={[styles.footer, { borderTopColor: colors.border }]}>{footer}</View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Pick<Theme, 'colors' | 'spacing' | 'layout'>) =>
-  StyleSheet.create({
-    safe:   { flex: 1, backgroundColor: colors.background },
-    kav:    { flex: 1 },
-    scroll: {
-      flexGrow: 1,
-      paddingHorizontal: layout.screenPaddingH,
-      paddingTop: spacing[6],
-      paddingBottom: spacing[4],
-    },
-    title:    { marginBottom: spacing[1] },
-    subtitle: { marginBottom: spacing[6] },
-    form:     { gap: spacing[4], marginBottom: spacing[6] },
-    dividerRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      marginBottom: spacing[4],
-    },
-    dividerLine: { flex: 1 },
-    orText:      { lineHeight: 18 },
-    footer: {
-      paddingHorizontal: layout.screenPaddingH,
-      paddingBottom: spacing[4],
-      paddingTop: spacing[3],
-      gap: spacing[3],
-      borderTopWidth: StyleSheet.hairlineWidth,
-      borderTopColor: colors.border,
-    },
-  });
+const styles = StyleSheet.create({
+  safe:   { flex: 1 },
+  kav:    { flex: 1 },
+  scroll: {
+    flexGrow: 1,
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.lg,
+  },
+  title:    { marginBottom: spacing.xs },
+  subtitle: { marginBottom: spacing.xxl },
+  form:     { gap: spacing.lg, marginBottom: spacing.xxl },
+  dividerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  dividerLine: { flex: 1 },
+  orText:      { lineHeight: 18 },
+  footer: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingBottom: spacing.lg,
+    paddingTop: spacing.md,
+    gap: spacing.md,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+});

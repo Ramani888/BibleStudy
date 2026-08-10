@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,7 +12,7 @@ import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
 import { getErrorMessage } from '../../../api';
-import { Theme, useTheme } from '../../../theme';
+import { layout, spacing, useTheme, palette } from '../../../theme';
 import type { Visibility, CardLayout, StudySet } from '../../../types';
 
 const ICON_SIZE = 18;
@@ -45,11 +45,9 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
   { defaultValues, onSubmit, onSubmittingChange },
   ref,
 ) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
-  const [layout, setLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
+  const [cardLayout, setCardLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
   const [folderId, setFolderId] = useState<string | null>(defaultValues?.folderId ?? null);
   const [selectedColor, setSelectedColor] = useState<string | null>(defaultValues?.color ?? null);
   const [folderPickerOpen, setFolderPickerOpen] = useState(false);
@@ -75,7 +73,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
 
   const handleSave = async (data: CreateSetFormData) => {
     try {
-      await onSubmit({ ...data, visibility, layout, folderId, color: selectedColor });
+      await onSubmit({ ...data, visibility, layout: cardLayout, folderId, color: selectedColor });
     } catch (err) {
       Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
     }
@@ -113,7 +111,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
           Folder (optional)
         </Typography>
-        <Pressable style={styles.picker} onPress={() => setFolderPickerOpen(true)}>
+        <Pressable style={[styles.picker, { backgroundColor: colors.surfaceMuted }]} onPress={() => setFolderPickerOpen(true)}>
           <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
             {selectedFolder ? selectedFolder.name : 'No folder'}
           </Typography>
@@ -138,18 +136,22 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
           {VISIBILITY_OPTIONS.map(opt => (
             <Pressable
               key={opt.value}
-              style={[styles.optionChip, visibility === opt.value && styles.optionChipActive]}
+              style={[
+                styles.optionChip,
+                { backgroundColor: colors.surfaceMuted },
+                visibility === opt.value && { borderWidth: 1.5, borderColor: colors.accent, backgroundColor: colors.accentSoft },
+              ]}
               onPress={() => setVisibility(opt.value)}
             >
               <Typography
                 preset="label"
-                color={visibility === opt.value ? colors.primary : colors.textSecondary}
+                color={visibility === opt.value ? colors.accent : colors.textSecondary}
               >
                 {opt.label}
               </Typography>
               <Typography
                 preset="caption"
-                color={visibility === opt.value ? colors.primaryDark : colors.textDisabled}
+                color={visibility === opt.value ? palette.indigo800 : colors.textDisabled}
               >
                 {opt.desc}
               </Typography>
@@ -167,12 +169,16 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
           {LAYOUT_OPTIONS.map(opt => (
             <Pressable
               key={opt.value}
-              style={[styles.layoutChip, layout === opt.value && styles.optionChipActive]}
-              onPress={() => setLayout(opt.value)}
+              style={[
+                styles.layoutChip,
+                { backgroundColor: colors.surfaceMuted },
+                cardLayout === opt.value && { borderWidth: 1.5, borderColor: colors.accent, backgroundColor: colors.accentSoft },
+              ]}
+              onPress={() => setCardLayout(opt.value)}
             >
               <Typography
                 preset="label"
-                color={layout === opt.value ? colors.primary : colors.textSecondary}
+                color={cardLayout === opt.value ? colors.accent : colors.textSecondary}
               >
                 {opt.label}
               </Typography>
@@ -189,12 +195,12 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       >
         <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
           <Pressable style={styles.folderOption} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
-            <Typography preset="body" color={!folderId ? colors.primary : colors.textPrimary}>
+            <Typography preset="body" color={!folderId ? colors.accent : colors.textPrimary}>
               No folder
             </Typography>
             {!folderId && <Badge label="Selected" variant="primary" />}
           </Pressable>
-          <Divider marginV={spacing[1]} />
+          <Divider marginV={spacing.xs} />
           {folders.map(folder => (
             <React.Fragment key={folder.id}>
               <Pressable
@@ -202,14 +208,14 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
                 onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
               >
                 <View style={styles.folderRow}>
-                  <FolderIcon size={ICON_SIZE} color={folderId === folder.id ? colors.primary : colors.textSecondary} />
-                  <Typography preset="body" color={folderId === folder.id ? colors.primary : colors.textPrimary}>
+                  <FolderIcon size={ICON_SIZE} color={folderId === folder.id ? colors.accent : colors.textSecondary} />
+                  <Typography preset="body" color={folderId === folder.id ? colors.accent : colors.textPrimary}>
                     {folder.name}
                   </Typography>
                 </View>
                 {folderId === folder.id && <Badge label="Selected" variant="primary" />}
               </Pressable>
-              <Divider marginV={spacing[1]} />
+              <Divider marginV={spacing.xs} />
             </React.Fragment>
           ))}
         </ScrollView>
@@ -218,45 +224,36 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
   );
 });
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    container: { gap: spacing[4] },
-    fieldLabel: { marginBottom: spacing[1.5] },
-    picker: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      height: layout.inputHeight,
-      borderRadius: layout.cardRadius,
-      backgroundColor: colors.backgroundSecondary,
-      paddingHorizontal: spacing[4],
-    },
-    optionRow: { flexDirection: 'row', gap: spacing[2] },
-    optionChip: {
-      flex: 1,
-      borderRadius: layout.cardRadius,
-      padding: spacing[3],
-      alignItems: 'center',
-      gap: spacing[0.5],
-      backgroundColor: colors.backgroundSecondary,
-    },
-    layoutChip: {
-      flex: 1,
-      borderRadius: layout.cardRadius,
-      paddingVertical: spacing[3],
-      alignItems: 'center',
-      backgroundColor: colors.backgroundSecondary,
-    },
-    optionChipActive: {
-      borderWidth: 1.5,
-      borderColor: colors.primary,
-      backgroundColor: colors.primarySurface,
-    },
-    folderOption: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      paddingVertical: spacing[3],
-    },
-    folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-  });
+const styles = StyleSheet.create({
+  container: { gap: spacing.lg },
+  fieldLabel: { marginBottom: spacing.s6 },
+  picker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    height: layout.inputHeight,
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg,
+  },
+  optionRow: { flexDirection: 'row', gap: spacing.sm },
+  optionChip: {
+    flex: 1,
+    borderRadius: layout.cardRadius,
+    padding: spacing.md,
+    alignItems: 'center',
+    gap: spacing.s2,
+  },
+  layoutChip: {
+    flex: 1,
+    borderRadius: layout.cardRadius,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+  },
+  folderOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: spacing.md,
+  },
+  folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+});

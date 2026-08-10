@@ -5,7 +5,7 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
 import { Divider } from '../../components/ui';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, palette, spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 
 const STORAGE_KEY = '@bsp/notification_settings';
@@ -59,7 +59,7 @@ export function NotificationSettingsScreen({ navigation }: Props) {
         </View>
 
         <View>
-        <View style={[styles.card, { backgroundColor: colors.backgroundCard }]}>
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
           {SETTINGS.map((s, i) => (
             <React.Fragment key={s.key}>
               {i > 0 && <Divider marginV={0} />}
@@ -71,8 +71,8 @@ export function NotificationSettingsScreen({ navigation }: Props) {
                 <Switch
                   value={prefs[s.key]}
                   onValueChange={() => toggle(s.key)}
-                  trackColor={{ false: colors.border, true: colors.primary }}
-                  thumbColor="#fff"
+                  trackColor={{ false: colors.border, true: colors.accent }}
+                  thumbColor={palette.white}
                 />
               </View>
             </React.Fragment>
@@ -85,8 +85,8 @@ export function NotificationSettingsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
-  hint: { marginBottom: spacing[4] },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
+  hint: { marginBottom: spacing.lg },
   card: {
     borderRadius: 14,
     overflow: 'hidden',
@@ -94,9 +94,9 @@ const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[4],
-    gap: spacing[3],
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.lg,
+    gap: spacing.md,
   },
-  rowText: { flex: 1, gap: spacing[1] },
+  rowText: { flex: 1, gap: spacing.xs },
 });

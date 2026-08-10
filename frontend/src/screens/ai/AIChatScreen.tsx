@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -26,7 +26,7 @@ import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirm
 import { detectTags } from '../../utils/tagDetector';
 import { storage } from '../../utils/storage';
 import { getErrorMessage } from '../../api';
-import { layout, spacing, useTheme, type Theme } from '../../theme';
+import { layout, spacing, useTheme, palette } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, MediaFile, MediaFileType, SuggestedCard } from '../../types';
 
@@ -43,9 +43,7 @@ const SUGGESTIONS = [
 ];
 
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
 
   const autoSend = route.params?.autoSend;
@@ -404,9 +402,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
         <Image source={{ uri: item.attachmentLocalUri }} style={styles.msgImageThumb} resizeMode="cover" />
       ) : item.role === 'user' && item.attachmentName ? (
-        <View style={styles.attachmentChip}>
-          <FileTextIcon size={14} color={colors.primary} />
-          <Typography preset="caption" color={colors.primary} numberOfLines={1} style={styles.attachmentChipText}>
+        <View style={[styles.attachmentChip, { backgroundColor: colors.accentSoft }]}>
+          <FileTextIcon size={14} color={colors.accent} />
+          <Typography preset="caption" color={colors.accent} numberOfLines={1} style={styles.attachmentChipText}>
             {item.attachmentName}
           </Typography>
         </View>
@@ -429,12 +427,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           {item.followUps.map((q, i) => (
             <Pressable
               key={i}
-              style={({ pressed }) => [styles.followUpChip, { opacity: pressed ? 0.7 : 1 }]}
+              style={({ pressed }) => [styles.followUpChip, { backgroundColor: colors.accentSoft }, { opacity: pressed ? 0.7 : 1 }]}
               onPress={() => handleSend(q)}
               disabled={isPending || isBalanceLoading}
             >
-              <ArrowRightIcon size={12} color={colors.primary} />
-              <Typography preset="caption" color={colors.primary} style={styles.followUpText}>
+              <ArrowRightIcon size={12} color={colors.accent} />
+              <Typography preset="caption" color={colors.accent} style={styles.followUpText}>
                 {q}
               </Typography>
             </Pressable>
@@ -444,9 +442,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
       {/* Flashcard proposal banner — shown when AI generated cards (incl. history) */}
       {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={styles.cardBanner}>
-          <AlbumsIcon size={16} color={colors.primary} />
-          <Typography preset="bodySm" color={colors.primary} style={styles.cardBannerText}>
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft }]}>
+          <AlbumsIcon size={16} color={colors.accent} />
+          <Typography preset="bodySm" color={colors.accent} style={styles.cardBannerText}>
             {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
           </Typography>
           {savedMessageIds.has(item.id) ? (
@@ -456,7 +454,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             </View>
           ) : (
             <Pressable
-              style={styles.saveToSetBtn}
+              style={[styles.saveToSetBtn, { backgroundColor: colors.accent }]}
               onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id, chatId: item.chatId })}
               hitSlop={8}
             >
@@ -466,19 +464,19 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         </Animated.View>
       )}
     </View>
-  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal, colors, styles]);
+  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal, colors]);
 
   return (
     <KeyboardAvoidingView
-      style={styles.safe}
+      style={[styles.safe, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
     <SafeAreaView style={styles.flex} edges={['top', 'bottom']}>
       {/* ── Header ── */}
-      <View style={styles.header}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
-          <View style={styles.aiBadge}>
-            <SparklesIcon size={ICON_SIZE} color={colors.textOnPrimary} />
+          <View style={[styles.aiBadge, { backgroundColor: colors.accent }]}>
+            <SparklesIcon size={ICON_SIZE} color={colors.textOnAccent} />
           </View>
           <View>
             <Typography preset="h4">AI Bible Assistant</Typography>
@@ -508,7 +506,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             hitSlop={8}
             style={({ pressed }) => [styles.historyBtn, { opacity: pressed ? 0.7 : 1 }]}
           >
-            <ClockIcon size={ICON_SIZE} color={colors.primary} />
+            <ClockIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
         </View>
       </View>
@@ -523,7 +521,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         extraData={savedMessageIds}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <SparklesIcon size={EMPTY_ICON_SIZE} color={colors.primaryLight} />
+            <SparklesIcon size={EMPTY_ICON_SIZE} color={palette.indigo300} />
             <Typography preset="h4" align="center">Ask anything about the Bible</Typography>
             <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
               Theology, history, verses, devotional insights — I'm here to help.
@@ -532,11 +530,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
               {SUGGESTIONS.map(s => (
                 <Pressable
                   key={s}
-                  style={({ pressed }) => [styles.suggestion, { opacity: pressed ? 0.7 : 1 }]}
+                  style={({ pressed }) => [styles.suggestion, { backgroundColor: colors.accentSoft }, { opacity: pressed ? 0.7 : 1 }]}
                   onPress={() => handleSend(s)}
                   disabled={isBalanceLoading}
                 >
-                  <Typography preset="bodySm" color={colors.primary}>{s}</Typography>
+                  <Typography preset="bodySm" color={colors.accent}>{s}</Typography>
                 </Pressable>
               ))}
             </View>
@@ -616,8 +614,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+const styles = StyleSheet.create({
+  safe: { flex: 1 },
   flex: { flex: 1 },
 
   header: {
@@ -625,54 +623,51 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   headerLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
+    gap: spacing.md,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
+    gap: spacing.md,
   },
   aiBadge: {
     width: 40,
     height: 40,
     borderRadius: layout.cardRadius,
-    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  historyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  historyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 
   list: {
     padding: layout.screenPaddingH,
-    paddingTop: spacing[4],
+    paddingTop: spacing.lg,
     flexGrow: 1,
   },
 
   emptyWrap: {
     flex: 1,
     alignItems: 'center',
-    paddingTop: spacing[8],
-    gap: spacing[3],
+    paddingTop: spacing.xxxl,
+    gap: spacing.md,
   },
-  emptySub: { paddingHorizontal: spacing[4] },
+  emptySub: { paddingHorizontal: spacing.lg },
   suggestions: {
     width: '100%',
-    gap: spacing[2],
-    marginTop: spacing[2],
+    gap: spacing.sm,
+    marginTop: spacing.sm,
   },
   suggestion: {
-    backgroundColor: colors.primarySurface,
     borderRadius: layout.cardRadius,
     borderWidth: 1,
-    borderColor: colors.primaryLight,
-    padding: spacing[3],
+    borderColor: palette.indigo300,
+    padding: spacing.md,
   },
 
   msgImageThumb: {
@@ -680,44 +675,42 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     height: 150,
     borderRadius: layout.cardRadius,
     alignSelf: 'flex-end',
-    marginRight: spacing[4],
-    marginBottom: spacing[1],
+    marginRight: spacing.lg,
+    marginBottom: spacing.xs,
   },
 
   attachmentChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1.5],
+    gap: spacing.s6,
     alignSelf: 'flex-end',
     maxWidth: '80%',
-    marginRight: spacing[4],
-    marginBottom: spacing[1],
-    backgroundColor: colors.primarySurface,
+    marginRight: spacing.lg,
+    marginBottom: spacing.xs,
     borderWidth: 1,
-    borderColor: colors.primaryLight,
+    borderColor: palette.indigo300,
     borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1.5],
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s6,
   },
   attachmentChipText: { flexShrink: 1 },
 
   followUps: {
-    paddingLeft: spacing[10],
-    paddingRight: spacing[4],
-    gap: spacing[2],
-    marginTop: -spacing[1],
-    marginBottom: spacing[3],
+    paddingLeft: spacing.huge,
+    paddingRight: spacing.lg,
+    gap: spacing.sm,
+    marginTop: -spacing.xs,
+    marginBottom: spacing.md,
   },
   followUpChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[1],
-    backgroundColor: colors.primarySurface,
+    gap: spacing.xs,
     borderRadius: layout.pillRadius,
     borderWidth: 1,
-    borderColor: colors.primaryLight,
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1.5],
+    borderColor: palette.indigo300,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s6,
     alignSelf: 'flex-start',
   },
   followUpText: { flexShrink: 1 },
@@ -725,24 +718,22 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   cardBanner: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[2],
-    marginTop: spacing[2],
-    marginLeft: spacing[10],
-    marginRight: spacing[4],
-    marginBottom: spacing[3],
-    paddingVertical: spacing[2],
-    paddingHorizontal: spacing[3],
-    backgroundColor: colors.primarySurface,
-    borderRadius: spacing[2.5],
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+    marginLeft: spacing.huge,
+    marginRight: spacing.lg,
+    marginBottom: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: spacing.s10,
     borderWidth: 1,
-    borderColor: colors.primaryLight,
+    borderColor: palette.indigo300,
   },
   cardBannerText: { flex: 1 },
-  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   saveToSetBtn: {
-    backgroundColor: colors.primary,
-    borderRadius: spacing[2],
-    paddingVertical: spacing[1.5],
-    paddingHorizontal: spacing[3],
+    borderRadius: spacing.sm,
+    paddingVertical: spacing.s6,
+    paddingHorizontal: spacing.md,
   },
 });

@@ -21,14 +21,12 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { type Theme, fontSizes, fontWeights, layout, lineHeights, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, lineHeights, useTheme, palette, spacing } from '../../theme';
 
 type Props = ProfileScreenProps<'NoteEditor'>;
 
 export function NoteEditorScreen({ navigation, route }: Props) {
-  const theme = useTheme();
-  const styles = React.useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const noteId = route.params?.noteId;
   const isEdit = !!noteId;
 
@@ -90,7 +88,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   if (isEdit && (isLoading || (isFetching && !initialized.current))) {
     return (
       <View style={styles.centered}>
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator color={colors.accent} />
       </View>
     );
   }
@@ -110,7 +108,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           right={
             <View style={styles.headerActions}>
               <Pressable onPress={() => setTagModalVisible(true)} hitSlop={8}>
-                <TagIcon size={22} color={selectedTags.length > 0 ? colors.primary : colors.textSecondary} />
+                <TagIcon size={22} color={selectedTags.length > 0 ? colors.accent : colors.textSecondary} />
               </Pressable>
               <Pressable onPress={handleShare} disabled={!canShare} hitSlop={8}>
                 <ShareIcon size={22} color={canShare ? colors.textSecondary : colors.textDisabled} />
@@ -118,7 +116,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
               <Pressable onPress={handleSave} disabled={!canSave} hitSlop={8}>
                 <Typography
                   preset="label"
-                  color={canSave ? colors.primary : colors.textDisabled}
+                  color={canSave ? colors.accent : colors.textDisabled}
                 >
                   {isSaving ? 'Saving…' : 'Save'}
                 </Typography>
@@ -136,7 +134,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
       >
         <View>
           <TextInput
-            style={styles.titleInput}
+            style={[styles.titleInput, { color: colors.textPrimary }]}
             placeholder="Title"
             placeholderTextColor={colors.textSecondary}
             value={title}
@@ -146,12 +144,12 @@ export function NoteEditorScreen({ navigation, route }: Props) {
             maxLength={500}
             autoFocus={!isEdit}
           />
-          <View style={styles.divider} />
+          <View style={[styles.divider, { backgroundColor: colors.border }]} />
           {selectedTags.length > 0 && (
             <View style={styles.tagRow}>
               {selectedTags.map(tag => (
-                <View key={tag} style={styles.tagPill}>
-                  <Typography preset="caption" color={colors.primary}>{tag}</Typography>
+                <View key={tag} style={[styles.tagPill, { borderColor: colors.accent }]}>
+                  <Typography preset="caption" color={colors.accent}>{tag}</Typography>
                 </View>
               ))}
             </View>
@@ -160,7 +158,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
         <View>
           <TextInput
             ref={bodyRef}
-            style={styles.bodyInput}
+            style={[styles.bodyInput, { color: colors.textPrimary }]}
             placeholder="Write your note here…"
             placeholderTextColor={colors.textSecondary}
             value={body}
@@ -179,70 +177,65 @@ export function NoteEditorScreen({ navigation, route }: Props) {
             return (
               <Pressable
                 key={tag}
-                style={[styles.tagChip, active && styles.tagChipActive]}
+                style={[
+                  styles.tagChip,
+                  { borderColor: colors.border, backgroundColor: colors.surfaceMuted },
+                  active && { borderColor: colors.accent, backgroundColor: palette.indigo300 },
+                ]}
                 onPress={() => toggleTag(tag)}
               >
-                <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}>
+                <Typography preset="caption" color={active ? colors.accent : colors.textSecondary}>
                   {tag}
                 </Typography>
               </Pressable>
             );
           })}
         </View>
-        <Pressable style={styles.tagDoneBtn} onPress={() => setTagModalVisible(false)}>
-          <Typography preset="label" color={colors.textOnPrimary}>Done</Typography>
+        <Pressable style={[styles.tagDoneBtn, { backgroundColor: colors.accent }]} onPress={() => setTagModalVisible(false)}>
+          <Typography preset="label" color={colors.textOnAccent}>Done</Typography>
         </Pressable>
       </AppModal>
     </Screen>
   );
 }
 
-function makeStyles({ colors, spacing, layout }: Theme) {
-  return StyleSheet.create({
-    flex: { flex: 1 },
-    centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
-    scroll: { padding: layout.screenPaddingH, paddingBottom: spacing[6], flexGrow: 1 },
-    titleInput: {
-      fontSize: fontSizes['2xl'],
-      fontWeight: fontWeights.bold,
-      color: colors.textPrimary,
-      paddingVertical: spacing[2],
-      marginBottom: spacing[2],
-    },
-    divider: { height: 1, backgroundColor: colors.border, marginBottom: spacing[4] },
-    tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[3] },
-    tagPill: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[1],
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.primaryLight,
-      borderWidth: 1,
-      borderColor: colors.primary,
-    },
-    bodyInput: {
-      fontSize: fontSizes.md,
-      color: colors.textPrimary,
-      lineHeight: fontSizes.md * lineHeights.relaxed,
-      minHeight: 200,
-      flexGrow: 1,
-    },
-tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[4] },
-    tagChip: {
-      paddingHorizontal: spacing[3],
-      paddingVertical: spacing[2],
-      borderRadius: layout.pillRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-    },
-    tagChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-    tagDoneBtn: {
-      backgroundColor: colors.primary,
-      borderRadius: layout.cardRadius,
-      paddingVertical: spacing[3],
-      alignItems: 'center',
-      marginTop: spacing[2],
-    },
-  });
-}
+const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl, flexGrow: 1 },
+  titleInput: {
+    fontSize: fontSizes['2xl'],
+    fontWeight: fontWeights.bold,
+    paddingVertical: spacing.sm,
+    marginBottom: spacing.sm,
+  },
+  divider: { height: 1, marginBottom: spacing.lg },
+  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.md },
+  tagPill: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: layout.pillRadius,
+    backgroundColor: palette.indigo300,
+    borderWidth: 1,
+  },
+  bodyInput: {
+    fontSize: fontSizes.md,
+    lineHeight: fontSizes.md * lineHeights.relaxed,
+    minHeight: 200,
+    flexGrow: 1,
+  },
+  tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.lg },
+  tagChip: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    borderRadius: layout.pillRadius,
+    borderWidth: 1,
+  },
+  tagDoneBtn: {
+    borderRadius: layout.cardRadius,
+    paddingVertical: spacing.md,
+    alignItems: 'center',
+    marginTop: spacing.sm,
+  },
+});

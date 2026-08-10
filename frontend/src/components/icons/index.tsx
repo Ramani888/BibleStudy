@@ -1,7 +1,7 @@
 /**
  * SVG icon set — hand-written `react-native-svg` components (no icon-font
  * library). One component per icon, uniform 24×24 viewBox, outline style with a
- * 1.8 stroke. Pass `color` from the theme (e.g. `color={colors.primary}`).
+ * 1.8 stroke. Pass `color` from the theme (e.g. `color={colors.accent}`).
  *
  * Paths are the standard Lucide (ISC-licensed) outlines.
  */

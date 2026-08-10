@@ -11,7 +11,7 @@ import { Divider, Typography } from '../ui';
 import { ChevronRightIcon, ShuffleIcon } from '../icons';
 import { useCards } from '../../hooks';
 import { supportedModes, MODE_META, MIN_MC_CARDS } from '../../hooks/useQuizSession';
-import { type Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme, palette } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
 
 interface QuizModeSheetProps {
@@ -23,9 +23,7 @@ interface QuizModeSheetProps {
 }
 
 export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: QuizModeSheetProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
   const isOpenRef = useRef(false);
 
@@ -65,7 +63,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
       onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
       handleIndicatorStyle={styles.handle}
-      backgroundStyle={styles.background}
+      backgroundStyle={[styles.background, { backgroundColor: colors.surface }]}
     >
       <BottomSheetScrollView contentContainerStyle={styles.content}>
         <Typography preset="h4" style={styles.title}>{setTitles[0]}</Typography>
@@ -73,13 +71,13 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
           CHOOSE A QUIZ TYPE
         </Typography>
 
-        <Pressable style={[styles.row, styles.mixRow]} onPress={() => handleStart('mix')}>
-          <ShuffleIcon size={20} color={colors.primary} />
+        <Pressable style={[styles.row, styles.mixRow, { backgroundColor: colors.accentSoft }]} onPress={() => handleStart('mix')}>
+          <ShuffleIcon size={20} color={colors.accent} />
           <View style={styles.flex}>
-            <Typography preset="h4" color={colors.primary}>Mix</Typography>
+            <Typography preset="h4" color={colors.accent}>Mix</Typography>
             <Typography preset="caption" color={colors.textSecondary}>Random mix of all types</Typography>
           </View>
-          <ChevronRightIcon size={18} color={colors.primary} />
+          <ChevronRightIcon size={18} color={colors.accent} />
         </Pressable>
 
         {modes.length > 0 && <Divider marginV={0} />}
@@ -124,30 +122,27 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) =>
-  StyleSheet.create({
-    background: {
-      backgroundColor: colors.backgroundCard,
-      borderTopLeftRadius: layout.cardRadiusSm,
-      borderTopRightRadius: layout.cardRadiusSm,
-    },
-    handle: { backgroundColor: colors.primaryLight, width: 40, height: 4 },
-    content: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[8] },
-    title: { marginTop: spacing[2], marginBottom: spacing[1] },
-    sectionLabel: { marginBottom: spacing[3] },
-    flex: { flex: 1 },
-    row: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      paddingVertical: spacing[4],
-    },
-    mixRow: {
-      backgroundColor: colors.primarySurface,
-      borderRadius: layout.cardRadius,
-      paddingHorizontal: spacing[3],
-      marginBottom: spacing[2],
-    },
-    empty: { paddingVertical: spacing[6] },
-    cancel: { paddingVertical: spacing[3] },
-  });
+const styles = StyleSheet.create({
+  background: {
+    borderTopLeftRadius: layout.cardRadiusSm,
+    borderTopRightRadius: layout.cardRadiusSm,
+  },
+  handle: { backgroundColor: palette.indigo300, width: 40, height: 4 },
+  content: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.xxxl },
+  title: { marginTop: spacing.sm, marginBottom: spacing.xs },
+  sectionLabel: { marginBottom: spacing.md },
+  flex: { flex: 1 },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.lg,
+  },
+  mixRow: {
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  empty: { paddingVertical: spacing.xxl },
+  cancel: { paddingVertical: spacing.md },
+});

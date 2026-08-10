@@ -15,7 +15,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import type { MediaFile } from '../../types';
 import { Typography } from '../../components/ui';
 import { CloseIcon, ShareIcon } from '../../components/icons';
-import { spacing } from '../../theme';
+import { palette, spacing } from '../../theme';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -100,9 +100,9 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 
         {/* Counter */}
         {images.length > 1 && (
-          <View style={[styles.counter, { top: insets.top + spacing[3] }]}>
+          <View style={[styles.counter, { top: insets.top + spacing.md }]}>
             <View style={styles.counterPill}>
-              <Typography preset="caption" color="#fff">
+              <Typography preset="caption" color={palette.white}>
                 {currentIndex + 1} / {images.length}
               </Typography>
             </View>
@@ -112,26 +112,26 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
         {/* Share */}
         {currentFile && (
           <Pressable
-            style={[styles.iconBtn, styles.shareBtn, { top: insets.top + spacing[3] }]}
+            style={[styles.iconBtn, styles.shareBtn, { top: insets.top + spacing.md }]}
             onPress={() => onShare(currentFile)}
             hitSlop={12}
           >
-            <ShareIcon size={20} color="#fff" />
+            <ShareIcon size={20} color={palette.white} />
           </Pressable>
         )}
 
         {/* Close */}
         <Pressable
-          style={[styles.iconBtn, styles.closeBtn, { top: insets.top + spacing[3] }]}
+          style={[styles.iconBtn, styles.closeBtn, { top: insets.top + spacing.md }]}
           onPress={onClose}
           hitSlop={12}
         >
-          <CloseIcon size={22} color="#fff" />
+          <CloseIcon size={22} color={palette.white} />
         </Pressable>
 
         {/* Caption */}
         {currentFile && (
-          <View style={[styles.caption, { bottom: insets.bottom + spacing[4] }]}>
+          <View style={[styles.caption, { bottom: insets.bottom + spacing.lg }]}>
             <Typography preset="caption" color="rgba(255,255,255,0.8)" numberOfLines={1}>
               {currentFile.name}
             </Typography>
@@ -144,7 +144,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#000' },
+  root: { flex: 1, backgroundColor: palette.black },
   page: { width: W, height: H, justifyContent: 'center' },
   img:  { width: W, height: H },
 
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
   },
   counterPill: {
     backgroundColor: 'rgba(0,0,0,0.5)',
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     borderRadius: 12,
   },
 
@@ -164,10 +164,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center', justifyContent: 'center',
   },
-  shareBtn: { left: spacing[4] },
-  closeBtn: { right: spacing[4] },
+  shareBtn: { left: spacing.lg },
+  closeBtn: { right: spacing.lg },
 
   caption: {
-    position: 'absolute', left: spacing[4], right: spacing[4], alignItems: 'center',
+    position: 'absolute', left: spacing.lg, right: spacing.lg, alignItems: 'center',
   },
 });

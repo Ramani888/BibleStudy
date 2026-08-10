@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { layout, Theme, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const CHECK_SIZE = 16;
 
@@ -18,20 +18,18 @@ interface ColorPickerProps {
 }
 
 export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorPickerProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
+  const { colors } = useTheme();
   return (
     <View style={styles.grid}>
       {presets.map(color => (
         <Pressable
           key={color}
-          style={[styles.swatch, { backgroundColor: color }, value === color && styles.swatchSelected]}
+          style={[styles.swatch, { backgroundColor: color }, value === color && styles.swatchSelected, value === color && { borderColor: colors.background }]}
           onPress={() => onChange(value === color ? null : color)}
           hitSlop={4}
         >
           {value === color && (
-            <Icon name="checkmark" size={CHECK_SIZE} color={colors.textInverse} />
+            <Icon name="checkmark" size={CHECK_SIZE} color={colors.textOnAccent} />
           )}
         </Pressable>
       ))}
@@ -39,22 +37,20 @@ export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorP
   );
 }
 
-const makeStyles = ({ colors, spacing }: Theme) =>
-  StyleSheet.create({
-    grid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: spacing[3],
-    },
-    swatch: {
-      width: 32,
-      height: 32,
-      borderRadius: layout.pillRadius,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    swatchSelected: {
-      borderWidth: 2,
-      borderColor: colors.background,
-    },
-  });
+const styles = StyleSheet.create({
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+  },
+  swatch: {
+    width: 32,
+    height: 32,
+    borderRadius: layout.pillRadius,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  swatchSelected: {
+    borderWidth: 2,
+  },
+});

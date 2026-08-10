@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { LeaderboardEntry } from '../../types/friends.types';
-import { type Theme, useTheme } from '../../theme';
+import { useTheme, spacing, layout } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Screen } from '../../components/ui/Screen';
@@ -28,16 +28,18 @@ function getQuote(rank: number) {
 }
 
 export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboard'>) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
+  const { colors } = useTheme();
   const { data: rows = [], isFetching, error, refetch } = useLeaderboard();
 
   const myRank = rows.findIndex(r => r.isMe) + 1;
   const quote = getQuote(myRank);
 
   const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
-    <View style={[styles.row, item.isMe && styles.rowMe]}>
+    <View style={[
+      styles.row,
+      { borderColor: colors.border },
+      item.isMe && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+    ]}>
       <View style={styles.rank}>
         <Typography preset="label" color={index < 3 ? colors.textPrimary : colors.textSecondary}>
           {MEDALS[index] ?? index + 1}
@@ -71,10 +73,10 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         ListHeaderComponent={
-          <View style={styles.quoteCard}>
-            <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
-            <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
-            <Typography preset="verse" color={colors.textOnPrimary} style={styles.quoteText}>{quote.text}</Typography>
+          <View style={[styles.quoteCard, { backgroundColor: colors.accent }]}>
+            <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
+            <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
+            <Typography preset="verse" color={colors.textOnAccent} style={styles.quoteText}>{quote.text}</Typography>
             <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
           </View>
         }
@@ -95,36 +97,33 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  list: { padding: layout.screenPaddingH, gap: spacing[2], flexGrow: 1 },
+const styles = StyleSheet.create({
+  list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
   quoteCard: {
-    backgroundColor: colors.primary,
     borderRadius: layout.cardRadiusLg,
     minHeight: 190,
-    paddingHorizontal: spacing[6],
-    paddingVertical: spacing[7],
+    paddingHorizontal: spacing.xxl,
+    paddingVertical: spacing.s28,
     justifyContent: 'center',
-    gap: spacing[3],
+    gap: spacing.md,
     overflow: 'hidden',
-    marginBottom: spacing[4],
+    marginBottom: spacing.lg,
   },
   quoteText: { fontStyle: 'italic', textAlign: 'center' },
   quoteSub: { textAlign: 'center' },
   quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
-  quoteTopLeft: { top: spacing[2], left: spacing[4] },
-  quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
+  quoteTopLeft: { top: spacing.sm, left: spacing.lg },
+  quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing[3],
-    paddingVertical: spacing[2.5],
-    paddingHorizontal: spacing[3],
+    gap: spacing.md,
+    paddingVertical: spacing.s10,
+    paddingHorizontal: spacing.md,
     borderRadius: layout.cardRadius,
     borderWidth: 1,
-    borderColor: colors.border,
   },
-  rowMe: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
   rank: { width: 28, alignItems: 'center' },
-  info: { flex: 1, gap: spacing[0.5] },
-  streak: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+  info: { flex: 1, gap: spacing.s2 },
+  streak: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 });

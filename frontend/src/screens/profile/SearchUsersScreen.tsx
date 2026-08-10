@@ -20,7 +20,6 @@ type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 300);
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
@@ -46,7 +45,7 @@ export function SearchUsersScreen({ navigation }: Props) {
     const isPending = !!item.pendingRequest || sentIds.has(item.id);
     return (
       <Pressable
-        style={styles.card}
+        style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}
         onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
       >
         <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
@@ -61,7 +60,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         {isFriend ? (
           <CheckCircleIcon size={22} color={colors.success} />
         ) : isPending ? (
-          <View style={styles.pendingBadge}>
+          <View style={[styles.pendingBadge, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
             <ClockIcon size={14} color={colors.textSecondary} />
             <Typography preset="caption" color={colors.textSecondary}>Sent</Typography>
           </View>
@@ -72,12 +71,12 @@ export function SearchUsersScreen({ navigation }: Props) {
             hitSlop={8}
             disabled={sendRequest.isPending}
           >
-            <UserPlusIcon size={20} color={colors.primary} />
+            <UserPlusIcon size={20} color={colors.accent} />
           </Pressable>
         )}
       </Pressable>
     );
-  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, styles]);
+  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors]);
 
   return (
     <Screen header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}>
@@ -91,7 +90,7 @@ export function SearchUsersScreen({ navigation }: Props) {
       </View>
 
       {isFetching && debouncedQuery.length > 1 && (
-        <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
+        <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
       )}
 
       <View style={{ flex: 1 }}>
@@ -115,34 +114,28 @@ export function SearchUsersScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    searchWrap: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
-    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[6] },
-    separator: { height: spacing[2] },
-    loader: { paddingVertical: spacing[2] },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[3],
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-    },
-    cardInfo: { flex: 1, gap: spacing[0.5] },
-    addBtn: { padding: spacing[1] },
-    pendingBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[1],
-      paddingHorizontal: spacing[2],
-      paddingVertical: spacing[1],
-      borderRadius: layout.pillRadius,
-      backgroundColor: colors.backgroundSecondary,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-  });
-}
+const styles = StyleSheet.create({
+  searchWrap: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
+  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.xxl },
+  separator: { height: spacing.sm },
+  loader: { paddingVertical: spacing.sm },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+  },
+  cardInfo: { flex: 1, gap: spacing.s2 },
+  addBtn: { padding: spacing.xs },
+  pendingBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
+    borderRadius: layout.pillRadius,
+    borderWidth: 1,
+  },
+});

@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, palette, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -26,7 +26,6 @@ type Tab = 'incoming' | 'outgoing';
 
 export function FriendRequestsScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const [tab, setTab] = useState<Tab>('incoming');
 
   const { data: incomingRequests = [] } = useFriendRequests('incoming');
@@ -62,7 +61,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
-      <View style={styles.card}>
+      <View style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}>
         <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
         <View style={styles.cardInfo}>
           <Typography preset="label" numberOfLines={1}>{person?.name ?? ''}</Typography>
@@ -76,7 +75,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
               <CheckCircleIcon size={28} color={colors.success} />
             </Pressable>
             <Pressable onPress={() => handleReject(item.id)} hitSlop={8} style={styles.actionBtn}>
-              <CloseCircleIcon size={28} color={colors.error} />
+              <CloseCircleIcon size={28} color={colors.alert} />
             </Pressable>
           </View>
         ) : (
@@ -87,7 +86,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
       </View>
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, colors, styles]);
+  }, [tab, colors]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
@@ -95,27 +94,27 @@ export function FriendRequestsScreen({ navigation }: Props) {
     <Screen
       header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
     >
-      <View style={styles.tabs}>
+      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         <Pressable
-          style={[styles.tab, tab === 'incoming' && styles.activeTab]}
+          style={[styles.tab, tab === 'incoming' && { borderBottomWidth: 2, borderBottomColor: colors.accent }]}
           onPress={() => setTab('incoming')}
         >
           <View style={styles.tabContent}>
-            <Typography preset="label" color={tab === 'incoming' ? colors.primary : colors.textSecondary}>
+            <Typography preset="label" color={tab === 'incoming' ? colors.accent : colors.textSecondary}>
               Incoming
             </Typography>
             {incomingCount > 0 ? (
-              <View style={styles.badge}>
-                <Typography preset="caption" color="#fff">{incomingCount}</Typography>
+              <View style={[styles.badge, { backgroundColor: colors.accent }]}>
+                <Typography preset="caption" color={palette.white}>{incomingCount}</Typography>
               </View>
             ) : null}
           </View>
         </Pressable>
         <Pressable
-          style={[styles.tab, tab === 'outgoing' && styles.activeTab]}
+          style={[styles.tab, tab === 'outgoing' && { borderBottomWidth: 2, borderBottomColor: colors.accent }]}
           onPress={() => setTab('outgoing')}
         >
-          <Typography preset="label" color={tab === 'outgoing' ? colors.primary : colors.textSecondary}>
+          <Typography preset="label" color={tab === 'outgoing' ? colors.accent : colors.textSecondary}>
             Sent
           </Typography>
         </Pressable>
@@ -142,40 +141,33 @@ export function FriendRequestsScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    tabs: {
-      flexDirection: 'row',
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-    },
-    tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center' },
-    activeTab: { borderBottomWidth: 2, borderBottomColor: colors.primary },
-    tabContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-    badge: {
-      backgroundColor: colors.primary,
-      borderRadius: 10,
-      minWidth: 20,
-      height: 20,
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingHorizontal: spacing[1],
-    },
-    list: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
-    separator: { height: spacing[2] },
-    emptyContainer: { flex: 1, justifyContent: 'center' },
-    card: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[3],
-      borderRadius: layout.cardRadius,
-      borderWidth: 1,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundSecondary,
-    },
-    cardInfo: { flex: 1, gap: spacing[0.5] },
-    requestActions: { flexDirection: 'row', gap: spacing[1] },
-    actionBtn: { padding: spacing[1] },
-  });
-}
+const styles = StyleSheet.create({
+  tabs: {
+    flexDirection: 'row',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  tab: { flex: 1, paddingVertical: spacing.md, alignItems: 'center' },
+  tabContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  badge: {
+    borderRadius: 10,
+    minWidth: 20,
+    height: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
+  },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
+  separator: { height: spacing.sm },
+  emptyContainer: { flex: 1, justifyContent: 'center' },
+  card: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.md,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+  },
+  cardInfo: { flex: 1, gap: spacing.s2 },
+  requestActions: { flexDirection: 'row', gap: spacing.xs },
+  actionBtn: { padding: spacing.xs },
+});

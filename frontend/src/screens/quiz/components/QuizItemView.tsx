@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Button, Typography } from '../../../components/ui';
@@ -28,7 +28,6 @@ function getDefaultResponse(item: QuizItem): unknown {
 
 export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev, isLast, onPrev, onNext, onFinish, bottomInset = 0 }: Props) {
   const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   const [response, setResponseState] = useState<unknown>(() => initialResponse ?? getDefaultResponse(item));
 
@@ -40,7 +39,7 @@ export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev,
   return (
     <View style={styles.wrap}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <View style={styles.questionCard}>
+        <View style={[styles.questionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item)}</Typography>
           {!!promptText(item) && (
             <Typography preset="h3" color={colors.textPrimary}>{promptText(item)}</Typography>
@@ -52,7 +51,7 @@ export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev,
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { paddingBottom: Math.max(bottomInset, spacing[4]) }]}>
+      <View style={[styles.footer, { borderTopColor: colors.border, paddingBottom: Math.max(bottomInset, spacing.lg) }]}>
         <View style={styles.btnRow}>
           <Button label="← Prev" variant="outline" onPress={onPrev} disabled={!hasPrev} style={styles.flex} />
           <Button label={isLast ? 'Finish' : 'Next →'} onPress={isLast ? onFinish : onNext} style={styles.flex} />
@@ -107,16 +106,23 @@ function Body({ item, response, onChangeResponse }: BodyProps) {
 
 function MC({ item, response, onChangeResponse }: { item: any; response: number | null; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <>
       {item.options.map((opt: string, i: number) => (
         <Pressable
           key={i}
           onPress={() => onChangeResponse(i)}
-          style={[styles.option, response === i && styles.optionSelected]}
+          style={[
+            styles.option,
+            { borderColor: colors.border, backgroundColor: colors.surface },
+            response === i && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+          ]}
         >
-          <View style={[styles.letter, response === i && styles.letterSelected]}>
+          <View style={[
+            styles.letter,
+            { backgroundColor: colors.surfaceMuted },
+            response === i && { backgroundColor: colors.accent },
+          ]}>
             <Typography preset="label" color={response === i ? colors.background : colors.textSecondary}>{LETTERS[i]}</Typography>
           </View>
           <Typography preset="body" color={colors.textPrimary} style={styles.flex}>{opt}</Typography>
@@ -128,10 +134,9 @@ function MC({ item, response, onChangeResponse }: { item: any; response: number 
 
 function TypeIn({ item, response, onChangeResponse }: { item: any; response: string; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
   return (
     <TextInput
-      style={styles.input}
+      style={[styles.input, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
       value={response}
       onChangeText={onChangeResponse}
       placeholder="Your answer…"
@@ -144,11 +149,7 @@ function TypeIn({ item, response, onChangeResponse }: { item: any; response: str
 
 function Blanks({ item, response, onChangeResponse }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
-  const blankPos = useMemo(
-    () => new Map<number, number>(item.blankAt.map((t: number, k: number) => [t, k])),
-    [item.blankAt],
-  );
+  const blankPos = new Map<number, number>(item.blankAt.map((t: number, k: number) => [t, k]));
   return (
     <View style={styles.blanksWrap}>
       {item.tokens.map((tok: string, i: number) => {
@@ -157,7 +158,7 @@ function Blanks({ item, response, onChangeResponse }: { item: any; response: str
           return (
             <TextInput
               key={i}
-              style={styles.blank}
+              style={[styles.blank, { borderColor: colors.accent, color: colors.textPrimary }]}
               value={response[k] ?? ''}
               onChangeText={t => { const n = [...response]; n[k] = t; onChangeResponse(n); }}
               autoCapitalize="none"
@@ -172,7 +173,6 @@ function Blanks({ item, response, onChangeResponse }: { item: any; response: str
 
 function Chunks({ item, response, onChangeResponse }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void }) {
   const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors), [colors]);
   const chunkKey = (c: string, i: number) => `${i}::${c}`;
   const unkey = (k: string) => k.slice(k.indexOf('::') + 2);
 
@@ -180,19 +180,19 @@ function Chunks({ item, response, onChangeResponse }: { item: any; response: str
     <>
       <View style={styles.chunkArea}>
         {response.map((k, i) => (
-          <View key={i} style={styles.chunkPicked}>
+          <View key={i} style={[styles.chunkPicked, { backgroundColor: colors.accentSoft }]}>
             <Typography preset="body" color={colors.textPrimary}>{unkey(k)}</Typography>
           </View>
         ))}
       </View>
-      <View style={{ height: spacing[3] }} />
+      <View style={{ height: spacing.md }} />
       <View style={styles.chunkArea}>
         {item.chunks.map((c: string, i: number) => {
           const key = chunkKey(c, i);
           if (response.includes(key)) return null;
           return (
-            <Pressable key={key} onPress={() => onChangeResponse([...response, key])} style={styles.chunk}>
-              <Typography preset="body" color={colors.primary}>{c}</Typography>
+            <Pressable key={key} onPress={() => onChangeResponse([...response, key])} style={[styles.chunk, { borderColor: colors.accent }]}>
+              <Typography preset="body" color={colors.accent}>{c}</Typography>
             </Pressable>
           );
         })}
@@ -204,66 +204,51 @@ function Chunks({ item, response, onChangeResponse }: { item: any; response: str
   );
 }
 
-type Colors = ReturnType<typeof useTheme>['colors'];
-
-function makeStyles(colors: Colors) {
-  return StyleSheet.create({
-    wrap:   { flex: 1 },
-    flex:   { flex: 1 },
-    scroll: { paddingBottom: spacing[4] },
-    questionCard: {
-      margin: layout.screenPaddingH,
-      padding: spacing[5],
-      borderRadius: layout.cardRadiusLg,
-      backgroundColor: colors.backgroundCard,
-      borderWidth: 1,
-      borderColor: colors.border,
-      gap: spacing[2],
-      minHeight: 100,
-      justifyContent: 'center',
-    },
-    label:      { letterSpacing: 0.5 },
-    answerArea: { paddingHorizontal: layout.screenPaddingH },
-    option: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      padding: spacing[4],
-      borderRadius: layout.cardRadiusSm,
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      backgroundColor: colors.backgroundCard,
-      marginBottom: spacing[3],
-    },
-    optionSelected:  { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-    letter:          { width: 28, height: 28, borderRadius: spacing[2], alignItems: 'center', justifyContent: 'center', backgroundColor: colors.backgroundSecondary },
-    letterSelected:  { backgroundColor: colors.primary },
-    input: {
-      borderWidth: 1.5,
-      borderColor: colors.border,
-      borderRadius: layout.cardRadius,
-      backgroundColor: colors.backgroundSecondary,
-      padding: spacing[4],
-      minHeight: layout.inputHeight,
-      color: colors.textPrimary,
-      textAlignVertical: 'top',
-    },
-    blanksWrap: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing[1] },
-    word:       { marginRight: spacing[1] },
-    blank: {
-      minWidth: 90,
-      borderBottomWidth: 2,
-      borderColor: colors.primary,
-      paddingHorizontal: spacing[2],
-      paddingVertical: spacing[0.5],
-      color: colors.textPrimary,
-      textAlign: 'center',
-    },
-    chunkArea:   { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], minHeight: 44 },
-    chunk:       { borderWidth: 1.5, borderColor: colors.primary, borderRadius: spacing[2.5], paddingHorizontal: spacing[3], paddingVertical: spacing[2] },
-    chunkPicked: { backgroundColor: colors.primarySurface, borderRadius: spacing[2.5], paddingHorizontal: spacing[3], paddingVertical: spacing[2] },
-    undoBtn:     { marginTop: spacing[3] },
-    footer:      { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[3], borderTopWidth: 1, borderTopColor: colors.border },
-    btnRow:      { flexDirection: 'row', gap: spacing[3] },
-  });
-}
+const styles = StyleSheet.create({
+  wrap:   { flex: 1 },
+  flex:   { flex: 1 },
+  scroll: { paddingBottom: spacing.lg },
+  questionCard: {
+    margin: layout.screenPaddingH,
+    padding: spacing.xl,
+    borderRadius: layout.cardRadiusLg,
+    borderWidth: 1,
+    gap: spacing.sm,
+    minHeight: 100,
+    justifyContent: 'center',
+  },
+  label:      { letterSpacing: 0.5 },
+  answerArea: { paddingHorizontal: layout.screenPaddingH },
+  option: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    borderRadius: layout.cardRadiusSm,
+    borderWidth: 1.5,
+    marginBottom: spacing.md,
+  },
+  letter:          { width: 28, height: 28, borderRadius: spacing.sm, alignItems: 'center', justifyContent: 'center' },
+  input: {
+    borderWidth: 1.5,
+    borderRadius: layout.cardRadius,
+    padding: spacing.lg,
+    minHeight: layout.inputHeight,
+    textAlignVertical: 'top',
+  },
+  blanksWrap: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.xs },
+  word:       { marginRight: spacing.xs },
+  blank: {
+    minWidth: 90,
+    borderBottomWidth: 2,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.s2,
+    textAlign: 'center',
+  },
+  chunkArea:   { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, minHeight: 44 },
+  chunk:       { borderWidth: 1.5, borderRadius: spacing.s10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  chunkPicked: { borderRadius: spacing.s10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  undoBtn:     { marginTop: spacing.md },
+  footer:      { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md, borderTopWidth: 1 },
+  btnRow:      { flexDirection: 'row', gap: spacing.md },
+});

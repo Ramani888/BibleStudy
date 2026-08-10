@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { AppModal } from './Modal';
 import { Divider, SearchBar, Typography } from '../ui';
-import { Theme, useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 
 export interface SelectOption {
   id: string;
@@ -36,9 +36,7 @@ export function SelectSheet({
   leadingOption,
   maxHeight = 300,
 }: SelectSheetProps) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors, spacing } = theme;
+  const { colors } = useTheme();
   const [search, setSearch] = useState('');
 
   const handleClose = () => {
@@ -66,7 +64,7 @@ export function SelectSheet({
           <Pressable style={styles.option} onPress={leadingOption.onPress}>
             <Typography preset="body" color={colors.textSecondary}>{leadingOption.label}</Typography>
           </Pressable>
-          <Divider marginV={spacing[1]} />
+          <Divider marginV={spacing.xs} />
         </>
       )}
 
@@ -79,7 +77,7 @@ export function SelectSheet({
               <Pressable style={styles.option} onPress={() => onSelect(o.id)}>
                 <Typography preset="body">{o.label}</Typography>
               </Pressable>
-              <Divider marginV={spacing[1]} />
+              <Divider marginV={spacing.xs} />
             </React.Fragment>
           ))}
           {filtered.length === 0 && (
@@ -93,9 +91,8 @@ export function SelectSheet({
   );
 }
 
-const makeStyles = ({ spacing }: Theme) =>
-  StyleSheet.create({
-    search: { marginBottom: spacing[2] },
-    option: { paddingVertical: spacing[3] },
-    noMatch: { paddingVertical: spacing[3] },
-  });
+const styles = StyleSheet.create({
+  search: { marginBottom: spacing.sm },
+  option: { paddingVertical: spacing.md },
+  noMatch: { paddingVertical: spacing.md },
+});
