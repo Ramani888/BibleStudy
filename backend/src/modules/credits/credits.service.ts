@@ -239,43 +239,47 @@ export async function getTransactions(userId: string, page = 1, limit = 20) {
 }
 
 export async function claimDailyLogin(userId: string) {
-  // Check if user already claimed today
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-
   const todayEnd = new Date();
   todayEnd.setHours(23, 59, 59, 999);
 
-  const rewardToday = await prisma.creditTransaction.findFirst({
-    where: {
-      userId,
-      type: 'REWARD',
-      createdAt: {
-        gte: todayStart,
-        lte: todayEnd,
-      },
-    },
-  });
+  // Serializable isolation closes the TOCTOU race: two concurrent claims on the same
+  // day will both read "no reward yet", but the DB serializes them — the second one
+  // retries and then finds the first one's row, causing the conflict throw.
+  // P2034 = Prisma's serialization failure code.
+  let updatedUser: { creditBalance: number };
+  let transaction: { id: string; amount: number; type: string; description: string; createdAt: Date };
 
-  if (rewardToday) {
-    throw new ConflictError('Daily login reward already claimed today');
+  try {
+    [updatedUser, transaction] = await prisma.$transaction(async (tx) => {
+      const rewardToday = await tx.creditTransaction.findFirst({
+        where: {
+          userId,
+          type: 'REWARD',
+          description: 'Daily login reward', // exclude achievement rewards (also type REWARD)
+          createdAt: { gte: todayStart, lte: todayEnd },
+        },
+      });
+      if (rewardToday) throw new ConflictError('Daily login reward already claimed today');
+
+      return Promise.all([
+        tx.user.update({
+          where: { id: userId },
+          data: { creditBalance: { increment: 1 } },
+          select: { creditBalance: true },
+        }),
+        tx.creditTransaction.create({
+          data: { userId, type: 'REWARD', amount: 1, description: 'Daily login reward' },
+        }),
+      ]);
+    }, { isolationLevel: 'Serializable' });
+  } catch (e) {
+    if ((e as { code?: string }).code === 'P2034') {
+      throw new ConflictError('Daily login reward already claimed today');
+    }
+    throw e;
   }
-
-  const [updatedUser, transaction] = await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: { creditBalance: { increment: 1 } },
-      select: { creditBalance: true },
-    }),
-    prisma.creditTransaction.create({
-      data: {
-        userId,
-        type: 'REWARD',
-        amount: 1,
-        description: 'Daily login reward',
-      },
-    }),
-  ]);
 
   triggerAchievementCheck(userId); // streak milestones
 

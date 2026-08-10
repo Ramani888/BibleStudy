@@ -167,16 +167,6 @@ function parseAIResponse(raw: string): {
 }
 
 export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { creditBalance: true },
-  });
-
-  if (!user) throw new NotFoundError('User not found');
-  if (user.creditBalance < 1) {
-    throw new PaymentRequiredError('Insufficient credits. Please earn more credits to use AI chat.');
-  }
-
   const messages: ChatMessage[] = [
     ...(dto.history ?? []).map(m => ({
       role: m.role as 'user' | 'assistant',
@@ -185,8 +175,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     { role: 'user', content: dto.question },
   ];
 
-  // Phase F: attach a PDF (F.1) or image (F.2) from the user's media library —
-  // routes this turn to Claude. PDFs → document blocks, images → image blocks.
+  // Phase F: resolve media before touching credits so we know the cost upfront.
   let mediaBlocks: MediaBlock[] | undefined;
   let hasPdf = false;
   let hasImage = false;
@@ -205,36 +194,71 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     hasImage = files.some(f => f.type === 'IMAGE');
   }
 
-  // G1: media routes to paid Claude, so require the FULL cost upfront (no floor) —
-  // reject before the Claude call so we never make a paid request we can't charge for.
   const mediaCost = hasPdf ? CREDIT_COST.pdf : hasImage ? CREDIT_COST.image : 0;
-  if (mediaCost > 0 && user.creditBalance < mediaCost) {
-    throw new PaymentRequiredError(`This needs ${mediaCost} credits. Earn more or upgrade to keep using media in chat.`);
+
+  // Atomic reserve: check AND decrement the minimum required cost in a single SQL statement.
+  // This eliminates the TOCTOU race — no concurrent request can sneak through on a stale read.
+  // Media cost is known upfront (full reserve). Text reserves 1; if AI returns cards (cost=2)
+  // we charge the extra 1 after the response.
+  const reserve = mediaCost > 0 ? mediaCost : 1;
+  const reserved = await prisma.$queryRaw<{ creditBalance: number }[]>`
+    UPDATE "User"
+    SET "creditBalance" = "creditBalance" - ${reserve}
+    WHERE id = ${userId} AND "creditBalance" >= ${reserve}
+    RETURNING "creditBalance"
+  `;
+  if (reserved.length === 0) {
+    const exists = await prisma.user.count({ where: { id: userId } });
+    if (!exists) throw new NotFoundError('User not found');
+    throw new PaymentRequiredError(
+      mediaCost > 0
+        ? `This needs ${mediaCost} credits. Earn more or upgrade to keep using media in chat.`
+        : 'Insufficient credits. Please earn more credits to use AI chat.',
+    );
   }
 
   const userContext = await retrieveContext(userId, dto.question).catch(() => '');
   const system = userContext ? `${SYSTEM_PROMPT}\n\n${userContext}` : SYSTEM_PROMPT;
 
-  const rawText = await generateAnswer(system, messages, mediaBlocks);
+  let rawText: string;
+  try {
+    rawText = await generateAnswer(system, messages, mediaBlocks);
+  } catch (e) {
+    // Refund the reserve on provider error — credit was deducted before the call.
+    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: reserve } } }).catch(() => {});
+    throw e;
+  }
+
   if (!rawText) {
+    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: reserve } } }).catch(() => {});
     throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
   }
 
   const { answer, followUps, suggestedCards } = parseAIResponse(rawText);
 
-  // Variable cost by what the AI did. Media dominates (Claude PDF/vision is the paid perk):
-  // PDF > image > cards > text, even if a media chat also returned cards.
-  // Charge is floored at the user's balance so it can't go negative — the AI already ran.
   const cost = hasPdf ? CREDIT_COST.pdf
     : hasImage ? CREDIT_COST.image
     : suggestedCards.length > 0 ? CREDIT_COST.cards
     : CREDIT_COST.text;
-  const charge = Math.min(cost, user.creditBalance);
   const description = hasPdf ? 'AI PDF chat'
     : hasImage ? 'AI image chat'
     : suggestedCards.length > 0 ? 'AI flashcard generation'
     : 'AI chat question';
 
+  // If text generated cards (cost=2, reserved=1), atomically deduct the extra 1.
+  // WHERE creditBalance >= extra ensures we never go negative.
+  let charge = reserve;
+  if (cost > reserve) {
+    const extra = cost - reserve;
+    const rows = Number(await prisma.$executeRaw`
+      UPDATE "User"
+      SET "creditBalance" = "creditBalance" - ${extra}
+      WHERE id = ${userId} AND "creditBalance" >= ${extra}
+    `);
+    if (rows > 0) charge = cost;
+  }
+
+  // No user.update needed — balance already adjusted atomically above.
   // Upsert session record when sessionId is provided
   const sessionOp = dto.sessionId
     ? prisma.aIChatSession.upsert({
@@ -244,11 +268,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
       })
     : null;
 
-  const [, , aiChat] = await prisma.$transaction([
-    prisma.user.update({
-      where: { id: userId },
-      data: { creditBalance: { decrement: charge } },
-    }),
+  const [, aiChat] = await prisma.$transaction([
     prisma.creditTransaction.create({
       data: { userId, type: 'USAGE', amount: -charge, description },
     }),
