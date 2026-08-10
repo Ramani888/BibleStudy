@@ -4,17 +4,15 @@ import Toast from 'react-native-toast-message';
 
 import type { LibraryScreenProps } from '../../navigation/types';
 import { useSets, useCreatePlan } from '../../hooks';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { Button, Screen, ScreenHeader } from '../../components/ui';
 import { Typography } from '../../components/ui/Typography';
 import { Input } from '../../components/ui/Input';
-import { Button } from '../../components/ui/Button';
 import { getErrorMessage } from '../../api';
 import { type Theme, useTheme } from '../../theme';
 
 type Props = LibraryScreenProps<'CreatePlan'>;
 
-export function CreatePlanScreen({ navigation, route }: Props) {
+export function CreatePlanScreen({ navigation }: Props) {
   const theme = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -43,9 +41,21 @@ export function CreatePlanScreen({ navigation, route }: Props) {
     );
   };
 
+  const header = <ScreenHeader title="New Study Plan" handle />;
+  const footer = (
+    <View style={styles.footer}>
+      <Button label="Create Plan" onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
+    </View>
+  );
+
   return (
-    <Screen header={<ScreenHeader title="New Study Plan" onClose={navigation.goBack} />}>
-      <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={styles.scroll}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         <Input placeholder="Plan title" value={title} onChangeText={setTitle} maxLength={200} />
         <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
 
@@ -76,16 +86,13 @@ export function CreatePlanScreen({ navigation, route }: Props) {
           })
         )}
       </ScrollView>
-
-      <View style={styles.footer}>
-        <Button label="Create Plan" onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
-      </View>
     </Screen>
   );
 }
 
 const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  scroll: { padding: layout.screenPaddingH, gap: spacing[3], paddingBottom: spacing[6] },
+  flex: { flex: 1 },
+  scroll: { padding: layout.screenPaddingH, gap: spacing[3] },
   descInput: { minHeight: 72 },
   label: { marginTop: spacing[2] },
   loader: { marginVertical: spacing[4] },
@@ -99,5 +106,10 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   badgeSel: { backgroundColor: colors.primary },
   badgeIdle: { borderWidth: 1.5, borderColor: colors.border },
   setTitle: { flex: 1 },
-  footer: { padding: layout.screenPaddingH, borderTopWidth: 1, borderTopColor: colors.border },
+  footer: {
+    padding: layout.screenPaddingH,
+    paddingBottom: spacing[2],
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
 });
