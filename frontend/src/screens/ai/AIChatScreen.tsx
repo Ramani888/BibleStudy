@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   FlatList,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   Share,
   StyleSheet,
@@ -457,7 +459,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal, colors, styles]);
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top']}>
+    <KeyboardAvoidingView
+      style={styles.safe}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+    <SafeAreaView style={styles.flex} edges={['top', 'bottom']}>
       {/* ── Header ── */}
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -573,11 +579,13 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
       <ConfirmDialog {...dialogProps} />
     </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
 const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
+  flex: { flex: 1 },
 
   header: {
     flexDirection: 'row',
