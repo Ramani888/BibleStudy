@@ -59,14 +59,3 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormData = z.infer<ReturnType<typeof makeChangePasswordSchema>>;
 export type CreateSetFormData = z.infer<typeof createSetSchema>;
-
-export const gatheringSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(100, 'Max 100 characters'),
-  description: z.string().max(500, 'Max 500 characters').optional(),
-  date: z.string().min(1, 'Date is required'),
-  locationName: z.string().optional(),
-  locationLat: z.number().optional(),
-  locationLng: z.number().optional(),
-  meetingLink: z.string().optional(),
-  visibility: z.enum(['PRIVATE', 'PUBLIC', 'FRIENDS']),
-});

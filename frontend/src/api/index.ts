@@ -7,7 +7,6 @@ export { cardsApi } from './cards.api';
 export { aiApi } from './ai.api';
 export { creditsApi } from './credits.api';
 
-// Phase 2 — Community
 export { friendsApi } from './friends.api';
 export { activitiesApi } from './activities.api';
 export { notificationsApi } from './notifications.api';

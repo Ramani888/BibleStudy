@@ -40,7 +40,6 @@ export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
 export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses } from './useQuiz';
 
-// Phase 2 — Community
 export {
   useFriends,
   useLeaderboard,

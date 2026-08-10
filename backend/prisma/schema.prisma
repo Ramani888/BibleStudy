@@ -178,8 +178,7 @@ model StudyPlanStep {
   @@index([setId])
 }
 
-// Per-user step completion — separate table so group plans (D2) track each
-// member independently with no migration.
+// Per-user step completion tracked separately so each user's progress is independent.
 model StudyPlanProgress {
   userId      String
   stepId      String
