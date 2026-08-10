@@ -1,11 +1,11 @@
 import React, { useCallback } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { Pressable, SectionList, StyleSheet, View } from 'react-native';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { formatDateTime } from '../../utils/formatters';
 import { layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
@@ -27,17 +27,39 @@ import {
 import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
+type Colors = ReturnType<typeof useTheme>['colors'];
 
 function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
     case 'friend_request':  return UserPlusIcon;
     case 'friend_accepted': return UsersIcon;
     case 'achievement':     return TrophyIcon;
-    // default guards against any backend type the app doesn't know yet —
-    // returning undefined here would crash the whole list.
     case 'system':
     default:                return BellIcon;
   }
+}
+
+function groupByDate(notifications: Notification[]): { title: string; data: Notification[] }[] {
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
+
+  const buckets = {
+    Today: [] as Notification[],
+    Yesterday: [] as Notification[],
+    Earlier: [] as Notification[],
+  };
+
+  for (const n of notifications) {
+    const d = new Date(n.createdAt);
+    if (d >= todayStart) buckets.Today.push(n);
+    else if (d >= yesterdayStart) buckets.Yesterday.push(n);
+    else buckets.Earlier.push(n);
+  }
+
+  return (['Today', 'Yesterday', 'Earlier'] as const)
+    .filter(k => buckets[k].length > 0)
+    .map(k => ({ title: k, data: buckets[k] }));
 }
 
 export function NotificationsScreen({ navigation }: Props) {
@@ -50,60 +72,80 @@ export function NotificationsScreen({ navigation }: Props) {
 
   const notifications = data?.notifications ?? [];
   const unreadCount = data?.unreadCount ?? 0;
+  const sections = groupByDate(notifications);
 
   const renderItem = useCallback(({ item }: { item: Notification }) => {
     const NotifIcon = getNotificationIcon(item.type);
     return (
-      <Pressable
-        style={[styles.notificationRow, !item.read && styles.unread]}
-        onPress={() => { if (!item.read) markRead.mutate(item.id); }}
+      <Swipeable
+        renderRightActions={() => (
+          <Pressable style={styles.deleteAction} onPress={() => deleteNotification.mutate(item.id)}>
+            <TrashIcon size={20} color="#fff" />
+          </Pressable>
+        )}
       >
-        <View style={styles.iconWrapper}>
-          <NotifIcon size={20} color={item.read ? colors.textSecondary : colors.primary} />
-        </View>
-        <View style={styles.info}>
-          <Typography preset="label" numberOfLines={1}>{item.title}</Typography>
-          <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
-            {item.body}
-          </Typography>
-          <Typography preset="caption" color={colors.textDisabled}>
-            {formatDateTime(item.createdAt)}
-          </Typography>
-        </View>
-        <Pressable onPress={() => deleteNotification.mutate(item.id)} hitSlop={8}>
-          <TrashIcon size={18} color={colors.textSecondary} />
+        <Pressable
+          style={[styles.notificationRow, !item.read && styles.unread]}
+          onPress={() => {
+            if (!item.read) markRead.mutate(item.id);
+            if (item.type === 'friend_request') navigation.navigate('FriendRequests');
+            else if (item.type === 'friend_accepted') navigation.navigate('Friends');
+            else if (item.type === 'achievement') navigation.navigate('Achievements');
+          }}
+        >
+          <View style={styles.iconWrapper}>
+            <NotifIcon size={20} color={item.read ? colors.textSecondary : colors.primary} />
+          </View>
+          <View style={styles.info}>
+            <Typography preset="label" numberOfLines={1}>{item.title}</Typography>
+            <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
+              {item.body}
+            </Typography>
+            <Typography preset="caption" color={colors.textDisabled}>
+              {formatDateTime(item.createdAt)}
+            </Typography>
+          </View>
         </Pressable>
-      </Pressable>
+      </Swipeable>
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [colors, markRead, deleteNotification]);
+  }, [colors, styles, markRead, deleteNotification]);
+
+  const renderSectionHeader = useCallback(
+    ({ section: { title } }: { section: { title: string } }) => (
+      <View style={styles.sectionHeader}>
+        <Typography preset="caption" color={colors.textSecondary}>{title}</Typography>
+      </View>
+    ),
+    [colors.textSecondary, styles.sectionHeader],
+  );
 
   if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
 
+  const headerRight = unreadCount > 0 ? (
+    <Pressable onPress={() => markAllRead.mutate()} hitSlop={8}>
+      <Typography preset="label" color={colors.primary}>Mark all read</Typography>
+    </Pressable>
+  ) : undefined;
+
   return (
     <Screen
-      header={<ScreenHeader title="Notifications" onBack={() => navigation.goBack()} />}
+      header={
+        <ScreenHeader
+          title="Notifications"
+          onBack={() => navigation.navigate('Profile')}
+          right={headerRight}
+        />
+      }
     >
-      {unreadCount > 0 && (
-        <View style={styles.unreadBar}>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {unreadCount} unread
-          </Typography>
-          <Button
-            label="Mark All Read"
-            variant="ghost"
-            onPress={() => markAllRead.mutate()}
-            style={styles.markAllBtn}
-          />
-        </View>
-      )}
-      <FlatList
-        data={notifications}
+      <SectionList
+        sections={sections}
         keyExtractor={item => item.id}
         renderItem={renderItem}
+        renderSectionHeader={renderSectionHeader}
         refreshing={isFetching}
         onRefresh={refetch}
-        contentContainerStyle={notifications.length === 0 ? styles.emptyContainer : styles.list}
+        stickySectionHeadersEnabled={false}
+        contentContainerStyle={sections.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           !isLoading ? (
             <EmptyState title="No Notifications" subtitle="You're all caught up!" />
@@ -114,27 +156,22 @@ export function NotificationsScreen({ navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
+function makeStyles(colors: Colors) {
   return StyleSheet.create({
-    unreadBar: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingHorizontal: layout.screenPaddingH,
-      paddingVertical: spacing[2],
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-    },
-    markAllBtn: { paddingHorizontal: spacing[2] },
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { paddingBottom: spacing[4] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
+    sectionHeader: {
+      paddingHorizontal: layout.screenPaddingH,
+      paddingTop: spacing[4],
+      paddingBottom: spacing[1],
+      backgroundColor: colors.background,
+    },
     notificationRow: {
       flexDirection: 'row',
       alignItems: 'center',
       paddingVertical: spacing[3],
       paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
+      backgroundColor: colors.background,
       gap: spacing[3],
     },
     unread: { backgroundColor: colors.primarySurface },
@@ -147,5 +184,11 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       justifyContent: 'center',
     },
     info: { flex: 1, gap: spacing[0.5] },
+    deleteAction: {
+      width: 72,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.error,
+    },
   });
 }
