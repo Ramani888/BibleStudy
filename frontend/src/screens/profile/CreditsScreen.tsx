@@ -2,10 +2,12 @@ import React from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StyleSheet,
   View,
 } from 'react-native';
-import { Badge, Card, Divider, Spacer, Typography } from '../../components/ui';
+import LinearGradient from 'react-native-linear-gradient';
+import { Badge, Divider, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { EmptyState, ErrorState } from '../../components/feedback';
@@ -15,11 +17,9 @@ import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks'
 import { WeeklyChart } from './components/WeeklyChart';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
-import { fontSizes, layout, spacing, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { TransactionType } from '../../types';
-
-const BALANCE_ICON_SIZE = 32;
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
   USAGE:    { label: 'Used',     variant: 'error',   sign: '−' },
@@ -28,43 +28,55 @@ const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | '
   BONUS:    { label: 'Bonus',    variant: 'primary', sign: '+' },
 };
 
-function BalanceCard() {
+function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const { data, isLoading } = useCreditBalance();
   const { data: streakData } = useStreak();
   const streak = streakData?.streak ?? 0;
 
   return (
-    <Card style={styles.balanceCard} shadow="md">
+    <View style={styles.balanceCard}>
+      <LinearGradient
+        colors={['#5D03FF', '#6366F1', '#8B5CF6']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <View style={styles.balanceHeader}>
-        <Typography preset="label" color={colors.primaryDark} style={styles.balanceLabel}>
+        <Typography preset="caption" color="rgba(255,255,255,0.7)" style={styles.balanceLabel}>
           CURRENT BALANCE
         </Typography>
         {streak > 0 && (
-          <View style={styles.streakBadge}>
-            <Typography preset="label" color={colors.primary}>🔥 {streak}</Typography>
+          <View style={styles.streakPill}>
+            <Typography preset="caption" color="#fff">🔥 {streak}</Typography>
           </View>
         )}
       </View>
+
       {isLoading ? (
-        <ActivityIndicator color={colors.primary} />
+        <ActivityIndicator color="#fff" />
       ) : (
         <View style={styles.balanceRow}>
-          <StarIcon size={BALANCE_ICON_SIZE} color={colors.primary} />
-          <Typography preset="h4" color={colors.primary}>
+          <StarIcon size={28} color="rgba(255,255,255,0.9)" />
+          <Typography preset="h2" color="#fff" style={styles.balanceAmount}>
             {data?.balance ?? 0}
           </Typography>
-          <Typography preset="h4" color={colors.textSecondary}>credits</Typography>
+          <Typography preset="bodyLg" color="rgba(255,255,255,0.7)">credits</Typography>
         </View>
       )}
-    </Card>
+
+      <Pressable
+        style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.85 }]}
+        onPress={onGetMore}
+      >
+        <Typography preset="label" style={styles.ctaBtnText}>Get More Credits</Typography>
+      </Pressable>
+    </View>
   );
 }
 
 export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const qc = useQueryClient();
   const {
     data,
@@ -100,11 +112,12 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
         onEndReachedThreshold={0.3}
         ListHeaderComponent={
           <>
-            <BalanceCard />
+            <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
             <Spacer size={spacing[4]} />
             <WeeklyChart />
             <Spacer size={spacing[6]} />
             <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
+            <Divider marginV={0} />
           </>
         }
         ItemSeparatorComponent={() => <Divider marginV={0} />}
@@ -135,12 +148,14 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
           return (
             <View style={styles.txRow}>
               <View style={styles.txLeft}>
-                <Badge label={cfg.label} variant={cfg.variant} />
-                <Typography preset="caption" color={colors.textSecondary} numberOfLines={1} style={styles.txDesc}>
+                <View style={styles.txTopRow}>
+                  <Badge label={cfg.label} variant={cfg.variant} />
+                  <Typography preset="caption" color={colors.textDisabled}>
+                    {formatDate(item.createdAt)}
+                  </Typography>
+                </View>
+                <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
                   {item.description}
-                </Typography>
-                <Typography preset="caption" color={colors.textDisabled}>
-                  {formatDate(item.createdAt)}
                 </Typography>
               </View>
               <Typography preset="h4" color={amountColor[item.type]} style={styles.txAmount}>
@@ -154,31 +169,49 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    safe: { flex: 1 },
-    list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
+const styles = StyleSheet.create({
+  // Single source of horizontal spacing — everything inside FlatList inherits this
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10] },
 
-    balanceCard: { gap: spacing[3], backgroundColor: colors.background, marginTop: spacing[2] },
-    balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-    balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
-    streakBadge: {
-      paddingHorizontal: spacing[2],
-      paddingVertical: spacing[0.5],
-      borderRadius: layout.cardRadius,
-      backgroundColor: colors.primarySurface,
-      borderWidth: 1,
-      borderColor: colors.primaryLight,
-    },
-    balanceRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing[2] },
+  // Balance card — no extra marginHorizontal, list padding handles alignment
+  balanceCard: {
+    borderRadius: layout.cardRadiusLg,
+    overflow: 'hidden',
+    padding: spacing[5],
+    gap: spacing[4],
+    ...shadows.lg,
+  },
+  balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },
+  streakPill: {
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1],
+    borderRadius: layout.pillRadius,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+  },
+  balanceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+  balanceAmount: { fontWeight: fontWeights.bold },
+  ctaBtn: {
+    backgroundColor: '#fff',
+    borderRadius: layout.cardRadius,
+    paddingVertical: spacing[3],
+    alignItems: 'center',
+  },
+  ctaBtnText: { color: '#6366F1', fontWeight: fontWeights.semiBold },
 
-    historyTitle: { marginBottom: spacing[2] },
-    txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing[3], gap: spacing[3] },
-    txLeft: { flex: 1, gap: spacing[1] },
-    txDesc: { maxWidth: '90%' },
-    txAmount: { minWidth: 48, textAlign: 'right' },
-    emptyState: { minHeight: 160 },
-    loadingWrap: { paddingTop: spacing[10], alignItems: 'center' },
-    footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
-  });
-}
+  historyTitle: { marginBottom: spacing[3] },
+
+  txRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing[3],
+    gap: spacing[3],
+  },
+  txLeft: { flex: 1, gap: spacing[1] },
+  txTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  txAmount: { minWidth: 48, textAlign: 'right' },
+
+  emptyState: { minHeight: 160 },
+  loadingWrap: { paddingTop: spacing[10], alignItems: 'center' },
+  footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
+});
