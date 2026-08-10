@@ -16,19 +16,6 @@ export async function listPlans(req: Request, res: Response): Promise<void> {
   } catch (error) { handleControllerError(res, error, 'Failed to list plans'); }
 }
 
-export async function listGroupPlans(req: Request, res: Response): Promise<void> {
-  try {
-    const plans = await plansService.listGroupPlans(req.user!.id, req.params.groupId);
-    sendSuccess(res, plans, 'Group plans retrieved');
-  } catch (error) { handleControllerError(res, error, 'Failed to list group plans'); }
-}
-
-export async function getMembersProgress(req: Request, res: Response): Promise<void> {
-  try {
-    const rows = await plansService.getMembersProgress(req.user!.id, req.params.id);
-    sendSuccess(res, rows, 'Members progress retrieved');
-  } catch (error) { handleControllerError(res, error, 'Failed to get members progress'); }
-}
 
 export async function getPlan(req: Request, res: Response): Promise<void> {
   try {

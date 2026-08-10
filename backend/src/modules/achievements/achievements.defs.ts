@@ -11,7 +11,6 @@ export type AchievementMetric =
   | 'quiz_modes'
   | 'streak'
   | 'friends'
-  | 'groups_joined'
   | 'ai_questions'
   | 'plans_completed';
 
@@ -53,7 +52,6 @@ export const ACHIEVEMENTS: AchievementDef[] = [
 
   // ── Social ──
   { key: 'first_friend', title: 'First Friend',  description: 'Add your first friend.',               icon: 'users',   category: 'social', metric: 'friends',       threshold: 1, reward: REWARD },
-  { key: 'joined_group', title: 'Joined a Group', description: 'Join your first group.',              icon: 'group',   category: 'social', metric: 'groups_joined', threshold: 1, reward: REWARD },
 
   // ── AI ──
   { key: 'first_ai',     title: 'Curious Mind',  description: 'Ask the AI assistant a question.',     icon: 'sparkles',category: 'ai',    metric: 'ai_questions',  threshold: 1,  reward: REWARD },

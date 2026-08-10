@@ -5,7 +5,7 @@ import Toast from 'react-native-toast-message';
 
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { QuizModeSheet } from '../../components/domain';
-import { Button, Divider, Input, Screen, ScreenHeader, Typography } from '../../components/ui';
+import { Button, Divider, Input, Screen, ScreenHeader, SearchBar, Typography } from '../../components/ui';
 import {
   SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
   HelpCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
@@ -210,7 +210,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       </Typography>
       {cardSearchVisible && (
         <View style={styles.searchWrap}>
-          <Input
+          <SearchBar
             placeholder="Search cards…"
             value={cardSearch}
             onChangeText={setCardSearch}

@@ -4,7 +4,6 @@ export const CreatePlanDto = z.object({
   title: z.string().trim().min(1, 'Title is required').max(200),
   description: z.string().trim().max(1000).optional(),
   setIds: z.array(z.string().uuid()).min(1, 'Add at least one set').max(100),
-  groupId: z.string().uuid().optional(), // present → group plan (D2, OWNER/ADMIN only)
 });
 
 export const UpdatePlanDto = z.object({

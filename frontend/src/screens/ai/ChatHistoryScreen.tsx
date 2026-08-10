@@ -8,16 +8,8 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import {
-  ArrowRightIcon,
-  ChatIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-  CloseCircleIcon,
   PencilIcon,
-  SearchIcon,
-  SparklesIcon,
   StarIcon,
   TagIcon,
   TrashIcon,
@@ -32,7 +24,7 @@ import {
   ErrorState,
   LoadingOverlay,
 } from '../../components/feedback';
-import { Button, Card, Divider, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { Button, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import {
   useAIChatHistory,
@@ -43,182 +35,19 @@ import {
   useRenameSession,
   useUpdateSessionTags,
 } from '../../hooks';
-import { formatDate } from '../../utils/formatters';
 import { useAIChatStore } from '../../store';
-import { useTheme, fontSizes, fontWeights, layout, spacing, type Theme } from '../../theme';
-import type { AIChat, BookmarkedChat, ChatSession } from '../../types';
+import { useTheme, fontSizes, layout, spacing, type Theme } from '../../theme';
+import type { BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
-
-const BADGE_ICON_SIZE = 12;
-const CHEVRON_SIZE = 16;
-const SESSION_ICON_SIZE = 14;
+import { BookmarkCard, SessionCard } from './components/ChatHistoryCards';
 
 const PREDEFINED_TAGS = [
   'Theology', 'Old Testament', 'New Testament',
   'Prayer', 'History', 'Devotional', 'Prophecy',
 ] as const;
 
-// Stable separator component — extracted to avoid hooks-in-JSX violation
 const ListSeparator = () => <Spacer size={spacing[3]} />;
 
-// ─── Individual Q&A pair inside an expanded session ──────────────────────────
-function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  return (
-    <>
-      {index > 0 && <Divider marginV={spacing[3]} />}
-      <View style={styles.qRow}>
-        <View style={styles.qBadge}>
-          <Typography preset="caption" color={colors.info} style={styles.badgeLabel}>Q</Typography>
-        </View>
-        <Typography preset="body" style={styles.flex}>{chat.question}</Typography>
-      </View>
-      <View style={[styles.aRow, { marginTop: spacing[2] }]}>
-        <View style={styles.aBadge}>
-          <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
-        </View>
-        <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
-          {chat.answer}
-        </Typography>
-      </View>
-    </>
-  );
-}
-
-// ─── Bookmarked message card ──────────────────────────────────────────────────
-function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const [expanded, setExpanded] = useState(false);
-  return (
-    <Pressable onPress={() => setExpanded(e => !e)}>
-      <Card style={styles.card}>
-        <View style={styles.titleRow}>
-          <View style={[styles.sessionIcon, { backgroundColor: colors.warningSurface }]}>
-            <StarIcon size={SESSION_ICON_SIZE} color={colors.warning} />
-          </View>
-          <Typography preset="body" style={[styles.flex, styles.sessionTitle]} numberOfLines={expanded ? undefined : 2}>
-            {chat.question}
-          </Typography>
-          {expanded ? (
-            <ChevronUpIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
-          ) : (
-            <ChevronDownIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
-          )}
-        </View>
-        {expanded && (
-          <Animated.View entering={FadeIn.duration(200)}>
-            <Divider marginV={spacing[3]} />
-            <View style={styles.aRow}>
-              <View style={styles.aBadge}>
-                <SparklesIcon size={BADGE_ICON_SIZE} color={colors.primary} />
-              </View>
-              <Typography preset="body" color={colors.textSecondary} style={styles.flex}>
-                {chat.answer}
-              </Typography>
-            </View>
-          </Animated.View>
-        )}
-        <Typography preset="caption" color={colors.textDisabled} style={{ marginTop: spacing[1] }}>
-          Bookmarked {formatDate(chat.bookmarkedAt)}
-        </Typography>
-      </Card>
-    </Pressable>
-  );
-}
-
-// ─── Session card ─────────────────────────────────────────────────────────────
-interface SessionCardProps {
-  session: ChatSession;
-  onLongPress: (session: ChatSession) => void;
-  onContinue: (session: ChatSession) => void;
-}
-
-function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const [expanded, setExpanded] = useState(false);
-  const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
-  const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
-  const displayTitle = session.customTitle || session.title;
-
-  return (
-    <Pressable
-      onPress={() => setExpanded(e => !e)}
-      onLongPress={() => onLongPress(session)}
-    >
-      <Card style={styles.card}>
-        <View style={styles.titleRow}>
-          <View style={styles.sessionIcon}>
-            <ChatIcon size={SESSION_ICON_SIZE} color={colors.primary} />
-          </View>
-          <Typography
-            preset="body"
-            style={[styles.flex, styles.sessionTitle]}
-            numberOfLines={expanded ? undefined : 2}
-          >
-            {displayTitle}
-          </Typography>
-          {expanded ? (
-            <ChevronUpIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
-          ) : (
-            <ChevronDownIcon size={CHEVRON_SIZE} color={colors.textSecondary} />
-          )}
-        </View>
-
-        {session.tags && session.tags.length > 0 && (
-          <View style={styles.tagRow}>
-            {session.tags.map(tag => (
-              <View key={tag} style={styles.tagPill}>
-                <Typography preset="caption" color={colors.primaryDark}>{tag}</Typography>
-              </View>
-            ))}
-          </View>
-        )}
-
-        <View style={styles.metaRow}>
-          <Typography preset="caption" color={colors.textDisabled}>
-            {session.messageCount} {questionLabel}
-          </Typography>
-          <View style={styles.dot} />
-          <View style={styles.creditPill}>
-            <Typography preset="caption" color={colors.primaryDark}>
-              −{session.totalCreditsUsed} {creditLabel}
-            </Typography>
-          </View>
-          <View style={styles.dot} />
-          <Typography preset="caption" color={colors.textDisabled}>
-            {formatDate(session.startedAt)}
-          </Typography>
-        </View>
-
-        {/* Continue button — inner Pressable takes priority over outer card tap */}
-        <Pressable
-          style={({ pressed }) => [styles.continueRow, { opacity: pressed ? 0.7 : 1 }]}
-          onPress={() => onContinue(session)}
-        >
-          <Typography preset="label" color={colors.primary}>Continue conversation</Typography>
-          <ArrowRightIcon size={14} color={colors.primary} />
-        </Pressable>
-
-        {expanded && (
-          <Animated.View entering={FadeIn.duration(200)}>
-            <Divider marginV={spacing[3]} />
-            {session.messages.map((msg, i) => (
-              <MessagePair key={msg.id} chat={msg} index={i} />
-            ))}
-          </Animated.View>
-        )}
-      </Card>
-    </Pressable>
-  );
-}
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
   const theme = useTheme();
   const { colors } = theme;
@@ -251,7 +80,6 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  // Reset search and tag filter when switching between All and Bookmarked tabs
   useEffect(() => {
     setSearchQuery('');
     setActiveTag(null);
@@ -285,8 +113,6 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   });
 
   const handleContinue = useCallback((session: ChatSession) => {
-    // Load the session into the shared store (single source of truth), then just
-    // navigate back to the chat screen — no need to spawn a new screen instance.
     useAIChatStore.getState().loadSession(session);
     navigation.navigate('AIChat');
   }, [navigation]);
@@ -392,25 +218,9 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   };
 
   const sheetActions = [
-    {
-      label: 'Rename',
-      icon: PencilIcon,
-      onPress: handleOpenRename,
-      disabled: !sheet.session?.sessionId,
-    },
-    {
-      label: 'Edit Tags',
-      icon: TagIcon,
-      onPress: handleOpenTags,
-      disabled: !sheet.session?.sessionId,
-    },
-    {
-      label: 'Delete',
-      icon: TrashIcon,
-      onPress: handleDeleteSession,
-      destructive: true,
-      disabled: !sheet.session?.sessionId || isDeleting,
-    },
+    { label: 'Rename', icon: PencilIcon, onPress: handleOpenRename, disabled: !sheet.session?.sessionId },
+    { label: 'Edit Tags', icon: TagIcon, onPress: handleOpenTags, disabled: !sheet.session?.sessionId },
+    { label: 'Delete', icon: TrashIcon, onPress: handleDeleteSession, destructive: true, disabled: !sheet.session?.sessionId || isDeleting },
   ];
 
   const renderSession = useCallback(({ item }: { item: ChatSession }) => (
@@ -428,7 +238,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   return (
     <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />}>
 
-      {/* ── View Mode Toggle (All / Bookmarked) ── */}
+      {/* ── View Mode Toggle ── */}
       <View style={styles.modeToggle}>
         <Pressable
           style={[styles.modeTab, viewMode === 'all' && styles.modeTabActive]}
@@ -442,10 +252,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           style={[styles.modeTab, viewMode === 'bookmarked' && styles.modeTabActive]}
           onPress={() => setViewMode('bookmarked')}
         >
-          <StarIcon
-            size={14}
-            color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary}
-          />
+          <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary} />
           <Typography preset="label" color={viewMode === 'bookmarked' ? colors.primary : colors.textSecondary}>
             Bookmarked
           </Typography>
@@ -454,24 +261,13 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
 
       {viewMode === 'all' && (
         <>
-          {/* ── Search + Clear ── */}
           <View style={styles.topBar}>
-            <View style={styles.searchRow}>
-              <SearchIcon size={16} color={colors.textSecondary} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Search conversations…"
-                placeholderTextColor={colors.textSecondary}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                returnKeyType="search"
-              />
-              {searchQuery.length > 0 && (
-                <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
-                  <CloseCircleIcon size={16} color={colors.textSecondary} />
-                </Pressable>
-              )}
-            </View>
+            <SearchBar
+              placeholder="Search conversations…"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              containerStyle={styles.searchBarContainer}
+            />
             {allSessions.length > 0 && (
               <Pressable onPress={handleClearAll} hitSlop={8} style={styles.clearBtn}>
                 <TrashIcon size={18} color={colors.error} />
@@ -479,14 +275,9 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             )}
           </View>
 
-          {/* ── Tag filter bar ── */}
           {hasAnyTaggedSession && (
             <View style={styles.tagBarWrapper}>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.tagBar}
-              >
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
                 <Pressable
                   style={[styles.tagFilter, activeTag === null && styles.tagFilterActive]}
                   onPress={() => setActiveTag(null)}
@@ -512,7 +303,6 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         </>
       )}
 
-      {/* ── List ── */}
       {viewMode === 'bookmarked' ? (
         <FlatList
           style={styles.fill}
@@ -525,14 +315,9 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           ItemSeparatorComponent={ListSeparator}
           ListEmptyComponent={
             !isBookmarksLoading ? (
-              <EmptyState
-                title="No bookmarks yet"
-                subtitle="Long-press any AI response and tap Bookmark to save it here"
-              />
+              <EmptyState title="No bookmarks yet" subtitle="Long-press any AI response and tap Bookmark to save it here" />
             ) : (
-              <View style={styles.loadingWrap}>
-                <ActivityIndicator color={colors.primary} />
-              </View>
+              <View style={styles.loadingWrap}><ActivityIndicator color={colors.primary} /></View>
             )
           }
           renderItem={renderBookmark}
@@ -556,23 +341,18 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
                 subtitle={searchQuery ? 'Try a different search term' : 'Your conversations with the AI assistant will appear here'}
               />
             ) : (
-              <View style={styles.loadingWrap}>
-                <ActivityIndicator color={colors.primary} />
-              </View>
+              <View style={styles.loadingWrap}><ActivityIndicator color={colors.primary} /></View>
             )
           }
           ListFooterComponent={
             isFetchingNextPage ? (
-              <View style={styles.footerLoader}>
-                <ActivityIndicator color={colors.primary} size="small" />
-              </View>
+              <View style={styles.footerLoader}><ActivityIndicator color={colors.primary} size="small" /></View>
             ) : null
           }
           renderItem={renderSession}
         />
       )}
 
-      {/* ── Long-press ActionSheet ── */}
       <ActionSheet
         visible={sheet.visible}
         title="Conversation"
@@ -580,7 +360,6 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         onClose={() => setSheet({ visible: false, session: null })}
       />
 
-      {/* ── Rename Modal ── */}
       <AppModal
         visible={renameModal.visible}
         title="Rename Conversation"
@@ -605,7 +384,6 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         />
       </AppModal>
 
-      {/* ── Tags Modal ── */}
       <AppModal
         visible={tagsModal.visible}
         title="Edit Tags"
@@ -643,8 +421,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   );
 }
 
-const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
-  safe: { flex: 1 },
+const makeStyles = ({ colors }: Theme) => StyleSheet.create({
   fill: { flex: 1 },
 
   modeToggle: {
@@ -654,182 +431,45 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     borderBottomColor: colors.border,
   },
   modeTab: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing[1],
-    paddingVertical: spacing[3],
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
+    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    gap: spacing[1], paddingVertical: spacing[3],
+    borderBottomWidth: 2, borderBottomColor: 'transparent',
   },
-  modeTabActive: {
-    borderBottomColor: colors.primary,
-  },
+  modeTabActive: { borderBottomColor: colors.primary },
 
   topBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[3],
-    gap: spacing[2],
-    backgroundColor: colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    flexDirection: 'row', alignItems: 'center',
+    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[3],
+    gap: spacing[2], backgroundColor: colors.background,
+    borderBottomWidth: 1, borderBottomColor: colors.border,
   },
-  searchRow: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.backgroundSecondary,
-    borderRadius: spacing[2.5],
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[2],
-    gap: spacing[2],
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    padding: 0,
-  },
+  searchBarContainer: { flex: 1, marginBottom: 0 },
   clearBtn: { padding: spacing[1] },
 
-  tagBarWrapper: {
-    backgroundColor: colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  tagBar: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing[2],
-    gap: spacing[2],
-  },
+  tagBarWrapper: { backgroundColor: colors.background, borderBottomWidth: 1, borderBottomColor: colors.border },
+  tagBar: { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing[2], gap: spacing[2] },
   tagFilter: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[1],
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
+    paddingHorizontal: spacing[3], paddingVertical: spacing[1],
+    borderRadius: layout.pillRadius, borderWidth: 1,
+    borderColor: colors.border, backgroundColor: colors.backgroundSecondary,
   },
-  tagFilterActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+  tagFilterActive: { backgroundColor: colors.primary, borderColor: colors.primary },
 
-  list: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing[10],
-    flexGrow: 1,
-  },
-  card: {
-    gap: spacing[2],
-    backgroundColor: colors.background,
-  },
-
-  titleRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing[2],
-  },
-  sessionIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: spacing[2],
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 1,
-    flexShrink: 0,
-  },
-  sessionTitle: { fontWeight: fontWeights.medium },
-
-  tagRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[1],
-  },
-  tagPill: {
-    backgroundColor: colors.primarySurface,
-    borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[0.5],
-  },
-
-  metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing[2],
-    flexWrap: 'wrap',
-  },
-  continueRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-    paddingTop: spacing[3],
-    marginTop: spacing[1],
-  },
-  dot: {
-    width: 3,
-    height: 3,
-    borderRadius: spacing[0.5],
-    backgroundColor: colors.textDisabled,
-  },
-  creditPill: {
-    backgroundColor: colors.primarySurface,
-    borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing[2],
-    paddingVertical: spacing[0.5],
-  },
-
-  qRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
-  aRow: { flexDirection: 'row', gap: spacing[2], alignItems: 'flex-start' },
-  qBadge: {
-    width: 22, height: 22, borderRadius: spacing[1.5],
-    backgroundColor: colors.infoSurface,
-    alignItems: 'center', justifyContent: 'center',
-    marginTop: 1, flexShrink: 0,
-  },
-  aBadge: {
-    width: 22, height: 22, borderRadius: spacing[1.5],
-    backgroundColor: colors.primarySurface,
-    alignItems: 'center', justifyContent: 'center',
-    marginTop: 1, flexShrink: 0,
-  },
-  badgeLabel: { fontWeight: fontWeights.bold, fontSize: fontSizes.xs2 },
-  flex: { flex: 1 },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing[10], flexGrow: 1 },
 
   loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing[20] },
   footerLoader: { paddingVertical: spacing[4], alignItems: 'center' },
 
   renameInput: {
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing[4],
-    paddingVertical: spacing[3],
-    fontSize: fontSizes.md,
-    color: colors.textPrimary,
-    backgroundColor: colors.backgroundSecondary,
+    borderWidth: 1.5, borderColor: colors.border, borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing[4], paddingVertical: spacing[3],
+    fontSize: fontSizes.md, color: colors.textPrimary, backgroundColor: colors.backgroundSecondary,
   },
-  tagGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing[2],
-  },
+  tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2] },
   tagOption: {
-    paddingHorizontal: spacing[3],
-    paddingVertical: spacing[2],
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-    borderColor: colors.border,
-    backgroundColor: colors.backgroundSecondary,
+    paddingHorizontal: spacing[3], paddingVertical: spacing[2],
+    borderRadius: layout.pillRadius, borderWidth: 1,
+    borderColor: colors.border, backgroundColor: colors.backgroundSecondary,
   },
-  tagOptionActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
+  tagOptionActive: { backgroundColor: colors.primary, borderColor: colors.primary },
 });

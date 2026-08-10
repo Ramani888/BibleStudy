@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 
 import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
-import { Button, ColorPicker, Input, Screen, Spacer, Typography } from '../../components/ui';
+import { Button, ColorPicker, Input, Screen, SearchBar, Spacer, Typography } from '../../components/ui';
 import { BookIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
 
 import {
@@ -200,7 +200,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <Input
+          <SearchBar
             placeholder={activeTab === 'sets' ? 'Search sets…' : 'Search folders…'}
             value={search}
             onChangeText={setSearch}

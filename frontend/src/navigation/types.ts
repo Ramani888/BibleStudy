@@ -68,17 +68,6 @@ export type ProfileStackParamList = {
   SearchUsers: undefined;
   UserProfile: { userId: string };
   BlockedUsers: undefined;
-  // Groups
-  Groups: undefined;
-  GroupDetail: { groupId: string };
-  CreateGroup: undefined;
-  EditGroup: { groupId: string };
-  JoinGroup: undefined;
-  // Group study plans (D2)
-  GroupPlanDetail: { planId: string; groupTitle?: string };
-  CreateGroupPlan: { groupId: string };
-  // Public groups
-  PublicGroups: undefined;
   // Notifications
   Notifications: undefined;
   // Notes

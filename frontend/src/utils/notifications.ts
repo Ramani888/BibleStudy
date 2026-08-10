@@ -94,13 +94,6 @@ export function handleNotificationNavigation(
     case 'friend_accepted':
       navigate('ProfileTab', { screen: 'Friends' });
       break;
-    case 'group':
-      navigate('ProfileTab', { screen: 'GroupDetail', params: { groupId: data.id } });
-      break;
-    case 'gathering':
-    case 'gathering_rsvp':
-      navigate('MapTab', { screen: 'GatheringDetail', params: { gatheringId: data.id } });
-      break;
     default:
       navigate('ProfileTab', { screen: 'Notifications' });
       break;

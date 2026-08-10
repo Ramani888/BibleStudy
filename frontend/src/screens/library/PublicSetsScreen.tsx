@@ -4,7 +4,7 @@ import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
-import { Input, Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
+import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { CopyIcon, SearchIcon } from '../../components/icons';
 
 import { useCloneSet, useDebouncedValue, usePublicSets } from '../../hooks';
@@ -82,7 +82,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
     <Screen header={header} footer={footer}>
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <Input
+          <SearchBar
             placeholder="Search public sets…"
             value={search}
             onChangeText={setSearch}

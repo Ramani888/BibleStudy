@@ -8,19 +8,21 @@ import { Theme, useTheme } from '../../theme';
 const MENU_ICON_SIZE = 20;
 
 interface ListCardProps {
-  /** Leading visual — usually an <AccentIcon />. */
+  /** Leading visual — an <AccentIcon />, <Avatar />, or any node. */
   leading?: React.ReactNode;
   title: string;
-  /** Right-aligned meta, shown beside the ⋮ menu (e.g. a visibility label). */
+  /** Right-aligned meta, shown beside the ⋮ menu / trailing (e.g. a visibility label). */
   meta?: React.ReactNode;
   subtitle?: string;
-  onPress: () => void;
+  /** Any right-side element (button, chevron, icon, count). Rendered after meta. */
+  trailing?: React.ReactNode;
+  onPress?: () => void;
   onLongPress?: () => void;
   onMenuPress?: () => void;
 }
 
-/** Reusable list row: leading · title/subtitle · (meta + ⋮ menu). */
-export function ListCard({ leading, title, meta, subtitle, onPress, onLongPress, onMenuPress }: ListCardProps) {
+/** Reusable list row: leading · title/subtitle · (meta + trailing + ⋮ menu). */
+export function ListCard({ leading, title, meta, subtitle, trailing, onPress, onLongPress, onMenuPress }: ListCardProps) {
   const theme = useTheme();
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { colors } = theme;
@@ -34,9 +36,10 @@ export function ListCard({ leading, title, meta, subtitle, onPress, onLongPress,
           <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>{subtitle}</Typography>
         ) : null}
       </View>
-      {(meta || onMenuPress) && (
+      {(meta || trailing || onMenuPress) && (
         <View style={styles.trailing}>
           {meta}
+          {trailing}
           {onMenuPress && (
             <Pressable onPress={onMenuPress} hitSlop={8}>
               <MoreVerticalIcon size={MENU_ICON_SIZE} color={colors.textDisabled} />

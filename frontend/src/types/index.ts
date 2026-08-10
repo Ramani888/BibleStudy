@@ -12,3 +12,6 @@ export * from './quiz.types';
 export * from './achievement.types';
 export * from './plan.types';
 export * from './subscription.types';
+export * from './friends.types';
+export * from './notification.types';
+export * from './activities.types';

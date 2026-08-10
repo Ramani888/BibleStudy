@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet } from 'react-native';
 import { AppModal } from './Modal';
-import { Divider, Input, Typography } from '../ui';
+import { Divider, SearchBar, Typography } from '../ui';
 import { Theme, useTheme } from '../../theme';
 
 export interface SelectOption {
@@ -53,7 +53,7 @@ export function SelectSheet({
   return (
     <AppModal visible={visible} title={title} onClose={handleClose}>
       {searchable && options.length > 0 && (
-        <Input
+        <SearchBar
           placeholder={searchPlaceholder}
           value={search}
           onChangeText={setSearch}

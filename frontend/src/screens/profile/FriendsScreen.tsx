@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
+import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -31,21 +32,17 @@ export function FriendsScreen({ navigation }: Props) {
   };
 
   const renderItem = ({ item }: { item: Friendship }) => (
-    <Pressable
-      style={styles.friendRow}
+    <ListCard
+      leading={<Avatar uri={item.friend.profileImage ?? null} name={item.friend.name ?? ''} size="sm" />}
+      title={item.friend.name}
+      subtitle={item.friend.church ?? undefined}
+      trailing={
+        <Pressable onPress={() => handleRemove(item.friendId, item.friend.name)} hitSlop={8}>
+          <UserMinusIcon size={20} color={colors.error} />
+        </Pressable>
+      }
       onPress={() => navigation.navigate('UserProfile', { userId: item.friendId })}
-    >
-      <Avatar uri={item.friend.profileImage ?? null} name={item.friend.name ?? ''} size="sm" />
-      <View style={styles.info}>
-        <Typography preset="label">{item.friend.name}</Typography>
-        {item.friend.church ? (
-          <Typography preset="caption" color={colors.textSecondary}>{item.friend.church}</Typography>
-        ) : null}
-      </View>
-      <Pressable onPress={() => handleRemove(item.friendId, item.friend.name)} hitSlop={8}>
-        <UserMinusIcon size={20} color={colors.error} />
-      </Pressable>
-    </Pressable>
+    />
   );
 
   if (error) return <ErrorState message="Could not load friends" onRetry={refetch} />;
@@ -85,6 +82,7 @@ export function FriendsScreen({ navigation }: Props) {
         renderItem={renderItem}
         refreshing={isFetching}
         onRefresh={refetch}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState
@@ -102,18 +100,9 @@ export function FriendsScreen({ navigation }: Props) {
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     headerActions: { flexDirection: 'row', gap: spacing[3] },
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { padding: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    friendRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-      gap: spacing[3],
-    },
-    info: { flex: 1 },
     footer: {
       paddingHorizontal: layout.screenPaddingH,
       paddingVertical: spacing[3],

@@ -27,7 +27,6 @@ import {
   usePublicSets,
   useFriendsSets,
   useFriendsActivityFeed,
-  useGroups,
   useFriends,
   useFolders,
   useNotes,
@@ -43,7 +42,6 @@ import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
 import type { DueSummary, StudySet } from '../../types';
 import type { Activity } from '../../types/activities.types';
-import type { Group } from '../../types/groups.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
@@ -192,33 +190,16 @@ function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponen
   );
 }
 
-// ─── Group mini card ──────────────────────────────────────────────────────────
-function GroupCard({ group, onPress }: { group: Group; onPress: () => void }) {
-  const theme = useTheme();
-  const styles = useMemo(() => makeStyles(theme), [theme]);
-  const { colors } = theme;
-  const members = group._count?.members ?? 0;
-  return (
-    <AnimatedPressable style={styles.miniCard} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${group.name}`}>
-      <View style={styles.miniIcon}>
-        <UsersIcon size={18} color={colors.textPrimary} />
-      </View>
-      <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{group.name}</Typography>
-      <Typography preset="caption" color={colors.textSecondary}>{members} member{plural(members)}</Typography>
-    </AnimatedPressable>
-  );
-}
 
 // ─── Activity feed item ───────────────────────────────────────────────────────
 function activityText(a: Activity): string {
   const name = a.user?.name ?? 'Someone';
   switch (a.type) {
-    case 'ADDED_FRIEND': return `${name} added a new friend`;
-    case 'JOINED_GROUP': return `${name} joined a group`;
-    case 'JOINED_GATHERING': return `${name} joined a gathering`;
-    case 'CREATED_SET': return `${name} created a new set`;
+    case 'ADDED_FRIEND':  return `${name} added a new friend`;
+    case 'CREATED_SET':   return `${name} created a new set`;
+    case 'CREATED_CARD':  return `${name} created a new card`;
     case 'STUDIED_CARDS': return `${name} studied some cards`;
-    case 'CREATED_NOTE': return `${name} wrote a note`;
+    case 'CREATED_NOTE':  return `${name} wrote a note`;
     default: return `${name} was active`;
   }
 }
@@ -300,7 +281,6 @@ export function HomeScreen() {
   const { data: publicData } = usePublicSets();
   const { data: friendsData } = useFriendsSets();
   const { data: activityData } = useFriendsActivityFeed();
-  const { data: groups } = useGroups();
   const { data: friends } = useFriends();
   const { data: folders } = useFolders();
   const { data: notes } = useNotes();
@@ -314,8 +294,6 @@ export function HomeScreen() {
   const publicSets = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
   const activities = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
-  const topGroups = useMemo(() => (groups ?? []).slice(0, 8), [groups]);
-
   const streak = streakData?.streak ?? 0;
   const firstName = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
@@ -401,19 +379,6 @@ export function HomeScreen() {
           </>
         )}
 
-        {/* Your groups */}
-        {topGroups.length > 0 && (
-          <>
-            <Spacer size={spacing[6]} />
-            <SectionRow title="Your Groups" actionLabel="See all" onAction={() => navigation.navigate('ProfileTab', { screen: 'Groups' })} />
-            <Spacer size={spacing[3]} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
-              {topGroups.map(g => (
-                <GroupCard key={g.id} group={g} onPress={() => navigation.navigate('ProfileTab', { screen: 'GroupDetail', params: { groupId: g.id } })} />
-              ))}
-            </ScrollView>
-          </>
-        )}
 
         {/* Recent activity */}
         {activities.length > 0 && (
@@ -520,7 +485,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     },
     dueBadge: { backgroundColor: colors.successSurface, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
 
-    // Horizontal rails (friends / groups / discover)
+    // Horizontal rails
     railContent: { gap: spacing[3], paddingRight: spacing[2] },
     miniCard: {
       width: 140, gap: spacing[2], padding: spacing[4], borderRadius: layout.cardRadiusSm,

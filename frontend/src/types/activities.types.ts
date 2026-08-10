@@ -2,9 +2,8 @@ import type { UserProfile } from './friends.types';
 
 export type ActivityType =
   | 'ADDED_FRIEND'
-  | 'JOINED_GROUP'
-  | 'JOINED_GATHERING'
   | 'CREATED_SET'
+  | 'CREATED_CARD'
   | 'STUDIED_CARDS'
   | 'CREATED_NOTE';
 

@@ -5,6 +5,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
+import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -56,29 +57,27 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
-      <View style={styles.requestRow}>
-        <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
-        <View style={styles.info}>
-          <Typography preset="label">{person?.name}</Typography>
-          {person?.church ? (
-            <Typography preset="caption" color={colors.textSecondary}>{person.church}</Typography>
-          ) : null}
-        </View>
-        {tab === 'incoming' ? (
-          <View style={styles.requestActions}>
-            <Pressable onPress={() => handleAccept(item.id)} hitSlop={8}>
-              <CheckCircleIcon size={28} color={colors.success} />
+      <ListCard
+        leading={<Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />}
+        title={person?.name ?? ''}
+        subtitle={person?.church ?? undefined}
+        trailing={
+          tab === 'incoming' ? (
+            <View style={styles.requestActions}>
+              <Pressable onPress={() => handleAccept(item.id)} hitSlop={8}>
+                <CheckCircleIcon size={28} color={colors.success} />
+              </Pressable>
+              <Pressable onPress={() => handleReject(item.id)} hitSlop={8}>
+                <CloseCircleIcon size={28} color={colors.error} />
+              </Pressable>
+            </View>
+          ) : (
+            <Pressable onPress={() => handleCancel(item.id)} hitSlop={8}>
+              <CloseCircleIcon size={28} color={colors.textSecondary} />
             </Pressable>
-            <Pressable onPress={() => handleReject(item.id)} hitSlop={8}>
-              <CloseCircleIcon size={28} color={colors.error} />
-            </Pressable>
-          </View>
-        ) : (
-          <Pressable onPress={() => handleCancel(item.id)} hitSlop={8}>
-            <CloseCircleIcon size={28} color={colors.textSecondary} />
-          </Pressable>
-        )}
-      </View>
+          )
+        }
+      />
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, colors]);
@@ -114,6 +113,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
         renderItem={renderItem}
         refreshing={isFetching}
         onRefresh={refetch}
+        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={requests.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState
@@ -135,18 +135,9 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center' },
     activeTab: { borderBottomWidth: 2, borderBottomColor: colors.primary },
-    list: { paddingHorizontal: layout.screenPaddingH },
+    list: { padding: layout.screenPaddingH },
+    separator: { height: spacing[3] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    requestRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: spacing[3],
-      paddingHorizontal: layout.screenPaddingH,
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
-      gap: spacing[3],
-    },
-    info: { flex: 1 },
     requestActions: { flexDirection: 'row', gap: spacing[2] },
   });
 }

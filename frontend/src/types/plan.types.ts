@@ -37,13 +37,5 @@ export interface CreatePlanPayload {
   title: string;
   description?: string;
   setIds: string[];
-  groupId?: string; // present → group plan (admins only)
 }
 
-export interface MemberProgress {
-  userId: string;
-  name: string;
-  profileImage: string | null;
-  completed: number;
-  total: number;
-}

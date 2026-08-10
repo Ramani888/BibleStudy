@@ -10,8 +10,6 @@ router.use(authMiddleware);
 
 router.post('/',                validate(CreatePlanDto), plansController.createPlan);
 router.get('/',                 plansController.listPlans);
-router.get('/group/:groupId',   plansController.listGroupPlans);
-router.get('/:id/members-progress', plansController.getMembersProgress);
 router.get('/:id',             plansController.getPlan);
 router.patch('/:id',           validate(UpdatePlanDto), plansController.updatePlan);
 router.delete('/:id',          plansController.deletePlan);

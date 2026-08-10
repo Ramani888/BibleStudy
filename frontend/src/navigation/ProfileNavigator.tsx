@@ -14,14 +14,6 @@ import { FriendRequestsScreen } from '../screens/profile/FriendRequestsScreen';
 import { SearchUsersScreen } from '../screens/profile/SearchUsersScreen';
 import { UserProfileScreen } from '../screens/profile/UserProfileScreen';
 import { BlockedUsersScreen } from '../screens/profile/BlockedUsersScreen';
-import { GroupsScreen } from '../screens/profile/GroupsScreen';
-import { GroupDetailScreen } from '../screens/profile/GroupDetailScreen';
-import { CreateGroupScreen } from '../screens/profile/CreateGroupScreen';
-import { EditGroupScreen } from '../screens/profile/EditGroupScreen';
-import { JoinGroupScreen } from '../screens/profile/JoinGroupScreen';
-import { PublicGroupsScreen } from '../screens/profile/PublicGroupsScreen';
-import { GroupPlanDetailScreen } from '../screens/profile/GroupPlanDetailScreen';
-import { CreatePlanScreen } from '../screens/library/CreatePlanScreen';
 import { NotificationsScreen } from '../screens/profile/NotificationsScreen';
 import { NotesScreen } from '../screens/profile/NotesScreen';
 import { NoteEditorScreen } from '../screens/profile/NoteEditorScreen';
@@ -46,14 +38,6 @@ export function ProfileNavigator() {
       <Stack.Screen name="SearchUsers"     component={SearchUsersScreen}     />
       <Stack.Screen name="UserProfile"     component={UserProfileScreen}     />
       <Stack.Screen name="BlockedUsers"    component={BlockedUsersScreen}    />
-      <Stack.Screen name="Groups"          component={GroupsScreen}          />
-      <Stack.Screen name="GroupDetail"     component={GroupDetailScreen}     />
-      <Stack.Screen name="CreateGroup"     component={CreateGroupScreen}     options={{ presentation: 'modal' }} />
-      <Stack.Screen name="EditGroup"       component={EditGroupScreen}       options={{ presentation: 'modal' }} />
-      <Stack.Screen name="JoinGroup"       component={JoinGroupScreen}       options={{ presentation: 'modal' }} />
-      <Stack.Screen name="PublicGroups"    component={PublicGroupsScreen}    />
-      <Stack.Screen name="GroupPlanDetail" component={GroupPlanDetailScreen} />
-      <Stack.Screen name="CreateGroupPlan" component={CreatePlanScreen}      options={{ presentation: 'modal' }} />
       <Stack.Screen name="Notifications"   component={NotificationsScreen}   />
       <Stack.Screen name="Notes"           component={NotesScreen}           />
       <Stack.Screen name="NoteEditor"      component={NoteEditorScreen}      options={{ presentation: 'modal' }} />

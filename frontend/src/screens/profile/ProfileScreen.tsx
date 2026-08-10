@@ -9,7 +9,6 @@ import { Avatar, Badge, Divider, Typography } from '../../components/ui';
 import {
   AlbumsIcon,
   BellIcon,
-  BuildingIcon,
   FileTextIcon,
   FlameIcon,
   LockIcon,
@@ -149,8 +148,6 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── Community ── */}
         <MenuSection label="Community">
           <MenuItem icon={UsersIcon} label="Friends" onPress={() => navigation.navigate('Friends')} />
-          <Divider marginV={0} />
-          <MenuItem icon={BuildingIcon} label="Groups" onPress={() => navigation.navigate('Groups')} />
           <Divider marginV={0} />
           <MenuItem icon={BellIcon} label="Notifications" onPress={() => navigation.navigate('Notifications')} />
         </MenuSection>
