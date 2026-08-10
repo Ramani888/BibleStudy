@@ -134,6 +134,7 @@ model Card {
   set           Set        @relation(fields: [setId], references: [id], onDelete: Cascade)
   user          User?      @relation(fields: [userId], references: [id], onDelete: SetNull)
   userId        String?
+  embedding     Unsupported("vector(512)")?
 
   @@index([setId])
   @@index([userId])
@@ -348,6 +349,7 @@ model Note {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  embedding Unsupported("vector(512)")?
 
   @@index([userId])
 }

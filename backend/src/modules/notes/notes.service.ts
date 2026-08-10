@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { CreateNoteDtoType, UpdateNoteDtoType } from './notes.dto';
+import { storeNoteEmbedding } from '../ai/embeddings.service';
 import { NotFoundError } from '../../utils/errors';
 import { logActivity } from '../../utils/activity';
 
@@ -20,6 +21,7 @@ export async function createNote(userId: string, dto: CreateNoteDtoType) {
     },
   });
   logActivity(userId, 'CREATED_NOTE', note.id);
+  storeNoteEmbedding(note.id, note.title, note.body).catch(() => {});
   return note;
 }
 
@@ -33,7 +35,7 @@ export async function updateNote(userId: string, noteId: string, dto: UpdateNote
   const note = await prisma.note.findFirst({ where: { id: noteId, userId } });
   if (!note) throw new NotFoundError('Note not found');
 
-  return prisma.note.update({
+  const updated = await prisma.note.update({
     where: { id: noteId },
     data: {
       ...(dto.title !== undefined && { title: dto.title }),
@@ -41,6 +43,12 @@ export async function updateNote(userId: string, noteId: string, dto: UpdateNote
       ...(dto.tags  !== undefined && { tags:  dto.tags  }),
     },
   });
+
+  if (dto.title !== undefined || dto.body !== undefined) {
+    storeNoteEmbedding(updated.id, updated.title, updated.body).catch(() => {});
+  }
+
+  return updated;
 }
 
 export async function deleteNote(userId: string, noteId: string) {

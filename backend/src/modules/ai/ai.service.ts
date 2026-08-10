@@ -5,6 +5,7 @@ import { env } from '../../config/env';
 import { AskQuestionDtoType } from './ai.dto';
 import { AppError, NotFoundError, PaymentRequiredError } from '../../utils/errors';
 import { triggerAchievementCheck } from '../../utils/achievementCheck';
+import { retrieveContext } from './embeddings.service';
 
 const anthropic = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY });
 
@@ -211,7 +212,10 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     throw new PaymentRequiredError(`This needs ${mediaCost} credits. Earn more or upgrade to keep using media in chat.`);
   }
 
-  const rawText = await generateAnswer(SYSTEM_PROMPT, messages, mediaBlocks);
+  const userContext = await retrieveContext(userId, dto.question).catch(() => '');
+  const system = userContext ? `${SYSTEM_PROMPT}\n\n${userContext}` : SYSTEM_PROMPT;
+
+  const rawText = await generateAnswer(system, messages, mediaBlocks);
   if (!rawText) {
     throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
   }

@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
+import { storeCardEmbedding } from '../ai/embeddings.service';
 import {
   CreateCardDtoType,
   BulkCreateCardsDtoType,
@@ -117,6 +118,7 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
   });
 
   await logActivity(userId, 'CREATED_CARD', dto.setId);
+  storeCardEmbedding(card.id, card.question, card.answer).catch(() => {});
 
   return card;
 }
@@ -144,6 +146,8 @@ export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoTyp
       )
     );
   });
+
+  Promise.all(cards.map(c => storeCardEmbedding(c.id, c.question, c.answer))).catch(() => {});
 
   return cards;
 }
@@ -189,6 +193,10 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
       ...(dto.difficulty !== undefined && { difficulty: dto.difficulty }),
     },
   });
+
+  if (dto.question !== undefined || dto.answer !== undefined) {
+    storeCardEmbedding(updated.id, updated.question, updated.answer).catch(() => {});
+  }
 
   return updated;
 }
