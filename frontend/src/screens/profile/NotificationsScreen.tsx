@@ -12,8 +12,6 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import {
   BellIcon,
-  CalendarIcon,
-  ClockIcon,
   TrashIcon,
   TrophyIcon,
   UserPlusIcon,
@@ -34,8 +32,6 @@ function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
     case 'friend_request':  return UserPlusIcon;
     case 'friend_accepted': return UsersIcon;
-    case 'gathering':       return CalendarIcon;
-    case 'gathering_rsvp':  return ClockIcon;
     case 'achievement':     return TrophyIcon;
     // default guards against any backend type the app doesn't know yet —
     // returning undefined here would crash the whole list.

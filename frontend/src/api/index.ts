@@ -9,8 +9,6 @@ export { creditsApi } from './credits.api';
 
 // Phase 2 — Community
 export { friendsApi } from './friends.api';
-export { gatheringsApi } from './gatherings.api';
-export { mapApi } from './map.api';
 export { activitiesApi } from './activities.api';
 export { notificationsApi } from './notifications.api';
 export { notesApi } from './notes.api';

@@ -23,11 +23,6 @@ model User {
   storageLimit    BigInt          @default(262144000)
   plan            Plan            @default(FREE)
   emailVerified   Boolean         @default(false)
-  locationLat     Float?
-  locationLng     Float?
-  locationName    String?
-  locationPrivacy LocationPrivacy @default(OFF)
-  lastLocationAt  DateTime?
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -46,8 +41,6 @@ model User {
   friendOf                Friendship[]          @relation("FriendOf")
   blockedUsers            Block[]               @relation("Blocker")
   blockedBy               Block[]               @relation("Blocked")
-  hostedGatherings        Gathering[]
-  gatheringParticipations GatheringParticipant[]
   activities              Activity[]
   notifications           Notification[]
   notes                   Note[]
@@ -321,38 +314,6 @@ model Block {
   @@index([blockedId])
 }
 
-model Gathering {
-  id           String                 @id @default(uuid())
-  title        String
-  description  String?
-  hostId       String
-  date         DateTime
-  locationName String?
-  locationLat  Float?
-  locationLng  Float?
-  meetingLink  String?
-  visibility   Visibility             @default(FRIENDS)
-  createdAt    DateTime               @default(now())
-  updatedAt    DateTime               @updatedAt
-  host         User                   @relation(fields: [hostId], references: [id], onDelete: Cascade)
-  participants GatheringParticipant[]
-
-  @@index([hostId])
-  @@index([date])
-}
-
-model GatheringParticipant {
-  gatheringId String
-  userId      String
-  status      ParticipantStatus @default(GOING)
-  joinedAt    DateTime          @default(now())
-  gathering   Gathering         @relation(fields: [gatheringId], references: [id], onDelete: Cascade)
-  user        User              @relation(fields: [userId],      references: [id], onDelete: Cascade)
-
-  @@id([gatheringId, userId])
-  @@index([userId])
-}
-
 model Activity {
   id          String       @id @default(uuid())
   userId      String
@@ -488,22 +449,8 @@ enum FriendRequestStatus {
   REJECTED
 }
 
-enum ParticipantStatus {
-  GOING
-  MAYBE
-  NOT_GOING
-}
-
-enum LocationPrivacy {
-  OFF
-  FRIENDS
-  SELECTED
-  EVERYONE
-}
-
 enum ActivityType {
   ADDED_FRIEND
-  JOINED_GATHERING
   CREATED_SET
   CREATED_CARD
   STUDIED_CARDS

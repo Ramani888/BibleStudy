@@ -56,17 +56,6 @@ export {
   useUnblockUser,
 } from './useFriends';
 export { useUser } from './useUser';
-export {
-  useGatherings,
-  useGathering,
-  useNearbyGatherings,
-  useCreateGathering,
-  useUpdateGathering,
-  useCancelGathering,
-  useRsvp,
-  useLeaveGathering,
-} from './useGatherings';
-export { useFriendsLocations, useUpdateLocation, useUpdateMapPrivacy } from './useMap';
 export { useFriendsActivityFeed } from './useActivities';
 export {
   useNotifications,
