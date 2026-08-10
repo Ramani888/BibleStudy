@@ -145,8 +145,6 @@ export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoTyp
     );
   });
 
-  await logActivity(userId, 'CREATED_CARD', dto.setId);
-
   return cards;
 }
 
@@ -224,8 +222,6 @@ export async function copyCard(userId: string, cardId: string) {
       userId,
     },
   });
-
-  await logActivity(userId, 'CREATED_CARD', copy.setId);
 
   return copy;
 }
