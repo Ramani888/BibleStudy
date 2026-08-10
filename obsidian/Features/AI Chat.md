@@ -1,7 +1,7 @@
 ---
 title: AI Chat
 tags: [feature, ai]
-updated: 2026-08-10
+updated: 2026-08-10b
 ---
 
 # AI Chat
@@ -141,6 +141,29 @@ Active conversation state lives in **Zustand** (`useAIChatStore`), not React Que
 - **RAG pipeline** (450567a): Voyage AI embeddings on cards + notes → pgvector retrieval → personal context injected into system prompt per request.
 - **Atomic credits** (b497ca5): TOCTOU race in credit reserve replaced with single atomic SQL UPDATE.
 - **UI polish**: new session via `+` icon (replaced trash); single-container chat input redesign; KAV fix; keyboard dismissed on media attach.
+- **Attachment UX v2** (d1ff479): image thumbnails + upload loading states — see below.
+
+## Attachment UX (composer + bubble)
+
+### Composer (`ChatInput`) states
+| State | Image | PDF |
+|-------|-------|-----|
+| Uploading | 64×64 thumbnail, dark overlay, `ActivityIndicator` centered | Chip with spinner instead of file icon + "Uploading…" label, no ✕ |
+| Ready | 64×64 thumbnail, ✕ button (top-right) | Chip with `FileTextIcon` + name + ✕ |
+
+- `pendingLocalUri` state in `usePickMedia` — set before the upload starts, cleared after; drives the thumbnail during the upload window.
+- `pickImage` / `takePhoto` now return `MediaFile & { localUri: string }` so the local file URI travels with the upload result and is stored in `attachment.localUri`.
+- `ChatUIMessage` carries `attachmentType: 'IMAGE' | 'PDF'` and `attachmentLocalUri: string` so the bubble can render the right thing after send.
+
+### Message bubble (sent)
+- **IMAGE**: 200×150 rounded thumbnail (`Image` from the local URI) rendered above the chat bubble, right-aligned.
+- **PDF**: existing pill chip (`FileTextIcon` + filename), no thumbnail.
+
+### Key files
+- `frontend/src/hooks/usePickMedia.ts` — `pendingLocalUri` state; extended return type
+- `frontend/src/screens/ai/components/ChatInput.tsx` — thumbnail + spinner UI
+- `frontend/src/screens/ai/AIChatScreen.tsx` — attachment state carries `localUri`; `renderItem` branches on `attachmentType`
+- `frontend/src/store/aiChat.store.ts` — `ChatUIMessage.attachmentType` + `attachmentLocalUri` fields
 
 ## Related
 [[Credits & Subscriptions]] · [[Notes & Media]] · [[Flashcards & Sets]] · [[Achievements]] · [[Home]] · [[Architecture Overview]] · [[Database Schema]]
