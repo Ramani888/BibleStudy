@@ -1,7 +1,7 @@
 ---
 title: Notes & Media
 tags: [feature, notes, media]
-updated: 2026-08-08
+updated: 2026-08-10
 ---
 
 # Notes & Media
@@ -17,8 +17,9 @@ One row per screen in this area. Route = the navigation route name.
 |--------|-------|-----------|---------|
 | NotesScreen | `Notes` | ProfileStack | List/search/sort/tag-filter personal notes; FAB to create; long-press to delete |
 | NoteEditorScreen | `NoteEditor` | ProfileStack | Create/edit a note (title, body, predefined tags); share as text |
-| MediaScreen | `Media` | ProfileStack | Image grid + PDF list, upload (library/camera/PDF), rename/share/delete, multi-select bulk delete, full-screen pinch-zoom image viewer |
-| MediaPDFViewerScreen | `MediaPDFViewer` | ProfileStack | Render a PDF by URL (native `react-native-pdf` on iOS, Google Docs WebView on Android) |
+| MediaScreen | `Media` | ProfileStack | Storage bar, image gallery (3-col grid, skeleton shimmer, per-image fade-in), PDF card list, upload with progress toast, rename/share/delete, multi-select bulk delete |
+| MediaImageViewer | — | Modal (in MediaScreen) | Swipeable full-screen image viewer: horizontal FlatList paginator, pinch-to-zoom + pan, counter pill, share/close buttons |
+| MediaPDFViewerScreen | `MediaPDFViewer` | ProfileStack | Render a PDF by URL — WebView on both iOS (WKWebView renders natively) and Android (Google Docs gview proxy) |
 
 Reached from `ProfileScreen` menu items ("My Notes", "My Media") and the
 Profile storage bar (taps to `Media`, or `Paywall` when over quota — see G2).
@@ -51,30 +52,41 @@ Profile storage bar (taps to `Media`, or `Paywall` when over quota — see G2).
 - Uses `edges={['top','bottom']}` + `keyboardAvoiding` (not a plain tab screen — has its own footer).
 
 ### MediaScreen (`Media`)
-- **Two tabs**: Images (`IMAGE`) / PDFs (`PDF`) — each is a separate `useMediaFiles(type)` query; tab pills with icons.
-- **Sort** icon cycles `newest → oldest → alpha` (client-side; newest = server order, oldest = reversed, alpha = name sort).
-- **Images**: 3-column `FlatList` grid, cover thumbnails. Tap → full-screen `Modal` viewer
-  with `PinchableImage` (pinch 1–4×, pan when zoomed, double-tap-reset-on-release), share + close buttons, filename caption.
-- **PDFs**: list rows (file icon, name, `size · relativeDate`, chevron). Tap → `MediaPDFViewer`.
-- **Upload FAB (+)**: for Images opens an `ActionSheet` (Photo Library / Take Photo);
-  for PDFs opens the document picker directly. Disabled + full-screen spinner overlay while `uploadMedia.isPending`.
-- **Long-press any item** → per-file `ActionSheet`: Rename / Share / Delete.
-  - **Rename**: `AppModal` with `TextInput`; edits only the name *stem* — the original
-    extension is re-appended on save, and `maxLength` is reduced by the extension length (keeps total ≤255).
-  - **Share**: `Share.share({ message: file.url })` (shares the public S3 URL).
-  - **Delete**: confirm dialog → `deleteMedia`.
-- **Selection mode** (checkbox icon in tab row): tap items to multi-select, header shows
-  "N selected" + Cancel + trash. Bulk delete via `useBulkDeleteMedia` (`Promise.allSettled`);
-  toast reports `"N deleted"` or `"N deleted, M failed"`.
-- Pull-to-refresh; per-tab `EmptyState`; `ErrorState` with retry.
+- **Single `useMediaFiles()` query** (no type filter) → split client-side into `imageFiles` / `pdfFiles` → both counts always visible.
+- **StorageBar**: animated progress fill (green < 70%, orange 70–90%, red ≥ 90%), label "X MB of Y MB used · Z%". Driven by `useStorageUsage()`.
+- **Tab pills** with count badges (e.g. "Images 12 · PDFs 3"). Active tab: primary border + primarySurface bg.
+- **Sort** icon cycles `newest → oldest → alpha` (client-side).
+- **Images tab**: 3-column `FlatList` grid, 3px gap.
+  - `SkeletonShimmer` — 9 pulsing placeholder cells (reanimated `withRepeat`) while `isLoading`.
+  - `FadeImage` — each cell shows `backgroundSecondary` placeholder, image fades in to opacity 1 on `onLoad` (reanimated `withTiming 250ms`).
+  - Tap → opens `MediaImageViewer` modal at the tapped index.
+- **PDFs tab**: card-style rows (border, `borderRadius cardRadiusSm`), 52×52 `primarySurface` icon box, name + `size · relativeDate`, chevron. 5 `SkeletonShimmer` rows while loading. Tap → `MediaPDFViewer`.
+- **Upload FAB (+)**: Images → `ActionSheet` (Photo Library / Take Photo); PDFs → document picker. FAB stays enabled during upload (non-blocking).
+- **UploadToast**: slides up from bottom (reanimated `withTiming`) when `uploadMedia.isPending`; shows real upload % progress bar via `onProgress` callback; slides away on complete. Replaces the old blocking overlay.
+- **Delete**: long-press any item → `ActionSheet` → Delete → confirm dialog → `deleteMedia`. Or enter selection mode (☑ icon) → multi-select → trash icon → `useBulkDeleteMedia`.
+- **Rename**: long-press → Rename → `AppModal`; edits name stem only, re-appends original ext, `maxLength` reduced by ext length.
+- **Share**: `Share.share({ message: file.url })` — shares the public S3 URL.
+- Pull-to-refresh; `EmptyState`; `ErrorState` + retry.
+
+### MediaImageViewer (modal component, `frontend/src/screens/profile/MediaImageViewer.tsx`)
+- Props: `visible`, `images: MediaFile[]`, `initialIndex`, `onClose`, `onShare`.
+- **Horizontal FlatList** paginated (`pagingEnabled`) — swipe left/right between images.
+- `getItemLayout` enables `initialScrollIndex` jump without measurement delay.
+- Per-page **`PinchableImage`** (pinch 1–4×, pan when zoomed; auto-resets when scale < 1.05).
+- **Counter pill** "3 / 12" — top center, dark semi-transparent bg; hidden for single image.
+- **Share** button (top-left) + **Close** button (top-right) — both 40×40 circular, dark bg.
+- **Caption** — filename, bottom of screen, semi-transparent white.
+- `GestureHandlerRootView` wraps everything for gesture interop.
 
 ### MediaPDFViewerScreen (`MediaPDFViewer`)
 - Params `{ url, name }`.
-- **iOS**: lazy-requires `react-native-pdf`, renders with cache; on error shows `ErrorState` "Could not load PDF" + retry.
-- **Android**: `WebView` → `https://docs.google.com/gview?embedded=true&url=<encoded>`.
-  An injected JS poller (`GOOGLE_DOCS_ERROR_DETECTOR`, 20 checks @1s) watches for
-  "unable to generate / no preview available / can't preview" text and posts
-  `PDF_LOAD_ERROR`; on failure shows "Preview unavailable" + **Open in browser** (`Linking.openURL`).
+- **Both platforms use `WebView`** (removed `react-native-pdf` — was never linked, caused `NativeEventEmitter` crash on iOS).
+- **iOS**: `source={{ uri: url }}` directly — `WKWebView` renders PDFs natively from a remote URL.
+- **Android**: `source={{ uri: googleDocsUrl }}` — `https://docs.google.com/gview?embedded=true&url=<encoded>`.
+  Injected JS (`GOOGLE_DOCS_ERROR_DETECTOR`, 20 checks @1s) detects Google's error page and posts `PDF_LOAD_ERROR`.
+- **onHttpError** (status ≥ 400) also triggers the error state.
+- Error state: "Preview unavailable" + **Open in browser** (`Linking.openURL(url)`) — lets user open in Safari/Chrome.
+- Loading: `ActivityIndicator` overlay on top of WebView, hidden on `onLoadEnd`.
 
 ## Data flow
 ```
@@ -85,7 +97,7 @@ NoteEditor(edit) → useUpdateNote(id)                     → notesApi.update  
 NotesScreen      → useDeleteNote()                       → notesApi.delete      → DELETE /api/v1/notes/:id
 ProfileScreen    → useNoteStats()  (derives count from ['notes'])
 
-MediaScreen      → useMediaFiles(type)  ['media', type]  → mediaApi.list        → GET    /api/v1/media?type=
+MediaScreen      → useMediaFiles()      ['media','all']  → mediaApi.list        → GET    /api/v1/media (all, split client-side)
 MediaScreen      → useUploadMedia()                      → mediaApi.upload      → POST   /api/v1/media/upload (multipart)
 MediaScreen      → useRenameMedia()                      → mediaApi.rename      → PATCH  /api/v1/media/:id
 MediaScreen      → useDeleteMedia() / useBulkDeleteMedia → mediaApi.delete      → DELETE /api/v1/media/:id
@@ -234,8 +246,7 @@ stored `mimeType`/`ext` never drift from `name`. Backend maps Prisma `P2025` (ro
   `DocumentPicker.pickSingle` (copyTo cachesDirectory, so a stable `fileCopyUri` is uploaded).
 - Cancel (`didCancel` / `isCancel`) returns silently. `errorCode === 'permission'` → toast
   telling the user to enable it in Settings. Missing `uri/type/fileName` → "could not read" toast.
-- Upload timeout is **60 s** (`mediaApi.upload`) with `onUploadProgress` reporting a % (MediaScreen
-  currently just shows an indeterminate spinner; AI chat can pass `onProgress`).
+- Upload timeout is **60 s** (`mediaApi.upload`) with `onUploadProgress` reporting a %. MediaScreen passes `onProgress: setUploadProgress` to `uploadMedia.mutateAsync` — drives the `UploadToast` progress bar. AI chat's `usePickMedia` also uses `onProgress` (drives its own state).
 
 **Media ↔ [[AI Chat]]:** `usePickMedia` exists specifically so AI chat can attach a file —
 "Choose from My Media" (lists existing `useMediaFiles()`), Photo Library, Take Photo, or Choose
@@ -254,14 +265,18 @@ and `ErrorState` + retry. Notes list uses full-screen `ErrorState`; Media uses i
 - Note tags are free-form `String[]` in the DB but the UI only offers the 7 predefined tags.
 - Android PDF preview depends on Google Docs viewer (external, requires public URL + network).
 
-## This session's additions (A–G arc)
-- **G2 (over-quota UX)**: Profile storage bar turns red, relabels to "Over storage limit —
-  Upgrade", and routes to `Paywall` when `used > limit`.
-- **#7 (no-destroy-on-downgrade)**: confirmed/annotated that shrinking `storageLimit` never
-  deletes files — the conditional UPDATE only *blocks new uploads*; existing media stays.
-- **Phase F (AI media attachments)**: `usePickMedia` + "Choose from My Media" wired into
-  [[AI Chat]], reusing the media upload path so attachments consume storage quota, and gated
-  on credits (`MIN_MEDIA_COST`).
+## This session's additions (A–G arc + post-G)
+- **G2 (over-quota UX)**: Profile storage bar turns red, relabels to "Over storage limit — Upgrade", and routes to `Paywall` when `used > limit`.
+- **#7 (no-destroy-on-downgrade)**: shrinking `storageLimit` never deletes files — conditional UPDATE only blocks new uploads.
+- **Phase F (AI media attachments)**: `usePickMedia` + "Choose from My Media" wired into [[AI Chat]].
+- **PDF viewer fix** (`64a9e77`): removed `react-native-pdf` (never linked → NativeEventEmitter crash on iOS). Both platforms now use `WebView` — iOS `WKWebView` renders PDFs natively.
+- **MediaScreen Level 3 redesign** (`00dee30`):
+  - `StorageBar` (animated, color-coded quota display)
+  - Tab count badges; single query split client-side
+  - `SkeletonShimmer` grid/list while loading; `FadeImage` per-image fade-in
+  - `UploadToast` (non-blocking, real % progress bar)
+  - PDF card rows with border + larger icon box
+  - `MediaImageViewer` — new swipeable full-screen image viewer with pinch-to-zoom + counter
 
 ## Related
 [[AI Chat]] · [[Credits & Subscriptions]] · [[Profile & Settings]] · [[Architecture Overview]] · [[Database Schema]]
