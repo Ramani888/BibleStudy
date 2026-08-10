@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { LibraryScreenProps, ProfileScreenProps } from '../../navigation/types';
+import type { LibraryScreenProps } from '../../navigation/types';
 import { useSets, useCreatePlan } from '../../hooks';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -12,12 +12,9 @@ import { Button } from '../../components/ui/Button';
 import { getErrorMessage } from '../../api';
 import { type Theme, useTheme } from '../../theme';
 
-// Hosted in both the Library stack (personal plans) and the Profile stack
-// (group plans, via CreateGroupPlan with a groupId param).
-type Props = LibraryScreenProps<'CreatePlan'> | ProfileScreenProps<'CreateGroupPlan'>;
+type Props = LibraryScreenProps<'CreatePlan'>;
 
 export function CreatePlanScreen({ navigation, route }: Props) {
-  const groupId = (route.params as { groupId?: string } | undefined)?.groupId;
   const theme = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => makeStyles(theme), [theme]);
@@ -26,7 +23,7 @@ export function CreatePlanScreen({ navigation, route }: Props) {
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [selected, setSelected] = useState<string[]>([]); // ordered setIds
+  const [selected, setSelected] = useState<string[]>([]);
 
   const toggle = (id: string) =>
     setSelected(prev => (prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]));
@@ -35,14 +32,11 @@ export function CreatePlanScreen({ navigation, route }: Props) {
 
   const handleSave = () => {
     createPlan.mutate(
-      { title: title.trim(), description: description.trim() || undefined, setIds: selected, groupId },
+      { title: title.trim(), description: description.trim() || undefined, setIds: selected },
       {
         onSuccess: plan => {
           Toast.show({ type: 'success', text1: 'Plan created' });
-          // Group plans live under the group → just go back to GroupDetail (its list refetches).
-          // Personal plans → jump straight into the new plan.
-          if (groupId) navigation.goBack();
-          else (navigation as LibraryScreenProps<'CreatePlan'>['navigation']).replace('PlanDetail', { planId: plan.id });
+          navigation.replace('PlanDetail', { planId: plan.id });
         },
         onError: e => Toast.show({ type: 'error', text1: 'Could not create plan', text2: getErrorMessage(e) }),
       },

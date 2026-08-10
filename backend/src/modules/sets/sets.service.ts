@@ -1,6 +1,5 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
-import { memberHasGroupPlanAccess } from '../../utils/planAccess';
 import { CreateSetDtoType, UpdateSetDtoType } from './sets.dto';
 import { NotFoundError } from '../../utils/errors';
 
@@ -63,10 +62,7 @@ export async function getSetById(userId: string, setId: string) {
     throw new NotFoundError('Set not found');
   }
 
-  // Owner always; otherwise allow members studying this set via a group plan (D2).
-  if (set.userId !== userId && !(await memberHasGroupPlanAccess(userId, setId))) {
-    throw new NotFoundError('Set not found');
-  }
+  if (set.userId !== userId) throw new NotFoundError('Set not found');
 
   return set;
 }

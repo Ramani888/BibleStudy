@@ -1,6 +1,5 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
-import { memberHasGroupPlanAccess } from '../../utils/planAccess';
 import {
   CreateCardDtoType,
   BulkCreateCardsDtoType,
@@ -156,15 +155,10 @@ export async function listCardsBySet(userId: string, setId: string) {
   if (!set) throw new NotFoundError('Set not found');
 
   if (set.userId !== userId) {
-    if (set.visibility === 'PRIVATE') {
-      // Allow members studying this set via a group plan (D2); otherwise hidden.
-      if (!(await memberHasGroupPlanAccess(userId, setId))) throw new NotFoundError('Set not found');
-    }
+    if (set.visibility === 'PRIVATE') throw new NotFoundError('Set not found');
     if (set.visibility === 'FRIENDS') {
-      const friendship = await prisma.friendship.findFirst({
-        where: { userId, friendId: set.userId },
-      });
-      if (!friendship && !(await memberHasGroupPlanAccess(userId, setId))) throw new NotFoundError('Set not found');
+      const friendship = await prisma.friendship.findFirst({ where: { userId, friendId: set.userId } });
+      if (!friendship) throw new NotFoundError('Set not found');
     }
     // PUBLIC sets are accessible to all authenticated users
   }

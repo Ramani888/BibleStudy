@@ -10,30 +10,11 @@ export function usePlan(id: string) {
   return useQuery({ queryKey: ['plans', id], queryFn: () => plansApi.get(id), enabled: !!id });
 }
 
-export function useGroupPlans(groupId: string) {
-  return useQuery({
-    queryKey: ['groupPlans', groupId],
-    queryFn: () => plansApi.listGroup(groupId),
-    enabled: !!groupId,
-  });
-}
-
-export function useMembersProgress(planId: string) {
-  return useQuery({
-    queryKey: ['plans', planId, 'members'],
-    queryFn: () => plansApi.membersProgress(planId),
-    enabled: !!planId,
-  });
-}
-
 export function useCreatePlan() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreatePlanPayload) => plansApi.create(payload),
-    onSuccess: (_data, payload) => {
-      qc.invalidateQueries({ queryKey: ['plans'] });
-      if (payload.groupId) qc.invalidateQueries({ queryKey: ['groupPlans', payload.groupId] });
-    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['plans'] }),
   });
 }
 
@@ -53,8 +34,7 @@ export function useToggleStep(planId: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['plans', planId] });
       qc.invalidateQueries({ queryKey: ['plans'] });
-      qc.invalidateQueries({ queryKey: ['groupPlans'] });   // group plan lists show my progress
-      qc.invalidateQueries({ queryKey: ['credits'] });      // "Finished a Plan" may grant credits
+      qc.invalidateQueries({ queryKey: ['credits'] });
       qc.invalidateQueries({ queryKey: ['achievements'] });
     },
   });

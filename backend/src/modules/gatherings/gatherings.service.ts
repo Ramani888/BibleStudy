@@ -31,12 +31,6 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
 }
 
 export async function createGathering(userId: string, dto: CreateGatheringDtoType) {
-  // Verify group membership if groupId provided
-  if (dto.groupId) {
-    const member = await prisma.groupMember.findFirst({ where: { groupId: dto.groupId, userId } });
-    if (!member) throw new ForbiddenError('Not a member of the specified group');
-  }
-
   const gathering = await prisma.$transaction(async (tx) => {
     const g = await tx.gathering.create({
       data: {
@@ -44,7 +38,6 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
         description:  dto.description ?? null,
         date:         new Date(dto.date),
         hostId:       userId,
-        groupId:      dto.groupId ?? null,
         locationName: dto.locationName ?? null,
         locationLat:  dto.locationLat ?? null,
         locationLng:  dto.locationLng ?? null,
@@ -52,7 +45,6 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
         visibility:   dto.visibility ?? 'FRIENDS',
       },
     });
-    // Auto-RSVP host as GOING
     await tx.gatheringParticipant.create({
       data: { gatheringId: g.id, userId, status: 'GOING' },
     });
@@ -61,24 +53,6 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
 
   await logActivity(userId, 'JOINED_GATHERING', gathering.id);
 
-  // Notify group members if associated with a group
-  if (dto.groupId) {
-    const members = await prisma.groupMember.findMany({
-      where: { groupId: dto.groupId, userId: { not: userId } },
-      select: { userId: true },
-    });
-    const dateStr = new Date(dto.date).toLocaleDateString();
-    await Promise.allSettled(
-      members.map(m =>
-        sendPushToUser(m.userId, 'New Gathering', `${dto.title} — ${dateStr}`, {
-          type: 'gathering',
-          id: gathering.id,
-        })
-      )
-    );
-  }
-
-  // Re-fetch with full relations so the frontend gets host, participants, _count
   return prisma.gathering.findUniqueOrThrow({
     where: { id: gathering.id },
     include: {
@@ -91,7 +65,7 @@ export async function createGathering(userId: string, dto: CreateGatheringDtoTyp
 
 export async function listGatherings(
   userId: string,
-  params: { groupId?: string; upcoming?: boolean; page?: number; limit?: number }
+  params: { upcoming?: boolean; page?: number; limit?: number }
 ) {
   const page = params.page ?? 1;
   const limit = Math.min(params.limit ?? 20, 50);
@@ -102,29 +76,16 @@ export async function listGatherings(
       { hostId: userId },
       { participants: { some: { userId } } },
       { visibility: 'PUBLIC' },
-      {
-        visibility: 'FRIENDS',
-        host: {
-          friendOf: { some: { userId } },
-        },
-      },
+      { visibility: 'FRIENDS', host: { friendOf: { some: { userId } } } },
     ],
   };
 
-  if (params.groupId) {
-    Object.assign(where, { groupId: params.groupId });
-  }
-  if (params.upcoming) {
-    Object.assign(where, { date: { gte: new Date() } });
-  }
+  if (params.upcoming) Object.assign(where, { date: { gte: new Date() } });
 
   const [gatherings, total] = await Promise.all([
     prisma.gathering.findMany({
       where,
-      include: {
-        host: { select: hostSelect },
-        _count: { select: { participants: true } },
-      },
+      include: { host: { select: hostSelect }, _count: { select: { participants: true } } },
       orderBy: { date: 'asc' },
       skip,
       take: limit,
@@ -149,16 +110,10 @@ export async function getNearby(userId: string, lat: number, lng: number, radius
         { hostId: userId },
         { participants: { some: { userId } } },
         { visibility: 'PUBLIC' },
-        {
-          visibility: 'FRIENDS',
-          host: { friendOf: { some: { userId } } },
-        },
+        { visibility: 'FRIENDS', host: { friendOf: { some: { userId } } } },
       ],
     },
-    include: {
-      host: { select: hostSelect },
-      _count: { select: { participants: true } },
-    },
+    include: { host: { select: hostSelect }, _count: { select: { participants: true } } },
     orderBy: { date: 'asc' },
   });
 
@@ -171,26 +126,17 @@ export async function getNearby(userId: string, lat: number, lng: number, radius
 export async function getGathering(userId: string, gatheringId: string) {
   const gathering = await prisma.gathering.findUnique({
     where: { id: gatheringId },
-    include: {
-      host: { select: hostSelect },
-      ...participantInclude,
-      _count: { select: { participants: true } },
-    },
+    include: { host: { select: hostSelect }, ...participantInclude, _count: { select: { participants: true } } },
   });
 
   if (!gathering) throw new NotFoundError('Gathering not found');
 
-  // Visibility check — only allow access if user is host, participant, or visibility permits
   const isHost = gathering.hostId === userId;
   const isParticipant = gathering.participants.some(p => p.userId === userId);
   if (!isHost && !isParticipant) {
-    if (gathering.visibility === 'PRIVATE') {
-      throw new NotFoundError('Gathering not found');
-    }
+    if (gathering.visibility === 'PRIVATE') throw new NotFoundError('Gathering not found');
     if (gathering.visibility === 'FRIENDS') {
-      const friendship = await prisma.friendship.findFirst({
-        where: { userId, friendId: gathering.hostId },
-      });
+      const friendship = await prisma.friendship.findFirst({ where: { userId, friendId: gathering.hostId } });
       if (!friendship) throw new NotFoundError('Gathering not found');
     }
   }
@@ -214,11 +160,7 @@ export async function updateGathering(userId: string, gatheringId: string, dto: 
       ...(dto.meetingLink  !== undefined && { meetingLink:  dto.meetingLink }),
       ...(dto.visibility   !== undefined && { visibility:   dto.visibility }),
     },
-    include: {
-      host: { select: hostSelect },
-      ...participantInclude,
-      _count: { select: { participants: true } },
-    },
+    include: { host: { select: hostSelect }, ...participantInclude, _count: { select: { participants: true } } },
   });
 }
 
@@ -226,7 +168,6 @@ export async function cancelGathering(userId: string, gatheringId: string) {
   const gathering = await prisma.gathering.findFirst({ where: { id: gatheringId, hostId: userId } });
   if (!gathering) throw new NotFoundError('Gathering not found or not authorized');
 
-  // Fetch participants before deleting so we can notify them
   const participants = await prisma.gatheringParticipant.findMany({
     where: { gatheringId, userId: { not: userId } },
     select: { userId: true },
@@ -234,7 +175,6 @@ export async function cancelGathering(userId: string, gatheringId: string) {
 
   await prisma.gathering.delete({ where: { id: gatheringId } });
 
-  // Notify all participants that the gathering was cancelled
   await Promise.allSettled(
     participants.map(p =>
       sendPushToUser(p.userId, 'Gathering Cancelled', `"${gathering.title}" has been cancelled by the host`)
@@ -258,8 +198,6 @@ export async function rsvp(userId: string, gatheringId: string, dto: RsvpDtoType
 
   if (!existing) {
     await logActivity(userId, 'JOINED_GATHERING', gatheringId);
-
-    // Notify host
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
     await sendPushToUser(gathering.hostId, 'New RSVP', `${user?.name} is going to ${gathering.title}`, {
       type: 'gathering_rsvp',
@@ -283,9 +221,7 @@ export async function leaveGathering(userId: string, gatheringId: string) {
 }
 
 export async function listParticipants(userId: string, gatheringId: string) {
-  // Reuse getGathering to validate visibility access
   await getGathering(userId, gatheringId);
-
   return prisma.gatheringParticipant.findMany({
     where: { gatheringId },
     include: { user: { select: hostSelect } },

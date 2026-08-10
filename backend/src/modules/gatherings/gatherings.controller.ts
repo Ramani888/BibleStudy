@@ -11,11 +11,10 @@ export async function createGathering(req: Request, res: Response): Promise<void
 
 export async function listGatherings(req: Request, res: Response): Promise<void> {
   try {
-    const groupId = req.query.groupId as string | undefined;
     const upcoming = req.query.upcoming === 'true';
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
-    const result = await gatheringsService.listGatherings(req.user!.id, { groupId, upcoming, page, limit });
+    const result = await gatheringsService.listGatherings(req.user!.id, { upcoming, page, limit });
     sendSuccess(res, result, 'Gatherings retrieved successfully');
   } catch (error) { handleControllerError(res, error, 'Failed to list gatherings'); }
 }

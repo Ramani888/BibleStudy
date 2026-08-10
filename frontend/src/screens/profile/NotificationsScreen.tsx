@@ -34,7 +34,6 @@ function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
     case 'friend_request':  return UserPlusIcon;
     case 'friend_accepted': return UsersIcon;
-    case 'group':           return UsersIcon;
     case 'gathering':       return CalendarIcon;
     case 'gathering_rsvp':  return ClockIcon;
     case 'achievement':     return TrophyIcon;
