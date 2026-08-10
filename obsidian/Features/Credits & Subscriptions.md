@@ -1,7 +1,7 @@
 ---
 title: Credits & Subscriptions
 tags: [feature, credits, subscriptions]
-updated: 2026-08-08
+updated: 2026-08-10
 ---
 
 # Credits & Subscriptions
@@ -63,7 +63,7 @@ Paywall is reachable from three places: Profile → "Upgrade to Premium" / "Mana
   - `getTransactions(userId, page, limit)` — desc by `createdAt` + total/pages pagination.
   - `getStats(userId, period, fromDate?, toDate?, interval?)` — pulls `REWARD`+`USAGE` rows in range, buckets by hour/day/week/month/quarter (`resolveInterval` picks the default granularity per period). `agg()` sums `REWARD` into `earned` and `abs(USAGE)` into `used`.
   - `getStreak(userId)` — builds a `Set` of local-date strings from all `REWARD` rows; current streak = consecutive days back from today; also computes `longestStreak` across history. Returns `{0,0}` if no rewards.
-  - `claimDailyLogin(userId)` — rejects with `ConflictError` if any `REWARD` already exists today; else atomically `increment: 1` balance + creates a `REWARD` tx "Daily login reward"; fires `triggerAchievementCheck` (streak milestones).
+  - `claimDailyLogin(userId)` — wrapped in a **Serializable** `$transaction` to prevent concurrent claims both passing the "does a REWARD exist today?" check. Also filters out `ACHIEVEMENT_REWARD` description rows when checking for today's reward (so achievement credit grants don't block the daily login). On success: atomically `increment: 1` balance + creates a `REWARD` tx; fires `triggerAchievementCheck` (streak milestones).
 - **Stats validation (controller):** period ∈ `today|week|month|year|custom`; interval ∈ `1h|2h|6h|day|week|month|quarter`; custom requires valid ISO `from`/`to`, `to ≥ from`, and ≤ `MAX_CUSTOM_DAYS` (90); hour intervals only for today/custom; quarter only for year/custom.
 
 ### Module `backend/src/modules/subscriptions/`
@@ -104,7 +104,9 @@ Paywall is reachable from three places: Profile → "Upgrade to Premium" / "Mana
 
 ## Edge cases, rules & gotchas
 
-- **Credit economy:** earn +1/day (`REWARD`, one claim per calendar day, `ConflictError` otherwise); spend variable per AI action (`USAGE`, capped at balance so it never goes negative); purchases add credits (`PURCHASE`). New users start at **3 credits** (`@default(3)`).
+- **Credit economy:** earn +1/day (`REWARD`, one claim per calendar day, `ConflictError` otherwise); spend variable per AI action (`USAGE`); purchases add credits (`PURCHASE`). New users start at **3 credits** (`@default(3)`).
+- **Concurrent daily-login protection:** `claimDailyLogin` runs inside a Serializable transaction — two simultaneous requests can't both pass the "no REWARD today" check. Achievement reward transactions (description contains "ACHIEVEMENT_REWARD") are excluded from the daily-login duplicate check so they don't accidentally block the daily reward.
+- **Atomic credit spend (AI):** `ai.service` uses a single SQL `UPDATE … WHERE creditBalance >= cost RETURNING id` — eliminates the old TOCTOU race where a stale read could allow overdraft.
 - **Idempotent grants:** credits are granted **only on a new `lastTransactionId`**. Verify-on-open / restore / repeated verify calls re-set plan/expiry/storage but do **not** re-grant credits. Sandbox renewals (monthly ≈5 min, annual ≈1 hr) are the way to confirm this.
 - **Annual pays 12× upfront** (E decision #2): annual grants base×12 credits on purchase, not monthly drips.
 - **Apple prod→sandbox fallback:** always hit prod `verifyReceipt` first; status `21007` = sandbox receipt → retry sandbox. Errors: `IAP_NOT_CONFIGURED` (503, missing shared secret), `RECEIPT_INVALID` (400), `RECEIPT_NO_MATCH` (400), `UNKNOWN_PRODUCT` (400).
