@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Dimensions,
   FlatList,
   Image,
-  Modal,
   Pressable,
   RefreshControl,
   Share,
@@ -16,13 +15,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
-import { GestureDetector, GestureHandlerRootView, Gesture } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { MediaFile, MediaFileType } from '../../types';
+import type { MediaFile, MediaFileType, StorageUsage } from '../../types';
 import {
-  useMediaFiles, useUploadMedia, useDeleteMedia,
+  useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia,
   useRenameMedia, useBulkDeleteMedia, useConfirmDialog,
 } from '../../hooks';
 import { Typography } from '../../components/ui/Typography';
@@ -35,44 +39,36 @@ import { AppModal } from '../../components/feedback/Modal';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import {
-  AlbumsIcon,
-  ArrowUpIcon,
-  CameraIcon,
-  CheckCircleIcon,
-  ChevronRightIcon,
-  CloseIcon,
-  FileTextIcon,
-  PencilIcon,
-  PlusIcon,
-  ShareIcon,
-  SortIcon,
-  TrashIcon,
-  ClockIcon,
+  AlbumsIcon, CameraIcon, CheckCircleIcon, ChevronRightIcon,
+  CloseIcon, FileTextIcon, PencilIcon, PlusIcon, ShareIcon,
+  SortIcon, TrashIcon, ClockIcon, ArrowUpIcon,
   type IconComponent,
 } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
 import { fontSizes, fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
+import { MediaImageViewer } from './MediaImageViewer';
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const CELL_GAP = 2;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CELL_GAP = 3;
 const CELL_SIZE = (SCREEN_WIDTH - CELL_GAP * 2) / 3;
 const FAB_SIZE = 56;
+const SKELETON_IMAGE_COUNT = 9;
+const SKELETON_PDF_COUNT = 5;
 
 type SortOrder = 'newest' | 'oldest' | 'alpha';
-
 const SORT_ICONS: Record<SortOrder, IconComponent> = {
-  newest: ClockIcon,
-  oldest: ArrowUpIcon,
-  alpha:  SortIcon,
+  newest: ClockIcon, oldest: ArrowUpIcon, alpha: SortIcon,
 };
 
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / 1048576).toFixed(1)} MB`;
+// ─── Helpers ────────────────────────────────────────────────────────────────
+
+function fmtBytes(n: number): string {
+  if (n < 1048576) return `${(n / 1024).toFixed(0)} KB`;
+  const mb = n / 1048576;
+  return mb >= 1000 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
 }
 
-function formatRelativeDate(iso: string): string {
+function fmtDate(iso: string): string {
   const diff = Date.now() - new Date(iso).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return 'just now';
@@ -80,98 +76,199 @@ function formatRelativeDate(iso: string): string {
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
+  return days < 7 ? `${days}d ago` : new Date(iso).toLocaleDateString();
 }
 
-function PinchableImage({ url }: { url: string }) {
-  const scale = useSharedValue(1);
-  const savedScale = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const translateY = useSharedValue(0);
-  const savedTranslateX = useSharedValue(0);
-  const savedTranslateY = useSharedValue(0);
+// ─── Skeleton ───────────────────────────────────────────────────────────────
 
-  const pinch = Gesture.Pinch()
-    .onUpdate((e) => { scale.value = Math.max(1, Math.min(savedScale.value * e.scale, 4)); })
-    .onEnd(() => {
-      savedScale.value = scale.value;
-      if (scale.value < 1.05) {
-        scale.value = withTiming(1);
-        translateX.value = withTiming(0);
-        translateY.value = withTiming(0);
-        savedScale.value = 1;
-        savedTranslateX.value = 0;
-        savedTranslateY.value = 0;
-      }
-    });
+function SkeletonShimmer({ style }: { style: object }) {
+  const { colors } = useTheme();
+  const opacity = useSharedValue(1);
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(withTiming(0.3, { duration: 650 }), withTiming(1, { duration: 650 })),
+      -1,
+    );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return <Animated.View style={[style, animStyle, { backgroundColor: colors.backgroundSecondary }]} />;
+}
 
-  const pan = Gesture.Pan()
-    .onUpdate((e) => {
-      if (scale.value <= 1) return;
-      translateX.value = savedTranslateX.value + e.translationX;
-      translateY.value = savedTranslateY.value + e.translationY;
-    })
-    .onEnd(() => {
-      savedTranslateX.value = translateX.value;
-      savedTranslateY.value = translateY.value;
-    });
-
-  const animStyle = useAnimatedStyle(() => ({
-    transform: [
-      { scale: scale.value },
-      { translateX: translateX.value },
-      { translateY: translateY.value },
-    ],
-  }));
-
+function SkeletonImageGrid() {
   return (
-    <GestureDetector gesture={Gesture.Simultaneous(pinch, pan)}>
-      <Animated.View style={[StyleSheet.absoluteFill, animStyle]}>
-        <Image source={{ uri: url }} style={s.viewerImage} resizeMode="contain" />
-      </Animated.View>
-    </GestureDetector>
+    <View style={sk.imageGrid}>
+      {Array.from({ length: SKELETON_IMAGE_COUNT }).map((_, i) => (
+        <SkeletonShimmer key={i} style={sk.imageCell} />
+      ))}
+    </View>
   );
 }
+
+function SkeletonPDFList() {
+  return (
+    <View style={sk.pdfList}>
+      {Array.from({ length: SKELETON_PDF_COUNT }).map((_, i) => (
+        <SkeletonShimmer key={i} style={sk.pdfRow} />
+      ))}
+    </View>
+  );
+}
+
+const sk = StyleSheet.create({
+  imageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: CELL_GAP, paddingTop: CELL_GAP },
+  imageCell: { width: CELL_SIZE, height: CELL_SIZE, borderRadius: 2 },
+  pdfList:   { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[2], gap: spacing[3] },
+  pdfRow:    { height: 72, borderRadius: layout.cardRadiusSm },
+});
+
+// ─── FadeImage ──────────────────────────────────────────────────────────────
+
+const AnimatedImage = Animated.createAnimatedComponent(Image);
+
+function FadeImage({ uri, style }: { uri: string; style: object }) {
+  const { colors } = useTheme();
+  const opacity = useSharedValue(0);
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <View style={[style, { backgroundColor: colors.backgroundSecondary }]}>
+      <AnimatedImage
+        source={{ uri }}
+        style={[StyleSheet.absoluteFill, animStyle]}
+        resizeMode="cover"
+        onLoad={() => { opacity.value = withTiming(1, { duration: 250 }); }}
+      />
+    </View>
+  );
+}
+
+// ─── StorageBar ─────────────────────────────────────────────────────────────
+
+function StorageBar({ used, limit, percent }: StorageUsage) {
+  const { colors } = useTheme();
+  const barColor = percent >= 90 ? colors.error : percent >= 70 ? colors.warning : colors.primary;
+  const anim = useSharedValue(0);
+  useEffect(() => {
+    anim.value = withTiming(percent / 100, { duration: 700 });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [percent]);
+  const barStyle = useAnimatedStyle(() => ({
+    width: `${anim.value * 100}%` as `${number}%`,
+    backgroundColor: barColor,
+  }));
+  return (
+    <View style={sbStyles.wrap}>
+      <View style={[sbStyles.track, { backgroundColor: colors.backgroundSecondary }]}>
+        <Animated.View style={[sbStyles.fill, barStyle]} />
+      </View>
+      <Typography preset="caption" color={colors.textSecondary}>
+        {fmtBytes(used)} of {fmtBytes(limit)} used · {percent}%
+      </Typography>
+    </View>
+  );
+}
+
+const sbStyles = StyleSheet.create({
+  wrap:  { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[3], gap: spacing[1.5] },
+  track: { height: 4, borderRadius: 2, overflow: 'hidden' },
+  fill:  { height: '100%', borderRadius: 2 },
+});
+
+// ─── UploadToast ────────────────────────────────────────────────────────────
+
+function UploadToast({ visible, progress, filename }: { visible: boolean; progress: number; filename: string }) {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const translateY = useSharedValue(100);
+  useEffect(() => {
+    translateY.value = withTiming(visible ? 0 : 100, { duration: 220 });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
+  return (
+    <Animated.View style={[
+      utStyles.container,
+      { backgroundColor: colors.background, borderColor: colors.border, bottom: insets.bottom + spacing[2] },
+      animStyle,
+    ]}>
+      <ActivityIndicator size="small" color={colors.primary} />
+      <View style={utStyles.info}>
+        <Typography preset="caption" numberOfLines={1} color={colors.textPrimary}>
+          {filename ? `Uploading ${filename}` : 'Uploading…'}
+        </Typography>
+        <View style={[utStyles.track, { backgroundColor: colors.backgroundSecondary }]}>
+          <View style={[utStyles.bar, { width: `${progress}%`, backgroundColor: colors.primary }]} />
+        </View>
+      </View>
+      <Typography preset="caption" color={colors.primary} style={utStyles.pct}>
+        {progress}%
+      </Typography>
+    </Animated.View>
+  );
+}
+
+const utStyles = StyleSheet.create({
+  container: {
+    position: 'absolute', left: spacing[4], right: spacing[4],
+    flexDirection: 'row', alignItems: 'center', gap: spacing[3],
+    borderWidth: 1, borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing[4], paddingVertical: spacing[3],
+    ...shadows.md,
+  },
+  info:  { flex: 1, gap: spacing[1] },
+  track: { height: 3, borderRadius: 2, overflow: 'hidden' },
+  bar:   { height: '100%', borderRadius: 2 },
+  pct:   { minWidth: 32, textAlign: 'right', fontWeight: fontWeights.semiBold },
+});
+
+// ─── Main Screen ─────────────────────────────────────────────────────────────
 
 type Props = ProfileScreenProps<'Media'>;
 
 export function MediaScreen({ navigation }: Props) {
   const { colors } = useTheme();
-  const styles = makeStyles(colors);
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<MediaFileType>('IMAGE');
-  const [viewerImage, setViewerImage] = useState<MediaFile | null>(null);
-  const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
+  const [activeTab, setActiveTab]         = useState<MediaFileType>('IMAGE');
+  const [sortOrder, setSortOrder]         = useState<SortOrder>('newest');
   const [selectionMode, setSelectionMode] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
-  const [pickSheetVisible, setPickSheetVisible] = useState(false);
-  const [actionSheetFile, setActionSheetFile] = useState<MediaFile | null>(null);
+  const [selectedIds, setSelectedIds]     = useState<Set<string>>(new Set());
+  const [viewerVisible, setViewerVisible] = useState(false);
+  const [viewerIndex, setViewerIndex]     = useState(0);
+  const [pickSheetVisible, setPickSheetVisible]   = useState(false);
+  const [actionSheetFile, setActionSheetFile]     = useState<MediaFile | null>(null);
+  const [uploadProgress, setUploadProgress]       = useState(0);
+  const [uploadFilename, setUploadFilename]       = useState('');
   const [renameState, setRenameState] = useState<{ visible: boolean; file: MediaFile | null; value: string }>({
     visible: false, file: null, value: '',
   });
 
-  const { data: files = [], isLoading, isFetching, error, refetch } = useMediaFiles(activeTab);
-  const uploadMedia = useUploadMedia();
-  const deleteMedia = useDeleteMedia();
-  const renameMedia = useRenameMedia();
+  const { data: allFiles = [], isLoading, isFetching, error, refetch } = useMediaFiles();
+  const { data: storage } = useStorageUsage();
+  const uploadMedia    = useUploadMedia();
+  const deleteMedia    = useDeleteMedia();
+  const renameMedia    = useRenameMedia();
   const bulkDeleteMedia = useBulkDeleteMedia();
   const { show: showConfirm, dialogProps } = useConfirmDialog();
 
+  const imageFiles = useMemo(() => allFiles.filter(f => f.type === 'IMAGE'), [allFiles]);
+  const pdfFiles   = useMemo(() => allFiles.filter(f => f.type === 'PDF'),   [allFiles]);
+  const activeFiles = activeTab === 'IMAGE' ? imageFiles : pdfFiles;
+
   const sortedFiles = useMemo(() => {
-    if (sortOrder === 'newest') return files;
-    const arr = [...files];
+    if (sortOrder === 'newest') return activeFiles;
+    const arr = [...activeFiles];
     if (sortOrder === 'oldest') return arr.reverse();
     return arr.sort((a, b) => a.name.localeCompare(b.name));
-  }, [files, sortOrder]);
+  }, [activeFiles, sortOrder]);
 
-  const SortIcon_ = SORT_ICONS[sortOrder];
+  const SortIconComp = SORT_ICONS[sortOrder];
   const cycleSortOrder = useCallback(() =>
     setSortOrder(s => s === 'newest' ? 'oldest' : s === 'oldest' ? 'alpha' : 'newest'), []);
 
   const exitSelectionMode = useCallback(() => {
-    setSelectionMode(false);
-    setSelectedIds(new Set());
+    setSelectionMode(false); setSelectedIds(new Set());
   }, []);
 
   const handleToggleSelect = useCallback((id: string) => {
@@ -186,8 +283,7 @@ export function MediaScreen({ navigation }: Props) {
     showConfirm({
       title: 'Delete Selected',
       message: `Delete ${selectedIds.size} file(s)? This cannot be undone.`,
-      confirmLabel: 'Delete',
-      variant: 'danger',
+      confirmLabel: 'Delete', variant: 'danger',
       onConfirm: async () => {
         try {
           const results = await bulkDeleteMedia.mutateAsync([...selectedIds]);
@@ -213,74 +309,71 @@ export function MediaScreen({ navigation }: Props) {
     setActionSheetFile(file);
   }, [selectionMode]);
 
-  const handlePickImage = useCallback(async () => {
+  const doUpload = useCallback(async (fd: FormData, name: string) => {
+    setUploadFilename(name);
+    setUploadProgress(0);
     try {
-      const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
-      if (result.didCancel) return;
-      if (result.errorCode === 'permission') {
-        Toast.show({ type: 'error', text1: 'Photo library permission denied. Please enable it in Settings.' });
-        return;
-      }
-      if (!result.assets?.[0]) return;
-      const asset = result.assets[0];
-      if (!asset.uri || !asset.type || !asset.fileName) {
-        Toast.show({ type: 'error', text1: 'Could not read image — try a different photo' });
-        return;
-      }
-      const fd = new FormData();
-      fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
-      await uploadMedia.mutateAsync({ formData: fd });
-      Toast.show({ type: 'success', text1: 'Image uploaded' });
+      await uploadMedia.mutateAsync({ formData: fd, onProgress: setUploadProgress });
+      Toast.show({ type: 'success', text1: `${name} uploaded` });
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
   }, [uploadMedia]);
 
-  const handlePickFromCamera = useCallback(async () => {
-    try {
-      const result = await launchCamera({ mediaType: 'photo', quality: 1 });
-      if (result.didCancel) return;
-      if (result.errorCode === 'permission') {
-        Toast.show({ type: 'error', text1: 'Camera permission denied. Please enable it in Settings.' });
-        return;
-      }
-      if (!result.assets?.[0]) return;
-      const asset = result.assets[0];
-      if (!asset.uri || !asset.type || !asset.fileName) {
-        Toast.show({ type: 'error', text1: 'Could not capture photo' });
-        return;
-      }
-      const fd = new FormData();
-      fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
-      await uploadMedia.mutateAsync({ formData: fd });
-      Toast.show({ type: 'success', text1: 'Photo uploaded' });
-    } catch (e) {
-      Toast.show({ type: 'error', text1: getErrorMessage(e) });
+  const handlePickImage = useCallback(async () => {
+    const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+    if (result.didCancel) return;
+    if (result.errorCode === 'permission') {
+      Toast.show({ type: 'error', text1: 'Photo library permission denied. Enable it in Settings.' });
+      return;
     }
-  }, [uploadMedia]);
+    const asset = result.assets?.[0];
+    if (!asset?.uri || !asset.type || !asset.fileName) {
+      if (asset) Toast.show({ type: 'error', text1: 'Could not read image — try a different photo' });
+      return;
+    }
+    const fd = new FormData();
+    fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
+    await doUpload(fd, asset.fileName);
+  }, [doUpload]);
+
+  const handlePickFromCamera = useCallback(async () => {
+    const result = await launchCamera({ mediaType: 'photo', quality: 1 });
+    if (result.didCancel) return;
+    if (result.errorCode === 'permission') {
+      Toast.show({ type: 'error', text1: 'Camera permission denied. Enable it in Settings.' });
+      return;
+    }
+    const asset = result.assets?.[0];
+    if (!asset?.uri || !asset.type || !asset.fileName) {
+      if (asset) Toast.show({ type: 'error', text1: 'Could not capture photo' });
+      return;
+    }
+    const fd = new FormData();
+    fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
+    await doUpload(fd, asset.fileName);
+  }, [doUpload]);
 
   const handlePickPDF = useCallback(async () => {
     try {
       const result = await DocumentPicker.pickSingle({ type: [DocumentPicker.types.pdf], copyTo: 'cachesDirectory' });
-      const uri = result.fileCopyUri ?? result.uri;
+      const uri  = result.fileCopyUri ?? result.uri;
       const name = result.name ?? 'document.pdf';
       const type = result.type ?? 'application/pdf';
       const fd = new FormData();
       fd.append('file', { uri, type, name } as unknown as Blob);
-      await uploadMedia.mutateAsync({ formData: fd });
-      Toast.show({ type: 'success', text1: 'PDF uploaded' });
+      await doUpload(fd, name);
     } catch (e) {
       if (DocumentPicker.isCancel(e)) return;
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
-  }, [uploadMedia]);
+  }, [doUpload]);
 
   const handleDelete = useCallback((file: MediaFile) => {
     showConfirm({
       title: `Delete ${file.type === 'IMAGE' ? 'Image' : 'PDF'}`,
       message: `Delete "${file.name}"? This cannot be undone.`,
-      confirmLabel: 'Delete',
-      variant: 'danger',
+      confirmLabel: 'Delete', variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteMedia.mutateAsync(file.id);
@@ -305,45 +398,45 @@ export function MediaScreen({ navigation }: Props) {
     }
   }, [renameMedia, renameState]);
 
-  const renderImageItem = useCallback(({ item }: { item: MediaFile }) => {
+  const renderImageItem = useCallback(({ item, index }: { item: MediaFile; index: number }) => {
     const isSelected = selectedIds.has(item.id);
     return (
       <Pressable
-        style={({ pressed }) => [s.imageCell, pressed && !selectionMode && { opacity: 0.8 }]}
-        onPress={() => selectionMode ? handleToggleSelect(item.id) : setViewerImage(item)}
+        style={({ pressed }) => [s.imageCell, pressed && !selectionMode && { opacity: 0.85 }]}
+        onPress={() => selectionMode ? handleToggleSelect(item.id) : (setViewerIndex(index), setViewerVisible(true))}
         onLongPress={() => handleLongPress(item)}
       >
-        <Image source={{ uri: item.url }} style={s.imageThumbnail} resizeMode="cover" />
+        <FadeImage uri={item.url} style={s.imageFill} />
         {isSelected && (
           <View style={styles.selectionOverlay}>
-            <CheckCircleIcon size={28} color={colors.textInverse} />
+            <CheckCircleIcon size={28} color="#fff" />
           </View>
         )}
       </Pressable>
     );
-  }, [selectedIds, selectionMode, handleToggleSelect, handleLongPress]);
+  }, [selectedIds, selectionMode, handleToggleSelect, handleLongPress, styles]);
 
   const renderPDFItem = useCallback(({ item }: { item: MediaFile }) => {
     const isSelected = selectedIds.has(item.id);
     return (
       <Pressable
         style={({ pressed }) => [
-          styles.pdfRow,
-          pressed && styles.pdfRowPressed,
-          isSelected && styles.pdfRowSelected,
+          styles.pdfCard,
+          pressed && styles.pdfCardPressed,
+          isSelected && styles.pdfCardSelected,
         ]}
         onPress={() => selectionMode
           ? handleToggleSelect(item.id)
           : navigation.navigate('MediaPDFViewer', { url: item.url, name: item.name })}
         onLongPress={() => handleLongPress(item)}
       >
-        <View style={styles.pdfIcon}>
-          <FileTextIcon size={28} color={colors.primary} />
+        <View style={styles.pdfIconBox}>
+          <FileTextIcon size={26} color={colors.primary} />
         </View>
         <View style={s.pdfInfo}>
           <Typography preset="label" numberOfLines={1} style={s.pdfName}>{item.name}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>
-            {formatFileSize(item.sizeBytes)} · {formatRelativeDate(item.createdAt)}
+            {fmtBytes(item.sizeBytes)} · {fmtDate(item.createdAt)}
           </Typography>
         </View>
         {isSelected
@@ -355,9 +448,11 @@ export function MediaScreen({ navigation }: Props) {
   }, [selectedIds, selectionMode, handleToggleSelect, navigation, handleLongPress, colors, styles]);
 
   return (
-    <Screen
-      header={<ScreenHeader title="My Media" onBack={() => navigation.goBack()} />}
-    >
+    <Screen header={<ScreenHeader title="My Media" onBack={() => navigation.goBack()} />}>
+
+      {/* Storage quota bar */}
+      {storage && <StorageBar {...storage} />}
+
       {/* Tab row / Selection header */}
       {selectionMode ? (
         <View style={styles.selectionHeader}>
@@ -367,38 +462,43 @@ export function MediaScreen({ navigation }: Props) {
           <Typography preset="caption" style={s.selectionCount}>
             {selectedIds.size} selected
           </Typography>
-          <Pressable
-            onPress={handleBulkDelete}
-            disabled={selectedIds.size === 0}
-            hitSlop={8}
-            style={selectedIds.size === 0 ? styles.btnDisabled : undefined}
-          >
+          <Pressable onPress={handleBulkDelete} disabled={selectedIds.size === 0} hitSlop={8}
+            style={selectedIds.size === 0 ? styles.btnDisabled : undefined}>
             <TrashIcon size={20} color={colors.error} />
           </Pressable>
         </View>
       ) : (
         <View style={styles.tabRow}>
-          {(['IMAGE', 'PDF'] as const).map(tab => (
-            <Pressable
-              key={tab}
-              style={[styles.tabPill, activeTab === tab && styles.tabPillActive]}
-              onPress={() => setActiveTab(tab)}
-            >
-              {tab === 'IMAGE'
-                ? <AlbumsIcon size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />
-                : <FileTextIcon size={16} color={activeTab === tab ? colors.primary : colors.textSecondary} />
-              }
-              <Typography
-                preset="caption"
-                color={activeTab === tab ? colors.primary : colors.textSecondary}
-                style={activeTab === tab ? s.tabLabelActive : undefined}
+          {(['IMAGE', 'PDF'] as const).map(tab => {
+            const count = tab === 'IMAGE' ? imageFiles.length : pdfFiles.length;
+            const active = activeTab === tab;
+            return (
+              <Pressable
+                key={tab}
+                style={[styles.tabPill, active && styles.tabPillActive]}
+                onPress={() => setActiveTab(tab)}
               >
-                {tab === 'IMAGE' ? 'Images' : 'PDFs'}
-              </Typography>
-            </Pressable>
-          ))}
+                {tab === 'IMAGE'
+                  ? <AlbumsIcon size={15} color={active ? colors.primary : colors.textSecondary} />
+                  : <FileTextIcon size={15} color={active ? colors.primary : colors.textSecondary} />
+                }
+                <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}
+                  style={active ? s.tabLabelActive : undefined}>
+                  {tab === 'IMAGE' ? 'Images' : 'PDFs'}
+                </Typography>
+                {!isLoading && count > 0 && (
+                  <View style={[styles.badge, active ? styles.badgeActive : styles.badgeInactive]}>
+                    <Typography preset="caption" color={active ? colors.primary : colors.textSecondary}
+                      style={s.badgeText}>
+                      {count}
+                    </Typography>
+                  </View>
+                )}
+              </Pressable>
+            );
+          })}
           <Pressable onPress={cycleSortOrder} style={s.iconBtn} hitSlop={8}>
-            <SortIcon_ size={20} color={colors.textSecondary} />
+            <SortIconComp size={20} color={colors.textSecondary} />
           </Pressable>
           <Pressable onPress={() => setSelectionMode(true)} style={s.iconBtn} hitSlop={8}>
             <CheckCircleIcon size={20} color={colors.textSecondary} />
@@ -406,60 +506,52 @@ export function MediaScreen({ navigation }: Props) {
         </View>
       )}
 
+      {/* Content */}
       <View style={s.contentArea}>
         {error ? (
-          <View style={s.list}>
-            <ErrorState message="Could not load media" onRetry={refetch} />
-          </View>
+          <ErrorState message="Could not load media" onRetry={refetch} />
         ) : activeTab === 'IMAGE' ? (
-          <FlatList
-            key="image-list"
-            data={sortedFiles}
-            keyExtractor={item => item.id}
-            renderItem={renderImageItem}
-            numColumns={3}
-            columnWrapperStyle={s.imageRow}
-            style={s.list}
-            contentContainerStyle={s.imageList}
-            refreshControl={
-              <RefreshControl
-                refreshing={isFetching && !isLoading}
-                onRefresh={refetch}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
-            ListEmptyComponent={
-              isLoading
-                ? <View style={s.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
-                : <EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />
-            }
-          />
+          isLoading ? <SkeletonImageGrid /> : (
+            <FlatList
+              key="images"
+              data={sortedFiles}
+              keyExtractor={item => item.id}
+              renderItem={renderImageItem}
+              numColumns={3}
+              columnWrapperStyle={s.imageRow}
+              style={s.list}
+              contentContainerStyle={s.imageListContent}
+              refreshControl={
+                <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch}
+                  tintColor={colors.primary} colors={[colors.primary]} />
+              }
+              ListEmptyComponent={
+                <EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />
+              }
+            />
+          )
         ) : (
-          <FlatList
-            key="pdf-list"
-            data={sortedFiles}
-            keyExtractor={item => item.id}
-            renderItem={renderPDFItem}
-            style={s.list}
-            contentContainerStyle={s.pdfList}
-            ItemSeparatorComponent={() => <View style={s.separator} />}
-            refreshControl={
-              <RefreshControl
-                refreshing={isFetching && !isLoading}
-                onRefresh={refetch}
-                tintColor={colors.primary}
-                colors={[colors.primary]}
-              />
-            }
-            ListEmptyComponent={
-              isLoading
-                ? <View style={s.loadingCenter}><ActivityIndicator size="large" color={colors.primary} /></View>
-                : <EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />
-            }
-          />
+          isLoading ? <SkeletonPDFList /> : (
+            <FlatList
+              key="pdfs"
+              data={sortedFiles}
+              keyExtractor={item => item.id}
+              renderItem={renderPDFItem}
+              style={s.list}
+              contentContainerStyle={s.pdfListContent}
+              ItemSeparatorComponent={() => <View style={s.separator} />}
+              refreshControl={
+                <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch}
+                  tintColor={colors.primary} colors={[colors.primary]} />
+              }
+              ListEmptyComponent={
+                <EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />
+              }
+            />
+          )
         )}
 
+        {/* FAB */}
         {!selectionMode && (
           <Pressable
             style={({ pressed }) => [
@@ -474,47 +566,22 @@ export function MediaScreen({ navigation }: Props) {
           </Pressable>
         )}
 
-        {uploadMedia.isPending && (
-          <Pressable style={styles.uploadOverlay} onPress={() => {}}>
-            <View style={styles.uploadSpinner}>
-              <ActivityIndicator size="large" color={colors.primary} />
-            </View>
-          </Pressable>
-        )}
+        {/* Non-blocking upload toast */}
+        <UploadToast
+          visible={uploadMedia.isPending}
+          progress={uploadProgress}
+          filename={uploadFilename}
+        />
       </View>
 
-      {/* Full-screen image viewer */}
-      <Modal
-        visible={viewerImage !== null}
-        statusBarTranslucent
-        animationType="fade"
-        onRequestClose={() => setViewerImage(null)}
-      >
-        <GestureHandlerRootView style={styles.viewer}>
-          {viewerImage && <PinchableImage url={viewerImage.url} />}
-          {viewerImage && (
-            <Pressable
-              style={({ pressed }) => [styles.viewerShareBtn, { top: insets.top + spacing[4] }, pressed && { opacity: 0.7 }]}
-              onPress={() => handleShare(viewerImage)}
-              hitSlop={12}
-            >
-              <ShareIcon size={22} color={colors.textInverse} />
-            </Pressable>
-          )}
-          <Pressable
-            style={({ pressed }) => [styles.closeBtn, { top: insets.top + spacing[4] }, pressed && { opacity: 0.7 }]}
-            onPress={() => setViewerImage(null)}
-            hitSlop={12}
-          >
-            <CloseIcon size={28} color={colors.textInverse} />
-          </Pressable>
-          {viewerImage && (
-            <View style={[s.viewerCaption, { bottom: insets.bottom + spacing[4] }]}>
-              <Typography preset="caption" color={colors.textInverse} numberOfLines={1}>{viewerImage.name}</Typography>
-            </View>
-          )}
-        </GestureHandlerRootView>
-      </Modal>
+      {/* Swipeable image viewer */}
+      <MediaImageViewer
+        visible={viewerVisible}
+        images={imageFiles}
+        initialIndex={viewerIndex}
+        onClose={() => setViewerVisible(false)}
+        onShare={handleShare}
+      />
 
       <ActionSheet
         visible={pickSheetVisible}
@@ -531,25 +598,14 @@ export function MediaScreen({ navigation }: Props) {
         title={actionSheetFile?.name}
         actions={[
           {
-            label: 'Rename',
-            icon: PencilIcon,
+            label: 'Rename', icon: PencilIcon,
             onPress: () => {
               if (!actionSheetFile) return;
-              const stem = actionSheetFile.name.replace(/\.[^.]+$/, '');
-              setRenameState({ visible: true, file: actionSheetFile, value: stem });
+              setRenameState({ visible: true, file: actionSheetFile, value: actionSheetFile.name.replace(/\.[^.]+$/, '') });
             },
           },
-          {
-            label: 'Share',
-            icon: ShareIcon,
-            onPress: () => { if (actionSheetFile) handleShare(actionSheetFile); },
-          },
-          {
-            label: 'Delete',
-            icon: TrashIcon,
-            destructive: true,
-            onPress: () => { if (actionSheetFile) handleDelete(actionSheetFile); },
-          },
+          { label: 'Share', icon: ShareIcon, onPress: () => { if (actionSheetFile) handleShare(actionSheetFile); } },
+          { label: 'Delete', icon: TrashIcon, destructive: true, onPress: () => { if (actionSheetFile) handleDelete(actionSheetFile); } },
         ]}
         onClose={() => setActionSheetFile(null)}
       />
@@ -563,22 +619,17 @@ export function MediaScreen({ navigation }: Props) {
           value={renameState.value}
           onChangeText={v => setRenameState(st => ({ ...st, value: v }))}
           style={styles.renameInput}
-          autoFocus
-          selectTextOnFocus
-          returnKeyType="done"
+          autoFocus selectTextOnFocus returnKeyType="done"
           onSubmitEditing={handleRenameConfirm}
           maxLength={255 - (renameState.file?.name.match(/\.[^.]+$/)?.[0]?.length ?? 0)}
           placeholder="File name"
           placeholderTextColor={colors.textSecondary}
         />
-        <View style={styles.gap3} />
-        <Button
-          label="Save"
-          onPress={handleRenameConfirm}
+        <View style={s.gap3} />
+        <Button label="Save" onPress={handleRenameConfirm}
           loading={renameMedia.isPending}
-          disabled={!renameState.value.trim() || renameMedia.isPending}
-        />
-        <View style={styles.gap2} />
+          disabled={!renameState.value.trim() || renameMedia.isPending} />
+        <View style={s.gap2} />
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />
@@ -586,124 +637,86 @@ export function MediaScreen({ navigation }: Props) {
   );
 }
 
-// Static layout (pure geometry, no color tokens)
+// ─── Static styles ───────────────────────────────────────────────────────────
+
 const s = StyleSheet.create({
-  contentArea: { flex: 1 },
-  list: { flex: 1 },
-  loadingCenter: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing[16] },
-  imageList: { paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1 },
-  imageRow: { gap: CELL_GAP },
-  imageCell: { width: CELL_SIZE, height: CELL_SIZE },
-  imageThumbnail: { width: '100%', height: '100%' },
-  pdfList: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1 },
-  separator: { height: spacing[3] },
-  pdfInfo: { flex: 1, gap: spacing[1] },
-  pdfName: { fontWeight: fontWeights.medium },
-  selectionCount: { fontWeight: fontWeights.semiBold },
-  tabLabelActive: { fontWeight: fontWeights.semiBold },
-  iconBtn: { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  viewerImage: { width: SCREEN_WIDTH, height: SCREEN_HEIGHT },
-  viewerCaption: { position: 'absolute', left: spacing[4], right: spacing[4], alignItems: 'center' },
+  contentArea:      { flex: 1 },
+  list:             { flex: 1 },
+  imageListContent: { paddingBottom: FAB_SIZE + spacing[12], flexGrow: 1, paddingTop: CELL_GAP },
+  imageRow:         { gap: CELL_GAP },
+  imageCell:        { width: CELL_SIZE, height: CELL_SIZE },
+  imageFill:        { width: '100%', height: '100%' },
+  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[12], flexGrow: 1 },
+  separator:        { height: spacing[2] },
+  pdfInfo:          { flex: 1, gap: spacing[0.5] },
+  pdfName:          { fontWeight: fontWeights.medium },
+  selectionCount:   { fontWeight: fontWeights.semiBold },
+  tabLabelActive:   { fontWeight: fontWeights.semiBold },
+  badgeText:        { fontSize: 10, fontWeight: fontWeights.semiBold },
+  iconBtn:          { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
+  gap3:             { height: spacing[3] },
+  gap2:             { height: spacing[2] },
 });
 
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
     selectionHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      marginHorizontal: layout.screenPaddingH,
-      marginTop: spacing[3],
-      marginBottom: spacing[3],
-      height: 40,
+      flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+      marginHorizontal: layout.screenPaddingH, marginVertical: spacing[3], height: 40,
     },
     tabRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
-      marginHorizontal: layout.screenPaddingH,
-      marginTop: spacing[3],
-      marginBottom: spacing[3],
+      flexDirection: 'row', alignItems: 'center', gap: spacing[2],
+      marginHorizontal: layout.screenPaddingH, marginBottom: spacing[3],
     },
     tabPill: {
-      flexGrow: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: spacing[2],
-      paddingVertical: spacing[2],
-      borderRadius: spacing[2.5],
-      backgroundColor: colors.background,
-      borderWidth: 1,
-      borderColor: colors.border,
+      flexGrow: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+      gap: spacing[1.5], paddingVertical: spacing[2.5],
+      borderRadius: spacing[2.5], borderWidth: 1,
+      borderColor: colors.border, backgroundColor: colors.background,
     },
     tabPillActive: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
-    pdfRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[3],
+    badge: {
+      minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: spacing[1],
+      alignItems: 'center', justifyContent: 'center',
+    },
+    badgeActive:   { backgroundColor: colors.primarySurface, borderWidth: 1, borderColor: colors.primaryLight },
+    badgeInactive: { backgroundColor: colors.backgroundSecondary },
+
+    pdfCard: {
+      flexDirection: 'row', alignItems: 'center', gap: spacing[3],
       backgroundColor: colors.background,
       borderRadius: layout.cardRadiusSm,
+      borderWidth: 1, borderColor: colors.border,
       padding: spacing[4],
     },
-    pdfRowPressed: { opacity: 0.7 },
-    pdfRowSelected: { borderWidth: 1, borderColor: colors.primary, backgroundColor: colors.primarySurface },
-    pdfIcon: {
-      width: 44, height: 44, borderRadius: spacing[2.5],
+    pdfCardPressed:  { opacity: 0.7 },
+    pdfCardSelected: { borderColor: colors.primary, backgroundColor: colors.primarySurface },
+    pdfIconBox: {
+      width: 52, height: 52, borderRadius: layout.cardRadiusSm,
       backgroundColor: colors.primarySurface,
       alignItems: 'center', justifyContent: 'center',
     },
-    uploadOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      backgroundColor: colors.overlay,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
+
     selectionOverlay: {
       ...StyleSheet.absoluteFillObject,
-      backgroundColor: colors.overlay,
-      alignItems: 'center',
-      justifyContent: 'center',
-    },
-    viewer: { flex: 1, backgroundColor: colors.shadow },
-    viewerShareBtn: {
-      position: 'absolute',
-      left: spacing[4],
-      width: 40, height: 40, borderRadius: layout.pillRadius,
-      backgroundColor: colors.overlay,
-      alignItems: 'center', justifyContent: 'center',
-    },
-    closeBtn: {
-      position: 'absolute',
-      right: spacing[4],
-      width: 40, height: 40, borderRadius: layout.pillRadius,
       backgroundColor: colors.overlay,
       alignItems: 'center', justifyContent: 'center',
     },
     fab: {
-      position: 'absolute',
-      bottom: spacing[8],
-      right: layout.screenPaddingH,
-      width: FAB_SIZE, height: FAB_SIZE,
-      borderRadius: FAB_SIZE / 2,
+      position: 'absolute', bottom: spacing[8], right: layout.screenPaddingH,
+      width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,
       backgroundColor: colors.primary,
       alignItems: 'center', justifyContent: 'center',
       ...shadows.lg,
     },
-    fabPressed: { opacity: 0.85 },
+    fabPressed:  { opacity: 0.85 },
     fabDisabled: { opacity: 0.5 },
     btnDisabled: { opacity: 0.4 },
-    gap3: { height: spacing[3] },
-    gap2: { height: spacing[2] },
-    uploadSpinner: { backgroundColor: colors.background, borderRadius: layout.cardRadius, padding: spacing[6] },
     renameInput: {
-      borderWidth: 1,
-      borderColor: colors.border,
+      borderWidth: 1, borderColor: colors.border,
       borderRadius: spacing[2.5],
-      paddingHorizontal: spacing[4],
-      paddingVertical: spacing[3],
-      fontSize: fontSizes.md,
-      color: colors.textPrimary,
+      paddingHorizontal: spacing[4], paddingVertical: spacing[3],
+      fontSize: fontSizes.md, color: colors.textPrimary,
       backgroundColor: colors.backgroundSecondary,
     },
   });
