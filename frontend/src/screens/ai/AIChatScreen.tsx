@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
+  Keyboard,
   Pressable,
   Share,
   StyleSheet,
@@ -12,7 +13,7 @@ import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
 
 import { ChatBubble } from '../../components/domain';
-import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CameraIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
+import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CameraIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
 import { ChatInput } from './components/ChatInput';
@@ -481,9 +482,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             <FileTextIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
           <Pressable onPress={handleClearChat} hitSlop={8}>
-            <TrashIcon
+            <PlusIcon
               size={ICON_SIZE}
-              color={messages.length > 0 ? colors.textSecondary : colors.textDisabled}
+              color={colors.textSecondary}
             />
           </Pressable>
           <Pressable
@@ -534,7 +535,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
         attachmentName={attachment?.name ?? null}
-        onAttachPress={() => setAttachMenuVisible(true)}
+        onAttachPress={() => { Keyboard.dismiss(); setAttachMenuVisible(true); }}
         onClearAttachment={() => setAttachment(null)}
         onUpgrade={goPaywall}
       />
