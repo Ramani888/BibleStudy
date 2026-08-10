@@ -4,13 +4,14 @@ import { WebView } from 'react-native-webview';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { Button, Typography } from '../../components/ui';
-import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'MediaPDFViewer'>;
 
+// Android: Google Docs can't reliably preview private/direct S3 URLs —
+// detect its error page and surface a fallback.
 const GOOGLE_DOCS_ERROR_DETECTOR = `
   (function() {
     var checks = 0;
@@ -35,28 +36,24 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const { url, name } = route.params;
-  const [loadError, setLoadError] = useState(false);
 
-  if (Platform.OS === 'android') {
+  const viewerUrl = Platform.OS === 'android'
+    ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`
+    : url; // WKWebView on iOS renders PDFs natively from a direct URL
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+
+  if (error) {
     return (
       <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
-        <AndroidPDFViewer url={url} colors={colors} styles={styles} />
-      </Screen>
-    );
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
-  const Pdf = require('react-native-pdf').default as React.ComponentType<{
-    source: { uri: string; cache: boolean };
-    style: object;
-    onError: () => void;
-    renderActivityIndicator: () => React.ReactElement;
-  }>;
-
-  if (loadError) {
-    return (
-      <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
-        <ErrorState message="Could not load PDF" onRetry={() => setLoadError(false)} />
+        <View style={styles.errorContainer}>
+          <Typography preset="h4" align="center" color={colors.textPrimary}>Preview unavailable</Typography>
+          <Typography preset="body" align="center" color={colors.textSecondary} style={styles.errorMessage}>
+            This PDF could not be previewed in-app.
+          </Typography>
+          <Button label="Open in browser" variant="outline" onPress={() => Linking.openURL(url)} style={styles.errorBtn} />
+        </View>
       </Screen>
     );
   }
@@ -64,56 +61,22 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   return (
     <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
       <View style={styles.pdfWrap}>
-        <Pdf
-          source={{ uri: url, cache: true }}
+        <WebView
+          source={{ uri: viewerUrl }}
           style={styles.pdf}
-          onError={() => setLoadError(true)}
-          renderActivityIndicator={() => (
-            <ActivityIndicator size="large" color={colors.primary} />
-          )}
+          injectedJavaScript={Platform.OS === 'android' ? GOOGLE_DOCS_ERROR_DETECTOR : undefined}
+          onMessage={(e) => { if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true); }}
+          onLoadEnd={() => setLoading(false)}
+          onError={() => setError(true)}
+          onHttpError={(e) => { if (e.nativeEvent.statusCode >= 400) setError(true); }}
         />
+        {loading && (
+          <View style={[StyleSheet.absoluteFill, styles.loadingOverlay]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        )}
       </View>
     </Screen>
-  );
-}
-
-function AndroidPDFViewer({ url, colors, styles }: {
-  url: string;
-  colors: ReturnType<typeof useTheme>['colors'];
-  styles: ReturnType<typeof makeStyles>;
-}) {
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
-  const viewerUrl = `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`;
-
-  if (error) {
-    return (
-      <View style={styles.errorContainer}>
-        <Typography preset="h4" align="center" color={colors.textPrimary}>Preview unavailable</Typography>
-        <Typography preset="body" align="center" color={colors.textSecondary} style={styles.errorMessage}>
-          This PDF could not be previewed in-app.
-        </Typography>
-        <Button label="Open in browser" variant="outline" onPress={() => Linking.openURL(url)} style={styles.errorBtn} />
-      </View>
-    );
-  }
-
-  return (
-    <View style={styles.pdfWrap}>
-      <WebView
-        source={{ uri: viewerUrl }}
-        style={styles.pdf}
-        injectedJavaScript={GOOGLE_DOCS_ERROR_DETECTOR}
-        onMessage={(e) => { if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true); }}
-        onLoadEnd={() => setLoading(false)}
-        onError={() => setError(true)}
-      />
-      {loading && (
-        <View style={[StyleSheet.absoluteFill, styles.loadingOverlay]}>
-          <ActivityIndicator size="large" color={colors.primary} />
-        </View>
-      )}
-    </View>
   );
 }
 
