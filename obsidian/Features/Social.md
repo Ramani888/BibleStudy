@@ -13,10 +13,10 @@ One row per screen. All social screens live inside the **ProfileTab → ProfileN
 
 | Screen | Route | Nav stack | Purpose |
 |--------|-------|-----------|---------|
-| FriendsScreen | `Friends` | ProfileStack | List accepted friends; entry to requests/search/blocked; remove friend |
-| FriendRequestsScreen | `FriendRequests` | ProfileStack | Incoming/outgoing request tabs; accept / reject / cancel |
-| SearchUsersScreen | `SearchUsers` | ProfileStack | Search users by name/email; send request; open profile |
-| UserProfileScreen | `UserProfile` | ProfileStack | Other user's profile + relationship-aware actions (send/cancel/accept/reject/remove/block) |
+| FriendsScreen | `Friends` | ProfileStack | Card rows with streak (from leaderboard cache) + friend count in title; trophy/search/bell header actions |
+| FriendRequestsScreen | `FriendRequests` | ProfileStack | Incoming (count badge) / Sent tabs; card rows with relative timestamp; accept / reject / cancel |
+| SearchUsersScreen | `SearchUsers` | ProfileStack | Card rows with church subtitle; ✓ friend / Sent pill / + add states |
+| UserProfileScreen | `UserProfile` | ProfileStack | Profile info + relationship actions + **"Their Sets" section** (PUBLIC 🌐 + FRIENDS 👥 sets via `GET /sets/user/:userId`) |
 | BlockedUsersScreen | `BlockedUsers` | ProfileStack | List blocked users; unblock |
 | ~~GroupsScreen~~ | ~~`Groups`~~ | — | **REMOVED** |
 | ~~GroupDetailScreen~~ | ~~`GroupDetail`~~ | — | **REMOVED** |
@@ -31,13 +31,14 @@ One row per screen. All social screens live inside the **ProfileTab → ProfileN
 ## Features & functionality
 
 ### Friends (FriendsScreen / FriendRequestsScreen / SearchUsersScreen / UserProfileScreen / BlockedUsersScreen)
-- **List friends** with a friend leaderboard (streak/points based) available via `useLeaderboard`.
-- **Search users** by query (name/email, case-insensitive), paginated; excludes self, excludes blocked, and each result carries relationship state so the UI shows the right action.
+- **List friends** — card rows showing streak pulled from `useLeaderboard` cache (no extra query); friend count in title; header shortcuts to Leaderboard / FindFriends / Requests.
+- **Leaderboard** — rank-aware motivational quote card (indigo verse-card style matching HomeScreen); ranked by current streak; medal emojis top 3; your row highlighted.
+- **Search users** by query (name/email, case-insensitive); card rows with church subtitle; status: ✓ friend (green) / Sent pill (pending) / + add button.
 - **Send friend request** → creates a PENDING `FriendRequest` and fires a `friend_request` notification to the receiver.
-- **Requests screen** has incoming/outgoing tabs: incoming can **accept** (creates bidirectional friendship + `friend_accepted` notification back to sender + `ADDED_FRIEND` activity) or **reject**; outgoing can **cancel**.
-- **UserProfileScreen** is the relationship hub — it wires all six friend hooks (send/cancel/accept/reject/remove/block) and branches on `user.pendingRequest` / friendship status.
+- **Requests screen** — Incoming tab shows count badge; card rows with relative timestamp (`formatDate`); incoming can **accept** or **reject**; outgoing can **cancel**.
+- **UserProfileScreen** — profile info (avatar, church, bio, join date, mutual friends) + relationship action buttons + **"Their Sets" section**: fetches `GET /sets/user/:userId` which returns PUBLIC sets always and FRIENDS sets when viewer is friends; each set card shows title, card count, visibility emoji (🌐/👥), taps into LibraryTab → SetDetail.
 - **Remove friend** deletes the friendship (both directions).
-- **Block user** — rejects any pending requests between the two, removes friendship, records a `Block`; **unblock** removes it. Blocked users listed on BlockedUsersScreen.
+- **Block user** — rejects any pending requests, removes friendship, records a `Block`; **unblock** removes it. Blocked users listed on BlockedUsersScreen.
 
 ### Groups — REMOVED
 Groups feature (GroupsScreen, GroupDetailScreen, Create/Edit/Join/PublicGroups) has been removed. Backend module (`backend/src/modules/groups/`) and related code may still exist but are no longer wired to any frontend screens or routes.
@@ -137,9 +138,10 @@ Prisma (`backend/prisma/schema.prisma`), all `onDelete: Cascade` from User:
 - **`achievement` notifications** originate from [[Gamification]] (achievement unlocks), routed through the same `sendPushToUser` path.
 
 ## Change log
-- **2026-08-10**: NotificationsScreen redesigned — date grouping (SectionList), swipe-to-delete, mark-all-read in header, tap-to-navigate per type, back button fix for cross-tab nav.
+- **2026-08-10**: Friends feature fully redesigned (commit `123332b`) — card rows throughout, streak on friends list, leaderboard quote card, requests timestamps + badge, UserProfile "Their Sets" section, new `GET /sets/user/:userId` backend endpoint.
+- **2026-08-10**: NotificationsScreen redesigned (commit `40418c7`) — date grouping, swipe-to-delete, mark-all-read in header, tap-to-navigate per type, back button fix.
 - **2026-08-10**: Groups feature removed from the app (frontend screens + routes gone).
-- **A–G arc**: `achievement` notification type + icon added alongside the [[Gamification]] achievements module. Notification icon-mapping default-case crash fix landed to tolerate unknown/new backend `type` strings.
+- **A–G arc**: `achievement` notification type + icon added alongside the [[Gamification]] achievements module. Notification icon-mapping default-case crash fix.
 
 ## Related
 [[Gamification]] · [[Study Plans]] · [[Navigation]] · [[Architecture Overview]] · [[Database Schema]]

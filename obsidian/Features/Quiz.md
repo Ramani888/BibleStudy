@@ -61,7 +61,7 @@ One row per screen. Route = the navigation route name.
   `Record<index, response>` and can be revisited.
 - Hardware back during an active quiz prompts "Quit quiz? Your progress will be lost."
 - On completion → `QuizResultScreen` (in `screens/quiz/components`) which records the
-  attempt and offers Retake / Exit; from there the full item review is `QuizSummary`.
+  attempt, shows a **score-aware motivational quote card** (same indigo verse-card style as HomeScreen; ≥90% celebratory / ≥70% encouraging / ≥50% effort / <50% resilience), and offers Retake / Exit; from there the full item review is `QuizSummary`.
 - States: loading, error ("Failed to load cards"), unavailable ("Nothing to quiz here"),
   complete.
 
