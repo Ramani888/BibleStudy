@@ -24,15 +24,15 @@ updated: 2026-08-10
 | `GoogleService-Info.plist` (iOS) | ✅ `4d5f209` — project `biblestudy-2b14c` |
 | `google-services.json` (Android) | ✅ `4d5f209` — project `biblestudy-2b14c` |
 | `FIREBASE_*` env vars in `backend/.env` | ✅ Added 2026-08-10 — service account `firebase-adminsdk-fbsvc@biblestudy-2b14c.iam.gserviceaccount.com` |
-| APNs key uploaded to Firebase | ⏳ **Pending** — Apple Developer → Keys → APNs → upload `.p8` to Firebase Console → Cloud Messaging |
+| APNs key uploaded to Firebase | ⏳ **Blocked** — user doesn't have Apple Developer account yet; needed for iOS push delivery only |
 
 ## To activate (remaining steps)
 
 ~~Steps 1–3 done 2026-08-10.~~ Firebase Admin connection verified ✅
 
-4. **APNs key (iOS delivery)** — without this, FCM token registers but pushes silently fail on iPhone:
-   - [developer.apple.com](https://developer.apple.com) → Certificates → Keys → `+` → check **Apple Push Notifications service (APNs)** → Download `.p8`
-   - Firebase Console → biblestudy-2b14c → Project Settings → Cloud Messaging → Apple app configuration → upload `.p8` + Key ID + Team ID
+4. **APNs key (iOS delivery)** — blocked on Apple Developer account (user doesn't have one yet).
+   When account is available: developer.apple.com → Certificates → Keys → `+` → check **Apple Push Notifications service (APNs)** → Download `.p8` → Firebase Console → Cloud Messaging → Apple app configuration → upload `.p8` + Key ID + Team ID.
+   **Android push works now without APNs.**
 5. Rebuild iOS app (`npx react-native run-ios`) to pick up new `GoogleService-Info.plist`
 
 ## Firebase project
