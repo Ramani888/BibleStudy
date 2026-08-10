@@ -63,6 +63,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
 
   return (
     <Screen header={<ScreenHeader title="Leaderboard" onBack={() => navigation.goBack()} />}>
+      <View style={{ flex: 1 }}>
       <FlatList
         data={rows}
         keyExtractor={item => item.userId}
@@ -89,6 +90,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
           ) : null
         }
       />
+      </View>
     </Screen>
   );
 }

@@ -3,7 +3,7 @@ import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { ActionSheet, EmptyState, ErrorState, Skeleton } from '../../components/feedback';
+import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
@@ -125,18 +125,17 @@ export function QuizHubScreen() {
 
   return (
     <Screen header={<ScreenHeader title="Quiz" />} footer={footer}>
-      {isLoading ? (
-        <View style={styles.pad}>
-          {[1, 2, 3, 4, 5].map(i => <Skeleton key={i} height={72} borderRadius={12} style={styles.skeletonRow} />)}
-        </View>
-      ) : isError ? (
+      {isError ? (
         <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
-      ) : attempts.length === 0 ? (
-        <EmptyState
-          title="No quizzes yet"
-          subtitle="Tap 'Start New Quiz' below to test yourself"
-        />
+      ) : attempts.length === 0 && !isLoading ? (
+        <View>
+          <EmptyState
+            title="No quizzes yet"
+            subtitle="Tap 'Start New Quiz' below to test yourself"
+          />
+        </View>
       ) : (
+        <View style={styles.flex}>
         <FlatList
           data={attempts}
           keyExtractor={a => a.id}
@@ -152,6 +151,7 @@ export function QuizHubScreen() {
             </Typography>
           }
         />
+        </View>
       )}
 
       <ActionSheet
@@ -206,7 +206,6 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     pad: { padding: layout.screenPaddingH, gap: spacing[3] },
     list: { padding: layout.screenPaddingH, gap: spacing[2], flexGrow: 1 },
     listHeader: { marginBottom: spacing[3] },
-    skeletonRow: { marginBottom: spacing[2] },
     row: {
       flexDirection: 'row',
       alignItems: 'center',

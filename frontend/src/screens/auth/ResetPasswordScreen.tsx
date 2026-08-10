@@ -64,35 +64,41 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         </>
       }
     >
-      <View style={{ gap: spacing[2] }}>
-        <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
-        <Controller
-          name="otp"
+      <View>
+        <View style={{ gap: spacing[2] }}>
+          <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
+          <Controller
+            name="otp"
+            control={control}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <OTPInput value={value} onChange={onChange} error={error?.message} />
+            )}
+          />
+        </View>
+      </View>
+      <View>
+        <FormField
+          name="newPassword"
           control={control}
-          render={({ field: { value, onChange }, fieldState: { error } }) => (
-            <OTPInput value={value} onChange={onChange} error={error?.message} />
-          )}
+          label="New password"
+          placeholder="Min 8 chars, 1 uppercase, 1 number"
+          isPassword
+          returnKeyType="next"
+          onSubmitEditing={() => confirmRef.current?.focus()}
         />
       </View>
-      <FormField
-        name="newPassword"
-        control={control}
-        label="New password"
-        placeholder="Min 8 chars, 1 uppercase, 1 number"
-        isPassword
-        returnKeyType="next"
-        onSubmitEditing={() => confirmRef.current?.focus()}
-      />
-      <FormField
-        name="confirmPassword"
-        control={control}
-        label="Confirm password"
-        placeholder="Repeat your new password"
-        isPassword
-        inputRef={confirmRef}
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit(onSubmit)}
-      />
+      <View>
+        <FormField
+          name="confirmPassword"
+          control={control}
+          label="Confirm password"
+          placeholder="Repeat your new password"
+          isPassword
+          inputRef={confirmRef}
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit(onSubmit)}
+        />
+      </View>
     </AuthLayout>
   );
 }

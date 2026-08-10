@@ -30,12 +30,15 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   return (
     <Screen header={<ScreenHeader title="Premium" onBack={navigation.goBack} />}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Typography preset="h4" style={styles.tagline}>Go further in your study</Typography>
-        <Typography preset="body" color={colors.textSecondary} style={styles.sub}>
-          More AI credits, more storage, higher limits. Cancel anytime.
-        </Typography>
+        <View>
+          <Typography preset="h4" style={styles.tagline}>Go further in your study</Typography>
+          <Typography preset="body" color={colors.textSecondary} style={styles.sub}>
+            More AI credits, more storage, higher limits. Cancel anytime.
+          </Typography>
+        </View>
 
         {/* Billing period toggle */}
+        <View>
         <View style={styles.toggle}>
           {(['monthly', 'annual'] as BillingPeriod[]).map(p => {
             const active = period === p;
@@ -84,7 +87,9 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             </View>
           );
         })}
+        </View>
 
+        <View>
         {!!error && <Typography preset="bodySm" color={colors.error} style={styles.error}>{error}</Typography>}
 
         <Pressable onPress={restore} disabled={processing} style={styles.link}>
@@ -100,6 +105,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           Subscriptions auto-renew until cancelled. Annual plans grant a full year of credits upfront.
           Manage or cancel anytime in your {`App Store`} account settings.
         </Typography>
+        </View>
       </ScrollView>
     </Screen>
   );

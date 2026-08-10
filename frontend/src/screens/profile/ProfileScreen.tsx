@@ -118,6 +118,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         </View>
 
         {/* ── Storage bar ── */}
+        <View>
         <Pressable
           style={({ pressed }) => [styles.storageSection, pressed && { opacity: 0.7 }]}
           onPress={() => navigation.navigate(overQuota ? 'Paywall' : 'Media')}
@@ -135,8 +136,10 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             color={overQuota ? colors.error : colors.primary}
           />
         </Pressable>
+        </View>
 
         {/* ── My Study ── */}
+        <View>
         <MenuSection label="My Study">
           <MenuItem icon={TrophyIcon} label="Achievements" onPress={() => navigation.navigate('Achievements')} />
           <Divider marginV={0} />
@@ -193,6 +196,8 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             }
           />
         </MenuSection>
+
+        </View>
 
         <Typography
           preset="caption"

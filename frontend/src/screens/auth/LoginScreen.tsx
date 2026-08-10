@@ -93,37 +93,41 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         </>
       }
     >
-      {socialOnly && (
-        <View style={{ backgroundColor: colors.primarySurface, borderRadius: layout.cardRadius, padding: spacing[3], marginBottom: spacing[2] }}>
-          <Typography preset="bodySm" color={colors.primaryDark} align="center">
-            This account was created with Google. Use the "Continue with Google" button above to sign in.
+      <View>
+        {socialOnly && (
+          <View style={{ backgroundColor: colors.primarySurface, borderRadius: layout.cardRadius, padding: spacing[3], marginBottom: spacing[2] }}>
+            <Typography preset="bodySm" color={colors.primaryDark} align="center">
+              This account was created with Google. Use the "Continue with Google" button above to sign in.
+            </Typography>
+          </View>
+        )}
+        <FormField
+          name="email"
+          control={control}
+          label="Email"
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          returnKeyType="next"
+          onSubmitEditing={() => passwordRef.current?.focus()}
+        />
+      </View>
+      <View>
+        <FormField
+          name="password"
+          control={control}
+          label="Password"
+          placeholder="Your password"
+          isPassword
+          inputRef={passwordRef}
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit(onSubmit)}
+        />
+        <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+          <Typography preset="label" color={colors.primary} align="right">
+            Forgot password?
           </Typography>
-        </View>
-      )}
-      <FormField
-        name="email"
-        control={control}
-        label="Email"
-        placeholder="you@example.com"
-        keyboardType="email-address"
-        returnKeyType="next"
-        onSubmitEditing={() => passwordRef.current?.focus()}
-      />
-      <FormField
-        name="password"
-        control={control}
-        label="Password"
-        placeholder="Your password"
-        isPassword
-        inputRef={passwordRef}
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit(onSubmit)}
-      />
-      <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
-        <Typography preset="label" color={colors.primary} align="right">
-          Forgot password?
-        </Typography>
-      </Pressable>
+        </Pressable>
+      </View>
     </AuthLayout>
   );
 }

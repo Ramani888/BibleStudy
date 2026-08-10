@@ -145,6 +145,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
         />
       }
     >
+      <View style={{ flex: 1 }}>
       <SectionList
         sections={sections}
         keyExtractor={item => item.id}
@@ -160,6 +161,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
           ) : null
         }
       />
+      </View>
     </Screen>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Pressable, TextInput } from 'react-native';
+import { Pressable, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -81,35 +81,41 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
         </>
       }
     >
-      <FormField
-        name="name"
-        control={control}
-        label="Full name"
-        placeholder="John Doe"
-        autoCapitalize="words"
-        returnKeyType="next"
-        onSubmitEditing={() => emailRef.current?.focus()}
-      />
-      <FormField
-        name="email"
-        control={control}
-        label="Email"
-        placeholder="you@example.com"
-        keyboardType="email-address"
-        returnKeyType="next"
-        inputRef={emailRef}
-        onSubmitEditing={() => passwordRef.current?.focus()}
-      />
-      <FormField
-        name="password"
-        control={control}
-        label="Password"
-        placeholder="Min 8 chars, 1 uppercase, 1 number"
-        isPassword
-        inputRef={passwordRef}
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit(onSubmit)}
-      />
+      <View>
+        <FormField
+          name="name"
+          control={control}
+          label="Full name"
+          placeholder="John Doe"
+          autoCapitalize="words"
+          returnKeyType="next"
+          onSubmitEditing={() => emailRef.current?.focus()}
+        />
+      </View>
+      <View>
+        <FormField
+          name="email"
+          control={control}
+          label="Email"
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          returnKeyType="next"
+          inputRef={emailRef}
+          onSubmitEditing={() => passwordRef.current?.focus()}
+        />
+      </View>
+      <View>
+        <FormField
+          name="password"
+          control={control}
+          label="Password"
+          placeholder="Min 8 chars, 1 uppercase, 1 number"
+          isPassword
+          inputRef={passwordRef}
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit(onSubmit)}
+        />
+      </View>
     </AuthLayout>
   );
 }

@@ -30,16 +30,18 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SetForm
-          ref={formRef}
-          defaultValues={{ folderId: route.params?.folderId }}
-          onSubmittingChange={setSubmitting}
-          onSubmit={async data => {
-            await createSet({ ...data, folderId: data.folderId ?? undefined, color: data.color ?? undefined, description: data.description || undefined });
-            Toast.show({ type: 'success', text1: 'Set created!' });
-            navigation.goBack();
-          }}
-        />
+        <View>
+          <SetForm
+            ref={formRef}
+            defaultValues={{ folderId: route.params?.folderId }}
+            onSubmittingChange={setSubmitting}
+            onSubmit={async data => {
+              await createSet({ ...data, folderId: data.folderId ?? undefined, color: data.color ?? undefined, description: data.description || undefined });
+              Toast.show({ type: 'success', text1: 'Set created!' });
+              navigation.goBack();
+            }}
+          />
+        </View>
       </ScrollView>
     </Screen>
   );

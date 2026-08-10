@@ -56,12 +56,16 @@ export function CreatePlanScreen({ navigation }: Props) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Input placeholder="Plan title" value={title} onChangeText={setTitle} maxLength={200} />
-        <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
+        <View>
+          <Input placeholder="Plan title" value={title} onChangeText={setTitle} maxLength={200} />
+          <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
+        </View>
 
-        <Typography preset="label" color={colors.textSecondary} style={styles.label}>
-          Pick sets in order ({selected.length} selected)
-        </Typography>
+        <View>
+          <Typography preset="label" color={colors.textSecondary} style={styles.label}>
+            Pick sets in order ({selected.length} selected)
+          </Typography>
+        </View>
 
         {isLoading ? (
           <ActivityIndicator color={colors.primary} style={styles.loader} />

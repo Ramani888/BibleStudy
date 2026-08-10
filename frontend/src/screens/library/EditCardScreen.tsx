@@ -49,20 +49,22 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   return (
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <CardForm
-        ref={formRef}
-        defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
-        onSubmittingChange={setSubmitting}
-        onSubmit={async ({ type, question, answer, note }) => {
-          try {
-            await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
-            Toast.show({ type: 'success', text1: 'Card updated!' });
-            navigation.goBack();
-          } catch (err) {
-            Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
-          }
-        }}
-      />
+      <View>
+        <CardForm
+          ref={formRef}
+          defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
+          onSubmittingChange={setSubmitting}
+          onSubmit={async ({ type, question, answer, note }) => {
+            try {
+              await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
+              Toast.show({ type: 'success', text1: 'Card updated!' });
+              navigation.goBack();
+            } catch (err) {
+              Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+            }
+          }}
+        />
+      </View>
     </Screen>
   );
 }

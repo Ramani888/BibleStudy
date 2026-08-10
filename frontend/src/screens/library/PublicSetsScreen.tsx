@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
-import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { CopyIcon, SearchIcon } from '../../components/icons';
 
@@ -80,18 +80,21 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
 
   return (
     <Screen header={header} footer={footer}>
-      {searchVisible && (
-        <View style={styles.searchWrap}>
-          <SearchBar
-            placeholder="Search public sets…"
-            value={search}
-            onChangeText={setSearch}
-            containerStyle={styles.searchInput}
-            autoFocus
-          />
-        </View>
-      )}
+      <View>
+        {searchVisible && (
+          <View style={styles.searchWrap}>
+            <SearchBar
+              placeholder="Search public sets…"
+              value={search}
+              onChangeText={setSearch}
+              containerStyle={styles.searchInput}
+              autoFocus
+            />
+          </View>
+        )}
+      </View>
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
@@ -105,13 +108,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         ListEmptyComponent={
           !isLoading ? (
             <EmptyState title="No public sets yet" subtitle="Be the first to publish a set!" />
-          ) : (
-            <>
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-            </>
-          )
+          ) : null
         }
         ListFooterComponent={
           isFetchingNextPage ? (
@@ -128,6 +125,8 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
           />
         )}
       />
+
+      </View>
 
       <ActionSheet
         visible={!!selectedSet}

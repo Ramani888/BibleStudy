@@ -260,6 +260,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
       </View>
 
       {viewMode === 'all' && (
+        <View>
         <>
           <View style={styles.topBar}>
             <SearchBar
@@ -301,9 +302,11 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             </View>
           )}
         </>
+        </View>
       )}
 
       {viewMode === 'bookmarked' ? (
+        <View style={styles.fill}>
         <FlatList
           style={styles.fill}
           data={allBookmarks}
@@ -322,7 +325,9 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           }
           renderItem={renderBookmark}
         />
+        </View>
       ) : (
+        <View style={styles.fill}>
         <FlatList
           style={styles.fill}
           data={filteredSessions}
@@ -351,6 +356,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           }
           renderItem={renderSession}
         />
+        </View>
       )}
 
       <ActionSheet

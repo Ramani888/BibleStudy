@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
-import { ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
+import { ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { SearchIcon } from '../../components/icons';
 
@@ -94,19 +94,22 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   return (
     <Screen header={header} footer={footer}>
-      {folderColor && <View style={[styles.colorBar, { backgroundColor: folderColor }]} />}
-      {searchVisible && (
-        <View style={styles.searchWrap}>
-          <SearchBar
-            placeholder="Search sets…"
-            value={search}
-            onChangeText={setSearch}
-            containerStyle={styles.searchInput}
-            autoFocus
-          />
-        </View>
-      )}
+      <View>
+        {folderColor && <View style={[styles.colorBar, { backgroundColor: folderColor }]} />}
+        {searchVisible && (
+          <View style={styles.searchWrap}>
+            <SearchBar
+              placeholder="Search sets…"
+              value={search}
+              onChangeText={setSearch}
+              containerStyle={styles.searchInput}
+              autoFocus
+            />
+          </View>
+        )}
+      </View>
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={filteredSets}
         keyExtractor={item => item.id}
@@ -117,18 +120,10 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         onRefresh={onRefresh}
         ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
         ListEmptyComponent={
-          isLoading ? (
-            <>
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-            </>
-          ) : (
-            <EmptyState
-              title={search ? 'No results' : 'No sets in this folder'}
-              subtitle={search ? `No sets match "${search}"` : 'Create a set and assign it to this folder'}
-            />
-          )
+          <EmptyState
+            title={search ? 'No results' : 'No sets in this folder'}
+            subtitle={search ? `No sets match "${search}"` : 'Create a set and assign it to this folder'}
+          />
         }
         renderItem={({ item }) => (
           <SetCard
@@ -138,6 +133,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
           />
         )}
       />
+
+      </View>
 
       <SetActionSheet
         set={selectedSet}

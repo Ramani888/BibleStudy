@@ -60,7 +60,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
             </View>
           </View>
 
-          {grouped.map(({ category, items }) => (
+          {grouped.map(({ category, items }, idx) => (
             <View key={category} style={styles.section}>
               <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>
                 {CATEGORY_LABELS[category]}

@@ -124,6 +124,7 @@ export function QuizSetupScreen() {
         <View style={styles.section}>
 
           {/* ── Quiz Name ── */}
+          <View>
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>QUIZ NAME</Typography>
           <Input
             placeholder="e.g. Week 3 Review…"
@@ -133,7 +134,10 @@ export function QuizSetupScreen() {
             containerStyle={{ marginBottom: spacing[5] }}
           />
 
+          </View>
+
           {/* ── Choose Sets row ── */}
+          <View>
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>CHOOSE SETS</Typography>
           <Pressable style={styles.selectorRow} onPress={() => setSetPickerOpen(true)} accessibilityRole="button">
             <View style={styles.selectorIcon}>
@@ -152,6 +156,8 @@ export function QuizSetupScreen() {
             </Typography>
             <ChevronRightIcon size={18} color={colors.textSecondary} />
           </Pressable>
+
+          </View>
 
           {/* ── Quiz Type chips ── */}
           {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (

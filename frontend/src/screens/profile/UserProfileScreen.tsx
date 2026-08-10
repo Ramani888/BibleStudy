@@ -132,6 +132,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
           )}
         </View>
 
+        <View>
         <Typography preset="h4" align="center">{user.name}</Typography>
 
         {user.church ? (
@@ -162,6 +163,8 @@ export function UserProfileScreen({ route, navigation }: Props) {
             </Typography>
           </View>
         ) : null}
+
+        </View>
 
         <View style={styles.actions}>
           {user.isFriend ? (

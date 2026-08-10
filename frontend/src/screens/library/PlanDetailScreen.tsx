@@ -88,6 +88,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
         <ErrorState onRetry={refetch} />
       ) : (
         <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <View>
           {!!plan.description && (
             <Typography preset="body" color={colors.textSecondary} style={styles.desc}>{plan.description}</Typography>
           )}
@@ -98,7 +99,10 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
           {plan.completedSteps === plan.totalSteps && plan.totalSteps > 0 && (
             <Typography preset="bodySm" color={colors.success} style={styles.done}>🎉 Plan complete!</Typography>
           )}
+          </View>
+          <View>
           <View style={styles.steps}>{plan.steps.map(renderStep)}</View>
+          </View>
         </ScrollView>
       )}
       <ConfirmDialog {...dialogProps} />

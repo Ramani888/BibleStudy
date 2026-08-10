@@ -134,38 +134,42 @@ export function NoteEditorScreen({ navigation, route }: Props) {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <TextInput
-          style={styles.titleInput}
-          placeholder="Title"
-          placeholderTextColor={colors.textSecondary}
-          value={title}
-          onChangeText={setTitle}
-          returnKeyType="next"
-          onSubmitEditing={() => bodyRef.current?.focus()}
-          maxLength={500}
-          autoFocus={!isEdit}
-        />
-        <View style={styles.divider} />
-        {selectedTags.length > 0 && (
-          <View style={styles.tagRow}>
-            {selectedTags.map(tag => (
-              <View key={tag} style={styles.tagPill}>
-                <Typography preset="caption" color={colors.primary}>{tag}</Typography>
-              </View>
-            ))}
-          </View>
-        )}
-        <TextInput
-          ref={bodyRef}
-          style={styles.bodyInput}
-          placeholder="Write your note here…"
-          placeholderTextColor={colors.textSecondary}
-          value={body}
-          onChangeText={setBody}
-          multiline
-          textAlignVertical="top"
-          scrollEnabled={false}
-        />
+        <View>
+          <TextInput
+            style={styles.titleInput}
+            placeholder="Title"
+            placeholderTextColor={colors.textSecondary}
+            value={title}
+            onChangeText={setTitle}
+            returnKeyType="next"
+            onSubmitEditing={() => bodyRef.current?.focus()}
+            maxLength={500}
+            autoFocus={!isEdit}
+          />
+          <View style={styles.divider} />
+          {selectedTags.length > 0 && (
+            <View style={styles.tagRow}>
+              {selectedTags.map(tag => (
+                <View key={tag} style={styles.tagPill}>
+                  <Typography preset="caption" color={colors.primary}>{tag}</Typography>
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+        <View>
+          <TextInput
+            ref={bodyRef}
+            style={styles.bodyInput}
+            placeholder="Write your note here…"
+            placeholderTextColor={colors.textSecondary}
+            value={body}
+            onChangeText={setBody}
+            multiline
+            textAlignVertical="top"
+            scrollEnabled={false}
+          />
+        </View>
       </ScrollView>
 
       <AppModal visible={tagModalVisible} title="Add Tags" onClose={() => setTagModalVisible(false)} showHandle>

@@ -9,7 +9,7 @@ import {
 import Toast from 'react-native-toast-message';
 
 import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
-import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet, SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, ColorPicker, Input, Screen, SearchBar, Spacer, Typography } from '../../components/ui';
 import { BookIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
 
@@ -231,6 +231,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     <Screen header={header} footer={footer}>
       {/* ── Body ── */}
       {activeTab === 'sets' ? (
+        <View style={{ flex: 1 }}>
         <FlatList
           data={setsLoading ? [] : sortedSets}
           keyExtractor={item => item.id}
@@ -253,13 +254,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             />
           )}
           ListEmptyComponent={
-            setsLoading ? (
-              <>
-                <SetCardSkeleton />
-                <SetCardSkeleton />
-                <SetCardSkeleton />
-              </>
-            ) : setsError ? (
+            setsError ? (
               <ErrorState message="Failed to load sets" onRetry={refetchSets} />
             ) : (
               <EmptyState
@@ -272,7 +267,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             )
           }
         />
+        </View>
       ) : (
+        <View style={{ flex: 1 }}>
         <FlatList
           data={foldersLoading ? [] : sortedFolders}
           keyExtractor={item => item.id}
@@ -296,12 +293,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             />
           )}
           ListEmptyComponent={
-            foldersLoading ? (
-              <>
-                <SetCardSkeleton />
-                <SetCardSkeleton />
-              </>
-            ) : foldersError ? (
+            foldersError ? (
               <ErrorState message="Failed to load folders" onRetry={refetchFolders} />
             ) : (
               <EmptyState
@@ -312,6 +304,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             )
           }
         />
+        </View>
       )}
 
       {/* ── Set actions sheet ── */}

@@ -52,8 +52,6 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CELL_GAP = 3;
 const CELL_SIZE = (SCREEN_WIDTH - CELL_GAP * 2) / 3;
 const FAB_SIZE = 56;
-const SKELETON_IMAGE_COUNT = 9;
-const SKELETON_PDF_COUNT = 5;
 
 type SortOrder = 'newest' | 'oldest' | 'alpha';
 const SORT_ICONS: Record<SortOrder, IconComponent> = {
@@ -78,49 +76,6 @@ function fmtDate(iso: string): string {
   const days = Math.floor(hrs / 24);
   return days < 7 ? `${days}d ago` : new Date(iso).toLocaleDateString();
 }
-
-// ─── Skeleton ───────────────────────────────────────────────────────────────
-
-function SkeletonShimmer({ style }: { style: object }) {
-  const { colors } = useTheme();
-  const opacity = useSharedValue(1);
-  useEffect(() => {
-    opacity.value = withRepeat(
-      withSequence(withTiming(0.3, { duration: 650 }), withTiming(1, { duration: 650 })),
-      -1,
-    );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-  return <Animated.View style={[style, animStyle, { backgroundColor: colors.backgroundSecondary }]} />;
-}
-
-function SkeletonImageGrid() {
-  return (
-    <View style={sk.imageGrid}>
-      {Array.from({ length: SKELETON_IMAGE_COUNT }).map((_, i) => (
-        <SkeletonShimmer key={i} style={sk.imageCell} />
-      ))}
-    </View>
-  );
-}
-
-function SkeletonPDFList() {
-  return (
-    <View style={sk.pdfList}>
-      {Array.from({ length: SKELETON_PDF_COUNT }).map((_, i) => (
-        <SkeletonShimmer key={i} style={sk.pdfRow} />
-      ))}
-    </View>
-  );
-}
-
-const sk = StyleSheet.create({
-  imageGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: CELL_GAP, paddingTop: CELL_GAP },
-  imageCell: { width: CELL_SIZE, height: CELL_SIZE, borderRadius: 2 },
-  pdfList:   { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing[2], gap: spacing[3] },
-  pdfRow:    { height: 72, borderRadius: layout.cardRadiusSm },
-});
 
 // ─── FadeImage ──────────────────────────────────────────────────────────────
 
@@ -511,8 +466,7 @@ export function MediaScreen({ navigation }: Props) {
         {error ? (
           <ErrorState message="Could not load media" onRetry={refetch} />
         ) : activeTab === 'IMAGE' ? (
-          isLoading ? <SkeletonImageGrid /> : (
-            <FlatList
+          <FlatList
               key="images"
               data={sortedFiles}
               keyExtractor={item => item.id}
@@ -529,10 +483,8 @@ export function MediaScreen({ navigation }: Props) {
                 <EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />
               }
             />
-          )
         ) : (
-          isLoading ? <SkeletonPDFList /> : (
-            <FlatList
+          <FlatList
               key="pdfs"
               data={sortedFiles}
               keyExtractor={item => item.id}
@@ -548,7 +500,6 @@ export function MediaScreen({ navigation }: Props) {
                 <EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />
               }
             />
-          )
         )}
 
         {/* FAB */}

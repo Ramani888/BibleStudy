@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -48,15 +48,17 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
         </>
       }
     >
-      <FormField
-        name="email"
-        control={control}
-        label="Email"
-        placeholder="you@example.com"
-        keyboardType="email-address"
-        returnKeyType="done"
-        onSubmitEditing={handleSubmit(onSubmit)}
-      />
+      <View>
+        <FormField
+          name="email"
+          control={control}
+          label="Email"
+          placeholder="you@example.com"
+          keyboardType="email-address"
+          returnKeyType="done"
+          onSubmitEditing={handleSubmit(onSubmit)}
+        />
+      </View>
     </AuthLayout>
   );
 }

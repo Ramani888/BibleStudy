@@ -306,6 +306,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   return (
     <Screen header={header}>
       {reorderMode ? (
+        <View style={{ flex: 1 }}>
         <DraggableFlatList
           data={orderedCards}
           onDragEnd={({ data }) => setOrderedCards(data)}
@@ -315,7 +316,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           renderItem={renderReorderCard}
         />
+        </View>
       ) : (
+        <View style={{ flex: 1 }}>
         <FlatList
           key={cardLayout}
           data={filteredCards}
@@ -341,6 +344,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           }
           renderItem={renderCard}
         />
+        </View>
       )}
 
       {/* ── Card action sheet ── */}

@@ -79,21 +79,25 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <SetForm
-          ref={formRef}
-          defaultValues={set}
-          onSubmittingChange={setSubmitting}
-          onSubmit={async data => {
-            await updateSet({ id: setId, payload: { ...data, description: data.description || null } });
-            Toast.show({ type: 'success', text1: 'Set updated!' });
-            navigation.goBack();
-          }}
-        />
-        <View style={styles.deleteSection}>
-          <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
-            <TrashIcon size={ICON_SIZE} color={colors.error} />
-            <Typography preset="label" color={colors.error}>Delete Set</Typography>
-          </Pressable>
+        <View>
+          <SetForm
+            ref={formRef}
+            defaultValues={set}
+            onSubmittingChange={setSubmitting}
+            onSubmit={async data => {
+              await updateSet({ id: setId, payload: { ...data, description: data.description || null } });
+              Toast.show({ type: 'success', text1: 'Set updated!' });
+              navigation.goBack();
+            }}
+          />
+        </View>
+        <View>
+          <View style={styles.deleteSection}>
+            <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
+              <TrashIcon size={ICON_SIZE} color={colors.error} />
+              <Typography preset="label" color={colors.error}>Delete Set</Typography>
+            </Pressable>
+          </View>
         </View>
       </ScrollView>
 

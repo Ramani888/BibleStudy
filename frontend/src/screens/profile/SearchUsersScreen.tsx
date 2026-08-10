@@ -94,6 +94,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
       )}
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={users}
         keyExtractor={item => item.id}
@@ -109,6 +110,7 @@ export function SearchUsersScreen({ navigation }: Props) {
           ) : null
         }
       />
+      </View>
     </Screen>
   );
 }

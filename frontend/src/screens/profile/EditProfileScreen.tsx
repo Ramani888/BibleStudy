@@ -83,15 +83,17 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Pressable style={styles.avatarSection} onPress={() => setPhotoSheetVisible(true)} disabled={isUploading}>
-          <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
-          <View style={styles.cameraRow}>
-            {isUploading
-              ? <ActivityIndicator size="small" color={colors.primary} />
-              : <><CameraIcon size={16} color={colors.primary} /><Typography preset="label" color={colors.primary}>Change Photo</Typography></>
-            }
-          </View>
-        </Pressable>
+        <View>
+          <Pressable style={styles.avatarSection} onPress={() => setPhotoSheetVisible(true)} disabled={isUploading}>
+            <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
+            <View style={styles.cameraRow}>
+              {isUploading
+                ? <ActivityIndicator size="small" color={colors.primary} />
+                : <><CameraIcon size={16} color={colors.primary} /><Typography preset="label" color={colors.primary}>Change Photo</Typography></>
+              }
+            </View>
+          </Pressable>
+        </View>
 
         <ActionSheet
           visible={photoSheetVisible}
@@ -103,36 +105,38 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
           ]}
         />
 
-        <View style={styles.form}>
-          <FormField
-            name="name"
-            control={control}
-            label="Full name"
-            placeholder="Your name"
-            autoCapitalize="words"
-            returnKeyType="next"
-            onSubmitEditing={() => bioRef.current?.focus()}
-          />
-          <FormField
-            name="bio"
-            control={control}
-            label="Bio (optional)"
-            placeholder="Tell us about yourself…"
-            autoCapitalize="sentences"
-            inputRef={bioRef}
-            returnKeyType="next"
-            onSubmitEditing={() => churchRef.current?.focus()}
-          />
-          <FormField
-            name="church"
-            control={control}
-            label="Church (optional)"
-            placeholder="Your church or congregation"
-            autoCapitalize="words"
-            inputRef={churchRef}
-            returnKeyType="done"
-            onSubmitEditing={handleSubmit(onSubmit)}
-          />
+        <View>
+          <View style={styles.form}>
+            <FormField
+              name="name"
+              control={control}
+              label="Full name"
+              placeholder="Your name"
+              autoCapitalize="words"
+              returnKeyType="next"
+              onSubmitEditing={() => bioRef.current?.focus()}
+            />
+            <FormField
+              name="bio"
+              control={control}
+              label="Bio (optional)"
+              placeholder="Tell us about yourself…"
+              autoCapitalize="sentences"
+              inputRef={bioRef}
+              returnKeyType="next"
+              onSubmitEditing={() => churchRef.current?.focus()}
+            />
+            <FormField
+              name="church"
+              control={control}
+              label="Church (optional)"
+              placeholder="Your church or congregation"
+              autoCapitalize="words"
+              inputRef={churchRef}
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit(onSubmit)}
+            />
+          </View>
         </View>
       </ScrollView>
     </Screen>

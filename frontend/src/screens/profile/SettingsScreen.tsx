@@ -60,28 +60,34 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <MenuSection label="Appearance">
-          <View style={styles.themeRow}>
-            <Typography preset="label" color={colors.textPrimary}>Dark Mode</Typography>
-            <Switch
-              value={isDark}
-              onValueChange={v => setMode(v ? 'dark' : 'light')}
-              trackColor={{ true: colors.primary, false: colors.border }}
-            />
-          </View>
-        </MenuSection>
+        <View>
+          <MenuSection label="Appearance">
+            <View style={styles.themeRow}>
+              <Typography preset="label" color={colors.textPrimary}>Dark Mode</Typography>
+              <Switch
+                value={isDark}
+                onValueChange={v => setMode(v ? 'dark' : 'light')}
+                trackColor={{ true: colors.primary, false: colors.border }}
+              />
+            </View>
+          </MenuSection>
+        </View>
 
-        <MenuSection label="Account">
-          <MenuItem icon={LogOutIcon} label="Sign Out" showChevron={false} onPress={handleSignOut} />
-          <Divider marginV={0} />
-          <MenuItem icon={TrashIcon} label="Delete Account" destructive showChevron={false} onPress={handleDeleteAccount} />
-        </MenuSection>
+        <View>
+          <MenuSection label="Account">
+            <MenuItem icon={LogOutIcon} label="Sign Out" showChevron={false} onPress={handleSignOut} />
+            <Divider marginV={0} />
+            <MenuItem icon={TrashIcon} label="Delete Account" destructive showChevron={false} onPress={handleDeleteAccount} />
+          </MenuSection>
+        </View>
 
-        <MenuSection label="App Info">
-          <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
-          <Divider marginV={0} />
-          <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
-        </MenuSection>
+        <View>
+          <MenuSection label="App Info">
+            <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
+            <Divider marginV={0} />
+            <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
+          </MenuSection>
+        </View>
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />

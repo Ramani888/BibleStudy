@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
-
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
@@ -63,10 +61,7 @@ export function QuizDetailScreen() {
   const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
 
   const footer = (
-    <Animated.View
-      entering={FadeInDown.delay(320).springify().damping(20)}
-      style={[styles.footer, { borderTopColor: colors.border }]}
-    >
+    <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button
         label="Re-Quiz"
         onPress={() => navigation.navigate('Quiz', {
@@ -77,7 +72,7 @@ export function QuizDetailScreen() {
         })}
         fullWidth
       />
-    </Animated.View>
+    </View>
   );
 
   return (
@@ -116,7 +111,7 @@ export function QuizDetailScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* ── Hero ── */}
-        <Animated.View entering={FadeInDown.delay(0).springify().damping(20)} style={styles.hero}>
+        <View style={styles.hero}>
           {isPerfect && <TrophyIcon size={32} color={colors.warning} />}
           {scored ? (
             <Typography style={[styles.scoreNumber, { color: scoreColor }]}>
@@ -133,10 +128,10 @@ export function QuizDetailScreen() {
               </Typography>
             </View>
           )}
-        </Animated.View>
+        </View>
 
         {/* ── Mode + sets chips ── */}
-        <Animated.View entering={FadeInDown.delay(80).springify().damping(20)} style={styles.chips}>
+        <View style={styles.chips}>
           <View style={[styles.chip, { backgroundColor: colors.backgroundSecondary, borderColor: colors.border }]}>
             <Typography preset="caption" color={colors.textSecondary}>{modeLabel}</Typography>
           </View>
@@ -145,13 +140,10 @@ export function QuizDetailScreen() {
               <Typography preset="caption" color={colors.textSecondary}>{setIds.length} sets</Typography>
             </View>
           )}
-        </Animated.View>
+        </View>
 
         {/* ── Date info card ── */}
-        <Animated.View
-          entering={FadeInDown.delay(240).springify().damping(20)}
-          style={[styles.card, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}
-        >
+        <View style={[styles.card, { backgroundColor: colors.backgroundCard, borderColor: colors.border }]}>
           <View style={styles.cardRow}>
             <View style={styles.cardRowLeft}>
               <ClockIcon size={16} color={colors.textSecondary} />
@@ -193,7 +185,7 @@ export function QuizDetailScreen() {
               </View>
             </>
           )}
-        </Animated.View>
+        </View>
       </ScrollView>
     </Screen>
   );

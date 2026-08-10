@@ -126,6 +126,7 @@ export function QuizSummaryScreen() {
         ))}
       </View>
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={filtered}
         keyExtractor={i => String(i.index)}
@@ -138,6 +139,7 @@ export function QuizSummaryScreen() {
           </View>
         }
       />
+      </View>
     </View>
   );
 }

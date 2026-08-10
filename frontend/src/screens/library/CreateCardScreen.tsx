@@ -28,19 +28,21 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
 
   return (
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <CardForm
-        ref={formRef}
-        onSubmittingChange={setSubmitting}
-        onSubmit={async ({ type, question, answer, note }) => {
-          try {
-            await createCard({ setId, type, question, answer, note: note || undefined });
-            Toast.show({ type: 'success', text1: 'Card added!' });
-            navigation.goBack();
-          } catch (e) {
-            Toast.show({ type: 'error', text1: getErrorMessage(e) });
-          }
-        }}
-      />
+      <View>
+        <CardForm
+          ref={formRef}
+          onSubmittingChange={setSubmitting}
+          onSubmit={async ({ type, question, answer, note }) => {
+            try {
+              await createCard({ setId, type, question, answer, note: note || undefined });
+              Toast.show({ type: 'success', text1: 'Card added!' });
+              navigation.goBack();
+            } catch (e) {
+              Toast.show({ type: 'error', text1: getErrorMessage(e) });
+            }
+          }}
+        />
+      </View>
     </Screen>
   );
 }

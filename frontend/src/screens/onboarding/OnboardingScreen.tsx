@@ -90,6 +90,7 @@ export function OnboardingScreen({ onComplete }: Props) {
   return (
     <SafeAreaView style={styles.safe}>
       {/* Skip — top right, hidden on last slide */}
+      <View>
       <View style={styles.skipRow}>
         {!isLast && (
           <Pressable onPress={markAndComplete} hitSlop={12}>
@@ -98,6 +99,7 @@ export function OnboardingScreen({ onComplete }: Props) {
             </Typography>
           </Pressable>
         )}
+      </View>
       </View>
 
       {/* Slides */}
@@ -114,6 +116,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       />
 
       {/* Bottom bar */}
+      <View>
       <View style={styles.bottom}>
         {/* Dot indicators */}
         <View style={styles.dotsRow}>
@@ -146,6 +149,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         ) : (
           <Button label="Next" onPress={goNext} fullWidth />
         )}
+      </View>
       </View>
     </SafeAreaView>
   );

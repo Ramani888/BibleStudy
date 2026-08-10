@@ -57,37 +57,43 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
     >
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View style={styles.form}>
-          {hasPassword && (
+          <View>
+            {hasPassword && (
+              <FormField
+                name="currentPassword"
+                control={control}
+                label="Current password"
+                placeholder="Enter current password"
+                isPassword
+                returnKeyType="next"
+                onSubmitEditing={() => newRef.current?.focus()}
+              />
+            )}
+          </View>
+          <View>
             <FormField
-              name="currentPassword"
+              name="newPassword"
               control={control}
-              label="Current password"
-              placeholder="Enter current password"
+              label="New password"
+              placeholder="Min 8 chars, 1 uppercase, 1 number"
               isPassword
+              inputRef={newRef}
               returnKeyType="next"
-              onSubmitEditing={() => newRef.current?.focus()}
+              onSubmitEditing={() => confirmRef.current?.focus()}
             />
-          )}
-          <FormField
-            name="newPassword"
-            control={control}
-            label="New password"
-            placeholder="Min 8 chars, 1 uppercase, 1 number"
-            isPassword
-            inputRef={newRef}
-            returnKeyType="next"
-            onSubmitEditing={() => confirmRef.current?.focus()}
-          />
-          <FormField
-            name="confirmPassword"
-            control={control}
-            label="Confirm new password"
-            placeholder="Repeat new password"
-            isPassword
-            inputRef={confirmRef}
-            returnKeyType="done"
-            onSubmitEditing={handleSubmit(onSubmit)}
-          />
+          </View>
+          <View>
+            <FormField
+              name="confirmPassword"
+              control={control}
+              label="Confirm new password"
+              placeholder="Repeat new password"
+              isPassword
+              inputRef={confirmRef}
+              returnKeyType="done"
+              onSubmitEditing={handleSubmit(onSubmit)}
+            />
+          </View>
         </View>
       </ScrollView>
     </Screen>

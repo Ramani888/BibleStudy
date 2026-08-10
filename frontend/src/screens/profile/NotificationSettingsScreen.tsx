@@ -52,10 +52,13 @@ export function NotificationSettingsScreen({ navigation }: Props) {
   return (
     <Screen header={<ScreenHeader title="Notification Settings" onBack={() => navigation.goBack()} />}>
       <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        <Typography preset="caption" color={colors.textSecondary} style={styles.hint}>
-          Choose which notifications you'd like to receive.
-        </Typography>
+        <View>
+          <Typography preset="caption" color={colors.textSecondary} style={styles.hint}>
+            Choose which notifications you'd like to receive.
+          </Typography>
+        </View>
 
+        <View>
         <View style={[styles.card, { backgroundColor: colors.backgroundCard }]}>
           {SETTINGS.map((s, i) => (
             <React.Fragment key={s.key}>
@@ -74,6 +77,7 @@ export function NotificationSettingsScreen({ navigation }: Props) {
               </View>
             </React.Fragment>
           ))}
+        </View>
         </View>
       </ScrollView>
     </Screen>

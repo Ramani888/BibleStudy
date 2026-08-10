@@ -168,6 +168,7 @@ export function NotesScreen({ navigation }: Props) {
         />
       }
     >
+      <View>
       {searchVisible && (
         <View style={styles.searchWrap}>
           <SearchBar
@@ -202,7 +203,9 @@ export function NotesScreen({ navigation }: Props) {
           </ScrollView>
         </View>
       )}
+      </View>
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={sorted}
         keyExtractor={item => item.id}
@@ -218,6 +221,8 @@ export function NotesScreen({ navigation }: Props) {
           )
         }
       />
+
+      </View>
 
       <Pressable
         style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}

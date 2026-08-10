@@ -51,6 +51,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
     <Screen
       header={<ScreenHeader title="Blocked Users" onBack={() => navigation.goBack()} />}
     >
+      <View style={{ flex: 1 }}>
       <FlatList
         data={blocked}
         keyExtractor={item => item.id}
@@ -63,6 +64,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
           <EmptyState title="No Blocked Users" subtitle="Users you block will appear here" />
         }
       />
+      </View>
     </Screen>
   );
 }

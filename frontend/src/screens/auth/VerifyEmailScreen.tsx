@@ -67,15 +67,17 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
         </>
       }
     >
-      <View style={{ gap: spacing[2] }}>
-        <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
-        <Controller
-          name="otp"
-          control={control}
-          render={({ field: { value, onChange }, fieldState: { error } }) => (
-            <OTPInput value={value} onChange={onChange} error={error?.message} />
-          )}
-        />
+      <View>
+        <View style={{ gap: spacing[2] }}>
+          <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
+          <Controller
+            name="otp"
+            control={control}
+            render={({ field: { value, onChange }, fieldState: { error } }) => (
+              <OTPInput value={value} onChange={onChange} error={error?.message} />
+            )}
+          />
+        </View>
       </View>
     </AuthLayout>
   );

@@ -92,6 +92,7 @@ export function FriendsScreen({ navigation }: Props) {
         />
       }
     >
+      <View style={{ flex: 1 }}>
       <FlatList
         data={friends}
         keyExtractor={item => item.id}
@@ -109,6 +110,7 @@ export function FriendsScreen({ navigation }: Props) {
           />
         }
       />
+      </View>
     </Screen>
   );
 }

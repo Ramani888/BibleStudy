@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
-
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
 import { usePlans } from '../../hooks';
@@ -59,14 +58,17 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
       ) : error ? (
         <ErrorState onRetry={refetch} />
       ) : plans.length === 0 ? (
-        <EmptyState
-          icon={<BookIcon size={48} color={colors.primaryLight} />}
-          title="No study plans yet"
-          subtitle="Create a guided path through your sets — step by step."
-          ctaLabel="Create a plan"
-          onCta={() => navigation.navigate('CreatePlan')}
-        />
+        <View>
+          <EmptyState
+            icon={<BookIcon size={48} color={colors.primaryLight} />}
+            title="No study plans yet"
+            subtitle="Create a guided path through your sets — step by step."
+            ctaLabel="Create a plan"
+            onCta={() => navigation.navigate('CreatePlan')}
+          />
+        </View>
       ) : (
+        <View style={{ flex: 1 }}>
         <FlatList
           data={plans}
           keyExtractor={p => p.id}
@@ -74,6 +76,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
         />
+        </View>
       )}
     </Screen>
   );

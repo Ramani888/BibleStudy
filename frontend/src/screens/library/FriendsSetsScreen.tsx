@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
-import { ActionSheet, EmptyState, ErrorState, SetCardSkeleton } from '../../components/feedback';
+import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
 import { CopyIcon } from '../../components/icons';
 
@@ -53,6 +53,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   return (
     <Screen header={header} footer={footer}>
+      <View style={{ flex: 1 }}>
       <FlatList
         data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
@@ -64,18 +65,10 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         onEndReachedThreshold={0.3}
         ItemSeparatorComponent={() => <Spacer size={spacing[3]} />}
         ListEmptyComponent={
-          isLoading ? (
-            <>
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-              <SetCardSkeleton />
-            </>
-          ) : (
-            <EmptyState
-              title="No sets from friends"
-              subtitle="When your friends mark sets as Friends-only, they'll appear here."
-            />
-          )
+          <EmptyState
+            title="No sets from friends"
+            subtitle="When your friends mark sets as Friends-only, they'll appear here."
+          />
         }
         ListFooterComponent={
           isFetchingNextPage ? (
@@ -94,6 +87,8 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
           />
         )}
       />
+
+      </View>
 
       <ActionSheet
         visible={!!selectedSet}

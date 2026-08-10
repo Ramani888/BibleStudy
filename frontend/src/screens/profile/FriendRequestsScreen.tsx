@@ -121,6 +121,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
+      <View style={{ flex: 1 }}>
       <FlatList
         data={requests}
         keyExtractor={item => item.id}
@@ -136,6 +137,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
           />
         }
       />
+      </View>
     </Screen>
   );
 }

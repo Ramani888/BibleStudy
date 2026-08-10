@@ -101,6 +101,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
 
   return (
     <Screen header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
+      <View style={{ flex: 1 }}>
       <FlatList
         data={transactions}
         keyExtractor={item => item.id}
@@ -112,9 +113,13 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
         onEndReachedThreshold={0.3}
         ListHeaderComponent={
           <>
-            <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
+            <View>
+              <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
+            </View>
             <Spacer size={spacing[4]} />
-            <WeeklyChart />
+            <View>
+              <WeeklyChart />
+            </View>
             <Spacer size={spacing[6]} />
             <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
             <Divider marginV={0} />
@@ -165,6 +170,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
           );
         }}
       />
+      </View>
     </Screen>
   );
 }
