@@ -23,20 +23,17 @@ updated: 2026-08-10
 | `@react-native-firebase/app` + `messaging` (frontend) | ✅ |
 | `GoogleService-Info.plist` (iOS) | ✅ `4d5f209` — project `biblestudy-2b14c` |
 | `google-services.json` (Android) | ✅ `4d5f209` — project `biblestudy-2b14c` |
-| `FIREBASE_*` env vars in `backend/.env` | ⏳ **Pending** — generate service account key |
-| APNs key uploaded to Firebase | ⏳ **Pending** — Apple Developer → Keys → APNs |
+| `FIREBASE_*` env vars in `backend/.env` | ✅ Added 2026-08-10 — service account `firebase-adminsdk-fbsvc@biblestudy-2b14c.iam.gserviceaccount.com` |
+| APNs key uploaded to Firebase | ⏳ **Pending** — Apple Developer → Keys → APNs → upload `.p8` to Firebase Console → Cloud Messaging |
 
 ## To activate (remaining steps)
 
-1. Firebase Console → `biblestudy-2b14c` → Project Settings → **Service accounts** → Generate new private key → download JSON
-2. Add to `backend/.env`:
-   ```
-   FIREBASE_PROJECT_ID=biblestudy-2b14c
-   FIREBASE_CLIENT_EMAIL=<client_email from JSON>
-   FIREBASE_PRIVATE_KEY="<private_key from JSON>"
-   ```
-3. Restart backend → push notifications live immediately
-4. For iOS physical device: Firebase Console → Cloud Messaging → Apple app configuration → upload APNs `.p8` key (from developer.apple.com → Keys)
+~~Steps 1–3 done 2026-08-10.~~ Firebase Admin connection verified ✅
+
+4. **APNs key (iOS delivery)** — without this, FCM token registers but pushes silently fail on iPhone:
+   - [developer.apple.com](https://developer.apple.com) → Certificates → Keys → `+` → check **Apple Push Notifications service (APNs)** → Download `.p8`
+   - Firebase Console → biblestudy-2b14c → Project Settings → Cloud Messaging → Apple app configuration → upload `.p8` + Key ID + Team ID
+5. Rebuild iOS app (`npx react-native run-ios`) to pick up new `GoogleService-Info.plist`
 
 ## Firebase project
 
