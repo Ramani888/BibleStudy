@@ -485,7 +485,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
     },
     dueBadge: { backgroundColor: colors.successSurface, borderRadius: spacing[2], paddingHorizontal: spacing[2], paddingVertical: spacing[1] / 2 },
 
-    // Horizontal rails (friends / groups / discover)
+    // Horizontal rails
     railContent: { gap: spacing[3], paddingRight: spacing[2] },
     miniCard: {
       width: 140, gap: spacing[2], padding: spacing[4], borderRadius: layout.cardRadiusSm,
