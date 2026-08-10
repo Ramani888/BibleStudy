@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const KEYS = {
   ACCESS_TOKEN: '@bsp/access_token',
   REFRESH_TOKEN: '@bsp/refresh_token',
+  AI_POLICY_ACCEPTED: '@bsp/ai_policy_accepted',
 } as const;
 
 export const storage = {
@@ -30,5 +31,13 @@ export const storage = {
       AsyncStorage.removeItem(KEYS.ACCESS_TOKEN),
       AsyncStorage.removeItem(KEYS.REFRESH_TOKEN),
     ]);
+  },
+
+  async getAiPolicyAccepted(): Promise<boolean> {
+    return (await AsyncStorage.getItem(KEYS.AI_POLICY_ACCEPTED)) === 'true';
+  },
+
+  async setAiPolicyAccepted(): Promise<void> {
+    await AsyncStorage.setItem(KEYS.AI_POLICY_ACCEPTED, 'true');
   },
 };

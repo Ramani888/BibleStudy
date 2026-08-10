@@ -23,6 +23,7 @@ import { CardProposalSheet } from './components/CardProposalSheet';
 import { useAuthStore, useAIChatStore, type ChatUIMessage } from '../../store';
 import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useMarkCardsSaved, useMediaFiles, usePickMedia, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
 import { detectTags } from '../../utils/tagDetector';
+import { storage } from '../../utils/storage';
 import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme, type Theme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
@@ -81,6 +82,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType } | null>(null);
   const [attachMenuVisible, setAttachMenuVisible] = useState(false); // source chooser
   const [pickerVisible, setPickerVisible] = useState(false);         // My Media list
+  const [policyAccepted, setPolicyAccepted] = useState(false);
+  const [policyDialogVisible, setPolicyDialogVisible] = useState(false);
   const { data: media = [] } = useMediaFiles();
   const { pickImage, takePhoto, pickPdf, isUploading } = usePickMedia();
 
@@ -106,6 +109,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       return () => clearTimeout(timer);
     }
   }, [messages]);
+
+  useEffect(() => {
+    storage.getAiPolicyAccepted().then(accepted => setPolicyAccepted(accepted));
+  }, []);
 
   const handleSend = useCallback(
     (question: string) => {
@@ -541,7 +548,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
         attachmentName={attachment?.name ?? null}
-        onAttachPress={() => { Keyboard.dismiss(); setAttachMenuVisible(true); }}
+        onAttachPress={() => {
+          Keyboard.dismiss();
+          if (policyAccepted) { setAttachMenuVisible(true); }
+          else { setPolicyDialogVisible(true); }
+        }}
         onClearAttachment={() => setAttachment(null)}
         onUpgrade={goPaywall}
       />
@@ -578,6 +589,22 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       />
 
       <ConfirmDialog {...dialogProps} />
+
+      {/* ── Content policy banner (one-time, before first attachment) ── */}
+      <ConfirmDialog
+        visible={policyDialogVisible}
+        title="Content Policy"
+        message={"Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines."}
+        confirmLabel="I Agree"
+        cancelLabel="Cancel"
+        onConfirm={() => {
+          storage.setAiPolicyAccepted();
+          setPolicyAccepted(true);
+          setPolicyDialogVisible(false);
+          setAttachMenuVisible(true);
+        }}
+        onCancel={() => setPolicyDialogVisible(false)}
+      />
     </SafeAreaView>
     </KeyboardAvoidingView>
   );
