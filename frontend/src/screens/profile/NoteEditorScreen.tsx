@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Keyboard,
   Pressable,
   ScrollView,
   Share,
@@ -13,7 +14,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNote, useCreateNote, useUpdateNote } from '../../hooks';
-import { Button, Typography } from '../../components/ui';
+import { Typography } from '../../components/ui';
 import { AppModal } from '../../components/feedback/Modal';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
@@ -57,6 +58,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
 
   const handleSave = async () => {
     if (!canSave) return;
+    Keyboard.dismiss();
     try {
       if (isEdit) {
         await updateNote.mutateAsync({ title: title.trim(), body: body.trim(), tags: selectedTags });
@@ -113,20 +115,17 @@ export function NoteEditorScreen({ navigation, route }: Props) {
               <Pressable onPress={handleShare} disabled={!canShare} hitSlop={8}>
                 <ShareIcon size={22} color={canShare ? colors.textSecondary : colors.textDisabled} />
               </Pressable>
+              <Pressable onPress={handleSave} disabled={!canSave} hitSlop={8}>
+                <Typography
+                  preset="label"
+                  color={canSave ? colors.primary : colors.textDisabled}
+                >
+                  {isSaving ? 'Saving…' : 'Save'}
+                </Typography>
+              </Pressable>
             </View>
           }
         />
-      }
-      footer={
-        <View style={styles.footer}>
-          <Button
-            label={isEdit ? 'Save Changes' : 'Save Note'}
-            onPress={handleSave}
-            loading={isSaving}
-            disabled={!canSave}
-            fullWidth
-          />
-        </View>
       }
     >
       <ScrollView
@@ -224,13 +223,7 @@ function makeStyles({ colors, spacing, layout }: Theme) {
       minHeight: 200,
       flexGrow: 1,
     },
-    footer: {
-      padding: layout.screenPaddingH,
-      paddingBottom: spacing[2],
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[4] },
+tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing[2], marginBottom: spacing[4] },
     tagChip: {
       paddingHorizontal: spacing[3],
       paddingVertical: spacing[2],

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
-import { useNotes, useDeleteNote, useConfirmDialog } from '../../hooks';
+import { useNotes, useDeleteNote, useConfirmDialog, useSearchToggle } from '../../hooks';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -19,7 +19,8 @@ import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { PlusIcon, SwapIcon } from '../../components/icons';
+import { PlusIcon, SearchIcon, SwapIcon, TrashIcon } from '../../components/icons';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { getErrorMessage } from '../../api/client';
 import { fontWeights, layout, shadows, spacing, useTheme } from '../../theme';
 
@@ -50,12 +51,15 @@ type Props = ProfileScreenProps<'Notes'>;
 export function NotesScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
-  const [search, setSearch] = useState('');
+
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [activeTag, setActiveTag] = useState<string | null>(null);
+
   const { data: notes = [], isLoading, isFetching, error, refetch } = useNotes();
   const deleteNote = useDeleteNote();
   const { show: showConfirm, dialogProps } = useConfirmDialog();
+  const openRow = useRef<Swipeable | null>(null);
 
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'oldest' : 'newest');
@@ -99,32 +103,45 @@ export function NotesScreen({ navigation }: Props) {
   }, [showConfirm, deleteNote]);
 
   const renderItem = useCallback(({ item }: { item: Note }) => (
-    <Pressable
-      style={({ pressed }) => [styles.noteCard, pressed && styles.noteCardPressed]}
-      onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
-      onLongPress={() => handleDelete(item)}
-    >
-      <View style={styles.noteHeader}>
-        <Typography preset="label" style={styles.noteTitle} numberOfLines={1}>
-          {item.title}
-        </Typography>
-        <Typography preset="caption" color={colors.textDisabled}>
-          {formatRelativeDate(item.updatedAt)}
-        </Typography>
-      </View>
-      <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
-        {item.body}
-      </Typography>
-      {item.tags.length > 0 && (
-        <View style={styles.tagRow}>
-          {item.tags.map(tag => (
-            <View key={tag} style={styles.tagPill}>
-              <Typography preset="caption" color={colors.primary}>{tag}</Typography>
-            </View>
-          ))}
-        </View>
+    <Swipeable
+      renderRightActions={() => (
+        <Pressable style={styles.deleteAction} onPress={() => handleDelete(item)}>
+          <TrashIcon size={20} color="#fff" />
+        </Pressable>
       )}
-    </Pressable>
+      onSwipeableOpen={(_, swipeable) => {
+        if (openRow.current && openRow.current !== swipeable) {
+          openRow.current.close();
+        }
+        openRow.current = swipeable;
+      }}
+    >
+      <Pressable
+        style={({ pressed }) => [styles.noteCard, pressed && styles.noteCardPressed]}
+        onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
+      >
+        <View style={styles.noteHeader}>
+          <Typography preset="label" style={styles.noteTitle} numberOfLines={1}>
+            {item.title}
+          </Typography>
+          <Typography preset="caption" color={colors.textDisabled}>
+            {formatRelativeDate(item.updatedAt)}
+          </Typography>
+        </View>
+        <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
+          {item.body}
+        </Typography>
+        {item.tags.length > 0 && (
+          <View style={styles.tagRow}>
+            {item.tags.map(tag => (
+              <View key={tag} style={styles.tagPill}>
+                <Typography preset="caption" color={colors.primary}>{tag}</Typography>
+              </View>
+            ))}
+          </View>
+        )}
+      </Pressable>
+    </Swipeable>
   ), [navigation, handleDelete, colors, styles]);
 
   if (error) return <ErrorState message="Could not load notes" onRetry={refetch} />;
@@ -136,26 +153,32 @@ export function NotesScreen({ navigation }: Props) {
           title="My Notes"
           onBack={() => navigation.goBack()}
           right={
-            <Pressable style={styles.sortBtn} onPress={cycleSortOrder} hitSlop={8}>
-              <SwapIcon size={16} color={colors.textSecondary} />
-              <Typography preset="caption" color={colors.textSecondary}>
-                {SORT_LABELS[sortOrder]}
-              </Typography>
-            </Pressable>
+            <View style={styles.headerActions}>
+              <Pressable onPress={toggleSearch} hitSlop={8}>
+                <SearchIcon size={20} color={searchVisible ? colors.primary : colors.textSecondary} />
+              </Pressable>
+              <Pressable style={styles.sortBtn} onPress={cycleSortOrder} hitSlop={8}>
+                <SwapIcon size={16} color={colors.textSecondary} />
+                <Typography preset="caption" color={colors.textSecondary}>
+                  {SORT_LABELS[sortOrder]}
+                </Typography>
+              </Pressable>
+            </View>
           }
         />
       }
     >
-      {/* Search */}
-      <View style={styles.searchRow}>
-        <SearchBar
-          placeholder="Search notes…"
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      {searchVisible && (
+        <View style={styles.searchWrap}>
+          <SearchBar
+            placeholder="Search notes…"
+            value={search}
+            onChangeText={setSearch}
+            autoFocus
+          />
+        </View>
+      )}
 
-      {/* Tag filter bar */}
       {hasTaggedNotes && (
         <View style={styles.tagBarWrap}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
@@ -196,7 +219,6 @@ export function NotesScreen({ navigation }: Props) {
         }
       />
 
-      {/* FAB */}
       <Pressable
         style={({ pressed }) => [styles.fab, pressed && styles.fabPressed]}
         onPress={() => navigation.navigate('NoteEditor', {})}
@@ -211,15 +233,12 @@ export function NotesScreen({ navigation }: Props) {
 
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
-    searchRow: {
+    headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing[4] },
+    sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    searchWrap: {
       marginHorizontal: layout.screenPaddingH,
-      marginTop: spacing[3],
-      marginBottom: spacing[2],
-    },
-    sortBtn: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: spacing[1],
+      marginTop: spacing[2],
+      marginBottom: spacing[1],
     },
     tagBarWrap: { height: 40, marginBottom: spacing[2] },
     tagBar: { paddingHorizontal: layout.screenPaddingH, alignItems: 'center', gap: spacing[2] },
@@ -232,13 +251,14 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       backgroundColor: colors.background,
     },
     tagFilterPillActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1 },
+    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing[8], flexGrow: 1, paddingTop: spacing[3] },
     separator: { height: spacing[3] },
     noteCard: {
-      backgroundColor: colors.background,
+      backgroundColor: colors.backgroundCard,
       borderRadius: layout.cardRadiusSm,
       padding: spacing[4],
       gap: spacing[1],
+      ...shadows.sm,
     },
     noteCardPressed: { opacity: 0.7 },
     noteHeader: {
@@ -270,5 +290,13 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       ...shadows.lg,
     },
     fabPressed: { opacity: 0.85 },
+    deleteAction: {
+      width: 72,
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: colors.error,
+      borderRadius: layout.cardRadiusSm,
+      marginLeft: spacing[2],
+    },
   });
 }
