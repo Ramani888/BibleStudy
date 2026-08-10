@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { Animated, StyleSheet, Text, View } from 'react-native';
+import { Animated, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { fontFamilies, fontSizes, fontWeights, layout, spacing, Theme, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, Theme, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 import { Avatar } from '../ui/Avatar';
 
@@ -64,13 +64,13 @@ function renderBold(text: string, color: string): React.ReactNode {
   if (segments.length === 1) return text;
   return segments.map((seg, i) =>
     seg.startsWith('**') && seg.endsWith('**') ? (
-      <Text key={i} style={{ fontWeight: fontWeights.bold, color, fontFamily: fontFamilies.regular }}>
+      <Typography key={i} preset="body" color={color} style={{ fontWeight: fontWeights.bold }}>
         {seg.slice(2, -2)}
-      </Text>
+      </Typography>
     ) : (
-      <Text key={i} style={{ color, fontFamily: fontFamilies.regular }}>
+      <Typography key={i} preset="body" color={color}>
         {seg}
-      </Text>
+      </Typography>
     ),
   );
 }
@@ -98,10 +98,10 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
                 const content = isBullet ? t.replace(/^[\-*•]\s+/, '') : t;
                 return (
                   <View key={li} style={[mdStyles.bulletRow, li > 0 && mdStyles.bulletRowGap]}>
-                    <Text style={[mdStyles.bulletDot, { color }]}>{isBullet ? '•' : ' '}</Text>
-                    <Text style={[mdStyles.bulletText, { color }]}>
+                    <Typography preset="body" color={color} style={mdStyles.bulletDot}>{isBullet ? '•' : ' '}</Typography>
+                    <Typography preset="body" color={color} style={mdStyles.bulletText}>
                       {renderBold(content, color)}
-                    </Text>
+                    </Typography>
                   </View>
                 );
               })}
@@ -110,9 +110,9 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
         }
 
         return (
-          <Text key={bi} style={[mdStyles.para, { color }]}>
+          <Typography key={bi} preset="body" color={color} style={mdStyles.para}>
             {renderBold(lines.join('\n'), color)}
-          </Text>
+          </Typography>
         );
       })}
     </View>
@@ -225,26 +225,12 @@ const makeStyles = ({ colors, spacing, layout }: Theme) =>
 
 const mdStyles = StyleSheet.create({
   root: { gap: spacing[2] },
-  para: {
-    fontSize: BODY_FONT_SIZE,
-    lineHeight: BODY_LINE_HEIGHT,
-    fontFamily: fontFamilies.regular,
-  },
+  para: { lineHeight: BODY_LINE_HEIGHT },
   bulletBlock: {},
   bulletRow: { flexDirection: 'row', gap: spacing[2] },
   bulletRowGap: { marginTop: spacing[1] },
-  bulletDot: {
-    fontSize: BODY_FONT_SIZE,
-    lineHeight: BODY_LINE_HEIGHT,
-    width: 12,
-    fontFamily: fontFamilies.regular,
-  },
-  bulletText: {
-    flex: 1,
-    fontSize: BODY_FONT_SIZE,
-    lineHeight: BODY_LINE_HEIGHT,
-    fontFamily: fontFamilies.regular,
-  },
+  bulletDot: { lineHeight: BODY_LINE_HEIGHT, width: 12 },
+  bulletText: { flex: 1, lineHeight: BODY_LINE_HEIGHT },
 });
 
 const dotStyles = StyleSheet.create({
