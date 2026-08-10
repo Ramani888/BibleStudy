@@ -1,12 +1,12 @@
 ---
 title: Social
 tags: [feature, social]
-updated: 2026-08-08
+updated: 2026-08-10
 ---
 
 # Social
 
-> The social layer of BibleStudyPro: friends, groups (with roles + invite codes + public discovery + group [[Study Plans]]), in-person gatherings on a map, an activity feed, and notifications (in-app + optional Firebase push).
+> The social layer of BibleStudyPro: friends (leaderboard + shared sets + activity feed), in-person gatherings on a map, and notifications (in-app + optional Firebase push). **Groups feature has been removed.**
 
 ## Screens
 One row per screen. All social screens live inside the **ProfileTab → ProfileNavigator** stack (see [[Navigation]]). The `map/` + gathering screens are **NOT built** on the frontend (see gotchas).
@@ -18,13 +18,13 @@ One row per screen. All social screens live inside the **ProfileTab → ProfileN
 | SearchUsersScreen | `SearchUsers` | ProfileStack | Search users by name/email; send request; open profile |
 | UserProfileScreen | `UserProfile` | ProfileStack | Other user's profile + relationship-aware actions (send/cancel/accept/reject/remove/block) |
 | BlockedUsersScreen | `BlockedUsers` | ProfileStack | List blocked users; unblock |
-| GroupsScreen | `Groups` | ProfileStack | List my groups; entry to create/join/public/detail |
-| GroupDetailScreen | `GroupDetail` | ProfileStack | Group info, members + role management, invite share, group [[Study Plans]] section, leave/delete |
-| CreateGroupScreen | `CreateGroup` | ProfileStack | Create a group (name/desc/visibility) |
-| EditGroupScreen | `EditGroup` | ProfileStack | Edit group (admin only) |
-| JoinGroupScreen | `JoinGroup` | ProfileStack | Join via invite code |
-| PublicGroupsScreen | `PublicGroups` | ProfileStack | Discover + join PUBLIC groups (search) |
-| NotificationsScreen | `Notifications` | ProfileStack | List notifications, mark read / mark all read / delete |
+| ~~GroupsScreen~~ | ~~`Groups`~~ | — | **REMOVED** |
+| ~~GroupDetailScreen~~ | ~~`GroupDetail`~~ | — | **REMOVED** |
+| ~~CreateGroupScreen~~ | ~~`CreateGroup`~~ | — | **REMOVED** |
+| ~~EditGroupScreen~~ | ~~`EditGroup`~~ | — | **REMOVED** |
+| ~~JoinGroupScreen~~ | ~~`JoinGroup`~~ | — | **REMOVED** |
+| ~~PublicGroupsScreen~~ | ~~`PublicGroups`~~ | — | **REMOVED** |
+| NotificationsScreen | `Notifications` | ProfileStack | Notifications grouped by date (Today/Yesterday/Earlier); swipe-to-delete; mark all read in header; tap navigates to relevant screen |
 | — activity feed | (no screen) | — | Surfaced inline on **HomeScreen** via `useFriendsActivityFeed`, not its own screen |
 | MapScreen / GatheringDetail / CreateGathering / EditGathering | — | **not built** | Backend + hooks exist; **no frontend screens, no routes** |
 
@@ -39,15 +39,8 @@ One row per screen. All social screens live inside the **ProfileTab → ProfileN
 - **Remove friend** deletes the friendship (both directions).
 - **Block user** — rejects any pending requests between the two, removes friendship, records a `Block`; **unblock** removes it. Blocked users listed on BlockedUsersScreen.
 
-### Groups (GroupsScreen / GroupDetailScreen / Create / Edit / Join / PublicGroups)
-- **Create group**: name (required, ≤100), description (≤500), visibility (PRIVATE default / PUBLIC / FRIENDS). Creator becomes an ADMIN member + is the `ownerId`.
-- **My groups** list; **public groups** discovery with search (only `visibility=PUBLIC`).
-- **GroupDetailScreen**: shows members with role badges, invite-code **Share** sheet, **Study Plans** section, and role-gated management.
-  - **Role management** (admin only, cannot target the owner or self): promote/demote between ADMIN/MEMBER, remove member.
-  - **Study Plans section** — lists group plans via `useGroupPlans(groupId)`; admins see a "New" affordance → `CreateGroupPlan`; rows open `GroupPlanDetail`. See [[Study Plans]].
-  - **Leave group** (blocked if you're the last admin), **Delete group** (owner/authorized only, cascades all data).
-  - **Regenerate invite code** (admin) → new UUID invite code.
-- **Join group**: JoinGroupScreen (paste invite code) or PublicGroupsScreen (tap a public group → joins by its invite code → navigates to GroupDetail). Joining fires a `group` notification to existing admins.
+### Groups — REMOVED
+Groups feature (GroupsScreen, GroupDetailScreen, Create/Edit/Join/PublicGroups) has been removed. Backend module (`backend/src/modules/groups/`) and related code may still exist but are no longer wired to any frontend screens or routes.
 
 ### Gatherings + Map (BACKEND + HOOKS ONLY — no UI)
 - Backend supports: create gathering (optionally tied to a group), list, nearby (haversine radius, default 50km), get, update, cancel, **RSVP** (GOING/MAYBE/NOT_GOING), leave, list participants. Host auto-RSVPs GOING; creating a group gathering notifies group members (`gathering`); RSVP notifies the host (`gathering_rsvp`).
@@ -59,12 +52,17 @@ One row per screen. All social screens live inside the **ProfileTab → ProfileN
 - `GET /activities` (my feed) exists but has **no frontend consumer**.
 
 ### Notifications (NotificationsScreen)
-- Paginated list with `unreadCount`; **mark one read**, **mark all read**, **delete**.
+- Notifications grouped by date: **Today / Yesterday / Earlier** (empty buckets omitted) using `SectionList`.
+- **Swipe left** to reveal a red delete button; tap to confirm delete (not auto-delete on swipe).
+- **Mark all read** lives in the header right slot (only visible when `unreadCount > 0`).
+- **Tap to navigate**: `friend_request` → FriendRequests, `friend_accepted` → Friends, `achievement` → Achievements, `system` → mark read only.
+- Tapping also marks the notification read if it was unread.
+- Back button uses `navigation.navigate('Profile')` (not `goBack()`) so the Home bell cross-tab navigate doesn't leave Notifications stuck in the Profile stack.
 - Each row renders a type-specific icon via `getNotificationIcon` — see the crash-fix gotcha below.
 
 ## Data flow
 - Friends: `FriendsScreen → useFriends (['friends']) → friendsApi.list → GET /friends → controller → service → Prisma`. Requests use `['friends','requests',type]`; search `['users','search',q]`; blocked `['friends','blocked']`. Mutations invalidate the relevant `['friends' ...]` / `['users' ...]` keys.
-- Groups: `GroupsScreen → useGroups (['groups']) → groupsApi.list → GET /groups`. Detail `['groups', id]`; public `['groups','public',search]`. Mutations invalidate `['groups']` / `['groups', id]`.
+- Groups: **REMOVED** — no frontend consumer.
 - Gatherings: `useGatherings (['gatherings','list',params])`, detail `['gatherings','detail',id]`, nearby `['gatherings','nearby',lat,lng]` → `gatheringsApi.*` → `/gatherings/*` (no screen wired).
 - Map: `useFriendsLocations (['map','friends'])` → `mapApi.*` → `/map/*` (no screen wired).
 - Activities: `useFriendsActivityFeed (['activities','friends'])` → `activitiesApi.getFriendsFeed` → `GET /activities/friends`.
@@ -138,10 +136,10 @@ Prisma (`backend/prisma/schema.prisma`), all `onDelete: Cascade` from User:
 - **Activity feed is home-only:** `useFriendsActivityFeed` renders inside HomeScreen; there is no dedicated activity screen, and `GET /activities` (my feed) has no client consumer.
 - **`achievement` notifications** originate from [[Gamification]] (achievement unlocks), routed through the same `sendPushToUser` path.
 
-## This session's additions (A–G arc)
-- Group **Study Plans section** in GroupDetailScreen (`useGroupPlans`, `CreateGroupPlan` / `GroupPlanDetail` routes) is the entry point for group plans — the church-revenue D2 direction. See [[Study Plans]].
-- `achievement` notification type + icon added alongside the [[Gamification]] achievements module.
-- Notification icon-mapping default-case crash fix landed to tolerate unknown/new backend `type` strings.
+## Change log
+- **2026-08-10**: NotificationsScreen redesigned — date grouping (SectionList), swipe-to-delete, mark-all-read in header, tap-to-navigate per type, back button fix for cross-tab nav.
+- **2026-08-10**: Groups feature removed from the app (frontend screens + routes gone).
+- **A–G arc**: `achievement` notification type + icon added alongside the [[Gamification]] achievements module. Notification icon-mapping default-case crash fix landed to tolerate unknown/new backend `type` strings.
 
 ## Related
 [[Gamification]] · [[Study Plans]] · [[Navigation]] · [[Architecture Overview]] · [[Database Schema]]

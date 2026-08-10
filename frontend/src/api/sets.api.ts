@@ -40,4 +40,7 @@ export const setsApi = {
 
   clone: (id: string) =>
     apiPost<StudySet>(`/sets/${id}/clone`),
+
+  getByUser: (userId: string) =>
+    apiGet<StudySet[]>(`/sets/user/${userId}`),
 };

@@ -73,6 +73,14 @@ export function useFriendsSets() {
   });
 }
 
+export function useUserSets(userId: string) {
+  return useQuery({
+    queryKey: ['sets', 'user', userId],
+    queryFn: () => setsApi.getByUser(userId),
+    enabled: !!userId,
+  });
+}
+
 export function usePublicSets(search?: string) {
   return useInfiniteQuery({
     queryKey: ['public-sets', search],

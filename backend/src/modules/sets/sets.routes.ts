@@ -10,6 +10,7 @@ router.use(authMiddleware);
 
 router.get('/public', setsController.getPublicSets);
 router.get('/friends', setsController.getFriendsSets);
+router.get('/user/:userId', setsController.getUserSets);
 router.post('/', validate(CreateSetDto), setsController.createSet);
 router.get('/', setsController.listSets);
 router.get('/:id', setsController.getSetById);

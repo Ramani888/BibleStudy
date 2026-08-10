@@ -57,6 +57,13 @@ export async function getFriendsSets(req: Request, res: Response): Promise<void>
   } catch (error) { handleControllerError(res, error, 'Failed to get friends sets'); }
 }
 
+export async function getUserSets(req: Request, res: Response): Promise<void> {
+  try {
+    const sets = await setsService.getUserSets(req.user!.id, req.params.userId);
+    sendSuccess(res, sets, 'User sets retrieved successfully');
+  } catch (error) { handleControllerError(res, error, 'Failed to get user sets'); }
+}
+
 export async function cloneSet(req: Request, res: Response): Promise<void> {
   try {
     const set = await setsService.cloneSet(req.user!.id, req.params.id);

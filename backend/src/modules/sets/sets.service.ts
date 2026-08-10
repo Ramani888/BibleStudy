@@ -172,6 +172,23 @@ export async function getFriendsSets(userId: string, page = 1, limit = 20) {
   };
 }
 
+export async function getUserSets(viewerId: string, targetId: string) {
+  if (viewerId === targetId) {
+    return prisma.set.findMany({
+      where: { userId: targetId },
+      include: { _count: { select: { cards: true } } },
+      orderBy: { updatedAt: 'desc' },
+    });
+  }
+  const isFriend = !!(await prisma.friendship.findFirst({ where: { userId: viewerId, friendId: targetId } }));
+  const visibilities: ('PUBLIC' | 'FRIENDS')[] = isFriend ? ['PUBLIC', 'FRIENDS'] : ['PUBLIC'];
+  return prisma.set.findMany({
+    where: { userId: targetId, visibility: { in: visibilities } },
+    include: { _count: { select: { cards: true } } },
+    orderBy: { updatedAt: 'desc' },
+  });
+}
+
 export async function cloneSet(userId: string, setId: string) {
   const originalSet = await prisma.set.findFirst({
     where: { id: setId },

@@ -5,9 +5,9 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
-import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
 import { SearchBar } from '../../components/ui/SearchBar';
+import { EmptyState } from '../../components/feedback/EmptyState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ClockIcon, UserPlusIcon } from '../../components/icons';
@@ -27,7 +27,6 @@ export function SearchUsersScreen({ navigation }: Props) {
   const { data: users = [], isFetching } = useSearchUsers(debouncedQuery);
   const sendRequest = useSendFriendRequest();
 
-  // Reset sent-request highlights when a new search result arrives
   React.useEffect(() => {
     if (!isFetching) setSentIds(new Set());
   }, [isFetching]);
@@ -46,46 +45,55 @@ export function SearchUsersScreen({ navigation }: Props) {
     const isFriend = !!item.isFriend;
     const isPending = !!item.pendingRequest || sentIds.has(item.id);
     return (
-      <ListCard
-        leading={<Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />}
-        title={item.name}
-        subtitle={item.church ?? undefined}
+      <Pressable
+        style={styles.card}
         onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
-        trailing={
-          isFriend ? (
-            <CheckCircleIcon size={24} color={colors.success} />
-          ) : isPending ? (
-            <ClockIcon size={24} color={colors.textSecondary} />
-          ) : (
-            <Pressable
-              style={styles.addBtn}
-              onPress={() => handleAdd(item)}
-              hitSlop={8}
-              disabled={sendRequest.isPending}
-            >
-              <UserPlusIcon size={20} color={colors.primary} />
-            </Pressable>
-          )
-        }
-      />
+      >
+        <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
+        <View style={styles.cardInfo}>
+          <Typography preset="label" numberOfLines={1}>{item.name}</Typography>
+          {item.church ? (
+            <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
+              {item.church}
+            </Typography>
+          ) : null}
+        </View>
+        {isFriend ? (
+          <CheckCircleIcon size={22} color={colors.success} />
+        ) : isPending ? (
+          <View style={styles.pendingBadge}>
+            <ClockIcon size={14} color={colors.textSecondary} />
+            <Typography preset="caption" color={colors.textSecondary}>Sent</Typography>
+          </View>
+        ) : (
+          <Pressable
+            style={styles.addBtn}
+            onPress={() => handleAdd(item)}
+            hitSlop={8}
+            disabled={sendRequest.isPending}
+          >
+            <UserPlusIcon size={20} color={colors.primary} />
+          </Pressable>
+        )}
+      </Pressable>
     );
   }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, styles]);
 
   return (
-    <Screen
-      header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}
-    >
-      <View style={styles.searchBar}>
+    <Screen header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}>
+      <View style={styles.searchWrap}>
         <SearchBar
-          placeholder="Search by name..."
+          placeholder="Search by name or email…"
           value={query}
           onChangeText={setQuery}
           autoFocus
         />
       </View>
+
       {isFetching && debouncedQuery.length > 1 && (
         <ActivityIndicator size="small" color={colors.primary} style={styles.loader} />
       )}
+
       <FlatList
         data={users}
         keyExtractor={item => item.id}
@@ -95,9 +103,9 @@ export function SearchUsersScreen({ navigation }: Props) {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           debouncedQuery.length > 1 && !isFetching ? (
-            <View style={styles.empty}>
-              <Typography preset="body" color={colors.textSecondary}>No users found</Typography>
-            </View>
+            <EmptyState title="No users found" subtitle={`No results for "${debouncedQuery}"`} />
+          ) : debouncedQuery.length === 0 ? (
+            <EmptyState title="Find Friends" subtitle="Search by name or email to connect with others." />
           ) : null
         }
       />
@@ -107,11 +115,32 @@ export function SearchUsersScreen({ navigation }: Props) {
 
 function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
   return StyleSheet.create({
-    searchBar: { padding: layout.screenPaddingH },
-    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: layout.screenPaddingH },
-    separator: { height: spacing[3] },
-    addBtn: { padding: spacing[1] },
+    searchWrap: { padding: layout.screenPaddingH, paddingBottom: spacing[2] },
+    list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing[6] },
+    separator: { height: spacing[2] },
     loader: { paddingVertical: spacing[2] },
-    empty: { padding: layout.screenPaddingH, alignItems: 'center' },
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      padding: spacing[3],
+      borderRadius: layout.cardRadius,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    cardInfo: { flex: 1, gap: spacing[0.5] },
+    addBtn: { padding: spacing[1] },
+    pendingBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[1],
+      paddingHorizontal: spacing[2],
+      paddingVertical: spacing[1],
+      borderRadius: layout.pillRadius,
+      backgroundColor: colors.backgroundSecondary,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
   });
 }

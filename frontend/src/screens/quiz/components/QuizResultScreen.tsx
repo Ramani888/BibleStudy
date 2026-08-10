@@ -9,6 +9,17 @@ import { useQuizAttemptSave } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import type { SummaryItem } from '../../../types';
 
+const QUOTES = [
+  { minScore: 90, text: 'Outstanding! Your dedication is bearing real fruit.',    sub: 'Keep that momentum going.' },
+  { minScore: 70, text: 'Great work — every review sharpens the mind and spirit.', sub: "You're building something lasting." },
+  { minScore: 50, text: 'Good effort — consistency is the key to mastery.',        sub: 'Come back tomorrow and go further.' },
+  { minScore: 0,  text: "Don't be discouraged — struggle is where growth happens.", sub: 'Every attempt makes you stronger.' },
+];
+
+function getQuote(score: number) {
+  return QUOTES.find(q => score >= q.minScore) ?? QUOTES[QUOTES.length - 1];
+}
+
 const RESULT_ICON_SIZE = 56;
 const AUTO_EXIT_SECS = 5;
 
@@ -65,6 +76,7 @@ export function QuizResultScreen({
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.error;
   const isNewBest = best !== null && scorePct >= best;
+  const quote = getQuote(scorePct);
 
   const openSummary = () => {
     (navigation as any).navigate('QuizSummary', {
@@ -90,6 +102,14 @@ export function QuizResultScreen({
         <Typography preset="caption" color={colors.textSecondary}>
           {correct} / {total} correct
         </Typography>
+      </View>
+
+      {/* Motivational quote — same style as home screen verse card */}
+      <View style={[styles.quoteCard, { backgroundColor: colors.primary }]}>
+        <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
+        <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
+        <Typography preset="verse" color={colors.textOnPrimary} style={styles.quoteText}>{quote.text}</Typography>
+        <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
       </View>
 
       {/* Summary icon button */}
@@ -164,4 +184,18 @@ const styles = StyleSheet.create({
     borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
+  quoteCard: {
+    alignSelf: 'stretch',
+    borderRadius: layout.cardRadiusLg,
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[5],
+    justifyContent: 'center',
+    gap: spacing[2],
+    overflow: 'hidden',
+  },
+  quoteText: { fontStyle: 'italic', textAlign: 'center' },
+  quoteSub: { textAlign: 'center' },
+  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
+  quoteTopLeft: { top: spacing[2], left: spacing[4] },
+  quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
 });

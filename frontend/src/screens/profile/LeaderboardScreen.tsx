@@ -15,11 +15,26 @@ import { useLeaderboard } from '../../hooks';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
+const QUOTES: { maxRank: number; text: string; sub: string }[] = [
+  { maxRank: 1,        text: "You're leading the way — keep that flame alive! 🔥",  sub: 'The crown is yours. Protect it.' },
+  { maxRank: 3,        text: 'So close to the top — one faithful day can do it.',    sub: 'Push through, the finish is near.' },
+  { maxRank: 10,       text: 'Consistency is your superpower. Keep showing up.',     sub: 'Small steps build mighty habits.' },
+  { maxRank: Infinity, text: 'Every great journey begins with a single step.',       sub: "Today's streak is tomorrow's legacy." },
+];
+
+function getQuote(rank: number) {
+  if (rank === 0) return { text: 'Every great journey begins with a single step.', sub: 'Start your streak today.' };
+  return QUOTES.find(q => rank <= q.maxRank) ?? QUOTES[QUOTES.length - 1];
+}
+
 export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboard'>) {
   const theme = useTheme();
   const { colors } = theme;
   const styles = useMemo(() => makeStyles(theme), [theme]);
   const { data: rows = [], isFetching, error, refetch } = useLeaderboard();
+
+  const myRank = rows.findIndex(r => r.isMe) + 1;
+  const quote = getQuote(myRank);
 
   const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
     <View style={[styles.row, item.isMe && styles.rowMe]}>
@@ -30,7 +45,9 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
       </View>
       <Avatar uri={item.profileImage} name={item.name ?? ''} size="sm" />
       <View style={styles.info}>
-        <Typography preset="label" numberOfLines={1}>{item.name}{item.isMe ? ' (you)' : ''}</Typography>
+        <Typography preset="label" numberOfLines={1}>
+          {item.name}{item.isMe ? ' (you)' : ''}
+        </Typography>
         <Typography preset="caption" color={colors.textSecondary}>
           Best {item.longestStreak} · {item.achievements} achievement{item.achievements === 1 ? '' : 's'}
         </Typography>
@@ -53,9 +70,12 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         contentContainerStyle={styles.list}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
         ListHeaderComponent={
-          <Typography preset="caption" color={colors.textSecondary} style={styles.caption}>
-            Ranked by current daily-study streak.
-          </Typography>
+          <View style={styles.quoteCard}>
+            <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
+            <Typography preset="verse" color={colors.textOnPrimary} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
+            <Typography preset="verse" color={colors.textOnPrimary} style={styles.quoteText}>{quote.text}</Typography>
+            <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
+          </View>
         }
         ListEmptyComponent={
           !isFetching ? (
@@ -75,7 +95,22 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
 
 const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
   list: { padding: layout.screenPaddingH, gap: spacing[2], flexGrow: 1 },
-  caption: { marginBottom: spacing[1] },
+  quoteCard: {
+    backgroundColor: colors.primary,
+    borderRadius: layout.cardRadiusLg,
+    minHeight: 190,
+    paddingHorizontal: spacing[6],
+    paddingVertical: spacing[7],
+    justifyContent: 'center',
+    gap: spacing[3],
+    overflow: 'hidden',
+    marginBottom: spacing[4],
+  },
+  quoteText: { fontStyle: 'italic', textAlign: 'center' },
+  quoteSub: { textAlign: 'center' },
+  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
+  quoteTopLeft: { top: spacing[2], left: spacing[4] },
+  quoteBottomRight: { bottom: spacing[2], right: spacing[4] },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

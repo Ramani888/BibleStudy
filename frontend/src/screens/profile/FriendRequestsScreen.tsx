@@ -5,7 +5,6 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
-import { ListCard } from '../../components/ui/ListCard';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
@@ -19,6 +18,7 @@ import {
   useCancelFriendRequest,
 } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
+import { formatDate } from '../../utils/formatters';
 import type { FriendRequest } from '../../types/friends.types';
 
 type Props = ProfileScreenProps<'FriendRequests'>;
@@ -28,10 +28,15 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const [tab, setTab] = useState<Tab>('incoming');
+
+  const { data: incomingRequests = [] } = useFriendRequests('incoming');
   const { data: requests = [], isFetching, error, refetch } = useFriendRequests(tab);
+
   const accept = useAcceptFriendRequest();
   const reject = useRejectFriendRequest();
   const cancel = useCancelFriendRequest();
+
+  const incomingCount = incomingRequests.length;
 
   const handleAccept = (requestId: string) => {
     accept.mutate(requestId, {
@@ -57,30 +62,32 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
-      <ListCard
-        leading={<Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />}
-        title={person?.name ?? ''}
-        subtitle={person?.church ?? undefined}
-        trailing={
-          tab === 'incoming' ? (
-            <View style={styles.requestActions}>
-              <Pressable onPress={() => handleAccept(item.id)} hitSlop={8}>
-                <CheckCircleIcon size={28} color={colors.success} />
-              </Pressable>
-              <Pressable onPress={() => handleReject(item.id)} hitSlop={8}>
-                <CloseCircleIcon size={28} color={colors.error} />
-              </Pressable>
-            </View>
-          ) : (
-            <Pressable onPress={() => handleCancel(item.id)} hitSlop={8}>
-              <CloseCircleIcon size={28} color={colors.textSecondary} />
+      <View style={styles.card}>
+        <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
+        <View style={styles.cardInfo}>
+          <Typography preset="label" numberOfLines={1}>{person?.name ?? ''}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>
+            {formatDate(item.createdAt)}
+          </Typography>
+        </View>
+        {tab === 'incoming' ? (
+          <View style={styles.requestActions}>
+            <Pressable onPress={() => handleAccept(item.id)} hitSlop={8} style={styles.actionBtn}>
+              <CheckCircleIcon size={28} color={colors.success} />
             </Pressable>
-          )
-        }
-      />
+            <Pressable onPress={() => handleReject(item.id)} hitSlop={8} style={styles.actionBtn}>
+              <CloseCircleIcon size={28} color={colors.error} />
+            </Pressable>
+          </View>
+        ) : (
+          <Pressable onPress={() => handleCancel(item.id)} hitSlop={8} style={styles.actionBtn}>
+            <CloseCircleIcon size={26} color={colors.textSecondary} />
+          </Pressable>
+        )}
+      </View>
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, colors]);
+  }, [tab, colors, styles]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
@@ -93,9 +100,16 @@ export function FriendRequestsScreen({ navigation }: Props) {
           style={[styles.tab, tab === 'incoming' && styles.activeTab]}
           onPress={() => setTab('incoming')}
         >
-          <Typography preset="label" color={tab === 'incoming' ? colors.primary : colors.textSecondary}>
-            Incoming
-          </Typography>
+          <View style={styles.tabContent}>
+            <Typography preset="label" color={tab === 'incoming' ? colors.primary : colors.textSecondary}>
+              Incoming
+            </Typography>
+            {incomingCount > 0 ? (
+              <View style={styles.badge}>
+                <Typography preset="caption" color="#fff">{incomingCount}</Typography>
+              </View>
+            ) : null}
+          </View>
         </Pressable>
         <Pressable
           style={[styles.tab, tab === 'outgoing' && styles.activeTab]}
@@ -135,9 +149,31 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     },
     tab: { flex: 1, paddingVertical: spacing[3], alignItems: 'center' },
     activeTab: { borderBottomWidth: 2, borderBottomColor: colors.primary },
-    list: { padding: layout.screenPaddingH },
-    separator: { height: spacing[3] },
+    tabContent: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    badge: {
+      backgroundColor: colors.primary,
+      borderRadius: 10,
+      minWidth: 20,
+      height: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingHorizontal: spacing[1],
+    },
+    list: { padding: layout.screenPaddingH, paddingBottom: spacing[6] },
+    separator: { height: spacing[2] },
     emptyContainer: { flex: 1, justifyContent: 'center' },
-    requestActions: { flexDirection: 'row', gap: spacing[2] },
+    card: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      padding: spacing[3],
+      borderRadius: layout.cardRadius,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    cardInfo: { flex: 1, gap: spacing[0.5] },
+    requestActions: { flexDirection: 'row', gap: spacing[1] },
+    actionBtn: { padding: spacing[1] },
   });
 }

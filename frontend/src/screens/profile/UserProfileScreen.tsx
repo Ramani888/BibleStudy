@@ -1,5 +1,5 @@
 import React from 'react';
-import { Image, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -9,8 +9,9 @@ import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, HomeIcon, UserIcon, UsersIcon } from '../../components/icons';
+import { CalendarIcon, HomeIcon, UserIcon, UsersIcon, BookIcon } from '../../components/icons';
 import { useUser } from '../../hooks/useUser';
+import { useUserSets } from '../../hooks/useSets';
 import {
   useAcceptFriendRequest,
   useBlockUser,
@@ -22,8 +23,15 @@ import {
 import { getErrorMessage } from '../../api/client';
 import { formatDateOnly } from '../../utils/formatters';
 import { layout, spacing, useTheme } from '../../theme';
+import type { StudySet } from '../../types';
 
 type Props = ProfileScreenProps<'UserProfile'>;
+
+const VISIBILITY_LABEL: Record<string, string> = {
+  PUBLIC: '🌐 Public',
+  FRIENDS: '👥 Friends',
+  PRIVATE: '🔒 Private',
+};
 
 export function UserProfileScreen({ route, navigation }: Props) {
   const { colors } = useTheme();
@@ -31,6 +39,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, error, refetch } = useUser(userId);
+  const { data: sets = [] } = useUserSets(userId);
 
   const sendRequest = useSendFriendRequest();
   const cancelRequest = useCancelFriendRequest();
@@ -82,17 +91,29 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
   const handleRemoveFriend = () => {
     removeFriend.mutate(userId, {
-      onSuccess: () => { Toast.show({ type: 'success', text1: 'Friend removed' }); navigation.goBack(); },
+      onSuccess: () => {
+        Toast.show({ type: 'success', text1: 'Friend removed' });
+        navigation.goBack();
+      },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
 
   const handleBlock = () => {
     blockUser.mutate(userId, {
-      onSuccess: () => { Toast.show({ type: 'success', text1: 'User blocked' }); navigation.goBack(); },
+      onSuccess: () => {
+        Toast.show({ type: 'success', text1: 'User blocked' });
+        navigation.goBack();
+      },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
+
+  const openSet = (set: StudySet) =>
+    navigation.navigate('LibraryTab', {
+      screen: 'SetDetail',
+      params: { setId: set.id, setTitle: set.title, isOwner: false },
+    });
 
   return (
     <Screen header={<ScreenHeader title={user.name ?? 'Profile'} onBack={() => navigation.goBack()} />}>
@@ -158,9 +179,27 @@ export function UserProfileScreen({ route, navigation }: Props) {
           ) : (
             <Button label="Send Friend Request" variant="primary" onPress={handleSendRequest} loading={sendRequest.isPending || isFetching} fullWidth />
           )}
-
           <Button label="Block User" variant="danger" onPress={handleBlock} loading={blockUser.isPending} fullWidth style={styles.blockBtn} />
         </View>
+
+        {sets.length > 0 ? (
+          <View style={styles.setsSection}>
+            <Typography preset="label" style={styles.setsTitle}>Their Sets</Typography>
+            {sets.map(set => (
+              <Pressable key={set.id} style={styles.setCard} onPress={() => openSet(set)}>
+                <View style={styles.setIcon}>
+                  <BookIcon size={18} color={colors.primary} />
+                </View>
+                <View style={styles.setInfo}>
+                  <Typography preset="label" numberOfLines={1}>{set.title}</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>
+                    {set._count?.cards ?? 0} cards · {VISIBILITY_LABEL[set.visibility] ?? set.visibility}
+                  </Typography>
+                </View>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
       </ScrollView>
     </Screen>
   );
@@ -175,11 +214,7 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
       alignItems: 'stretch',
     },
     avatarContainer: { alignItems: 'center', marginBottom: spacing[2] },
-    avatar: {
-      width: layout.avatarLg,
-      height: layout.avatarLg,
-      borderRadius: layout.avatarLg / 2,
-    },
+    avatar: { width: layout.avatarLg, height: layout.avatarLg, borderRadius: layout.avatarLg / 2 },
     avatarPlaceholder: {
       width: layout.avatarLg,
       height: layout.avatarLg,
@@ -197,5 +232,26 @@ function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
     bio: { marginVertical: spacing[1] },
     actions: { gap: spacing[2], marginTop: spacing[4] },
     blockBtn: { marginTop: spacing[2] },
+    setsSection: { marginTop: spacing[4], gap: spacing[2] },
+    setsTitle: { marginBottom: spacing[1] },
+    setCard: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      padding: spacing[3],
+      borderRadius: layout.cardRadius,
+      borderWidth: 1,
+      borderColor: colors.border,
+      backgroundColor: colors.backgroundSecondary,
+    },
+    setIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: layout.pillRadius,
+      backgroundColor: colors.primarySurface,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    setInfo: { flex: 1, gap: spacing[0.5] },
   });
 }
