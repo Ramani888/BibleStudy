@@ -69,7 +69,7 @@ export type ProfileStackParamList = {
   UserProfile: { userId: string };
   BlockedUsers: undefined;
   // Notifications
-  Notifications: undefined;
+  Notifications: { from?: 'Home' } | undefined;
   NotificationSettings: undefined;
   // Notes
   Notes: undefined;

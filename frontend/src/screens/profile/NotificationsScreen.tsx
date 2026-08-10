@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Pressable, SectionList, StyleSheet, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
@@ -62,7 +62,7 @@ function groupByDate(notifications: Notification[]): { title: string; data: Noti
     .map(k => ({ title: k, data: buckets[k] }));
 }
 
-export function NotificationsScreen({ navigation }: Props) {
+export function NotificationsScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const styles = makeStyles(colors);
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
@@ -74,10 +74,18 @@ export function NotificationsScreen({ navigation }: Props) {
   const unreadCount = data?.unreadCount ?? 0;
   const sections = groupByDate(notifications);
 
+  const openSwipeableRef = useRef<Swipeable | null>(null);
+
   const renderItem = useCallback(({ item }: { item: Notification }) => {
     const NotifIcon = getNotificationIcon(item.type);
+    let thisSwipeable: Swipeable | null = null;
     return (
       <Swipeable
+        ref={r => { thisSwipeable = r; }}
+        onSwipeableOpen={() => {
+          if (openSwipeableRef.current !== thisSwipeable) openSwipeableRef.current?.close();
+          openSwipeableRef.current = thisSwipeable;
+        }}
         renderRightActions={() => (
           <Pressable style={styles.deleteAction} onPress={() => deleteNotification.mutate(item.id)}>
             <TrashIcon size={20} color="#fff" />
@@ -132,7 +140,7 @@ export function NotificationsScreen({ navigation }: Props) {
       header={
         <ScreenHeader
           title="Notifications"
-          onBack={() => navigation.navigate('Profile')}
+          onBack={() => route.params?.from === 'Home' ? navigation.navigate('HomeTab') : navigation.goBack()}
           right={headerRight}
         />
       }

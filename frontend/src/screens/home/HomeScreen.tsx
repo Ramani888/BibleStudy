@@ -327,7 +327,7 @@ export function HomeScreen() {
         avatarUri={user?.profileImage}
         unread={notifData?.unreadCount ?? 0}
         onAI={() => navigation.navigate('AITab', { screen: 'AIChat' })}
-        onBell={() => navigation.navigate('ProfileTab', { screen: 'Notifications' })}
+        onBell={() => navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } })}
         onAvatar={() => navigation.navigate('ProfileTab', { screen: 'Profile' })}
       />
 
