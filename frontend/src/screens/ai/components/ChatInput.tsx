@@ -1,5 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
+  Image,
   Pressable,
   StyleSheet,
   TextInput,
@@ -19,6 +21,9 @@ interface ChatInputProps {
   disabled?: boolean;
   creditBalance?: number;
   attachmentName?: string | null;
+  attachmentType?: 'IMAGE' | 'PDF';
+  attachmentLocalUri?: string | null;
+  isUploading?: boolean;
   onAttachPress?: () => void;
   onClearAttachment?: () => void;
   onUpgrade?: () => void;
@@ -29,6 +34,9 @@ export function ChatInput({
   disabled,
   creditBalance,
   attachmentName,
+  attachmentType,
+  attachmentLocalUri,
+  isUploading,
   onAttachPress,
   onClearAttachment,
   onUpgrade,
@@ -70,18 +78,40 @@ export function ChatInput({
         </View>
       )}
 
-      {/* State 5 — attachment chip */}
-      {attachmentName ? (
-        <View style={styles.attachChip}>
-          <FileTextIcon size={14} color={colors.primary} />
-          <Typography preset="caption" color={colors.primary} style={styles.attachName} numberOfLines={1}>
-            {attachmentName}
-          </Typography>
-          <Pressable onPress={onClearAttachment} hitSlop={8}>
-            <CloseIcon size={14} color={colors.textSecondary} />
-          </Pressable>
-        </View>
-      ) : null}
+      {/* State 5 — attachment: image thumbnail or PDF chip */}
+      {(isUploading || !!attachmentName) && (
+        attachmentType === 'IMAGE' && attachmentLocalUri ? (
+          // Image: thumbnail with spinner overlay while uploading, clear button after
+          <View style={styles.thumbWrap}>
+            <Image source={{ uri: attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />
+            {isUploading ? (
+              <View style={styles.thumbOverlay}>
+                <ActivityIndicator size="small" color="#fff" />
+              </View>
+            ) : (
+              <Pressable style={styles.thumbClearBtn} onPress={onClearAttachment} hitSlop={8}>
+                <CloseIcon size={10} color="#fff" />
+              </Pressable>
+            )}
+          </View>
+        ) : (
+          // PDF (or unknown type during upload): text chip with spinner or file icon
+          <View style={styles.attachChip}>
+            {isUploading
+              ? <ActivityIndicator size="small" color={colors.primary} style={styles.chipSpinner} />
+              : <FileTextIcon size={14} color={colors.primary} />
+            }
+            <Typography preset="caption" color={colors.primary} style={styles.attachName} numberOfLines={1}>
+              {attachmentName ?? 'Uploading…'}
+            </Typography>
+            {!isUploading && (
+              <Pressable onPress={onClearAttachment} hitSlop={8}>
+                <CloseIcon size={14} color={colors.textSecondary} />
+              </Pressable>
+            )}
+          </View>
+        )
+      )}
 
       {/* States 1–4 — single container, always */}
       <View style={styles.inputBox}>
@@ -154,6 +184,36 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     gap: spacing[1],
   },
 
+  thumbWrap: {
+    position: 'relative',
+    width: 64,
+    height: 64,
+    borderRadius: layout.cardRadius,
+    overflow: 'hidden',
+    alignSelf: 'flex-start',
+  },
+  thumb: {
+    width: 64,
+    height: 64,
+  },
+  thumbOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  thumbClearBtn: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: 'rgba(0,0,0,0.55)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   attachChip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -168,6 +228,7 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     paddingVertical: spacing[1.5],
   },
   attachName: { flexShrink: 1 },
+  chipSpinner: { width: 14, height: 14 },
 
   // One box — filled, no hard border
   inputBox: {

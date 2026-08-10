@@ -15,7 +15,9 @@ export interface ChatUIMessage {
   suggestedCards?: SuggestedCard[];
   isHistorical?: boolean;   // loaded from Chat History (banner suppressed)
   userQuestion?: string;    // question that prompted this AI response (for Save as Card)
-  attachmentName?: string;  // Phase F.1: name of an attached PDF (user messages only)
+  attachmentName?: string;     // name of an attached file (user messages only)
+  attachmentType?: 'IMAGE' | 'PDF';
+  attachmentLocalUri?: string; // local/S3 URI for image thumbnail
 }
 
 function generateUUID(): string {

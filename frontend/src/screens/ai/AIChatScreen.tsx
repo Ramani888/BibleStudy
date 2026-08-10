@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
+  Image,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -79,13 +80,13 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   });
 
   // Phase F: PDF (F.1) or image (F.2) attached — from My Media or straight from the device.
-  const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType } | null>(null);
+  const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType; localUri?: string } | null>(null);
   const [attachMenuVisible, setAttachMenuVisible] = useState(false); // source chooser
   const [pickerVisible, setPickerVisible] = useState(false);         // My Media list
   const [policyAccepted, setPolicyAccepted] = useState(false);
   const [policyDialogVisible, setPolicyDialogVisible] = useState(false);
   const { data: media = [] } = useMediaFiles();
-  const { pickImage, takePhoto, pickPdf, isUploading } = usePickMedia();
+  const { pickImage, takePhoto, pickPdf, isUploading, pendingLocalUri } = usePickMedia();
 
   const { mutate: sendMessage, isPending } = useAIChat();
   const { mutateAsync: bulkCreateCards } = useBulkCreateCards();
@@ -149,7 +150,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       const userMsgId = Date.now().toString();
       setMessages(prev => [
         ...prev,
-        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: att ? (att.type === 'PDF' ? 5 : 3) : 1, attachmentName: att?.name },
+        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: att ? (att.type === 'PDF' ? 5 : 3) : 1, attachmentName: att?.name, attachmentType: att?.type, attachmentLocalUri: att?.localUri },
         { id: `${userMsgId}_typing`, role: 'ai', text: TYPING_INDICATOR, timestamp: Date.now() },
       ]);
 
@@ -327,9 +328,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const MIN_MEDIA_COST = 3;
   const goPaywall = () => navigation.navigate('ProfileTab', { screen: 'Paywall' });
 
-  const attachFromDevice = async (pick: () => Promise<MediaFile | null>) => {
+  const attachFromDevice = async (pick: () => Promise<(MediaFile & { localUri?: string }) | null>) => {
     const file = await pick();
-    if (file) setAttachment({ id: file.id, name: file.name, type: file.type });
+    if (file) setAttachment({ id: file.id, name: file.name, type: file.type, localUri: file.localUri });
   };
 
   const attachMenuActions = creditBalance < MIN_MEDIA_COST
@@ -399,15 +400,17 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   const renderItem = useCallback(({ item }: { item: ChatUIMessage }) => (
     <View>
-      {/* Attached-PDF chip on the user's message (Phase F.1) */}
-      {item.role === 'user' && item.attachmentName && (
+      {/* Attachment preview on user messages */}
+      {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
+        <Image source={{ uri: item.attachmentLocalUri }} style={styles.msgImageThumb} resizeMode="cover" />
+      ) : item.role === 'user' && item.attachmentName ? (
         <View style={styles.attachmentChip}>
           <FileTextIcon size={14} color={colors.primary} />
           <Typography preset="caption" color={colors.primary} numberOfLines={1} style={styles.attachmentChipText}>
             {item.attachmentName}
           </Typography>
         </View>
-      )}
+      ) : null}
       <Pressable onLongPress={() => handleLongPress(item)}>
         <ChatBubble
           role={item.role}
@@ -548,6 +551,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
         attachmentName={attachment?.name ?? null}
+        attachmentType={attachment?.type ?? (pendingLocalUri ? 'IMAGE' : 'PDF')}
+        attachmentLocalUri={pendingLocalUri ?? attachment?.localUri ?? null}
+        isUploading={isUploading}
         onAttachPress={() => {
           Keyboard.dismiss();
           if (policyAccepted) { setAttachMenuVisible(true); }
@@ -667,6 +673,15 @@ const makeStyles = ({ colors, spacing, layout }: Theme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.primaryLight,
     padding: spacing[3],
+  },
+
+  msgImageThumb: {
+    width: 200,
+    height: 150,
+    borderRadius: layout.cardRadius,
+    alignSelf: 'flex-end',
+    marginRight: spacing[4],
+    marginBottom: spacing[1],
   },
 
   attachmentChip: {
