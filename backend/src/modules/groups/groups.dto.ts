@@ -12,6 +12,11 @@ export const UpdateRoleDto = z.object({
   role: z.enum(['ADMIN', 'MEMBER']),
 });
 
+export const AddMemberDto = z.object({
+  userId: z.string().min(1),
+});
+
 export type CreateGroupDtoType = z.infer<typeof CreateGroupDto>;
 export type UpdateGroupDtoType = z.infer<typeof UpdateGroupDto>;
 export type UpdateRoleDtoType  = z.infer<typeof UpdateRoleDto>;
+export type AddMemberDtoType   = z.infer<typeof AddMemberDto>;

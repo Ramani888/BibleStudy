@@ -12,7 +12,7 @@ import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { LogOutIcon, UsersIcon } from '../../components/icons';
-import { usePublicGroups, useJoinGroup } from '../../hooks/useGroups';
+import { usePublicGroups, useJoinPublicGroup } from '../../hooks/useGroups';
 import { useDebouncedValue } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import type { Group } from '../../types/groups.types';
@@ -25,12 +25,12 @@ export function PublicGroupsScreen({ navigation }: Props) {
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 300);
   const { data, isFetching, error, refetch } = usePublicGroups(debouncedQuery || undefined);
-  const joinGroup = useJoinGroup();
+  const joinGroup = useJoinPublicGroup();
 
   const groups = data?.groups ?? [];
 
   const handleJoin = (group: Group) => {
-    joinGroup.mutate(group.inviteCode, {
+    joinGroup.mutate(group.id, {
       onSuccess: () => {
         Toast.show({ type: 'success', text1: `Joined "${group.name}"` });
         navigation.navigate('GroupDetail', { groupId: group.id });

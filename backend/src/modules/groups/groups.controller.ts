@@ -47,9 +47,16 @@ export async function deleteGroup(req: Request, res: Response): Promise<void> {
   } catch (error) { handleControllerError(res, error, 'Failed to delete group'); }
 }
 
-export async function joinGroup(req: Request, res: Response): Promise<void> {
+export async function addMember(req: Request, res: Response): Promise<void> {
   try {
-    const group = await groupsService.joinGroup(req.user!.id, req.params.inviteCode);
+    const group = await groupsService.addMember(req.user!.id, req.params.id, req.body);
+    sendSuccess(res, group, 'Member added successfully', 201);
+  } catch (error) { handleControllerError(res, error, 'Failed to add member'); }
+}
+
+export async function joinPublicGroup(req: Request, res: Response): Promise<void> {
+  try {
+    const group = await groupsService.joinPublicGroup(req.user!.id, req.params.id);
     sendSuccess(res, group, 'Joined group successfully');
   } catch (error) { handleControllerError(res, error, 'Failed to join group'); }
 }
@@ -75,9 +82,3 @@ export async function removeMember(req: Request, res: Response): Promise<void> {
   } catch (error) { handleControllerError(res, error, 'Failed to remove member'); }
 }
 
-export async function regenerateInviteCode(req: Request, res: Response): Promise<void> {
-  try {
-    const result = await groupsService.regenerateInviteCode(req.user!.id, req.params.id);
-    sendSuccess(res, result, 'Invite code regenerated');
-  } catch (error) { handleControllerError(res, error, 'Failed to regenerate invite code'); }
-}

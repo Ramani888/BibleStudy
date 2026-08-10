@@ -73,7 +73,7 @@ export type ProfileStackParamList = {
   GroupDetail: { groupId: string };
   CreateGroup: undefined;
   EditGroup: { groupId: string };
-  JoinGroup: undefined;
+  AddGroupMember: { groupId: string };
   // Group study plans (D2)
   GroupPlanDetail: { planId: string; groupTitle?: string };
   CreateGroupPlan: { groupId: string };

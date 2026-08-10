@@ -45,11 +45,20 @@ export function useDeleteGroup() {
   });
 }
 
-export function useJoinGroup() {
+export function useJoinPublicGroup() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (inviteCode: string) => groupsApi.joinByCode(inviteCode),
+    mutationFn: (id: string) => groupsApi.joinPublic(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['groups'] }),
+  });
+}
+
+export function useAddGroupMember() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ groupId, userId }: { groupId: string; userId: string }) =>
+      groupsApi.addMember(groupId, userId),
+    onSuccess: (_data, { groupId }) => qc.invalidateQueries({ queryKey: ['groups', groupId] }),
   });
 }
 
@@ -86,10 +95,3 @@ export function usePublicGroups(search?: string) {
   });
 }
 
-export function useRegenerateInviteCode() {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => groupsApi.regenerateInvite(id),
-    onSuccess: (_data, id) => qc.invalidateQueries({ queryKey: ['groups', id] }),
-  });
-}

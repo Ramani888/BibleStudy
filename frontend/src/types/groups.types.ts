@@ -8,7 +8,6 @@ export interface Group {
   ownerId: string;
   owner?: UserProfile;
   visibility: Visibility;
-  inviteCode: string;
   createdAt: string;
   updatedAt: string;
   members?: GroupMember[];

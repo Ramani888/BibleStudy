@@ -18,7 +18,7 @@ import { GroupsScreen } from '../screens/profile/GroupsScreen';
 import { GroupDetailScreen } from '../screens/profile/GroupDetailScreen';
 import { CreateGroupScreen } from '../screens/profile/CreateGroupScreen';
 import { EditGroupScreen } from '../screens/profile/EditGroupScreen';
-import { JoinGroupScreen } from '../screens/profile/JoinGroupScreen';
+import { AddGroupMemberScreen } from '../screens/profile/AddGroupMemberScreen';
 import { PublicGroupsScreen } from '../screens/profile/PublicGroupsScreen';
 import { GroupPlanDetailScreen } from '../screens/profile/GroupPlanDetailScreen';
 import { CreatePlanScreen } from '../screens/library/CreatePlanScreen';
@@ -50,7 +50,7 @@ export function ProfileNavigator() {
       <Stack.Screen name="GroupDetail"     component={GroupDetailScreen}     />
       <Stack.Screen name="CreateGroup"     component={CreateGroupScreen}     options={{ presentation: 'modal' }} />
       <Stack.Screen name="EditGroup"       component={EditGroupScreen}       options={{ presentation: 'modal' }} />
-      <Stack.Screen name="JoinGroup"       component={JoinGroupScreen}       options={{ presentation: 'modal' }} />
+      <Stack.Screen name="AddGroupMember"  component={AddGroupMemberScreen}  options={{ presentation: 'modal' }} />
       <Stack.Screen name="PublicGroups"    component={PublicGroupsScreen}    />
       <Stack.Screen name="GroupPlanDetail" component={GroupPlanDetailScreen} />
       <Stack.Screen name="CreateGroupPlan" component={CreatePlanScreen}      options={{ presentation: 'modal' }} />

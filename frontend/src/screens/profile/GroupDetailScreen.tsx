@@ -1,19 +1,34 @@
-import React from 'react';
-import { Pressable, RefreshControl, ScrollView, Share, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, spacing, Theme, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
 import { ProgressBar } from '../../components/ui/ProgressBar';
+import { Card, PressableCard } from '../../components/ui/Card';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, PlusIcon, ShareIcon, SwapIcon, UserMinusIcon, UsersIcon } from '../../components/icons';
+import {
+  CalendarIcon,
+  MoreVerticalIcon,
+  PencilIcon,
+  PlusIcon,
+  SwapIcon,
+  UserMinusIcon,
+  UserPlusIcon,
+  UsersIcon,
+} from '../../components/icons';
 import { useGroup, useLeaveGroup, useDeleteGroup, useUpdateMemberRole, useRemoveMember } from '../../hooks/useGroups';
 import { useGroupPlans } from '../../hooks/usePlans';
 import { useConfirmDialog } from '../../hooks';
@@ -23,11 +38,15 @@ import type { GroupMember } from '../../types/groups.types';
 
 type Props = ProfileScreenProps<'GroupDetail'>;
 
+const HERO_AVATAR_SIZE = 96;
+
 export function GroupDetailScreen({ route, navigation }: Props) {
-  const { colors } = useTheme();
-  const styles = makeStyles(colors);
+  const theme = useTheme();
+  const { colors } = theme;
+  const styles = makeStyles(theme);
   const { groupId } = route.params;
   const user = useAuthStore(s => s.user);
+
   const { data: group, isLoading, isFetching, error, refetch } = useGroup(groupId);
   const { data: plans = [] } = useGroupPlans(groupId);
   const leaveGroup = useLeaveGroup();
@@ -36,17 +55,15 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   const removeMember = useRemoveMember();
   const { show, dialogProps } = useConfirmDialog();
 
+  const [activeMemberMenu, setActiveMemberMenu] = useState<string | null>(null);
+
   if (isLoading) return <LoadingOverlay visible />;
   if (error || !group) return <ErrorState message="Could not load group" onRetry={refetch} />;
 
   const myMembership = group?.members?.find(m => m.userId === user?.id);
   const isAdmin = myMembership?.role === 'ADMIN';
   const isOwner = group?.ownerId === user?.id;
-
-  const handleShare = async () => {
-    if (!group) return;
-    await Share.share({ message: `Join my BibleStudy group "${group.name}" with code: ${group.inviteCode}` });
-  };
+  const memberCount = group._count?.members ?? group.members?.length ?? 0;
 
   const handleLeave = () => {
     show({
@@ -75,6 +92,7 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   };
 
   const handleToggleRole = (member: GroupMember) => {
+    setActiveMemberMenu(null);
     const newRole = member.role === 'ADMIN' ? 'MEMBER' : 'ADMIN';
     show({
       title: `${newRole === 'ADMIN' ? 'Promote' : 'Demote'} ${member.user.name}?`,
@@ -89,6 +107,7 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   };
 
   const handleRemoveMember = (member: GroupMember) => {
+    setActiveMemberMenu(null);
     show({
       title: `Remove ${member.user.name}?`,
       message: 'They can rejoin with the invite code.',
@@ -101,123 +120,183 @@ export function GroupDetailScreen({ route, navigation }: Props) {
     });
   };
 
-  const renderMember = ({ item }: { item: GroupMember }) => {
-    const isMemberOwner = item.userId === group?.ownerId;
-    const canManage = isAdmin && !isMemberOwner && item.userId !== user?.id;
-    return (
-      <View style={styles.memberRow}>
-        <Avatar uri={item.user.profileImage ?? null} name={item.user.name ?? ''} size="sm" />
-        <Typography preset="label" style={styles.flex}>{item.user.name}</Typography>
-        {item.role === 'ADMIN' && (
-          <View style={styles.adminBadge}>
-            <Typography preset="caption" color={colors.primary}>Admin</Typography>
-          </View>
-        )}
-        {canManage && (
-          <View style={styles.memberActions}>
-            <Pressable onPress={() => handleToggleRole(item)} hitSlop={8}>
-              <SwapIcon size={18} color={colors.textSecondary} />
-            </Pressable>
-            <Pressable onPress={() => handleRemoveMember(item)} hitSlop={8}>
-              <UserMinusIcon size={18} color={colors.error} />
-            </Pressable>
-          </View>
-        )}
-      </View>
-    );
-  };
-
   return (
     <Screen
       header={
         <ScreenHeader
-          title={group.name}
+          title=""
           onBack={() => navigation.goBack()}
-          right={
-            <Pressable onPress={handleShare} hitSlop={8}>
-              <ShareIcon size={22} color={colors.primary} />
-            </Pressable>
-          }
         />
       }
     >
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.scroll}
         refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+        onScrollBeginDrag={() => setActiveMemberMenu(null)}
       >
-        {group.description ? (
-          <Typography preset="body" color={colors.textSecondary}>{group.description}</Typography>
-        ) : null}
-
-        <View style={styles.metaRow}>
-          <UsersIcon size={16} color={colors.textSecondary} />
-          <Typography preset="caption" color={colors.textSecondary}>
-            {group._count?.members ?? group.members?.length ?? 0} members
-          </Typography>
-          <CalendarIcon size={16} color={colors.textSecondary} />
-          <Typography preset="caption" color={colors.textSecondary}>
-            {group._count?.gatherings ?? 0} gatherings
-          </Typography>
+        {/* ── Hero ─────────────────────────────────────────────── */}
+        <View style={styles.hero}>
+          <Avatar
+            uri={null}
+            name={group.name}
+            size="lg"
+            style={styles.heroAvatar}
+          />
+          <Typography preset="h2" style={styles.heroName}>{group.name}</Typography>
+          <View style={styles.heroMeta}>
+            <UsersIcon size={14} color={colors.textSecondary} />
+            <Typography preset="caption" color={colors.textSecondary}>
+              {memberCount} {memberCount === 1 ? 'member' : 'members'}
+            </Typography>
+            <Typography preset="caption" color={colors.textDisabled}>·</Typography>
+            <CalendarIcon size={14} color={colors.textSecondary} />
+            <Typography preset="caption" color={colors.textSecondary}>
+              {group._count?.gatherings ?? 0} gatherings
+            </Typography>
+          </View>
         </View>
 
-        <Pressable style={styles.inviteRow} onPress={handleShare}>
-          <View style={styles.inviteInfo}>
-            <Typography preset="label">Invite Code</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>{group.inviteCode}</Typography>
-          </View>
-          <ShareIcon size={20} color={colors.primary} />
-        </Pressable>
-
-        {isAdmin && (
-          <Button label="Edit Group" variant="outline" onPress={() => navigation.navigate('EditGroup', { groupId })} />
-        )}
-
-        <View style={styles.sectionHeader}>
-          <Typography preset="label">Study Plans</Typography>
+        {/* ── Quick actions ─────────────────────────────────────── */}
+        <View style={styles.actions}>
           {isAdmin && (
-            <Pressable onPress={() => navigation.navigate('CreateGroupPlan', { groupId })} hitSlop={8} style={styles.addPlan}>
-              <PlusIcon size={16} color={colors.primary} />
-              <Typography preset="caption" color={colors.primary}>New</Typography>
+            <Pressable
+              style={styles.actionPill}
+              onPress={() => navigation.navigate('AddGroupMember', { groupId })}
+            >
+              <UserPlusIcon size={18} color={colors.primary} />
+              <Typography preset="caption" color={colors.primary} style={styles.actionLabel}>Add Member</Typography>
+            </Pressable>
+          )}
+          {isAdmin && (
+            <Pressable
+              style={styles.actionPill}
+              onPress={() => navigation.navigate('EditGroup', { groupId })}
+            >
+              <PencilIcon size={18} color={colors.primary} />
+              <Typography preset="caption" color={colors.primary} style={styles.actionLabel}>Edit</Typography>
             </Pressable>
           )}
         </View>
-        {plans.length === 0 ? (
-          <Typography preset="caption" color={colors.textSecondary}>
-            No study plans yet{isAdmin ? ' — tap New to create one.' : '.'}
-          </Typography>
-        ) : (
-          plans.map(plan => (
-            <Pressable
-              key={plan.id}
-              style={styles.planRow}
-              onPress={() => navigation.navigate('GroupPlanDetail', { planId: plan.id, groupTitle: group.name })}
-            >
-              <View style={styles.flex}>
-                <Typography preset="label" numberOfLines={1}>{plan.title}</Typography>
+
+        {/* ── Description ───────────────────────────────────────── */}
+        {group.description ? (
+          <Card style={styles.section}>
+            <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>ABOUT</Typography>
+            <Typography preset="body">{group.description}</Typography>
+          </Card>
+        ) : null}
+
+        {/* ── Study Plans ───────────────────────────────────────── */}
+        <View style={styles.sectionBlock}>
+          <View style={styles.sectionHeader}>
+            <Typography preset="label">Study Plans</Typography>
+            {isAdmin && (
+              <Pressable
+                onPress={() => navigation.navigate('CreateGroupPlan', { groupId })}
+                hitSlop={8}
+                style={styles.addBtn}
+              >
+                <PlusIcon size={16} color={colors.primary} />
+                <Typography preset="caption" color={colors.primary}>New</Typography>
+              </Pressable>
+            )}
+          </View>
+
+          {plans.length === 0 ? (
+            <Typography preset="caption" color={colors.textSecondary} style={styles.emptyText}>
+              No study plans yet{isAdmin ? ' — tap New to create one.' : '.'}
+            </Typography>
+          ) : (
+            plans.map(plan => (
+              <PressableCard
+                key={plan.id}
+                style={styles.planCard}
+                onPress={() => navigation.navigate('GroupPlanDetail', { planId: plan.id, groupTitle: group.name })}
+              >
+                <View style={styles.planTop}>
+                  <Typography preset="label" numberOfLines={1} style={styles.flex}>{plan.title}</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>
+                    {plan.completedSteps}/{plan.totalSteps}
+                  </Typography>
+                </View>
                 <ProgressBar
                   progress={plan.totalSteps > 0 ? plan.completedSteps / plan.totalSteps : 0}
                   color={colors.primary}
                   style={styles.planBar}
                 />
-              </View>
-              <Typography preset="caption" color={colors.textSecondary}>{plan.completedSteps}/{plan.totalSteps}</Typography>
-            </Pressable>
-          ))
-        )}
-
-        <Typography preset="label" style={styles.sectionTitle}>Members</Typography>
-        {group.members?.map(member => (
-          <React.Fragment key={member.userId}>
-            {renderMember({ item: member })}
-          </React.Fragment>
-        ))}
-
-        <View style={styles.dangerZone}>
-          {!isOwner && (
-            <Button label="Leave Group" variant="outline" onPress={handleLeave} style={styles.leaveBtn} />
+              </PressableCard>
+            ))
           )}
-          {isOwner && (
-            <Button label="Delete Group" variant="outline" onPress={handleDelete} style={styles.leaveBtn} />
+        </View>
+
+        {/* ── Members ───────────────────────────────────────────── */}
+        <View style={styles.sectionBlock}>
+          <Typography preset="label" style={styles.sectionHeader}>
+            Members ({memberCount})
+          </Typography>
+
+          <Card style={styles.memberCard}>
+            {group.members?.map((member, idx) => {
+              const isMemberOwner = member.userId === group?.ownerId;
+              const canManage = isAdmin && !isMemberOwner && member.userId !== user?.id;
+              const isMenuOpen = activeMemberMenu === member.userId;
+              const isLast = idx === (group.members?.length ?? 0) - 1;
+
+              return (
+                <View key={member.userId}>
+                  <View style={[styles.memberRow, !isLast && !isMenuOpen && styles.memberBorder]}>
+                    <Avatar uri={member.user.profileImage ?? null} name={member.user.name ?? ''} size="sm" />
+                    <View style={styles.flex}>
+                      <Typography preset="label">{member.user.name}</Typography>
+                      {isMemberOwner && (
+                        <Typography preset="caption" color={colors.textSecondary}>Owner</Typography>
+                      )}
+                    </View>
+                    {member.role === 'ADMIN' && !isMemberOwner && (
+                      <View style={styles.adminBadge}>
+                        <Typography preset="caption" color={colors.primary}>Admin</Typography>
+                      </View>
+                    )}
+                    {canManage && (
+                      <Pressable
+                        onPress={() => setActiveMemberMenu(isMenuOpen ? null : member.userId)}
+                        hitSlop={8}
+                      >
+                        <MoreVerticalIcon size={18} color={colors.textSecondary} />
+                      </Pressable>
+                    )}
+                  </View>
+
+                  {isMenuOpen && (
+                    <View style={[styles.memberMenu, !isLast && styles.memberBorder]}>
+                      <Pressable style={styles.menuItem} onPress={() => handleToggleRole(member)}>
+                        <SwapIcon size={16} color={colors.textPrimary} />
+                        <Typography preset="body">
+                          {member.role === 'ADMIN' ? 'Remove admin' : 'Make admin'}
+                        </Typography>
+                      </Pressable>
+                      <Pressable style={styles.menuItem} onPress={() => handleRemoveMember(member)}>
+                        <UserMinusIcon size={16} color={colors.error} />
+                        <Typography preset="body" color={colors.error}>Remove from group</Typography>
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              );
+            })}
+          </Card>
+        </View>
+
+        {/* ── Danger zone ───────────────────────────────────────── */}
+        <View style={styles.dangerZone}>
+          {!isOwner ? (
+            <Pressable onPress={handleLeave} hitSlop={8}>
+              <Typography preset="body" color={colors.error} style={styles.dangerText}>Leave Group</Typography>
+            </Pressable>
+          ) : (
+            <Pressable onPress={handleDelete} hitSlop={8}>
+              <Typography preset="body" color={colors.error} style={styles.dangerText}>Delete Group</Typography>
+            </Pressable>
           )}
         </View>
       </ScrollView>
@@ -227,48 +306,79 @@ export function GroupDetailScreen({ route, navigation }: Props) {
   );
 }
 
-function makeStyles(colors: ReturnType<typeof useTheme>['colors']) {
-  return StyleSheet.create({
-    content: { padding: layout.screenPaddingH, gap: spacing[3] },
-    metaRow: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
-    flex: { flex: 1 },
-    inviteRow: {
+const makeStyles = ({ colors, spacing, layout }: Theme) =>
+  StyleSheet.create({
+    scroll: { paddingBottom: spacing[10] },
+
+    // Hero
+    hero: { alignItems: 'center', paddingTop: spacing[4], paddingBottom: spacing[6], gap: spacing[2] },
+    heroAvatar: { width: HERO_AVATAR_SIZE, height: HERO_AVATAR_SIZE, borderRadius: HERO_AVATAR_SIZE / 2 },
+    heroName: { textAlign: 'center' },
+    heroMeta: { flexDirection: 'row', alignItems: 'center', gap: spacing[1.5] },
+
+    // Quick actions
+    actions: {
       flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: spacing[3],
-      backgroundColor: colors.backgroundSecondary,
-      borderRadius: spacing[2],
-    },
-    inviteInfo: { gap: spacing[1] },
-    sectionTitle: { marginTop: spacing[2] },
-    sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing[2] },
-    addPlan: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
-    planRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      justifyContent: 'center',
       gap: spacing[3],
-      paddingVertical: spacing[3],
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
+      paddingHorizontal: layout.screenPaddingH,
+      marginBottom: spacing[5],
     },
-    planBar: { marginTop: spacing[1] },
+    actionPill: {
+      alignItems: 'center',
+      gap: spacing[1],
+      backgroundColor: colors.primarySurface,
+      borderRadius: layout.cardRadius,
+      paddingVertical: spacing[3],
+      paddingHorizontal: spacing[6],
+    },
+    actionLabel: { fontWeight: '500' },
+
+    // Cards
+    section: { marginHorizontal: layout.screenPaddingH, marginBottom: spacing[3] },
+    sectionLabel: { marginBottom: spacing[2], letterSpacing: 0.5 },
+
+    // Section blocks
+    sectionBlock: { marginHorizontal: layout.screenPaddingH, marginBottom: spacing[5] },
+    sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing[3] },
+    addBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing[1] },
+    emptyText: { marginTop: spacing[1] },
+
+    // Plans
+    planCard: { marginBottom: spacing[2] },
+    planTop: { flexDirection: 'row', alignItems: 'center', gap: spacing[2] },
+    planBar: { marginTop: spacing[2] },
+    flex: { flex: 1 },
+
+    // Members
+    memberCard: { padding: 0, overflow: 'hidden' },
     memberRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingVertical: spacing[2],
-      borderBottomWidth: StyleSheet.hairlineWidth,
-      borderBottomColor: colors.border,
       gap: spacing[3],
+      paddingHorizontal: spacing[4],
+      paddingVertical: spacing[3],
     },
+    memberBorder: { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: colors.border },
     adminBadge: {
       paddingHorizontal: spacing[2],
       paddingVertical: spacing[0.5],
       borderRadius: spacing[1],
       backgroundColor: colors.primarySurface,
     },
-    memberActions: { flexDirection: 'row', gap: spacing[2] },
-    dangerZone: { marginTop: spacing[4] },
-    leaveBtn: { borderColor: colors.error },
+    memberMenu: {
+      backgroundColor: colors.backgroundSecondary,
+      paddingHorizontal: spacing[4],
+      paddingVertical: spacing[1],
+    },
+    menuItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: spacing[3],
+      paddingVertical: spacing[3],
+    },
+
+    // Danger
+    dangerZone: { alignItems: 'center', paddingVertical: spacing[4] },
+    dangerText: { textAlign: 'center' },
   });
-}

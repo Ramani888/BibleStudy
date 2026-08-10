@@ -62,11 +62,11 @@ export {
   useCreateGroup,
   useUpdateGroup,
   useDeleteGroup,
-  useJoinGroup,
+  useJoinPublicGroup,
+  useAddGroupMember,
   useLeaveGroup,
   useUpdateMemberRole,
   useRemoveMember,
-  useRegenerateInviteCode,
   usePublicGroups,
 } from './useGroups';
 export {

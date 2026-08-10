@@ -9,7 +9,7 @@ import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { ChevronRightIcon, CompassIcon, LinkIcon, PlusIcon, UsersIcon } from '../../components/icons';
+import { ChevronRightIcon, CompassIcon, PlusIcon, UsersIcon } from '../../components/icons';
 import { useGroups } from '../../hooks/useGroups';
 import type { Group } from '../../types/groups.types';
 
@@ -45,14 +45,9 @@ export function GroupsScreen({ navigation }: Props) {
           title="My Groups"
           onBack={() => navigation.goBack()}
           right={
-            <View style={styles.headerActions}>
-              <Pressable onPress={() => navigation.navigate('PublicGroups')} hitSlop={8}>
-                <CompassIcon size={22} color={colors.primary} />
-              </Pressable>
-              <Pressable onPress={() => navigation.navigate('JoinGroup')} hitSlop={8}>
-                <LinkIcon size={22} color={colors.primary} />
-              </Pressable>
-            </View>
+            <Pressable onPress={() => navigation.navigate('PublicGroups')} hitSlop={8}>
+              <CompassIcon size={22} color={colors.primary} />
+            </Pressable>
           }
         />
       }
@@ -68,7 +63,7 @@ export function GroupsScreen({ navigation }: Props) {
         ListEmptyComponent={
           <EmptyState
             title="No Groups Yet"
-            subtitle="Create a study group or join one with an invite code"
+            subtitle="Create a study group or browse public groups to join"
             ctaLabel="Create Group"
             onCta={() => navigation.navigate('CreateGroup')}
           />

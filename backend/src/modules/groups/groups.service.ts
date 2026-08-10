@@ -1,9 +1,8 @@
-import { randomUUID } from 'crypto';
 import type { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
-import { CreateGroupDtoType, UpdateGroupDtoType, UpdateRoleDtoType } from './groups.dto';
+import { CreateGroupDtoType, UpdateGroupDtoType, UpdateRoleDtoType, AddMemberDtoType } from './groups.dto';
 import { NotFoundError, ForbiddenError, ConflictError, ValidationError } from '../../utils/errors';
 
 const memberUserSelect = {
@@ -103,38 +102,55 @@ export async function deleteGroup(userId: string, groupId: string) {
   return { message: 'Group deleted successfully' };
 }
 
-export async function joinGroup(userId: string, inviteCode: string) {
-  const group = await prisma.group.findUnique({ where: { inviteCode } });
-  if (!group) throw new NotFoundError('Invalid invite code');
+/** Admin directly adds a user to the group */
+export async function addMember(requesterId: string, groupId: string, dto: AddMemberDtoType) {
+  await verifyGroupAdmin(groupId, requesterId);
 
-  const existing = await prisma.groupMember.findFirst({ where: { groupId: group.id, userId } });
-  if (existing) throw new ConflictError('Already a member of this group');
+  const group = await prisma.group.findUnique({ where: { id: groupId } });
+  if (!group) throw new NotFoundError('Group not found');
+
+  const existing = await prisma.groupMember.findFirst({ where: { groupId, userId: dto.userId } });
+  if (existing) throw new ConflictError('User is already a member');
 
   await prisma.groupMember.create({
-    data: { groupId: group.id, userId, role: 'MEMBER' },
+    data: { groupId, userId: dto.userId, role: 'MEMBER' },
   });
 
-  await logActivity(userId, 'JOINED_GROUP', group.id);
+  await logActivity(dto.userId, 'JOINED_GROUP', groupId);
 
-  // Notify group admins that a new member joined
+  const addedUser = await prisma.user.findUnique({ where: { id: dto.userId }, select: { name: true } });
+  await sendPushToUser(dto.userId, 'Added to Group', `You were added to "${group.name}"`, {
+    type: 'group',
+    id: groupId,
+  });
+
+  return prisma.group.findUniqueOrThrow({ where: { id: groupId }, include: groupInclude });
+}
+
+/** Self-join for PUBLIC groups */
+export async function joinPublicGroup(userId: string, groupId: string) {
+  const group = await prisma.group.findUnique({ where: { id: groupId } });
+  if (!group) throw new NotFoundError('Group not found');
+  if (group.visibility !== 'PUBLIC') throw new ForbiddenError('Group is not public');
+
+  const existing = await prisma.groupMember.findFirst({ where: { groupId, userId } });
+  if (existing) throw new ConflictError('Already a member of this group');
+
+  await prisma.groupMember.create({ data: { groupId, userId, role: 'MEMBER' } });
+  await logActivity(userId, 'JOINED_GROUP', groupId);
+
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
   const admins = await prisma.groupMember.findMany({
-    where: { groupId: group.id, role: 'ADMIN', userId: { not: userId } },
+    where: { groupId, role: 'ADMIN', userId: { not: userId } },
     select: { userId: true },
   });
   await Promise.allSettled(
     admins.map(a =>
-      sendPushToUser(a.userId, 'New Member', `${user?.name} joined "${group.name}"`, {
-        type: 'group',
-        id: group.id,
-      })
+      sendPushToUser(a.userId, 'New Member', `${user?.name} joined "${group.name}"`, { type: 'group', id: groupId })
     )
   );
 
-  return prisma.group.findUniqueOrThrow({
-    where: { id: group.id },
-    include: groupInclude,
-  });
+  return prisma.group.findUniqueOrThrow({ where: { id: groupId }, include: groupInclude });
 }
 
 export async function leaveGroup(userId: string, groupId: string) {
@@ -193,18 +209,6 @@ export async function removeMember(requesterId: string, groupId: string, targetU
   return { message: 'Member removed' };
 }
 
-export async function regenerateInviteCode(userId: string, groupId: string) {
-  const group = await prisma.group.findFirst({ where: { id: groupId, ownerId: userId } });
-  if (!group) throw new NotFoundError('Group not found or not authorized');
-
-  const newCode = randomUUID();
-  const updated = await prisma.group.update({
-    where: { id: groupId },
-    data: { inviteCode: newCode },
-  });
-
-  return { inviteCode: updated.inviteCode };
-}
 
 export async function listPublicGroups(params?: { search?: string; page?: number; limit?: number }) {
   const page = params?.page ?? 1;
