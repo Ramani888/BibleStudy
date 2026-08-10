@@ -195,11 +195,11 @@ function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponen
 function activityText(a: Activity): string {
   const name = a.user?.name ?? 'Someone';
   switch (a.type) {
-    case 'ADDED_FRIEND': return `${name} added a new friend`;
-    case 'JOINED_GATHERING': return `${name} joined a gathering`;
-    case 'CREATED_SET': return `${name} created a new set`;
+    case 'ADDED_FRIEND':  return `${name} added a new friend`;
+    case 'CREATED_SET':   return `${name} created a new set`;
+    case 'CREATED_CARD':  return `${name} created a new card`;
     case 'STUDIED_CARDS': return `${name} studied some cards`;
-    case 'CREATED_NOTE': return `${name} wrote a note`;
+    case 'CREATED_NOTE':  return `${name} wrote a note`;
     default: return `${name} was active`;
   }
 }

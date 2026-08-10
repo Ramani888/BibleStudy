@@ -1,6 +1,7 @@
 import { prisma } from '../../config/db';
 import { CreateNoteDtoType, UpdateNoteDtoType } from './notes.dto';
 import { NotFoundError } from '../../utils/errors';
+import { logActivity } from '../../utils/activity';
 
 export async function listNotes(userId: string) {
   return prisma.note.findMany({
@@ -10,7 +11,7 @@ export async function listNotes(userId: string) {
 }
 
 export async function createNote(userId: string, dto: CreateNoteDtoType) {
-  return prisma.note.create({
+  const note = await prisma.note.create({
     data: {
       title: dto.title,
       body:  dto.body,
@@ -18,6 +19,8 @@ export async function createNote(userId: string, dto: CreateNoteDtoType) {
       userId,
     },
   });
+  logActivity(userId, 'CREATED_NOTE', note.id);
+  return note;
 }
 
 export async function getNoteById(userId: string, noteId: string) {
