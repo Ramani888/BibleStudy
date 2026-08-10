@@ -149,7 +149,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         <MenuSection label="Community">
           <MenuItem icon={UsersIcon} label="Friends" onPress={() => navigation.navigate('Friends')} />
           <Divider marginV={0} />
-          <MenuItem icon={BellIcon} label="Notifications" onPress={() => navigation.navigate('Notifications')} />
+          <MenuItem icon={BellIcon} label="Notifications" onPress={() => navigation.navigate('NotificationSettings')} />
         </MenuSection>
 
         {/* ── Account ── */}

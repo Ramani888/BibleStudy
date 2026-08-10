@@ -70,6 +70,7 @@ export type ProfileStackParamList = {
   BlockedUsers: undefined;
   // Notifications
   Notifications: undefined;
+  NotificationSettings: undefined;
   // Notes
   Notes: undefined;
   NoteEditor: { noteId?: string };

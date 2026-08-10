@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,11 +8,12 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { FormField } from '../../components/forms';
 import { Avatar, Button, Typography } from '../../components/ui';
+import { ActionSheet } from '../../components/feedback';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CameraIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
-import { useUpdateProfile } from '../../hooks';
+import { useUpdateProfile, usePickMedia } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme } from '../../theme';
 
@@ -28,6 +29,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   const styles = makeStyles(colors);
   const user = useAuthStore(s => s.user);
   const { mutateAsync: updateProfile } = useUpdateProfile();
+  const { pickImage, takePhoto, isUploading } = usePickMedia();
+  const [photoSheetVisible, setPhotoSheetVisible] = useState(false);
   const bioRef = useRef<TextInput>(null);
   const churchRef = useRef<TextInput>(null);
 
@@ -39,6 +42,17 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
       church: user?.church ?? '',
     },
   });
+
+  const handlePickPhoto = async (source: 'library' | 'camera') => {
+    setPhotoSheetVisible(false);
+    const media = source === 'library' ? await pickImage() : await takePhoto();
+    if (!media) return;
+    try {
+      await updateProfile({ profileImage: media.url });
+    } catch (err) {
+      Toast.show({ type: 'error', text1: getErrorMessage(err) });
+    }
+  };
 
   const onSubmit = async (data: EditProfileForm) => {
     try {
@@ -69,16 +83,25 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <Pressable
-          style={styles.avatarSection}
-          onPress={() => Toast.show({ type: 'info', text1: 'Image upload coming soon' })}
-        >
+        <Pressable style={styles.avatarSection} onPress={() => setPhotoSheetVisible(true)} disabled={isUploading}>
           <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
           <View style={styles.cameraRow}>
-            <CameraIcon size={16} color={colors.primary} />
-            <Typography preset="label" color={colors.primary}>Change Photo</Typography>
+            {isUploading
+              ? <ActivityIndicator size="small" color={colors.primary} />
+              : <><CameraIcon size={16} color={colors.primary} /><Typography preset="label" color={colors.primary}>Change Photo</Typography></>
+            }
           </View>
         </Pressable>
+
+        <ActionSheet
+          visible={photoSheetVisible}
+          title="Change Profile Photo"
+          onClose={() => setPhotoSheetVisible(false)}
+          actions={[
+            { label: 'Choose from Library', iconName: 'image-outline', onPress: () => handlePickPhoto('library') },
+            { label: 'Take Photo',          iconName: 'camera-outline', onPress: () => handlePickPhoto('camera') },
+          ]}
+        />
 
         <View style={styles.form}>
           <FormField

@@ -15,6 +15,7 @@ import { SearchUsersScreen } from '../screens/profile/SearchUsersScreen';
 import { UserProfileScreen } from '../screens/profile/UserProfileScreen';
 import { BlockedUsersScreen } from '../screens/profile/BlockedUsersScreen';
 import { NotificationsScreen } from '../screens/profile/NotificationsScreen';
+import { NotificationSettingsScreen } from '../screens/profile/NotificationSettingsScreen';
 import { NotesScreen } from '../screens/profile/NotesScreen';
 import { NoteEditorScreen } from '../screens/profile/NoteEditorScreen';
 import { MediaScreen } from '../screens/profile/MediaScreen';
@@ -38,7 +39,8 @@ export function ProfileNavigator() {
       <Stack.Screen name="SearchUsers"     component={SearchUsersScreen}     />
       <Stack.Screen name="UserProfile"     component={UserProfileScreen}     />
       <Stack.Screen name="BlockedUsers"    component={BlockedUsersScreen}    />
-      <Stack.Screen name="Notifications"   component={NotificationsScreen}   />
+      <Stack.Screen name="Notifications"         component={NotificationsScreen}         />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen}   />
       <Stack.Screen name="Notes"           component={NotesScreen}           />
       <Stack.Screen name="NoteEditor"      component={NoteEditorScreen}      options={{ presentation: 'modal' }} />
       <Stack.Screen name="Media"           component={MediaScreen}           />
