@@ -18,3 +18,4 @@ export { AccentIcon } from './AccentIcon';
 export { FilterChip } from './FilterChip';
 export { ListCard } from './ListCard';
 export { SearchBar } from './SearchBar';
+export { Switch } from './Switch';

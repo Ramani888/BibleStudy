@@ -21,7 +21,7 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { fontSizes, fontWeights, layout, lineHeights, useTheme, palette, spacing } from '../../theme';
+import { fontSizes, fontWeights, layout, lineHeights, useTheme, spacing } from '../../theme';
 
 type Props = ProfileScreenProps<'NoteEditor'>;
 
@@ -148,7 +148,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           {selectedTags.length > 0 && (
             <View style={styles.tagRow}>
               {selectedTags.map(tag => (
-                <View key={tag} style={[styles.tagPill, { borderColor: colors.accent }]}>
+                <View key={tag} style={[styles.tagPill, { borderColor: colors.accent, backgroundColor: colors.accentSoft }]}>
                   <Typography preset="caption" color={colors.accent}>{tag}</Typography>
                 </View>
               ))}
@@ -180,7 +180,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
                 style={[
                   styles.tagChip,
                   { borderColor: colors.border, backgroundColor: colors.surfaceMuted },
-                  active && { borderColor: colors.accent, backgroundColor: palette.indigo300 },
+                  active && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
                 ]}
                 onPress={() => toggleTag(tag)}
               >
@@ -216,7 +216,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: layout.pillRadius,
-    backgroundColor: palette.indigo300,
     borderWidth: 1,
   },
   bodyInput: {

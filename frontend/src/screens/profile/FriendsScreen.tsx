@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -98,29 +98,31 @@ export function FriendsScreen({ navigation }: Props) {
         />
       }
     >
-      <View style={{ flex: 1 }}>
-      <FlatList
-        data={friends}
-        keyExtractor={item => item.id}
-        renderItem={renderItem}
-        refreshing={isFetching}
-        onRefresh={refetch}
-        contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
-        ListEmptyComponent={
-          <EmptyState
-            title="No Friends Yet"
-            subtitle="Search for people to add as friends"
-            ctaLabel="Find Friends"
-            onCta={() => navigation.navigate('SearchUsers')}
-          />
-        }
-      />
+      <View style={styles.flex}>
+        <FlatList
+          data={friends}
+          keyExtractor={item => item.id}
+          renderItem={renderItem}
+          refreshControl={
+            <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />
+          }
+          contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
+          ListEmptyComponent={
+            <EmptyState
+              title="No Friends Yet"
+              subtitle="Search for people to add as friends"
+              ctaLabel="Find Friends"
+              onCta={() => navigation.navigate('SearchUsers')}
+            />
+          }
+        />
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   headerActions: { flexDirection: 'row', gap: spacing.md },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl, gap: spacing.lg },
   emptyContainer: { flex: 1, justifyContent: 'center' },

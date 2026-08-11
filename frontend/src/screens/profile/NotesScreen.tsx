@@ -135,7 +135,7 @@ export function NotesScreen({ navigation }: Props) {
         {item.tags.length > 0 && (
           <View style={styles.tagRow}>
             {item.tags.map(tag => (
-              <View key={tag} style={[styles.tagPill, { borderColor: colors.accent }]}>
+              <View key={tag} style={[styles.tagPill, { borderColor: colors.accent, backgroundColor: colors.accentSoft }]}>
                 <Typography preset="caption" color={colors.accent}>{tag}</Typography>
               </View>
             ))}
@@ -185,7 +185,7 @@ export function NotesScreen({ navigation }: Props) {
         <View style={styles.tagBarWrap}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
             <Pressable
-              style={[styles.tagFilterPill, { borderColor: colors.border, backgroundColor: colors.background }, !activeTag && styles.tagFilterPillActive]}
+              style={[styles.tagFilterPill, { borderColor: !activeTag ? colors.accent : colors.border, backgroundColor: !activeTag ? colors.accentSoft : colors.background }]}
               onPress={() => setActiveTag(null)}
             >
               <Typography preset="caption" color={!activeTag ? colors.accent : colors.textSecondary}>All</Typography>
@@ -193,7 +193,7 @@ export function NotesScreen({ navigation }: Props) {
             {NOTE_PREDEFINED_TAGS.map(tag => (
               <Pressable
                 key={tag}
-                style={[styles.tagFilterPill, { borderColor: colors.border, backgroundColor: colors.background }, activeTag === tag && styles.tagFilterPillActive]}
+                style={[styles.tagFilterPill, { borderColor: activeTag === tag ? colors.accent : colors.border, backgroundColor: activeTag === tag ? colors.accentSoft : colors.background }]}
                 onPress={() => setActiveTag(prev => (prev === tag ? null : tag))}
               >
                 <Typography preset="caption" color={activeTag === tag ? colors.accent : colors.textSecondary}>
@@ -252,7 +252,6 @@ const styles = StyleSheet.create({
     borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
-  tagFilterPillActive: { borderColor: palette.indigo300, backgroundColor: palette.indigo300 },
   list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.xxxl, flexGrow: 1, paddingTop: spacing.md, gap: spacing.lg },
   noteCard: {
     borderRadius: layout.cardRadiusSm,
@@ -279,7 +278,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     borderRadius: layout.pillRadius,
-    backgroundColor: palette.indigo300,
     borderWidth: 1,
   },
   fab: {

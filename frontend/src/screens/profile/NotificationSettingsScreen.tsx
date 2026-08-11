@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { Switch } from '../../components/ui/Switch';
 import { Typography } from '../../components/ui/Typography';
-import { CARD_FILL_LIGHT, palette, spacing, radius, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, spacing, radius, useTheme } from '../../theme';
 import { layout } from '../../constants/layout';
 import type { ProfileScreenProps } from '../../navigation/types';
 
@@ -48,12 +49,7 @@ function PreferenceCard({
         <Typography preset="label" color={colors.textPrimary}>{title}</Typography>
         <Typography preset="caption" color={colors.textSecondary} style={styles.cardSub}>{description}</Typography>
       </View>
-      <Switch
-        value={value}
-        onValueChange={onToggle}
-        trackColor={{ false: colors.border, true: colors.accent }}
-        thumbColor={palette.white}
-      />
+      <Switch value={value} onValueChange={onToggle} />
     </View>
   );
 }

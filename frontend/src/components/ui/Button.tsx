@@ -7,7 +7,8 @@ import {
   StyleSheet,
   ViewStyle,
 } from 'react-native';
-import { layout, spacing, Theme, useTheme , palette } from '../../theme';
+import LinearGradient from 'react-native-linear-gradient';
+import { layout, spacing, Theme, useTheme, palette } from '../../theme';
 import { Typography } from './Typography';
 import { triggerHaptic } from '../../utils/haptics';
 
@@ -27,7 +28,7 @@ const makeVariantStyles = (
   colors: Theme['colors'],
 ): Record<ButtonVariant, { container: ViewStyle; labelColor: string }> => ({
   primary: {
-    container: { backgroundColor: colors.accent },
+    container: { backgroundColor: 'transparent' },
     labelColor: colors.textOnAccent,
   },
   secondary: {
@@ -78,7 +79,7 @@ export function Button({
       style={({ pressed }) => [
         styles.base,
         container,
-        { height, opacity: pressed || isDisabled ? 0.65 : 1 },
+        { height, opacity: isDisabled ? 0.5 : pressed ? 0.85 : 1 },
         fullWidth && styles.fullWidth,
         style,
       ]}
@@ -86,6 +87,14 @@ export function Button({
       onPressIn={handlePressIn}
       {...rest}
     >
+      {variant === 'primary' && (
+        <LinearGradient
+          colors={[colors.gradientStart, colors.gradientEnd]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+          style={StyleSheet.absoluteFillObject}
+        />
+      )}
       {loading ? (
         <ActivityIndicator color={labelColor} size="small" />
       ) : (
@@ -99,10 +108,11 @@ export function Button({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: layout.cardRadius,
+    borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xl,
+    overflow: 'hidden',
   },
   fullWidth: {
     width: '100%',

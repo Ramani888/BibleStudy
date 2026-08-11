@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react';
-import { Pressable, SectionList, StyleSheet, View } from 'react-native';
+import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -62,7 +62,9 @@ function groupByDate(notifications: Notification[]): { title: string; data: Noti
 }
 
 export function NotificationsScreen({ navigation, route }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -85,13 +87,21 @@ export function NotificationsScreen({ navigation, route }: Props) {
           openSwipeableRef.current = thisSwipeable;
         }}
         renderRightActions={() => (
-          <Pressable style={[styles.deleteAction, { backgroundColor: colors.alert }]} onPress={() => deleteNotification.mutate(item.id)}>
+          <Pressable
+            style={({ pressed }) => [styles.deleteAction, { backgroundColor: colors.alert }, pressed && styles.iconBtnPressed]}
+            onPress={() => deleteNotification.mutate(item.id)}
+          >
             <TrashIcon size={20} color={palette.white} />
           </Pressable>
         )}
       >
         <Pressable
-          style={[styles.notificationRow, { backgroundColor: colors.background }, !item.read && { backgroundColor: colors.accentSoft }]}
+          style={({ pressed }) => [
+            styles.notificationRow,
+            { backgroundColor: colors.surface },
+            !item.read && { backgroundColor: colors.accentSoft },
+            pressed && styles.rowPressed,
+          ]}
           onPress={() => {
             if (!item.read) markRead.mutate(item.id);
             if (item.type === 'friend_request') navigation.navigate('FriendRequests');
@@ -114,7 +124,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
         </Pressable>
       </Swipeable>
     );
-  }, [colors, markRead, deleteNotification, navigation]);
+  }, [colors, isDark, markRead, deleteNotification, navigation]);
 
   const renderSectionHeader = useCallback(
     ({ section: { title } }: { section: { title: string } }) => (
@@ -128,13 +138,14 @@ export function NotificationsScreen({ navigation, route }: Props) {
   if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
 
   const headerRight = unreadCount > 0 ? (
-    <Pressable onPress={() => markAllRead.mutate()} hitSlop={8}>
+    <Pressable onPress={() => markAllRead.mutate()} hitSlop={8} style={({ pressed }) => pressed && styles.iconBtnPressed}>
       <Typography preset="label" color={colors.accent}>Mark all read</Typography>
     </Pressable>
   ) : undefined;
 
   return (
     <Screen
+      edges={['top', 'bottom']}
       header={
         <ScreenHeader
           title="Notifications"
@@ -143,14 +154,13 @@ export function NotificationsScreen({ navigation, route }: Props) {
         />
       }
     >
-      <View style={{ flex: 1 }}>
+      <View style={styles.listWrapper}>
       <SectionList
         sections={sections}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         renderSectionHeader={renderSectionHeader}
-        refreshing={isFetching}
-        onRefresh={refetch}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
         stickySectionHeadersEnabled={false}
         contentContainerStyle={sections.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
@@ -180,16 +190,19 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   iconWrapper: {
-    width: 40,
-    height: 40,
+    width: spacing.huge,
+    height: spacing.huge,
     borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },
   info: { flex: 1, gap: spacing.s2 },
   deleteAction: {
-    width: 72,
+    width: 72, // ponytail: off-grid Figma value
     alignItems: 'center',
     justifyContent: 'center',
   },
+  listWrapper: { flex: 1 },
+  rowPressed: { opacity: 0.7 },
+  iconBtnPressed: { opacity: 0.85 },
 });

@@ -39,7 +39,7 @@ export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumbe
       <View style={[styles.header, { backgroundColor: colors.background }]}>
         {leading}
         {title ? (
-          <Typography preset="h3" numberOfLines={titleNumberOfLines} style={styles.title}>
+          <Typography preset="h4" numberOfLines={titleNumberOfLines} style={styles.title}>
             {title}
           </Typography>
         ) : (

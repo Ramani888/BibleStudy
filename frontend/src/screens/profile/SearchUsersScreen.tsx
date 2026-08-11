@@ -3,7 +3,7 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { SearchBar } from '../../components/ui/SearchBar';
@@ -19,7 +19,9 @@ import type { UserProfile } from '../../types/friends.types';
 type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const [query, setQuery] = useState('');
   const debouncedQuery = useDebouncedValue(query, 300);
   const [sentIds, setSentIds] = useState<Set<string>>(new Set());
@@ -45,7 +47,7 @@ export function SearchUsersScreen({ navigation }: Props) {
     const isPending = !!item.pendingRequest || sentIds.has(item.id);
     return (
       <Pressable
-        style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}
+        style={({ pressed }) => [styles.card, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.cardPressed]}
         onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
       >
         <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
@@ -66,7 +68,7 @@ export function SearchUsersScreen({ navigation }: Props) {
           </View>
         ) : (
           <Pressable
-            style={styles.addBtn}
+            style={({ pressed }) => [styles.addBtn, pressed && styles.addBtnPressed]}
             onPress={() => handleAdd(item)}
             hitSlop={8}
             disabled={sendRequest.isPending}
@@ -76,7 +78,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         )}
       </Pressable>
     );
-  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors]);
+  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, isDark]);
 
   return (
     <Screen header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}>
@@ -93,7 +95,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
       )}
 
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <FlatList
         data={users}
         keyExtractor={item => item.id}
@@ -115,6 +117,7 @@ export function SearchUsersScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   searchWrap: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
   list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.xxl },
   separator: { height: spacing.sm },
@@ -129,6 +132,8 @@ const styles = StyleSheet.create({
   },
   cardInfo: { flex: 1, gap: spacing.s2 },
   addBtn: { padding: spacing.xs },
+  addBtnPressed: { opacity: 0.85 },
+  cardPressed: { opacity: 0.7 },
   pendingBadge: {
     flexDirection: 'row',
     alignItems: 'center',

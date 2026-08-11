@@ -25,7 +25,8 @@ const schema = z.object({
 type EditProfileForm = z.infer<typeof schema>;
 
 export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const user = useAuthStore(s => s.user);
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const { pickImage, takePhoto, isUploading } = usePickMedia();
@@ -69,6 +70,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
 
   return (
     <Screen
+      edges={['top', 'bottom']}
       keyboardAvoiding
       header={<ScreenHeader title="Edit Profile" onBack={() => navigation.goBack()} />}
       footer={
@@ -83,7 +85,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <Pressable style={styles.avatarSection} onPress={() => setPhotoSheetVisible(true)} disabled={isUploading}>
+          <Pressable style={({ pressed }) => [styles.avatarSection, pressed && styles.avatarPressed]} onPress={() => setPhotoSheetVisible(true)} disabled={isUploading}>
             <Avatar uri={user?.profileImage} name={user?.name} size="lg" />
             <View style={styles.cameraRow}>
               {isUploading
@@ -148,4 +150,5 @@ const styles = StyleSheet.create({
   cameraRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   form: { gap: spacing.lg },
   footer: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
+  avatarPressed: { opacity: 0.85 },
 });

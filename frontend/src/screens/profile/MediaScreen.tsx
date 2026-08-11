@@ -452,7 +452,7 @@ export function MediaScreen({ navigation }: Props) {
                   <View style={[
                     styles.badge,
                     active
-                      ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: palette.indigo300 }
+                      ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: colors.accent }
                       : { backgroundColor: colors.surfaceMuted },
                   ]}>
                     <Typography preset="caption" color={active ? colors.accent : colors.textSecondary}
@@ -525,7 +525,7 @@ export function MediaScreen({ navigation }: Props) {
             onPress={activeTab === 'IMAGE' ? () => setPickSheetVisible(true) : handlePickPDF}
             disabled={uploadMedia.isPending}
           >
-            <PlusIcon size={28} color={colors.background} />
+            <PlusIcon size={28} color={colors.textOnAccent} />
           </Pressable>
         )}
 

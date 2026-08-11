@@ -13,10 +13,9 @@ import { useChangePassword } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useAuthStore } from '../../store';
 import { makeChangePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, spacing } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
-  const { colors } = useTheme();
   const hasPassword = useAuthStore(s => s.user?.hasPassword ?? true);
   const updateUser = useAuthStore(s => s.updateUser);
   const user = useAuthStore(s => s.user);

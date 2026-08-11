@@ -3,7 +3,7 @@ import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { LeaderboardEntry } from '../../types/friends.types';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { Screen } from '../../components/ui/Screen';
@@ -28,7 +28,9 @@ function getQuote(rank: number) {
 }
 
 export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboard'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const { data: rows = [], isFetching, error, refetch } = useLeaderboard();
 
   const myRank = rows.findIndex(r => r.isMe) + 1;
@@ -37,7 +39,8 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
     <View style={[
       styles.row,
-      { borderColor: colors.border },
+      { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+      !isDark && !item.isMe && styles.rowShadow,
       item.isMe && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
     ]}>
       <View style={styles.rank}>
@@ -65,13 +68,13 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
 
   return (
     <Screen header={<ScreenHeader title="Leaderboard" onBack={() => navigation.goBack()} />}>
-      <View style={{ flex: 1 }}>
-      <FlatList
+      <View style={styles.flex}>
+        <FlatList
         data={rows}
         keyExtractor={item => item.userId}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
         ListHeaderComponent={
           <View style={[styles.quoteCard, { backgroundColor: colors.accent }]}>
             <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
@@ -91,13 +94,14 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
             />
           ) : null
         }
-      />
+        />
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
   quoteCard: {
     borderRadius: layout.cardRadiusLg,
@@ -114,6 +118,13 @@ const styles = StyleSheet.create({
   quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
   quoteTopLeft: { top: spacing.sm, left: spacing.lg },
   quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
+  rowShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

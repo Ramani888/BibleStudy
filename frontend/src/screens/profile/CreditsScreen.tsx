@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  RefreshControl,
   StyleSheet,
   View,
 Platform } from 'react-native';
@@ -69,7 +70,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
       )}
 
       <Pressable
-        style={({ pressed }) => [styles.ctaBtn, { backgroundColor: palette.white }, pressed && { opacity: 0.85 }]}
+        style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.85 }]}
         onPress={onGetMore}
       >
         <Typography preset="label" color={palette.indigo500} style={styles.ctaBtnText}>Get More Credits</Typography>
@@ -112,12 +113,13 @@ function TrendWindowPill({ value, onToggle }: { value: CreditStatsPeriod; onTogg
     <Pressable
       onPress={onToggle}
       hitSlop={8}
-      style={[
+      style={({ pressed }) => [
         styles.pill,
         isDark
-          ? { backgroundColor: colors.chipIdle, borderColor: 'transparent' }
+          ? { backgroundColor: colors.chipIdle, borderColor: colors.transparent }
           : { backgroundColor: colors.surface, borderColor: colors.cardBorder },
         !isDark && styles.pillShadow,
+        pressed && styles.pillPressed,
       ]}
     >
       <Typography preset="label" color={colors.textPrimary}>{label}</Typography>
@@ -173,15 +175,20 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
     setChartWindow(w => w === 'week' ? 'month' : 'week');
 
   return (
-    <Screen header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
-      <View style={{ flex: 1 }}>
+    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
+      <View style={styles.flex}>
         <FlatList
           data={transactions}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshing={isFetching && !isFetchingNextPage}
-          onRefresh={() => { void Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits', 'stats'] })]); }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isFetching && !isFetchingNextPage}
+              onRefresh={() => { void Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits', 'stats'] })]); }}
+              tintColor={colors.accent}
+            />
+          }
           onEndReached={() => hasNextPage && fetchNextPage()}
           onEndReachedThreshold={0.3}
           ListHeaderComponent={
@@ -193,7 +200,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
               <View style={styles.statGrid}>
                 <StatTile label="Balance" value={creditData?.balance ?? 0} valueColor={colors.accent} />
                 <StatTile label="Earned" value={`+${totalEarned}`} valueColor={colors.success} />
-                <StatTile label="Used" value={`−${totalUsed}`} valueColor={colors.alert} />
+                <StatTile label="Used" value={`−${Math.abs(totalUsed)}`} valueColor={colors.alert} />
                 <StatTile label="Streak" value={`🔥 ${streakData?.streak ?? 0}`} />
               </View>
 
@@ -262,6 +269,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
 
   // Balance card
@@ -282,7 +290,7 @@ const styles = StyleSheet.create({
   },
   balanceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   balanceAmount: { fontWeight: fontWeights.bold },
-  ctaBtn: { borderRadius: layout.cardRadius, paddingVertical: spacing.md, alignItems: 'center' },
+  ctaBtn: { borderRadius: layout.pillRadius, paddingVertical: spacing.md, alignItems: 'center', backgroundColor: palette.white },
   ctaBtnText: { fontWeight: fontWeights.semiBold },
 
   // Stat grid — 2×2
@@ -324,7 +332,7 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s7,
-    borderRadius: layout.cardRadius,
+    borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
   pillShadow: {
@@ -334,13 +342,14 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 3,
   },
+  pillPressed: { opacity: 0.7 },
 
   // Transaction list
   historyTitle: { marginBottom: spacing.md },
   txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, gap: spacing.md },
   txLeft: { flex: 1, gap: spacing.xs },
   txTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  txAmount: { minWidth: 48, textAlign: 'right' },
+  txAmount: { minWidth: spacing.s48, textAlign: 'right' },
 
   emptyState: { minHeight: 160 },
   loadingWrap: { paddingTop: spacing.huge, alignItems: 'center' },

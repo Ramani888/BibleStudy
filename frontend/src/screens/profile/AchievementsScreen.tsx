@@ -13,14 +13,13 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import type { Achievement, AchievementCategory } from '../../types';
 import { useAchievements } from '../../hooks';
 import { Typography } from '../../components/ui/Typography';
-import { ProgressBar } from '../../components/ui/ProgressBar';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import {
   AlbumsIcon, BackIcon, BookIcon, BookmarkIcon, BuildingIcon,
   CheckCircleIcon, CompassIcon, FlameIcon, FolderIcon, LockIcon,
   SparklesIcon, StarIcon, TrophyIcon, UsersIcon,
 } from '../../components/icons';
-import { useTheme, palette, spacing, layout, radius } from '../../theme';
+import { useTheme, palette, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 
 const ICON_BY_KEY: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
   card: BookmarkIcon, cards: AlbumsIcon, folder: FolderIcon, quiz: CompassIcon,
@@ -75,12 +74,12 @@ function StatusBadge({ achievement: a }: { achievement: Achievement }) {
 
 // ── Achievement card ─────────────────────────────────────────────────────────
 
-function AchievementCard({ achievement: a, colors }: { achievement: Achievement; colors: ReturnType<typeof useTheme>['colors'] }) {
+function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achievement; colors: ReturnType<typeof useTheme>['colors']; isDark: boolean }) {
   const Icon = ICON_BY_KEY[a.icon] ?? TrophyIcon;
   const isLocked = !a.unlocked && a.progress === 0;
 
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.cardBorder }]}>
+    <View style={[styles.card, !isDark && styles.cardShadow, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder }]}>
       <View style={isLocked ? styles.cardLocked : undefined}>
         <View style={styles.cardTop}>
           <View style={styles.emojiBadge}>
@@ -122,7 +121,9 @@ function AchievementCard({ achievement: a, colors }: { achievement: Achievement;
 // ── Screen ───────────────────────────────────────────────────────────────────
 
 export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achievements'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
   const { data: achievements = [], isLoading, error, refetch } = useAchievements();
 
@@ -193,7 +194,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
                 {CATEGORY_LABELS[category]}
               </Typography>
               {items.map(a => (
-                <AchievementCard key={a.key} achievement={a} colors={colors} />
+                <AchievementCard key={a.key} achievement={a} colors={colors} isDark={isDark} />
               ))}
             </View>
           ))}
@@ -278,8 +279,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.lg,
     marginBottom: spacing.md,
-    ...CARD_SHADOW,
   },
+  cardShadow: CARD_SHADOW,
   cardLocked: { opacity: 0.6 },
   cardTop: {
     flexDirection: 'row',

@@ -1,9 +1,9 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { layout, palette, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, palette, radius, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -25,7 +25,9 @@ type Props = ProfileScreenProps<'FriendRequests'>;
 type Tab = 'incoming' | 'outgoing';
 
 export function FriendRequestsScreen({ navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const [tab, setTab] = useState<Tab>('incoming');
 
   const { data: incomingRequests = [] } = useFriendRequests('incoming');
@@ -61,7 +63,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     return (
-      <View style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}>
+      <View style={[styles.card, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]}>
         <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
         <View style={styles.cardInfo}>
           <Typography preset="label" numberOfLines={1}>{person?.name ?? ''}</Typography>
@@ -86,12 +88,13 @@ export function FriendRequestsScreen({ navigation }: Props) {
       </View>
     );
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, colors]);
+  }, [tab, colors, isDark]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 
   return (
     <Screen
+      edges={['top', 'bottom']}
       header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
     >
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
@@ -120,13 +123,12 @@ export function FriendRequestsScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={styles.listWrapper}>
       <FlatList
         data={requests}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isFetching}
-        onRefresh={refetch}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={requests.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
@@ -149,9 +151,9 @@ const styles = StyleSheet.create({
   tab: { flex: 1, paddingVertical: spacing.md, alignItems: 'center' },
   tabContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   badge: {
-    borderRadius: 10,
-    minWidth: 20,
-    height: 20,
+    borderRadius: radius.r10,
+    minWidth: spacing.xl,
+    height: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.xs,
@@ -159,6 +161,7 @@ const styles = StyleSheet.create({
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
   separator: { height: spacing.sm },
   emptyContainer: { flex: 1, justifyContent: 'center' },
+  listWrapper: { flex: 1 },
   card: {
     flexDirection: 'row',
     alignItems: 'center',

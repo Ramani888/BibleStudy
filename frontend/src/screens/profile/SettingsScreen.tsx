@@ -1,12 +1,12 @@
 import React from 'react';
-import { ScrollView, StyleSheet, Switch, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
-import { Typography } from '../../components/ui';
+import { Switch, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { BookIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
@@ -55,7 +55,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   };
 
   return (
-    <Screen header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
@@ -67,7 +67,6 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
               <Switch
                 value={isDark}
                 onValueChange={v => setMode(v ? 'dark' : 'light')}
-                trackColor={{ true: colors.accent, false: colors.border }}
               />
             </View>
           </MenuSection>

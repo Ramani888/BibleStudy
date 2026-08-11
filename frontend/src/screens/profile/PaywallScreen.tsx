@@ -49,9 +49,10 @@ function PlanCard({ tier, period, selected, onPress }: {
       accessibilityRole="radio"
       accessibilityState={{ selected }}
       onPress={onPress}
-      style={[
+      style={({ pressed }) => [
         styles.planCard,
         !isDark && !selected && styles.cardShadow,
+        pressed && styles.cardPressed,
         {
           backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
           borderColor: selected ? theme.colors.accent : theme.colors.cardBorder,
@@ -62,7 +63,7 @@ function PlanCard({ tier, period, selected, onPress }: {
       <Radio selected={selected} />
       <View style={styles.planText}>
         {showBadge && (
-          <View style={styles.badge}>
+          <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
             <Typography preset="caption" color={palette.white}>Best Value</Typography>
           </View>
         )}
@@ -130,7 +131,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             return (
               <Pressable
                 key={p}
-                style={[styles.toggleBtn, active && { backgroundColor: colors.accent }]}
+                style={({ pressed }) => [styles.toggleBtn, active && { backgroundColor: colors.accent }, pressed && styles.cardPressed]}
                 onPress={() => setPeriod(p)}
               >
                 <Typography preset="label" color={active ? palette.white : colors.textSecondary}>
@@ -187,18 +188,18 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
 
         {/* ── Links ── */}
         <View style={styles.links}>
-          <Pressable onPress={restore} disabled={processing} style={styles.link}>
+          <Pressable onPress={restore} disabled={processing} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="label" color={colors.accent}>Restore Purchases</Typography>
           </Pressable>
           {isSubscribed && (
-            <Pressable onPress={openManageSubscriptions} style={styles.link}>
+            <Pressable onPress={openManageSubscriptions} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
               <Typography preset="label" color={colors.textSecondary}>Manage Subscription</Typography>
             </Pressable>
           )}
-          <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} style={styles.link}>
+          <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>Terms of Use</Typography>
           </Pressable>
-          <Pressable onPress={() => Linking.openURL('https://zen2-privacy-policy.surge.sh')} style={styles.link}>
+          <Pressable onPress={() => Linking.openURL('https://zen2-privacy-policy.surge.sh')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>Privacy Policy</Typography>
           </Pressable>
         </View>
@@ -258,7 +259,6 @@ const styles = StyleSheet.create({
   planSub: { marginTop: spacing.xs },
   badge: {
     alignSelf: 'flex-start',
-    backgroundColor: palette.success,
     borderRadius: radius.pill,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
@@ -267,14 +267,15 @@ const styles = StyleSheet.create({
 
   // Radio
   radio: {
-    width: 24,
-    height: 24,
+    width: spacing.xxl,
+    height: spacing.xxl,
     borderRadius: radius.r12,
     borderWidth: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  radioDot: { width: 11, height: 11, borderRadius: radius.r6 },
+  radioDot: { width: 11, height: 11, borderRadius: radius.r6 }, // ponytail: off-grid Figma value
+  cardPressed: { opacity: 0.7 },
 
   // Features
   includedTitle: { marginTop: spacing.s28 },
