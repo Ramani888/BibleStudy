@@ -27,6 +27,7 @@ export interface TierDef {
   credits: number;
   storage: string;
   aiPerHour: number;
+  benefits: string[];
   monthly: { productId: string; priceLabel: string };
   annual: { productId: string; priceLabel: string };
 }
@@ -39,6 +40,12 @@ export const TIERS: TierDef[] = [
     credits: 100,
     storage: '2 GB',
     aiPerHour: 60,
+    benefits: [
+      '100 AI credits per month',
+      'Image & PDF analysis',
+      '2 GB media storage',
+      'Credit usage statistics',
+    ],
     monthly: { productId: 'com.biblestudypro.starter.monthly', priceLabel: '$4.99/mo' },
     annual: { productId: 'com.biblestudypro.starter.annual', priceLabel: '$39.99/yr' },
   },
@@ -48,6 +55,14 @@ export const TIERS: TierDef[] = [
     credits: 500,
     storage: '10 GB',
     aiPerHour: 120,
+    benefits: [
+      '500 AI credits per month',
+      'Priority AI responses',
+      '10 GB media storage',
+      'Advanced study analytics',
+      'Group study plan tools',
+      'Export & backup',
+    ],
     monthly: { productId: 'com.biblestudypro.pro.monthly', priceLabel: '$9.99/mo' },
     annual: { productId: 'com.biblestudypro.pro.annual', priceLabel: '$79.99/yr' },
   },

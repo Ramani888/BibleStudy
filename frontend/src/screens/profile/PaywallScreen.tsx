@@ -67,12 +67,17 @@ function PlanCard({ tier, period, selected, onPress }: {
             <Typography preset="caption" color={palette.white}>Best Value</Typography>
           </View>
         )}
-        <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
-        <Typography preset="caption" color={theme.colors.textSecondary} style={styles.planSub}>
-          {tier.credits} credits · {tier.storage} storage
-        </Typography>
+        <View style={styles.planHeader}>
+          <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
+          <Typography preset="h4" color={theme.colors.textPrimary}>{opt.priceLabel}</Typography>
+        </View>
+        {tier.benefits.map(b => (
+          <View key={b} style={styles.benefitRow}>
+            <CheckCircleIcon size={14} color={theme.colors.accent} />
+            <Typography preset="caption" color={theme.colors.textSecondary}>{b}</Typography>
+          </View>
+        ))}
       </View>
-      <Typography preset="h4" color={theme.colors.textPrimary}>{opt.priceLabel}</Typography>
     </Pressable>
   );
 }
@@ -276,8 +281,9 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
-  planText: { flex: 1 },
-  planSub: { marginTop: spacing.xs },
+  planText: { flex: 1, gap: spacing.xs },
+  planHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   badge: {
     alignSelf: 'flex-start',
     borderRadius: radius.pill,
