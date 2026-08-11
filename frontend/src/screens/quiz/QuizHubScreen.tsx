@@ -33,10 +33,17 @@ export function QuizHubScreen() {
   const isDark = theme.name === 'dark';
   const navigation = useNavigation<Nav>();
 
-  const { data: attempts = [], isLoading, isError, error, refetch, isFetching } = useRecentQuizAttempts(20);
+  const { data: attempts = [], isLoading, isError, error, refetch } = useRecentQuizAttempts(20);
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
 
+  // Silent background refresh on focus — does NOT trigger the pull-to-refresh spinner
   useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
+
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try { await refetch(); } finally { setRefreshing(false); }
+  }, [refetch]);
 
   const [activeItem, setActiveItem] = useState<QuizAttemptWithSet | null>(null);
 
@@ -144,7 +151,7 @@ export function QuizHubScreen() {
           renderItem={renderItem}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} />}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} tintColor={colors.accent} />}
           style={styles.flex}
           ListHeaderComponent={
             <Typography preset="caption" color={colors.textSecondary} style={styles.listHeader}>

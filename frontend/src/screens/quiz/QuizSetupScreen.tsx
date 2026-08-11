@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
 import { AppModal, EmptyState } from '../../components/feedback';
@@ -106,7 +106,11 @@ export function QuizSetupScreen() {
       footer={
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Button
-            label={cardsLoading ? 'Loading cards…' : 'Start Quiz'}
+            label={
+              cardsLoading ? 'Loading cards…'
+              : selectedSetIds.length > 0 && cards.length === 0 ? 'No cards in selected sets'
+              : 'Start Quiz'
+            }
             onPress={() => navigation.navigate('Quiz', {
               setIds: selectedSetIds,
               setTitles: selectedSetTitles,
@@ -240,7 +244,9 @@ export function QuizSetupScreen() {
           showsVerticalScrollIndicator={false}
           style={styles.sheetList}
           ListEmptyComponent={
-            !isLoading ? <EmptyState title="No sets found" subtitle="Create a set with cards to start quizzing" /> : null
+            isLoading
+              ? <View style={styles.modalLoading}><ActivityIndicator color={colors.accent} /></View>
+              : <EmptyState title="No sets found" subtitle="Create a set with cards to start quizzing" />
           }
           renderItem={({ item }) => {
             const count = item._count?.cards ?? 0;
@@ -338,4 +344,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sheetDone: { marginTop: spacing.md },
+  modalLoading: { paddingVertical: spacing.xxxl, alignItems: 'center' },
 });

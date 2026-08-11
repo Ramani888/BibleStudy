@@ -18,9 +18,7 @@ function formatTime(s: number): string {
 }
 
 export function QuizScreen() {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
