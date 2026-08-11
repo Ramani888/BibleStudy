@@ -105,7 +105,7 @@ Keep credits as the universal meter. Different actions cost different credits:
 | Media in chat | ❌ | ✅ | ✅ |
 | Storage | 250 MB | **2 GB** | **10 GB** |
 | Rate limit | 30/hr | **60/hr** | **120/hr** |
-| Social (friends/groups/gatherings) | ✅ free | ✅ | ✅ |
+| Social (friends + leaderboard) | ✅ free | ✅ | ✅ |
 
 Notes: annual ≈ 2 months free (retention lever). Same Claude model for all tiers — differentiate on
 *volume* (credits/storage/rate), not model quality; simpler and avoids "why is my paid answer worse."
@@ -175,7 +175,7 @@ None win on cheap AI. All win on **content + community + habit**.
 
 ### Revenue paths (priority order)
 1. **Church / small-group plans (B2B2C)** — 🎯 *the real money.* Sell seats to a group leader or
-   church. Our groups/gatherings features are built for this. One church = 30–200 seats at once.
+   church. Groups/gatherings are deferred post-launch — group study plans (D2) are the prerequisite. One church = 30–200 seats at once.
 2. **Consumer Premium subscription** — freemium; Premium unlocks advanced AI, more storage,
    premium study plans, group features. (Hallow's model.)
 3. **Premium content** — curated reading/study plans, devotionals (AI-assisted to produce cheaply).

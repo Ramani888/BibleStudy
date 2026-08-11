@@ -25,10 +25,10 @@ This repo has two knowledge graphs — prefer them for exploration; they're chea
 | IAP | react-native-iap v16 (+ react-native-nitro-modules) |
 
 ## Backend
-Base URL `/api/v1`. **19 modules**, each `backend/src/modules/<m>/` with the same 4 files:
+Base URL `/api/v1`. **16 modules**, each `backend/src/modules/<m>/` with the same 4 files:
 `<m>.routes.ts` · `<m>.controller.ts` · `<m>.service.ts` (owns ALL Prisma) · `<m>.dto.ts` (zod):
-`auth`, `users`, `folders`, `sets`, `cards`, `ai`, `credits`, `friends`, `groups`, `gatherings`,
-`map`, `activities`, `notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`.
+`auth`, `users`, `folders`, `sets`, `cards`, `ai`, `credits`, `friends`, `activities`,
+`notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`.
 
 - Prisma access lives ONLY in `*.service.ts` — controllers/routes never call Prisma directly.
 - Every new module must be mounted in `backend/src/app.ts` and get a migration via `prisma migrate dev`.
@@ -42,7 +42,7 @@ frontend/src/
   components/  # ui/ feedback/ forms/ domain/  (custom lib — no 3rd-party UI kit)
   hooks/       # use<Feature>.ts — React Query wrappers (one per module + usePickMedia, useSubscription…)
   navigation/  # RootNavigator → AuthNavigator | AppNavigator (5 tabs)
-  screens/     # auth/ onboarding/ home/ library/ ai/ profile/  (~45 screens)
+  screens/     # auth/ onboarding/ home/ library/ ai/ profile/ quiz/  (~49 screens)
   store/       # auth.store.ts, aiChat.store.ts (Zustand)
   theme/ types/ utils/
 ```
@@ -99,8 +99,7 @@ use `edges={['bottom']}`/all-edges on a tab-hosted screen.
   `nextReviewAt`/`lastStudiedAt`. `getDueSummary` reads it, so Home's "due" count works. Ceilings: cards that
   were never quizzed have `nextReviewAt=null` (not counted as due); a wrong card reschedules +1 day (no sub-day
   learning steps yet). `FlashCard.tsx` is dead code — review happens in Quiz, not a flip screen.
-- **Map + Gatherings**: backend modules + unused `useMap`/`useGatherings` hooks exist, but there are NO
-  `screens/map/` and NO Map/Gathering nav routes — the feature is unreachable by design.
+- **Map + Gatherings + Groups**: not implemented — no backend modules, no frontend hooks, no screens, no nav routes. Deferred to post-launch.
 - **Media chat needs a funded Anthropic account** (media routes to paid Claude); errors cleanly, charges nothing, when unfunded.
 - **IAP purchases** need App Store Connect products + `APPLE_IAP_SHARED_SECRET` before they work (see `IAP_SETUP.md`). Google verify is a stub.
 - Credit costs are centralized in `ai.service.ts` `CREDIT_COST` (text1/cards2/image3/pdf5); media dominates + is charged full-cost-upfront.

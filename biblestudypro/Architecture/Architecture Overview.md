@@ -65,7 +65,7 @@ Grouped in this brain as: [[Module - Auth & Users]],
 
 ## Frontend surface
 
-5-tab shell (Home · Library · Quiz · AI · Profile), **~45 screens**, plus a
+5-tab shell (Home · Library · Quiz · AI · Profile), **~49 screens**, plus a
 large Profile stack that hosts social, monetization (Paywall), and gamification
 (Achievements, Leaderboard) features. Study Plans live under LibraryTab; the
 Quiz runner is a root-level screen above the tabs. Map feature deleted

@@ -9,12 +9,7 @@ The single reference for the app-wide redesign. Every module we polish follows
 **this** doc, so the whole app feels like one product — not 16 screens each
 styled on a different day. Companion to [[Theme & Components]].
 
-> ⚠️ **PALETTE PIVOT (2026-08-05):** The original gold/light-only theme was
-> abandoned. Current palette = **indigo #6366F1 primary + violet #A78BFA** (copied
-> from the Meditation project). Full light/dark system added via `theme/useTheme()` +
-> `theme/themeStore.ts`. The color-discipline section below is partially stale —
-> replace "Gold" references with "Indigo primary". The structural rules (whitespace,
-> one-hero, typography, soft surfaces, motion) remain valid.
+Palette: **indigo #6366F1 primary + violet #A78BFA**, full light/dark via `theme/useTheme()` + `theme/themeStore.ts`.
 
 Mood: **calm + serene** (indigo/violet palette, light + dark modes, airy whitespace).
 
@@ -71,10 +66,10 @@ body/sans preset.
 - Borders: prefer **`colors.border` at low weight** or none + a soft shadow.
   Avoid hard 1px boxes stacked next to each other.
 - Gradients: gentle, cohesive (adjacent palette steps), never a light→very-dark
-  jump. Hero gradient = `gold400 → gold500 → gold600`.
+  jump. Hero gradient = adjacent indigo/violet steps.
 
 ### 5. Color discipline
-- **Gold = the one accent.** Use for the single primary action / hero only.
+- **Indigo = the one accent.** Use for the single primary action / hero only.
 - Semantic colors (info/warning/success) only for their meaning, not decoration.
 - Most surfaces neutral: `background`, `backgroundSecondary`, `textSecondary`.
 
@@ -97,7 +92,7 @@ Every data surface handles **loading / empty / error** with the shared
 | Hero card | radius 18, padding `spacing[6]`, soft gradient, serif if verse. |
 | Content card | radius 14, padding `spacing[4]`, faint border OR soft shadow (not both). |
 | Chips / stats | quiet fill (`backgroundSecondary`), no hard border, subtle. |
-| Primary button | gold, one per screen. Secondary = ghost/outline. |
+| Primary button | indigo accent, one per screen. Secondary = ghost/outline. |
 | Empty state | icon + one calm sentence + one action. Lots of padding. |
 
 ---
@@ -110,7 +105,7 @@ Run this on each module as we go (tick in that module's note):
 - [ ] Section gaps ≥ `spacing[6]`; card padding ≥ `spacing[5]`.
 - [ ] Scripture uses the `verse` preset.
 - [ ] Radii 14–18; no stacked hard borders.
-- [ ] Gold used only for the single primary action / hero.
+- [ ] Indigo accent used only for the single primary action / hero.
 - [ ] loading / empty / error all present via `feedback/` components.
 - [ ] Entrance motion is a soft staggered `FadeInDown`.
 - [ ] No duplicate data on screen (e.g. streak shown once).
