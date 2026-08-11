@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -50,13 +50,12 @@ export function BlockedUsersScreen({ navigation }: Props) {
     <Screen
       header={<ScreenHeader title="Blocked Users" onBack={() => navigation.goBack()} />}
     >
-      <View style={{ flex: 1 }}>
+      <View style={styles.fill}>
       <FlatList
         data={blocked}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshing={isFetching}
-        onRefresh={refetch}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={blocked.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
@@ -69,6 +68,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
+  fill: { flex: 1 },
   list: { padding: layout.screenPaddingH },
   separator: { height: spacing.md },
   emptyContainer: { flex: 1, justifyContent: 'center' },

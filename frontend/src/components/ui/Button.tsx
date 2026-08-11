@@ -8,7 +8,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import { layout, spacing, Theme, useTheme, palette } from '../../theme';
+import { layout, spacing, Theme, useTheme } from '../../theme';
 import { Typography } from './Typography';
 import { triggerHaptic } from '../../utils/haptics';
 
@@ -33,7 +33,7 @@ const makeVariantStyles = (
   },
   secondary: {
     container: { backgroundColor: colors.accentSoft },
-    labelColor: palette.indigo800,
+    labelColor: colors.accent,
   },
   outline: {
     container: {

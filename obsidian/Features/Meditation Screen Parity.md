@@ -44,3 +44,13 @@ PreferenceCard gap: spacing.lg (between cards, NOT dividers inside one card)
 - Status badge: `height:24, borderRadius: radius.sm, paddingHorizontal: spacing.s10`
 - Locked cards: `opacity: 0.6`
 - Progress bar: `height:4, borderRadius: radius.r2, sliderTrack/sliderFill colors`
+
+## Token-level audit — Library module complete (2026-08-11, commit 601d04f)
+
+All 15 files in `screens/library/` have been `/meditation-parity` audited. Notable fixes in the components subfolder:
+
+| File | Violations fixed |
+|---|---|
+| `components/CardPreview.tsx` | Card bg `colors.surface`/`background` → `CARD_FILL_LIGHT`/`chipIdle`; `lineHeight:22` → token |
+| `components/CardForm.tsx` | `minHeight:80` → `spacing.s80`; TextInput missing `fontSize`/`fontFamily` tokens |
+| `components/SetForm.tsx` | `palette.indigo800` chip text → `colors.textSecondary` (dark-mode safe); dead `palette` import removed |

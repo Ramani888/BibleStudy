@@ -93,5 +93,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxxl,
   },
   errorMessage: { marginTop: spacing.sm },
-  errorBtn: { marginTop: spacing.xxl, minWidth: 140 },
+  errorBtn: { marginTop: spacing.xxl, minWidth: 140 }, // ponytail: off-grid Figma value, no s140 token
 });

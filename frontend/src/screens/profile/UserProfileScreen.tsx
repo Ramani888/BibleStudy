@@ -22,7 +22,7 @@ import {
 } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import { formatDateOnly } from '../../utils/formatters';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 import type { StudySet } from '../../types';
 
 type Props = ProfileScreenProps<'UserProfile'>;
@@ -34,7 +34,9 @@ const VISIBILITY_LABEL: Record<string, string> = {
 };
 
 export function UserProfileScreen({ route, navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, error, refetch } = useUser(userId);
@@ -119,7 +121,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} />}
+        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
       >
         <View style={styles.avatarContainer}>
           {user.profileImage ? (
@@ -188,7 +190,16 @@ export function UserProfileScreen({ route, navigation }: Props) {
           <View style={styles.setsSection}>
             <Typography preset="label" style={styles.setsTitle}>Their Sets</Typography>
             {sets.map(set => (
-              <Pressable key={set.id} style={[styles.setCard, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]} onPress={() => openSet(set)}>
+              <Pressable
+                key={set.id}
+                style={({ pressed }) => [
+                  styles.setCard,
+                  { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+                  !isDark && styles.cardShadow,
+                  pressed && styles.setCardPressed,
+                ]}
+                onPress={() => openSet(set)}
+              >
                 <View style={[styles.setIcon, { backgroundColor: colors.accentSoft }]}>
                   <BookIcon size={18} color={colors.accent} />
                 </View>
@@ -243,11 +254,19 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   setIcon: {
-    width: 36,
+    width: 36, // ponytail: off-grid Figma value, no s36 token
     height: 36,
     borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },
   setInfo: { flex: 1, gap: spacing.s2 },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  setCardPressed: { opacity: 0.7 },
 });

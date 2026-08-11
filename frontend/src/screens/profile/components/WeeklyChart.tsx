@@ -29,7 +29,7 @@ import {
   type IconComponent,
 } from '../../../components/icons';
 import { useCreditBalance, useCreditStats } from '../../../hooks';
-import { layout, spacing, useTheme } from '../../../theme';
+import { CARD_FILL_LIGHT, layout, radius, spacing, useTheme } from '../../../theme';
 import type { CreditStatsPeriod, CreditInterval, DayStat } from '../../../hooks/useCredits';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
@@ -161,7 +161,7 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
         const usedH    = total > 0 ? (day.used   / total) * barH : 0;
         const selected = selectedIdx === idx;
         return (
-          <Pressable key={idx} style={s.barCol} onPress={() => onSelect(selected ? null : idx)}>
+          <Pressable key={idx} style={({ pressed }) => [s.barCol, pressed && s.barColPressed]} onPress={() => onSelect(selected ? null : idx)}>
             <View style={[s.barTrack, { height: maxBarH, backgroundColor: colors.surfaceMuted }, selected && { borderWidth: 1, borderColor: colors.accent }]}>
               {total > 0 && (
                 <View style={[s.barStack, { height: barH }]}>
@@ -382,7 +382,9 @@ function ChartBody({
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: CreditStatsPeriod }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
 
   const [chartType,       setChartType]       = useState<ChartType>('bar');
@@ -483,7 +485,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
         {CHART_ICONS.map(({ key, Icon }) => (
           <Pressable
             key={key}
-            style={[styles.iconBtn, chartType === key && { backgroundColor: colors.accentSoft }]}
+            style={({ pressed }) => [styles.iconBtn, chartType === key && { backgroundColor: colors.accentSoft }, pressed && styles.btnPressed]}
             onPress={() => { setChartType(key); setSelectedIdx(null); }}
           >
             <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.accent : colors.textSecondary} />
@@ -491,7 +493,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
         ))}
         <View style={[styles.iconDivider, { backgroundColor: colors.border }]} />
         <Pressable
-          style={styles.iconBtn}
+          style={({ pressed }) => [styles.iconBtn, pressed && styles.btnPressed]}
           onPress={isFullscreenMode ? () => setFullscreen(false) : () => setFullscreen(true)}
         >
           {isFullscreenMode
@@ -507,7 +509,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
     const sel = selectedIdx !== null ? safeStats[selectedIdx] : null;
     if (!sel) return null;
     return (
-      <View style={[styles.detailStrip, { backgroundColor: colors.surfaceMuted, borderRadius: spacing.sm }]}>
+      <View style={[styles.detailStrip, { backgroundColor: colors.surfaceMuted }]}>
         <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
         <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
         <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
@@ -525,7 +527,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
         {available.map(iv => (
           <Pressable
             key={iv}
-            style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, chartInterval === iv && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+            style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, chartInterval === iv && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
             onPress={() => handleIntervalChange(iv)}
           >
             <Typography preset="label" color={chartInterval === iv ? colors.textOnAccent : colors.textSecondary}>
@@ -543,7 +545,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
         {PERIOD_CHIPS.map(({ key, label }) => (
           <Pressable
             key={key}
-            style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === key && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+            style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === key && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
             onPress={() => handlePeriod(key)}
           >
             <Typography preset="label" color={period === key ? colors.textOnAccent : colors.textSecondary}>
@@ -552,7 +554,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
           </Pressable>
         ))}
         <Pressable
-          style={[styles.chip, styles.chipCustom, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === 'custom' && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+          style={({ pressed }) => [styles.chip, styles.chipCustom, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === 'custom' && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
           onPress={openCustomPicker}
         >
           <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnAccent : colors.textSecondary} />
@@ -617,7 +619,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
 
   return (
     <>
-      <Card style={{ ...styles.card, backgroundColor: colors.background }} shadow="sm">
+      <Card style={{ ...styles.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }} shadow="sm">
         <View style={s.header}>
           <Typography preset="h4">Credit Activity</Typography>
           {renderChartIcons(false)}
@@ -665,7 +667,8 @@ const s = StyleSheet.create({
   emptyText:   { textAlign: 'center' },
   barBars:     { flexDirection: 'row', gap: spacing.sm },
   barCol:      { flex: 1, alignItems: 'center', gap: spacing.xs },
-  barTrack:    { width: '100%', borderRadius: spacing.xs, justifyContent: 'flex-end', overflow: 'hidden' },
+  barTrack:    { width: '100%', borderRadius: spacing.xs, justifyContent: 'flex-end', overflow: 'hidden' }, // ponytail: r4 off-grid (no token), spacing.xs=4 as proxy
+  barColPressed: { opacity: 0.85 },
   barStack:    { width: '100%' },
   barSeg:      { width: '100%' },
   donutWrap:   { alignItems: 'center' },
@@ -677,8 +680,9 @@ const s = StyleSheet.create({
 
 const styles = StyleSheet.create({
   card:          { gap: spacing.md },
-  iconBtn:       { padding: spacing.s6, borderRadius: spacing.s6 },
-  iconDivider:   { width: 1, height: 16, marginHorizontal: spacing.xs },
+  iconBtn:       { padding: spacing.s6, borderRadius: radius.r6 },
+  iconDivider:   { width: 1, height: spacing.lg, marginHorizontal: spacing.xs },
+  btnPressed:    { opacity: 0.85 },
   chip: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s6,
@@ -693,8 +697,9 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     paddingVertical: spacing.sm,
     marginTop: spacing.sm,
+    borderRadius: radius.sm,
   },
-  detailDot:     { width: 3, height: 3, borderRadius: spacing.s2 },
+  detailDot:     { width: spacing.s3, height: spacing.s3, borderRadius: radius.r2 },
   summaryRow:    { flexDirection: 'row', borderTopWidth: 1, paddingTop: spacing.md, marginTop: spacing.xs },
   summaryDivider: { width: 1, marginVertical: spacing.xs },
   fsContainer:   { flex: 1, padding: spacing.lg, gap: spacing.md },

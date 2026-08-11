@@ -15,7 +15,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-na
 import type { MediaFile } from '../../types';
 import { Typography } from '../../components/ui';
 import { CloseIcon, ShareIcon } from '../../components/icons';
-import { palette, spacing } from '../../theme';
+import { layout, palette, radius, spacing } from '../../theme';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -112,7 +112,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
         {/* Share */}
         {currentFile && (
           <Pressable
-            style={[styles.iconBtn, styles.shareBtn, { top: insets.top + spacing.md }]}
+            style={({ pressed }) => [styles.iconBtn, styles.shareBtn, { top: insets.top + spacing.md }, pressed && styles.btnPressed]}
             onPress={() => onShare(currentFile)}
             hitSlop={12}
           >
@@ -122,7 +122,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 
         {/* Close */}
         <Pressable
-          style={[styles.iconBtn, styles.closeBtn, { top: insets.top + spacing.md }]}
+          style={({ pressed }) => [styles.iconBtn, styles.closeBtn, { top: insets.top + spacing.md }, pressed && styles.btnPressed]}
           onPress={onClose}
           hitSlop={12}
         >
@@ -132,7 +132,8 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
         {/* Caption */}
         {currentFile && (
           <View style={[styles.caption, { bottom: insets.bottom + spacing.lg }]}>
-            <Typography preset="caption" color="rgba(255,255,255,0.8)" numberOfLines={1}>
+            {/* ponytail: rgba semi-transparent white on photo overlay, no theme token */}
+        <Typography preset="caption" color="rgba(255,255,255,0.8)" numberOfLines={1}>
               {currentFile.name}
             </Typography>
           </View>
@@ -152,18 +153,19 @@ const styles = StyleSheet.create({
     position: 'absolute', left: 0, right: 0, alignItems: 'center',
   },
   counterPill: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    backgroundColor: 'rgba(0,0,0,0.5)', // ponytail: overlay on photo, no theme token
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
-    borderRadius: 12,
+    borderRadius: layout.cardRadius,
   },
 
   iconBtn: {
     position: 'absolute',
-    width: 40, height: 40, borderRadius: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
+    width: spacing.huge, height: spacing.huge, borderRadius: radius.r20,
+    backgroundColor: 'rgba(0,0,0,0.5)', // ponytail: overlay on photo, no theme token
     alignItems: 'center', justifyContent: 'center',
   },
+  btnPressed: { opacity: 0.85 },
   shareBtn: { left: spacing.lg },
   closeBtn: { right: spacing.lg },
 

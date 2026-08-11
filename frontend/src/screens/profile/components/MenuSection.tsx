@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { Typography } from '../../../components/ui';
-import { fontSize, layout, radius, spacing, useTheme } from '../../../theme';
+import { fontSizes, layout, radius, spacing, useTheme } from '../../../theme';
 
 interface MenuSectionProps {
   label: string;
@@ -50,7 +50,7 @@ const styles = StyleSheet.create({
     marginHorizontal: layout.screenPaddingH,
   },
   title: {
-    fontSize: fontSize.f13,
+    fontSize: fontSizes.sm,
     letterSpacing: 1,
     marginBottom: spacing.s10,
     marginLeft: spacing.xs,

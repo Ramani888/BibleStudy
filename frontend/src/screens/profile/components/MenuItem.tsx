@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { fontFamily, fontSize, palette, radius, spacing, useTheme } from '../../../theme';
+import { fontFamily, fontSizes, palette, radius, spacing, useTheme } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { ChevronRightIcon, type IconComponent } from '../../../components/icons';
 
@@ -34,7 +34,7 @@ export function MenuItem({
 
   return (
     <Pressable
-      style={({ pressed }) => [styles.row, { opacity: pressed ? 0.6 : 1 }]}
+      style={({ pressed }) => [styles.row, { opacity: pressed ? 0.7 : 1 }]}
       onPress={onPress}
     >
       <View style={[styles.tile, { backgroundColor: tileColor }]}>
@@ -70,5 +70,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { flex: 1, fontFamily: fontFamily.semibold, fontSize: fontSize.body },
+  label: { flex: 1, fontFamily: fontFamily.semibold, fontSize: fontSizes.md },
 });
