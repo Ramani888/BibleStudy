@@ -6,7 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
@@ -26,7 +26,9 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizSummaryScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
@@ -51,7 +53,7 @@ export function QuizSummaryScreen() {
   const renderItem = ({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
     return (
-      <View style={[styles.card, { backgroundColor: colors.surface, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
+      <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
         <View style={styles.cardHeader}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.cardIndex}>
             Q{item.index + 1} · {MODE_LABEL[item.mode] ?? item.mode}
@@ -99,17 +101,17 @@ export function QuizSummaryScreen() {
       </View>
 
       {/* Score strip */}
-      <View style={[styles.scoreStrip, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View style={[styles.scoreStrip, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.divider }]}>
         <Typography preset="h3" style={{ color: scoreColor }}>{scorePct}%</Typography>
         <Typography preset="caption" color={colors.textSecondary}>{correct}/{total} correct · {title}</Typography>
       </View>
 
       {/* Filter tabs */}
-      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
+      <View style={[styles.tabs, { borderBottomColor: colors.divider }]}>
         {FILTER_LABELS.map(({ key, label }) => (
           <Pressable
             key={key}
-            style={[styles.tab, filter === key && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
+            style={({ pressed }) => [styles.tab, filter === key && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, pressed && styles.tabPressed]}
             onPress={() => setFilter(key)}
           >
             <Typography
@@ -122,7 +124,7 @@ export function QuizSummaryScreen() {
         ))}
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <FlatList
         data={filtered}
         keyExtractor={i => String(i.index)}
@@ -142,9 +144,11 @@ export function QuizSummaryScreen() {
 
 const styles = StyleSheet.create({
   root:        { flex: 1 },
+  flex:        { flex: 1 },
   scoreStrip:  { alignItems: 'center', paddingVertical: spacing.md, gap: spacing.xs, borderBottomWidth: StyleSheet.hairlineWidth },
   tabs:        { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth },
   tab:         { flex: 1, alignItems: 'center', paddingVertical: spacing.md },
+  tabPressed:  { opacity: 0.7 },
   list:        { padding: layout.screenPaddingH, gap: spacing.md },
   empty:       { paddingTop: spacing.s48 },
   card: {
@@ -155,8 +159,8 @@ const styles = StyleSheet.create({
   },
   cardHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardIndex:   { flex: 1 },
-  prompt:      { lineHeight: 22 },
+  prompt:      { lineHeight: fontSizes.md * lineHeights.normal },
   answerRow:   { flexDirection: 'row', gap: spacing.sm },
-  answerLabel: { width: 80 },
+  answerLabel: { width: spacing.s80 },
   answerValue: { flex: 1 },
 });

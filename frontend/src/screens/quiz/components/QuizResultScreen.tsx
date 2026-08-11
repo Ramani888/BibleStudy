@@ -43,7 +43,9 @@ export function QuizResultScreen({
   total, correct, scorePct, timeSecs,
   summaryItems, retakeAttemptId, isFocused, onExit,
 }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const navigation = useNavigation();
   const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
   const saved = useRef(false);
@@ -115,7 +117,7 @@ export function QuizResultScreen({
       {/* Summary icon button */}
       <Pressable
         onPress={openSummary}
-        style={({ pressed }) => [styles.reviewBtn, { opacity: pressed ? 0.6 : 1 }]}
+        style={({ pressed }) => [styles.reviewBtn, { opacity: pressed ? 0.85 : 1 }]}
         accessibilityRole="button"
         accessibilityLabel="View summary"
       >
@@ -165,6 +167,7 @@ const styles = StyleSheet.create({
   },
   sub:       { marginTop: -spacing.sm },
   scoreWrap: { alignItems: 'center', gap: spacing.s2 },
+  // ponytail: fontSize 52 / lineHeight 64 are off-grid hero display values — no matching tokens
   scoreNumber: { fontSize: 52, fontWeight: fontWeights.bold, lineHeight: 64 },
   reviewBtn: { alignItems: 'center', gap: spacing.xs },
   reviewIcon: {
@@ -195,6 +198,7 @@ const styles = StyleSheet.create({
   },
   quoteText: { fontStyle: 'italic', textAlign: 'center' },
   quoteSub: { textAlign: 'center' },
+  // ponytail: fontSize 52 / lineHeight 56 are off-grid decorative values — no matching tokens
   quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
   quoteTopLeft: { top: spacing.sm, left: spacing.lg },
   quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },

@@ -9,7 +9,7 @@ import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon } 
 import { useSearchToggle, useSets } from '../../hooks';
 import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
 import type { QuizStackParamList } from '../../navigation/types';
 
@@ -35,7 +35,9 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
 export function QuizSetupScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizSetup: Params }, 'QuizSetup'>>();
 
@@ -137,7 +139,11 @@ export function QuizSetupScreen() {
           {/* ── Choose Sets row ── */}
           <View>
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>CHOOSE SETS</Typography>
-          <Pressable style={[styles.selectorRow, { borderColor: colors.border, backgroundColor: colors.surface }]} onPress={() => setSetPickerOpen(true)} accessibilityRole="button">
+          <Pressable
+            style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+            onPress={() => setSetPickerOpen(true)}
+            accessibilityRole="button"
+          >
             <View style={styles.selectorIcon}>
               {selectedSetIds.length > 0
                 ? <CheckCircleIcon size={20} color={colors.accent} />
@@ -159,7 +165,7 @@ export function QuizSetupScreen() {
 
           {/* ── Quiz Type chips ── */}
           {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
-            <View style={{ marginTop: spacing.xxl }}>
+            <View style={styles.modeSection}>
               <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>QUIZ TYPE</Typography>
               {cardsLoading ? (
                 <Typography preset="body" color={colors.textSecondary}>Loading modes…</Typography>
@@ -190,10 +196,20 @@ export function QuizSetupScreen() {
       <AppModal visible={setPickerOpen} onClose={() => setSetPickerOpen(false)} contentStyle={styles.sheetContent}>
         <View style={styles.sheetToolbar}>
           <Typography preset="h4" style={styles.flex}>Choose Sets</Typography>
-          <Pressable onPress={toggleSearch} hitSlop={8} accessibilityRole="button">
+          <Pressable
+            style={({ pressed }) => pressed && styles.iconPressed}
+            onPress={toggleSearch}
+            hitSlop={8}
+            accessibilityRole="button"
+          >
             <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn} accessibilityRole="button">
+          <Pressable
+            style={({ pressed }) => [styles.sortBtn, pressed && styles.iconPressed]}
+            onPress={cycleSortOrder}
+            hitSlop={8}
+            accessibilityRole="button"
+          >
             <SortIcon size={20} color={colors.accent} />
             <Typography preset="caption" color={colors.accent}>{SORT_LABEL[sortOrder]}</Typography>
           </Pressable>
@@ -231,10 +247,11 @@ export function QuizSetupScreen() {
             const selected = selectedSetIds.includes(item.id);
             return (
               <Pressable
-                style={[
+                style={({ pressed }) => [
                   styles.setRow,
                   { borderColor: colors.border, backgroundColor: colors.surface },
                   selected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                  pressed && styles.rowPressed,
                 ]}
                 onPress={() => handleToggle(item.id, item.title)}
               >
@@ -278,9 +295,12 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadiusSm,
     borderWidth: 1,
   },
-  selectorIcon: { width: 28, alignItems: 'center' },
+  selectorIcon: { width: spacing.s28, alignItems: 'center' },
+  modeSection: { marginTop: spacing.xxl },
   chipRow: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
   modeDesc: { marginTop: spacing.md },
+  rowPressed: { opacity: 0.7 },
+  iconPressed: { opacity: 0.85 },
   footer: {
     paddingHorizontal: layout.screenPaddingH,
     paddingVertical: spacing.lg,

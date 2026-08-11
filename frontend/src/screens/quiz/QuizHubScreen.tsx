@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { Alert, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
@@ -9,7 +9,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { fontSizes, fontWeights, useTheme, spacing, layout } from '../../theme';
+import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
@@ -28,7 +28,9 @@ const MODE_DISPLAY: Record<string, string> = {
 };
 
 export function QuizHubScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const navigation = useNavigation<Nav>();
 
   const { data: attempts = [], isLoading, isError, error, refetch, isFetching } = useRecentQuizAttempts(20);
@@ -72,7 +74,7 @@ export function QuizHubScreen() {
 
     return (
       <Pressable
-        style={[styles.row, { borderColor: colors.border, backgroundColor: colors.surface }]}
+        style={({ pressed }) => [styles.row, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
         onPress={() => handleDetails(item)}
         accessibilityRole="button"
       >
@@ -125,8 +127,10 @@ export function QuizHubScreen() {
     <Screen header={<ScreenHeader title="Quiz" />} footer={footer}>
       {isError ? (
         <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
-      ) : attempts.length === 0 && !isLoading ? (
-        <View>
+      ) : isLoading ? (
+        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
+      ) : attempts.length === 0 ? (
+        <View style={styles.flex}>
           <EmptyState
             title="No quizzes yet"
             subtitle="Tap 'Start New Quiz' below to test yourself"
@@ -140,8 +144,7 @@ export function QuizHubScreen() {
           renderItem={renderItem}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshing={isFetching && !isLoading}
-          onRefresh={refetch}
+          refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} />}
           style={styles.flex}
           ListHeaderComponent={
             <Typography preset="caption" color={colors.textSecondary} style={styles.listHeader}>
@@ -200,6 +203,7 @@ export function QuizHubScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
   listHeader: { marginBottom: spacing.md },
   row: {
@@ -222,6 +226,7 @@ const styles = StyleSheet.create({
     fontSize: fontSizes.sm,
     fontWeight: fontWeights.bold,
   },
+  rowPressed: { opacity: 0.7 },
   rowText: { flex: 1, gap: spacing.s2 },
   footerBar: {
     paddingHorizontal: layout.screenPaddingH,

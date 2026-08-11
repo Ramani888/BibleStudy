@@ -18,7 +18,9 @@ function formatTime(s: number): string {
 }
 
 export function QuizScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
@@ -66,7 +68,13 @@ export function QuizScreen() {
   // Fix 1: back button on error/loading/unavailable states (gesture is disabled globally)
   const safeHeader = (
     <View style={[styles.safeHeader, { paddingTop: insets.top }]}>
-      <Pressable onPress={goBack} hitSlop={12} accessibilityRole="button" accessibilityLabel="Go back">
+      <Pressable
+        style={({ pressed }) => pressed && styles.backPressed}
+        onPress={goBack}
+        hitSlop={12}
+        accessibilityRole="button"
+        accessibilityLabel="Go back"
+      >
         <BackIcon size={24} color={colors.textPrimary} />
       </Pressable>
     </View>
@@ -156,10 +164,11 @@ const styles = StyleSheet.create({
   center:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
   safeHeader:    { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md },
   header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
-  timerWrap:     { width: 56, alignItems: 'flex-start' },
+  timerWrap:     { width: 56, alignItems: 'flex-start' }, // ponytail: off-grid, no spacing.s56
   timer:         { fontVariant: ['tabular-nums'] },
   title:         { flex: 1, textAlign: 'center' },
-  counterWrap:   { width: 56, alignItems: 'flex-end' },
+  counterWrap:   { width: 56, alignItems: 'flex-end' }, // ponytail: off-grid, no spacing.s56
+  backPressed:   { opacity: 0.85 },
   progressTrack: { height: layout.progressBarHeight, width: '100%' },
   progressFill:  { height: layout.progressBarHeight },
 });

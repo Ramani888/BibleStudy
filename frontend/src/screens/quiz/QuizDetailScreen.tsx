@@ -5,7 +5,7 @@ import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
-import { fontWeights, useTheme, spacing, layout } from '../../theme';
+import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
@@ -19,7 +19,9 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizDetailScreen() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
@@ -83,6 +85,7 @@ export function QuizDetailScreen() {
             <View style={styles.headerActions}>
               {storedResponses && storedResponses.length > 0 && (
                 <Pressable
+                  style={({ pressed }) => pressed && styles.iconPressed}
                   onPress={() => navigation.navigate('QuizSummary' as any, {
                     items: storedResponses,
                     title: quizName ?? setsLabel,
@@ -95,7 +98,13 @@ export function QuizDetailScreen() {
                   <ListIcon size={20} color={colors.textSecondary} />
                 </Pressable>
               )}
-              <Pressable onPress={handleDelete} hitSlop={12} disabled={isPending} accessibilityRole="button">
+              <Pressable
+                style={({ pressed }) => pressed && styles.iconPressed}
+                onPress={handleDelete}
+                hitSlop={12}
+                disabled={isPending}
+                accessibilityRole="button"
+              >
                 <TrashIcon size={20} color={colors.alert} />
               </Pressable>
             </View>
@@ -141,7 +150,7 @@ export function QuizDetailScreen() {
         </View>
 
         {/* ── Date info card ── */}
-        <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
           <View style={styles.cardRow}>
             <View style={styles.cardRowLeft}>
               <ClockIcon size={16} color={colors.textSecondary} />
@@ -156,7 +165,7 @@ export function QuizDetailScreen() {
 
           {timeSecs != null && (
             <>
-              <View style={[styles.divider, { backgroundColor: colors.border }]} />
+              <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               <View style={styles.cardRow}>
                 <View style={styles.cardRowLeft}>
                   <RefreshIcon size={16} color={colors.textSecondary} />
@@ -171,7 +180,7 @@ export function QuizDetailScreen() {
 
           {isRetaken && (
             <>
-              <View style={[styles.divider, { backgroundColor: colors.border }]} />
+              <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               <View style={styles.cardRow}>
                 <View style={styles.cardRowLeft}>
                   <CalendarIcon size={16} color={colors.textSecondary} />
@@ -200,7 +209,9 @@ const styles = StyleSheet.create({
 
   // Hero
   hero: { alignItems: 'center', gap: spacing.sm },
+  // ponytail: fontSize 72 and lineHeight 80 are off-grid hero display values — no matching tokens
   scoreNumber: { fontSize: 72, fontWeight: fontWeights.bold, lineHeight: 80, includeFontPadding: false },
+  iconPressed: { opacity: 0.85 },
   correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
 
   // Chips

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Button, Typography } from '../../../components/ui';
-import { layout, spacing, useTheme } from '../../../theme';
+import { layout, spacing, useTheme, CARD_FILL_LIGHT, radius } from '../../../theme';
 import type { QuizItem } from '../../../types';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
@@ -27,7 +27,9 @@ function getDefaultResponse(item: QuizItem): unknown {
 }
 
 export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev, isLast, onPrev, onNext, onFinish, bottomInset = 0 }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
 
   const [response, setResponseState] = useState<unknown>(() => initialResponse ?? getDefaultResponse(item));
 
@@ -39,7 +41,7 @@ export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev,
   return (
     <View style={styles.wrap}>
       <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-        <View style={[styles.questionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+        <View style={[styles.questionCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item)}</Typography>
           {!!promptText(item) && (
             <Typography preset="h3" color={colors.textPrimary}>{promptText(item)}</Typography>
@@ -51,7 +53,7 @@ export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev,
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { borderTopColor: colors.border, paddingBottom: Math.max(bottomInset, spacing.lg) }]}>
+      <View style={[styles.footer, { borderTopColor: colors.divider, paddingBottom: Math.max(bottomInset, spacing.lg) }]}>
         <View style={styles.btnRow}>
           <Button label="← Prev" variant="outline" onPress={onPrev} disabled={!hasPrev} style={styles.flex} />
           <Button label={isLast ? 'Finish' : 'Next →'} onPress={isLast ? onFinish : onNext} style={styles.flex} />
@@ -112,10 +114,11 @@ function MC({ item, response, onChangeResponse }: { item: any; response: number 
         <Pressable
           key={i}
           onPress={() => onChangeResponse(i)}
-          style={[
+          style={({ pressed }) => [
             styles.option,
             { borderColor: colors.border, backgroundColor: colors.surface },
             response === i && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+            pressed && styles.optionPressed,
           ]}
         >
           <View style={[
@@ -185,13 +188,13 @@ function Chunks({ item, response, onChangeResponse }: { item: any; response: str
           </View>
         ))}
       </View>
-      <View style={{ height: spacing.md }} />
+      <View style={styles.spacer} />
       <View style={styles.chunkArea}>
         {item.chunks.map((c: string, i: number) => {
           const key = chunkKey(c, i);
           if (response.includes(key)) return null;
           return (
-            <Pressable key={key} onPress={() => onChangeResponse([...response, key])} style={[styles.chunk, { borderColor: colors.accent }]}>
+            <Pressable key={key} onPress={() => onChangeResponse([...response, key])} style={({ pressed }) => [styles.chunk, { borderColor: colors.accent }, pressed && styles.chunkPressed]}>
               <Typography preset="body" color={colors.accent}>{c}</Typography>
             </Pressable>
           );
@@ -214,7 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadiusLg,
     borderWidth: 1,
     gap: spacing.sm,
-    minHeight: 100,
+    minHeight: 100, // ponytail: off-grid, no spacing token for 100
     justifyContent: 'center',
   },
   label:      { letterSpacing: 0.5 },
@@ -228,7 +231,8 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     marginBottom: spacing.md,
   },
-  letter:          { width: 28, height: 28, borderRadius: spacing.sm, alignItems: 'center', justifyContent: 'center' },
+  letter:          { width: spacing.s28, height: spacing.s28, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  optionPressed:   { opacity: 0.7 },
   input: {
     borderWidth: 1.5,
     borderRadius: layout.cardRadius,
@@ -239,15 +243,17 @@ const styles = StyleSheet.create({
   blanksWrap: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.xs },
   word:       { marginRight: spacing.xs },
   blank: {
-    minWidth: 90,
+    minWidth: 90, // ponytail: off-grid, no spacing token for 90
     borderBottomWidth: 2,
     paddingHorizontal: spacing.sm,
     paddingVertical: spacing.s2,
     textAlign: 'center',
   },
-  chunkArea:   { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, minHeight: 44 },
-  chunk:       { borderWidth: 1.5, borderRadius: spacing.s10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-  chunkPicked: { borderRadius: spacing.s10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  chunkArea:    { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, minHeight: 44 }, // ponytail: minHeight 44 — no spacing token
+  chunk:        { borderWidth: 1.5, borderRadius: radius.r10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  chunkPressed: { opacity: 0.7 },
+  chunkPicked:  { borderRadius: radius.r10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  spacer:       { height: spacing.md },
   undoBtn:     { marginTop: spacing.md },
   footer:      { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md, borderTopWidth: 1 },
   btnRow:      { flexDirection: 'row', gap: spacing.md },
