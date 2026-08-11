@@ -70,7 +70,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
 
   return (
     <Screen
-      edges={['top', 'bottom']}
+      edges={['top']}
       keyboardAvoiding
       header={<ScreenHeader title="Edit Profile" onBack={() => navigation.goBack()} />}
       footer={

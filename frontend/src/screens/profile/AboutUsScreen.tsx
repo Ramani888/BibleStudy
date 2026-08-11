@@ -13,7 +13,7 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
   const { colors } = useTheme();
 
   return (
-    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="About Us" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title="About Us" onBack={() => navigation.goBack()} />}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>

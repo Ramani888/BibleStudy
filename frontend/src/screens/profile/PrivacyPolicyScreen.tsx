@@ -32,7 +32,7 @@ export function PrivacyPolicyScreen({ navigation }: ProfileScreenProps<'PrivacyP
   const { colors } = useTheme();
 
   return (
-    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="Privacy Policy" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title="Privacy Policy" onBack={() => navigation.goBack()} />}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         <Typography preset="caption" color={colors.textSecondary} style={styles.updated}>

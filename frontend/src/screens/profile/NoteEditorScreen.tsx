@@ -99,7 +99,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
 
   return (
     <Screen
-      edges={['top', 'bottom']}
+      edges={['top']}
       keyboardAvoiding
       header={
         <ScreenHeader

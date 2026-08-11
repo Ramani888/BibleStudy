@@ -26,7 +26,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
+    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
       <View style={styles.flex}>
         <CardForm
           ref={formRef}

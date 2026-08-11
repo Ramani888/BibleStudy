@@ -47,7 +47,7 @@ export function CreatePlanScreen({ navigation }: Props) {
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
+    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.scroll}

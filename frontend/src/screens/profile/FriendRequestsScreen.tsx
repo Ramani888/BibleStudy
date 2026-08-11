@@ -94,7 +94,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
 
   return (
     <Screen
-      edges={['top', 'bottom']}
+      edges={['top']}
       header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
     >
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>

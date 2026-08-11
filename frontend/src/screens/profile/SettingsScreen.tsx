@@ -55,7 +55,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   };
 
   return (
-    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
       <ScrollView
         contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}

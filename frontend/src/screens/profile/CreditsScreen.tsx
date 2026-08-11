@@ -175,7 +175,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
     setChartWindow(w => w === 'week' ? 'month' : 'week');
 
   return (
-    <Screen edges={['top', 'bottom']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
       <View style={styles.flex}>
         <FlatList
           data={transactions}
