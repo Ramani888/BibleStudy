@@ -10,7 +10,6 @@ import {
   BellIcon,
   ArrowRightIcon,
   ChevronRightIcon,
-  BookIcon,
   CheckCircleIcon,
   SparklesIcon,
   FileTextIcon,
@@ -31,7 +30,6 @@ import {
   useFolders,
   useNotes,
   useCreditBalance,
-  useDailyVerse,
   useAutoDailyClaim,
   useStreak,
   useDueSummary,
@@ -54,9 +52,10 @@ function getGreeting(): string {
   return 'Good evening';
 }
 
-// ─── Sticky Header ────────────────────────────────────────────────────────────
+// ─── Sticky Header ─────────────────────────────────────────────────────────────
 function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
-  greeting: string; name: string; avatarUri?: string | null; unread: number; onAI: () => void; onBell: () => void; onAvatar: () => void;
+  greeting: string; name: string; avatarUri?: string | null; unread: number;
+  onAI: () => void; onBell: () => void; onAvatar: () => void;
 }) {
   const { colors } = useTheme();
   return (
@@ -85,13 +84,12 @@ function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvata
   );
 }
 
-// ─── Featured card (bold dark hero) ───────────────────────────────────────────
+// ─── Featured card ─────────────────────────────────────────────────────────────
 function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate }: {
   due?: DueSummary; continueSet: StudySet | null; streak: number;
   onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
 }) {
   const { colors } = useTheme();
-
   const hasDue = !!due && due.dueCount > 0 && !!due.topSet;
   const weekProgress = Math.min(streak, 7) / 7;
 
@@ -109,18 +107,17 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
   }
 
   return (
-    <AnimatedPressable style={[styles.featured, { backgroundColor: colors.featuredSurface }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
+    <AnimatedPressable style={[styles.featured, { backgroundColor: colors.accent }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
       <View style={styles.featuredTop}>
-        <View style={[styles.badge, { backgroundColor: colors.success }]}>
-          <Typography preset="caption" color={colors.textOnAccent}>{badge}</Typography>
+        <View style={[styles.badge, { backgroundColor: colors.textOnAccent }]}>
+          <Typography preset="caption" color={colors.accent}>{badge}</Typography>
         </View>
         <ArrowRightIcon size={18} color={colors.textOnAccent} />
       </View>
       <Typography preset="h4" color={colors.textOnAccent} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
       <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
-
       <View style={[styles.progressTrack, { backgroundColor: colors.overlayLight }]}>
-        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.success }]} />
+        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.textOnAccent }]} />
       </View>
       <View style={styles.featuredFooter}>
         <FlameIcon size={14} color={colors.warning} />
@@ -130,7 +127,7 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
   );
 }
 
-// ─── Circular quick action ────────────────────────────────────────────────────
+// ─── Circular quick action ─────────────────────────────────────────────────────
 function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
   const { colors } = useTheme();
   return (
@@ -143,14 +140,22 @@ function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: str
   );
 }
 
-// ─── Recent set row ───────────────────────────────────────────────────────────
+// ─── Recent set row ────────────────────────────────────────────────────────────
 function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: () => void }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { colors, name: themeName } = useTheme();
+  const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={[styles.setRow, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.cardShadow]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+    <AnimatedPressable
+      style={[
+        styles.setRow,
+        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, shadowColor: colors.textPrimary },
+        !isDark && styles.cardShadow,
+      ]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${set.title}`}
+    >
       <View style={[styles.setIcon, { borderColor: colors.border }]}>
         <LibraryIcon size={18} color={colors.textPrimary} />
       </View>
@@ -159,7 +164,9 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
         <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
       </View>
       {due ? (
-        <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}><Typography preset="caption" color={colors.success}>DUE</Typography></View>
+        <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}>
+          <Typography preset="caption" color={colors.success}>DUE</Typography>
+        </View>
       ) : (
         <ChevronRightIcon size={18} color={colors.textSecondary} />
       )}
@@ -167,14 +174,22 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
   );
 }
 
-// ─── Reusable mini set card (for the horizontal rails) ────────────────────────
+// ─── Mini set card (horizontal rails) ─────────────────────────────────────────
 function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponent; onPress: () => void }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { colors, name: themeName } = useTheme();
+  const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={[styles.miniCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }, !isDark && styles.cardShadow]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+    <AnimatedPressable
+      style={[
+        styles.miniCard,
+        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border, shadowColor: colors.textPrimary },
+        !isDark && styles.cardShadow,
+      ]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${set.title}`}
+    >
       <View style={[styles.miniIcon, { borderColor: colors.border }]}>
         <Icon size={18} color={colors.textPrimary} />
       </View>
@@ -184,8 +199,7 @@ function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponen
   );
 }
 
-
-// ─── Activity feed item ───────────────────────────────────────────────────────
+// ─── Activity feed item ────────────────────────────────────────────────────────
 function activityText(a: Activity): string {
   const name = a.user?.name ?? 'Someone';
   switch (a.type) {
@@ -211,33 +225,25 @@ function ActivityItem({ activity }: { activity: Activity }) {
   );
 }
 
-// ─── Summary card (Friends · Folders · Sets · Cards · Credits · Groups) ────────
+// ─── Summary stats ─────────────────────────────────────────────────────────────
 function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { colors, name: themeName } = useTheme();
+  const isDark = themeName === 'dark';
   return (
     <View style={styles.summaryCard}>
       {stats.map(s => (
-        <View key={s.label} style={[styles.summaryStat, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.cardShadow]}>
+        <View
+          key={s.label}
+          style={[
+            styles.summaryStat,
+            { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, shadowColor: colors.textPrimary },
+            !isDark && styles.cardShadow,
+          ]}
+        >
           <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>{s.label}</Typography>
         </View>
       ))}
-    </View>
-  );
-}
-
-// ─── Verse card (purple box with big corner quote marks) ──────────────────────
-function VerseCard({ text, reference }: { text?: string; reference?: string }) {
-  const { colors } = useTheme();
-  if (!text || !reference) return null;
-  return (
-    <View style={[styles.verseCard, { backgroundColor: colors.accent }]}>
-      <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
-      <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
-      <Typography preset="verse" color={colors.textOnAccent} style={styles.verseText}>{text}</Typography>
-      <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.verseRef}>— {reference}</Typography>
     </View>
   );
 }
@@ -257,7 +263,7 @@ function SectionRow({ title, actionLabel, onAction }: { title: string; actionLab
   );
 }
 
-// ─── Main Screen ──────────────────────────────────────────────────────────────
+// ─── Main Screen ───────────────────────────────────────────────────────────────
 export function HomeScreen() {
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
@@ -271,38 +277,38 @@ export function HomeScreen() {
   const { data: folders } = useFolders();
   const { data: notes } = useNotes();
   const { data: creditData } = useCreditBalance();
-  const { data: verse } = useDailyVerse();
   const { data: streakData } = useStreak();
   const { data: dueSummary } = useDueSummary();
   const { data: notifData } = useNotifications(1);
   useAutoDailyClaim();
 
-  const publicSets = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
+  const publicSets  = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
-  const activities = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
-  const streak = streakData?.streak ?? 0;
-  const firstName = user?.name?.split(' ')[0] ?? 'Friend';
+  const activities  = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
+  const streak      = streakData?.streak ?? 0;
+  const firstName   = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
-  const cardTotal = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);
-  const recentSets = useMemo(
+  const cardTotal   = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);
+  const recentSets  = useMemo(
     () => [...(sets ?? [])].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4),
     [sets],
   );
 
-  const goReview = (setId: string, setTitle: string) =>
+  const goReview   = (setId: string, setTitle: string) =>
     navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } });
-  const goContinue = (s: StudySet) => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } });
-  const goCreate = () => navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} });
+  const goContinue = (s: StudySet) =>
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } });
+  const goCreate   = () => navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} });
 
   const quickActions: Array<{ label: string; Icon: IconComponent; onPress: () => void }> = [
-    { label: 'Library', Icon: LibraryIcon, onPress: () => navigation.navigate('LibraryTab', { screen: 'Library' }) },
-    { label: 'Quiz', Icon: CheckCircleIcon, onPress: () => navigation.navigate('QuizTab', { screen: 'QuizHub' }) },
-    { label: 'AI Chat', Icon: SparklesIcon, onPress: () => navigation.navigate('AITab', { screen: 'AIChat' }) },
-    { label: 'Notes', Icon: FileTextIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Notes' }) },
-    { label: 'Media', Icon: FolderIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Media' }) },
-    { label: 'Discover', Icon: SearchIcon, onPress: () => navigation.navigate('LibraryTab', { screen: 'PublicSets' }) },
-    { label: 'Friends', Icon: UsersIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Friends' }) },
-    { label: 'Profile', Icon: UserIcon, onPress: () => navigation.navigate('ProfileTab', { screen: 'Profile' }) },
+    { label: 'Library',  Icon: LibraryIcon,      onPress: () => navigation.navigate('LibraryTab', { screen: 'Library' }) },
+    { label: 'Quiz',     Icon: CheckCircleIcon,   onPress: () => navigation.navigate('QuizTab',   { screen: 'QuizHub' }) },
+    { label: 'AI Chat',  Icon: SparklesIcon,      onPress: () => navigation.navigate('AITab',     { screen: 'AIChat' }) },
+    { label: 'Notes',    Icon: FileTextIcon,      onPress: () => navigation.navigate('ProfileTab', { screen: 'Notes' }) },
+    { label: 'Media',    Icon: FolderIcon,        onPress: () => navigation.navigate('ProfileTab', { screen: 'Media' }) },
+    { label: 'Discover', Icon: SearchIcon,        onPress: () => navigation.navigate('LibraryTab', { screen: 'PublicSets' }) },
+    { label: 'Friends',  Icon: UsersIcon,         onPress: () => navigation.navigate('ProfileTab', { screen: 'Friends' }) },
+    { label: 'Profile',  Icon: UserIcon,          onPress: () => navigation.navigate('ProfileTab', { screen: 'Profile' }) },
   ];
 
   return (
@@ -318,8 +324,18 @@ export function HomeScreen() {
       />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <FeaturedCard due={dueSummary} continueSet={continueSet} streak={streak} onReview={goReview} onContinue={goContinue} onCreate={goCreate} />
 
+        {/* Hero */}
+        <FeaturedCard
+          due={dueSummary}
+          continueSet={continueSet}
+          streak={streak}
+          onReview={goReview}
+          onContinue={goContinue}
+          onCreate={goCreate}
+        />
+
+        {/* Quick actions */}
         <Spacer size={spacing.xxl} />
         <View style={styles.quickGrid}>
           {quickActions.map(a => (
@@ -327,6 +343,7 @@ export function HomeScreen() {
           ))}
         </View>
 
+        {/* My sets */}
         {recentSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
@@ -340,15 +357,15 @@ export function HomeScreen() {
           </>
         )}
 
-        {/* Summary */}
+        {/* Summary stats */}
         <Spacer size={spacing.xxl} />
         <SummaryCard stats={[
-          { value: friends?.length ?? 0, label: 'Friends' },
-          { value: folders?.length ?? 0, label: 'Folders' },
-          { value: sets?.length ?? 0, label: 'Sets' },
-          { value: cardTotal, label: 'Cards' },
-          { value: creditData?.balance ?? 0, label: 'Credits' },
-          { value: notes?.length ?? 0, label: 'Notes' },
+          { value: friends?.length ?? 0,      label: 'Friends' },
+          { value: folders?.length ?? 0,      label: 'Folders' },
+          { value: sets?.length ?? 0,         label: 'Sets' },
+          { value: cardTotal,                  label: 'Cards' },
+          { value: creditData?.balance ?? 0,  label: 'Credits' },
+          { value: notes?.length ?? 0,        label: 'Notes' },
         ]} />
 
         {/* From your friends */}
@@ -364,7 +381,6 @@ export function HomeScreen() {
             </ScrollView>
           </>
         )}
-
 
         {/* Recent activity */}
         {activities.length > 0 && (
@@ -392,13 +408,8 @@ export function HomeScreen() {
           </>
         )}
 
-        {/* Daily verse */}
-        <Spacer size={spacing.xxl} />
-        <VerseCard text={verse?.text} reference={verse?.reference} />
-
         <Spacer size={spacing.xxxl} />
       </ScrollView>
-
     </SafeAreaView>
   );
 }
@@ -412,31 +423,24 @@ const styles = StyleSheet.create({
 
   // Header
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing.md,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
   greetingCol: { flex: 1 },
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  headerIconBtn: {
-    width: 40, height: 40, borderRadius: layout.pillRadius,
-    alignItems: 'center', justifyContent: 'center',
-  },
+  headerIconBtn: { width: spacing.huge, height: spacing.huge, borderRadius: layout.pillRadius, alignItems: 'center', justifyContent: 'center' },
   bellBadge: {
-    position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: radius.sm, paddingHorizontal: spacing.s2,
+    position: 'absolute', top: spacing.s2, right: spacing.s2, minWidth: spacing.lg, height: spacing.lg,
+    borderRadius: radius.sm, paddingHorizontal: spacing.s2,
     alignItems: 'center', justifyContent: 'center',
   },
   headerLeftPressed: { opacity: 0.7 },
   headerIconPressed: { opacity: 0.85 },
 
   // Featured card
-  featured: {
-    borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm,
-  },
+  featured: { borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm },
   featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   badge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
   featuredTitle: { marginTop: spacing.xs },
@@ -449,12 +453,12 @@ const styles = StyleSheet.create({
   quickAction: { width: '25%', alignItems: 'center', gap: spacing.sm },
   quickCircle: {
     width: 56, height: 56, borderRadius: layout.pillRadius, // ponytail: off-grid circle size
-    borderWidth: 1,
-    alignItems: 'center', justifyContent: 'center',
+    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
 
-  // Section
+  // Section header
   sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  seeAllPressed: { opacity: 0.7 },
 
   // Recent sets
   setsList: { gap: spacing.md },
@@ -462,33 +466,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     borderRadius: layout.cardRadiusSm, padding: spacing.lg,
   },
-  setIcon: {
-    width: 40, height: 40, borderRadius: layout.pillRadius,
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
+  setIcon: { width: spacing.huge, height: spacing.huge, borderRadius: layout.pillRadius, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
   dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
-  seeAllPressed: { opacity: 0.7 },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
+  cardShadow: { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 },
 
-  // Horizontal rails
-  railContent: { gap: spacing.md, paddingRight: spacing.sm },
-  miniCard: {
-    width: 140, gap: spacing.sm, padding: spacing.lg, borderRadius: layout.cardRadiusSm, // ponytail: off-grid card width
-    borderWidth: 1,
-  },
-  miniIcon: {
-    width: 36, height: 36, borderRadius: layout.pillRadius,
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
-  miniTitle: { minHeight: 34 }, // ponytail: off-grid Figma value
-
-  // Summary — separate square boxes, 3 per row
+  // Summary stats
   summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing.md },
   summaryStat: {
     width: '31%', aspectRatio: 1.4,
@@ -496,19 +478,17 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadiusLg,
   },
 
+  // Horizontal rails
+  railContent: { gap: spacing.md, paddingRight: spacing.sm },
+  miniCard: {
+    width: 140, gap: spacing.sm, padding: spacing.lg, // ponytail: off-grid card width
+    borderRadius: layout.cardRadiusSm, borderWidth: 1,
+  },
+  miniIcon: { width: 36, height: 36, borderRadius: layout.pillRadius, borderWidth: 1, alignItems: 'center', justifyContent: 'center' }, // ponytail: off-grid icon size
+  miniTitle: { minHeight: 34 }, // ponytail: off-grid Figma value
+
   // Activity feed
   activityList: { gap: spacing.lg },
   activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
 
-  // Verse card
-  verseCard: {
-    borderRadius: layout.cardRadiusLg, minHeight: 190,
-    paddingHorizontal: spacing.xxl, paddingVertical: spacing.s28,
-    justifyContent: 'center', gap: spacing.md, overflow: 'hidden',
-  },
-  verseText: { fontStyle: 'italic', textAlign: 'center' },
-  verseRef: { textAlign: 'center' },
-  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 }, // ponytail: off-grid Figma values
-  quoteTopLeft: { top: spacing.sm, left: spacing.lg },
-  quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
 });
