@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -10,11 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { resetPasswordSchema, type ResetPasswordFormData } from '../../utils/validators';
-import { useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'ResetPassword'>) {
-  const { colors, spacing } = useTheme();
+  const { colors } = useTheme();
   const { email }       = route.params;
   const resetPassword   = useAuthStore(s => s.resetPassword);
   const confirmRef      = useRef<TextInput>(null);
@@ -56,7 +56,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
       footer={
         <>
           <Button label="Reset Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={handleResend} disabled={resending}>
+          <Pressable onPress={handleResend} disabled={resending} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
               {resending ? 'Sending…' : 'Resend code'}
             </Typography>
@@ -65,7 +65,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
       }
     >
       <View>
-        <View style={{ gap: spacing.sm }}>
+        <View style={styles.codeContainer}>
           <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
           <Controller
             name="otp"
@@ -102,3 +102,8 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
     </AuthLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  codeContainer: { gap: spacing.sm },
+  linkPressed: { opacity: 0.7 },
+});

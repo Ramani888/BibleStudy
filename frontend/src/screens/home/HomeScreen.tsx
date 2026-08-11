@@ -37,7 +37,7 @@ import {
   useDueSummary,
   useNotifications,
 } from '../../hooks';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
 import type { DueSummary, StudySet } from '../../types';
@@ -61,7 +61,7 @@ function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvata
   const { colors } = useTheme();
   return (
     <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      <Pressable style={styles.headerLeft} onPress={onAvatar} accessibilityRole="button" accessibilityLabel="Go to profile">
+      <Pressable style={({ pressed }) => [styles.headerLeft, pressed && styles.headerLeftPressed]} onPress={onAvatar} accessibilityRole="button" accessibilityLabel="Go to profile">
         <Avatar uri={avatarUri} name={name} size="sm" />
         <View style={styles.greetingCol}>
           <Typography preset="caption" color={colors.textSecondary}>{greeting},</Typography>
@@ -69,10 +69,10 @@ function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvata
         </View>
       </Pressable>
       <View style={styles.headerActions}>
-        <Pressable onPress={onAI} hitSlop={8} style={[styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }]} accessibilityRole="button" accessibilityLabel="AI Chat">
+        <Pressable onPress={onAI} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel="AI Chat">
           <SparklesIcon size={20} color={colors.textPrimary} />
         </Pressable>
-        <Pressable onPress={onBell} hitSlop={8} style={[styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }]} accessibilityRole="button" accessibilityLabel="Notifications">
+        <Pressable onPress={onBell} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel="Notifications">
           <BellIcon size={20} color={colors.textPrimary} />
           {unread > 0 && (
             <View style={[styles.bellBadge, { backgroundColor: colors.alert }]}>
@@ -145,10 +145,12 @@ function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: str
 
 // ─── Recent set row ───────────────────────────────────────────────────────────
 function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: () => void }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={[styles.setRow, { backgroundColor: colors.surface }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+    <AnimatedPressable style={[styles.setRow, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.cardShadow]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
       <View style={[styles.setIcon, { borderColor: colors.border }]}>
         <LibraryIcon size={18} color={colors.textPrimary} />
       </View>
@@ -167,10 +169,12 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
 
 // ─── Reusable mini set card (for the horizontal rails) ────────────────────────
 function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponent; onPress: () => void }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const count = set._count?.cards ?? 0;
   return (
-    <AnimatedPressable style={[styles.miniCard, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
+    <AnimatedPressable style={[styles.miniCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }, !isDark && styles.cardShadow]} onPress={onPress} accessibilityRole="button" accessibilityLabel={`Open ${set.title}`}>
       <View style={[styles.miniIcon, { borderColor: colors.border }]}>
         <Icon size={18} color={colors.textPrimary} />
       </View>
@@ -209,11 +213,13 @@ function ActivityItem({ activity }: { activity: Activity }) {
 
 // ─── Summary card (Friends · Folders · Sets · Cards · Credits · Groups) ────────
 function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   return (
     <View style={styles.summaryCard}>
       {stats.map(s => (
-        <View key={s.label} style={[styles.summaryStat, { backgroundColor: colors.surface }]}>
+        <View key={s.label} style={[styles.summaryStat, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.cardShadow]}>
           <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
           <Typography preset="caption" color={colors.textSecondary}>{s.label}</Typography>
         </View>
@@ -242,7 +248,7 @@ function SectionRow({ title, actionLabel, onAction }: { title: string; actionLab
     <View style={styles.sectionRow}>
       <Typography preset="h4" color={colors.textPrimary}>{title}</Typography>
       {actionLabel && onAction && (
-        <Pressable onPress={onAction} hitSlop={8} style={styles.rowCenter} accessibilityRole="button" accessibilityLabel={actionLabel}>
+        <Pressable onPress={onAction} hitSlop={8} style={({ pressed }) => [styles.rowCenter, pressed && styles.seeAllPressed]} accessibilityRole="button" accessibilityLabel={actionLabel}>
           <Typography preset="label" color={colors.accent}>{actionLabel}</Typography>
           <ChevronRightIcon size={16} color={colors.accent} />
         </Pressable>
@@ -421,26 +427,28 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   bellBadge: {
-    position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: spacing.sm, paddingHorizontal: spacing.s2,
+    position: 'absolute', top: 2, right: 2, minWidth: 16, height: 16, borderRadius: radius.sm, paddingHorizontal: spacing.s2,
     alignItems: 'center', justifyContent: 'center',
   },
+  headerLeftPressed: { opacity: 0.7 },
+  headerIconPressed: { opacity: 0.85 },
 
   // Featured card
   featured: {
     borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm,
   },
   featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  badge: { borderRadius: spacing.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
+  badge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
   featuredTitle: { marginTop: spacing.xs },
-  progressTrack: { height: 6, borderRadius: spacing.s2, marginTop: spacing.sm, overflow: 'hidden' },
-  progressFill: { height: 6, borderRadius: spacing.s2 },
+  progressTrack: { height: spacing.s6, borderRadius: spacing.s2, marginTop: spacing.sm, overflow: 'hidden' },
+  progressFill: { height: spacing.s6, borderRadius: spacing.s2 },
   featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
 
   // Quick actions
   quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing.xl },
   quickAction: { width: '25%', alignItems: 'center', gap: spacing.sm },
   quickCircle: {
-    width: 56, height: 56, borderRadius: layout.pillRadius,
+    width: 56, height: 56, borderRadius: layout.pillRadius, // ponytail: off-grid circle size
     borderWidth: 1,
     alignItems: 'center', justifyContent: 'center',
   },
@@ -458,19 +466,27 @@ const styles = StyleSheet.create({
     width: 40, height: 40, borderRadius: layout.pillRadius,
     borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
-  dueBadge: { borderRadius: spacing.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
+  dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
+  seeAllPressed: { opacity: 0.7 },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
 
   // Horizontal rails
   railContent: { gap: spacing.md, paddingRight: spacing.sm },
   miniCard: {
-    width: 140, gap: spacing.sm, padding: spacing.lg, borderRadius: layout.cardRadiusSm,
+    width: 140, gap: spacing.sm, padding: spacing.lg, borderRadius: layout.cardRadiusSm, // ponytail: off-grid card width
     borderWidth: 1,
   },
   miniIcon: {
     width: 36, height: 36, borderRadius: layout.pillRadius,
     borderWidth: 1, alignItems: 'center', justifyContent: 'center',
   },
-  miniTitle: { minHeight: 34 },
+  miniTitle: { minHeight: 34 }, // ponytail: off-grid Figma value
 
   // Summary — separate square boxes, 3 per row
   summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing.md },
@@ -492,7 +508,7 @@ const styles = StyleSheet.create({
   },
   verseText: { fontStyle: 'italic', textAlign: 'center' },
   verseRef: { textAlign: 'center' },
-  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
+  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 }, // ponytail: off-grid Figma values
   quoteTopLeft: { top: spacing.sm, left: spacing.lg },
   quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
 });

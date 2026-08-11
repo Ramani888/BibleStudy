@@ -12,7 +12,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Button, Spacer, Typography } from '../../components/ui';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, spacing, fontSizes, lineHeights, useTheme } from '../../theme';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -94,7 +94,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       <View>
       <View style={styles.skipRow}>
         {!isLast && (
-          <Pressable onPress={markAndComplete} hitSlop={12}>
+          <Pressable onPress={markAndComplete} hitSlop={12} style={({ pressed }) => pressed && styles.skipPressed}>
             <Typography preset="label" color={colors.textSecondary}>
               Skip
             </Typography>
@@ -139,7 +139,7 @@ export function OnboardingScreen({ onComplete }: Props) {
           <>
             <Button label="Get Started" onPress={markAndComplete} fullWidth />
             <Spacer size={spacing.lg} />
-            <Pressable onPress={markAndComplete} hitSlop={8}>
+            <Pressable onPress={markAndComplete} hitSlop={8} style={({ pressed }) => pressed && styles.loginPressed}>
               <Typography preset="bodySm" color={colors.textSecondary} align="center">
                 Already have an account?{' '}
                 <Typography preset="bodySm" color={colors.accent}>
@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: layout.screenPaddingH,
     paddingVertical: spacing.md,
-    minHeight: 44,
+    minHeight: 44, // ponytail: off-grid hit-target height
   },
 
   list: { flex: 1 },
@@ -178,15 +178,14 @@ const styles = StyleSheet.create({
   },
 
   iconWrap: {
-    width: 136,
-    height: 136,
+    width: 136, height: 136, // ponytail: off-grid Figma value
     borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },
 
   subtitle: {
-    lineHeight: 26,
+    lineHeight: fontSizes.md * lineHeights.relaxed,
   },
 
   bottom: {
@@ -200,9 +199,11 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   dot: {
-    height: 8,
-    borderRadius: spacing.xs,
+    height: spacing.sm,
+    borderRadius: layout.pillRadius,
   },
-  dotActive: { width: 24, opacity: 1 },
-  dotInactive: { width: 8, opacity: 0.3 },
+  dotActive: { width: spacing.xxl, opacity: 1 },
+  dotInactive: { width: spacing.sm, opacity: 0.3 },
+  skipPressed: { opacity: 0.7 },
+  loginPressed: { opacity: 0.7 },
 });

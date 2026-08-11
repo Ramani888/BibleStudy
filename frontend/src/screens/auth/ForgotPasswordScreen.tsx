@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -39,7 +39,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
       footer={
         <>
           <Button label="Send Reset Code" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={() => navigation.navigate('Login')}>
+          <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Remember your password?{' '}
               <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
@@ -62,3 +62,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
     </AuthLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  linkPressed: { opacity: 0.7 },
+});

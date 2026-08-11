@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -10,11 +10,11 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { verifyEmailSchema, type VerifyEmailFormData } from '../../utils/validators';
-import { useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'VerifyEmail'>) {
-  const { colors, spacing } = useTheme();
+  const { colors } = useTheme();
   const { email }      = route.params;
   const verifyEmail    = useAuthStore(s => s.verifyEmail);
   const [resending, setResending] = useState(false);
@@ -53,12 +53,12 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
       footer={
         <>
           <Button label="Verify Email" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={handleResend} disabled={resending}>
+          <Pressable onPress={handleResend} disabled={resending} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
               {resending ? 'Sending…' : 'Resend code'}
             </Typography>
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('Login')}>
+          <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Back to{' '}
               <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
@@ -68,7 +68,7 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
       }
     >
       <View>
-        <View style={{ gap: spacing.sm }}>
+        <View style={styles.codeContainer}>
           <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
           <Controller
             name="otp"
@@ -82,3 +82,8 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     </AuthLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  codeContainer: { gap: spacing.sm },
+  linkPressed: { opacity: 0.7 },
+});

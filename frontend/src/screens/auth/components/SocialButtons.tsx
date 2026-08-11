@@ -6,13 +6,13 @@ import { useTheme, fontSizes, lineHeights, spacing, layout } from '../../../them
 // Inline SVG-style Google 'G' logo as a Unicode character is not enough — use a minimal SVG path
 function GoogleIcon() {
   return (
-    <Typography preset="label" style={{ fontSize: fontSizes.md, lineHeight: fontSizes.md * lineHeights.tight }}>{'G'}</Typography>
+    <Typography preset="label" style={styles.googleIcon}>{'G'}</Typography>
   );
 }
 
 function AppleIcon({ color }: { color: string }) {
   return (
-    <Typography preset="label" color={color} style={{ fontSize: fontSizes.lg, lineHeight: fontSizes.md * lineHeights.tight }}>{'\u{F8FF}'}</Typography>
+    <Typography preset="label" color={color} style={styles.appleIcon}>{'\u{F8FF}'}</Typography>
   );
 }
 
@@ -78,4 +78,6 @@ const styles = StyleSheet.create({
   },
   pressed: { opacity: 0.7 },
   label: { letterSpacing: 0.2 },
+  googleIcon: { fontSize: fontSizes.md, lineHeight: fontSizes.md * lineHeights.tight },
+  appleIcon:  { fontSize: fontSizes.lg, lineHeight: fontSizes.md * lineHeights.tight },
 });

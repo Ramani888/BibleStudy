@@ -27,11 +27,11 @@ interface AuthLayoutProps {
 function BrandLogo() {
   const { colors } = useTheme();
   return (
-    <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.s10, marginBottom: spacing.xxxl }}>
-      <View style={{ width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accent }}>
+    <View style={styles.logoRow}>
+      <View style={[styles.logoIcon, { backgroundColor: colors.accent }]}>
         <SparklesIcon size={26} color={colors.textOnAccent} />
       </View>
-      <Typography preset="h4" color={colors.accent} style={{ letterSpacing: 0.3 }}>
+      <Typography preset="h4" color={colors.accent} style={styles.logoText}>
         BibleStudy Pro
       </Typography>
     </View>
@@ -117,7 +117,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   dividerLine: { flex: 1 },
-  orText:      { lineHeight: 18 },
+  orText:      { lineHeight: 18 }, // ponytail: off-grid Figma value
+  logoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10, marginBottom: spacing.xxxl },
+  logoIcon: {
+    width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius,
+    alignItems: 'center', justifyContent: 'center',
+  },
+  logoText: { letterSpacing: 0.3 },
   footer: {
     paddingHorizontal: layout.screenPaddingH,
     paddingBottom: spacing.lg,

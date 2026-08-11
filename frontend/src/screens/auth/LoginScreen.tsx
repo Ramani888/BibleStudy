@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
@@ -11,12 +11,12 @@ import { Button, Typography } from '../../components/ui';
 import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
-import { spacing, useTheme , palette } from '../../theme';
+import { layout, spacing, useTheme, palette } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
-  const { colors, layout } = useTheme();
+  const { colors } = useTheme();
   const login          = useAuthStore(s => s.login);
   const loginWithGoogle = useAuthStore(s => s.loginWithGoogle);
   const loginWithApple  = useAuthStore(s => s.loginWithApple);
@@ -84,7 +84,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
       footer={
         <>
           <Button label="Sign In" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={() => navigation.navigate('Register')}>
+          <Pressable onPress={() => navigation.navigate('Register')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Don't have an account?{' '}
               <Typography preset="bodySm" color={colors.accent}>Register</Typography>
@@ -95,7 +95,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     >
       <View>
         {socialOnly && (
-          <View style={{ backgroundColor: colors.accentSoft, borderRadius: layout.cardRadius, padding: spacing.md, marginBottom: spacing.sm }}>
+          <View style={[styles.socialBanner, { backgroundColor: colors.accentSoft }]}>
             <Typography preset="bodySm" color={palette.indigo800} align="center">
               This account was created with Google. Use the "Continue with Google" button above to sign in.
             </Typography>
@@ -122,7 +122,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
           returnKeyType="done"
           onSubmitEditing={handleSubmit(onSubmit)}
         />
-        <Pressable onPress={() => navigation.navigate('ForgotPassword')}>
+        <Pressable onPress={() => navigation.navigate('ForgotPassword')} style={({ pressed }) => pressed && styles.linkPressed}>
           <Typography preset="label" color={colors.accent} align="right">
             Forgot password?
           </Typography>
@@ -131,3 +131,12 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     </AuthLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  socialBanner: {
+    borderRadius: layout.cardRadius,
+    padding: spacing.md,
+    marginBottom: spacing.sm,
+  },
+  linkPressed: { opacity: 0.7 },
+});

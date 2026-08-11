@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { Pressable, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -72,7 +72,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
       footer={
         <>
           <Button label="Create Account" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={() => navigation.navigate('Login')}>
+          <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Already have an account?{' '}
               <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
@@ -119,3 +119,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     </AuthLayout>
   );
 }
+
+const styles = StyleSheet.create({
+  linkPressed: { opacity: 0.7 },
+});
