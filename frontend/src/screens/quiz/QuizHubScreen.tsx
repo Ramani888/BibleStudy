@@ -85,7 +85,7 @@ export function QuizHubScreen() {
 
     return (
       <Pressable
-        style={({ pressed }) => [styles.row, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+        style={({ pressed }) => [styles.row, { borderColor: colors.cardBorder, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
         onPress={() => handleDetails(item)}
         accessibilityRole="button"
       >
@@ -115,6 +115,7 @@ export function QuizHubScreen() {
         <Pressable
           hitSlop={12}
           onPress={e => { e.stopPropagation(); openSheet(item); }}
+          style={({ pressed }) => pressed && styles.iconPressed}
           accessibilityRole="button"
           accessibilityLabel="More options"
         >
@@ -125,7 +126,7 @@ export function QuizHubScreen() {
   };
 
   const footer = !isLoading && !isError ? (
-    <View style={[styles.footerBar, { borderTopColor: colors.border }]}>
+    <View style={[styles.footerBar, { borderTopColor: colors.divider }]}>
       <Button
         label="+ Start New Quiz"
         onPress={() => navigation.navigate('QuizSetup', undefined)}
@@ -239,6 +240,7 @@ const styles = StyleSheet.create({
     fontWeight: fontWeights.bold,
   },
   rowPressed: { opacity: 0.7 },
+  iconPressed: { opacity: 0.85 },
   rowText: { flex: 1, gap: spacing.s2 },
   footerBar: {
     paddingHorizontal: layout.screenPaddingH,

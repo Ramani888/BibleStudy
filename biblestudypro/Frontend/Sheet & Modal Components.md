@@ -8,11 +8,11 @@ Three distinct overlay primitives in `components/feedback/`. Pick the right one 
 
 ## Primitives
 
-| Component | File | Underlying | Use for |
-|-----------|------|------------|---------|
+| Component     | File                       | Underlying                                | Use for                                                                                |
+| ------------- | -------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------- |
 | `ActionSheet` | `feedback/ActionSheet.tsx` | `@gorhom/bottom-sheet` `BottomSheetModal` | Action menus — list of tappable actions with icons, destructive styling, Cancel button |
-| `AppModal` | `feedback/Modal.tsx` | RN `<Modal>` | Dialogs, forms, confirmations — anything that needs a centred overlay |
-| `SelectSheet` | `feedback/SelectSheet.tsx` | wraps `AppModal` | Searchable "pick one from a list" flows (move to folder, assign, choose) |
+| `AppModal`    | `feedback/Modal.tsx`       | RN `<Modal>`                              | Dialogs, forms, confirmations — anything that needs a centred overlay                  |
+| `SelectSheet` | `feedback/SelectSheet.tsx` | wraps `AppModal`                          | Searchable "pick one from a list" flows (move to folder, assign, choose)               |
 
 > `SelectSheet` is **not** a bottom sheet — it renders inside `AppModal`.
 
