@@ -1,7 +1,7 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Typography } from './Typography';
-import { layout, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { IconComponent } from '../icons';
 
 interface FilterChipProps {
@@ -13,7 +13,7 @@ interface FilterChipProps {
 }
 
 export function FilterChip({ label, active = false, onPress, icon: Icon, disabled }: FilterChipProps) {
-  const { colors, spacing } = useTheme();
+  const { colors } = useTheme();
   return (
     <Pressable
       onPress={onPress}
@@ -24,16 +24,13 @@ export function FilterChip({ label, active = false, onPress, icon: Icon, disable
           borderColor: active ? colors.accent : colors.border,
           backgroundColor: active ? colors.accent : colors.surface,
           opacity: pressed || disabled ? 0.6 : 1,
-          paddingHorizontal: spacing.md,
-          paddingVertical: spacing.sm,
-          gap: spacing.xs,
         },
       ]}
       accessibilityRole="button"
       accessibilityState={{ selected: active }}
     >
-      {Icon && <Icon size={14} color={active ? colors.background : colors.textSecondary} />}
-      <Typography preset="label" color={active ? colors.background : colors.textSecondary}>
+      {Icon && <Icon size={14} color={active ? colors.textOnAccent : colors.textSecondary} />}
+      <Typography preset="label" color={active ? colors.textOnAccent : colors.textSecondary}>
         {label}
       </Typography>
     </Pressable>
@@ -46,5 +43,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: layout.pillRadius,
     borderWidth: 1,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
   },
 });

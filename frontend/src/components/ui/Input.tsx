@@ -60,7 +60,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input({
 
         {isPassword ? (
           <Pressable
-            style={styles.iconRight}
+            style={({ pressed }) => [styles.iconRight, pressed && { opacity: 0.85 }]}
             onPress={() => setSecure(s => !s)}
             hitSlop={8}
           >

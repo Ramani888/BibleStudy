@@ -1,6 +1,6 @@
 import React from 'react';
 import { Platform, Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
 type ShadowLevel = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 
@@ -34,19 +34,23 @@ interface PressableCardProps extends Omit<PressableProps, 'style'> {
 }
 
 export function Card({ children, shadow: s = 'none', padding, style, ...rest }: CardProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   return (
-    <View style={[styles.base, { backgroundColor: colors.surface, borderColor: colors.border }, shadows[s], padding !== undefined ? { padding } : null, style]} {...rest}>
+    <View style={[styles.base, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }, !isDark ? shadows[s] : null, padding !== undefined ? { padding } : null, style]} {...rest}>
       {children}
     </View>
   );
 }
 
 export function PressableCard({ children, shadow: s = 'none', padding, style, ...rest }: PressableCardProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   return (
     <Pressable
-      style={({ pressed }) => [styles.base, { backgroundColor: colors.surface, borderColor: colors.border }, shadows[s], padding !== undefined ? { padding } : null, { opacity: pressed ? 0.85 : 1 }, style]}
+      style={({ pressed }) => [styles.base, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }, !isDark ? shadows[s] : null, padding !== undefined ? { padding } : null, { opacity: pressed ? 0.7 : 1 }, style]}
       {...rest}
     >
       {children}

@@ -421,16 +421,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         />
         <Divider />
         <Button label="Save Note" onPress={handleSaveNote} loading={savingNote} fullWidth />
-        <Button
-          label="Edit Card"
-          variant="secondary"
-          onPress={() => {
-            const c = noteCard;
-            setNoteCard(null);
-            if (c) navigation.navigate('EditCard', { cardId: c.id, setId });
-          }}
-          fullWidth
-        />
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />

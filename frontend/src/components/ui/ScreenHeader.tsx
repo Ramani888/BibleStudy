@@ -2,7 +2,7 @@ import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { BackIcon, CloseIcon } from '../icons';
 import { Typography } from './Typography';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, radius, spacing, useTheme } from '../../theme';
 
 const NAV_ICON_SIZE = 24;
 
@@ -24,11 +24,11 @@ export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumbe
   const { colors } = useTheme();
 
   const leading = handle ? null : onBack ? (
-    <Pressable onPress={onBack} hitSlop={8} style={styles.navBtn} accessibilityRole="button" accessibilityLabel="Go back">
+    <Pressable onPress={onBack} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel="Go back">
       <BackIcon size={NAV_ICON_SIZE} color={colors.textPrimary} />
     </Pressable>
   ) : onClose ? (
-    <Pressable onPress={onClose} hitSlop={8} style={styles.navBtn} accessibilityRole="button" accessibilityLabel="Close">
+    <Pressable onPress={onClose} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel="Close">
       <CloseIcon size={NAV_ICON_SIZE} color={colors.textPrimary} />
     </Pressable>
   ) : null;
@@ -53,9 +53,9 @@ export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumbe
 
 const styles = StyleSheet.create({
   grabber: {
-    width: 40,
-    height: 4,
-    borderRadius: spacing.s2,
+    width: spacing.huge,
+    height: spacing.xs,
+    borderRadius: radius.r2,
     alignSelf: 'center',
     marginTop: spacing.sm,
   },

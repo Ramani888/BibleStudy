@@ -28,7 +28,7 @@ export function SearchBar({ value, onChangeText, placeholder = 'Search…', auto
       leftIcon={<SearchIcon size={ICON_SIZE} color={colors.textDisabled} />}
       rightIcon={
         value.length > 0 ? (
-          <Pressable onPress={() => onChangeText('')} hitSlop={8} accessibilityRole="button" accessibilityLabel="Clear search">
+          <Pressable onPress={() => onChangeText('')} hitSlop={8} style={({ pressed }) => pressed && { opacity: 0.85 }} accessibilityRole="button" accessibilityLabel="Clear search">
             <CloseCircleIcon size={ICON_SIZE} color={colors.textDisabled} />
           </Pressable>
         ) : undefined

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { AnimatedPressable } from './AnimatedPressable';
 import { Typography } from './Typography';
 import { MoreVerticalIcon } from '../icons';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
 const MENU_ICON_SIZE = 20;
 
@@ -23,10 +23,12 @@ interface ListCardProps {
 
 /** Reusable list row: leading · title/subtitle · (meta + trailing + ⋮ menu). */
 export function ListCard({ leading, title, meta, subtitle, trailing, onPress, onLongPress, onMenuPress }: ListCardProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
 
   return (
-    <AnimatedPressable style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress} onLongPress={onLongPress} accessibilityRole="button">
+    <AnimatedPressable style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]} onPress={onPress} onLongPress={onLongPress} accessibilityRole="button">
       {leading}
       <View style={styles.content}>
         <Typography preset="label" numberOfLines={1}>{title}</Typography>
@@ -39,7 +41,7 @@ export function ListCard({ leading, title, meta, subtitle, trailing, onPress, on
           {meta}
           {trailing}
           {onMenuPress && (
-            <Pressable onPress={onMenuPress} hitSlop={8}>
+            <Pressable style={({ pressed }) => pressed && { opacity: 0.85 }} onPress={onMenuPress} hitSlop={8}>
               <MoreVerticalIcon size={MENU_ICON_SIZE} color={colors.textDisabled} />
             </Pressable>
           )}

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, Pressable, StyleSheet } from 'react-native';
-import { useTheme } from '../../theme';
+import { palette, useTheme } from '../../theme';
 
 interface SwitchProps {
   value: boolean;
@@ -39,6 +39,7 @@ export function Switch({ value, onValueChange, accessibilityLabel }: SwitchProps
       accessibilityLabel={accessibilityLabel}
       hitSlop={8}
       onPress={() => onValueChange(!value)}
+      style={({ pressed }) => pressed && { opacity: 0.85 }}
     >
       <Animated.View
         style={[styles.track, { backgroundColor: value ? colors.accent : colors.sliderTrack }]}
@@ -60,7 +61,7 @@ const styles = StyleSheet.create({
     width: KNOB,
     height: KNOB,
     borderRadius: KNOB / 2,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: palette.white,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

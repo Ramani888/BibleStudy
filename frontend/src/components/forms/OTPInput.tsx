@@ -22,13 +22,22 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
   const digits = value.padEnd(OTP_LENGTH, '').split('').slice(0, OTP_LENGTH);
 
   const handleChange = (text: string, index: number) => {
-    // Only allow digits
-    const digit = text.replace(/[^0-9]/g, '').slice(-1);
+    const cleaned = text.replace(/[^0-9]/g, '');
+    // Auto-fill / paste: spread all digits starting from this box
+    if (cleaned.length > 1) {
+      const newDigits = [...digits];
+      cleaned.split('').slice(0, OTP_LENGTH - index).forEach((d, i) => {
+        newDigits[index + i] = d;
+      });
+      onChange(newDigits.join('').replace(/ /g, ''));
+      const nextFocus = Math.min(index + cleaned.length, OTP_LENGTH - 1);
+      inputRefs.current[nextFocus]?.focus();
+      return;
+    }
+    const digit = cleaned;
     const newDigits = [...digits];
     newDigits[index] = digit;
-    const newValue = newDigits.join('').replace(/ /g, '');
-    onChange(newValue);
-
+    onChange(newDigits.join('').replace(/ /g, ''));
     if (digit && index < OTP_LENGTH - 1) {
       inputRefs.current[index + 1]?.focus();
     }
@@ -66,7 +75,8 @@ export function OTPInput({ value, onChange, error }: OTPInputProps) {
               onFocus={() => setFocused(i)}
               onBlur={() => setFocused(null)}
               keyboardType="number-pad"
-              maxLength={1}
+              maxLength={6}
+              textContentType="oneTimeCode"
               selectTextOnFocus
               textAlign="center"
             />

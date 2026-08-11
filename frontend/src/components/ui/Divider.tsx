@@ -14,7 +14,7 @@ export function Divider({ marginV = spacing.lg, color, style }: DividerProps) {
     <View
       style={[
         styles.divider,
-        { marginVertical: marginV, backgroundColor: color ?? colors.border },
+        { marginVertical: marginV, backgroundColor: color ?? colors.divider },
         style,
       ]}
     />

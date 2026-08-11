@@ -1,6 +1,6 @@
 import React from 'react';
 import { Image, ImageStyle, StyleSheet, View, ViewStyle } from 'react-native';
-import { layout, useTheme } from '../../theme';
+import { fontSizes, layout, lineHeights, useTheme } from '../../theme';
 import { Typography } from './Typography';
 
 type AvatarSize = 'sm' | 'md' | 'lg';
@@ -28,7 +28,8 @@ function getInitials(name?: string): string {
 export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
   const { colors } = useTheme();
   const dimension = sizeMap[size];
-  const fontSize = size === 'lg' ? 28 : size === 'md' ? 18 : 13;
+  // ponytail: 18 is off-grid (no fontSizes token); lg=3xl, sm=fontSizes.sm
+  const fontSize = size === 'lg' ? fontSizes['3xl'] : size === 'md' ? 18 : fontSizes.sm;
 
   const circleStyle: ViewStyle = {
     width: dimension,
@@ -50,7 +51,7 @@ export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
       <Typography
         preset="label"
         color={colors.textOnAccent}
-        style={{ fontSize, lineHeight: fontSize * 1.2 }}
+        style={{ fontSize, lineHeight: fontSize * lineHeights.tight }}
       >
         {getInitials(name)}
       </Typography>

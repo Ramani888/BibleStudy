@@ -24,7 +24,7 @@ export function ColorPicker({ value, onChange, presets = PRESET_COLORS }: ColorP
       {presets.map(color => (
         <Pressable
           key={color}
-          style={[styles.swatch, { backgroundColor: color }, value === color && styles.swatchSelected, value === color && { borderColor: colors.background }]}
+          style={({ pressed }) => [styles.swatch, { backgroundColor: color }, value === color && styles.swatchSelected, value === color && { borderColor: colors.background }, pressed && styles.swatchPressed]}
           onPress={() => onChange(value === color ? null : color)}
           hitSlop={4}
         >
@@ -44,13 +44,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   swatch: {
-    width: 32,
-    height: 32,
+    width: spacing.xxxl,
+    height: spacing.xxxl,
     borderRadius: layout.pillRadius,
     alignItems: 'center',
     justifyContent: 'center',
   },
   swatchSelected: {
     borderWidth: 2,
+  },
+  swatchPressed: {
+    opacity: 0.85,
   },
 });

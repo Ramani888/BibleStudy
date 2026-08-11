@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 import { useAuthStore } from '../store';
-import { colors } from '../theme';
+import { useTheme } from '../theme';
 import {
   registerDeviceToken,
   onTokenRefresh,
@@ -25,8 +25,9 @@ const RootStack = createNativeStackNavigator<RootStackParamList>();
 const ONBOARDING_KEY = '@onboarding_seen';
 
 function SplashScreen() {
+  const { colors } = useTheme();
   return (
-    <View style={styles.splash}>
+    <View style={[styles.splash, { backgroundColor: colors.background }]}>
       <ActivityIndicator size="large" color={colors.accent} />
     </View>
   );
@@ -115,7 +116,6 @@ export function RootNavigator() {
 const styles = StyleSheet.create({
   splash: {
     flex: 1,
-    backgroundColor: colors.background,
     alignItems: 'center',
     justifyContent: 'center',
   },
