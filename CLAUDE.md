@@ -2,7 +2,7 @@
 
 AI-assisted Bible-study flashcard app. Full-stack: **Node/Express/Prisma/PostgreSQL**
 backend + **React Native 0.84 / React 19** app (NO Expo). Full feature docs live in the
-Obsidian vault at `obsidian/` — open `obsidian/Home.md` (MOC) → `obsidian/Features/`.
+Obsidian vault at `biblestudypro/` — open `biblestudypro/Home.md` (MOC) → `biblestudypro/Features/`.
 
 ## Exploration tooling (use BEFORE Grep/Glob/Read)
 This repo has two knowledge graphs — prefer them for exploration; they're cheaper and give structure.
@@ -80,7 +80,7 @@ use `edges={['bottom']}`/all-edges on a tab-hosted screen.
 - **Verify money/DB/permission logic with a runnable check** before claiming done — a throwaway ts-node
   script against the dev DB (run inside `backend/` with `--compiler-options '{"module":"commonjs","moduleResolution":"node"}'`),
   asserting the outcome (e.g. "no credit charged on reject"). Delete the script after.
-- **After a feature/phase lands**, update `APP_SCOPE.md`, the relevant `obsidian/Features/` note, and memory.
+- **After a feature/phase lands**, update `APP_SCOPE.md`, the relevant `biblestudypro/Features/` note, and memory.
 - **Backend restart required** after `.env` or `schema.prisma` changes (ts-node-dev won't pick them up live).
 - **Physical-device API base URL** must be the Mac's LAN IP (react-native-config `.env`), not `localhost`.
 
