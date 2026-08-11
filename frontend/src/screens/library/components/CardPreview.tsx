@@ -2,7 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
 import { Typography } from '../../../components/ui';
-import { layout, spacing, useTheme } from '../../../theme';
+import { CARD_FILL_LIGHT, fontSizes, layout, lineHeights, spacing, useTheme } from '../../../theme';
 
 interface CardPreviewProps {
   question: string;
@@ -10,10 +10,13 @@ interface CardPreviewProps {
 }
 
 export function CardPreview({ question, answer }: CardPreviewProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
+  const cardBg = isDark ? colors.chipIdle : CARD_FILL_LIGHT;
   return (
     <View style={styles.preview}>
-      <View style={[styles.previewTop, { backgroundColor: colors.surface }]}>
+      <View style={[styles.previewTop, { backgroundColor: cardBg }]}>
         <Typography
           preset="body"
           color={question ? colors.textPrimary : colors.textDisabled}
@@ -22,7 +25,7 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
           {question || 'Front (question)'}
         </Typography>
       </View>
-      <View style={[styles.previewBottom, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+      <View style={[styles.previewBottom, { backgroundColor: cardBg, borderTopColor: colors.border }]}>
         <Typography
           preset="body"
           color={answer ? colors.textSecondary : colors.textDisabled}
@@ -42,14 +45,14 @@ const styles = StyleSheet.create({
   },
   previewTop: {
     padding: spacing.lg,
-    minHeight: 72,
+    minHeight: 72, // ponytail: off-grid Figma value, no s72 token
     justifyContent: 'center',
   },
   previewBottom: {
     padding: spacing.lg,
-    minHeight: 56,
+    minHeight: 56, // ponytail: off-grid Figma value, no s56 token
     justifyContent: 'center',
     borderTopWidth: 1,
   },
-  previewText: { lineHeight: 22 },
+  previewText: { lineHeight: fontSizes.md * lineHeights.normal },
 });

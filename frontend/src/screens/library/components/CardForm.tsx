@@ -7,7 +7,7 @@ import { z } from 'zod';
 import { PlusCircleIcon } from '../../../components/icons';
 import { FormField } from '../../../components/forms';
 import { Typography } from '../../../components/ui';
-import { layout, spacing, useTheme } from '../../../theme';
+import { fontFamily, fontSizes, layout, spacing, useTheme } from '../../../theme';
 import type { CardType } from '../../../types';
 
 const ICON_SIZE = 20;
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
   formGap: { gap: spacing.lg },
   noteLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   addNoteBtn: { borderWidth: 1.5, borderRadius: layout.cardRadius, borderStyle: 'dashed', paddingVertical: spacing.md, alignItems: 'center' },
-  noteInput: { borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: 80, textAlignVertical: 'top' }, // ponytail: off-grid Figma value
+  noteInput: { borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: spacing.s80, textAlignVertical: 'top', fontSize: fontSizes.md, fontFamily: fontFamily.regular },
   btnPressed: { opacity: 0.85 },
   addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 });

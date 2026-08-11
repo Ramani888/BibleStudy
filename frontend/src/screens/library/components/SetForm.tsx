@@ -12,7 +12,7 @@ import { AppModal } from '../../../components/feedback';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
 import { getErrorMessage } from '../../../api';
-import { layout, spacing, useTheme, palette } from '../../../theme';
+import { layout, spacing, useTheme } from '../../../theme';
 import type { Visibility, CardLayout, StudySet } from '../../../types';
 
 const ICON_SIZE = 18;
@@ -152,7 +152,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
               </Typography>
               <Typography
                 preset="caption"
-                color={visibility === opt.value ? palette.indigo800 : colors.textDisabled}
+                color={visibility === opt.value ? colors.textSecondary : colors.textDisabled}
               >
                 {opt.desc}
               </Typography>

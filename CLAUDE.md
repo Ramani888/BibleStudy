@@ -121,6 +121,7 @@ cd backend && npx prisma migrate dev             # run migrations
 
 ## Skills
 `/feature-dev` (new screen/component) · `/code-review` (bugs pre-commit) · `/simplify` (cleanup) ·
-`/frontend-design` (styling, web-focused — adapt to RN) · `/claude-api` (Claude integration).
+`/frontend-design` (styling, web-focused — adapt to RN) · `/claude-api` (Claude integration) ·
+`/meditation-parity <ScreenName>` (audit + fix a screen for Meditation theme parity — dark/light mode, card bg, shadows, tints).
 Subagent roles: `feature-dev:code-architect` (design), `code-explorer` (trace), `code-reviewer` (review),
 `rn-screen-builder`/`rn-reviewer` (RN-specific), `Explore` (fast search), `safe-committer` (commit).
