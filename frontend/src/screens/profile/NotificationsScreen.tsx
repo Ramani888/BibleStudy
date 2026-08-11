@@ -145,11 +145,18 @@ export function NotificationsScreen({ navigation, route }: Props) {
 
   return (
     <Screen
-      edges={['top', 'bottom']}
+      edges={['top']}
       header={
         <ScreenHeader
           title="Notifications"
-          onBack={() => route.params?.from === 'Home' ? navigation.navigate('HomeTab') : navigation.goBack()}
+          onBack={() => {
+            if (route.params?.from === 'Home') {
+              navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
+              navigation.getParent()?.navigate('HomeTab');
+            } else {
+              navigation.goBack();
+            }
+          }}
           right={headerRight}
         />
       }

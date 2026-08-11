@@ -8,7 +8,7 @@ import { QuizModeSheet } from '../../components/domain';
 import { Button, Divider, Input, Screen, ScreenHeader, SearchBar, Typography } from '../../components/ui';
 import {
   SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
-  HelpCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
+  CheckCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
   ListIcon, GridIcon,
 } from '../../components/icons';
 
@@ -383,7 +383,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={cachedTitle ?? setTitle}
         onClose={() => setHeaderMenuOpen(false)}
         actions={[
-          { label: 'Quiz', icon: HelpCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
+          { label: 'Quiz', icon: CheckCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
           ...(isOwner ? [
             { label: 'Create Card', icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
             { label: 'Edit Set', icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
