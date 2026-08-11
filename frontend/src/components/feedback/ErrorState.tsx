@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
   },
   btn: {
     marginTop: spacing.xxl,
-    minWidth: 140,
+    minWidth: 140, // ponytail: off-grid value, no spacing token ≥ s80
   },
 });

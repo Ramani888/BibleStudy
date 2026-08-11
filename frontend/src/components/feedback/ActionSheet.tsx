@@ -9,7 +9,7 @@ import {
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 import { Divider, Typography } from '../ui';
 import type { IconComponent } from '../icons';
-import { layout, spacing, useTheme, palette } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 
 const ACTION_ICON_SIZE = 20;
 
@@ -79,7 +79,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
       snapPoints={snapPoints}
       onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
-      handleIndicatorStyle={styles.handle}
+      handleIndicatorStyle={[styles.handle, { backgroundColor: colors.accent }]}
       backgroundStyle={[styles.background, { backgroundColor: colors.surface }]}
     >
       <BottomSheetView style={styles.content}>
@@ -93,7 +93,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
               <Pressable
                 style={({ pressed }) => [
                   styles.item,
-                  { opacity: pressed || action.disabled ? 0.5 : 1 },
+                  { opacity: action.disabled ? 0.5 : pressed ? 0.7 : 1 },
                 ]}
                 onPress={() => {
                   const fn = action.onPress;
@@ -128,7 +128,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
         </View>
         <Divider />
         <Pressable
-          style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.6 : 1 }]}
+          style={({ pressed }) => [styles.cancel, { opacity: pressed ? 0.85 : 1 }]}
           onPress={() => ref.current?.dismiss()}
         >
           <Typography preset="bodyLg" color={colors.textSecondary} align="center">
@@ -142,13 +142,12 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
 
 const styles = StyleSheet.create({
   background: {
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
+    borderTopLeftRadius: layout.cardRadiusSm,
+    borderTopRightRadius: layout.cardRadiusSm,
   },
   handle: {
-    backgroundColor: palette.indigo300,
-    width: 40,
-    height: 4,
+    width: spacing.huge,
+    height: spacing.xs,
   },
   content: {
     paddingHorizontal: layout.screenPaddingH,

@@ -61,7 +61,7 @@ export function SelectSheet({
 
       {leadingOption && (
         <>
-          <Pressable style={styles.option} onPress={leadingOption.onPress}>
+          <Pressable style={({ pressed }) => [styles.option, pressed && styles.optionPressed]} onPress={leadingOption.onPress}>
             <Typography preset="body" color={colors.textSecondary}>{leadingOption.label}</Typography>
           </Pressable>
           <Divider marginV={spacing.xs} />
@@ -74,7 +74,7 @@ export function SelectSheet({
         <ScrollView style={{ maxHeight }} showsVerticalScrollIndicator={false}>
           {filtered.map(o => (
             <React.Fragment key={o.id}>
-              <Pressable style={styles.option} onPress={() => onSelect(o.id)}>
+              <Pressable style={({ pressed }) => [styles.option, pressed && styles.optionPressed]} onPress={() => onSelect(o.id)}>
                 <Typography preset="body">{o.label}</Typography>
               </Pressable>
               <Divider marginV={spacing.xs} />
@@ -95,4 +95,5 @@ const styles = StyleSheet.create({
   search: { marginBottom: spacing.sm },
   option: { paddingVertical: spacing.md },
   noMatch: { paddingVertical: spacing.md },
+  optionPressed: { opacity: 0.7 },
 });

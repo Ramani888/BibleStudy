@@ -11,7 +11,7 @@ import { Divider, Typography } from '../ui';
 import { ChevronRightIcon, ShuffleIcon } from '../icons';
 import { useCards } from '../../hooks';
 import { supportedModes, MODE_META, MIN_MC_CARDS } from '../../hooks/useQuizSession';
-import { layout, spacing, useTheme, palette } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
 
 interface QuizModeSheetProps {
@@ -62,7 +62,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
       snapPoints={['70%']}
       onDismiss={handleDismiss}
       backdropComponent={renderBackdrop}
-      handleIndicatorStyle={styles.handle}
+      handleIndicatorStyle={[styles.handle, { backgroundColor: colors.accent }]}
       backgroundStyle={[styles.background, { backgroundColor: colors.surface }]}
     >
       <BottomSheetScrollView contentContainerStyle={styles.content}>
@@ -71,7 +71,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
           CHOOSE A QUIZ TYPE
         </Typography>
 
-        <Pressable style={[styles.row, styles.mixRow, { backgroundColor: colors.accentSoft }]} onPress={() => handleStart('mix')}>
+        <Pressable style={({ pressed }) => [styles.row, styles.mixRow, { backgroundColor: colors.accentSoft }, pressed && styles.rowPressed]} onPress={() => handleStart('mix')}>
           <ShuffleIcon size={20} color={colors.accent} />
           <View style={styles.flex}>
             <Typography preset="h4" color={colors.accent}>Mix</Typography>
@@ -84,7 +84,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
 
         {modes.map((m, i) => (
           <React.Fragment key={m}>
-            <Pressable style={styles.row} onPress={() => handleStart(m)}>
+            <Pressable style={({ pressed }) => [styles.row, pressed && styles.rowPressed]} onPress={() => handleStart(m)}>
               <View style={styles.flex}>
                 <Typography preset="h4" color={colors.textPrimary}>{MODE_META[m].label}</Typography>
                 {!MODE_META[m].scored && (
@@ -114,7 +114,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
         )}
 
         <Divider />
-        <Pressable style={styles.cancel} onPress={() => ref.current?.dismiss()}>
+        <Pressable style={({ pressed }) => [styles.cancel, pressed && styles.cancelPressed]} onPress={() => ref.current?.dismiss()}>
           <Typography preset="bodyLg" color={colors.textSecondary} align="center">Cancel</Typography>
         </Pressable>
       </BottomSheetScrollView>
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: layout.cardRadiusSm,
     borderTopRightRadius: layout.cardRadiusSm,
   },
-  handle: { backgroundColor: palette.indigo300, width: 40, height: 4 },
+  handle: { width: spacing.huge, height: spacing.xs },
   content: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.xxxl },
   title: { marginTop: spacing.sm, marginBottom: spacing.xs },
   sectionLabel: { marginBottom: spacing.md },
@@ -145,4 +145,6 @@ const styles = StyleSheet.create({
   },
   empty: { paddingVertical: spacing.xxl },
   cancel: { paddingVertical: spacing.md },
+  rowPressed: { opacity: 0.7 },
+  cancelPressed: { opacity: 0.85 },
 });

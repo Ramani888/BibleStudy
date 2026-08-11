@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const SHIMMER_COLORS: [string, string, string] = [
@@ -64,13 +64,15 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
 
 /** Pre-built skeleton for a set card */
 export function SetCardSkeleton() {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
       <Skeleton height={18} width="60%" borderRadius={6} />
-      <View style={{ height: 8 }} />
+      <View style={styles.spacerSm} />
       <Skeleton height={13} width="80%" borderRadius={6} />
-      <View style={{ height: 16 }} />
+      <View style={styles.spacerLg} />
       <Skeleton height={13} width="30%" borderRadius={6} />
     </View>
   );
@@ -84,4 +86,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: spacing.md,
   },
+  spacerSm: { height: spacing.sm },
+  spacerLg: { height: spacing.lg },
 });

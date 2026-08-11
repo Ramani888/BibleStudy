@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { fontSizes, fontWeights, layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 import { Avatar } from '../ui/Avatar';
 
@@ -9,7 +9,7 @@ const AI_BADGE_ICON_SIZE = 14;
 
 // Body text metrics matching Typography preset="body"
 const BODY_FONT_SIZE = fontSizes.md;   // 15
-const BODY_LINE_HEIGHT = BODY_FONT_SIZE * 1.5; // 22.5
+const BODY_LINE_HEIGHT = BODY_FONT_SIZE * lineHeights.normal;
 
 type Role = 'user' | 'ai';
 
@@ -64,7 +64,7 @@ function renderBold(text: string, color: string): React.ReactNode {
   if (segments.length === 1) return text;
   return segments.map((seg, i) =>
     seg.startsWith('**') && seg.endsWith('**') ? (
-      <Typography key={i} preset="body" color={color} style={{ fontWeight: fontWeights.bold }}>
+      <Typography key={i} preset="body" color={color} style={mdStyles.boldText}>
         {seg.slice(2, -2)}
       </Typography>
     ) : (
@@ -122,7 +122,9 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
 // ── ChatBubble ────────────────────────────────────────────────────────────────
 
 export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyping = false, timestamp }: ChatBubbleProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const isUser = role === 'user';
 
   return (
@@ -134,7 +136,7 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyp
       )}
 
       <View style={styles.bubbleCol}>
-        <View style={[styles.bubble, isUser ? [styles.bubbleUser, { backgroundColor: colors.accent }] : [styles.bubbleAI, { backgroundColor: colors.background, borderColor: colors.border }]]}>
+        <View style={[styles.bubble, isUser ? [styles.bubbleUser, { backgroundColor: colors.accent }] : [styles.bubbleAI, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]]}>
           {isTyping ? (
             <TypingDots />
           ) : isUser ? (
@@ -222,7 +224,8 @@ const mdStyles = StyleSheet.create({
   bulletBlock: {},
   bulletRow: { flexDirection: 'row', gap: spacing.sm },
   bulletRowGap: { marginTop: spacing.xs },
-  bulletDot: { lineHeight: BODY_LINE_HEIGHT, width: 12 },
+  boldText: { fontWeight: fontWeights.bold },
+  bulletDot: { lineHeight: BODY_LINE_HEIGHT, width: spacing.md },
   bulletText: { flex: 1, lineHeight: BODY_LINE_HEIGHT },
 });
 
@@ -234,8 +237,8 @@ const dotStyles = StyleSheet.create({
     paddingHorizontal: spacing.xs,
   },
   dot: {
-    width: 7,
-    height: 7,
+    width: spacing.s7,
+    height: spacing.s7,
     borderRadius: spacing.xs,
   },
 });

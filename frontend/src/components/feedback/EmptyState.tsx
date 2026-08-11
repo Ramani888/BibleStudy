@@ -57,8 +57,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xxxl,
   },
   lottie: {
-    width: 120,
-    height: 120,
+    width: 120, // ponytail: off-grid value, no spacing token ≥ s80
+    height: 120, // ponytail: off-grid value, no spacing token ≥ s80
     marginBottom: spacing.md,
   },
   icon: {
@@ -69,6 +69,6 @@ const styles = StyleSheet.create({
   },
   cta: {
     marginTop: spacing.xxl,
-    minWidth: 160,
+    minWidth: 160, // ponytail: off-grid value, no spacing token ≥ s80
   },
 });

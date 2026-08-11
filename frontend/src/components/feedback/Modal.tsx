@@ -10,7 +10,7 @@ import {
   ViewStyle,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, radius, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui';
 
 interface AppModalProps extends Pick<ModalProps, 'visible' | 'animationType'> {
@@ -57,7 +57,7 @@ export function AppModal({
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <Pressable style={[styles.backdrop, { backgroundColor: colors.overlay }]} onPress={onClose} />
-        <View style={[styles.sheet, { backgroundColor: colors.background }, contentStyle, { paddingBottom }]}>
+        <View style={[styles.sheet, { backgroundColor: colors.surface }, contentStyle, { paddingBottom }]}>
           {showGrabber && <View style={[styles.handle, { backgroundColor: colors.border }]} />}
           {title && (
             <Typography preset="h4" numberOfLines={1} style={styles.title}>
@@ -81,15 +81,15 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFillObject,
   },
   sheet: {
-    borderTopLeftRadius: spacing.xxl,
-    borderTopRightRadius: spacing.xxl,
+    borderTopLeftRadius: radius.lg,
+    borderTopRightRadius: radius.lg,
     paddingTop: spacing.lg,
     paddingHorizontal: layout.screenPaddingH,
   },
   handle: {
-    width: 40,
-    height: 4,
-    borderRadius: spacing.s2,
+    width: spacing.huge,
+    height: spacing.xs,
+    borderRadius: radius.r2,
     alignSelf: 'center',
     marginBottom: spacing.lg,
   },
