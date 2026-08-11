@@ -1,13 +1,13 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, Alert, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
+import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
-import { useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
+import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
@@ -35,6 +35,7 @@ export function QuizHubScreen() {
 
   const { data: attempts = [], isLoading, isError, error, refetch } = useRecentQuizAttempts(20);
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
+  const { show, dialogProps } = useConfirmDialog();
 
   // Silent background refresh on focus — does NOT trigger the pull-to-refresh spinner
   useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
@@ -52,10 +53,13 @@ export function QuizHubScreen() {
 
   const handleDelete = (item: QuizAttemptWithSet) => {
     closeSheet();
-    Alert.alert('Delete Quiz', 'Remove this attempt from your history?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Delete', style: 'destructive', onPress: () => deleteAttempt(item.id) },
-    ]);
+    show({
+      title: 'Delete Quiz',
+      message: 'Remove this attempt from your history?',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: () => deleteAttempt(item.id),
+    });
   };
 
   const handleDetails = (item: QuizAttemptWithSet) => {
@@ -204,6 +208,7 @@ export function QuizHubScreen() {
           },
         ]}
       />
+      <ConfirmDialog {...dialogProps} />
     </Screen>
   );
 }

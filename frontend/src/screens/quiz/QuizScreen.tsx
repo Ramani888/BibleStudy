@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Alert, BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
+import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
 import { BackIcon } from '../../components/icons';
-import { useCardsForSets } from '../../hooks';
+import { useCardsForSets, useConfirmDialog } from '../../hooks';
+import { ConfirmDialog } from '../../components/feedback';
 import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
@@ -30,6 +31,9 @@ export function QuizScreen() {
   const [responses, setResponses] = useState<Record<number, unknown>>({});
   const saveResponse = (idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r }));
   const goBack = () => navigation.goBack();
+  const { show, dialogProps } = useConfirmDialog();
+  const showRef = useRef(show);
+  showRef.current = show;
 
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -47,10 +51,13 @@ export function QuizScreen() {
   useEffect(() => {
     if (isLoading || isError || !s.isAvailable || s.isComplete) return;
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
-      Alert.alert('Quit quiz?', 'Your progress will be lost.', [
-        { text: 'Stay', style: 'cancel' },
-        { text: 'Quit', style: 'destructive', onPress: goBack },
-      ]);
+      showRef.current({
+        title: 'Quit quiz?',
+        message: 'Your progress will be lost.',
+        confirmLabel: 'Quit',
+        variant: 'danger',
+        onConfirm: goBack,
+      });
       return true;
     });
     return () => handler.remove();
@@ -153,6 +160,7 @@ export function QuizScreen() {
           bottomInset={insets.bottom}
         />
       )}
+      <ConfirmDialog {...dialogProps} />
     </View>
   );
 }

@@ -1,10 +1,11 @@
 import React from 'react';
-import { Alert, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
-import { useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
+import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
+import { ConfirmDialog } from '../../components/feedback';
 import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
@@ -25,6 +26,7 @@ export function QuizDetailScreen() {
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
+  const { show, dialogProps } = useConfirmDialog();
   const { data: attempts = [] } = useRecentQuizAttempts(50);
 
   const live = attempts.find(a => a.id === params.id);
@@ -48,13 +50,13 @@ export function QuizDetailScreen() {
   const isRetaken = practicedAt !== createdAt;
 
   const handleDelete = () => {
-    Alert.alert('Delete Quiz', 'Remove this attempt from your history?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete', style: 'destructive',
-        onPress: () => deleteAttempt(id, { onSuccess: () => navigation.goBack() }),
-      },
-    ]);
+    show({
+      title: 'Delete Quiz',
+      message: 'Remove this attempt from your history?',
+      confirmLabel: 'Delete',
+      variant: 'danger',
+      onConfirm: () => deleteAttempt(id, { onSuccess: () => navigation.goBack() }),
+    });
   };
 
   const { data: responsesData } = useQuizAttemptResponses(params.id);
@@ -194,6 +196,7 @@ export function QuizDetailScreen() {
           )}
         </View>
       </ScrollView>
+      <ConfirmDialog {...dialogProps} />
     </Screen>
   );
 }

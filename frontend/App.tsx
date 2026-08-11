@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -12,6 +12,7 @@ import { useAuthStore } from './src/store';
 import { useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 import { configureGoogleSignIn } from './src/utils/socialAuth';
+import { SplashScreen } from './src/screens/SplashScreen';
 
 // Enable native screens for better performance
 enableScreens(true);
@@ -19,15 +20,26 @@ configureGoogleSignIn();
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);
+  const isInitialized = useAuthStore(s => s.isInitialized);
   const hydrateTheme = useThemeStore(s => s.hydrate);
+  const [showSplash, setShowSplash] = useState(true);
 
-  // Init auth + load saved light/dark preference
   useEffect(() => {
     initialize();
     hydrateTheme();
   }, [initialize, hydrateTheme]);
 
-  return <RootNavigator />;
+  return (
+    <View style={styles.root}>
+      <RootNavigator />
+      {showSplash && (
+        <SplashScreen
+          isReady={isInitialized}
+          onFinish={() => setShowSplash(false)}
+        />
+      )}
+    </View>
+  );
 }
 
 export default function App() {
@@ -46,5 +58,5 @@ export default function App() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
+  root: { flex: 1, backgroundColor: '#000' },
 });
