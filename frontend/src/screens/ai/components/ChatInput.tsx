@@ -47,6 +47,7 @@ export function ChatInput({
 
   const canSend     = text.trim().length > 0 && !disabled;
   const showCounter = text.length >= WARN_THRESHOLD;
+  const actionCost  = attachmentType === 'PDF' ? 5 : attachmentType === 'IMAGE' ? 3 : 1;
 
   const handleSend = () => {
     if (!canSend) return;
@@ -65,7 +66,7 @@ export function ChatInput({
           <StarIcon size={CREDIT_ICON_SIZE} color={creditBalance > 0 ? colors.textSecondary : colors.alert} />
           <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.alert}>
             {creditBalance > 0
-              ? `${creditBalance} credits remaining`
+              ? `Costs ${actionCost} credit${actionCost > 1 ? 's' : ''} · ${creditBalance} remaining`
               : 'No credits — claim your daily credit or'}
           </Typography>
           {creditBalance <= 0 && onUpgrade && (

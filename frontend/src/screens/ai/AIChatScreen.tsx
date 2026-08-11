@@ -538,6 +538,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
                 </Pressable>
               ))}
             </View>
+            <Typography preset="caption" color={colors.textSecondary} align="center" style={styles.emptySub}>
+              AI answers cite Bible verses but may contain errors. Verify important interpretations with your pastor or a trusted commentary.
+            </Typography>
           </View>
         }
         renderItem={renderItem}
