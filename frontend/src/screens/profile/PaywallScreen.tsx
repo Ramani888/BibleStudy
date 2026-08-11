@@ -119,8 +119,18 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           <Typography preset="h1" color={colors.textPrimary} style={styles.heroTitle}>
             Premium
           </Typography>
-          <Typography preset="body" color={colors.accent} style={styles.heroTagline}>
-            Go deeper in your study journey.
+          <Typography preset="body" color={colors.textSecondary} style={styles.heroTagline}>
+            Bible study is free. Credits unlock AI assistance.
+          </Typography>
+        </View>
+
+        {/* ── Free plan note ── */}
+        <View style={[styles.freeBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
+          <Typography preset="bodySm" color={colors.accent} style={styles.freeBannerTitle}>
+            Always free, no card needed
+          </Typography>
+          <Typography preset="caption" color={colors.textSecondary}>
+            Flashcards · Quizzes · Spaced repetition · Streaks · 1 AI credit every day
           </Typography>
         </View>
 
@@ -221,6 +231,17 @@ const styles = StyleSheet.create({
   brand: { letterSpacing: 2, textTransform: 'uppercase' },
   heroTitle: { marginTop: spacing.s2, textAlign: 'center' },
   heroTagline: { fontStyle: 'italic', marginTop: spacing.s6, textAlign: 'center' },
+
+  // Free banner
+  freeBanner: {
+    borderWidth: 1,
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    marginTop: spacing.xl,
+    gap: spacing.xs,
+  },
+  freeBannerTitle: { fontWeight: '600' },
 
   // Toggle
   toggle: {
