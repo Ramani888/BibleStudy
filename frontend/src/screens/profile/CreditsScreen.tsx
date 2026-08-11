@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -11,15 +11,16 @@ import { Badge, Divider, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { EmptyState, ErrorState } from '../../components/feedback';
-import { StarIcon } from '../../components/icons';
+import { ChevronDownIcon, StarIcon } from '../../components/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks';
 import { WeeklyChart } from './components/WeeklyChart';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
-import { fontSizes, fontWeights, layout, spacing, useTheme , palette } from '../../theme';
+import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, radius, spacing, useTheme, palette } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { TransactionType } from '../../types';
+import type { CreditStatsPeriod } from '../../hooks/useCredits';
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
   USAGE:    { label: 'Used',     variant: 'error',   sign: '−' },
@@ -27,6 +28,8 @@ const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | '
   PURCHASE: { label: 'Purchase', variant: 'info',    sign: '+' },
   BONUS:    { label: 'Bonus',    variant: 'primary', sign: '+' },
 };
+
+// ── Balance card (gradient hero) ─────────────────────────────────────────────
 
 function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
   const { colors } = useTheme();
@@ -75,9 +78,63 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
   );
 }
 
+// ── Stat tile ────────────────────────────────────────────────────────────────
+
+function StatTile({ label, value, valueColor }: { label: string; value: string | number; valueColor?: string }) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
+  return (
+    <View style={[
+      styles.statTile,
+      { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+      !isDark && styles.statTileShadow,
+    ]}>
+      <Typography preset="h4" color={valueColor ?? colors.textPrimary}>{value}</Typography>
+      <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
+    </View>
+  );
+}
+
+// ── TrendWindowPill ───────────────────────────────────────────────────────────
+
+const WINDOW_OPTIONS: { key: CreditStatsPeriod; label: string }[] = [
+  { key: 'week',  label: '7 Days'  },
+  { key: 'month', label: '30 Days' },
+];
+
+function TrendWindowPill({ value, onToggle }: { value: CreditStatsPeriod; onToggle: () => void }) {
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
+  const label = WINDOW_OPTIONS.find(o => o.key === value)?.label ?? '7 Days';
+  return (
+    <Pressable
+      onPress={onToggle}
+      hitSlop={8}
+      style={[
+        styles.pill,
+        isDark
+          ? { backgroundColor: colors.chipIdle, borderColor: 'transparent' }
+          : { backgroundColor: colors.surface, borderColor: colors.cardBorder },
+        !isDark && styles.pillShadow,
+      ]}
+    >
+      <Typography preset="label" color={colors.textPrimary}>{label}</Typography>
+      <ChevronDownIcon size={14} color={colors.textPrimary} />
+    </Pressable>
+  );
+}
+
+// ── Screen ────────────────────────────────────────────────────────────────────
+
 export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
   const qc = useQueryClient();
+
+  const [chartWindow, setChartWindow] = useState<CreditStatsPeriod>('week');
+
   const {
     data,
     isLoading,
@@ -92,6 +149,19 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
 
   const transactions = data?.pages.flatMap(p => p.transactions) ?? [];
 
+  // Compute all-time totals from loaded transactions
+  const { totalEarned, totalUsed } = useMemo(() => {
+    let earned = 0, used = 0;
+    for (const t of transactions) {
+      if (t.type === 'USAGE') used += t.amount;
+      else earned += t.amount;
+    }
+    return { totalEarned: earned, totalUsed: used };
+  }, [transactions]);
+
+  const { data: creditData } = useCreditBalance();
+  const { data: streakData } = useStreak();
+
   const amountColor: Record<TransactionType, string> = {
     USAGE:    colors.alert,
     REWARD:   colors.success,
@@ -99,87 +169,102 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
     BONUS:    colors.accent,
   };
 
+  const toggleWindow = () =>
+    setChartWindow(w => w === 'week' ? 'month' : 'week');
+
   return (
     <Screen header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
       <View style={{ flex: 1 }}>
-      <FlatList
-        data={transactions}
-        keyExtractor={item => item.id}
-        contentContainerStyle={styles.list}
-        showsVerticalScrollIndicator={false}
-        refreshing={isFetching && !isFetchingNextPage}
-        onRefresh={() => { void Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits', 'stats'] })]); }}
-        onEndReached={() => hasNextPage && fetchNextPage()}
-        onEndReachedThreshold={0.3}
-        ListHeaderComponent={
-          <>
-            <View>
+        <FlatList
+          data={transactions}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          refreshing={isFetching && !isFetchingNextPage}
+          onRefresh={() => { void Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits', 'stats'] })]); }}
+          onEndReached={() => hasNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.3}
+          ListHeaderComponent={
+            <>
+              {/* Balance hero card */}
               <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
-            </View>
-            <Spacer size={spacing.lg} />
-            <View>
-              <WeeklyChart />
-            </View>
-            <Spacer size={spacing.xxl} />
-            <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
-            <Divider marginV={0} />
-          </>
-        }
-        ItemSeparatorComponent={() => <Divider marginV={0} />}
-        ListEmptyComponent={
-          isError ? (
-            <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
-          ) : !isLoading ? (
-            <EmptyState
-              title="No transactions yet"
-              subtitle="Credits you earn or use will appear here"
-              style={styles.emptyState}
-            />
-          ) : (
-            <View style={styles.loadingWrap}>
-              <ActivityIndicator color={colors.accent} />
-            </View>
-          )
-        }
-        ListFooterComponent={
-          isFetchingNextPage ? (
-            <View style={styles.footerLoader}>
-              <ActivityIndicator color={colors.accent} size="small" />
-            </View>
-          ) : null
-        }
-        renderItem={({ item }) => {
-          const cfg = TYPE_CONFIG[item.type];
-          return (
-            <View style={styles.txRow}>
-              <View style={styles.txLeft}>
-                <View style={styles.txTopRow}>
-                  <Badge label={cfg.label} variant={cfg.variant} />
-                  <Typography preset="caption" color={colors.textDisabled}>
-                    {formatDate(item.createdAt)}
+
+              {/* ── Stat grid ── */}
+              <View style={styles.statGrid}>
+                <StatTile label="Balance" value={creditData?.balance ?? 0} valueColor={colors.accent} />
+                <StatTile label="Earned" value={`+${totalEarned}`} valueColor={colors.success} />
+                <StatTile label="Used" value={`−${totalUsed}`} valueColor={colors.alert} />
+                <StatTile label="Streak" value={`🔥 ${streakData?.streak ?? 0}`} />
+              </View>
+
+              {/* ── Chart section header + TrendWindowPill ── */}
+              <View style={styles.chartHeader}>
+                <Typography preset="h4" color={colors.textPrimary}>Credit Activity</Typography>
+                <TrendWindowPill value={chartWindow} onToggle={toggleWindow} />
+              </View>
+
+              {/* Chart — key forces re-mount when window changes */}
+              <WeeklyChart key={chartWindow} defaultPeriod={chartWindow} />
+
+              <Spacer size={spacing.xxl} />
+              <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
+              <Divider marginV={0} />
+            </>
+          }
+          ItemSeparatorComponent={() => <Divider marginV={0} />}
+          ListEmptyComponent={
+            isError ? (
+              <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
+            ) : !isLoading ? (
+              <EmptyState
+                title="No transactions yet"
+                subtitle="Credits you earn or use will appear here"
+                style={styles.emptyState}
+              />
+            ) : (
+              <View style={styles.loadingWrap}>
+                <ActivityIndicator color={colors.accent} />
+              </View>
+            )
+          }
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View style={styles.footerLoader}>
+                <ActivityIndicator color={colors.accent} size="small" />
+              </View>
+            ) : null
+          }
+          renderItem={({ item }) => {
+            const cfg = TYPE_CONFIG[item.type];
+            return (
+              <View style={styles.txRow}>
+                <View style={styles.txLeft}>
+                  <View style={styles.txTopRow}>
+                    <Badge label={cfg.label} variant={cfg.variant} />
+                    <Typography preset="caption" color={colors.textDisabled}>
+                      {formatDate(item.createdAt)}
+                    </Typography>
+                  </View>
+                  <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
+                    {item.description}
                   </Typography>
                 </View>
-                <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
-                  {item.description}
+                <Typography preset="h4" color={amountColor[item.type]} style={styles.txAmount}>
+                  {cfg.sign}{Math.abs(item.amount)}
                 </Typography>
               </View>
-              <Typography preset="h4" color={amountColor[item.type]} style={styles.txAmount}>
-                {cfg.sign}{Math.abs(item.amount)}
-              </Typography>
-            </View>
-          );
-        }}
-      />
+            );
+          }}
+        />
       </View>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  // Single source of horizontal spacing — everything inside FlatList inherits this
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
 
-  // Balance card — no extra marginHorizontal, list padding handles alignment
+  // Balance card
   balanceCard: {
     borderRadius: layout.cardRadiusLg,
     overflow: 'hidden',
@@ -197,21 +282,62 @@ const styles = StyleSheet.create({
   },
   balanceRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   balanceAmount: { fontWeight: fontWeights.bold },
-  ctaBtn: {
-    borderRadius: layout.cardRadius,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
+  ctaBtn: { borderRadius: layout.cardRadius, paddingVertical: spacing.md, alignItems: 'center' },
   ctaBtnText: { fontWeight: fontWeights.semiBold },
 
-  historyTitle: { marginBottom: spacing.md },
+  // Stat grid — 2×2
+  statGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.md,
+    marginTop: spacing.lg,
+  },
+  statTile: {
+    width: '47.5%',
+    borderRadius: radius.md,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.s2,
+    alignItems: 'center',
+  },
+  statTileShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
 
-  txRow: {
+  // Chart section header
+  chartHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: spacing.md,
-    gap: spacing.md,
+    justifyContent: 'space-between',
+    marginTop: spacing.xxl,
+    marginBottom: spacing.md,
   },
+
+  // TrendWindowPill
+  pill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.s7,
+    borderRadius: layout.cardRadius,
+    borderWidth: 1,
+  },
+  pillShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+
+  // Transaction list
+  historyTitle: { marginBottom: spacing.md },
+  txRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: spacing.md, gap: spacing.md },
   txLeft: { flex: 1, gap: spacing.xs },
   txTopRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   txAmount: { minWidth: 48, textAlign: 'right' },

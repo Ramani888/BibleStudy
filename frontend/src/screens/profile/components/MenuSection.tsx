@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { Typography } from '../../../components/ui';
-import { CARD_FILL_LIGHT, fontSize, layout, radius, spacing, useTheme } from '../../../theme';
+import { fontSize, layout, radius, spacing, useTheme } from '../../../theme';
 
 interface MenuSectionProps {
   label: string;
@@ -28,9 +28,7 @@ export function MenuSection({ label, children, style }: MenuSectionProps) {
       <View
         style={[
           styles.card,
-          isDark
-            ? { backgroundColor: theme.colors.surface }
-            : [styles.lightCard, { borderColor: theme.colors.divider }],
+          { backgroundColor: isDark ? theme.colors.chipIdle : theme.colors.surface },
         ]}
       >
         {rows.map((child, i) => (
@@ -52,7 +50,7 @@ const styles = StyleSheet.create({
     marginHorizontal: layout.screenPaddingH,
   },
   title: {
-    fontSize: fontSize.caption,
+    fontSize: fontSize.f13,
     letterSpacing: 1,
     marginBottom: spacing.s10,
     marginLeft: spacing.xs,
@@ -60,10 +58,6 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: radius.md,
     overflow: 'hidden',
-  },
-  lightCard: {
-    backgroundColor: CARD_FILL_LIGHT,
-    borderWidth: 1,
   },
   divider: {
     height: StyleSheet.hairlineWidth,

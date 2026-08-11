@@ -23,7 +23,7 @@ import {
 import { useAuthStore } from '../../store';
 import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage, useStreak } from '../../hooks';
 import { ProgressBar } from '../../components/ui/ProgressBar';
-import { fontSize, layout, palette, radius, spacing, useTheme } from '../../theme';
+import { fontFamily, fontSize, layout, palette, radius, spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Plan } from '../../types';
 
@@ -70,7 +70,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           <View style={styles.profileContent}>
             <Avatar uri={user?.profileImage} name={user?.name} size="md" style={styles.avatar} />
             <View style={styles.profileText}>
-              <Typography preset="h3" color={palette.white}>{user?.name}</Typography>
+              <Typography preset="h3" color={palette.white} style={styles.profileName}>{user?.name}</Typography>
               <Typography preset="caption" color={palette.white} style={styles.profileSub}>
                 {user?.plan ?? 'FREE'} · {streakData?.streak ?? 0} day streak 🔥
               </Typography>
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   scroll: { paddingTop: spacing.sm, paddingBottom: spacing.s48 },
 
   profileCard: {
-    height: 100,
+    height: 92,
     marginHorizontal: layout.screenPaddingH,
     borderRadius: radius.md,
     overflow: 'hidden',
@@ -214,13 +214,17 @@ const styles = StyleSheet.create({
     gap: spacing.s14,
   },
   avatar: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: palette.indigo500,
   },
   profileText: { flex: 1 },
+  profileName: {
+    fontFamily: fontFamily.semibold,
+    fontSize: fontSize.f22,
+  },
   profileSub: {
     marginTop: spacing.xs,
-    fontSize: fontSize.caption,
+    fontSize: fontSize.label,
     opacity: 0.92,
   },
 

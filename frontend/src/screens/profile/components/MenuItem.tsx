@@ -1,12 +1,12 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
-import { palette, radius, spacing, useTheme } from '../../../theme';
+import { fontFamily, fontSize, palette, radius, spacing, useTheme } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { ChevronRightIcon, type IconComponent } from '../../../components/icons';
 
 const ICON_SIZE = 20;
 const TILE_SIZE = 40;
-const CHEVRON_SIZE = 18;
+const CHEVRON_SIZE = 20;
 
 export const MENU_ICON_COLOR = palette.indigo500;
 
@@ -70,5 +70,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  label: { flex: 1 },
+  label: { flex: 1, fontFamily: fontFamily.semibold, fontSize: fontSize.body },
 });

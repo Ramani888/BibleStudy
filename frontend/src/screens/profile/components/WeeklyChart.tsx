@@ -381,14 +381,14 @@ function ChartBody({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function WeeklyChart() {
+export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: CreditStatsPeriod }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   const [chartType,       setChartType]       = useState<ChartType>('bar');
-  const [period,          setPeriod]          = useState<CreditStatsPeriod>('week');
+  const [period,          setPeriod]          = useState<CreditStatsPeriod>(defaultPeriod);
   const [selectedIdx,     setSelectedIdx]     = useState<number | null>(null);
-  const [prevPeriod,      setPrevPeriod]      = useState<CreditStatsPeriod>('week');
+  const [prevPeriod,      setPrevPeriod]      = useState<CreditStatsPeriod>(defaultPeriod);
   const [chartInterval,   setChartInterval]   = useState<CreditInterval>('day');
   const [customFrom,      setCustomFrom]      = useState<Date | null>(null);
   const [customTo,        setCustomTo]        = useState<Date | null>(null);

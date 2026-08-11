@@ -3,7 +3,7 @@ import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, layout, radius, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -19,7 +19,9 @@ import { getErrorMessage } from '../../api/client';
 type Props = ProfileScreenProps<'Friends'>;
 
 export function FriendsScreen({ navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const { data: friends = [], isFetching, error, refetch } = useFriends();
   const { data: leaderboard = [] } = useLeaderboard();
   const removeFriend = useRemoveFriend();
@@ -44,7 +46,12 @@ export function FriendsScreen({ navigation }: Props) {
 
     return (
       <Pressable
-        style={[styles.card, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}
+        style={({ pressed }) => [
+          styles.card,
+          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+          !isDark && styles.cardShadow,
+          pressed && { opacity: 0.7 },
+        ]}
         onPress={() => navigation.navigate('UserProfile', { userId: item.friendId })}
       >
         <Avatar uri={item.friend.profileImage ?? null} name={item.friend.name ?? ''} size="sm" />
@@ -98,7 +105,6 @@ export function FriendsScreen({ navigation }: Props) {
         renderItem={renderItem}
         refreshing={isFetching}
         onRefresh={refetch}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState
@@ -116,16 +122,23 @@ export function FriendsScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   headerActions: { flexDirection: 'row', gap: spacing.md },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
-  separator: { height: spacing.sm },
+  list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl, gap: spacing.lg },
   emptyContainer: { flex: 1, justifyContent: 'center' },
   card: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
+    paddingHorizontal: spacing.s18,
+    paddingVertical: spacing.lg,
+    minHeight: 72,
+    borderRadius: radius.md,
+  },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   cardInfo: { flex: 1, gap: spacing.s2 },
   removeBtn: { padding: spacing.xs },

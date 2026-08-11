@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, Switch, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
-import { Divider } from '../../components/ui';
-import { layout, palette, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, palette, spacing, radius, useTheme } from '../../theme';
+import { layout } from '../../constants/layout';
 import type { ProfileScreenProps } from '../../navigation/types';
 
 const STORAGE_KEY = '@bsp/notification_settings';
@@ -13,8 +14,8 @@ const STORAGE_KEY = '@bsp/notification_settings';
 interface NotificationPrefs {
   friendRequests: boolean;
   friendAccepted: boolean;
-  achievements: boolean;
-  system: boolean;
+  achievements:   boolean;
+  system:         boolean;
 }
 
 const DEFAULTS: NotificationPrefs = {
@@ -25,16 +26,41 @@ const DEFAULTS: NotificationPrefs = {
 };
 
 const SETTINGS: { key: keyof NotificationPrefs; label: string; description: string }[] = [
-  { key: 'friendRequests', label: 'Friend Requests',   description: 'When someone sends you a friend request' },
-  { key: 'friendAccepted', label: 'Friend Accepted',   description: 'When someone accepts your friend request' },
-  { key: 'achievements',   label: 'Achievements',      description: 'When you unlock a new achievement' },
-  { key: 'system',         label: 'System',            description: 'App announcements and important updates' },
+  { key: 'friendRequests', label: 'Friend Requests',  description: 'When someone sends you a friend request' },
+  { key: 'friendAccepted', label: 'Friend Accepted',  description: 'When someone accepts your friend request' },
+  { key: 'achievements',   label: 'Achievements',     description: 'When you unlock a new achievement' },
+  { key: 'system',         label: 'System',           description: 'App announcements and important updates' },
 ];
 
-type Props = ProfileScreenProps<'NotificationSettings'>;
-
-export function NotificationSettingsScreen({ navigation }: Props) {
+function PreferenceCard({
+  title, description, value, onToggle, isDark,
+}: {
+  title: string; description: string; value: boolean; onToggle: () => void; isDark: boolean;
+}) {
   const { colors } = useTheme();
+  return (
+    <View style={[
+      styles.card,
+      { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+      !isDark && styles.cardShadow,
+    ]}>
+      <View style={styles.cardText}>
+        <Typography preset="label" color={colors.textPrimary}>{title}</Typography>
+        <Typography preset="caption" color={colors.textSecondary} style={styles.cardSub}>{description}</Typography>
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onToggle}
+        trackColor={{ false: colors.border, true: colors.accent }}
+        thumbColor={palette.white}
+      />
+    </View>
+  );
+}
+
+export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'NotificationSettings'>) {
+  const theme = useTheme();
+  const isDark = theme.name === 'dark';
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
 
   useEffect(() => {
@@ -50,34 +76,22 @@ export function NotificationSettingsScreen({ navigation }: Props) {
   };
 
   return (
-    <Screen header={<ScreenHeader title="Notification Settings" onBack={() => navigation.goBack()} />}>
-      <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
-        <View>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.hint}>
-            Choose which notifications you'd like to receive.
-          </Typography>
-        </View>
-
-        <View>
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
-          {SETTINGS.map((s, i) => (
-            <React.Fragment key={s.key}>
-              {i > 0 && <Divider marginV={0} />}
-              <View style={styles.row}>
-                <View style={styles.rowText}>
-                  <Typography preset="label">{s.label}</Typography>
-                  <Typography preset="caption" color={colors.textSecondary}>{s.description}</Typography>
-                </View>
-                <Switch
-                  value={prefs[s.key]}
-                  onValueChange={() => toggle(s.key)}
-                  trackColor={{ false: colors.border, true: colors.accent }}
-                  thumbColor={palette.white}
-                />
-              </View>
-            </React.Fragment>
+    <Screen header={<ScreenHeader title="Notifications" onBack={() => navigation.goBack()} />}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        <Typography preset="caption" color={theme.colors.textSecondary} style={styles.hint}>
+          Choose which notifications you'd like to receive.
+        </Typography>
+        <View style={styles.list}>
+          {SETTINGS.map(s => (
+            <PreferenceCard
+              key={s.key}
+              title={s.label}
+              description={s.description}
+              value={prefs[s.key]}
+              onToggle={() => toggle(s.key)}
+              isDark={isDark}
+            />
           ))}
-        </View>
         </View>
       </ScrollView>
     </Screen>
@@ -85,18 +99,29 @@ export function NotificationSettingsScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
-  hint: { marginBottom: spacing.lg },
-  card: {
-    borderRadius: 14,
-    overflow: 'hidden',
+  scroll: {
+    paddingHorizontal: layout.screenPaddingH,
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.s48,
   },
-  row: {
+  hint: { marginBottom: spacing.xl },
+  list: { gap: spacing.lg },
+  card: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
+    minHeight: 78,
+    borderRadius: radius.md,
+    paddingHorizontal: spacing.s18,
     paddingVertical: spacing.lg,
     gap: spacing.md,
   },
-  rowText: { flex: 1, gap: spacing.xs },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  cardText: { flex: 1 },
+  cardSub: { marginTop: spacing.xs },
 });

@@ -22,7 +22,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { PlusIcon, SearchIcon, SwapIcon, TrashIcon } from '../../components/icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { getErrorMessage } from '../../api/client';
-import { fontWeights, layout, spacing, useTheme, palette } from '../../theme';
+import { CARD_FILL_LIGHT, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 
 const FAB_SIZE = 56;
 
@@ -49,7 +49,9 @@ function formatRelativeDate(iso: string): string {
 type Props = ProfileScreenProps<'Notes'>;
 
 export function NotesScreen({ navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
@@ -116,7 +118,7 @@ export function NotesScreen({ navigation }: Props) {
       }}
     >
       <Pressable
-        style={({ pressed }) => [styles.noteCard, { backgroundColor: colors.surface }, pressed && styles.noteCardPressed]}
+        style={({ pressed }) => [styles.noteCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.noteCardShadow, pressed && styles.noteCardPressed]}
         onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
       >
         <View style={styles.noteHeader}>
@@ -210,7 +212,6 @@ export function NotesScreen({ navigation }: Props) {
         keyExtractor={item => item.id}
         renderItem={renderItem}
         contentContainerStyle={styles.list}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
         refreshControl={
           <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />
         }
@@ -252,13 +253,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   tagFilterPillActive: { borderColor: palette.indigo300, backgroundColor: palette.indigo300 },
-  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.xxxl, flexGrow: 1, paddingTop: spacing.md },
-  separator: { height: spacing.md },
+  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.xxxl, flexGrow: 1, paddingTop: spacing.md, gap: spacing.lg },
   noteCard: {
     borderRadius: layout.cardRadiusSm,
     padding: spacing.lg,
     gap: spacing.xs,
-    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.06, shadowRadius: 4, shadowOffset: { width: 0, height: 1 } }, android: { elevation: 2 }, default: {} }),
+  },
+  noteCardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   noteCardPressed: { opacity: 0.7 },
   noteHeader: {

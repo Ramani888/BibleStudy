@@ -45,7 +45,7 @@ import {
   type IconComponent,
 } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
+import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 import { MediaImageViewer } from './MediaImageViewer';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
@@ -181,7 +181,9 @@ const utStyles = StyleSheet.create({
 type Props = ProfileScreenProps<'Media'>;
 
 export function MediaScreen({ navigation }: Props) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
 
   const [activeTab, setActiveTab]         = useState<MediaFileType>('IMAGE');
@@ -376,9 +378,10 @@ export function MediaScreen({ navigation }: Props) {
       <Pressable
         style={({ pressed }) => [
           styles.pdfCard,
-          { backgroundColor: colors.background, borderColor: colors.border },
+          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+          !isDark && !isSelected && styles.pdfCardShadow,
           pressed && styles.pdfCardPressed,
-          isSelected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+          isSelected && { borderColor: colors.accent, borderWidth: 1.5, backgroundColor: colors.accentSoft },
         ]}
         onPress={() => selectionMode
           ? handleToggleSelect(item.id)
@@ -500,7 +503,6 @@ export function MediaScreen({ navigation }: Props) {
               renderItem={renderPDFItem}
               style={s.list}
               contentContainerStyle={s.pdfListContent}
-              ItemSeparatorComponent={() => <View style={s.separator} />}
               refreshControl={
                 <RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch}
                   tintColor={colors.accent} colors={[colors.accent]} />
@@ -607,8 +609,7 @@ const s = StyleSheet.create({
   imageRow:         { gap: CELL_GAP },
   imageCell:        { width: CELL_SIZE, height: CELL_SIZE },
   imageFill:        { width: '100%', height: '100%' },
-  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1 },
-  separator:        { height: spacing.sm },
+  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1, gap: spacing.lg },
   pdfInfo:          { flex: 1, gap: spacing.s2 },
   pdfName:          { fontWeight: fontWeights.medium },
   selectionCount:   { fontWeight: fontWeights.semiBold },
@@ -640,8 +641,14 @@ const styles = StyleSheet.create({
   pdfCard: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     borderRadius: layout.cardRadiusSm,
-    borderWidth: 1,
     padding: spacing.lg,
+  },
+  pdfCardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
   },
   pdfCardPressed:  { opacity: 0.7 },
   pdfIconBox: {
