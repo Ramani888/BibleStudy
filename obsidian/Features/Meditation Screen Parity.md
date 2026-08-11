@@ -14,7 +14,7 @@ Goal: copy each Meditation project screen's visual/layout pattern into the equiv
 | FavoritesScreen | NotesScreen | ✅ Done | `CARD_FILL_LIGHT`/`chipIdle` cards + `CARD_SHADOW` + `gap: spacing.lg` |
 | FavoritesScreen | MediaScreen | ✅ Done | Same as NotesScreen pattern (PDF cards) |
 | InviteFriendsScreen | FriendsScreen | ✅ Done | `CARD_FILL_LIGHT`/`chipIdle` cards + `CARD_SHADOW` + `gap: spacing.lg` + `radius.md` |
-| HomeScreen | HomeScreen | ✅ Already solid | Already has sticky header + hero card + streak + sections. No meaningful new pattern to copy |
+| HomeScreen | HomeScreen | ✅ Audited 2026-08-11 | Check 12 spacing violations fixed; hero color → colors.accent; shadowColor → theme token; fully compliant |
 | StatesScreen | CreditsScreen | 🔲 Low priority | 2×2 stat tile grid above transaction list |
 
 ## Key Style Constants (from Meditation)

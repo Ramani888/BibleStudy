@@ -1,90 +1,50 @@
 ---
 tags: [frontend, design, home, plan]
-updated: 2026-08-05
+updated: 2026-08-11
 ---
 
 # Home Screen — Content Plan
 
 Deciding **what information Home shows**, grounded in the app's full feature set.
-Styling is already handled (themed, dark-aware, no inline) — this note is only
-about *content / information architecture*. Companion to [[Screen Map]] and
-[[Design Language (Calm Serene)]].
-
-## What the app can do (the menu Home draws from)
-- **Study core** — folders → sets → cards; public sets; friends' shared sets
-- **Study & Quiz** — study sessions, Quiz v2 (7 modes, best scores); cards have
-  spaced-repetition fields (`nextReviewAt`, `lastStudiedAt`)
-- **AI** — chat assistant (spends credits), history, bookmarks, suggested cards
-- **Credits** — balance, daily claim, streak (login-based), transactions
-- **Social** — friends (requests/search), groups, **activity feed**, **notifications**
-- **Notes & Media** — personal notes, PDF viewer
-- **Daily verse**
-- **Gatherings/Map** — built but **unreachable** (not mounted) → ignore for Home
+Companion to [[Screen Map]] and [[Design Language (Calm Serene)]].
 
 ## Home's job (one sentence)
-When a user opens the app each day, Home should: **(1) reconnect them
-spiritually (verse), (2) get them straight into today's study (the core loop),
-(3) show progress to keep the habit, and (4) surface a glimpse of their
-community** — without becoming a cluttered dashboard.
+Get the user straight into today's study, show momentum, and surface community — without becoming a cluttered dashboard.
 
-## Content blocks — prioritized (MoSCoW)
+## Final content blocks (as shipped 2026-08-11)
 
-### MUST — the daily core
-1. **Header** — greeting (time + first name), avatar → Profile, credit badge.
-   Data: `useAuthStore`, `useCreditBalance`. ✅ have data.
-2. **Verse of the Day** — serif indigo hero. The devotional anchor.
-   Data: `useDailyVerse`. ✅ have data.
-3. **TODAY card** — the single primary action, dynamic by state:
-   - cards due for review → *"12 cards due · Review"* (→ Quiz/Study)
-   - else last studied set → *"Continue: {set}"*
-   - else new user → *"Create your first set"*
-   Data: `useSets` (✅) + **due count needs a small backend endpoint** (see
-   Decision A).
-4. **Progress** — 🔥 streak · N sets · N cards, one calm row.
-   Data: `useStreak`, `useSets`. ✅ have data.
-   ⚠️ Note: streak = daily *login/claim* days, not study days
-   (`credits.service.ts`). Label honestly ("day streak") or change later.
+| # | Section | Condition | Priority |
+|---|---------|-----------|----------|
+| 1 | Sticky header (greeting, avatar, AI, bell) | Always | Must |
+| 2 | Hero card (due / continue / create + streak) | Always | Must |
+| 3 | Quick-action grid (8 shortcuts) | Always | Must |
+| 4 | My Sets (4 rows, sorted by updatedAt) | `sets.length > 0` | Must |
+| 5 | Summary stats (Friends/Folders/Sets/Cards/Credits/Notes) | Always | Should |
+| 6 | From your friends (horizontal rail) | `friendsSets.length > 0` | Should |
+| 7 | Recent activity feed | `activities.length > 0` | Should |
+| 8 | Discover (public sets rail) | `publicSets.length > 0` | Could |
 
-### SHOULD — engagement / retention
-5. **My sets** — 2–3 recent sets to jump back in. Data: `useSets`. ✅
-6. **Community glimpse** — ONE compact row surfacing the social layer that's
-   otherwise buried in Profile: e.g. pending friend requests, or latest
-   activity-feed item, or unread notifications count → deep-links in.
-   Data: `useActivities` / `useFriends` / `useNotifications`. ✅ have data.
+## Key decisions (history)
 
-### COULD — nice-to-have
-7. **Ask AI** — a slim entry into AIChat ("Ask about a verse…"), since AI is a
-   headline feature. Data: navigate only. ✅
-8. **Notifications bell** in header with unread badge. Data: `useNotifications`. ✅
+| Decision | Choice | Reason |
+|----------|--------|--------|
+| Daily verse on Home? | **Removed** (2026-08-11) | Took up ~190px below hero with no CTA; verse is spiritual/passive, Home should be action-first |
+| Hero background color | **`colors.accent`** (indigo) | Dark `featuredSurface` felt off-brand; indigo matches the app's core theme |
+| Hero badge + progress fill | **White** (`colors.textOnAccent`) | Green clashed with indigo bg; white is clean and on-theme |
+| Quick actions position | **Slot 2** (after hero) | Provides visual variety + shortcuts immediately; My Sets follows as primary actionable content |
+| Social sections | **Keep both** (friends rail + activity) | Visual richness; each occupies different format (horizontal cards vs feed rows) |
+| Discover rail | **Keep** | Adds depth; conditionally rendered so new users don't see it |
+| Get Started cards (Create/Explore/AI) | **Removed** | Hero already handles empty state with "START" CTA |
 
-### EXCLUDE (and why)
-- **Library / AI / Profile nav tiles** — redundant with the bottom tab bar.
-- **Map / gatherings** — feature is unreachable.
-- **Notes / Media** — personal utilities; belong in Profile, not daily Home.
+## What was removed from previous versions
+- `VerseCard` + `useDailyVerse` hook — daily verse removed 2026-08-11
+- `GroupCard` / Groups rail — Groups feature removed entirely (commit `1742f44`)
+- Get Started 3-card block — removed in favour of hero empty state
 
-## Recommended layout (calm, one hero + prioritized sections)
-```
-Header:  Good morning, David          🔔  🪙  (avatar)
-Hero:    ❝ Verse of the day ❞  — John 3:16
-TODAY:   📖  12 cards due for review        [ Review → ]
-Progress: 🔥 5 day streak · 12 sets · 240 cards
-My Sets:  ▸ Romans deep-dive   ▸ Psalms memory      (See all)
-Community: 👥 2 friend requests · Sarah added a set   (→)
-```
-
-## Open decisions (need user input)
-- **A. Due-cards endpoint?** Add `GET /cards/due-summary` (real "N due") vs
-  ship "Continue last set" only for now.
-- **B. Community glimpse on Home?** Include block 6 (surfaces friends/groups/
-  notifications) or keep Home purely study-focused?
-- **C. Ask-AI shortcut?** Include block 7 or not?
-- **D. Progress style?** Slim one-line row vs the current 3 stat chips.
+## Excluded (and why)
+- **Map / gatherings** — feature unreachable (no FE screens mounted)
+- **Notes / Media shortcuts** — personal utilities, belong in Profile
+- **Study Plan progress** — not yet surfaced on Home (future addition)
 
 ## Status
-✅ IMPLEMENTED 2026-08-05. Decisions: A=added `GET /cards/due-summary`
-(dueCount/dueSets/topSet), B=Community row included, C=Ask-AI shortcut skipped
-(not in the approved wireframe), D=slim progress row. Home rebuilt with all 6
-blocks, fully themed via `useTheme()`/`makeStyles` (no inline), dark-aware.
-Backend + frontend typecheck clean. Nav fix: `ProfileTab` now typed with
-`NavigatorScreenParams<ProfileStackParamList>` so cross-tab nested nav works.
-Still device-untested; Inter font + other-module migrations still pending.
+✅ Fully redesigned and committed 2026-08-11 (`a4a3f43`). Meditation-parity audit clean. TypeScript clean.
