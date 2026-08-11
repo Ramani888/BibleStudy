@@ -91,7 +91,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
         </View>
         <View>
           <View style={[styles.deleteSection, { borderTopColor: colors.border }]}>
-            <Pressable onPress={handleDelete} hitSlop={8} style={styles.deleteRow}>
+            <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => [styles.deleteRow, pressed && styles.rowPressed]}>
               <TrashIcon size={ICON_SIZE} color={colors.alert} />
               <Typography preset="label" color={colors.alert}>Delete Set</Typography>
             </Pressable>
@@ -120,4 +120,5 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
   },
   deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  rowPressed: { opacity: 0.7 },
 });

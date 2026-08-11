@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
@@ -51,14 +51,13 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   return (
     <Screen header={header} footer={footer}>
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <FlatList
         data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isRefetching}
-        onRefresh={refetch}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.accent} />}
         onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
         onEndReachedThreshold={0.3}
         ItemSeparatorComponent={() => <Spacer size={spacing.md} />}
@@ -114,6 +113,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },
   footer: {
     paddingHorizontal: layout.screenPaddingH,

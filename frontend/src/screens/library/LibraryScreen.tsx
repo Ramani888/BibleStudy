@@ -157,23 +157,23 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <View style={styles.headerActions}>
         {/* Left: other collections */}
         <View style={styles.headerGroup}>
-          <Pressable onPress={() => navigation.navigate('FriendsSets')} hitSlop={8}>
+          <Pressable onPress={() => navigation.navigate('FriendsSets')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
             <UsersIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8}>
+          <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
             <GlobeIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('StudyPlans')} hitSlop={8}>
+          <Pressable onPress={() => navigation.navigate('StudyPlans')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
             <BookIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
         </View>
 
         {/* Right: current-list controls */}
         <View style={styles.headerGroup}>
-          <Pressable onPress={toggleSearch} hitSlop={8}>
+          <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
             <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={cycleSortOrder} hitSlop={8} style={styles.sortBtn}>
+          <Pressable onPress={cycleSortOrder} hitSlop={8} style={({ pressed }) => [styles.sortBtn, pressed && styles.iconPressed]}>
             <SortIcon size={ICON_SIZE} color={colors.accent} />
             <Typography preset="caption" color={colors.accent}>
               {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : activeTab === 'sets' ? 'Cards' : 'Sets'}
@@ -186,7 +186,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         {(['sets', 'folders'] as Tab[]).map(tab => (
           <Pressable
             key={tab}
-            style={[styles.tab, { borderBottomColor: colors.transparent }, activeTab === tab && { borderBottomColor: colors.accent }]}
+            style={({ pressed }) => [styles.tab, { borderBottomColor: activeTab === tab ? colors.accent : colors.transparent }, pressed && styles.iconPressed]}
             onPress={() => switchTab(tab)}
           >
             <Typography preset="label" color={activeTab === tab ? colors.accent : colors.textSecondary}>
@@ -229,7 +229,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     <Screen header={header} footer={footer}>
       {/* ── Body ── */}
       {activeTab === 'sets' ? (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
         <FlatList
           data={setsLoading ? [] : sortedSets}
           keyExtractor={item => item.id}
@@ -267,7 +267,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
         <FlatList
           data={foldersLoading ? [] : sortedFolders}
           keyExtractor={item => item.id}
@@ -472,7 +472,9 @@ const styles = StyleSheet.create({
   searchInput: { marginBottom: 0 },
   scroll: { padding: layout.screenPaddingH },
   separator: { height: spacing.md },
-  emptyState: { minHeight: 200 },
+  emptyState: { minHeight: 200 }, // ponytail: off-grid Figma value
+  flex: { flex: 1 },
+  iconPressed: { opacity: 0.85 },
   modalBody: { gap: spacing.lg },
   colorLabel: { marginBottom: spacing.s6 },
   footer: {

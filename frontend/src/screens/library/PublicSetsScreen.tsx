@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
@@ -55,7 +55,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
       title="Browse Public Sets"
       onBack={() => navigation.goBack()}
       right={
-        <Pressable onPress={toggleSearch} hitSlop={8}>
+        <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
           <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
         </Pressable>
       }
@@ -92,14 +92,13 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         )}
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <FlatList
         data={isLoading ? [] : sets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        refreshing={isRefetching}
-        onRefresh={refetch}
+        refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.accent} />}
         onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
         onEndReachedThreshold={0.3}
         ItemSeparatorComponent={() => <Spacer size={sp.md} />}
@@ -152,6 +151,8 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
+  iconPressed: { opacity: 0.85 },
   searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
   searchInput: { marginBottom: 0 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },

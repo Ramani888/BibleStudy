@@ -111,7 +111,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
           Folder (optional)
         </Typography>
-        <Pressable style={[styles.picker, { backgroundColor: colors.surfaceMuted }]} onPress={() => setFolderPickerOpen(true)}>
+        <Pressable style={({ pressed }) => [styles.picker, { backgroundColor: colors.surfaceMuted }, pressed && styles.btnPressed]} onPress={() => setFolderPickerOpen(true)}>
           <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
             {selectedFolder ? selectedFolder.name : 'No folder'}
           </Typography>
@@ -136,10 +136,11 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
           {VISIBILITY_OPTIONS.map(opt => (
             <Pressable
               key={opt.value}
-              style={[
+              style={({ pressed }) => [
                 styles.optionChip,
-                { backgroundColor: colors.surfaceMuted },
-                visibility === opt.value && { borderWidth: 1.5, borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                { backgroundColor: visibility === opt.value ? colors.accentSoft : colors.surfaceMuted },
+                visibility === opt.value && { borderWidth: 1.5, borderColor: colors.accent },
+                pressed && styles.btnPressed,
               ]}
               onPress={() => setVisibility(opt.value)}
             >
@@ -169,10 +170,11 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
           {LAYOUT_OPTIONS.map(opt => (
             <Pressable
               key={opt.value}
-              style={[
+              style={({ pressed }) => [
                 styles.layoutChip,
-                { backgroundColor: colors.surfaceMuted },
-                cardLayout === opt.value && { borderWidth: 1.5, borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                { backgroundColor: cardLayout === opt.value ? colors.accentSoft : colors.surfaceMuted },
+                cardLayout === opt.value && { borderWidth: 1.5, borderColor: colors.accent },
+                pressed && styles.btnPressed,
               ]}
               onPress={() => setCardLayout(opt.value)}
             >
@@ -193,8 +195,8 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
         title="Choose Folder"
         onClose={() => setFolderPickerOpen(false)}
       >
-        <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={false}>
-          <Pressable style={styles.folderOption} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
+        <ScrollView style={styles.folderScroll} showsVerticalScrollIndicator={false}>
+          <Pressable style={({ pressed }) => [styles.folderOption, pressed && styles.rowPressed]} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
             <Typography preset="body" color={!folderId ? colors.accent : colors.textPrimary}>
               No folder
             </Typography>
@@ -204,7 +206,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
           {folders.map(folder => (
             <React.Fragment key={folder.id}>
               <Pressable
-                style={styles.folderOption}
+                style={({ pressed }) => [styles.folderOption, pressed && styles.rowPressed]}
                 onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
               >
                 <View style={styles.folderRow}>
@@ -255,5 +257,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: spacing.md,
   },
+  folderScroll: { maxHeight: 300 }, // ponytail: off-grid modal cap
   folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  btnPressed: { opacity: 0.85 },
+  rowPressed: { opacity: 0.7 },
 });

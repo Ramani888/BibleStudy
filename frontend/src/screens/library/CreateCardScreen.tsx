@@ -27,7 +27,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
 
   return (
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <View>
+      <View style={styles.flex}>
         <CardForm
           ref={formRef}
           onSubmittingChange={setSubmitting}
@@ -47,6 +47,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   footer: {
     padding: layout.screenPaddingH,
     paddingBottom: spacing.sm,

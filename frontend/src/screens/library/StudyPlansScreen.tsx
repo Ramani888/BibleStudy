@@ -10,17 +10,24 @@ import { ProgressBar } from '../../components/ui/ProgressBar';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { PlusIcon, BookIcon } from '../../components/icons';
-import { layout, spacing, useTheme, palette } from '../../theme';
+import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const { data: plans = [], isLoading, error, refetch } = usePlans();
 
   const renderItem = ({ item }: { item: PlanListItem }) => {
     const pct = item.totalSteps > 0 ? item.completedSteps / item.totalSteps : 0;
     return (
       <Pressable
-        style={({ pressed }) => [styles.card, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: 0.8 }]}
+        style={({ pressed }) => [
+          styles.card,
+          !isDark && styles.cardShadow,
+          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder },
+          pressed && styles.cardPressed,
+        ]}
         onPress={() => navigation.navigate('PlanDetail', { planId: item.id })}
       >
         <Typography preset="h4" numberOfLines={1}>{item.title}</Typography>
@@ -44,7 +51,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           title="Study Plans"
           onBack={navigation.goBack}
           right={
-            <Pressable onPress={() => navigation.navigate('CreatePlan')} hitSlop={8}>
+            <Pressable onPress={() => navigation.navigate('CreatePlan')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <PlusIcon size={22} color={colors.accent} />
             </Pressable>
           }
@@ -58,7 +65,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
       ) : plans.length === 0 ? (
         <View>
           <EmptyState
-            icon={<BookIcon size={48} color={palette.indigo300} />}
+            icon={<BookIcon size={48} color={colors.accent} />}
             title="No study plans yet"
             subtitle="Create a guided path through your sets — step by step."
             ctaLabel="Create a plan"
@@ -66,7 +73,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
         <FlatList
           data={plans}
           keyExtractor={p => p.id}
@@ -82,6 +89,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
 
 const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  flex: { flex: 1 },
   list: { padding: layout.screenPaddingH, gap: spacing.md },
   card: {
     borderRadius: layout.cardRadius,
@@ -89,6 +97,15 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.sm,
   },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
+  cardPressed: { opacity: 0.7 },
+  iconPressed: { opacity: 0.85 },
   progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs },
   bar: { flex: 1 },
 });

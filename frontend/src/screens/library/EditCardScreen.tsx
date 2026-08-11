@@ -47,7 +47,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   return (
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <View>
+      <View style={styles.flex}>
         <CardForm
           ref={formRef}
           defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
@@ -68,6 +68,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   footer: {
     padding: layout.screenPaddingH,

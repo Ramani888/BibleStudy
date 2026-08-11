@@ -78,11 +78,10 @@ export function CreatePlanScreen({ navigation }: Props) {
             return (
               <Pressable
                 key={set.id}
-                style={[
+                style={({ pressed }) => [
                   styles.setRow,
-                  { borderColor: colors.border },
-                  isSel && styles.setRowSelStatic,
-                  isSel && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                  { borderColor: isSel ? colors.accent : colors.border, backgroundColor: isSel ? colors.accentSoft : colors.surface },
+                  pressed && styles.rowPressed,
                 ]}
                 onPress={() => toggle(set.id)}
               >
@@ -94,7 +93,7 @@ export function CreatePlanScreen({ navigation }: Props) {
                       : { borderWidth: 1.5, borderColor: colors.border },
                   ]}
                 >
-                  <Typography preset="caption" color={isSel ? colors.background : colors.textSecondary}>
+                  <Typography preset="caption" color={isSel ? colors.textOnAccent : colors.textSecondary}>
                     {isSel ? idx + 1 : ''}
                   </Typography>
                 </View>
@@ -111,7 +110,7 @@ export function CreatePlanScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: { padding: layout.screenPaddingH, gap: spacing.md },
-  descInput: { minHeight: 72 },
+  descInput: { minHeight: 72 }, // ponytail: off-grid Figma value
   label: { marginTop: spacing.sm },
   loader: { marginVertical: spacing.lg },
   empty: { textAlign: 'center', marginVertical: spacing.lg },
@@ -119,8 +118,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     padding: spacing.md, borderRadius: layout.cardRadius, borderWidth: 1.5,
   },
-  setRowSelStatic: {},
-  badge: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
+  rowPressed: { opacity: 0.7 },
+  badge: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' }, // ponytail: off-grid Figma values (26, 13)
   setTitle: { flex: 1 },
   footer: {
     padding: layout.screenPaddingH,

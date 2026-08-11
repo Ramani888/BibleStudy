@@ -90,7 +90,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
         {(['QA', 'STORY'] as CardType[]).map(t => (
           <Pressable
             key={t}
-            style={[styles.tab, { borderBottomColor: colors.transparent }, type === t && { borderBottomColor: colors.accent }]}
+            style={({ pressed }) => [styles.tab, { borderBottomColor: type === t ? colors.accent : colors.transparent }, pressed && styles.btnPressed]}
             onPress={() => setValue('type', t)}
           >
             <Typography preset="label" color={type === t ? colors.accent : colors.textSecondary}>
@@ -133,7 +133,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
             <View>
               <View style={styles.noteLabelRow}>
                 <Typography preset="label" color={colors.textSecondary}>{copy.noteLabel}</Typography>
-                <Pressable onPress={() => { setNoteExpanded(false); setNote(''); }} hitSlop={8}>
+                <Pressable onPress={() => { setNoteExpanded(false); setNote(''); }} hitSlop={8} style={({ pressed }) => pressed && styles.btnPressed}>
                   <Typography preset="caption" color={colors.textSecondary}>Remove</Typography>
                 </Pressable>
               </View>
@@ -150,7 +150,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
               />
             </View>
           ) : (
-            <Pressable style={[styles.addNoteBtn, { borderColor: colors.border }]} onPress={() => setNoteExpanded(true)}>
+            <Pressable style={({ pressed }) => [styles.addNoteBtn, { borderColor: colors.border }, pressed && styles.btnPressed]} onPress={() => setNoteExpanded(true)}>
               <View style={styles.addNoteBtnContent}>
                 <PlusCircleIcon size={ICON_SIZE} color={colors.textSecondary} />
                 <Typography preset="label" color={colors.textSecondary}>{copy.noteBtn}</Typography>
@@ -171,6 +171,7 @@ const styles = StyleSheet.create({
   formGap: { gap: spacing.lg },
   noteLabelRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: spacing.sm },
   addNoteBtn: { borderWidth: 1.5, borderRadius: layout.cardRadius, borderStyle: 'dashed', paddingVertical: spacing.md, alignItems: 'center' },
-  noteInput: { borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: 80, textAlignVertical: 'top' },
+  noteInput: { borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, minHeight: 80, textAlignVertical: 'top' }, // ponytail: off-grid Figma value
+  btnPressed: { opacity: 0.85 },
   addNoteBtnContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 });

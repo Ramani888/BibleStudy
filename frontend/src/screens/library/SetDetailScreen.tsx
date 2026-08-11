@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ActivityIndicator, FlatList, Pressable, Share, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, Share, StyleSheet, TextInput, View } from 'react-native';
 import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
 
@@ -14,14 +14,16 @@ import {
 
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { fontWeights, layout, spacing, useTheme } from '../../theme';
+import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
 const ICON_SIZE = 20;
 
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
 
   const { setId, setTitle, isOwner = true } = route.params;
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
@@ -171,11 +173,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   // ── Header (normal vs reorder) ──
   const header = reorderMode ? (
     <View style={[styles.reorderBar, { borderBottomColor: colors.border }]}>
-      <Pressable onPress={handleCancelReorder} hitSlop={8}>
+      <Pressable onPress={handleCancelReorder} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
         <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
       </Pressable>
       <Typography preset="bodySm" style={styles.reorderTitle}>Reorder Cards</Typography>
-      <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8}>
+      <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
         {isReordering
           ? <ActivityIndicator size="small" color={colors.accent} />
           : <Typography preset="bodySm" color={colors.accent} style={styles.reorderTitle}>Save</Typography>
@@ -189,15 +191,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onBack={() => navigation.goBack()}
         right={
           <>
-            <Pressable onPress={toggleCardSearch} hitSlop={8}>
+            <Pressable onPress={toggleCardSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <SearchIcon size={ICON_SIZE} color={cardSearchVisible ? colors.accent : colors.textSecondary} />
             </Pressable>
             {cards.length > 0 && (
-              <Pressable onPress={handleShare} hitSlop={8}>
+              <Pressable onPress={handleShare} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
                 <ShareIcon size={ICON_SIZE} color={colors.textSecondary} />
               </Pressable>
             )}
-            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8}>
+            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
           </>
@@ -230,27 +232,27 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   // ── Normal card (list / grid) ──
   const renderCard = ({ item }: { item: CardType }) => (
-    <View style={[styles.cardItem, cardLayout === 'grid' && styles.cardItemGrid]}>
-      <View style={[styles.questionSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
+    <View style={[styles.cardItem, !isDark && styles.cardShadow, cardLayout === 'grid' && styles.cardItemGrid]}>
+      <View style={[styles.questionSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
         <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
           {item.question}
         </Typography>
         {isOwner ? (
           <View style={styles.cardActions}>
-            <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={styles.iconBtn}>
+            <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
               <InfoIcon size={ICON_SIZE} color={colors.textDisabled} />
             </Pressable>
-            <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={styles.iconBtn}>
+            <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
               {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textDisabled} /> : <EyeIcon size={ICON_SIZE} color={colors.textDisabled} />}
             </Pressable>
-            <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={styles.iconBtn}>
+            <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
               <MoreVerticalIcon size={ICON_SIZE} color={colors.textDisabled} />
             </Pressable>
           </View>
         ) : null}
       </View>
 
-      <View style={[styles.answerSection, { backgroundColor: colors.surface }, cardLayout === 'grid' && styles.answerSectionGrid]}>
+      <View style={[styles.answerSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, cardLayout === 'grid' && styles.answerSectionGrid]}>
         {item.isBlurred && isOwner ? (
           <View style={styles.blurOverlay}>
             <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
@@ -282,9 +284,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         onLongPress={drag}
         delayLongPress={150}
         disabled={isActive}
-        style={[styles.cardItem, isActive && styles.cardItemActive]}
+        style={({ pressed }) => [styles.cardItem, isActive && styles.cardItemActive, pressed && !isActive && styles.cardPressed]}
       >
-        <View style={[styles.questionSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.questionSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.border }]}>
           <Typography preset="body" style={styles.question} numberOfLines={2}>
             {item.question}
           </Typography>
@@ -292,7 +294,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
           </View>
         </View>
-        <View style={[styles.answerSection, { backgroundColor: colors.surface }]}>
+        <View style={[styles.answerSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]}>
           <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={2}>
             {item.answer}
           </Typography>
@@ -304,7 +306,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   return (
     <Screen header={header}>
       {reorderMode ? (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
         <DraggableFlatList
           data={orderedCards}
           onDragEnd={({ data }) => setOrderedCards(data)}
@@ -316,7 +318,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         />
         </View>
       ) : (
-        <View style={{ flex: 1 }}>
+        <View style={styles.flex}>
         <FlatList
           key={cardLayout}
           data={filteredCards}
@@ -325,8 +327,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           columnWrapperStyle={cardLayout === 'grid' ? styles.gridRow : undefined}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshing={refreshing}
-          onRefresh={onRefresh}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
           ItemSeparatorComponent={() => <View style={styles.separator} />}
           ListEmptyComponent={
             isLoading ? (
@@ -457,11 +458,21 @@ const styles = StyleSheet.create({
   },
   listLoader: { marginTop: spacing.xxxl },
   separator: { height: spacing.md },
+  flex: { flex: 1 },
   cardItem: {
     borderRadius: layout.cardRadius,
     overflow: 'hidden',
   },
+  cardShadow: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.04,
+    shadowRadius: 10,
+    elevation: 2,
+  },
   cardItemActive: { opacity: 0.9 },
+  cardPressed: { opacity: 0.7 },
+  iconPressed: { opacity: 0.85 },
   questionSection: {
     padding: spacing.lg,
     flexDirection: 'row',
@@ -469,14 +480,14 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     borderBottomWidth: 1,
   },
-  question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: 22 },
+  question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: fontSizes.md * lineHeights.normal },
   cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   iconBtn: { padding: spacing.xs },
   answerSection: {
     padding: spacing.lg,
   },
-  answer: { lineHeight: 22 },
-  note: { lineHeight: 20 },
+  answer: { lineHeight: fontSizes.md * lineHeights.normal },
+  note: { lineHeight: 20 }, // ponytail: off-grid Figma value
   blurOverlay: { alignItems: 'center', paddingVertical: spacing.sm },
   // space-between + fixed half-width so an odd last card stays half-width
   // (left column) instead of stretching to fill the row. flex-start keeps each
@@ -491,7 +502,7 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadius,
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.md,
-    minHeight: 80,
+    minHeight: 80, // ponytail: off-grid Figma value
     textAlignVertical: 'top',
   },
 });

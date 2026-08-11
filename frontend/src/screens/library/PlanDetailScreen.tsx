@@ -13,7 +13,7 @@ import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
 import { CheckCircleIcon, TrashIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api';
-import { layout, spacing, useTheme } from '../../theme';
+import { layout, radius, spacing, useTheme } from '../../theme';
 
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
   const { planId } = route.params;
@@ -43,13 +43,14 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
         onPress={() => toggleStep.mutate({ stepId: step.id, completed: step.completed })}
         hitSlop={8}
         disabled={toggleStep.isPending}
+        style={({ pressed }) => pressed && styles.iconPressed}
       >
         {step.completed
           ? <CheckCircleIcon size={26} color={colors.success} />
           : <View style={[styles.emptyCircle, { borderColor: colors.textDisabled }]} />}
       </Pressable>
       <Pressable
-        style={styles.stepBody}
+        style={({ pressed }) => [styles.stepBody, pressed && styles.rowPressed]}
         onPress={() =>
           step.set
             ? navigation.navigate('SetDetail', { setId: step.set.id, setTitle: step.set.title, isOwner: true })
@@ -73,7 +74,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
           title={plan?.title ?? 'Plan'}
           onBack={navigation.goBack}
           right={
-            <Pressable onPress={handleDelete} hitSlop={8}>
+            <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <TrashIcon size={20} color={colors.textSecondary} />
             </Pressable>
           }
@@ -118,5 +119,7 @@ const styles = StyleSheet.create({
   steps: { marginTop: spacing.md, gap: spacing.xs },
   step: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1 },
   stepBody: { flex: 1, gap: spacing.s2 },
-  emptyCircle: { width: 24, height: 24, borderRadius: 12, borderWidth: 2 },
+  emptyCircle: { width: spacing.xxl, height: spacing.xxl, borderRadius: radius.r12, borderWidth: 2 },
+  iconPressed: { opacity: 0.85 },
+  rowPressed: { opacity: 0.7 },
 });

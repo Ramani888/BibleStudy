@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
@@ -69,7 +69,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       title={folderName}
       onBack={() => navigation.goBack()}
       right={
-        <Pressable onPress={toggleSearch} hitSlop={8}>
+        <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
           <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
         </Pressable>
       }
@@ -107,15 +107,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         )}
       </View>
 
-      <View style={{ flex: 1 }}>
+      <View style={styles.flex}>
       <FlatList
         data={filteredSets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{sets.length} {sets.length === 1 ? 'set' : 'sets'}</Typography>}
         showsVerticalScrollIndicator={false}
-        refreshing={refreshing}
-        onRefresh={onRefresh}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
         ItemSeparatorComponent={() => <Spacer size={sp.md} />}
         ListEmptyComponent={
           <EmptyState
@@ -179,7 +178,9 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 }
 
 const styles = StyleSheet.create({
-  colorBar: { height: 4 },
+  flex: { flex: 1 },
+  iconPressed: { opacity: 0.85 },
+  colorBar: { height: spacing.xs },
   searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
   searchInput: { marginBottom: 0 },
   count: { marginBottom: spacing.md },
