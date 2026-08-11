@@ -9,7 +9,7 @@ import { ConfirmDialog } from '../../components/feedback';
 import { Switch, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { BookIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
+import { BookIcon, FileTextIcon, InfoIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
 import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
@@ -83,6 +83,8 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
           <MenuSection label="App Info">
             <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
             <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
+            <MenuItem icon={InfoIcon} label="About Us" onPress={() => navigation.navigate('AboutUs')} />
+            <MenuItem icon={FileTextIcon} label="Privacy Policy" onPress={() => navigation.navigate('PrivacyPolicy')} />
           </MenuSection>
         </View>
       </ScrollView>

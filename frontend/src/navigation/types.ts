@@ -77,6 +77,8 @@ export type ProfileStackParamList = {
   // Media
   Media: undefined;
   MediaPDFViewer: { url: string; name: string };
+  AboutUs: undefined;
+  PrivacyPolicy: undefined;
 };
 
 // ─── Bottom Tabs ──────────────────────────────────────────────────────────────

@@ -20,6 +20,8 @@ import { NotesScreen } from '../screens/profile/NotesScreen';
 import { NoteEditorScreen } from '../screens/profile/NoteEditorScreen';
 import { MediaScreen } from '../screens/profile/MediaScreen';
 import { MediaPDFViewerScreen } from '../screens/profile/MediaPDFViewerScreen';
+import { AboutUsScreen } from '../screens/profile/AboutUsScreen';
+import { PrivacyPolicyScreen } from '../screens/profile/PrivacyPolicyScreen';
 
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
@@ -45,6 +47,8 @@ export function ProfileNavigator() {
       <Stack.Screen name="NoteEditor"      component={NoteEditorScreen}      options={{ presentation: 'modal' }} />
       <Stack.Screen name="Media"           component={MediaScreen}           />
       <Stack.Screen name="MediaPDFViewer"  component={MediaPDFViewerScreen}  />
+      <Stack.Screen name="AboutUs"         component={AboutUsScreen}         />
+      <Stack.Screen name="PrivacyPolicy"   component={PrivacyPolicyScreen}   />
     </Stack.Navigator>
   );
 }
