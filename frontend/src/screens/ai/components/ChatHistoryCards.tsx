@@ -10,7 +10,7 @@ import {
   StarIcon,
 } from '../../../components/icons';
 import { Card, Divider, Typography } from '../../../components/ui';
-import { useTheme, fontSizes, fontWeights, layout, spacing, palette } from '../../../theme';
+import { CARD_FILL_LIGHT, useTheme, fontSizes, fontWeights, layout, radius, spacing } from '../../../theme';
 import { formatDate } from '../../../utils/formatters';
 import type { AIChat, BookmarkedChat, ChatSession } from '../../../types';
 
@@ -29,7 +29,7 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
         </View>
         <Typography preset="body" style={styles.flex}>{chat.question}</Typography>
       </View>
-      <View style={[styles.aRow, { marginTop: spacing.sm }]}>
+      <View style={[styles.aRow, styles.aRowWithMargin]}>
         <View style={[styles.aBadge, { backgroundColor: colors.accentSoft }]}>
           <SparklesIcon size={BADGE_ICON_SIZE} color={colors.accent} />
         </View>
@@ -42,11 +42,13 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
 }
 
 export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const [expanded, setExpanded] = useState(false);
   return (
-    <Pressable onPress={() => setExpanded(e => !e)}>
-      <Card style={{ ...styles.card, backgroundColor: colors.background }}>
+    <Pressable onPress={() => setExpanded(e => !e)} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+      <Card style={{ ...styles.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }}>
         <View style={styles.titleRow}>
           <View style={[styles.sessionIcon, { backgroundColor: colors.warningSurface }]}>
             <StarIcon size={SESSION_ICON_SIZE} color={colors.warning} />
@@ -71,7 +73,7 @@ export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
             </View>
           </Animated.View>
         )}
-        <Typography preset="caption" color={colors.textDisabled} style={{ marginTop: spacing.xs }}>
+        <Typography preset="caption" color={colors.textDisabled} style={styles.bookmarkDate}>
           Bookmarked {formatDate(chat.bookmarkedAt)}
         </Typography>
       </Card>
@@ -86,7 +88,9 @@ export interface SessionCardProps {
 }
 
 export function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const [expanded, setExpanded] = useState(false);
   const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
   const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
@@ -96,8 +100,9 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
     <Pressable
       onPress={() => setExpanded(e => !e)}
       onLongPress={() => onLongPress(session)}
+      style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
     >
-      <Card style={{ ...styles.card, backgroundColor: colors.background }}>
+      <Card style={{ ...styles.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }}>
         <View style={styles.titleRow}>
           <View style={[styles.sessionIcon, { backgroundColor: colors.accentSoft }]}>
             <ChatIcon size={SESSION_ICON_SIZE} color={colors.accent} />
@@ -118,7 +123,7 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
           <View style={styles.tagRow}>
             {session.tags.map(tag => (
               <View key={tag} style={[styles.tagPill, { backgroundColor: colors.accentSoft }]}>
-                <Typography preset="caption" color={palette.indigo800}>{tag}</Typography>
+                <Typography preset="caption" color={colors.accent}>{tag}</Typography>
               </View>
             ))}
           </View>
@@ -130,7 +135,7 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
           </Typography>
           <View style={[styles.dot, { backgroundColor: colors.textDisabled }]} />
           <View style={[styles.creditPill, { backgroundColor: colors.accentSoft }]}>
-            <Typography preset="caption" color={palette.indigo800}>
+            <Typography preset="caption" color={colors.accent}>
               −{session.totalCreditsUsed} {creditLabel}
             </Typography>
           </View>
@@ -166,9 +171,9 @@ const styles = StyleSheet.create({
 
   titleRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.sm },
   sessionIcon: {
-    width: 26, height: 26, borderRadius: spacing.sm,
+    width: 26 /* ponytail: off-grid Figma value */, height: 26, borderRadius: radius.sm,
     alignItems: 'center', justifyContent: 'center',
-    marginTop: 1, flexShrink: 0,
+    marginTop: 1 /* ponytail: off-grid Figma value */, flexShrink: 0,
   },
   sessionTitle: { fontWeight: fontWeights.medium },
 
@@ -185,7 +190,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     paddingTop: spacing.md, marginTop: spacing.xs,
   },
-  dot: { width: 3, height: 3, borderRadius: spacing.s2 },
+  dot: { width: spacing.s3, height: spacing.s3, borderRadius: radius.r2 },
   creditPill: {
     borderRadius: layout.pillRadius,
     paddingHorizontal: spacing.sm,
@@ -195,15 +200,17 @@ const styles = StyleSheet.create({
   qRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
   aRow: { flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' },
   qBadge: {
-    width: 22, height: 22, borderRadius: spacing.s6,
+    width: spacing.s22, height: spacing.s22, borderRadius: radius.r6,
     alignItems: 'center', justifyContent: 'center',
-    marginTop: 1, flexShrink: 0,
+    marginTop: 1 /* ponytail: off-grid Figma value */, flexShrink: 0,
   },
   aBadge: {
-    width: 22, height: 22, borderRadius: spacing.s6,
+    width: spacing.s22, height: spacing.s22, borderRadius: radius.r6,
     alignItems: 'center', justifyContent: 'center',
-    marginTop: 1, flexShrink: 0,
+    marginTop: 1 /* ponytail: off-grid Figma value */, flexShrink: 0,
   },
   badgeLabel: { fontWeight: fontWeights.bold, fontSize: fontSizes.xs2 },
   flex: { flex: 1 },
+  aRowWithMargin: { marginTop: spacing.sm },
+  bookmarkDate: { marginTop: spacing.xs },
 });

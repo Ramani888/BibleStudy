@@ -26,7 +26,7 @@ import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirm
 import { detectTags } from '../../utils/tagDetector';
 import { storage } from '../../utils/storage';
 import { getErrorMessage } from '../../api';
-import { layout, spacing, useTheme, palette } from '../../theme';
+import { layout, radius, spacing, useTheme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, MediaFile, MediaFileType, SuggestedCard } from '../../types';
 
@@ -402,14 +402,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
         <Image source={{ uri: item.attachmentLocalUri }} style={styles.msgImageThumb} resizeMode="cover" />
       ) : item.role === 'user' && item.attachmentName ? (
-        <View style={[styles.attachmentChip, { backgroundColor: colors.accentSoft }]}>
+        <View style={[styles.attachmentChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
           <FileTextIcon size={14} color={colors.accent} />
           <Typography preset="caption" color={colors.accent} numberOfLines={1} style={styles.attachmentChipText}>
             {item.attachmentName}
           </Typography>
         </View>
       ) : null}
-      <Pressable onLongPress={() => handleLongPress(item)}>
+      <Pressable onLongPress={() => handleLongPress(item)} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
         <ChatBubble
           role={item.role}
           text={item.text}
@@ -427,7 +427,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           {item.followUps.map((q, i) => (
             <Pressable
               key={i}
-              style={({ pressed }) => [styles.followUpChip, { backgroundColor: colors.accentSoft }, { opacity: pressed ? 0.7 : 1 }]}
+              style={({ pressed }) => [styles.followUpChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
               onPress={() => handleSend(q)}
               disabled={isPending || isBalanceLoading}
             >
@@ -442,7 +442,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
       {/* Flashcard proposal banner — shown when AI generated cards (incl. history) */}
       {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft }]}>
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
           <AlbumsIcon size={16} color={colors.accent} />
           <Typography preset="bodySm" color={colors.accent} style={styles.cardBannerText}>
             {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
@@ -454,11 +454,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             </View>
           ) : (
             <Pressable
-              style={[styles.saveToSetBtn, { backgroundColor: colors.accent }]}
+              style={({ pressed }) => [styles.saveToSetBtn, { backgroundColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
               onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id, chatId: item.chatId })}
               hitSlop={8}
             >
-              <Typography preset="caption" color={colors.background}>Save to Set</Typography>
+              <Typography preset="caption" color={colors.textOnAccent}>Save to Set</Typography>
             </Pressable>
           )}
         </Animated.View>
@@ -471,7 +471,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       style={[styles.safe, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
-    <SafeAreaView style={styles.flex} edges={['top', 'bottom']}>
+    <SafeAreaView style={styles.flex} edges={['top']}>
       {/* ── Header ── */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
@@ -491,11 +491,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             onPress={handleExport}
             hitSlop={8}
             disabled={!hasExportableMessages}
-            style={{ opacity: hasExportableMessages ? 1 : 0 }}
+            style={({ pressed }) => ({ opacity: hasExportableMessages ? (pressed ? 0.7 : 1) : 0 })}
           >
             <FileTextIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={handleClearChat} hitSlop={8}>
+          <Pressable onPress={handleClearChat} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
             <PlusIcon
               size={ICON_SIZE}
               color={colors.textSecondary}
@@ -521,7 +521,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         extraData={savedMessageIds}
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
-            <SparklesIcon size={EMPTY_ICON_SIZE} color={palette.indigo300} />
+            <SparklesIcon size={EMPTY_ICON_SIZE} color={colors.accent} />
             <Typography preset="h4" align="center">Ask anything about the Bible</Typography>
             <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
               Theology, history, verses, devotional insights — I'm here to help.
@@ -530,7 +530,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
               {SUGGESTIONS.map(s => (
                 <Pressable
                   key={s}
-                  style={({ pressed }) => [styles.suggestion, { backgroundColor: colors.accentSoft }, { opacity: pressed ? 0.7 : 1 }]}
+                  style={({ pressed }) => [styles.suggestion, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
                   onPress={() => handleSend(s)}
                   disabled={isBalanceLoading}
                 >
@@ -637,8 +637,8 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   aiBadge: {
-    width: 40,
-    height: 40,
+    width: spacing.huge,
+    height: spacing.huge,
     borderRadius: layout.cardRadius,
     alignItems: 'center',
     justifyContent: 'center',
@@ -666,7 +666,6 @@ const styles = StyleSheet.create({
   suggestion: {
     borderRadius: layout.cardRadius,
     borderWidth: 1,
-    borderColor: palette.indigo300,
     padding: spacing.md,
   },
 
@@ -688,7 +687,6 @@ const styles = StyleSheet.create({
     marginRight: spacing.lg,
     marginBottom: spacing.xs,
     borderWidth: 1,
-    borderColor: palette.indigo300,
     borderRadius: layout.pillRadius,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s6,
@@ -708,7 +706,6 @@ const styles = StyleSheet.create({
     gap: spacing.xs,
     borderRadius: layout.pillRadius,
     borderWidth: 1,
-    borderColor: palette.indigo300,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s6,
     alignSelf: 'flex-start',
@@ -725,14 +722,13 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.md,
-    borderRadius: spacing.s10,
+    borderRadius: radius.r10,
     borderWidth: 1,
-    borderColor: palette.indigo300,
   },
   cardBannerText: { flex: 1 },
   savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   saveToSetBtn: {
-    borderRadius: spacing.sm,
+    borderRadius: radius.sm,
     paddingVertical: spacing.s6,
     paddingHorizontal: spacing.md,
   },

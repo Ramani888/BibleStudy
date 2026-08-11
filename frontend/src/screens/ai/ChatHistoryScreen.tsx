@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   TextInput,
@@ -239,7 +240,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
       {/* ── View Mode Toggle ── */}
       <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <Pressable
-          style={[styles.modeTab, viewMode === 'all' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
+          style={({ pressed }) => [styles.modeTab, viewMode === 'all' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, { opacity: pressed ? 0.85 : 1 }]}
           onPress={() => setViewMode('all')}
         >
           <Typography preset="label" color={viewMode === 'all' ? colors.accent : colors.textSecondary}>
@@ -247,7 +248,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           </Typography>
         </Pressable>
         <Pressable
-          style={[styles.modeTab, viewMode === 'bookmarked' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }]}
+          style={({ pressed }) => [styles.modeTab, viewMode === 'bookmarked' && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, { opacity: pressed ? 0.85 : 1 }]}
           onPress={() => setViewMode('bookmarked')}
         >
           <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary} />
@@ -268,7 +269,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
               containerStyle={styles.searchBarContainer}
             />
             {allSessions.length > 0 && (
-              <Pressable onPress={handleClearAll} hitSlop={8} style={styles.clearBtn}>
+              <Pressable onPress={handleClearAll} hitSlop={8} style={({ pressed }) => [styles.clearBtn, { opacity: pressed ? 0.85 : 1 }]}>
                 <TrashIcon size={18} color={colors.alert} />
               </Pressable>
             )}
@@ -278,7 +279,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             <View style={[styles.tagBarWrapper, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
                 <Pressable
-                  style={[styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === null && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                  style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === null && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
                   onPress={() => setActiveTag(null)}
                 >
                   <Typography preset="caption" color={activeTag === null ? colors.textOnAccent : colors.textSecondary}>
@@ -288,7 +289,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
                 {PREDEFINED_TAGS.map(tag => (
                   <Pressable
                     key={tag}
-                    style={[styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === tag && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                    style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === tag && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
                     onPress={() => setActiveTag(prev => prev === tag ? null : tag)}
                   >
                     <Typography preset="caption" color={activeTag === tag ? colors.textOnAccent : colors.textSecondary}>
@@ -311,8 +312,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           keyExtractor={item => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshing={isBookmarksRefetching}
-          onRefresh={refetchBookmarks}
+          refreshControl={<RefreshControl refreshing={isBookmarksRefetching} onRefresh={refetchBookmarks} tintColor={colors.accent} />}
           ItemSeparatorComponent={ListSeparator}
           ListEmptyComponent={
             !isBookmarksLoading ? (
@@ -332,8 +332,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           keyExtractor={(item) => item.sessionId ?? item.messages[0]?.id ?? 'unknown'}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          refreshing={isRefetching}
-          onRefresh={refetch}
+          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.accent} />}
           ItemSeparatorComponent={ListSeparator}
           onEndReached={() => hasNextPage && fetchNextPage()}
           onEndReachedThreshold={0.3}
@@ -384,7 +383,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           onPress={handleSaveRename}
           disabled={!renameModal.value.trim() || isRenaming}
           fullWidth
-          style={{ marginTop: spacing.md }}
+          style={styles.renameModalBtn}
         />
       </AppModal>
 
@@ -400,7 +399,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
             return (
               <Pressable
                 key={tag}
-                style={[styles.tagOption, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, active && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                style={({ pressed }) => [styles.tagOption, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, active && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => handleToggleTag(tag)}
               >
                 <Typography preset="bodySm" color={active ? colors.textOnAccent : colors.textPrimary}>
@@ -415,7 +414,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           onPress={handleSaveTags}
           disabled={isUpdatingTags}
           fullWidth
-          style={{ marginTop: spacing.lg }}
+          style={styles.tagsModalBtn}
         />
       </AppModal>
 
@@ -469,4 +468,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     borderRadius: layout.pillRadius, borderWidth: 1,
   },
+  renameModalBtn: { marginTop: spacing.md },
+  tagsModalBtn: { marginTop: spacing.lg },
 });

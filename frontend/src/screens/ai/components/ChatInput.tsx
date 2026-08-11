@@ -7,7 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { fontSizes, layout, spacing, useTheme, palette } from '../../../theme';
+import { fontSizes, layout, lineHeights, radius, spacing, useTheme, palette } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { StarIcon, ArrowUpIcon, FileTextIcon, PlusIcon, CloseIcon } from '../../../components/icons';
 
@@ -69,7 +69,7 @@ export function ChatInput({
               : 'No credits — claim your daily credit or'}
           </Typography>
           {creditBalance <= 0 && onUpgrade && (
-            <Pressable onPress={onUpgrade} hitSlop={8}>
+            <Pressable onPress={onUpgrade} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
               <Typography preset="caption" color={colors.accent}> Upgrade</Typography>
             </Pressable>
           )}
@@ -87,14 +87,14 @@ export function ChatInput({
                 <ActivityIndicator size="small" color={palette.white} />
               </View>
             ) : (
-              <Pressable style={styles.thumbClearBtn} onPress={onClearAttachment} hitSlop={8}>
+              <Pressable style={({ pressed }) => [styles.thumbClearBtn, { opacity: pressed ? 0.85 : 1 }]} onPress={onClearAttachment} hitSlop={8}>
                 <CloseIcon size={10} color={palette.white} />
               </Pressable>
             )}
           </View>
         ) : (
           // PDF (or unknown type during upload): text chip with spinner or file icon
-          <View style={[styles.attachChip, { backgroundColor: colors.accentSoft }]}>
+          <View style={[styles.attachChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
             {isUploading
               ? <ActivityIndicator size="small" color={colors.accent} style={styles.chipSpinner} />
               : <FileTextIcon size={14} color={colors.accent} />
@@ -103,7 +103,7 @@ export function ChatInput({
               {attachmentName ?? 'Uploading…'}
             </Typography>
             {!isUploading && (
-              <Pressable onPress={onClearAttachment} hitSlop={8}>
+              <Pressable onPress={onClearAttachment} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
                 <CloseIcon size={14} color={colors.textSecondary} />
               </Pressable>
             )}
@@ -143,14 +143,14 @@ export function ChatInput({
               onPress={onAttachPress}
               disabled={disabled}
               hitSlop={12}
-              style={[styles.attachIconBtn, disabled && styles.inputDisabled]}
+              style={({ pressed }) => [styles.attachIconBtn, disabled && styles.inputDisabled, { opacity: disabled ? 0.5 : pressed ? 0.85 : 1 }]}
             >
               <PlusIcon size={22} color={colors.textSecondary} />
             </Pressable>
           ) : <View style={styles.attachPlaceholder} />}
 
           <Pressable
-            style={[styles.sendBtn, { backgroundColor: colors.accent }, canSend ? styles.sendActive : styles.sendInactive]}
+            style={({ pressed }) => [styles.sendBtn, { backgroundColor: colors.accent }, canSend ? styles.sendActive : styles.sendInactive, canSend && { opacity: pressed ? 0.85 : 1 }]}
             onPress={handleSend}
             disabled={!canSend}
             hitSlop={8}
@@ -182,14 +182,14 @@ const styles = StyleSheet.create({
 
   thumbWrap: {
     position: 'relative',
-    width: 64,
+    width: 64 /* ponytail: off-grid Figma value */,
     height: 64,
     borderRadius: layout.cardRadius,
     overflow: 'hidden',
     alignSelf: 'flex-start',
   },
   thumb: {
-    width: 64,
+    width: 64 /* ponytail: off-grid Figma value */,
     height: 64,
   },
   thumbOverlay: {
@@ -200,11 +200,11 @@ const styles = StyleSheet.create({
   },
   thumbClearBtn: {
     position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 18,
-    height: 18,
-    borderRadius: 9,
+    top: spacing.xs,
+    right: spacing.xs,
+    width: spacing.s18,
+    height: spacing.s18,
+    borderRadius: radius.pill,
     backgroundColor: 'rgba(0,0,0,0.55)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -217,13 +217,12 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     maxWidth: '80%',
     borderWidth: 1,
-    borderColor: palette.indigo300,
     borderRadius: layout.pillRadius,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s6,
   },
   attachName: { flexShrink: 1 },
-  chipSpinner: { width: 14, height: 14 },
+  chipSpinner: { width: spacing.s14, height: spacing.s14 },
 
   // One box — filled, no hard border
   inputBox: {
@@ -234,10 +233,10 @@ const styles = StyleSheet.create({
   },
 
   input: {
-    minHeight: 24,
-    maxHeight: 160,
+    minHeight: spacing.xxl,
+    maxHeight: 160 /* ponytail: off-grid Figma value */,
     fontSize: fontSizes.md,
-    lineHeight: fontSizes.md * 1.45,
+    lineHeight: fontSizes.md * lineHeights.normal,
     padding: 0,
     margin: 0,
   },
@@ -258,14 +257,14 @@ const styles = StyleSheet.create({
     padding: spacing.xs,
   },
   attachPlaceholder: {
-    width: 30,
+    width: spacing.s30,
   },
 
   sendBtn: {
     marginLeft: 'auto',
-    width: 34,
+    width: 34 /* ponytail: off-grid Figma value */,
     height: 34,
-    borderRadius: 17,
+    borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },

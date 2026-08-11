@@ -7,7 +7,7 @@ import { Button, Input, Typography } from '../../../components/ui';
 import { useCreateSet, useSets } from '../../../hooks';
 import { getErrorMessage } from '../../../api';
 import Toast from 'react-native-toast-message';
-import { layout, spacing, useTheme } from '../../../theme';
+import { CARD_FILL_LIGHT, radius, spacing, useTheme } from '../../../theme';
 import type { SuggestedCard } from '../../../types';
 
 interface CardProposalSheetProps {
@@ -18,7 +18,9 @@ interface CardProposalSheetProps {
 }
 
 export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
-  const { colors } = useTheme();
+  const theme = useTheme();
+  const { colors } = theme;
+  const isDark = theme.name === 'dark';
   const [selectedSetId, setSelectedSetId] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [newSetName, setNewSetName] = useState('');
@@ -117,10 +119,11 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
           {sets.map(set => (
             <Pressable
               key={set.id}
-              style={[
+              style={({ pressed }) => [
                 styles.setRow,
-                { borderColor: colors.border },
+                { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
                 selectedSetId === set.id && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+                { opacity: pressed ? 0.7 : 1 },
               ]}
               onPress={() => setSelectedSetId(set.id)}
             >
@@ -154,7 +157,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
 
 const styles = StyleSheet.create({
   subheader: { marginBottom: spacing.md },
-  previewScroll: { maxHeight: 180, marginBottom: spacing.lg },
+  previewScroll: { maxHeight: 180 /* ponytail: off-grid Figma value */, marginBottom: spacing.lg },
   cardRow: {
     gap: spacing.xs,
     paddingVertical: spacing.s10,
@@ -166,18 +169,18 @@ const styles = StyleSheet.create({
   createInput: { flex: 1 },
   loader: { marginVertical: spacing.lg },
   emptyText: { textAlign: 'center', marginVertical: spacing.lg },
-  setList: { maxHeight: 220, marginBottom: spacing.lg },
+  setList: { maxHeight: 220 /* ponytail: off-grid Figma value */, marginBottom: spacing.lg },
   setRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
-    borderRadius: spacing.s10,
+    borderRadius: radius.r10,
     borderWidth: 1.5,
     marginBottom: spacing.sm,
   },
-  setColor: { width: 12, height: 12, borderRadius: spacing.s6 },
+  setColor: { width: spacing.md, height: spacing.md, borderRadius: radius.r6 },
   setInfo: { flex: 1 },
   footer: { marginTop: spacing.sm },
 });
