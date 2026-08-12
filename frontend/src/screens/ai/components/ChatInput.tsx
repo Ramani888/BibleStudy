@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -29,7 +29,7 @@ interface ChatInputProps {
   onUpgrade?: () => void;
 }
 
-export function ChatInput({
+export const ChatInput = React.memo(function ChatInput({
   onSend,
   disabled,
   creditBalance,
@@ -49,13 +49,13 @@ export function ChatInput({
   const showCounter = text.length >= WARN_THRESHOLD;
   const actionCost  = attachmentType === 'PDF' ? 5 : attachmentType === 'IMAGE' ? 3 : 1;
 
-  const handleSend = () => {
+  const handleSend = useCallback(() => {
     if (!canSend) return;
     const msg = text.trim();
     setText('');
     onSend(msg);
     requestAnimationFrame(() => inputRef.current?.focus());
-  };
+  }, [canSend, text, onSend]);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
@@ -163,7 +163,7 @@ export function ChatInput({
 
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

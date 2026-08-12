@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import {
@@ -18,7 +18,7 @@ const BADGE_ICON_SIZE = 12;
 const CHEVRON_SIZE = 16;
 const SESSION_ICON_SIZE = 14;
 
-function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
+const MessagePair = React.memo(function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
   const { colors } = useTheme();
   return (
     <>
@@ -39,9 +39,9 @@ function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
       </View>
     </>
   );
-}
+});
 
-export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
+export const BookmarkCard = React.memo(function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -79,7 +79,7 @@ export function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
       </Card>
     </Pressable>
   );
-}
+});
 
 export interface SessionCardProps {
   session: ChatSession;
@@ -87,7 +87,7 @@ export interface SessionCardProps {
   onContinue: (session: ChatSession) => void;
 }
 
-export function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
+export const SessionCard = React.memo(function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -96,10 +96,14 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
   const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
   const displayTitle = session.customTitle || session.title;
 
+  const handleToggle = useCallback(() => setExpanded(e => !e), []);
+  const handleLongPress = useCallback(() => onLongPress(session), [onLongPress, session]);
+  const handleContinue = useCallback(() => onContinue(session), [onContinue, session]);
+
   return (
     <Pressable
-      onPress={() => setExpanded(e => !e)}
-      onLongPress={() => onLongPress(session)}
+      onPress={handleToggle}
+      onLongPress={handleLongPress}
       style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}
     >
       <Card style={{ ...styles.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }}>
@@ -147,7 +151,7 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
 
         <Pressable
           style={({ pressed }) => [styles.continueRow, { borderTopColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
-          onPress={() => onContinue(session)}
+          onPress={handleContinue}
         >
           <Typography preset="label" color={colors.accent}>Continue conversation</Typography>
           <ArrowRightIcon size={14} color={colors.accent} />
@@ -164,7 +168,7 @@ export function SessionCard({ session, onLongPress, onContinue }: SessionCardPro
       </Card>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: { gap: spacing.sm },

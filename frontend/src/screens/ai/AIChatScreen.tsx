@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Image,
@@ -99,7 +99,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const { mutate: removeBookmark } = useRemoveBookmark();
 
   const creditBalance = (creditData?.balance ?? 0) - (isPending ? 1 : 0);
-  const bookmarkedChatIds = new Set(bookmarksData?.bookmarks.map(b => b.id) ?? []);
+  const bookmarkedChatIds = useMemo(
+    () => new Set(bookmarksData?.bookmarks.map(b => b.id) ?? []),
+    [bookmarksData],
+  );
   const hasExportableMessages = messages.some(m => m.text !== TYPING_INDICATOR);
 
   useEffect(() => {
@@ -260,18 +263,18 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     setSheet({ visible: true, message: item });
   }, []);
 
-  const handleCopyMessage = () => {
+  const handleCopyMessage = useCallback(() => {
     if (!sheet.message) return;
     Clipboard.setString(sheet.message.text);
     Toast.show({ type: 'success', text1: 'Copied to clipboard' });
-  };
+  }, [sheet.message]);
 
-  const handleShareMessage = () => {
+  const handleShareMessage = useCallback(() => {
     if (!sheet.message) return;
     Share.share({ message: sheet.message.text });
-  };
+  }, [sheet.message]);
 
-  const handleToggleBookmark = () => {
+  const handleToggleBookmark = useCallback(() => {
     const chatId = sheet.message?.chatId;
     if (!chatId) return;
     if (bookmarkedChatIds.has(chatId)) {
@@ -283,7 +286,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmarked' }),
       });
     }
-  };
+  }, [sheet.message, bookmarkedChatIds, removeBookmark, addBookmark]);
 
   const handleExport = useCallback(() => {
     const exportable = messages.filter(m => m.text !== TYPING_INDICATOR);
@@ -296,7 +299,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     Share.share({ message: `${header}\n${divider}\n\n${lines}` });
   }, [messages]);
 
-  const handleClearChat = () => {
+  const handleClearChat = useCallback(() => {
     if (messages.length === 0) return;
     show({
       title: 'New Conversation',
@@ -305,7 +308,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       variant: 'danger',
       onConfirm: () => clearChat(),
     });
-  };
+  }, [messages.length, show, clearChat]);
 
   const handleSaveCards = useCallback(async (setId: string) => {
     try {
@@ -324,14 +327,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   // Attach flow (Phase F). Media is credit-metered (min image cost 3); if the user can't
   // afford it, the source menu becomes an Upgrade nudge instead of a picker.
   const MIN_MEDIA_COST = 3;
-  const goPaywall = () => navigation.navigate('ProfileTab', { screen: 'Paywall' });
+  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
 
-  const attachFromDevice = async (pick: () => Promise<(MediaFile & { localUri?: string }) | null>) => {
+  const attachFromDevice = useCallback(async (pick: () => Promise<(MediaFile & { localUri?: string }) | null>) => {
     const file = await pick();
     if (file) setAttachment({ id: file.id, name: file.name, type: file.type, localUri: file.localUri });
-  };
+  }, []);
 
-  const attachMenuActions = creditBalance < MIN_MEDIA_COST
+  const attachMenuActions = useMemo(() => creditBalance < MIN_MEDIA_COST
     ? [
         { label: 'Media costs 3–5 credits', icon: StarOutlineIcon, onPress: () => {}, disabled: true },
         { label: 'Upgrade to Premium', icon: StarIcon, onPress: goPaywall },
@@ -341,22 +344,32 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         { label: 'Photo Library', icon: AlbumsIcon, onPress: () => attachFromDevice(pickImage) },
         { label: 'Take Photo', icon: CameraIcon, onPress: () => attachFromDevice(takePhoto) },
         { label: 'Choose PDF', icon: FileTextIcon, onPress: () => attachFromDevice(pickPdf) },
-      ];
+      ],
+  [creditBalance, goPaywall, attachFromDevice, pickImage, takePhoto, pickPdf]);
 
   // My Media list — PDFs + images already uploaded.
-  const pickerActions = media.length > 0
+  const pickerActions = useMemo(() => media.length > 0
     ? media.map(f => ({
         label: f.name,
         icon: f.type === 'PDF' ? FileTextIcon : AlbumsIcon,
         onPress: () => setAttachment({ id: f.id, name: f.name, type: f.type }),
       }))
-    : [{ label: 'No files in My Media', icon: FileTextIcon, onPress: () => {}, disabled: true }];
+    : [{ label: 'No files in My Media', icon: FileTextIcon, onPress: () => {}, disabled: true }],
+  [media]);
+
+  const handleAttachPress = useCallback(() => {
+    Keyboard.dismiss();
+    if (policyAccepted) { setAttachMenuVisible(true); }
+    else { setPolicyDialogVisible(true); }
+  }, [policyAccepted]);
+
+  const handleClearAttachment = useCallback(() => setAttachment(null), []);
 
   const isCurrentMessageBookmarked = sheet.message?.chatId
     ? bookmarkedChatIds.has(sheet.message.chatId)
     : false;
 
-  const sheetActions = sheet.message ? [
+  const sheetActions = useMemo(() => sheet.message ? [
     {
       label: 'Copy',
       icon: CopyIcon,
@@ -394,7 +407,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         },
       },
     ] : []),
-  ] : [];
+  ] : [],
+  [sheet.message, handleCopyMessage, handleShareMessage, handleRegenerate, isPending,
+   isCurrentMessageBookmarked, handleToggleBookmark, setSaveModal]);
 
   const renderItem = useCallback(({ item }: { item: ChatUIMessage }) => (
     <View>
@@ -555,12 +570,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         attachmentType={attachment?.type ?? (pendingLocalUri ? 'IMAGE' : 'PDF')}
         attachmentLocalUri={pendingLocalUri ?? attachment?.localUri ?? null}
         isUploading={isUploading}
-        onAttachPress={() => {
-          Keyboard.dismiss();
-          if (policyAccepted) { setAttachMenuVisible(true); }
-          else { setPolicyDialogVisible(true); }
-        }}
-        onClearAttachment={() => setAttachment(null)}
+        onAttachPress={handleAttachPress}
+        onClearAttachment={handleClearAttachment}
         onUpgrade={goPaywall}
       />
 

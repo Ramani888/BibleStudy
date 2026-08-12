@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { CheckCircleIcon } from '../../../components/icons';
 
@@ -17,7 +17,7 @@ interface CardProposalSheetProps {
   onClose: () => void;
 }
 
-export function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
+export const CardProposalSheet = React.memo(function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -28,22 +28,22 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
   const { data: sets = [], isLoading: setsLoading } = useSets();
   const { mutateAsync: createSet } = useCreateSet();
 
-  const handleCreateSet = async () => {
+  const handleCreateSet = useCallback(async () => {
     const title = newSetName.trim();
     if (!title || isCreating) return;
     setIsCreating(true);
     try {
       const set = await createSet({ title });
-      setSelectedSetId(set.id);   // auto-select the new set, ready to save into it
+      setSelectedSetId(set.id);
       setNewSetName('');
     } catch (e) {
       Toast.show({ type: 'error', text1: 'Could not create set', text2: getErrorMessage(e) });
     } finally {
       setIsCreating(false);
     }
-  };
+  }, [newSetName, isCreating, createSet]);
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!selectedSetId) return;
     setIsSaving(true);
     try {
@@ -54,13 +54,13 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [selectedSetId, onSave]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setSelectedSetId(null);
     setNewSetName('');
     onClose();
-  };
+  }, [onClose]);
 
   return (
     <AppModal visible={visible} title="Save as Flashcards" onClose={handleClose} showHandle>
@@ -153,7 +153,7 @@ export function CardProposalSheet({ visible, cards, onSave, onClose }: CardPropo
       </View>
     </AppModal>
   );
-}
+});
 
 const styles = StyleSheet.create({
   subheader: { marginBottom: spacing.md },
