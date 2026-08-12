@@ -28,6 +28,7 @@ export {
 export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak } from './useCredits';
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
+export { useWeeklyChart } from './useWeeklyChart';
 export { useAchievements } from './useAchievements';
 export { usePlans, usePlan, useCreatePlan, useDeletePlan, useToggleStep } from './usePlans';
 export { useSubscriptionStatus, useSubscriptionSync, useIapSubscriptions } from './useSubscription';

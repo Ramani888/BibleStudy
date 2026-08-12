@@ -17,7 +17,6 @@ import Svg, {
   Text as SvgText,
 } from 'react-native-svg';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import Toast from 'react-native-toast-message';
 import { Card, Typography } from '../../../components/ui';
 import {
   BarChartIcon,
@@ -28,13 +27,19 @@ import {
   TrendingUpIcon,
   type IconComponent,
 } from '../../../components/icons';
-import { useCreditBalance, useCreditStats } from '../../../hooks';
 import { CARD_FILL_LIGHT, layout, radius, spacing, useTheme } from '../../../theme';
-import type { CreditStatsPeriod, CreditInterval, DayStat } from '../../../hooks/useCredits';
+import type { DayStat } from '../../../hooks/useCredits';
+import {
+  useWeeklyChart,
+  getAvailableIntervals,
+  emptyMsgFor,
+} from '../../../hooks/useWeeklyChart';
+import type { CreditStatsPeriod, CreditInterval } from '../../../hooks/useWeeklyChart';
 
 // ─── Types & constants ────────────────────────────────────────────────────────
 
 type ChartType = 'bar' | 'line' | 'donut' | 'balance';
+type Colors = ReturnType<typeof useTheme>['colors'];
 
 const CHART_ICONS: { key: ChartType; Icon: IconComponent }[] = [
   { key: 'bar',     Icon: BarChartIcon    },
@@ -50,87 +55,24 @@ const PERIOD_CHIPS: { key: CreditStatsPeriod; label: string }[] = [
   { key: 'year',  label: '1Y'    },
 ];
 
-const MAX_CUSTOM_DAYS = 90;
-const ICON_BTN_SIZE   = 18;
-const CHIP_ICON_SIZE  = 13;
-const MAX_BAR_H       = 140;
-const FS_BAR_H        = 260;
-const FS_SVG_H        = 300;
-const SVG_H           = 180;
-const SVG_PAD         = 12;
-const DONUT_SIZE      = 200;
-
-function fmtDate(d: Date): string {
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-}
-
 const INTERVAL_LABELS: Record<CreditInterval, string> = {
   '1h': '1H', '2h': '2H', '6h': '6H',
   day: 'Day', week: 'Week', month: 'Month', quarter: 'Qtr',
 };
 
-function getAvailableIntervals(
-  period: CreditStatsPeriod,
-  customFrom: Date | null,
-  customTo: Date | null,
-): CreditInterval[] {
-  switch (period) {
-    case 'today': return ['6h', '2h', '1h'];
-    case 'week':  return [];
-    case 'month': return ['week', 'day'];
-    case 'year':  return ['month', 'quarter'];
-    case 'custom': {
-      if (!customFrom || !customTo) return [];
-      const sameDay =
-        customFrom.getFullYear() === customTo.getFullYear() &&
-        customFrom.getMonth()    === customTo.getMonth()    &&
-        customFrom.getDate()     === customTo.getDate();
-      if (sameDay) return ['6h', '2h', '1h'];
-      const days = Math.ceil((customTo.getTime() - customFrom.getTime()) / 86400000);
-      if (days <= 14) return [];
-      return ['week', 'day'];
-    }
-    default: return [];
-  }
-}
-
-function getDefaultInterval(
-  period: CreditStatsPeriod,
-  customFrom: Date | null,
-  customTo: Date | null,
-): CreditInterval {
-  switch (period) {
-    case 'today': return '6h';
-    case 'week':  return 'day';
-    case 'month': return 'week';
-    case 'year':  return 'month';
-    case 'custom': {
-      if (!customFrom || !customTo) return 'day';
-      const sameDay =
-        customFrom.getFullYear() === customTo.getFullYear() &&
-        customFrom.getMonth()    === customTo.getMonth()    &&
-        customFrom.getDate()     === customTo.getDate();
-      if (sameDay) return '6h';
-      const days = Math.ceil((customTo.getTime() - customFrom.getTime()) / 86400000);
-      if (days <= 14) return 'day';
-      return 'week';
-    }
-    default: return 'day';
-  }
-}
-
-function emptyMsgFor(period: CreditStatsPeriod): string {
-  if (period === 'today')  return 'No activity today';
-  if (period === 'custom') return 'No activity in selected range';
-  if (period === 'week')   return 'No activity this week';
-  if (period === 'month')  return 'No activity this month';
-  return 'No activity this year';
-}
+const ICON_BTN_SIZE = 18;
+const CHIP_ICON_SIZE = 13;
+const MAX_BAR_H = 140;
+const FS_BAR_H  = 260;
+const FS_SVG_H  = 300;
+const SVG_H     = 180;
+const SVG_PAD   = 12;
+const DONUT_SIZE = 200;
 
 // ─── Shared ───────────────────────────────────────────────────────────────────
 
 function EmptyView({ height = SVG_H, message = 'No activity', colors }: {
-  height?: number; message?: string; colors: ReturnType<typeof useTheme>['colors'];
+  height?: number; message?: string; colors: Colors;
 }) {
   return (
     <View style={[s.centerBox, { height }]}>
@@ -146,7 +88,7 @@ function EmptyView({ height = SVG_H, message = 'No activity', colors }: {
 function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; emptyMsg: string; maxBarH?: number;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: Colors;
 }) {
   const maxTotal = Math.max(...stats.map(d => d.earned + d.used), 1);
   const hasData  = stats.some(d => d.earned > 0 || d.used > 0);
@@ -183,7 +125,7 @@ function BarChartView({ stats, emptyMsg, maxBarH = MAX_BAR_H, selectedIdx, onSel
 function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; width: number; emptyMsg: string; svgH?: number;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: Colors;
 }) {
   const hasData = stats.some(d => d.earned > 0 || d.used > 0);
   if (!hasData) return <EmptyView height={svgH} message={emptyMsg} colors={colors} />;
@@ -227,7 +169,7 @@ function LineChartView({ stats, width, emptyMsg, svgH = SVG_H, selectedIdx, onSe
 // ─── Donut Chart ──────────────────────────────────────────────────────────────
 
 function DonutChartView({ stats, size = DONUT_SIZE, colors }: {
-  stats: DayStat[]; size?: number; colors: ReturnType<typeof useTheme>['colors'];
+  stats: DayStat[]; size?: number; colors: Colors;
 }) {
   const totalEarned = stats.reduce((sum, d) => sum + d.earned, 0);
   const totalUsed   = stats.reduce((sum, d) => sum + d.used,   0);
@@ -284,7 +226,7 @@ function DonutChartView({ stats, size = DONUT_SIZE, colors }: {
 function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg, selectedIdx, onSelect, colors }: {
   stats: DayStat[]; currentBalance: number; width: number; svgH?: number; emptyMsg: string;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: Colors;
 }) {
   if (stats.length === 0) return <EmptyView height={svgH} message={emptyMsg} colors={colors} />;
 
@@ -337,8 +279,6 @@ function BalanceChartView({ stats, currentBalance, width, svgH = SVG_H, emptyMsg
 
 // ─── ChartBody ────────────────────────────────────────────────────────────────
 
-const LABEL_H = 24;
-
 function ChartBody({
   stats, chartType, currentBalance, emptyMsg, isLoading,
   isFullscreen = false, selectedIdx, onSelect, colors,
@@ -346,7 +286,7 @@ function ChartBody({
   stats: DayStat[]; chartType: ChartType; currentBalance: number; emptyMsg: string;
   isLoading: boolean; isFullscreen?: boolean;
   selectedIdx: number | null; onSelect: (i: number | null) => void;
-  colors: ReturnType<typeof useTheme>['colors'];
+  colors: Colors;
 }) {
   const [width, setWidth] = useState(0);
 
@@ -355,9 +295,7 @@ function ChartBody({
   const effectiveDonutSz = isFullscreen ? 260 : DONUT_SIZE;
 
   return (
-    <View
-      onLayout={e => setWidth(e.nativeEvent.layout.width)}
-    >
+    <View onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       {isLoading ? (
         <View style={[s.centerBox, { height: effectiveSvgH }]}>
           <ActivityIndicator color={colors.accent} />
@@ -379,6 +317,135 @@ function ChartBody({
   );
 }
 
+// ─── Control sub-components ───────────────────────────────────────────────────
+
+function ChartIconsBar({ chartType, colors, onChartType, onToggleFullscreen, isFullscreenMode }: {
+  chartType: ChartType; colors: Colors;
+  onChartType: (t: ChartType) => void;
+  onToggleFullscreen: () => void;
+  isFullscreenMode: boolean;
+}) {
+  return (
+    <View style={s.headerRight}>
+      {CHART_ICONS.map(({ key, Icon }) => (
+        <Pressable
+          key={key}
+          style={({ pressed }) => [styles.iconBtn, chartType === key && { backgroundColor: colors.accentSoft }, pressed && styles.btnPressed]}
+          onPress={() => onChartType(key)}
+        >
+          <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.accent : colors.textSecondary} />
+        </Pressable>
+      ))}
+      <View style={[styles.iconDivider, { backgroundColor: colors.border }]} />
+      <Pressable style={({ pressed }) => [styles.iconBtn, pressed && styles.btnPressed]} onPress={onToggleFullscreen}>
+        {isFullscreenMode
+          ? <CloseIcon  size={ICON_BTN_SIZE} color={colors.textSecondary} />
+          : <ExpandIcon size={ICON_BTN_SIZE} color={colors.textSecondary} />
+        }
+      </Pressable>
+    </View>
+  );
+}
+
+function PeriodRow({ period, customLabel, colors, onPeriod, onOpenCustom }: {
+  period: CreditStatsPeriod; customLabel: string | null; colors: Colors;
+  onPeriod: (p: CreditStatsPeriod) => void;
+  onOpenCustom: () => void;
+}) {
+  return (
+    <View style={s.periodRow}>
+      {PERIOD_CHIPS.map(({ key, label }) => (
+        <Pressable
+          key={key}
+          style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === key && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
+          onPress={() => onPeriod(key)}
+        >
+          <Typography preset="label" color={period === key ? colors.textOnAccent : colors.textSecondary}>
+            {label}
+          </Typography>
+        </Pressable>
+      ))}
+      <Pressable
+        style={({ pressed }) => [styles.chip, styles.chipCustom, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === 'custom' && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
+        onPress={onOpenCustom}
+      >
+        <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnAccent : colors.textSecondary} />
+        {customLabel && (
+          <Typography preset="caption" color={period === 'custom' ? colors.textOnAccent : colors.textSecondary}>
+            {customLabel}
+          </Typography>
+        )}
+      </Pressable>
+    </View>
+  );
+}
+
+function IntervalRow({ period, customFrom, customTo, chartInterval, colors, onIntervalChange }: {
+  period: CreditStatsPeriod; customFrom: Date | null; customTo: Date | null;
+  chartInterval: CreditInterval; colors: Colors;
+  onIntervalChange: (iv: CreditInterval) => void;
+}) {
+  const available = getAvailableIntervals(period, customFrom, customTo);
+  if (available.length < 2) return null;
+  return (
+    <View style={s.periodRow}>
+      {available.map(iv => (
+        <Pressable
+          key={iv}
+          style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, chartInterval === iv && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
+          onPress={() => onIntervalChange(iv)}
+        >
+          <Typography preset="label" color={chartInterval === iv ? colors.textOnAccent : colors.textSecondary}>
+            {INTERVAL_LABELS[iv]}
+          </Typography>
+        </Pressable>
+      ))}
+    </View>
+  );
+}
+
+function DetailStrip({ selectedIdx, stats, colors }: {
+  selectedIdx: number | null; stats: DayStat[]; colors: Colors;
+}) {
+  const sel = selectedIdx !== null ? stats[selectedIdx] : null;
+  if (!sel) return null;
+  return (
+    <View style={[styles.detailStrip, { backgroundColor: colors.surfaceMuted }]}>
+      <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
+      <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
+      <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
+      <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
+      <Typography preset="label" color={colors.alert}>−{sel.used} used</Typography>
+    </View>
+  );
+}
+
+function SummaryRow({ hasSummary, totalEarned, totalUsed, net, colors }: {
+  hasSummary: boolean; totalEarned: number; totalUsed: number; net: number; colors: Colors;
+}) {
+  if (!hasSummary) return null;
+  return (
+    <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
+      <View style={s.summaryItem}>
+        <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+      </View>
+      <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+      <View style={s.summaryItem}>
+        <Typography preset="h4" color={colors.alert}>−{totalUsed}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+      </View>
+      <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
+      <View style={s.summaryItem}>
+        <Typography preset="h4" color={net >= 0 ? colors.success : colors.alert}>
+          {net >= 0 ? '+' : ''}{net}
+        </Typography>
+        <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
+      </View>
+    </View>
+  );
+}
+
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: CreditStatsPeriod }) {
@@ -387,232 +454,40 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
   const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
 
-  const [chartType,       setChartType]       = useState<ChartType>('bar');
-  const [period,          setPeriod]          = useState<CreditStatsPeriod>(defaultPeriod);
-  const [selectedIdx,     setSelectedIdx]     = useState<number | null>(null);
-  const [prevPeriod,      setPrevPeriod]      = useState<CreditStatsPeriod>(defaultPeriod);
-  const [chartInterval,   setChartInterval]   = useState<CreditInterval>('day');
-  const [customFrom,      setCustomFrom]      = useState<Date | null>(null);
-  const [customTo,        setCustomTo]        = useState<Date | null>(null);
-  const [prevCustomFrom,  setPrevCustomFrom]  = useState<Date | null>(null);
-  const [prevCustomTo,    setPrevCustomTo]    = useState<Date | null>(null);
-  const [pickingFrom,     setPickingFrom]     = useState(false);
-  const [pickingTo,       setPickingTo]       = useState(false);
-  const [fullscreen,      setFullscreen]      = useState(false);
-
-  const { data: stats, isLoading } = useCreditStats(
-    period,
-    customFrom ?? undefined,
-    customTo ?? undefined,
-    chartInterval,
-  );
-  const { data: balanceData } = useCreditBalance();
-
-  const safeStats     = stats ?? [];
-  const currentBal    = balanceData?.balance ?? 0;
-  const emptyMsg      = emptyMsgFor(period);
-  const totalEarned   = safeStats.reduce((s, d) => s + d.earned, 0);
-  const totalUsed     = safeStats.reduce((s, d) => s + d.used,   0);
-  const net           = totalEarned - totalUsed;
-  const hasSummary    = !isLoading && (totalEarned > 0 || totalUsed > 0);
-
-  const handlePeriod = (p: CreditStatsPeriod) => {
-    setPrevPeriod(period);
-    setPeriod(p);
-    setChartInterval(getDefaultInterval(p, null, null));
-    setSelectedIdx(null);
-    if (p !== 'custom') { setCustomFrom(null); setCustomTo(null); }
-  };
-
-  const openCustomPicker = () => {
-    setPrevPeriod(period);
-    setPrevCustomFrom(customFrom);
-    setPrevCustomTo(customTo);
-    setPeriod('custom');
-    setCustomFrom(null);
-    setCustomTo(null);
-    setPickingFrom(true);
-  };
-
-  const handleFromConfirm = (date: Date) => {
-    setCustomFrom(date);
-    setPickingFrom(false);
-    setPickingTo(true);
-  };
-
-  const handleToConfirm = (date: Date) => {
-    setPickingTo(false);
-    if (!customFrom) return;
-    const diffDays = Math.ceil((date.getTime() - customFrom.getTime()) / (1000 * 60 * 60 * 24));
-    if (date < customFrom) {
-      Toast.show({ type: 'error', text1: 'End date must be after start date' });
-      setPeriod(prevPeriod); setCustomFrom(null);
-      return;
-    }
-    if (diffDays > MAX_CUSTOM_DAYS) {
-      Toast.show({ type: 'error', text1: 'Max range is 90 days', text2: 'Please select a shorter range.' });
-      setPeriod(prevPeriod); setCustomFrom(null);
-      return;
-    }
-    setCustomTo(date);
-    setChartInterval(getDefaultInterval('custom', customFrom, date));
-    setSelectedIdx(null);
-  };
-
-  const handlePickerCancel = () => {
-    setPickingFrom(false);
-    setPickingTo(false);
-    if (!customFrom || !customTo) {
-      setPeriod(prevPeriod);
-      setCustomFrom(prevCustomFrom);
-      setCustomTo(prevCustomTo);
-    }
-  };
-
-  const handleIntervalChange = (iv: CreditInterval) => {
-    setChartInterval(iv);
-    setSelectedIdx(null);
-    if ((iv === '1h' || iv === '2h') && chartType === 'bar') setChartType('line');
-  };
-
-  const customLabel = customFrom && customTo
-    ? `${fmtDate(customFrom)}–${fmtDate(customTo)}`
-    : null;
-
-  function renderChartIcons(isFullscreenMode: boolean) {
-    return (
-      <View style={s.headerRight}>
-        {CHART_ICONS.map(({ key, Icon }) => (
-          <Pressable
-            key={key}
-            style={({ pressed }) => [styles.iconBtn, chartType === key && { backgroundColor: colors.accentSoft }, pressed && styles.btnPressed]}
-            onPress={() => { setChartType(key); setSelectedIdx(null); }}
-          >
-            <Icon size={ICON_BTN_SIZE} color={chartType === key ? colors.accent : colors.textSecondary} />
-          </Pressable>
-        ))}
-        <View style={[styles.iconDivider, { backgroundColor: colors.border }]} />
-        <Pressable
-          style={({ pressed }) => [styles.iconBtn, pressed && styles.btnPressed]}
-          onPress={isFullscreenMode ? () => setFullscreen(false) : () => setFullscreen(true)}
-        >
-          {isFullscreenMode
-            ? <CloseIcon size={ICON_BTN_SIZE} color={colors.textSecondary} />
-            : <ExpandIcon size={ICON_BTN_SIZE} color={colors.textSecondary} />
-          }
-        </Pressable>
-      </View>
-    );
-  }
-
-  function renderDetailStrip() {
-    const sel = selectedIdx !== null ? safeStats[selectedIdx] : null;
-    if (!sel) return null;
-    return (
-      <View style={[styles.detailStrip, { backgroundColor: colors.surfaceMuted }]}>
-        <Typography preset="label" color={colors.textSecondary}>{sel.label}</Typography>
-        <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
-        <Typography preset="label" color={colors.success}>+{sel.earned} earned</Typography>
-        <View style={[styles.detailDot, { backgroundColor: colors.border }]} />
-        <Typography preset="label" color={colors.alert}>−{sel.used} used</Typography>
-      </View>
-    );
-  }
-
-  function renderIntervalRow() {
-    const available = getAvailableIntervals(period, customFrom, customTo);
-    if (available.length < 2) return null;
-    return (
-      <View style={s.periodRow}>
-        {available.map(iv => (
-          <Pressable
-            key={iv}
-            style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, chartInterval === iv && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
-            onPress={() => handleIntervalChange(iv)}
-          >
-            <Typography preset="label" color={chartInterval === iv ? colors.textOnAccent : colors.textSecondary}>
-              {INTERVAL_LABELS[iv]}
-            </Typography>
-          </Pressable>
-        ))}
-      </View>
-    );
-  }
-
-  function renderPeriodRow() {
-    return (
-      <View style={s.periodRow}>
-        {PERIOD_CHIPS.map(({ key, label }) => (
-          <Pressable
-            key={key}
-            style={({ pressed }) => [styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === key && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
-            onPress={() => handlePeriod(key)}
-          >
-            <Typography preset="label" color={period === key ? colors.textOnAccent : colors.textSecondary}>
-              {label}
-            </Typography>
-          </Pressable>
-        ))}
-        <Pressable
-          style={({ pressed }) => [styles.chip, styles.chipCustom, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }, period === 'custom' && { backgroundColor: colors.accent, borderColor: colors.accent }, pressed && styles.btnPressed]}
-          onPress={openCustomPicker}
-        >
-          <CalendarIcon size={CHIP_ICON_SIZE} color={period === 'custom' ? colors.textOnAccent : colors.textSecondary} />
-          {customLabel && (
-            <Typography preset="caption" color={period === 'custom' ? colors.textOnAccent : colors.textSecondary}>
-              {customLabel}
-            </Typography>
-          )}
-        </Pressable>
-      </View>
-    );
-  }
-
-  function renderSummary() {
-    if (!hasSummary) return null;
-    return (
-      <View style={[styles.summaryRow, { borderTopColor: colors.border }]}>
-        <View style={s.summaryItem}>
-          <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
-        </View>
-        <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
-        <View style={s.summaryItem}>
-          <Typography preset="h4" color={colors.alert}>−{totalUsed}</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
-        </View>
-        <View style={[styles.summaryDivider, { backgroundColor: colors.border }]} />
-        <View style={s.summaryItem}>
-          <Typography preset="h4" color={net >= 0 ? colors.success : colors.alert}>
-            {net >= 0 ? '+' : ''}{net}
-          </Typography>
-          <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
-        </View>
-      </View>
-    );
-  }
+  const chart = useWeeklyChart(defaultPeriod);
 
   const sharedChartProps = {
-    stats: safeStats, chartType, currentBalance: currentBal,
-    emptyMsg, isLoading, selectedIdx, onSelect: setSelectedIdx, colors,
+    stats: chart.safeStats, chartType: chart.chartType, currentBalance: chart.currentBal,
+    emptyMsg: chart.emptyMsg, isLoading: chart.isLoading,
+    selectedIdx: chart.selectedIdx, onSelect: chart.setSelectedIdx, colors,
   };
+
+  const controls = (isFullscreenMode: boolean) => (
+    <ChartIconsBar
+      chartType={chart.chartType}
+      colors={colors}
+      onChartType={t => { chart.setChartType(t); chart.setSelectedIdx(null); }}
+      onToggleFullscreen={() => chart.setFullscreen(!chart.fullscreen)}
+      isFullscreenMode={isFullscreenMode}
+    />
+  );
 
   const datePickers = (
     <>
       <DateTimePickerModal
-        isVisible={pickingFrom}
+        isVisible={chart.pickingFrom}
         mode="date"
         maximumDate={new Date()}
-        onConfirm={handleFromConfirm}
-        onCancel={handlePickerCancel}
+        onConfirm={chart.handleFromConfirm}
+        onCancel={chart.handlePickerCancel}
       />
       <DateTimePickerModal
-        isVisible={pickingTo}
+        isVisible={chart.pickingTo}
         mode="date"
-        minimumDate={customFrom ?? undefined}
+        minimumDate={chart.customFrom ?? undefined}
         maximumDate={new Date()}
-        onConfirm={handleToConfirm}
-        onCancel={handlePickerCancel}
+        onConfirm={chart.handleToConfirm}
+        onCancel={chart.handlePickerCancel}
       />
     </>
   );
@@ -622,74 +497,69 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Credit
       <Card style={{ ...styles.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }} shadow="sm">
         <View style={s.header}>
           <Typography preset="h4">Credit Activity</Typography>
-          {renderChartIcons(false)}
+          {controls(false)}
         </View>
-        {renderPeriodRow()}
-        {renderIntervalRow()}
+        <PeriodRow period={chart.period} customLabel={chart.customLabel} colors={colors} onPeriod={chart.handlePeriod} onOpenCustom={chart.openCustomPicker} />
+        <IntervalRow period={chart.period} customFrom={chart.customFrom} customTo={chart.customTo} chartInterval={chart.chartInterval} colors={colors} onIntervalChange={chart.handleIntervalChange} />
         <ChartBody {...sharedChartProps} />
-        {renderDetailStrip()}
-        {renderSummary()}
+        <DetailStrip selectedIdx={chart.selectedIdx} stats={chart.safeStats} colors={colors} />
+        <SummaryRow hasSummary={chart.hasSummary} totalEarned={chart.totalEarned} totalUsed={chart.totalUsed} net={chart.net} colors={colors} />
       </Card>
 
-      <Modal
-        visible={fullscreen}
-        animationType="slide"
-        onRequestClose={() => setFullscreen(false)}
-      >
+      <Modal visible={chart.fullscreen} animationType="slide" onRequestClose={() => chart.setFullscreen(false)}>
         <View style={[styles.fsContainer, { backgroundColor: colors.background, paddingTop: insets.top + spacing.sm, paddingBottom: Math.max(insets.bottom, spacing.lg) }]}>
           <View style={s.header}>
             <Typography preset="h4">Credit Activity</Typography>
-            {renderChartIcons(true)}
+            {controls(true)}
           </View>
-          {renderPeriodRow()}
-          {renderIntervalRow()}
+          <PeriodRow period={chart.period} customLabel={chart.customLabel} colors={colors} onPeriod={chart.handlePeriod} onOpenCustom={chart.openCustomPicker} />
+          <IntervalRow period={chart.period} customFrom={chart.customFrom} customTo={chart.customTo} chartInterval={chart.chartInterval} colors={colors} onIntervalChange={chart.handleIntervalChange} />
           <ChartBody {...sharedChartProps} isFullscreen />
-          {renderDetailStrip()}
+          <DetailStrip selectedIdx={chart.selectedIdx} stats={chart.safeStats} colors={colors} />
           <View style={s.fsSpacer} />
-          {renderSummary()}
+          <SummaryRow hasSummary={chart.hasSummary} totalEarned={chart.totalEarned} totalUsed={chart.totalUsed} net={chart.net} colors={colors} />
           {datePickers}
         </View>
       </Modal>
 
-      {!fullscreen && datePickers}
+      {!chart.fullscreen && datePickers}
     </>
   );
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
-// Static layout constants that don't depend on theme color
 const s = StyleSheet.create({
-  header:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  periodRow:   { flexDirection: 'row', gap: spacing.s6, flexWrap: 'wrap' },
-  centerBox:   { alignItems: 'center', justifyContent: 'center' },
-  emptyText:   { textAlign: 'center' },
-  barBars:     { flexDirection: 'row', gap: spacing.sm },
-  barCol:      { flex: 1, alignItems: 'center', gap: spacing.xs },
-  barTrack:    { width: '100%', borderRadius: spacing.xs, justifyContent: 'flex-end', overflow: 'hidden' }, // ponytail: r4 off-grid (no token), spacing.xs=4 as proxy
+  header:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  headerRight:   { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  periodRow:     { flexDirection: 'row', gap: spacing.s6, flexWrap: 'wrap' },
+  centerBox:     { alignItems: 'center', justifyContent: 'center' },
+  emptyText:     { textAlign: 'center' },
+  barBars:       { flexDirection: 'row', gap: spacing.sm },
+  barCol:        { flex: 1, alignItems: 'center', gap: spacing.xs },
+  barTrack:      { width: '100%', borderRadius: spacing.xs, justifyContent: 'flex-end', overflow: 'hidden' }, // ponytail: r4 off-grid (no token), spacing.xs=4 as proxy
   barColPressed: { opacity: 0.85 },
-  barStack:    { width: '100%' },
-  barSeg:      { width: '100%' },
-  donutWrap:   { alignItems: 'center' },
-  xLabels:     { flexDirection: 'row', marginTop: spacing.xs },
-  xLabel:      { flex: 1, textAlign: 'center' },
-  summaryItem: { flex: 1, alignItems: 'center', gap: spacing.s2 },
-  fsSpacer: { flex: 1 },
+  barStack:      { width: '100%' },
+  barSeg:        { width: '100%' },
+  donutWrap:     { alignItems: 'center' },
+  xLabels:       { flexDirection: 'row', marginTop: spacing.xs },
+  xLabel:        { flex: 1, textAlign: 'center' },
+  summaryItem:   { flex: 1, alignItems: 'center', gap: spacing.s2 },
+  fsSpacer:      { flex: 1 },
 });
 
 const styles = StyleSheet.create({
-  card:          { gap: spacing.md },
-  iconBtn:       { padding: spacing.s6, borderRadius: radius.r6 },
-  iconDivider:   { width: 1, height: spacing.lg, marginHorizontal: spacing.xs },
-  btnPressed:    { opacity: 0.85 },
+  card:           { gap: spacing.md },
+  iconBtn:        { padding: spacing.s6, borderRadius: radius.r6 },
+  iconDivider:    { width: 1, height: spacing.lg, marginHorizontal: spacing.xs },
+  btnPressed:     { opacity: 0.85 },
   chip: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.s6,
     borderRadius: layout.pillRadius,
     borderWidth: 1,
   },
-  chipCustom:    { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  chipCustom:     { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   detailStrip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -699,8 +569,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     borderRadius: radius.sm,
   },
-  detailDot:     { width: spacing.s3, height: spacing.s3, borderRadius: radius.r2 },
-  summaryRow:    { flexDirection: 'row', borderTopWidth: 1, paddingTop: spacing.md, marginTop: spacing.xs },
+  detailDot:      { width: spacing.s3, height: spacing.s3, borderRadius: radius.r2 },
+  summaryRow:     { flexDirection: 'row', borderTopWidth: 1, paddingTop: spacing.md, marginTop: spacing.xs },
   summaryDivider: { width: 1, marginVertical: spacing.xs },
-  fsContainer:   { flex: 1, padding: spacing.lg, gap: spacing.md },
+  fsContainer:    { flex: 1, padding: spacing.lg, gap: spacing.md },
 });
