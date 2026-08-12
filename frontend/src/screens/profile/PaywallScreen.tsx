@@ -67,18 +67,32 @@ function PlanCard({ tier, period, selected, onPress }: {
             <Typography preset="caption" color={palette.white}>Best Value</Typography>
           </View>
         )}
-        <View style={styles.planHeader}>
-          <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
-          <Typography preset="h4" color={theme.colors.textPrimary}>{opt.priceLabel}</Typography>
-        </View>
-        {tier.benefits.map(b => (
-          <View key={b} style={styles.benefitRow}>
-            <CheckCircleIcon size={14} color={theme.colors.accent} />
-            <Typography preset="caption" color={theme.colors.textSecondary}>{b}</Typography>
-          </View>
-        ))}
+        <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
+        <Typography preset="caption" color={theme.colors.textSecondary}>
+          {period === 'annual' ? 'Billed annually' : 'Billed monthly'}
+        </Typography>
       </View>
+      <Typography preset="h4" color={theme.colors.textPrimary}>{opt.priceLabel}</Typography>
     </Pressable>
+  );
+}
+
+// ── Benefits panel ────────────────────────────────────────────────────────────
+
+function BenefitsPanel({ tier }: { tier: TierDef }) {
+  const { colors } = useTheme();
+  return (
+    <View style={[styles.benefitsPanel, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
+      <Typography preset="label" color={colors.accent} style={styles.benefitsPanelTitle}>
+        What you get with {tier.name}
+      </Typography>
+      {tier.benefits.map(b => (
+        <View key={b} style={styles.benefitRow}>
+          <CheckCircleIcon size={16} color={colors.accent} />
+          <Typography preset="bodySm" color={colors.textPrimary}>{b}</Typography>
+        </View>
+      ))}
+    </View>
   );
 }
 
@@ -174,6 +188,9 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             />
           ))}
         </View>
+
+        {/* ── Selected plan benefits ── */}
+        <BenefitsPanel tier={selectedTier} />
 
         {/* ── What's included ── */}
         <Typography preset="h4" color={colors.textPrimary} style={styles.includedTitle}>
@@ -282,8 +299,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   planText: { flex: 1, gap: spacing.xs },
-  planHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   badge: {
     alignSelf: 'flex-start',
     borderRadius: radius.pill,
@@ -291,6 +306,18 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     marginBottom: spacing.s6,
   },
+
+  // Benefits panel
+  benefitsPanel: {
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderRadius: layout.cardRadius,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  benefitsPanelTitle: { fontWeight: '600', marginBottom: spacing.xs },
+  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
 
   // Radio
   radio: {
