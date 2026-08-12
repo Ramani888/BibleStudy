@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
@@ -72,7 +72,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
 
   const notifications = data?.notifications ?? [];
   const unreadCount = data?.unreadCount ?? 0;
-  const sections = groupByDate(notifications);
+  const sections = useMemo(() => groupByDate(notifications), [notifications]);
 
   const openSwipeableRef = useRef<Swipeable | null>(null);
 

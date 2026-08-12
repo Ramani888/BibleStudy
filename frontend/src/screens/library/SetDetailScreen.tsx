@@ -50,6 +50,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: reorderCards, isPending: isReordering } = useReorderCards();
 
   const cachedTitle = allSets.find(s => s.id === setId)?.title;
+
+  const moveSetOptions = useMemo(
+    () => allSets.filter(s => s.id !== setId).map(s => ({ id: s.id, label: s.title })),
+    [allSets, setId],
+  );
   useEffect(() => {
     if (cachedTitle) navigation.setOptions({ title: cachedTitle });
   }, [cachedTitle, navigation]);
@@ -374,7 +379,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         visible={movePickerOpen}
         title="Move to Set"
         searchPlaceholder="Search sets…"
-        options={allSets.filter(s => s.id !== setId).map(s => ({ id: s.id, label: s.title }))}
+        options={moveSetOptions}
         onSelect={handleMoveCard}
         onClose={() => { setMovePickerOpen(false); setMoveTargetCard(null); }}
         emptyText="No other sets available"
