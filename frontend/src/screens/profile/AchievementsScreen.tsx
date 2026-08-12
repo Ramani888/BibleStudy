@@ -127,7 +127,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   const insets = useSafeAreaInsets();
   const { data: achievements = [], isLoading, error, refetch } = useAchievements();
 
-  const unlockedCount = achievements.filter(a => a.unlocked).length;
+  const unlockedCount = useMemo(() => achievements.filter(a => a.unlocked).length, [achievements]);
   const remaining = achievements.length - unlockedCount;
 
   const grouped = useMemo(() => {

@@ -62,8 +62,8 @@ export function NotesScreen({ navigation }: Props) {
   const { show: showConfirm, dialogProps } = useConfirmDialog();
   const openRow = useRef<Swipeable | null>(null);
 
-  const cycleSortOrder = () =>
-    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'oldest' : 'newest');
+  const cycleSortOrder = useCallback(() =>
+    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'oldest' : 'newest'), []);
 
   const filtered = useMemo(
     () => notes.filter(n => {

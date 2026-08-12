@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -36,7 +36,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   const myRank = rows.findIndex(r => r.isMe) + 1;
   const quote = getQuote(myRank);
 
-  const renderItem = ({ item, index }: { item: LeaderboardEntry; index: number }) => (
+  const renderItem = useCallback(({ item, index }: { item: LeaderboardEntry; index: number }) => (
     <View style={[
       styles.row,
       { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
@@ -62,7 +62,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         <Typography preset="h4" color={colors.warning}>{item.streak}</Typography>
       </View>
     </View>
-  );
+  ), [colors, isDark]);
 
   if (error) return <ErrorState message="Could not load leaderboard" onRetry={refetch} />;
 

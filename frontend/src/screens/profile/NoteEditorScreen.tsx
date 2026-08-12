@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Keyboard,
@@ -54,7 +54,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   const canSave = title.trim().length > 0 && body.trim().length > 0 && !isSaving;
   const canShare = title.trim().length > 0 && body.trim().length > 0;
 
-  const handleSave = async () => {
+  const handleSave = useCallback(async () => {
     if (!canSave) return;
     Keyboard.dismiss();
     try {
@@ -69,16 +69,16 @@ export function NoteEditorScreen({ navigation, route }: Props) {
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
-  };
+  }, [canSave, isEdit, title, body, selectedTags, updateNote, createNote, navigation]);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     if (!canShare) return;
     try {
       await Share.share({ message: `${title.trim()}\n\n${body.trim()}` });
     } catch {
       // share cancelled
     }
-  };
+  }, [canShare, title, body]);
 
   const toggleTag = (tag: string) =>
     setSelectedTags(prev =>

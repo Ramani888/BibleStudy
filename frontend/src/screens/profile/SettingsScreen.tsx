@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -27,7 +27,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   const isDark = theme.name === 'dark';
   const setMode = useThemeStore(s => s.setMode);
 
-  const handleSignOut = () => {
+  const handleSignOut = useCallback(() => {
     show({
       title: 'Sign Out',
       message: 'Are you sure you want to sign out?',
@@ -35,9 +35,9 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
       variant: 'danger',
       onConfirm: logout,
     });
-  };
+  }, [show, logout]);
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = useCallback(() => {
     show({
       title: 'Delete Account',
       message: 'This will permanently delete your account, all your sets, cards, and data. This action cannot be undone.',
@@ -52,7 +52,11 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         }
       },
     });
-  };
+  }, [show, deleteAccount]);
+
+  const handleThemeToggle = useCallback((v: boolean) => setMode(v ? 'dark' : 'light'), [setMode]);
+  const handleNavAboutUs = useCallback(() => navigation.navigate('AboutUs'), [navigation]);
+  const handleNavPrivacy = useCallback(() => navigation.navigate('PrivacyPolicy'), [navigation]);
 
   return (
     <Screen edges={['top']} header={<ScreenHeader title="Settings" onBack={() => navigation.goBack()} />}>
@@ -66,7 +70,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
               <Typography preset="label" color={colors.textPrimary}>Dark Mode</Typography>
               <Switch
                 value={isDark}
-                onValueChange={v => setMode(v ? 'dark' : 'light')}
+                onValueChange={handleThemeToggle}
               />
             </View>
           </MenuSection>
@@ -83,8 +87,8 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
           <MenuSection label="App Info">
             <MenuItem icon={BookIcon} label="Version" value={APP_VERSION} showChevron={false} onPress={() => {}} />
             <MenuItem icon={StarOutlineIcon} label="BibleStudy Pro" value="Made with ♥" showChevron={false} onPress={() => {}} />
-            <MenuItem icon={InfoIcon} label="About Us" onPress={() => navigation.navigate('AboutUs')} />
-            <MenuItem icon={FileTextIcon} label="Privacy Policy" onPress={() => navigation.navigate('PrivacyPolicy')} />
+            <MenuItem icon={InfoIcon} label="About Us" onPress={handleNavAboutUs} />
+            <MenuItem icon={FileTextIcon} label="Privacy Policy" onPress={handleNavPrivacy} />
           </MenuSection>
         </View>
       </ScrollView>

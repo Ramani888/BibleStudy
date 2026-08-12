@@ -39,26 +39,26 @@ export function FriendRequestsScreen({ navigation }: Props) {
 
   const incomingCount = incomingRequests.length;
 
-  const handleAccept = (requestId: string) => {
+  const handleAccept = useCallback((requestId: string) => {
     accept.mutate(requestId, {
       onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request accepted' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  };
+  }, [accept]);
 
-  const handleReject = (requestId: string) => {
+  const handleReject = useCallback((requestId: string) => {
     reject.mutate(requestId, {
       onSuccess: () => Toast.show({ type: 'info', text1: 'Request declined' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  };
+  }, [reject]);
 
-  const handleCancel = (requestId: string) => {
+  const handleCancel = useCallback((requestId: string) => {
     cancel.mutate(requestId, {
       onSuccess: () => Toast.show({ type: 'info', text1: 'Request cancelled' }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  };
+  }, [cancel]);
 
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
@@ -87,8 +87,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
         )}
       </View>
     );
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab, colors, isDark]);
+  }, [tab, colors, isDark, handleAccept, handleReject, handleCancel]);
 
   if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
 

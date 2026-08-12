@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
@@ -54,6 +54,27 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   // G2: over quota (e.g. after a downgrade) — nudge to upgrade. Nothing is deleted (#7).
   const overQuota = !!storage && storage.used > storage.limit;
 
+  const handleNavBell         = useCallback(() => navigation.navigate('Notifications'), [navigation]);
+  const handleNavStorage      = useCallback(() => navigation.navigate(overQuota ? 'Paywall' : 'Media'), [navigation, overQuota]);
+  const handleNavAchievements = useCallback(() => navigation.navigate('Achievements'), [navigation]);
+  const handleNavNotes        = useCallback(() => navigation.navigate('Notes'), [navigation]);
+  const handleNavMedia        = useCallback(() => navigation.navigate('Media'), [navigation]);
+  const handleNavFriends      = useCallback(() => navigation.navigate('Friends'), [navigation]);
+  const handleNavNotifSettings = useCallback(() => navigation.navigate('NotificationSettings'), [navigation]);
+  const handleNavEditProfile  = useCallback(() => navigation.navigate('EditProfile'), [navigation]);
+  const handleNavCredits      = useCallback(() => navigation.navigate('Credits'), [navigation]);
+  const handleNavPaywall      = useCallback(() => navigation.navigate('Paywall'), [navigation]);
+  const handleNavChangePass   = useCallback(() => navigation.navigate('ChangePassword'), [navigation]);
+  const handleNavSettings     = useCallback(() => navigation.navigate('Settings'), [navigation]);
+  const handleSignOut         = useCallback(() =>
+    showConfirm({
+      title: 'Sign Out',
+      message: 'Are you sure you want to sign out?',
+      confirmLabel: 'Sign Out',
+      variant: 'danger',
+      onConfirm: logout,
+    }), [showConfirm, logout]);
+
   return (
     <View style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={[styles.stickyHeader, { paddingTop: insets.top + 8, backgroundColor: colors.background }]}>
@@ -81,7 +102,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             </View>
             <Pressable
               style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1 })}
-              onPress={() => navigation.navigate('Notifications')}
+              onPress={handleNavBell}
               hitSlop={12}
             >
               <BellIcon size={22} color={palette.white} />
@@ -115,7 +136,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── Storage bar ── */}
         <Pressable
           style={({ pressed }) => [styles.storageSection, { backgroundColor: colors.surface, borderColor: colors.border }, pressed && { opacity: 0.7 }]}
-          onPress={() => navigation.navigate(overQuota ? 'Paywall' : 'Media')}
+          onPress={handleNavStorage}
         >
           <View style={styles.storageRow}>
             <Typography preset="caption" color={overQuota ? colors.alert : colors.textSecondary}>
@@ -134,34 +155,34 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── My Study ── */}
         <View>
         <MenuSection label="My Study">
-          <MenuItem icon={TrophyIcon} label="Achievements" onPress={() => navigation.navigate('Achievements')} />
-          <MenuItem icon={FileTextIcon} label="My Notes" onPress={() => navigation.navigate('Notes')} />
-          <MenuItem icon={AlbumsIcon} label="My Media" onPress={() => navigation.navigate('Media')} />
+          <MenuItem icon={TrophyIcon} label="Achievements" onPress={handleNavAchievements} />
+          <MenuItem icon={FileTextIcon} label="My Notes" onPress={handleNavNotes} />
+          <MenuItem icon={AlbumsIcon} label="My Media" onPress={handleNavMedia} />
         </MenuSection>
 
         {/* ── Community ── */}
         <MenuSection label="Community">
-          <MenuItem icon={UsersIcon} label="Friends" onPress={() => navigation.navigate('Friends')} />
-          <MenuItem icon={BellIcon} label="Notifications" onPress={() => navigation.navigate('NotificationSettings')} />
+          <MenuItem icon={UsersIcon} label="Friends" onPress={handleNavFriends} />
+          <MenuItem icon={BellIcon} label="Notifications" onPress={handleNavNotifSettings} />
         </MenuSection>
 
         {/* ── Account ── */}
         <MenuSection label="Account">
-          <MenuItem icon={UserIcon} label="Edit Profile" onPress={() => navigation.navigate('EditProfile')} />
+          <MenuItem icon={UserIcon} label="Edit Profile" onPress={handleNavEditProfile} />
           <MenuItem
             icon={StarOutlineIcon}
             label="My Credits"
             value={`${creditData?.balance ?? 0} credits`}
-            onPress={() => navigation.navigate('Credits')}
+            onPress={handleNavCredits}
           />
           <MenuItem
             icon={StarOutlineIcon}
             label={user?.plan && user.plan !== 'FREE' ? 'Manage Plan' : 'Upgrade to Premium'}
             value={user?.plan ?? 'FREE'}
-            onPress={() => navigation.navigate('Paywall')}
+            onPress={handleNavPaywall}
           />
-          <MenuItem icon={LockIcon} label="Change Password" onPress={() => navigation.navigate('ChangePassword')} />
-          <MenuItem icon={SettingsIcon} label="Settings" onPress={() => navigation.navigate('Settings')} />
+          <MenuItem icon={LockIcon} label="Change Password" onPress={handleNavChangePass} />
+          <MenuItem icon={SettingsIcon} label="Settings" onPress={handleNavSettings} />
         </MenuSection>
 
         {/* ── Sign out ── */}
@@ -171,15 +192,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             label="Sign Out"
             destructive
             showChevron={false}
-            onPress={() =>
-              showConfirm({
-                title: 'Sign Out',
-                message: 'Are you sure you want to sign out?',
-                confirmLabel: 'Sign Out',
-                variant: 'danger',
-                onConfirm: logout,
-              })
-            }
+            onPress={handleSignOut}
           />
         </MenuSection>
 

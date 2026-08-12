@@ -171,8 +171,8 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
     BONUS:    colors.accent,
   }), [colors]);
 
-  const toggleWindow = () =>
-    setChartWindow(w => w === 'week' ? 'month' : 'week');
+  const toggleWindow = useCallback(() =>
+    setChartWindow(w => w === 'week' ? 'month' : 'week'), []);
 
   const renderTxItem = useCallback(({ item }: { item: CreditTransaction }) => {
     const cfg = TYPE_CONFIG[item.type];

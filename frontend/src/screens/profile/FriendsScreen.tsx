@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -31,14 +31,14 @@ export function FriendsScreen({ navigation }: Props) {
     [leaderboard],
   );
 
-  const handleRemove = (friendId: string, name: string) => {
+  const handleRemove = useCallback((friendId: string, name: string) => {
     removeFriend.mutate(friendId, {
       onSuccess: () => Toast.show({ type: 'success', text1: `${name} removed` }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  };
+  }, [removeFriend]);
 
-  const renderItem = ({ item }: { item: Friendship }) => {
+  const renderItem = useCallback(({ item }: { item: Friendship }) => {
     const streak = streakMap.get(item.friendId) ?? 0;
     const subtitle = streak > 0
       ? `🔥 ${streak} day streak`
@@ -72,7 +72,7 @@ export function FriendsScreen({ navigation }: Props) {
         </Pressable>
       </Pressable>
     );
-  };
+  }, [streakMap, handleRemove, colors, isDark, navigation]);
 
   if (error) return <ErrorState message="Could not load friends" onRetry={refetch} />;
 
