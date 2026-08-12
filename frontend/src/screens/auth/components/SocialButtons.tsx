@@ -39,7 +39,7 @@ interface Props {
   loading?: 'google' | 'apple' | null;
 }
 
-export function SocialButtons({ onGoogle, onApple, loading }: Props) {
+export const SocialButtons = React.memo(function SocialButtons({ onGoogle, onApple, loading }: Props) {
   const { colors } = useTheme();
 
   return (
@@ -79,7 +79,7 @@ export function SocialButtons({ onGoogle, onApple, loading }: Props) {
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   row: { flexDirection: 'row', gap: spacing.md },

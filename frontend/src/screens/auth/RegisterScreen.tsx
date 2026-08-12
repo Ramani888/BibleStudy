@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -38,7 +38,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     }
   };
 
-  const handleGoogle = async () => {
+  const handleGoogle = useCallback(async () => {
     setSocialLoading('google');
     try {
       await loginWithGoogle();
@@ -49,9 +49,9 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     } finally {
       setSocialLoading(null);
     }
-  };
+  }, [loginWithGoogle]);
 
-  const handleApple = async () => {
+  const handleApple = useCallback(async () => {
     setSocialLoading('apple');
     try {
       await loginWithApple();
@@ -60,7 +60,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
     } finally {
       setSocialLoading(null);
     }
-  };
+  }, [loginWithApple]);
 
   return (
     <AuthLayout

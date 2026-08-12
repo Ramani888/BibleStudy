@@ -24,7 +24,7 @@ interface AuthLayoutProps {
   socialLoading?: 'google' | 'apple' | null;
 }
 
-function BrandLogo() {
+const BrandLogo = React.memo(function BrandLogo() {
   const { colors } = useTheme();
   return (
     <View style={styles.logoRow}>
@@ -36,7 +36,7 @@ function BrandLogo() {
       </Typography>
     </View>
   );
-}
+});
 
 export function AuthLayout({
   title,
