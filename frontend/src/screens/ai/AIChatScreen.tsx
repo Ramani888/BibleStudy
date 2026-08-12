@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
-  Image,
-  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -10,29 +8,27 @@ import {
   StyleSheet,
   View,
 } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
 
-import { ChatBubble } from '../../components/domain';
-import { AlbumsIcon, ArrowRightIcon, BookmarkIcon, CameraIcon, CheckCircleIcon, ClockIcon, CopyIcon, FileTextIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
+import { BookmarkIcon, ClockIcon, CopyIcon, FileTextIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
 import { ChatInput } from './components/ChatInput';
 import { CardProposalSheet } from './components/CardProposalSheet';
+import { ChatMessageItem } from './components/ChatMessageItem';
 import { useAuthStore, useAIChatStore, type ChatUIMessage } from '../../store';
-import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useMarkCardsSaved, useMediaFiles, usePickMedia, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
+import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useMarkCardsSaved, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
+import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { detectTags } from '../../utils/tagDetector';
-import { storage } from '../../utils/storage';
 import { getErrorMessage } from '../../api';
-import { layout, radius, spacing, useTheme } from '../../theme';
+import { layout, spacing, useTheme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
-import type { ChatMessage, MediaFile, MediaFileType, SuggestedCard } from '../../types';
+import type { ChatMessage, SuggestedCard } from '../../types';
 
 const ICON_SIZE = 20;
 const EMPTY_ICON_SIZE = 48;
-
 const TYPING_INDICATOR = '__typing__' as const;
 
 const SUGGESTIONS = [
@@ -50,52 +46,35 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   // Active conversation lives in the store, so it survives navigation. The chat
   // shown is always what's here until cleared or a history session is loaded.
-  const messages = useAIChatStore(s => s.messages);
-  const setMessages = useAIChatStore(s => s.setMessages);
-  const sessionId = useAIChatStore(s => s.sessionId);
-  const tags = useAIChatStore(s => s.tags);
-  const setTags = useAIChatStore(s => s.setTags);
+  const messages      = useAIChatStore(s => s.messages);
+  const setMessages   = useAIChatStore(s => s.setMessages);
+  const sessionId     = useAIChatStore(s => s.sessionId);
+  const tags          = useAIChatStore(s => s.tags);
+  const setTags       = useAIChatStore(s => s.setTags);
   const savedMessageIds = useAIChatStore(s => s.savedMessageIds);
-  const markSaved = useAIChatStore(s => s.markSaved);
-  const unmarkSaved = useAIChatStore(s => s.unmarkSaved);
-  const clearChat = useAIChatStore(s => s.clear);
+  const markSaved     = useAIChatStore(s => s.markSaved);
+  const unmarkSaved   = useAIChatStore(s => s.unmarkSaved);
+  const clearChat     = useAIChatStore(s => s.clear);
 
   const listRef = useRef<FlatList>(null);
   const lastAutoSendRef = useRef<string | undefined>(undefined);
   const { show, dialogProps } = useConfirmDialog();
 
-  const [saveModal, setSaveModal] = useState<{
-    visible: boolean;
-    cards: SuggestedCard[];
-    messageId: string;
-    chatId?: string;
-  }>({ visible: false, cards: [], messageId: '' });
-
-  // ActionSheet state for long-press on messages
+  const [saveModal, setSaveModal] = useState<{ visible: boolean; cards: SuggestedCard[]; messageId: string; chatId?: string }>({
+    visible: false, cards: [], messageId: '',
+  });
   const [sheet, setSheet] = useState<{ visible: boolean; message: ChatUIMessage | null }>({
-    visible: false,
-    message: null,
+    visible: false, message: null,
   });
 
-  // Phase F: PDF (F.1) or image (F.2) attached — from My Media or straight from the device.
-  const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType; localUri?: string } | null>(null);
-  const [attachMenuVisible, setAttachMenuVisible] = useState(false); // source chooser
-  const [pickerVisible, setPickerVisible] = useState(false);         // My Media list
-  const [policyAccepted, setPolicyAccepted] = useState(false);
-  const [policyDialogVisible, setPolicyDialogVisible] = useState(false);
-  const { data: media = [] } = useMediaFiles();
-  const { pickImage, takePhoto, pickPdf, isUploading, pendingLocalUri } = usePickMedia();
-
-  const { mutate: sendMessage, isPending } = useAIChat();
-  const { mutateAsync: bulkCreateCards } = useBulkCreateCards();
-  const { mutate: markCardsSaved } = useMarkCardsSaved();
-  const { mutate: updateTags } = useUpdateSessionTags();
+  const { mutate: sendMessage, isPending }       = useAIChat();
+  const { mutateAsync: bulkCreateCards }         = useBulkCreateCards();
+  const { mutate: markCardsSaved }               = useMarkCardsSaved();
+  const { mutate: updateTags }                   = useUpdateSessionTags();
   const { data: creditData, isLoading: isBalanceLoading } = useCreditBalance();
-  // Only fetch bookmarks once the user has received at least one AI response
-  // (which gives it a real chatId worth bookmarking)
   const hasBookmarkableMessages = messages.some(m => m.role === 'ai' && !!m.chatId);
   const { data: bookmarksData } = useBookmarks(hasBookmarkableMessages);
-  const { mutate: addBookmark } = useAddBookmark();
+  const { mutate: addBookmark }    = useAddBookmark();
   const { mutate: removeBookmark } = useRemoveBookmark();
 
   const creditBalance = (creditData?.balance ?? 0) - (isPending ? 1 : 0);
@@ -105,6 +84,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
   const hasExportableMessages = messages.some(m => m.text !== TYPING_INDICATOR);
 
+  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+
+  const att = useAIChatAttachment(creditBalance, goPaywall);
+
   useEffect(() => {
     if (messages.length > 0) {
       const timer = setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
@@ -112,20 +95,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     }
   }, [messages]);
 
-  useEffect(() => {
-    storage.getAiPolicyAccepted().then(accepted => setPolicyAccepted(accepted));
-  }, []);
+  // ─── Core send logic ──────────────────────────────────────────────────────
 
   const handleSend = useCallback(
     (question: string) => {
       if (isBalanceLoading) return;
 
       if (creditBalance <= 0) {
-        Toast.show({
-          type: 'error',
-          text1: 'No credits',
-          text2: 'Claim your daily credit from the Home screen.',
-        });
+        Toast.show({ type: 'error', text1: 'No credits', text2: 'Claim your daily credit from the Home screen.' });
         return;
       }
 
@@ -145,18 +122,18 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       const history = rawHistory.slice(-20);
 
       // Snapshot + clear the attachment now so it's sent once and the composer resets.
-      const att = attachment;
-      setAttachment(null);
+      const snap = att.attachment;
+      att.setAttachment(null);
 
       const userMsgId = Date.now().toString();
       setMessages(prev => [
         ...prev,
-        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: att ? (att.type === 'PDF' ? 5 : 3) : 1, attachmentName: att?.name, attachmentType: att?.type, attachmentLocalUri: att?.localUri },
+        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: snap ? (snap.type === 'PDF' ? 5 : 3) : 1, attachmentName: snap?.name, attachmentType: snap?.type, attachmentLocalUri: snap?.localUri },
         { id: `${userMsgId}_typing`, role: 'ai', text: TYPING_INDICATOR, timestamp: Date.now() },
       ]);
 
       sendMessage(
-        { question, history, sessionId, mediaIds: att ? [att.id] : undefined },
+        { question, history, sessionId, mediaIds: snap ? [snap.id] : undefined },
         {
           onSuccess: data => {
             setMessages(prev =>
@@ -184,16 +161,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           },
           onError: err => {
             setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
-            Toast.show({
-              type: 'error',
-              text1: 'Could not get response',
-              text2: getErrorMessage(err),
-            });
+            Toast.show({ type: 'error', text1: 'Could not get response', text2: getErrorMessage(err) });
           },
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, attachment],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att],
   );
 
   useEffect(() => {
@@ -206,7 +179,6 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     (item: ChatUIMessage) => {
       const idx = messages.findIndex(m => m.id === item.id);
       if (idx < 1) return;
-
       const userMsg = messages[idx - 1];
       if (!userMsg || userMsg.role !== 'user') return;
 
@@ -246,17 +218,15 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           },
           onError: err => {
             setMessages(prev => prev.map(m => m.id === item.id ? item : m));
-            Toast.show({
-              type: 'error',
-              text1: 'Could not regenerate response',
-              text2: getErrorMessage(err),
-            });
+            Toast.show({ type: 'error', text1: 'Could not regenerate response', text2: getErrorMessage(err) });
           },
         },
       );
     },
     [messages, sendMessage, sessionId, unmarkSaved, setMessages],
   );
+
+  // ─── Sheet actions ────────────────────────────────────────────────────────
 
   const handleLongPress = useCallback((item: ChatUIMessage) => {
     if (item.text === TYPING_INDICATOR) return;
@@ -278,22 +248,16 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     const chatId = sheet.message?.chatId;
     if (!chatId) return;
     if (bookmarkedChatIds.has(chatId)) {
-      removeBookmark(chatId, {
-        onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmark removed' }),
-      });
+      removeBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmark removed' }) });
     } else {
-      addBookmark(chatId, {
-        onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmarked' }),
-      });
+      addBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmarked' }) });
     }
   }, [sheet.message, bookmarkedChatIds, removeBookmark, addBookmark]);
 
   const handleExport = useCallback(() => {
     const exportable = messages.filter(m => m.text !== TYPING_INDICATOR);
     if (exportable.length === 0) return;
-    const lines = exportable.map(m =>
-      m.role === 'user' ? `You: ${m.text}` : `AI: ${m.text}`,
-    ).join('\n\n');
+    const lines = exportable.map(m => m.role === 'user' ? `You: ${m.text}` : `AI: ${m.text}`).join('\n\n');
     const header = `AI Bible Study — ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
     const divider = '─'.repeat(36);
     Share.share({ message: `${header}\n${divider}\n\n${lines}` });
@@ -301,13 +265,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   const handleClearChat = useCallback(() => {
     if (messages.length === 0) return;
-    show({
-      title: 'New Conversation',
-      message: 'Clear the current chat and start fresh?',
-      confirmLabel: 'Clear',
-      variant: 'danger',
-      onConfirm: () => clearChat(),
-    });
+    show({ title: 'New Conversation', message: 'Clear the current chat and start fresh?', confirmLabel: 'Clear', variant: 'danger', onConfirm: () => clearChat() });
   }, [messages.length, show, clearChat]);
 
   const handleSaveCards = useCallback(async (setId: string) => {
@@ -315,7 +273,6 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       await bulkCreateCards({ setId, cards: saveModal.cards });
       Toast.show({ type: 'success', text1: `${saveModal.cards.length} card${saveModal.cards.length !== 1 ? 's' : ''} saved!` });
       markSaved(saveModal.messageId);
-      // Persist saved-state so the "Saved" chip survives reopening from history.
       if (saveModal.chatId) markCardsSaved(saveModal.chatId);
       setSaveModal({ visible: false, cards: [], messageId: '' });
     } catch (e) {
@@ -324,170 +281,45 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     }
   }, [bulkCreateCards, saveModal, markCardsSaved, markSaved]);
 
-  // Attach flow (Phase F). Media is credit-metered (min image cost 3); if the user can't
-  // afford it, the source menu becomes an Upgrade nudge instead of a picker.
-  const MIN_MEDIA_COST = 3;
-  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
-
-  const attachFromDevice = useCallback(async (pick: () => Promise<(MediaFile & { localUri?: string }) | null>) => {
-    const file = await pick();
-    if (file) setAttachment({ id: file.id, name: file.name, type: file.type, localUri: file.localUri });
-  }, []);
-
-  const attachMenuActions = useMemo(() => creditBalance < MIN_MEDIA_COST
-    ? [
-        { label: 'Media costs 3–5 credits', icon: StarOutlineIcon, onPress: () => {}, disabled: true },
-        { label: 'Upgrade to Premium', icon: StarIcon, onPress: goPaywall },
-      ]
-    : [
-        { label: 'Choose from My Media', icon: AlbumsIcon, onPress: () => setPickerVisible(true) },
-        { label: 'Photo Library', icon: AlbumsIcon, onPress: () => attachFromDevice(pickImage) },
-        { label: 'Take Photo', icon: CameraIcon, onPress: () => attachFromDevice(takePhoto) },
-        { label: 'Choose PDF', icon: FileTextIcon, onPress: () => attachFromDevice(pickPdf) },
-      ],
-  [creditBalance, goPaywall, attachFromDevice, pickImage, takePhoto, pickPdf]);
-
-  // My Media list — PDFs + images already uploaded.
-  const pickerActions = useMemo(() => media.length > 0
-    ? media.map(f => ({
-        label: f.name,
-        icon: f.type === 'PDF' ? FileTextIcon : AlbumsIcon,
-        onPress: () => setAttachment({ id: f.id, name: f.name, type: f.type }),
-      }))
-    : [{ label: 'No files in My Media', icon: FileTextIcon, onPress: () => {}, disabled: true }],
-  [media]);
-
-  const handleAttachPress = useCallback(() => {
-    Keyboard.dismiss();
-    if (policyAccepted) { setAttachMenuVisible(true); }
-    else { setPolicyDialogVisible(true); }
-  }, [policyAccepted]);
-
-  const handleClearAttachment = useCallback(() => setAttachment(null), []);
-
-  const isCurrentMessageBookmarked = sheet.message?.chatId
-    ? bookmarkedChatIds.has(sheet.message.chatId)
-    : false;
+  const isCurrentMessageBookmarked = sheet.message?.chatId ? bookmarkedChatIds.has(sheet.message.chatId) : false;
 
   const sheetActions = useMemo(() => sheet.message ? [
-    {
-      label: 'Copy',
-      icon: CopyIcon,
-      onPress: handleCopyMessage,
-    },
-    {
-      label: 'Share',
-      icon: ShareIcon,
-      onPress: handleShareMessage,
-    },
+    { label: 'Copy',  icon: CopyIcon,  onPress: handleCopyMessage },
+    { label: 'Share', icon: ShareIcon, onPress: handleShareMessage },
     ...(sheet.message.role === 'ai' ? [
-      {
-        label: 'Regenerate',
-        icon: RefreshIcon,
-        onPress: () => sheet.message && handleRegenerate(sheet.message),
-        disabled: isPending,
-      },
-      {
-        label: isCurrentMessageBookmarked ? 'Remove Bookmark' : 'Bookmark',
-        icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon,
-        onPress: handleToggleBookmark,
-        disabled: !sheet.message.chatId,
-      },
-      {
-        label: 'Save as Card',
-        icon: BookmarkIcon,
-        onPress: () => {
-          if (!sheet.message) return;
-          setSaveModal({
-            visible: true,
-            cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }],
-            messageId: sheet.message.id,
-            chatId: sheet.message.chatId,
-          });
-        },
-      },
+      { label: 'Regenerate', icon: RefreshIcon, onPress: () => sheet.message && handleRegenerate(sheet.message), disabled: isPending },
+      { label: isCurrentMessageBookmarked ? 'Remove Bookmark' : 'Bookmark', icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon, onPress: handleToggleBookmark, disabled: !sheet.message.chatId },
+      { label: 'Save as Card', icon: BookmarkIcon, onPress: () => {
+        if (!sheet.message) return;
+        setSaveModal({ visible: true, cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }], messageId: sheet.message.id, chatId: sheet.message.chatId });
+      }},
     ] : []),
   ] : [],
   [sheet.message, handleCopyMessage, handleShareMessage, handleRegenerate, isPending,
-   isCurrentMessageBookmarked, handleToggleBookmark, setSaveModal]);
+   isCurrentMessageBookmarked, handleToggleBookmark]);
+
+  // ─── Render ───────────────────────────────────────────────────────────────
 
   const renderItem = useCallback(({ item }: { item: ChatUIMessage }) => (
-    <View>
-      {/* Attachment preview on user messages */}
-      {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
-        <Image source={{ uri: item.attachmentLocalUri }} style={styles.msgImageThumb} resizeMode="cover" />
-      ) : item.role === 'user' && item.attachmentName ? (
-        <View style={[styles.attachmentChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-          <FileTextIcon size={14} color={colors.accent} />
-          <Typography preset="caption" color={colors.accent} numberOfLines={1} style={styles.attachmentChipText}>
-            {item.attachmentName}
-          </Typography>
-        </View>
-      ) : null}
-      <Pressable onLongPress={() => handleLongPress(item)} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-        <ChatBubble
-          role={item.role}
-          text={item.text}
-          creditsUsed={item.creditsUsed}
-          userName={user?.name}
-          userImage={user?.profileImage}
-          isTyping={item.text === TYPING_INDICATOR}
-          timestamp={item.text !== TYPING_INDICATOR ? item.timestamp : undefined}
-        />
-      </Pressable>
-
-      {/* Follow-up suggestion chips after AI messages */}
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.followUps && item.followUps.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={styles.followUps}>
-          {item.followUps.map((q, i) => (
-            <Pressable
-              key={i}
-              style={({ pressed }) => [styles.followUpChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
-              onPress={() => handleSend(q)}
-              disabled={isPending || isBalanceLoading}
-            >
-              <ArrowRightIcon size={12} color={colors.accent} />
-              <Typography preset="caption" color={colors.accent} style={styles.followUpText}>
-                {q}
-              </Typography>
-            </Pressable>
-          ))}
-        </Animated.View>
-      )}
-
-      {/* Flashcard proposal banner — shown when AI generated cards (incl. history) */}
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-          <AlbumsIcon size={16} color={colors.accent} />
-          <Typography preset="bodySm" color={colors.accent} style={styles.cardBannerText}>
-            {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
-          </Typography>
-          {savedMessageIds.has(item.id) ? (
-            <View style={styles.savedChip}>
-              <CheckCircleIcon size={14} color={colors.success} />
-              <Typography preset="caption" color={colors.success}> Saved</Typography>
-            </View>
-          ) : (
-            <Pressable
-              style={({ pressed }) => [styles.saveToSetBtn, { backgroundColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
-              onPress={() => setSaveModal({ visible: true, cards: item.suggestedCards!, messageId: item.id, chatId: item.chatId })}
-              hitSlop={8}
-            >
-              <Typography preset="caption" color={colors.textOnAccent}>Save to Set</Typography>
-            </Pressable>
-          )}
-        </Animated.View>
-      )}
-    </View>
-  ), [user, handleLongPress, handleSend, isPending, isBalanceLoading, savedMessageIds, setSaveModal, colors]);
+    <ChatMessageItem
+      item={item}
+      userName={user?.name}
+      userImage={user?.profileImage}
+      isPending={isPending}
+      isBalanceLoading={isBalanceLoading}
+      savedMessageIds={savedMessageIds}
+      colors={colors as unknown as Record<string, string>}
+      onLongPress={handleLongPress}
+      onSend={handleSend}
+      onSaveCards={(cards, messageId, chatId) => setSaveModal({ visible: true, cards, messageId, chatId })}
+    />
+  ), [user, isPending, isBalanceLoading, savedMessageIds, colors, handleLongPress, handleSend]);
 
   return (
-    <KeyboardAvoidingView
-      style={[styles.safe, { backgroundColor: colors.background }]}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <KeyboardAvoidingView style={[styles.safe, { backgroundColor: colors.background }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <SafeAreaView style={styles.flex} edges={['top']}>
-      {/* ── Header ── */}
+
+      {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
         <View style={styles.headerLeft}>
           <View style={[styles.aiBadge, { backgroundColor: colors.accent }]}>
@@ -495,38 +327,23 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           </View>
           <View>
             <Typography preset="h4">AI Bible Assistant</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>
-              Powered by Claude
-            </Typography>
+            <Typography preset="caption" color={colors.textSecondary}>Powered by Claude</Typography>
           </View>
         </View>
         <View style={styles.headerRight}>
-          {/* Always rendered to prevent layout shift — hidden via opacity when no messages */}
-          <Pressable
-            onPress={handleExport}
-            hitSlop={8}
-            disabled={!hasExportableMessages}
-            style={({ pressed }) => ({ opacity: hasExportableMessages ? (pressed ? 0.7 : 1) : 0 })}
-          >
+          <Pressable onPress={handleExport} hitSlop={8} disabled={!hasExportableMessages} style={({ pressed }) => ({ opacity: hasExportableMessages ? (pressed ? 0.7 : 1) : 0 })}>
             <FileTextIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
           <Pressable onPress={handleClearChat} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-            <PlusIcon
-              size={ICON_SIZE}
-              color={colors.textSecondary}
-            />
+            <PlusIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
-          <Pressable
-            onPress={() => navigation.navigate('ChatHistory')}
-            hitSlop={8}
-            style={({ pressed }) => [styles.historyBtn, { opacity: pressed ? 0.7 : 1 }]}
-          >
+          <Pressable onPress={() => navigation.navigate('ChatHistory')} hitSlop={8} style={({ pressed }) => [styles.historyBtn, { opacity: pressed ? 0.7 : 1 }]}>
             <ClockIcon size={ICON_SIZE} color={colors.accent} />
           </Pressable>
         </View>
       </View>
 
-      {/* ── Messages ── */}
+      {/* Messages */}
       <FlatList
         ref={listRef}
         data={messages}
@@ -561,189 +378,61 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         renderItem={renderItem}
       />
 
-      {/* ── Input ── */}
+      {/* Input */}
       <ChatInput
         onSend={handleSend}
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
-        attachmentName={attachment?.name ?? null}
-        attachmentType={attachment?.type ?? (pendingLocalUri ? 'IMAGE' : 'PDF')}
-        attachmentLocalUri={pendingLocalUri ?? attachment?.localUri ?? null}
-        isUploading={isUploading}
-        onAttachPress={handleAttachPress}
-        onClearAttachment={handleClearAttachment}
+        attachmentName={att.attachment?.name ?? null}
+        attachmentType={att.attachment?.type ?? (att.pendingLocalUri ? 'IMAGE' : 'PDF')}
+        attachmentLocalUri={att.pendingLocalUri ?? att.attachment?.localUri ?? null}
+        isUploading={att.isUploading}
+        onAttachPress={att.handleAttachPress}
+        onClearAttachment={att.handleClearAttachment}
         onUpgrade={goPaywall}
       />
 
-      {/* ── Attach source chooser (My Media / device) ── */}
-      <ActionSheet
-        visible={attachMenuVisible}
-        title={isUploading ? 'Uploading…' : 'Attach a file'}
-        actions={attachMenuActions}
-        onClose={() => setAttachMenuVisible(false)}
-      />
+      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? 'Uploading…' : 'Attach a file'} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
+      <ActionSheet visible={att.pickerVisible} title="Choose from My Media" actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
+      <ActionSheet visible={sheet.visible} title={sheet.message?.role === 'user' ? 'Your message' : 'AI response'} actions={sheetActions} onClose={() => setSheet({ visible: false, message: null })} />
 
-      {/* ── My Media list ── */}
-      <ActionSheet
-        visible={pickerVisible}
-        title="Choose from My Media"
-        actions={pickerActions}
-        onClose={() => setPickerVisible(false)}
-      />
-
-      {/* ── Long-press ActionSheet ── */}
-      <ActionSheet
-        visible={sheet.visible}
-        title={sheet.message?.role === 'user' ? 'Your message' : 'AI response'}
-        actions={sheetActions}
-        onClose={() => setSheet({ visible: false, message: null })}
-      />
-
-      <CardProposalSheet
-        visible={saveModal.visible}
-        cards={saveModal.cards}
-        onSave={handleSaveCards}
-        onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })}
-      />
+      <CardProposalSheet visible={saveModal.visible} cards={saveModal.cards} onSave={handleSaveCards} onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })} />
 
       <ConfirmDialog {...dialogProps} />
 
-      {/* ── Content policy banner (one-time, before first attachment) ── */}
+      {/* Content policy — one-time, before first attachment */}
       <ConfirmDialog
-        visible={policyDialogVisible}
+        visible={att.policyDialogVisible}
         title="Content Policy"
         message={"Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines."}
         confirmLabel="I Agree"
         cancelLabel="Cancel"
-        onConfirm={() => {
-          storage.setAiPolicyAccepted();
-          setPolicyAccepted(true);
-          setPolicyDialogVisible(false);
-          setAttachMenuVisible(true);
-        }}
-        onCancel={() => setPolicyDialogVisible(false)}
+        onConfirm={att.acceptPolicy}
+        onCancel={() => att.setPolicyDialogVisible(false)}
       />
+
     </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  flex: { flex: 1 },
-
+  safe:   { flex: 1 },
+  flex:   { flex: 1 },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing.md,
-    borderBottomWidth: 1,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md, borderBottomWidth: 1,
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
+  headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   aiBadge: {
-    width: spacing.huge,
-    height: spacing.huge,
-    borderRadius: layout.cardRadius,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius,
+    alignItems: 'center', justifyContent: 'center',
   },
   historyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-
-  list: {
-    padding: layout.screenPaddingH,
-    paddingTop: spacing.lg,
-    flexGrow: 1,
-  },
-
-  emptyWrap: {
-    flex: 1,
-    alignItems: 'center',
-    paddingTop: spacing.xxxl,
-    gap: spacing.md,
-  },
-  emptySub: { paddingHorizontal: spacing.lg },
-  suggestions: {
-    width: '100%',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-  },
-  suggestion: {
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
-    padding: spacing.md,
-  },
-
-  msgImageThumb: {
-    width: 200,
-    height: 150,
-    borderRadius: layout.cardRadius,
-    alignSelf: 'flex-end',
-    marginRight: spacing.lg,
-    marginBottom: spacing.xs,
-  },
-
-  attachmentChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.s6,
-    alignSelf: 'flex-end',
-    maxWidth: '80%',
-    marginRight: spacing.lg,
-    marginBottom: spacing.xs,
-    borderWidth: 1,
-    borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.s6,
-  },
-  attachmentChipText: { flexShrink: 1 },
-
-  followUps: {
-    paddingLeft: spacing.huge,
-    paddingRight: spacing.lg,
-    gap: spacing.sm,
-    marginTop: -spacing.xs,
-    marginBottom: spacing.md,
-  },
-  followUpChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.s6,
-    alignSelf: 'flex-start',
-  },
-  followUpText: { flexShrink: 1 },
-
-  cardBanner: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.sm,
-    marginLeft: spacing.huge,
-    marginRight: spacing.lg,
-    marginBottom: spacing.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: spacing.md,
-    borderRadius: radius.r10,
-    borderWidth: 1,
-  },
-  cardBannerText: { flex: 1 },
-  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  saveToSetBtn: {
-    borderRadius: radius.sm,
-    paddingVertical: spacing.s6,
-    paddingHorizontal: spacing.md,
-  },
+  list: { padding: layout.screenPaddingH, paddingTop: spacing.lg, flexGrow: 1 },
+  emptyWrap: { flex: 1, alignItems: 'center', paddingTop: spacing.xxxl, gap: spacing.md },
+  emptySub:  { paddingHorizontal: spacing.lg },
+  suggestions: { width: '100%', gap: spacing.sm, marginTop: spacing.sm },
+  suggestion:  { borderRadius: layout.cardRadius, borderWidth: 1, padding: spacing.md },
 });
