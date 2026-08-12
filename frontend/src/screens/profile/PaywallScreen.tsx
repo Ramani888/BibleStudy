@@ -88,8 +88,8 @@ function BenefitsPanel({ tier }: { tier: TierDef }) {
       </Typography>
       {tier.benefits.map(b => (
         <View key={b} style={styles.benefitRow}>
-          <CheckCircleIcon size={16} color={colors.accent} />
-          <Typography preset="bodySm" color={colors.textPrimary}>{b}</Typography>
+          <CheckCircleIcon size={22} color={colors.accent} />
+          <Typography preset="body" color={colors.textPrimary} style={styles.benefitLabel}>{b}</Typography>
         </View>
       ))}
     </View>
@@ -313,11 +313,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: layout.cardRadius,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    gap: spacing.sm,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.xl,
   },
   benefitsPanelTitle: { fontWeight: '600', marginBottom: spacing.xs },
-  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.lg },
+  benefitLabel: { flex: 1 },
 
   // Radio
   radio: {
