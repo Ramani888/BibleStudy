@@ -52,7 +52,7 @@ export function AppNavigator() {
       })}
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
-      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
+      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library', popToTopOnBlur: true }} />
       <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
       <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
       {/* popToTopOnBlur: leaving Profile resets its stack to the Profile root, so a
