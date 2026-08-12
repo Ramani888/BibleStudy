@@ -21,6 +21,7 @@ import {
   type IconComponent,
 } from '../../components/icons';
 import { useAuthStore } from '../../store';
+import { useHomeNavigation } from '../../hooks/useHomeNavigation';
 import {
   useSets,
   usePublicSets,
@@ -284,6 +285,8 @@ export function HomeScreen() {
   const { data: notifData } = useNotifications(1);
   useAutoDailyClaim();
 
+  const nav = useHomeNavigation(navigation);
+
   const publicSets  = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
   const activities  = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
@@ -295,55 +298,6 @@ export function HomeScreen() {
     () => [...(sets ?? [])].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4),
     [sets],
   );
-
-  const goReview = useCallback((setId: string, setTitle: string) =>
-    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } }),
-  [navigation]);
-
-  const goContinue = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } }),
-  [navigation]);
-
-  const goCreate = useCallback(() =>
-    navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} }),
-  [navigation]);
-
-  const onAI = useCallback(() =>
-    navigation.navigate('AITab', { screen: 'AIChat' }),
-  [navigation]);
-
-  const onBell = useCallback(() =>
-    navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } }),
-  [navigation]);
-
-  const onAvatar = useCallback(() =>
-    navigation.navigate('ProfileTab', { screen: 'Profile' }),
-  [navigation]);
-
-  const goLibrary      = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),     [navigation]);
-  const goQuizHub      = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),      [navigation]);
-  const goAIChat       = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),       [navigation]);
-  const goNotes        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes' }),        [navigation]);
-  const goMedia        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }),        [navigation]);
-  const goPublicSets   = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets' }),   [navigation]);
-  const goFriends      = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends' }),      [navigation]);
-  const goProfile      = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),      [navigation]);
-  const goFriendsSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' }), [navigation]);
-
-  const goViewSet = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } }),
-  [navigation]);
-
-  const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [
-    { label: 'Library',  Icon: LibraryIcon,    onPress: goLibrary },
-    { label: 'Quiz',     Icon: CheckCircleIcon, onPress: goQuizHub },
-    { label: 'AI Chat',  Icon: SparklesIcon,    onPress: goAIChat },
-    { label: 'Notes',    Icon: FileTextIcon,    onPress: goNotes },
-    { label: 'Media',    Icon: FolderIcon,      onPress: goMedia },
-    { label: 'Discover', Icon: SearchIcon,      onPress: goPublicSets },
-    { label: 'Friends',  Icon: UsersIcon,       onPress: goFriends },
-    { label: 'Profile',  Icon: UserIcon,        onPress: goProfile },
-  ], [goLibrary, goQuizHub, goAIChat, goNotes, goMedia, goPublicSets, goFriends, goProfile]);
 
   const summaryStats = useMemo(() => [
     { value: friends?.length ?? 0,     label: 'Friends' },
@@ -361,9 +315,9 @@ export function HomeScreen() {
         name={firstName}
         avatarUri={user?.profileImage}
         unread={notifData?.unreadCount ?? 0}
-        onAI={onAI}
-        onBell={onBell}
-        onAvatar={onAvatar}
+        onAI={nav.onAI}
+        onBell={nav.onBell}
+        onAvatar={nav.onAvatar}
       />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -373,15 +327,15 @@ export function HomeScreen() {
           due={dueSummary}
           continueSet={continueSet}
           streak={streak}
-          onReview={goReview}
-          onContinue={goContinue}
-          onCreate={goCreate}
+          onReview={nav.goReview}
+          onContinue={nav.goContinue}
+          onCreate={nav.goCreate}
         />
 
         {/* Quick actions */}
         <Spacer size={spacing.xxl} />
         <View style={styles.quickGrid}>
-          {quickActions.map(a => (
+          {nav.quickActions.map(a => (
             <QuickAction key={a.label} Icon={a.Icon} label={a.label} onPress={a.onPress} />
           ))}
         </View>
@@ -390,11 +344,11 @@ export function HomeScreen() {
         {recentSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="My Sets" actionLabel="See all" onAction={goLibrary} />
+            <SectionRow title="My Sets" actionLabel="See all" onAction={nav.goLibrary} />
             <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
-                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onSelect={goContinue} />
+                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onSelect={nav.goContinue} />
               ))}
             </View>
           </>
@@ -408,11 +362,11 @@ export function HomeScreen() {
         {friendsSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="From your friends" actionLabel="See all" onAction={goFriendsSets} />
+            <SectionRow title="From your friends" actionLabel="See all" onAction={nav.goFriendsSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {friendsSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onSelect={goViewSet} />
+                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onSelect={nav.goViewSet} />
               ))}
             </ScrollView>
           </>
@@ -434,11 +388,11 @@ export function HomeScreen() {
         {publicSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="Discover" actionLabel="See all" onAction={goPublicSets} />
+            <SectionRow title="Discover" actionLabel="See all" onAction={nav.goPublicSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {publicSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onSelect={goViewSet} />
+                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onSelect={nav.goViewSet} />
               ))}
             </ScrollView>
           </>

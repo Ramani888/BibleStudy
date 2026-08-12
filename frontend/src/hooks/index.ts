@@ -32,6 +32,7 @@ export { useWeeklyChart } from './useWeeklyChart';
 export { useChatHistoryActions } from './useChatHistoryActions';
 export { useMediaUpload } from './useMediaUpload';
 export { useMediaActions } from './useMediaActions';
+export { useHomeNavigation } from './useHomeNavigation';
 export { useAchievements } from './useAchievements';
 export { usePlans, usePlan, useCreatePlan, useDeletePlan, useToggleStep } from './usePlans';
 export { useSubscriptionStatus, useSubscriptionSync, useIapSubscriptions } from './useSubscription';
