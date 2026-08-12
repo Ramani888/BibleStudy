@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 import {
   Dimensions,
   FlatList,
@@ -61,18 +61,18 @@ export function OnboardingScreen({ onComplete }: Props) {
 
   const isLast = activeIndex === SLIDES.length - 1;
 
-  const markAndComplete = async () => {
+  const markAndComplete = useCallback(async () => {
     await AsyncStorage.setItem('@onboarding_seen', 'true');
     onComplete();
-  };
+  }, [onComplete]);
 
-  const goNext = () => {
+  const goNext = useCallback(() => {
     const next = activeIndex + 1;
     listRef.current?.scrollToIndex({ index: next, animated: true });
     setActiveIndex(next);
-  };
+  }, [activeIndex]);
 
-  const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => (
+  const renderSlide = useCallback(({ item }: ListRenderItemInfo<Slide>) => (
     <View style={styles.slide}>
       <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
         <Icon name={item.icon} size={72} color={colors.accent} />
@@ -86,7 +86,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         {item.subtitle}
       </Typography>
     </View>
-  );
+  ), [colors]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
