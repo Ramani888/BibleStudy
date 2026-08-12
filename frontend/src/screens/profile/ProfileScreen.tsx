@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { MenuSection } from './components/MenuSection';
@@ -37,6 +37,7 @@ const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
 
 export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const user = useAuthStore(s => s.user);
   const logout = useAuthStore(s => s.logout);
@@ -54,9 +55,12 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const overQuota = !!storage && storage.used > storage.limit;
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
+    <View style={[styles.safe, { backgroundColor: colors.background }]}>
+      <View style={[styles.stickyHeader, { paddingTop: insets.top + 8, backgroundColor: colors.background }]}>
+        <Typography preset="h3" color={colors.textPrimary}>Profile</Typography>
+      </View>
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 96 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile card (gradient) ── */}
@@ -192,13 +196,18 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
-  scroll: { paddingTop: spacing.sm, paddingBottom: spacing.s48 },
+  stickyHeader: {
+    width: '100%',
+    paddingHorizontal: spacing.lg,
+    paddingBottom: spacing.sm,
+  },
+  scroll: { paddingTop: spacing.sm },
 
   profileCard: {
     height: 92,
