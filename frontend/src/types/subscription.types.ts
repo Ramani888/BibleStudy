@@ -60,8 +60,6 @@ export const TIERS: TierDef[] = [
       'Priority AI responses',
       '10 GB media storage',
       'Advanced study analytics',
-      'Group study plan tools',
-      'Export & backup',
     ],
     monthly: { productId: 'com.biblestudypro.pro.monthly', priceLabel: '$9.99/mo' },
     annual: { productId: 'com.biblestudypro.pro.annual', priceLabel: '$79.99/yr' },
