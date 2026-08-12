@@ -1,13 +1,15 @@
 import { randomUUID } from 'crypto';
-import { PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import fs from 'fs/promises';
+import path from 'path';
 import { Prisma } from '@prisma/client';
 import sharp from 'sharp';
 import { prisma } from '../../config/db';
-import { s3, S3_BUCKET, S3_BASE_URL } from '../../config/s3.client';
+import { env } from '../../config/env';
 import { AppError, NotFoundError } from '../../utils/errors';
 import type { ListMediaDtoType } from './media.dto';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -53,8 +55,7 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
     finalSize = buffer.length;
   }
 
-  // Fast pre-check: avoids S3 upload cost when quota is clearly exceeded.
-  // Not atomic — the real enforcement is the conditional UPDATE inside the transaction below.
+  // Fast pre-check: not atomic — the real enforcement is the conditional UPDATE below.
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
   if (user.storageUsed + BigInt(finalSize) > user.storageLimit) {
     throw new AppError(
@@ -64,28 +65,22 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
     );
   }
 
-  const uuid         = randomUUID();
-  const baseName     = file.originalname.replace(/\.[^.]+$/, ''); // strip original extension
-  const displayName  = `${baseName}.${ext}`;                       // reflect actual stored format
-  const key          = isPdf
-    ? `users/${userId}/pdfs/${uuid}.${ext}`
-    : `users/${userId}/images/${uuid}.${ext}`;
-  const url          = `${S3_BASE_URL}/${key}`;
+  const uuid        = randomUUID();
+  const baseName    = file.originalname.replace(/\.[^.]+$/, '');
+  const displayName = `${baseName}.${ext}`;
+  const subDir      = isPdf ? 'pdfs' : 'images';
+  const key         = `users/${userId}/${subDir}/${uuid}.${ext}`;
+  const filePath    = path.join(UPLOADS_DIR, key);
+  const url         = `${env.APP_URL}/uploads/${key}`;
 
-  // Upload to Hetzner Object Storage
-  await s3.send(new PutObjectCommand({
-    Bucket:      S3_BUCKET,
-    Key:         key,
-    Body:        buffer,
-    ContentType: mimeType,
-    ACL:         'public-read' as const,
-  }));
+  // Write to disk
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, buffer);
 
   // Persist record + update quota atomically.
-  // The conditional UPDATE is the real quota enforcement — it only increments storageUsed
-  // if the post-upload total still fits within the limit, closing the race window where
-  // two concurrent uploads could both pass the pre-check before either has incremented.
-  // If the DB step fails for any reason after a successful S3 upload, clean up the orphaned file.
+  // The conditional UPDATE is the real quota enforcement — closes the race window where
+  // two concurrent uploads both pass the pre-check before either has incremented.
+  // If the DB step fails after writing to disk, clean up the orphaned file.
   try {
     return await prisma.$transaction(async (tx) => {
       const affected = await tx.$executeRaw`
@@ -121,7 +116,7 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
       });
     });
   } catch (dbError) {
-    await s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: key })).catch(() => {});
+    await fs.unlink(filePath).catch(() => {});
     throw dbError;
   }
 }
@@ -137,7 +132,7 @@ export async function deleteFile(userId: string, fileId: string) {
   const file = await prisma.mediaFile.findFirst({ where: { id: fileId, userId } });
   if (!file) throw new NotFoundError('Media file not found');
 
-  // DB transaction first — if this fails the S3 file is untouched (consistent state).
+  // DB first — if this fails the file on disk is untouched (consistent state).
   await prisma.$transaction([
     prisma.mediaFile.delete({ where: { id: fileId } }),
     prisma.user.update({
@@ -146,10 +141,10 @@ export async function deleteFile(userId: string, fileId: string) {
     }),
   ]);
 
-  // S3 after DB — if S3 delete fails the file is orphaned in storage but is removed from
-  // the user's listing. DB state is the source of truth; don't surface this error.
-  await s3.send(new DeleteObjectCommand({ Bucket: S3_BUCKET, Key: file.key })).catch(err => {
-    console.error(`[media] S3 delete failed for key ${file.key}:`, err);
+  // Disk delete after DB — if it fails the file is orphaned but removed from listing.
+  const filePath = path.join(UPLOADS_DIR, file.key);
+  await fs.unlink(filePath).catch(err => {
+    console.error(`[media] disk delete failed for key ${file.key}:`, err);
   });
 
   return { message: 'File deleted successfully' };

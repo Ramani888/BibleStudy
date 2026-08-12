@@ -1,6 +1,7 @@
 import 'express-async-errors'; // must be first — patches Express 4 async error propagation
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import path from 'path';
 import { env } from './config/env';
 import { prisma } from './config/db';
 import { generalRateLimit } from './middlewares/rateLimit.middleware';
@@ -53,6 +54,9 @@ app.use(
 // Body parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Serve uploaded media files
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Global rate limit
 app.use(generalRateLimit);

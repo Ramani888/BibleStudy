@@ -41,12 +41,8 @@ const envSchema = z.object({
   FIREBASE_PRIVATE_KEY: z.string().optional().default(''),
   FIREBASE_CLIENT_EMAIL: z.string().optional().default(''),
 
-  // Hetzner Object Storage (required for media upload feature)
-  HETZNER_S3_ENDPOINT:   z.string().min(1, 'HETZNER_S3_ENDPOINT is required'),
-  HETZNER_S3_BUCKET:     z.string().min(1, 'HETZNER_S3_BUCKET is required'),
-  HETZNER_S3_REGION:     z.string().min(1, 'HETZNER_S3_REGION is required'),
-  HETZNER_S3_ACCESS_KEY: z.string().min(1, 'HETZNER_S3_ACCESS_KEY is required'),
-  HETZNER_S3_SECRET_KEY: z.string().min(1, 'HETZNER_S3_SECRET_KEY is required'),
+  // Public base URL of this server — used to build media file URLs
+  APP_URL: z.string().min(1, 'APP_URL is required'),
 });
 
 const parsed = envSchema.safeParse(process.env);
