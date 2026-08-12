@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -53,7 +53,7 @@ function getGreeting(): string {
 }
 
 // ─── Sticky Header ─────────────────────────────────────────────────────────────
-function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
+const StickyHeader = React.memo(function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
   greeting: string; name: string; avatarUri?: string | null; unread: number;
   onAI: () => void; onBell: () => void; onAvatar: () => void;
 }) {
@@ -82,10 +82,10 @@ function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvata
       </View>
     </View>
   );
-}
+});
 
 // ─── Featured card ─────────────────────────────────────────────────────────────
-function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate }: {
+const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate }: {
   due?: DueSummary; continueSet: StudySet | null; streak: number;
   onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
 }) {
@@ -125,10 +125,10 @@ function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate
       </View>
     </AnimatedPressable>
   );
-}
+});
 
 // ─── Circular quick action ─────────────────────────────────────────────────────
-function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
+const QuickAction = React.memo(function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
   const { colors } = useTheme();
   return (
     <AnimatedPressable style={styles.quickAction} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
@@ -138,13 +138,14 @@ function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: str
       <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
     </AnimatedPressable>
   );
-}
+});
 
 // ─── Recent set row ────────────────────────────────────────────────────────────
-function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: () => void }) {
+const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySet; due: boolean; onSelect: (s: StudySet) => void }) {
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
+  const handlePress = useCallback(() => onSelect(set), [onSelect, set]);
   return (
     <AnimatedPressable
       style={[
@@ -152,7 +153,7 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
         { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, shadowColor: colors.textPrimary },
         !isDark && styles.cardShadow,
       ]}
-      onPress={onPress}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`Open ${set.title}`}
     >
@@ -172,13 +173,14 @@ function SetRow({ set, due, onPress }: { set: StudySet; due: boolean; onPress: (
       )}
     </AnimatedPressable>
   );
-}
+});
 
 // ─── Mini set card (horizontal rails) ─────────────────────────────────────────
-function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponent; onPress: () => void }) {
+const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { set: StudySet; Icon: IconComponent; onSelect: (s: StudySet) => void }) {
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
+  const handlePress = useCallback(() => onSelect(set), [onSelect, set]);
   return (
     <AnimatedPressable
       style={[
@@ -186,7 +188,7 @@ function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponen
         { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border, shadowColor: colors.textPrimary },
         !isDark && styles.cardShadow,
       ]}
-      onPress={onPress}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`Open ${set.title}`}
     >
@@ -197,7 +199,7 @@ function SetMiniCard({ set, Icon, onPress }: { set: StudySet; Icon: IconComponen
       <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
     </AnimatedPressable>
   );
-}
+});
 
 // ─── Activity feed item ────────────────────────────────────────────────────────
 function activityText(a: Activity): string {
@@ -212,7 +214,7 @@ function activityText(a: Activity): string {
   }
 }
 
-function ActivityItem({ activity }: { activity: Activity }) {
+const ActivityItem = React.memo(function ActivityItem({ activity }: { activity: Activity }) {
   const { colors } = useTheme();
   return (
     <View style={styles.activityItem}>
@@ -223,10 +225,10 @@ function ActivityItem({ activity }: { activity: Activity }) {
       </View>
     </View>
   );
-}
+});
 
 // ─── Summary stats ─────────────────────────────────────────────────────────────
-function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
+const SummaryCard = React.memo(function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   return (
@@ -246,9 +248,9 @@ function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }>
       ))}
     </View>
   );
-}
+});
 
-function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
+const SectionRow = React.memo(function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
   const { colors } = useTheme();
   return (
     <View style={styles.sectionRow}>
@@ -261,7 +263,7 @@ function SectionRow({ title, actionLabel, onAction }: { title: string; actionLab
       )}
     </View>
   );
-}
+});
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 export function HomeScreen() {
@@ -294,22 +296,63 @@ export function HomeScreen() {
     [sets],
   );
 
-  const goReview   = (setId: string, setTitle: string) =>
-    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } });
-  const goContinue = (s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } });
-  const goCreate   = () => navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} });
+  const goReview = useCallback((setId: string, setTitle: string) =>
+    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } }),
+  [navigation]);
 
-  const quickActions: Array<{ label: string; Icon: IconComponent; onPress: () => void }> = [
-    { label: 'Library',  Icon: LibraryIcon,      onPress: () => navigation.navigate('LibraryTab', { screen: 'Library' }) },
-    { label: 'Quiz',     Icon: CheckCircleIcon,   onPress: () => navigation.navigate('QuizTab',   { screen: 'QuizHub' }) },
-    { label: 'AI Chat',  Icon: SparklesIcon,      onPress: () => navigation.navigate('AITab',     { screen: 'AIChat' }) },
-    { label: 'Notes',    Icon: FileTextIcon,      onPress: () => navigation.navigate('ProfileTab', { screen: 'Notes' }) },
-    { label: 'Media',    Icon: FolderIcon,        onPress: () => navigation.navigate('ProfileTab', { screen: 'Media' }) },
-    { label: 'Discover', Icon: SearchIcon,        onPress: () => navigation.navigate('LibraryTab', { screen: 'PublicSets' }) },
-    { label: 'Friends',  Icon: UsersIcon,         onPress: () => navigation.navigate('ProfileTab', { screen: 'Friends' }) },
-    { label: 'Profile',  Icon: UserIcon,          onPress: () => navigation.navigate('ProfileTab', { screen: 'Profile' }) },
-  ];
+  const goContinue = useCallback((s: StudySet) =>
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } }),
+  [navigation]);
+
+  const goCreate = useCallback(() =>
+    navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} }),
+  [navigation]);
+
+  const onAI = useCallback(() =>
+    navigation.navigate('AITab', { screen: 'AIChat' }),
+  [navigation]);
+
+  const onBell = useCallback(() =>
+    navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } }),
+  [navigation]);
+
+  const onAvatar = useCallback(() =>
+    navigation.navigate('ProfileTab', { screen: 'Profile' }),
+  [navigation]);
+
+  const goLibrary      = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),     [navigation]);
+  const goQuizHub      = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),      [navigation]);
+  const goAIChat       = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),       [navigation]);
+  const goNotes        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes' }),        [navigation]);
+  const goMedia        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }),        [navigation]);
+  const goPublicSets   = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets' }),   [navigation]);
+  const goFriends      = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends' }),      [navigation]);
+  const goProfile      = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),      [navigation]);
+  const goFriendsSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' }), [navigation]);
+
+  const goViewSet = useCallback((s: StudySet) =>
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } }),
+  [navigation]);
+
+  const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [
+    { label: 'Library',  Icon: LibraryIcon,    onPress: goLibrary },
+    { label: 'Quiz',     Icon: CheckCircleIcon, onPress: goQuizHub },
+    { label: 'AI Chat',  Icon: SparklesIcon,    onPress: goAIChat },
+    { label: 'Notes',    Icon: FileTextIcon,    onPress: goNotes },
+    { label: 'Media',    Icon: FolderIcon,      onPress: goMedia },
+    { label: 'Discover', Icon: SearchIcon,      onPress: goPublicSets },
+    { label: 'Friends',  Icon: UsersIcon,       onPress: goFriends },
+    { label: 'Profile',  Icon: UserIcon,        onPress: goProfile },
+  ], [goLibrary, goQuizHub, goAIChat, goNotes, goMedia, goPublicSets, goFriends, goProfile]);
+
+  const summaryStats = useMemo(() => [
+    { value: friends?.length ?? 0,     label: 'Friends' },
+    { value: folders?.length ?? 0,     label: 'Folders' },
+    { value: sets?.length ?? 0,        label: 'Sets' },
+    { value: cardTotal,                 label: 'Cards' },
+    { value: creditData?.balance ?? 0, label: 'Credits' },
+    { value: notes?.length ?? 0,       label: 'Notes' },
+  ], [friends, folders, sets, cardTotal, creditData, notes]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
@@ -318,9 +361,9 @@ export function HomeScreen() {
         name={firstName}
         avatarUri={user?.profileImage}
         unread={notifData?.unreadCount ?? 0}
-        onAI={() => navigation.navigate('AITab', { screen: 'AIChat' })}
-        onBell={() => navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } })}
-        onAvatar={() => navigation.navigate('ProfileTab', { screen: 'Profile' })}
+        onAI={onAI}
+        onBell={onBell}
+        onAvatar={onAvatar}
       />
 
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -347,11 +390,11 @@ export function HomeScreen() {
         {recentSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="My Sets" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'Library' })} />
+            <SectionRow title="My Sets" actionLabel="See all" onAction={goLibrary} />
             <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
-                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onPress={() => goContinue(s)} />
+                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onSelect={goContinue} />
               ))}
             </View>
           </>
@@ -359,24 +402,17 @@ export function HomeScreen() {
 
         {/* Summary stats */}
         <Spacer size={spacing.xxl} />
-        <SummaryCard stats={[
-          { value: friends?.length ?? 0,      label: 'Friends' },
-          { value: folders?.length ?? 0,      label: 'Folders' },
-          { value: sets?.length ?? 0,         label: 'Sets' },
-          { value: cardTotal,                  label: 'Cards' },
-          { value: creditData?.balance ?? 0,  label: 'Credits' },
-          { value: notes?.length ?? 0,        label: 'Notes' },
-        ]} />
+        <SummaryCard stats={summaryStats} />
 
         {/* From your friends */}
         {friendsSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="From your friends" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' })} />
+            <SectionRow title="From your friends" actionLabel="See all" onAction={goFriendsSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {friendsSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
+                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onSelect={goViewSet} />
               ))}
             </ScrollView>
           </>
@@ -398,11 +434,11 @@ export function HomeScreen() {
         {publicSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="Discover" actionLabel="See all" onAction={() => navigation.navigate('LibraryTab', { screen: 'PublicSets' })} />
+            <SectionRow title="Discover" actionLabel="See all" onAction={goPublicSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {publicSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onPress={() => navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } })} />
+                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onSelect={goViewSet} />
               ))}
             </ScrollView>
           </>
@@ -490,5 +526,4 @@ const styles = StyleSheet.create({
   // Activity feed
   activityList: { gap: spacing.lg },
   activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-
 });
