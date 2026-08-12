@@ -1,0 +1,8 @@
+<svg width="108" height="108" viewBox="0 0 108 108" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left page (white on transparent — sits on indigo adaptive bg) -->
+  <path d="M 52 28 C 52 25, 44 22, 34 24 C 21 27, 14 38, 14 52 C 14 66, 23 76, 37 78 C 45 80, 51 76, 52 69 Z" fill="white" fill-opacity="0.95"/>
+  <!-- Right page -->
+  <path d="M 56 28 C 56 25, 64 22, 74 24 C 87 27, 94 38, 94 52 C 94 66, 85 76, 71 78 C 63 80, 57 76, 56 69 Z" fill="white" fill-opacity="0.80"/>
+  <!-- Spine -->
+  <rect x="50" y="26" width="8" height="54" rx="4" fill="white" fill-opacity="0.50"/>
+</svg>

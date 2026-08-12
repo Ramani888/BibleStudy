@@ -71,7 +71,7 @@ export function PrivacyPolicyScreen({ navigation }: ProfileScreenProps<'PrivacyP
 
         <Section
           title="Contact Us"
-          body={"For privacy-related questions or data requests, contact us at:\nprivacy@biblestudypro.app"}
+          body={"For privacy-related questions or data requests, contact us at:\nddtechservices.work@gmail.com"}
         />
 
       </ScrollView>

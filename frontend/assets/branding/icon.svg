@@ -1,0 +1,43 @@
+<svg width="443" height="443" viewBox="0 0 443 443" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="443" height="443" rx="64" fill="#6366F1"/>
+
+  <!-- Left page — flat top, rounded outer corners, pages fan at bottom -->
+  <path d="M 214 118
+           L 100 118
+           C 86 118, 78 126, 78 140
+           L 78 295
+           C 78 309, 86 318, 100 320
+           C 138 328, 186 326, 214 320
+           Z"
+        fill="white" fill-opacity="0.95"/>
+
+  <!-- Right page — mirror -->
+  <path d="M 229 118
+           L 343 118
+           C 357 118, 365 126, 365 140
+           L 365 295
+           C 365 309, 357 318, 343 320
+           C 305 328, 257 326, 229 320
+           Z"
+        fill="white" fill-opacity="0.78"/>
+
+  <!-- Spine shadow/divider -->
+  <rect x="211" y="112" width="21" height="214" rx="10" fill="white" fill-opacity="0.40"/>
+
+  <!-- Left page lines -->
+  <rect x="98"  y="158" width="90" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.20"/>
+  <rect x="98"  y="181" width="72" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.16"/>
+  <rect x="98"  y="204" width="84" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.20"/>
+  <rect x="98"  y="227" width="68" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.16"/>
+  <rect x="98"  y="250" width="78" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.13"/>
+  <rect x="98"  y="273" width="60" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.10"/>
+
+  <!-- Right page lines -->
+  <rect x="255" y="158" width="90" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.14"/>
+  <rect x="255" y="181" width="72" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.11"/>
+  <rect x="255" y="204" width="84" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.14"/>
+  <rect x="255" y="227" width="68" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.11"/>
+  <rect x="255" y="250" width="78" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.09"/>
+  <rect x="255" y="273" width="60" height="7" rx="3.5" fill="#6366F1" fill-opacity="0.07"/>
+</svg>

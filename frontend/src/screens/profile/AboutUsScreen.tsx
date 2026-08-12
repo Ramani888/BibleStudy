@@ -46,7 +46,7 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
           </Typography>
           <Typography preset="body" color={colors.textSecondary}>
             Questions or feedback? Reach us at{'\n'}
-            <Typography preset="body" color={colors.accent}>support@biblestudypro.app</Typography>
+            <Typography preset="body" color={colors.accent}>ddtechservices.work@gmail.com</Typography>
           </Typography>
         </View>
 
