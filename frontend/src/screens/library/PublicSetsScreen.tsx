@@ -47,10 +47,13 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
     />
   ), [navigation]);
 
-  const toggleSearch = () => {
+  const toggleSearch = useCallback(() => {
     if (searchVisible) setSearch('');
     setSearchVisible(v => !v);
-  };
+  }, [searchVisible]);
+
+  const handleGoBack = useCallback(() => navigation.goBack(), [navigation]);
+  const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
 
   const countText = (isFetching && !isLoading && !isRefetching && !isFetchingNextPage)
     ? 'Searching…'
@@ -61,7 +64,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   const header = (
     <ScreenHeader
       title="Browse Public Sets"
-      onBack={() => navigation.goBack()}
+      onBack={handleGoBack}
       right={
         <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
           <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
@@ -130,7 +133,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
       <ActionSheet
         visible={!!selectedSet}
         title={selectedSet?.title}
-        onClose={() => setSelectedSet(null)}
+        onClose={closeSelectedSet}
         actions={[
           {
             label: 'Clone to Library',

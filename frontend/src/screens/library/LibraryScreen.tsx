@@ -56,8 +56,18 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const { refreshing, onRefresh } = useManualRefresh(() => Promise.all([refetchFolders(), refetchSets()]));
 
-  const cycleSortOrder = () =>
-    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
+  const cycleSortOrder = useCallback(() =>
+    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest'), []);
+
+  const switchTab = useCallback((tab: Tab) => { setActiveTab(tab); clearSearch(); }, [clearSearch]);
+  const closeSelectedSet    = useCallback(() => setSelectedSet(null), []);
+  const closeSelectedFolder = useCallback(() => setSelectedFolder(null), []);
+  const closeQuizSet        = useCallback(() => setQuizSet(null), []);
+  const handleCreateItem    = useCallback(() =>
+    activeTab === 'sets' ? navigation.navigate('CreateSet', {}) : folderModal.openCreateModal(),
+    [activeTab, navigation, folderModal]);
+  const handleQuizStart     = useCallback((mode: any, ids: string[], titles: string[]) =>
+    navigation.navigate('Quiz', { setIds: ids, setTitles: titles, mode }), [navigation]);
 
   const filteredSets = useMemo(
     () => search.trim()
@@ -93,12 +103,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   }), [filteredFolders, sortOrder, folderSetCounts]);
 
-  const switchTab = (tab: Tab) => {
-    setActiveTab(tab);
-    clearSearch();
-  };
-
-  const handleDeleteSet = (id: string) => {
+  const handleDeleteSet = useCallback((id: string) => {
     show({
       title: 'Delete Set',
       message: 'This cannot be undone.',
@@ -113,9 +118,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         }
       },
     });
-  };
+  }, [show, deleteSetAsync]);
 
-  const handleAssignFolder = (folderId: string | null) => {
+  const handleAssignFolder = useCallback((folderId: string | null) => {
     if (!assignTargetSetId) return;
     updateSet({ id: assignTargetSetId, payload: { folderId } }, {
       onSuccess: () => {
@@ -126,9 +131,9 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
-  };
+  }, [assignTargetSetId, updateSet, folderModal]);
 
-  const handleDeleteFolder = (id: string) => {
+  const handleDeleteFolder = useCallback((id: string) => {
     show({
       title: 'Delete Folder',
       message: 'Sets inside will be moved to No Folder. This cannot be undone.',
@@ -148,12 +153,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         }
       },
     });
-  };
+  }, [show, deleteFolderAsync]);
 
-  const handleCloseEditFolderModal = () => {
+  const handleCloseEditFolderModal = useCallback(() => {
     folderModal.closeEditModal();
     setSelectedFolder(null);
-  };
+  }, [folderModal]);
 
   const currentFolderId = sets.find(s => s.id === assignTargetSetId)?.folderId;
 
@@ -238,11 +243,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button
         label={activeTab === 'sets' ? 'Create Set' : 'Create Folder'}
-        onPress={() =>
-          activeTab === 'sets'
-            ? navigation.navigate('CreateSet', {})
-            : folderModal.openCreateModal()
-        }
+        onPress={handleCreateItem}
         fullWidth
       />
     </View>
@@ -319,7 +320,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <SetActionSheet
         set={selectedSet}
         visible={!!selectedSet}
-        onClose={() => setSelectedSet(null)}
+        onClose={closeSelectedSet}
         onQuiz={() => {
           if (!selectedSet) return;
           const target = { id: selectedSet.id, title: selectedSet.title };
@@ -340,15 +341,15 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         visible={!!quizSet}
         setIds={quizSet ? [quizSet[0].id] : []}
         setTitles={quizSet ? [quizSet[0].title] : []}
-        onClose={() => setQuizSet(null)}
-        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
+        onClose={closeQuizSet}
+        onStart={handleQuizStart}
       />
 
       {/* ── Folder actions sheet ── */}
       <ActionSheet
         visible={!!selectedFolder}
         title={selectedFolder?.name}
-        onClose={() => setSelectedFolder(null)}
+        onClose={closeSelectedFolder}
         actions={[
           {
             label: 'Create Set',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -23,7 +23,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
   const deletePlan = useDeletePlan();
   const { show, dialogProps } = useConfirmDialog();
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     show({
       title: 'Delete plan?',
       message: 'This removes the plan and its progress. Your sets are not affected.',
@@ -35,7 +35,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
           onError: e => Toast.show({ type: 'error', text1: 'Could not delete', text2: getErrorMessage(e) }),
         }),
     });
-  };
+  }, [show, deletePlan, planId, navigation]);
 
   const renderStep = (step: PlanStep, index: number) => (
     <View key={step.id} style={[styles.step, { borderBottomColor: colors.border }]}>

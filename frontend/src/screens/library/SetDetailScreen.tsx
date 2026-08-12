@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Share, StyleSheet, TextInput, View } from 'react-native';
 import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
@@ -59,7 +59,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     if (cachedTitle) navigation.setOptions({ title: cachedTitle });
   }, [cachedTitle, navigation]);
 
-  const handleShare = async () => {
+  const handleShare = useCallback(async () => {
     try {
       const title = cachedTitle ?? setTitle;
       const cardList = cards
@@ -68,7 +68,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       const divider = '─'.repeat(Math.min(title.length, 40));
       await Share.share({ message: `${title}\n${divider}\n\n${cardList}` });
     } catch {}
-  };
+  }, [cachedTitle, setTitle, cards]);
 
   const filteredCards = useMemo(
     () => cardSearch.trim()
@@ -81,24 +81,24 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     [cards, cardSearch],
   );
 
-  const handleCopyCard = (id: string) => {
+  const handleCopyCard = useCallback((id: string) => {
     copyCard(id, {
       onSuccess: () => Toast.show({ type: 'success', text1: 'Card copied' }),
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Copy failed', text2: getErrorMessage(err) }),
     });
-  };
+  }, [copyCard]);
 
-  const handleBlurToggle = (card: CardType) => {
+  const handleBlurToggle = useCallback((card: CardType) => {
     updateCard({ id: card.id, payload: { isBlurred: !card.isBlurred } }, {
       onSuccess: () =>
         Toast.show({ type: 'success', text1: card.isBlurred ? 'Card unblurred' : 'Card blurred' }),
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
-  };
+  }, [updateCard]);
 
   const allBlurred = cards.length > 0 && cards.every(c => c.isBlurred);
 
-  const handleBlurAll = async (blur: boolean) => {
+  const handleBlurAll = useCallback(async (blur: boolean) => {
     const toUpdate = cards.filter(c => c.isBlurred !== blur);
     if (toUpdate.length === 0) return;
     const results = await Promise.allSettled(
@@ -110,9 +110,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     } else {
       Toast.show({ type: 'error', text1: `${toUpdate.length - failed} updated, ${failed} failed` });
     }
-  };
+  }, [cards, updateCardAsync]);
 
-  const handleMoveCard = (targetSetId: string) => {
+  const handleMoveCard = useCallback((targetSetId: string) => {
     if (!moveTargetCard) return;
     moveCard({ id: moveTargetCard.id, payload: { targetSetId } }, {
       onSuccess: () => {
@@ -122,14 +122,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Move failed', text2: getErrorMessage(err) }),
     });
-  };
+  }, [moveTargetCard, moveCard]);
 
-  const handleEnterReorder = () => {
+  const handleEnterReorder = useCallback(() => {
     setOrderedCards([...cards]);
     setReorderMode(true);
-  };
+  }, [cards]);
 
-  const handleSaveReorder = () => {
+  const handleSaveReorder = useCallback(() => {
     reorderCards({ setId, cardIds: orderedCards.map(c => c.id) }, {
       onSuccess: () => {
         setReorderMode(false);
@@ -138,14 +138,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Failed to save order', text2: getErrorMessage(err) }),
     });
-  };
+  }, [reorderCards, setId, orderedCards]);
 
-  const handleCancelReorder = () => {
+  const handleCancelReorder = useCallback(() => {
     setReorderMode(false);
     setOrderedCards([]);
-  };
+  }, []);
 
-  const handleSaveNote = () => {
+  const handleSaveNote = useCallback(() => {
     if (!noteCard) return;
     setSavingNote(true);
     updateCard({ id: noteCard.id, payload: { note: noteText.trim() || null } }, {
@@ -159,9 +159,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
       },
     });
-  };
+  }, [noteCard, noteText, updateCard]);
 
-  const handleDelete = (cardId: string) => {
+  const handleDelete = useCallback((cardId: string) => {
     show({
       title: 'Delete Card',
       message: 'This cannot be undone.',
@@ -176,7 +176,18 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         }
       },
     });
-  };
+  }, [show, deleteCardAsync]);
+
+  const handleGoBack         = useCallback(() => navigation.goBack(), [navigation]);
+  const handleOpenHeaderMenu = useCallback(() => setHeaderMenuOpen(true), []);
+  const handleCloseHeaderMenu = useCallback(() => setHeaderMenuOpen(false), []);
+  const handleCloseSelectedCard = useCallback(() => setSelectedCard(null), []);
+  const handleCloseMovePicker   = useCallback(() => { setMovePickerOpen(false); setMoveTargetCard(null); }, []);
+  const handleCloseQuizSheet    = useCallback(() => setQuizSheetOpen(false), []);
+  const handleCloseNoteModal    = useCallback(() => { setNoteCard(null); setNoteText(''); }, []);
+  const handleDragEnd = useCallback(({ data }: { data: CardType[] }) => setOrderedCards(data), []);
+  const handleQuizStart = useCallback((mode: any, ids: string[], titles: string[]) =>
+    navigation.navigate('Quiz', { setIds: ids, setTitles: titles, mode }), [navigation]);
 
   // ── Header (normal vs reorder) ──
   const header = reorderMode ? (
@@ -196,7 +207,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     <View>
       <ScreenHeader
         title={cachedTitle ?? setTitle}
-        onBack={() => navigation.goBack()}
+        onBack={handleGoBack}
         right={
           <>
             <Pressable onPress={toggleCardSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
@@ -207,7 +218,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
                 <ShareIcon size={ICON_SIZE} color={colors.textSecondary} />
               </Pressable>
             )}
-            <Pressable onPress={() => setHeaderMenuOpen(true)} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+            <Pressable onPress={handleOpenHeaderMenu} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
           </>
@@ -239,7 +250,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   }
 
   // ── Normal card (list / grid) ──
-  const renderCard = ({ item }: { item: CardType }) => (
+  const renderCard = useCallback(({ item }: { item: CardType }) => (
     <View style={[styles.cardItem, !isDark && styles.cardShadow, cardLayout === 'grid' && styles.cardItemGrid]}>
       <View style={[styles.questionSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
         <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
@@ -283,10 +294,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         )}
       </View>
     </View>
-  );
+  ), [isDark, colors, cardLayout, isOwner, handleBlurToggle]);
 
   // ── Reorder card (drag handle) ──
-  const renderReorderCard = ({ item, drag, isActive }: RenderItemParams<CardType>) => (
+  const renderReorderCard = useCallback(({ item, drag, isActive }: RenderItemParams<CardType>) => (
     <ScaleDecorator>
       <Pressable
         onLongPress={drag}
@@ -309,7 +320,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         </View>
       </Pressable>
     </ScaleDecorator>
-  );
+  ), [isDark, colors]);
 
   return (
     <Screen header={header}>
@@ -317,7 +328,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         <View style={styles.flex}>
         <DraggableFlatList
           data={orderedCards}
-          onDragEnd={({ data }) => setOrderedCards(data)}
+          onDragEnd={handleDragEnd}
           keyExtractor={item => item.id}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
@@ -358,7 +369,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       <ActionSheet
         visible={!!selectedCard}
         title="Card options"
-        onClose={() => setSelectedCard(null)}
+        onClose={handleCloseSelectedCard}
         actions={[
           { label: 'Edit', icon: PencilIcon, onPress: () => selectedCard && navigation.navigate('EditCard', { cardId: selectedCard.id, setId }) },
           { label: 'Copy', icon: CopyIcon, onPress: () => selectedCard && handleCopyCard(selectedCard.id) },
@@ -381,7 +392,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         searchPlaceholder="Search sets…"
         options={moveSetOptions}
         onSelect={handleMoveCard}
-        onClose={() => { setMovePickerOpen(false); setMoveTargetCard(null); }}
+        onClose={handleCloseMovePicker}
         emptyText="No other sets available"
       />
 
@@ -389,7 +400,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       <ActionSheet
         visible={headerMenuOpen}
         title={cachedTitle ?? setTitle}
-        onClose={() => setHeaderMenuOpen(false)}
+        onClose={handleCloseHeaderMenu}
         actions={[
           { label: 'Quiz', icon: CheckCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
           ...(isOwner ? [
@@ -406,15 +417,15 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         visible={quizSheetOpen}
         setIds={[setId]}
         setTitles={[cachedTitle ?? setTitle]}
-        onClose={() => setQuizSheetOpen(false)}
-        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
+        onClose={handleCloseQuizSheet}
+        onStart={handleQuizStart}
       />
 
       {/* ── Note popup ── */}
       <AppModal
         visible={!!noteCard}
         title="Note"
-        onClose={() => { setNoteCard(null); setNoteText(''); }}
+        onClose={handleCloseNoteModal}
       >
         <TextInput
           style={[styles.notePopupInput, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}

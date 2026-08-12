@@ -51,7 +51,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
     />
   ), [navigation]);
 
-  const handleAssignFolder = (newFolderId: string | null) => {
+  const handleGoBack       = useCallback(() => navigation.goBack(), [navigation]);
+  const handleNavCreateSet = useCallback(() => navigation.navigate('CreateSet', { folderId }), [navigation, folderId]);
+  const handleQuizStart    = useCallback((mode: any, ids: string[], titles: string[]) =>
+    navigation.navigate('Quiz', { setIds: ids, setTitles: titles, mode }), [navigation]);
+  const closeQuizSet       = useCallback(() => setQuizSet(null), []);
+  const closeSelectedSet   = useCallback(() => { setSelectedSet(null); setAssignTargetSetId(null); }, []);
+
+  const handleAssignFolder = useCallback((newFolderId: string | null) => {
     if (!assignTargetSetId) return;
     updateSet({ id: assignTargetSetId, payload: { folderId: newFolderId } }, {
       onSuccess: () => {
@@ -61,9 +68,9 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       },
       onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
     });
-  };
+  }, [assignTargetSetId, updateSet, folderModal]);
 
-  const handleDeleteSet = (set: StudySet) => {
+  const handleDeleteSet = useCallback((set: StudySet) => {
     show({
       title: 'Delete Set',
       message: 'This cannot be undone.',
@@ -78,12 +85,12 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         }
       },
     });
-  };
+  }, [show, deleteSetAsync]);
 
   const header = (
     <ScreenHeader
       title={folderName}
-      onBack={() => navigation.goBack()}
+      onBack={handleGoBack}
       right={
         <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
           <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
@@ -94,7 +101,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Create Set" onPress={() => navigation.navigate('CreateSet', { folderId })} fullWidth />
+      <Button label="Create Set" onPress={handleNavCreateSet} fullWidth />
     </View>
   );
 
@@ -146,7 +153,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       <SetActionSheet
         set={selectedSet}
         visible={!!selectedSet}
-        onClose={() => { setSelectedSet(null); setAssignTargetSetId(null); }}
+        onClose={closeSelectedSet}
         onQuiz={() => {
           if (!selectedSet) return;
           const target = { id: selectedSet.id, title: selectedSet.title };
@@ -178,8 +185,8 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         visible={!!quizSet}
         setIds={quizSet ? [quizSet.id] : []}
         setTitles={quizSet ? [quizSet.title] : []}
-        onClose={() => setQuizSet(null)}
-        onStart={(mode, setIds, setTitles) => navigation.navigate('Quiz', { setIds, setTitles, mode })}
+        onClose={closeQuizSet}
+        onStart={handleQuizStart}
       />
 
       <ConfirmDialog {...dialogProps} />

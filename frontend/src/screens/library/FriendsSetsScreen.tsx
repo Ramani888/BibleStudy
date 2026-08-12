@@ -40,7 +40,10 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
     />
   ), [navigation]);
 
-  const header = <ScreenHeader title="Friends' Sets" onBack={() => navigation.goBack()} />;
+  const handleGoBack = useCallback(() => navigation.goBack(), [navigation]);
+  const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
+
+  const header = <ScreenHeader title="Friends' Sets" onBack={handleGoBack} />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Typography preset="caption" color={colors.textSecondary} align="center">
@@ -90,7 +93,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
       <ActionSheet
         visible={!!selectedSet}
         title={selectedSet?.title}
-        onClose={() => setSelectedSet(null)}
+        onClose={closeSelectedSet}
         actions={[
           {
             label: 'Clone to Library',

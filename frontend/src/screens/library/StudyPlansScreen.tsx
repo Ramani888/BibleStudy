@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
@@ -18,7 +18,9 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   const isDark = theme.name === 'dark';
   const { data: plans = [], isLoading, error, refetch } = usePlans();
 
-  const renderItem = ({ item }: { item: PlanListItem }) => {
+  const handleNavCreatePlan = useCallback(() => navigation.navigate('CreatePlan'), [navigation]);
+
+  const renderItem = useCallback(({ item }: { item: PlanListItem }) => {
     const pct = item.totalSteps > 0 ? item.completedSteps / item.totalSteps : 0;
     return (
       <Pressable
@@ -42,7 +44,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
         </View>
       </Pressable>
     );
-  };
+  }, [navigation, isDark, colors]);
 
   return (
     <Screen
@@ -51,7 +53,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           title="Study Plans"
           onBack={navigation.goBack}
           right={
-            <Pressable onPress={() => navigation.navigate('CreatePlan')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+            <Pressable onPress={handleNavCreatePlan} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <PlusIcon size={22} color={colors.accent} />
             </Pressable>
           }
@@ -69,7 +71,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
             title="No study plans yet"
             subtitle="Create a guided path through your sets — step by step."
             ctaLabel="Create a plan"
-            onCta={() => navigation.navigate('CreatePlan')}
+            onCta={handleNavCreatePlan}
           />
         </View>
       ) : (
