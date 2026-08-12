@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, Share, StyleSheet, TextInput, View } from 'react-native';
 import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-native-draggable-flatlist';
 import Toast from 'react-native-toast-message';
@@ -65,13 +65,16 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     } catch {}
   };
 
-  const filteredCards = cardSearch.trim()
-    ? cards.filter(
-        c =>
-          c.question.toLowerCase().includes(cardSearch.trim().toLowerCase()) ||
-          c.answer.toLowerCase().includes(cardSearch.trim().toLowerCase()),
-      )
-    : cards;
+  const filteredCards = useMemo(
+    () => cardSearch.trim()
+      ? cards.filter(
+          c =>
+            c.question.toLowerCase().includes(cardSearch.trim().toLowerCase()) ||
+            c.answer.toLowerCase().includes(cardSearch.trim().toLowerCase()),
+        )
+      : cards,
+    [cards, cardSearch],
+  );
 
   const handleCopyCard = (id: string) => {
     copyCard(id, {

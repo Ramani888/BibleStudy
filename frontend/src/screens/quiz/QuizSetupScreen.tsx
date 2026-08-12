@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
@@ -59,7 +59,7 @@ export function QuizSetupScreen() {
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
 
-  const filteredSets = (() => {
+  const filteredSets = useMemo(() => {
     const q = search.trim().toLowerCase();
     const filtered = q ? sets.filter(s => s.title.toLowerCase().includes(q)) : [...sets];
     return filtered.sort((a, b) => {
@@ -67,12 +67,12 @@ export function QuizSetupScreen() {
       if (sortOrder === 'cards') return (b._count?.cards ?? 0) - (a._count?.cards ?? 0);
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
-  })();
+  }, [sets, search, sortOrder]);
 
-  const chipModes = (() => {
+  const chipModes = useMemo(() => {
     if (selectedSetIds.length === 0 || cards.length === 0) return [] as QuizSelectableMode[];
     return ALL_SELECTABLE.filter(m => m === 'mix' || available.includes(m as any));
-  })();
+  }, [selectedSetIds.length, cards.length, available]);
 
   // reset mode when selected sets change and mode is no longer available
   useEffect(() => {
@@ -81,7 +81,7 @@ export function QuizSetupScreen() {
     }
   }, [chipModes]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleToggle = (id: string, title: string) => {
+  const handleToggle = useCallback((id: string, title: string) => {
     if (selectedSetIds.includes(id)) {
       const idx = selectedSetIds.indexOf(id);
       setSelectedSetIds(prev => prev.filter(x => x !== id));
@@ -90,7 +90,35 @@ export function QuizSetupScreen() {
       setSelectedSetIds(prev => [...prev, id]);
       setSelectedSetTitles(prev => [...prev, title]);
     }
-  };
+  }, [selectedSetIds]);
+
+  const renderSetRow = useCallback(({ item }: { item: typeof filteredSets[number] }) => {
+    const count = item._count?.cards ?? 0;
+    const selected = selectedSetIds.includes(item.id);
+    return (
+      <Pressable
+        style={({ pressed }) => [
+          styles.setRow,
+          { borderColor: colors.border, backgroundColor: colors.surface },
+          selected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
+          pressed && styles.rowPressed,
+        ]}
+        onPress={() => handleToggle(item.id, item.title)}
+      >
+        <View style={[styles.checkbox, { borderColor: colors.border }, selected && { borderColor: colors.accent }]}>
+          {selected && <CheckCircleIcon size={18} color={colors.accent} />}
+        </View>
+        <View style={styles.flex}>
+          <Typography preset="h4" color={selected ? colors.accent : colors.textPrimary} numberOfLines={1}>
+            {item.title}
+          </Typography>
+          <Typography preset="caption" color={colors.textSecondary}>
+            {count === 0 ? 'No cards yet' : `${count} ${count === 1 ? 'card' : 'cards'}`}
+          </Typography>
+        </View>
+      </Pressable>
+    );
+  }, [selectedSetIds, colors, handleToggle]);
 
   const selectorLabel = selectedSetIds.length === 0
     ? 'Tap to choose sets…'
@@ -248,33 +276,7 @@ export function QuizSetupScreen() {
               ? <View style={styles.modalLoading}><ActivityIndicator color={colors.accent} /></View>
               : <EmptyState title="No sets found" subtitle="Create a set with cards to start quizzing" />
           }
-          renderItem={({ item }) => {
-            const count = item._count?.cards ?? 0;
-            const selected = selectedSetIds.includes(item.id);
-            return (
-              <Pressable
-                style={({ pressed }) => [
-                  styles.setRow,
-                  { borderColor: colors.border, backgroundColor: colors.surface },
-                  selected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
-                  pressed && styles.rowPressed,
-                ]}
-                onPress={() => handleToggle(item.id, item.title)}
-              >
-                <View style={[styles.checkbox, { borderColor: colors.border }, selected && { borderColor: colors.accent }]}>
-                  {selected && <CheckCircleIcon size={18} color={colors.accent} />}
-                </View>
-                <View style={styles.flex}>
-                  <Typography preset="h4" color={selected ? colors.accent : colors.textPrimary} numberOfLines={1}>
-                    {item.title}
-                  </Typography>
-                  <Typography preset="caption" color={colors.textSecondary}>
-                    {count === 0 ? 'No cards yet' : `${count} ${count === 1 ? 'card' : 'cards'}`}
-                  </Typography>
-                </View>
-              </Pressable>
-            );
-          }}
+          renderItem={renderSetRow}
         />
 
         <Button

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -20,7 +20,7 @@ import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, radius, spacing, useTheme, palette } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { TransactionType } from '../../types';
+import type { CreditTransaction, TransactionType } from '../../types';
 import type { CreditStatsPeriod } from '../../hooks/useCredits';
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
@@ -149,7 +149,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
     isFetchingNextPage,
   } = useCreditTransactions();
 
-  const transactions = data?.pages.flatMap(p => p.transactions) ?? [];
+  const transactions = useMemo(() => data?.pages.flatMap(p => p.transactions) ?? [], [data]);
 
   // Compute all-time totals from loaded transactions
   const { totalEarned, totalUsed } = useMemo(() => {
@@ -164,15 +164,37 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const { data: creditData } = useCreditBalance();
   const { data: streakData } = useStreak();
 
-  const amountColor: Record<TransactionType, string> = {
+  const amountColor = useMemo<Record<TransactionType, string>>(() => ({
     USAGE:    colors.alert,
     REWARD:   colors.success,
     PURCHASE: colors.info,
     BONUS:    colors.accent,
-  };
+  }), [colors]);
 
   const toggleWindow = () =>
     setChartWindow(w => w === 'week' ? 'month' : 'week');
+
+  const renderTxItem = useCallback(({ item }: { item: CreditTransaction }) => {
+    const cfg = TYPE_CONFIG[item.type];
+    return (
+      <View style={styles.txRow}>
+        <View style={styles.txLeft}>
+          <View style={styles.txTopRow}>
+            <Badge label={cfg.label} variant={cfg.variant} />
+            <Typography preset="caption" color={colors.textDisabled}>
+              {formatDate(item.createdAt)}
+            </Typography>
+          </View>
+          <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
+            {item.description}
+          </Typography>
+        </View>
+        <Typography preset="h4" color={amountColor[item.type]} style={styles.txAmount}>
+          {cfg.sign}{Math.abs(item.amount)}
+        </Typography>
+      </View>
+    );
+  }, [colors, amountColor]);
 
   return (
     <Screen edges={['top']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
@@ -241,27 +263,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
               </View>
             ) : null
           }
-          renderItem={({ item }) => {
-            const cfg = TYPE_CONFIG[item.type];
-            return (
-              <View style={styles.txRow}>
-                <View style={styles.txLeft}>
-                  <View style={styles.txTopRow}>
-                    <Badge label={cfg.label} variant={cfg.variant} />
-                    <Typography preset="caption" color={colors.textDisabled}>
-                      {formatDate(item.createdAt)}
-                    </Typography>
-                  </View>
-                  <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
-                    {item.description}
-                  </Typography>
-                </View>
-                <Typography preset="h4" color={amountColor[item.type]} style={styles.txAmount}>
-                  {cfg.sign}{Math.abs(item.amount)}
-                </Typography>
-              </View>
-            );
-          }}
+          renderItem={renderTxItem}
         />
       </View>
     </Screen>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -29,8 +29,16 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
     isFetchingNextPage,
   } = useFriendsSets();
 
-  const sets = data?.pages.flatMap(p => p.sets) ?? [];
+  const sets = useMemo(() => data?.pages.flatMap(p => p.sets) ?? [], [data]);
   const total = data?.pages[0]?.pagination.total ?? 0;
+
+  const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
+    <SetCard
+      set={item}
+      onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })}
+      onMenuPress={() => setSelectedSet(item)}
+    />
+  ), [navigation]);
 
   const header = <ScreenHeader title="Friends' Sets" onBack={() => navigation.goBack()} />;
   const footer = (
@@ -74,15 +82,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
             </View>
           ) : null
         }
-        renderItem={({ item }) => (
-          <SetCard
-            set={item}
-            onPress={() =>
-              navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })
-            }
-            onMenuPress={() => setSelectedSet(item)}
-          />
-        )}
+        renderItem={renderSetItem}
       />
 
       </View>

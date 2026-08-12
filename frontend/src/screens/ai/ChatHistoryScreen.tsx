@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -101,15 +101,18 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
     selected: [],
   });
 
-  const allSessions = data?.pages.flatMap(p => p.sessions) ?? [];
+  const allSessions = useMemo(() => data?.pages.flatMap(p => p.sessions) ?? [], [data]);
   const allBookmarks = bookmarksData?.bookmarks ?? [];
 
-  const filteredSessions = allSessions.filter(s => {
-    const matchesSearch = searchQuery.trim() === '' ||
-      (s.customTitle || s.title).toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesTag = activeTag === null || s.tags?.includes(activeTag);
-    return matchesSearch && matchesTag;
-  });
+  const filteredSessions = useMemo(
+    () => allSessions.filter(s => {
+      const matchesSearch = searchQuery.trim() === '' ||
+        (s.customTitle || s.title).toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesTag = activeTag === null || s.tags?.includes(activeTag);
+      return matchesSearch && matchesTag;
+    }),
+    [allSessions, searchQuery, activeTag],
+  );
 
   const handleContinue = useCallback((session: ChatSession) => {
     useAIChatStore.getState().loadSession(session);

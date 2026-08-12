@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -36,8 +36,16 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
     isFetchingNextPage,
   } = usePublicSets(debouncedSearch || undefined);
 
-  const sets = data?.pages.flatMap(p => p.sets) ?? [];
+  const sets = useMemo(() => data?.pages.flatMap(p => p.sets) ?? [], [data]);
   const total = data?.pages[0]?.pagination.total ?? 0;
+
+  const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
+    <SetCard
+      set={item}
+      onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })}
+      onMenuPress={() => setSelectedSet(item)}
+    />
+  ), [navigation]);
 
   const toggleSearch = () => {
     if (searchVisible) setSearch('');
@@ -114,13 +122,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
             </View>
           ) : null
         }
-        renderItem={({ item }) => (
-          <SetCard
-            set={item}
-            onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })}
-            onMenuPress={() => setSelectedSet(item)}
-          />
-        )}
+        renderItem={renderSetItem}
       />
 
       </View>

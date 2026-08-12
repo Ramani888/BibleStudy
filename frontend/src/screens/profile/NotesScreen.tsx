@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -65,19 +65,25 @@ export function NotesScreen({ navigation }: Props) {
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'oldest' : 'newest');
 
-  const filtered = notes.filter(n => {
-    const matchesSearch = !search.trim() ||
-      n.title.toLowerCase().includes(search.toLowerCase()) ||
-      n.body.toLowerCase().includes(search.toLowerCase());
-    const matchesTag = !activeTag || n.tags.includes(activeTag);
-    return matchesSearch && matchesTag;
-  });
+  const filtered = useMemo(
+    () => notes.filter(n => {
+      const matchesSearch = !search.trim() ||
+        n.title.toLowerCase().includes(search.toLowerCase()) ||
+        n.body.toLowerCase().includes(search.toLowerCase());
+      const matchesTag = !activeTag || n.tags.includes(activeTag);
+      return matchesSearch && matchesTag;
+    }),
+    [notes, search, activeTag],
+  );
 
-  const sorted = [...filtered].sort((a, b) => {
-    if (sortOrder === 'alpha')  return a.title.localeCompare(b.title);
-    if (sortOrder === 'oldest') return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-    return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  });
+  const sorted = useMemo(
+    () => [...filtered].sort((a, b) => {
+      if (sortOrder === 'alpha')  return a.title.localeCompare(b.title);
+      if (sortOrder === 'oldest') return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
+      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+    }),
+    [filtered, sortOrder],
+  );
 
   const hasTaggedNotes = notes.some(n => n.tags.length > 0);
 

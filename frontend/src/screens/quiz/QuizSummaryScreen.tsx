@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -44,9 +44,12 @@ export function QuizSummaryScreen() {
 
   const [filter, setFilter] = useState<Filter>('all');
 
-  const filtered = filter === 'correct' ? items.filter(i => i.isCorrect)
-    : filter === 'wrong' ? items.filter(i => !i.isCorrect)
-    : items;
+  const filtered = useMemo(
+    () => filter === 'correct' ? items.filter(i => i.isCorrect)
+      : filter === 'wrong' ? items.filter(i => !i.isCorrect)
+      : items,
+    [filter, items],
+  );
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
 

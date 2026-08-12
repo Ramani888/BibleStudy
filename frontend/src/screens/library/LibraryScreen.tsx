@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   FlatList,
   Pressable,
@@ -59,9 +59,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const cycleSortOrder = () =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
 
-  const filteredSets = search.trim()
-    ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
-    : sets;
+  const filteredSets = useMemo(
+    () => search.trim()
+      ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
+      : sets,
+    [sets, search],
+  );
 
   const sortedSets = useMemo(() => [...filteredSets].sort((a, b) => {
     if (sortOrder === 'alpha') return a.title.localeCompare(b.title);
@@ -69,9 +72,12 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
   }), [filteredSets, sortOrder]);
 
-  const filteredFolders = search.trim()
-    ? folders.filter(f => f.name.toLowerCase().includes(search.trim().toLowerCase()))
-    : folders;
+  const filteredFolders = useMemo(
+    () => search.trim()
+      ? folders.filter(f => f.name.toLowerCase().includes(search.trim().toLowerCase()))
+      : folders,
+    [folders, search],
+  );
 
   const folderSetCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -150,6 +156,23 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   };
 
   const currentFolderId = sets.find(s => s.id === assignTargetSetId)?.folderId;
+
+  const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
+    <SetCard
+      set={item}
+      onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
+      onMenuPress={() => setSelectedSet(item)}
+    />
+  ), [navigation]);
+
+  const renderFolderItem = useCallback(({ item }: { item: Folder }) => (
+    <FolderCard
+      folder={item}
+      setCount={folderSetCounts[item.id] ?? 0}
+      onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name, folderColor: item.color })}
+      onMenuPress={() => setSelectedFolder(item)}
+    />
+  ), [navigation, folderSetCounts]);
 
   // ── Header (no title): actions row + full-width tabs + search ──
   const header = (
@@ -244,13 +267,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
               tintColor={colors.accent}
             />
           }
-          renderItem={({ item }) => (
-            <SetCard
-              set={item}
-              onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
-              onMenuPress={() => setSelectedSet(item)}
-            />
-          )}
+          renderItem={renderSetItem}
           ListEmptyComponent={
             setsError ? (
               <ErrorState message="Failed to load sets" onRetry={refetchSets} />
@@ -282,14 +299,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
               tintColor={colors.accent}
             />
           }
-          renderItem={({ item }) => (
-            <FolderCard
-              folder={item}
-              setCount={folderSetCounts[item.id] ?? 0}
-              onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name, folderColor: item.color })}
-              onMenuPress={() => setSelectedFolder(item)}
-            />
-          )}
+          renderItem={renderFolderItem}
           ListEmptyComponent={
             foldersError ? (
               <ErrorState message="Failed to load folders" onRetry={refetchFolders} />

@@ -77,6 +77,12 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 
   const currentFile = images[currentIndex];
 
+  const renderImageItem = useCallback(({ item }: { item: typeof images[number] }) => (
+    <View style={styles.page}>
+      <PinchableImage url={item.url} />
+    </View>
+  ), []);
+
   return (
     <Modal visible={visible} statusBarTranslucent animationType="fade" onRequestClose={onClose}>
       <GestureHandlerRootView style={styles.root}>
@@ -85,11 +91,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
           ref={flatRef}
           data={images}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.page}>
-              <PinchableImage url={item.url} />
-            </View>
-          )}
+          renderItem={renderImageItem}
           horizontal
           pagingEnabled
           showsHorizontalScrollIndicator={false}

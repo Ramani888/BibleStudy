@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
@@ -31,9 +31,25 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const { show, dialogProps } = useConfirmDialog();
   const folderModal = useFolderModal();
 
-  const filteredSets = search.trim()
-    ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
-    : sets;
+  const filteredSets = useMemo(
+    () => search.trim()
+      ? sets.filter(s => s.title.toLowerCase().includes(search.trim().toLowerCase()))
+      : sets,
+    [sets, search],
+  );
+
+  const folderOptions = useMemo(
+    () => allFolders.filter(f => f.id !== folderId).map(f => ({ id: f.id, label: f.name })),
+    [allFolders, folderId],
+  );
+
+  const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
+    <SetCard
+      set={item}
+      onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
+      onMenuPress={() => setSelectedSet(item)}
+    />
+  ), [navigation]);
 
   const handleAssignFolder = (newFolderId: string | null) => {
     if (!assignTargetSetId) return;
@@ -122,13 +138,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
             subtitle={search ? `No sets match "${search}"` : 'Create a set and assign it to this folder'}
           />
         }
-        renderItem={({ item }) => (
-          <SetCard
-            set={item}
-            onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
-            onMenuPress={() => setSelectedSet(item)}
-          />
-        )}
+        renderItem={renderSetItem}
       />
 
       </View>
@@ -157,7 +167,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         visible={folderModal.assignFolderOpen}
         title="Move to Folder"
         searchable={false}
-        options={allFolders.filter(f => f.id !== folderId).map(f => ({ id: f.id, label: f.name }))}
+        options={folderOptions}
         leadingOption={{ label: 'No Folder', onPress: () => handleAssignFolder(null) }}
         onSelect={handleAssignFolder}
         onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
