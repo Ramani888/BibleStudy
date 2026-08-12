@@ -30,6 +30,8 @@ export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useWeeklyChart } from './useWeeklyChart';
 export { useChatHistoryActions } from './useChatHistoryActions';
+export { useMediaUpload } from './useMediaUpload';
+export { useMediaActions } from './useMediaActions';
 export { useAchievements } from './useAchievements';
 export { usePlans, usePlan, useCreatePlan, useDeletePlan, useToggleStep } from './usePlans';
 export { useSubscriptionStatus, useSubscriptionSync, useIapSubscriptions } from './useSubscription';
