@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -34,13 +34,13 @@ export function QuizSummaryScreen() {
   const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
   const { items, title, scorePct, total, correct, exitToHub } = params;
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
     if (exitToHub) {
-      (navigation as any).popToTop(); // pop back to App (hub), safe regardless of stack depth
+      (navigation as any).popToTop();
     } else {
       navigation.goBack();
     }
-  };
+  }, [exitToHub, navigation]);
 
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -53,7 +53,7 @@ export function QuizSummaryScreen() {
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
 
-  const renderItem = ({ item }: { item: SummaryItem }) => {
+  const renderItem = useCallback(({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
     return (
       <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
@@ -95,7 +95,7 @@ export function QuizSummaryScreen() {
         )}
       </View>
     );
-  };
+  }, [colors, isDark]);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>

@@ -56,8 +56,11 @@ export function QuizSetupScreen() {
   const { data: cards = [], isLoading: cardsLoading } = useCardsForSets(selectedSetIds);
   const available = supportedModes(cards);
 
-  const cycleSortOrder = () =>
-    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest');
+  const cycleSortOrder = useCallback(() =>
+    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest'), []);
+
+  const openSetPicker  = useCallback(() => setSetPickerOpen(true), []);
+  const closeSetPicker = useCallback(() => setSetPickerOpen(false), []);
 
   const filteredSets = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -173,7 +176,7 @@ export function QuizSetupScreen() {
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>CHOOSE SETS</Typography>
           <Pressable
             style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-            onPress={() => setSetPickerOpen(true)}
+            onPress={openSetPicker}
             accessibilityRole="button"
           >
             <View style={styles.selectorIcon}>
@@ -225,7 +228,7 @@ export function QuizSetupScreen() {
       </ScrollView>
 
       {/* ── Set Picker Sheet ── */}
-      <AppModal visible={setPickerOpen} onClose={() => setSetPickerOpen(false)} contentStyle={styles.sheetContent}>
+      <AppModal visible={setPickerOpen} onClose={closeSetPicker} contentStyle={styles.sheetContent}>
         <View style={styles.sheetToolbar}>
           <Typography preset="h4" style={styles.flex}>Choose Sets</Typography>
           <Pressable
@@ -281,7 +284,7 @@ export function QuizSetupScreen() {
 
         <Button
           label={selectedSetIds.length === 0 ? 'Select sets to continue' : `Done — ${selectedSetIds.length} set${selectedSetIds.length > 1 ? 's' : ''}`}
-          onPress={() => setSetPickerOpen(false)}
+          onPress={closeSetPicker}
           disabled={selectedSetIds.length === 0}
           fullWidth
           style={styles.sheetDone}

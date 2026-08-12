@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
@@ -80,7 +80,7 @@ export function QuizResultScreen({
   const isNewBest = best !== null && scorePct >= best;
   const quote = getQuote(scorePct);
 
-  const openSummary = () => {
+  const openSummary = useCallback(() => {
     (navigation as any).navigate('QuizSummary', {
       items: summaryItems,
       title: setTitle,
@@ -89,7 +89,7 @@ export function QuizResultScreen({
       correct,
       exitToHub: true,
     });
-  };
+  }, [navigation, summaryItems, setTitle, scorePct, total, correct]);
 
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 
 import { Button, Typography } from '../../../components/ui';
@@ -33,10 +33,10 @@ export function QuizItemView({ item, initialResponse, onResponseChange, hasPrev,
 
   const [response, setResponseState] = useState<unknown>(() => initialResponse ?? getDefaultResponse(item));
 
-  const setResponse = (r: unknown) => {
+  const setResponse = useCallback((r: unknown) => {
     setResponseState(r);
     onResponseChange?.(r);
-  };
+  }, [onResponseChange]);
 
   return (
     <View style={styles.wrap}>

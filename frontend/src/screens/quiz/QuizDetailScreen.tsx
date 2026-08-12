@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Button, Screen, Typography } from '../../components/ui';
@@ -49,7 +49,7 @@ export function QuizDetailScreen() {
   const isPerfect = scored && scorePct === 100;
   const isRetaken = practicedAt !== createdAt;
 
-  const handleDelete = () => {
+  const handleDelete = useCallback(() => {
     show({
       title: 'Delete Quiz',
       message: 'Remove this attempt from your history?',
@@ -57,23 +57,21 @@ export function QuizDetailScreen() {
       variant: 'danger',
       onConfirm: () => deleteAttempt(id, { onSuccess: () => navigation.goBack() }),
     });
-  };
+  }, [show, deleteAttempt, id, navigation]);
+
+  const handleReQuiz = useCallback(() => navigation.navigate('Quiz', {
+    setIds,
+    setTitles,
+    mode: mode ?? 'mix',
+    retakeAttemptId: id,
+  }), [navigation, setIds, setTitles, mode, id]);
 
   const { data: responsesData } = useQuizAttemptResponses(params.id);
   const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button
-        label="Re-Quiz"
-        onPress={() => navigation.navigate('Quiz', {
-          setIds,
-          setTitles,
-          mode: mode ?? 'mix',
-          retakeAttemptId: id,
-        })}
-        fullWidth
-      />
+      <Button label="Re-Quiz" onPress={handleReQuiz} fullWidth />
     </View>
   );
 

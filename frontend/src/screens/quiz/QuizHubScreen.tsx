@@ -48,10 +48,10 @@ export function QuizHubScreen() {
 
   const [activeItem, setActiveItem] = useState<QuizAttemptWithSet | null>(null);
 
-  const openSheet = (item: QuizAttemptWithSet) => setActiveItem(item);
-  const closeSheet = () => setActiveItem(null);
+  const openSheet = useCallback((item: QuizAttemptWithSet) => setActiveItem(item), []);
+  const closeSheet = useCallback(() => setActiveItem(null), []);
 
-  const handleDelete = (item: QuizAttemptWithSet) => {
+  const handleDelete = useCallback((item: QuizAttemptWithSet) => {
     closeSheet();
     show({
       title: 'Delete Quiz',
@@ -60,9 +60,9 @@ export function QuizHubScreen() {
       variant: 'danger',
       onConfirm: () => deleteAttempt(item.id),
     });
-  };
+  }, [closeSheet, show, deleteAttempt]);
 
-  const handleDetails = (item: QuizAttemptWithSet) => {
+  const handleDetails = useCallback((item: QuizAttemptWithSet) => {
     closeSheet();
     navigation.navigate('QuizDetail', {
       id: item.id,
@@ -77,9 +77,9 @@ export function QuizHubScreen() {
       quizName: item.quizName,
       timeSecs: item.timeSecs,
     });
-  };
+  }, [closeSheet, navigation]);
 
-  const renderItem = ({ item }: { item: QuizAttemptWithSet }) => {
+  const renderItem = useCallback(({ item }: { item: QuizAttemptWithSet }) => {
     const scored = item.total > 0;
     const scoreColor = item.scorePct >= 80 ? colors.success : item.scorePct >= 50 ? colors.warning : colors.alert;
 
@@ -123,7 +123,7 @@ export function QuizHubScreen() {
         </Pressable>
       </Pressable>
     );
-  };
+  }, [handleDetails, openSheet, colors, isDark]);
 
   const footer = !isLoading && !isError ? (
     <View style={[styles.footerBar, { borderTopColor: colors.divider }]}>

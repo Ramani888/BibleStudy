@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
 import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -29,8 +29,8 @@ export function QuizScreen() {
   const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
   const s = useQuizSession(cards, mode);
   const [responses, setResponses] = useState<Record<number, unknown>>({});
-  const saveResponse = (idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r }));
-  const goBack = () => navigation.goBack();
+  const saveResponse = useCallback((idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r })), []);
+  const goBack = useCallback(() => navigation.goBack(), [navigation]);
   const { show, dialogProps } = useConfirmDialog();
   const showRef = useRef(show);
   showRef.current = show;
@@ -63,10 +63,10 @@ export function QuizScreen() {
     return () => handler.remove();
   }, [isLoading, isError, s.isAvailable, s.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const finish = () => {
+  const finish = useCallback(() => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
     s.next();
-  };
+  }, [s]);
 
   const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : `${setTitles.length} Sets`);
 
