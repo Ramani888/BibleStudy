@@ -107,14 +107,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   if (isError) {
     return (
-      <Screen header={header}>
+      <Screen header={header} edges={['top']}>
         <ErrorState message="Could not load sets." onRetry={refetch} />
       </Screen>
     );
   }
 
   return (
-    <Screen header={header} footer={footer}>
+    <Screen header={header} footer={footer} edges={['top']}>
       <View>
         {folderColor && <View style={[styles.colorBar, { backgroundColor: folderColor }]} />}
         {searchVisible && (

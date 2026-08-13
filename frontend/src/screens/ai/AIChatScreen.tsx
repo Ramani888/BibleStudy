@@ -84,7 +84,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
   const hasExportableMessages = messages.some(m => m.text !== TYPING_INDICATOR);
 
-  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+  const goPaywall = useCallback(() => navigation.navigate('Paywall'), [navigation]);
 
   const att = useAIChatAttachment(creditBalance, goPaywall);
 

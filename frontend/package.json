@@ -7,6 +7,7 @@
     "app-icon": "node scripts/generate-app-icon.mjs",
     "ios": "react-native run-ios",
     "lint": "eslint .",
+    "lint:nav": "node scripts/nav-lint.js",
     "start": "react-native start",
     "test": "jest",
     "postinstall": "patch-package"
@@ -47,6 +48,7 @@
     "react-native-safe-area-context": "^5.5.2",
     "react-native-screens": "^4.24.0",
     "react-native-svg": "^15.15.5",
+    "react-native-system-navigation-bar": "^3.0.0",
     "react-native-toast-message": "^2.3.3",
     "react-native-vector-icons": "^10.3.0",
     "react-native-webview": "^13.16.1",

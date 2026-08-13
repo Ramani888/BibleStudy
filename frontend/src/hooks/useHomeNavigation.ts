@@ -1,14 +1,19 @@
 import { useCallback, useMemo } from 'react';
+import type { CompositeNavigationProp } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import {
   CheckCircleIcon, FileTextIcon, FolderIcon, LibraryIcon,
   SearchIcon, SparklesIcon, UsersIcon, UserIcon,
   type IconComponent,
 } from '../components/icons';
-import type { AppTabParamList } from '../navigation/types';
+import type { AppTabParamList, RootStackParamList } from '../navigation/types';
 import type { StudySet } from '../types';
 
-type HomeNav = BottomTabNavigationProp<AppTabParamList>;
+export type HomeNav = CompositeNavigationProp<
+  BottomTabNavigationProp<AppTabParamList>,
+  NativeStackNavigationProp<RootStackParamList>
+>;
 
 export function useHomeNavigation(navigation: HomeNav) {
   const goReview = useCallback((setId: string, setTitle: string) =>
@@ -16,7 +21,7 @@ export function useHomeNavigation(navigation: HomeNav) {
   [navigation]);
 
   const goContinue = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } }),
+    navigation.navigate('SetDetail', { setId: s.id, setTitle: s.title, isOwner: false }),
   [navigation]);
 
   const goCreate = useCallback(() =>
@@ -28,7 +33,7 @@ export function useHomeNavigation(navigation: HomeNav) {
   [navigation]);
 
   const onBell = useCallback(() =>
-    navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } }),
+    navigation.navigate('Notifications', { from: 'Home' }),
   [navigation]);
 
   const onAvatar = useCallback(() =>
@@ -38,15 +43,15 @@ export function useHomeNavigation(navigation: HomeNav) {
   const goLibrary     = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),     [navigation]);
   const goQuizHub     = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),      [navigation]);
   const goAIChat      = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),       [navigation]);
-  const goNotes       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes' }),        [navigation]);
-  const goMedia       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }),        [navigation]);
-  const goPublicSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets' }),   [navigation]);
-  const goFriends     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends' }),      [navigation]);
+  const goNotes       = useCallback(() => navigation.navigate('Notes'),                                   [navigation]);
+  const goMedia       = useCallback(() => navigation.navigate('Media'),                                   [navigation]);
+  const goPublicSets  = useCallback(() => navigation.navigate('PublicSets'),                              [navigation]);
+  const goFriends     = useCallback(() => navigation.navigate('Friends'),                                 [navigation]);
   const goProfile     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),      [navigation]);
-  const goFriendsSets = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' }), [navigation]);
+  const goFriendsSets = useCallback(() => navigation.navigate('FriendsSets'),                            [navigation]);
 
   const goViewSet = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } }),
+    navigation.navigate('SetDetail', { setId: s.id, setTitle: s.title, isOwner: false }),
   [navigation]);
 
   const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [

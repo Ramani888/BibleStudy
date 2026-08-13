@@ -3,11 +3,26 @@ import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import type { QuizSelectableMode } from '../types';
 
-// ─── Root Stack (above tabs — full-screen overlays) ───────────────────────────
+// ─── Root Stack (above tabs — full-screen overlays + cross-cutting modals) ────
 export type RootStackParamList = {
   App: undefined;
   Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
   QuizSummary: { items: import('../types').SummaryItem[]; title: string; scorePct: number; total: number; correct: number; exitToHub?: boolean };
+  // Cross-cutting modals — navigate here from any tab; back always returns to caller
+  Notes: undefined;
+  NoteEditor: { noteId?: string };
+  Media: undefined;
+  MediaPDFViewer: { url: string; name: string };
+  Notifications: { from?: 'Home' } | undefined;
+  Friends: undefined;
+  Leaderboard: undefined;
+  FriendRequests: undefined;
+  SearchUsers: undefined;
+  UserProfile: { userId: string };
+  BlockedUsers: undefined;
+  Paywall: undefined;
+  Credits: undefined;
+  Achievements: undefined;
 };
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
@@ -23,13 +38,10 @@ export type AuthStackParamList = {
 export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
-  SetDetail: { setId: string; setTitle: string; isOwner?: boolean };
   CreateSet: { folderId?: string };
   EditSet: { setId: string };
   CreateCard: { setId: string };
   EditCard: { cardId: string; setId: string };
-  PublicSets: undefined;
-  FriendsSets: undefined;
   StudyPlans: undefined;
   PlanDetail: { planId: string };
   CreatePlan: undefined;
@@ -52,31 +64,13 @@ export type AIStackParamList = {
   ChatHistory: undefined;
 };
 
-// ─── Profile Stack ────────────────────────────────────────────────────────────
+// ─── Profile Stack (profile-specific settings screens only) ──────────────────
 export type ProfileStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   ChangePassword: undefined;
-  Credits: undefined;
-  Paywall: undefined;
-  Achievements: undefined;
   Settings: undefined;
-  // Friends
-  Friends: undefined;
-  Leaderboard: undefined;
-  FriendRequests: undefined;
-  SearchUsers: undefined;
-  UserProfile: { userId: string };
-  BlockedUsers: undefined;
-  // Notifications
-  Notifications: { from?: 'Home' } | undefined;
   NotificationSettings: undefined;
-  // Notes
-  Notes: undefined;
-  NoteEditor: { noteId?: string };
-  // Media
-  Media: undefined;
-  MediaPDFViewer: { url: string; name: string };
   AboutUs: undefined;
   PrivacyPolicy: undefined;
 };
@@ -94,27 +88,42 @@ export type AppTabParamList = {
 export type AuthScreenProps<T extends keyof AuthStackParamList> =
   NativeStackScreenProps<AuthStackParamList, T>;
 
+// Root modal screens (cross-cutting — navigable from any tab)
+export type RootScreenProps<T extends keyof RootStackParamList> =
+  NativeStackScreenProps<RootStackParamList, T>;
+
 export type LibraryScreenProps<T extends keyof LibraryStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<LibraryStackParamList, T>,
-    BottomTabScreenProps<AppTabParamList>
+    CompositeScreenProps<
+      BottomTabScreenProps<AppTabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
   >;
 
 export type AIScreenProps<T extends keyof AIStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<AIStackParamList, T>,
-    BottomTabScreenProps<AppTabParamList>
+    CompositeScreenProps<
+      BottomTabScreenProps<AppTabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
   >;
 
 export type QuizScreenProps<T extends keyof QuizStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<QuizStackParamList, T>,
-    BottomTabScreenProps<AppTabParamList>
+    CompositeScreenProps<
+      BottomTabScreenProps<AppTabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
   >;
 
 export type ProfileScreenProps<T extends keyof ProfileStackParamList> =
   CompositeScreenProps<
     NativeStackScreenProps<ProfileStackParamList, T>,
-    BottomTabScreenProps<AppTabParamList>
+    CompositeScreenProps<
+      BottomTabScreenProps<AppTabParamList>,
+      NativeStackScreenProps<RootStackParamList>
+    >
   >;
-

@@ -18,7 +18,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
   const formRef = useRef<CardFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title="Add Cards" handle />;
+  const header = <ScreenHeader title="Add Cards" handle onClose={() => navigation.goBack()} />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Add Card" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
@@ -26,7 +26,7 @@ export function CreateCardScreen({ navigation, route }: LibraryScreenProps<'Crea
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
+    <Screen header={header} footer={footer} keyboardAvoiding>
       <View style={styles.flex}>
         <CardForm
           ref={formRef}

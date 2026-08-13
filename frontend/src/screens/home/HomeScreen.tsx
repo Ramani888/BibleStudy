@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { HomeNav } from '../../hooks/useHomeNavigation';
 
 import { Avatar, Spacer, Typography, AnimatedPressable } from '../../components/ui';
 import {
@@ -38,11 +38,8 @@ import {
 } from '../../hooks';
 import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate } from '../../utils/formatters';
-import type { AppTabParamList } from '../../navigation/types';
 import type { DueSummary, StudySet } from '../../types';
 import type { Activity } from '../../types/activities.types';
-
-type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
 const plural = (n: number) => (n === 1 ? '' : 's');
 

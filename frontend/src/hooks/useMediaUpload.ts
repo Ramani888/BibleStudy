@@ -7,6 +7,7 @@ import { getErrorMessage } from '../api/client';
 
 export function useMediaUpload() {
   const uploadMedia = useUploadMedia();
+  const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadFilename, setUploadFilename] = useState('');
   const [pickSheetVisible, setPickSheetVisible] = useState(false);
@@ -14,15 +15,19 @@ export function useMediaUpload() {
   const doUpload = useCallback(async (fd: FormData, name: string) => {
     setUploadFilename(name);
     setUploadProgress(0);
+    setIsUploading(true);
     try {
       await uploadMedia.mutateAsync({ formData: fd, onProgress: setUploadProgress });
       Toast.show({ type: 'success', text1: `${name} uploaded` });
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
+    } finally {
+      setIsUploading(false);
     }
   }, [uploadMedia]);
 
   const handlePickImage = useCallback(async () => {
+    setPickSheetVisible(false);
     const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
@@ -40,6 +45,7 @@ export function useMediaUpload() {
   }, [doUpload]);
 
   const handlePickFromCamera = useCallback(async () => {
+    setPickSheetVisible(false);
     const result = await launchCamera({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
@@ -73,6 +79,7 @@ export function useMediaUpload() {
 
   return {
     uploadMedia,
+    isUploading,
     uploadProgress,
     uploadFilename,
     pickSheetVisible, setPickSheetVisible,

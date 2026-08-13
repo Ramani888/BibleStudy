@@ -25,7 +25,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   const formRef = useRef<SetFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title="Edit Set" handle />;
+  const header = <ScreenHeader title="Edit Set" handle onClose={() => navigation.goBack()} />;
 
   const handleDelete = () => {
     show({
@@ -47,7 +47,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
 
   if (isLoading) {
     return (
-      <Screen header={header} edges={['top']}>
+      <Screen header={header} edges={['top', 'bottom']}>
         <View style={styles.loading}>
           <ActivityIndicator color={colors.accent} size="large" />
         </View>
@@ -57,7 +57,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
 
   if (isError || !set) {
     return (
-      <Screen header={header} edges={['top']}>
+      <Screen header={header} edges={['top', 'bottom']}>
         <ErrorState message="Could not load set." onRetry={refetch} />
       </Screen>
     );
@@ -70,7 +70,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
+    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.scroll}

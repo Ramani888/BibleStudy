@@ -8,7 +8,7 @@ export const mediaApi = {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 60_000,
         onUploadProgress: e =>
-          onProgress?.(Math.round((e.loaded / (e.total ?? 1)) * 100)),
+          onProgress?.(Math.min(100, Math.round((e.loaded / (e.total || e.loaded || 1)) * 100))),
       })
       .then(res => res.data.data),
 

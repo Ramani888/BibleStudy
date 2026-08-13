@@ -15,7 +15,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
   const formRef = useRef<SetFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title="New Set" handle />;
+  const header = <ScreenHeader title="New Set" handle onClose={() => navigation.goBack()} />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Create Set" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
@@ -23,7 +23,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
+    <Screen header={header} footer={footer} keyboardAvoiding>
       <ScrollView style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"

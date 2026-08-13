@@ -3,9 +3,6 @@ import { Animated, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
-import { Avatar } from '../ui/Avatar';
-
-const AI_BADGE_ICON_SIZE = 14;
 
 // Body text metrics matching Typography preset="body"
 const BODY_FONT_SIZE = fontSizes.md;   // 15
@@ -121,7 +118,7 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
 
 // ── ChatBubble ────────────────────────────────────────────────────────────────
 
-export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyping = false, timestamp }: ChatBubbleProps) {
+export function ChatBubble({ role, text, creditsUsed, isTyping = false, timestamp }: ChatBubbleProps) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -129,11 +126,7 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyp
 
   return (
     <View style={[styles.row, isUser ? styles.rowUser : styles.rowAI]}>
-      {!isUser && (
-        <View style={[styles.aiBadge, { backgroundColor: colors.accent }]}>
-          <Icon name="sparkles" size={AI_BADGE_ICON_SIZE} color={colors.textOnAccent} />
-        </View>
-      )}
+
 
       <View style={styles.bubbleCol}>
         <View style={[styles.bubble, isUser ? [styles.bubbleUser, { backgroundColor: colors.accent }] : [styles.bubbleAI, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]]}>
@@ -165,9 +158,7 @@ export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyp
         )}
       </View>
 
-      {isUser && (
-        <Avatar uri={userImage} name={userName} size="sm" style={styles.userAvatar} />
-      )}
+
     </View>
   );
 }
@@ -208,14 +199,6 @@ const styles = StyleSheet.create({
   timestampUser: { textAlign: 'right' },
   timestampAI: { textAlign: 'left' },
 
-  aiBadge: {
-    width: layout.avatarSm,
-    height: layout.avatarSm,
-    borderRadius: layout.cardRadius,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  userAvatar: { marginBottom: spacing.s2 },
 });
 
 const mdStyles = StyleSheet.create({

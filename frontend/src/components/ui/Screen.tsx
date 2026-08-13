@@ -11,8 +11,8 @@ interface ScreenProps {
   /** Footer region — a persistent CTA. Omit when the screen has no standing action. */
   footer?: React.ReactNode;
   /**
-   * Safe-area edges. Defaults to top only (Library screens are tab-hosted; the
-   * tab bar owns the bottom inset). Modal-presented screens pass ['top','bottom'].
+   * Safe-area edges. Defaults to top+bottom. Tab-root screens (where the tab bar
+   * owns the bottom inset) should pass ['top'] explicitly.
    */
   edges?: Edge[];
   /** Wrap body+footer in a KeyboardAvoidingView so a pinned footer rises with the keyboard. */
@@ -22,7 +22,7 @@ interface ScreenProps {
 }
 
 /** Canonical Header → Body → Footer screen frame, themed. */
-export function Screen({ children, header, footer, edges = ['top'], keyboardAvoiding, bodyStyle }: ScreenProps) {
+export function Screen({ children, header, footer, edges = ['top', 'bottom'], keyboardAvoiding, bodyStyle }: ScreenProps) {
   const { colors } = useTheme();
 
   const content = (
