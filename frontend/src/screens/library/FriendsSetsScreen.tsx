@@ -15,7 +15,9 @@ import type { StudySet } from '../../types';
 
 export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSets'>) {
   const { colors } = useTheme();
-  const screenEdges = ['top', 'bottom'] as const;
+  const screenEdges = navigation.getParent()?.getState()?.type === 'tab'
+    ? ['top' as const]
+    : ['top' as const, 'bottom' as const];
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 

@@ -17,7 +17,7 @@ const ICON_SIZE = 20;
 
 export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'>) {
   const { colors, spacing: sp } = useTheme();
-  const screenEdges = ['top', 'bottom'] as const;
+  const screenEdges = navigation.getParent()?.getState()?.type === 'tab'
     ? ['top' as const]
     : ['top' as const, 'bottom' as const];
   const { mutate: cloneSet } = useCloneSet();

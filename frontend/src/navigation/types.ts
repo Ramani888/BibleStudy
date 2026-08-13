@@ -23,6 +23,9 @@ export type RootStackParamList = {
   Paywall: undefined;
   Credits: undefined;
   Achievements: undefined;
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean };
+  PublicSets: undefined;
+  FriendsSets: undefined;
 };
 
 // ─── Auth Stack ───────────────────────────────────────────────────────────────
@@ -38,10 +41,13 @@ export type AuthStackParamList = {
 export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean };
   CreateSet: { folderId?: string };
   EditSet: { setId: string };
   CreateCard: { setId: string };
   EditCard: { cardId: string; setId: string };
+  PublicSets: undefined;
+  FriendsSets: undefined;
   StudyPlans: undefined;
   PlanDetail: { planId: string };
   CreatePlan: undefined;
