@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import type { Achievement, AchievementCategory } from '../../types';
 import { useAchievements } from '../../hooks';
 import { Typography } from '../../components/ui/Typography';
@@ -120,7 +120,7 @@ function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achi
 
 // ── Screen ───────────────────────────────────────────────────────────────────
 
-export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achievements'>) {
+export function AchievementsScreen({ navigation }: RootScreenProps<'Achievements'>) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';

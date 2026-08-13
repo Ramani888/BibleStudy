@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import type { BillingPeriod, TierDef } from '../../types';
 import { TIERS } from '../../types';
 import { useAuthStore } from '../../store';
@@ -112,7 +112,7 @@ function FeatureRow({ label }: { label: string }) {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
+export function PaywallScreen({ navigation }: RootScreenProps<'Paywall'>) {
   const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
   const currentPlan = user?.plan ?? 'FREE';

@@ -92,10 +92,10 @@ export function handleNotificationNavigation(
   switch (data.type) {
     case 'friend_request':
     case 'friend_accepted':
-      navigate('ProfileTab', { screen: 'Friends' });
+      navigate('Friends', {});
       break;
     default:
-      navigate('ProfileTab', { screen: 'Notifications' });
+      navigate('Notifications', {});
       break;
   }
 }

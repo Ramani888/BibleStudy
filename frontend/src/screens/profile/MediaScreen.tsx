@@ -18,7 +18,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import type { MediaFile, MediaFileType, StorageUsage } from '../../types';
 import { useMediaFiles, useStorageUsage } from '../../hooks';
 import { useMediaUpload } from '../../hooks/useMediaUpload';
@@ -127,12 +127,14 @@ const sbStyles = StyleSheet.create({
 function UploadToast({ visible, progress, filename }: { visible: boolean; progress: number; filename: string }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const translateY = useSharedValue(100);
+  const translateY = useSharedValue(120);
+  const opacity = useSharedValue(0);
   useEffect(() => {
-    translateY.value = withTiming(visible ? 0 : 100, { duration: 220 });
+    translateY.value = withTiming(visible ? 0 : 120, { duration: 220 });
+    opacity.value = withTiming(visible ? 1 : 0, { duration: 220 });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible]);
-  const animStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
+  const animStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }], opacity: opacity.value }));
   return (
     <Animated.View style={[
       utStyles.container,
@@ -171,7 +173,7 @@ const utStyles = StyleSheet.create({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
-type Props = ProfileScreenProps<'Media'>;
+type Props = RootScreenProps<'Media'>;
 
 export function MediaScreen({ navigation }: Props) {
   const theme = useTheme();
@@ -341,15 +343,15 @@ export function MediaScreen({ navigation }: Props) {
         {/* FAB */}
         {!actions.selectionMode && (
           <Pressable
-            style={({ pressed }) => [styles.fab, { backgroundColor: colors.accent }, pressed && styles.fabPressed, upload.uploadMedia.isPending && styles.fabDisabled]}
+            style={({ pressed }) => [styles.fab, { backgroundColor: colors.accent }, pressed && styles.fabPressed, upload.isUploading && styles.fabDisabled]}
             onPress={activeTab === 'IMAGE' ? () => upload.setPickSheetVisible(true) : upload.handlePickPDF}
-            disabled={upload.uploadMedia.isPending}
+            disabled={upload.isUploading}
           >
             <PlusIcon size={28} color={colors.textOnAccent} />
           </Pressable>
         )}
 
-        <UploadToast visible={upload.uploadMedia.isPending} progress={upload.uploadProgress} filename={upload.uploadFilename} />
+        <UploadToast visible={upload.isUploading} progress={upload.uploadProgress} filename={upload.uploadFilename} />
       </View>
 
       <MediaImageViewer

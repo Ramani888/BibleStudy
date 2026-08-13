@@ -9,7 +9,7 @@ import {
 Platform } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNotes, useDeleteNote, useConfirmDialog, useSearchToggle } from '../../hooks';
 import { SearchBar } from '../../components/ui/SearchBar';
@@ -46,7 +46,7 @@ function formatRelativeDate(iso: string): string {
   return new Date(iso).toLocaleDateString();
 }
 
-type Props = ProfileScreenProps<'Notes'>;
+type Props = RootScreenProps<'Notes'>;
 
 export function NotesScreen({ navigation }: Props) {
   const theme = useTheme();

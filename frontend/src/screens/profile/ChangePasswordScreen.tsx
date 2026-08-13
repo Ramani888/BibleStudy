@@ -45,6 +45,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
 
   return (
     <Screen
+      edges={['top']}
       keyboardAvoiding
       header={<ScreenHeader title="Change Password" onBack={() => navigation.goBack()} />}
       footer={

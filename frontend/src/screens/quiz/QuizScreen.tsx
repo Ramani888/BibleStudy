@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
-import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
@@ -11,6 +11,7 @@ import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
 import type { QuizSelectableMode } from '../../types';
+import type { RootScreenProps } from '../../navigation/types';
 
 type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string };
 
@@ -18,12 +19,10 @@ function formatTime(s: number): string {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
-export function QuizScreen() {
+export function QuizScreen({ navigation, route }: RootScreenProps<'Quiz'>) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
-  const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
-  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = params;
+  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = route.params;
 
   const isFocused = useIsFocused();
   const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);

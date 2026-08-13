@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import type { LeaderboardEntry } from '../../types/friends.types';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
@@ -27,7 +27,7 @@ function getQuote(rank: number) {
   return QUOTES.find(q => rank <= q.maxRank) ?? QUOTES[QUOTES.length - 1];
 }
 
-export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboard'>) {
+export function LeaderboardScreen({ navigation }: RootScreenProps<'Leaderboard'>) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Linking, Platform, StyleSheet, View } from 'react-native';
 import { WebView } from 'react-native-webview';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import { Button, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { spacing, useTheme } from '../../theme';
 
-type Props = ProfileScreenProps<'MediaPDFViewer'>;
+type Props = RootScreenProps<'MediaPDFViewer'>;
 
 // Android: Google Docs can't reliably preview private/direct S3 URLs —
 // detect its error page and surface a fallback.

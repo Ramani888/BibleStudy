@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import { NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNote, useCreateNote, useUpdateNote } from '../../hooks';
 import { Typography } from '../../components/ui';
@@ -23,7 +23,7 @@ import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
 import { fontSizes, fontWeights, layout, lineHeights, useTheme, spacing } from '../../theme';
 
-type Props = ProfileScreenProps<'NoteEditor'>;
+type Props = RootScreenProps<'NoteEditor'>;
 
 export function NoteEditorScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
@@ -99,7 +99,6 @@ export function NoteEditorScreen({ navigation, route }: Props) {
 
   return (
     <Screen
-      edges={['top']}
       keyboardAvoiding
       header={
         <ScreenHeader

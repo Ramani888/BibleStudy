@@ -1,8 +1,6 @@
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
-import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-
+import { useFocusEffect } from '@react-navigation/native';
 import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -11,10 +9,8 @@ import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts } from '.
 import { getErrorMessage } from '../../api';
 import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
-import type { QuizStackParamList } from '../../navigation/types';
+import type { QuizScreenProps } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
-
-type Nav = NativeStackNavigationProp<QuizStackParamList>;
 
 const MODE_DISPLAY: Record<string, string> = {
   mix: 'Mix',
@@ -27,11 +23,10 @@ const MODE_DISPLAY: Record<string, string> = {
   read: 'Read',
 };
 
-export function QuizHubScreen() {
+export function QuizHubScreen({ navigation }: QuizScreenProps<'QuizHub'>) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
-  const navigation = useNavigation<Nav>();
 
   const { data: attempts = [], isLoading, isError, error, refetch } = useRecentQuizAttempts(20);
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
@@ -136,7 +131,7 @@ export function QuizHubScreen() {
   ) : undefined;
 
   return (
-    <Screen header={<ScreenHeader title="Quiz" />} footer={footer}>
+    <Screen header={<ScreenHeader title="Quiz" />} footer={footer} edges={['top']}>
       {isError ? (
         <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
       ) : isLoading ? (
@@ -182,8 +177,8 @@ export function QuizHubScreen() {
             icon: ListIcon,
             onPress: () => {
               closeSheet();
-              (navigation as any).navigate('QuizSummary', {
-                items: activeItem!.responses,
+              navigation.navigate('QuizSummary', {
+                items: activeItem!.responses ?? [],
                 title: activeItem!.quizName ?? activeItem!.setTitle,
                 scorePct: activeItem!.scorePct,
                 total: activeItem!.total,

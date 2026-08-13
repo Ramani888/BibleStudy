@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { ProfileScreenProps } from '../../navigation/types';
+import type { RootScreenProps } from '../../navigation/types';
 import { CARD_FILL_LIGHT, layout, palette, radius, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
@@ -21,7 +21,7 @@ import { getErrorMessage } from '../../api/client';
 import { formatDate } from '../../utils/formatters';
 import type { FriendRequest } from '../../types/friends.types';
 
-type Props = ProfileScreenProps<'FriendRequests'>;
+type Props = RootScreenProps<'FriendRequests'>;
 type Tab = 'incoming' | 'outgoing';
 
 export function FriendRequestsScreen({ navigation }: Props) {
@@ -93,7 +93,6 @@ export function FriendRequestsScreen({ navigation }: Props) {
 
   return (
     <Screen
-      edges={['top']}
       header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
     >
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
