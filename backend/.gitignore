@@ -38,3 +38,6 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Local uploads (dev only — production uses object storage)
+uploads/

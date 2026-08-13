@@ -38,3 +38,4 @@ frontend/android/app/*.keystore
 # Obsidian local UI state
 biblestudypro/.obsidian/graph.json
 biblestudypro/.obsidian/workspace.json
+biblestudypro/Ops/Google Credentials.md
