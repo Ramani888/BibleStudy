@@ -41,18 +41,18 @@ export function AppNavigator() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: colors.tabActive,
-        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.textDisabled,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ color, size, focused }) => {
+        tabBarIcon: ({ color, size }) => {
           const TabIcon = TAB_ICONS[route.name as keyof AppTabParamList];
-          return <TabIcon size={size ?? 24} color={color} filled={focused} />;
+          return <TabIcon size={size ?? 24} color={color} />;
         },
       })}
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
-      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library', popToTopOnBlur: true }} />
+      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
       <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
       <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
       {/* popToTopOnBlur: leaving Profile resets its stack to the Profile root, so a
@@ -65,7 +65,7 @@ export function AppNavigator() {
 const makeStyles = (colors: ThemeColors, bottomInset: number) =>
   StyleSheet.create({
     tabBar: {
-      backgroundColor: colors.bottomBar,
+      backgroundColor: colors.background,
       borderTopColor: colors.border,
       borderTopWidth: StyleSheet.hairlineWidth,
       height: layout.tabBarHeight + bottomInset,
