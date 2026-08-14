@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
 import { AppModal, EmptyState } from '../../components/feedback';
 import { Button, FilterChip, Input, Screen, SearchBar, Typography } from '../../components/ui';
@@ -11,7 +11,7 @@ import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
-import type { QuizScreenProps, QuizStackParamList } from '../../navigation/types';
+import type { QuizStackParamList } from '../../navigation/types';
 
 type Params = QuizStackParamList['QuizSetup'];
 type SortOrder = 'newest' | 'alpha' | 'cards';
@@ -34,11 +34,12 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 };
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
-export function QuizSetupScreen({ navigation, route }: QuizScreenProps<'QuizSetup'>) {
+export function QuizSetupScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
-  const { params } = route;
+  const navigation = useNavigation<any>();
+  const { params } = useRoute<RouteProp<{ QuizSetup: Params }, 'QuizSetup'>>();
 
   const preIds = params?.preSelectedSetIds ?? [];
   const preTitles = params?.preSelectedSetTitles ?? [];
@@ -132,7 +133,6 @@ export function QuizSetupScreen({ navigation, route }: QuizScreenProps<'QuizSetu
 
   return (
     <Screen
-      edges={['top']}
       header={<ScreenHeader title="New Quiz" onBack={() => navigation.goBack()} />}
       footer={
         <View style={[styles.footer, { borderTopColor: colors.border }]}>

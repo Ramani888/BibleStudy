@@ -15,9 +15,6 @@ import type { StudySet } from '../../types';
 
 export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSets'>) {
   const { colors } = useTheme();
-  const screenEdges = navigation.getParent()?.getState()?.type === 'tab'
-    ? ['top' as const]
-    : ['top' as const, 'bottom' as const];
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
 
@@ -57,14 +54,14 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   if (isError) {
     return (
-      <Screen header={header} edges={screenEdges}>
+      <Screen header={header}>
         <ErrorState message="Could not load friends' sets." onRetry={refetch} />
       </Screen>
     );
   }
 
   return (
-    <Screen header={header} footer={footer} edges={screenEdges}>
+    <Screen header={header} footer={footer}>
       <View style={styles.flex}>
       <FlatList
         data={isLoading ? [] : sets}

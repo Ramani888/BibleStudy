@@ -161,7 +161,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   if (isError) return <ErrorState message="Could not load history." onRetry={refetch} />;
 
   return (
-    <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />} edges={['top']}>
+    <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />}>
 
       {/* View mode toggle */}
       <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>

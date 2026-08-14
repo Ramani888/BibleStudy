@@ -72,7 +72,7 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
   };
 
   return (
-    <Screen edges={['top']} header={<ScreenHeader title="Notifications" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title="Notifications" onBack={() => navigation.goBack()} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <Typography preset="caption" color={theme.colors.textSecondary} style={styles.hint}>
           Choose which notifications you'd like to receive.

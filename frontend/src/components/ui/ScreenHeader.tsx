@@ -23,7 +23,7 @@ interface ScreenHeaderProps {
 export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumberOfLines = 1 }: ScreenHeaderProps) {
   const { colors } = useTheme();
 
-  const leading = (handle && !onClose) ? null : onBack ? (
+  const leading = handle ? null : onBack ? (
     <Pressable onPress={onBack} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel="Go back">
       <BackIcon size={NAV_ICON_SIZE} color={colors.textPrimary} />
     </Pressable>

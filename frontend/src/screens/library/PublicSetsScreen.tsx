@@ -17,9 +17,6 @@ const ICON_SIZE = 20;
 
 export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'>) {
   const { colors, spacing: sp } = useTheme();
-  const screenEdges = navigation.getParent()?.getState()?.type === 'tab'
-    ? ['top' as const]
-    : ['top' as const, 'bottom' as const];
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
   const [search, setSearch] = useState('');
@@ -84,14 +81,14 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
 
   if (isError) {
     return (
-      <Screen header={header} edges={screenEdges}>
+      <Screen header={header}>
         <ErrorState message="Could not load public sets." onRetry={refetch} />
       </Screen>
     );
   }
 
   return (
-    <Screen header={header} footer={footer} edges={screenEdges}>
+    <Screen header={header} footer={footer}>
       <View>
         {searchVisible && (
           <View style={styles.searchWrap}>

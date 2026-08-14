@@ -12,20 +12,7 @@
           "package_name": "com.biblestudypro.app"
         }
       },
-      "oauth_client": [
-        {
-          "client_id": "206724613277-cqrbdtc5sd45dpg22e50s5tcncfukhaj.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.biblestudypro.app",
-            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
-          }
-        },
-        {
-          "client_id": "206724613277-l6ch6sre18joco08p17rq8jk2grsai60.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
+      "oauth_client": [],
       "api_key": [
         {
           "current_key": "AIzaSyAoZqe5rj5_ei-rmlpw-k6jGrlBztsbSOE"
@@ -33,12 +20,7 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "206724613277-l6ch6sre18joco08p17rq8jk2grsai60.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
+          "other_platform_oauth_client": []
         }
       }
     }

@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
 import { LoadingOverlay } from '../../components/feedback/LoadingOverlay';
@@ -25,7 +25,7 @@ import { formatDateOnly } from '../../utils/formatters';
 import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 import type { StudySet } from '../../types';
 
-type Props = RootScreenProps<'UserProfile'>;
+type Props = ProfileScreenProps<'UserProfile'>;
 
 const VISIBILITY_LABEL: Record<string, string> = {
   PUBLIC: '🌐 Public',
@@ -111,7 +111,10 @@ export function UserProfileScreen({ route, navigation }: Props) {
   };
 
   const openSet = (set: StudySet) =>
-    navigation.navigate('SetDetail', { setId: set.id, setTitle: set.title, isOwner: false });
+    navigation.navigate('LibraryTab', {
+      screen: 'SetDetail',
+      params: { setId: set.id, setTitle: set.title, isOwner: false },
+    });
 
   return (
     <Screen header={<ScreenHeader title={user.name ?? 'Profile'} onBack={() => navigation.goBack()} />}>

@@ -48,7 +48,6 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
 
   return (
     <Screen
-      edges={['top']}
       header={
         <ScreenHeader
           title="Study Plans"

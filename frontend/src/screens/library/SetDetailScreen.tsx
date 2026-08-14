@@ -26,9 +26,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const isDark = theme.name === 'dark';
 
   const { setId, setTitle, isOwner = true } = route.params;
-  const screenEdges = navigation.getParent()?.getState()?.type === 'tab'
-    ? ['top' as const]
-    : ['top' as const, 'bottom' as const];
   const [selectedCard, setSelectedCard] = useState<CardType | null>(null);
   const [movePickerOpen, setMovePickerOpen] = useState(false);
   const [moveTargetCard, setMoveTargetCard] = useState<CardType | null>(null);
@@ -246,7 +243,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   if (isError) {
     return (
-      <Screen header={header} edges={screenEdges}>
+      <Screen header={header}>
         <ErrorState message="Could not load cards." onRetry={refetch} />
       </Screen>
     );
@@ -326,7 +323,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   ), [isDark, colors]);
 
   return (
-    <Screen header={header} edges={screenEdges}>
+    <Screen header={header}>
       {reorderMode ? (
         <View style={styles.flex}>
         <DraggableFlatList

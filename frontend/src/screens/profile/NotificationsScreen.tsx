@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { formatDateTime } from '../../utils/formatters';
 import { layout, palette, spacing, useTheme } from '../../theme';
 import { Typography } from '../../components/ui/Typography';
@@ -26,7 +26,7 @@ import {
 } from '../../hooks/useNotifications';
 import type { Notification } from '../../types/notification.types';
 
-type Props = RootScreenProps<'Notifications'>;
+type Props = ProfileScreenProps<'Notifications'>;
 
 function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
@@ -145,10 +145,18 @@ export function NotificationsScreen({ navigation, route }: Props) {
 
   return (
     <Screen
+      edges={['top']}
       header={
         <ScreenHeader
           title="Notifications"
-          onBack={() => navigation.goBack()}
+          onBack={() => {
+            if (route.params?.from === 'Home') {
+              navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
+              navigation.getParent()?.navigate('HomeTab');
+            } else {
+              navigation.goBack();
+            }
+          }}
           right={headerRight}
         />
       }

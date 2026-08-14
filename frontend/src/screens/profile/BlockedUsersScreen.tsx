@@ -2,7 +2,7 @@ import React from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { ListCard } from '../../components/ui/ListCard';
@@ -15,7 +15,7 @@ import { useBlockedUsers, useUnblockUser } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import type { BlockedUser } from '../../types/friends.types';
 
-type Props = RootScreenProps<'BlockedUsers'>;
+type Props = ProfileScreenProps<'BlockedUsers'>;
 
 export function BlockedUsersScreen({ navigation }: Props) {
   const { colors } = useTheme();

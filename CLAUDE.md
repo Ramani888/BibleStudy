@@ -55,11 +55,6 @@ under the Profile stack.
 wrap content in `<SafeAreaView edges={['top']}>` (top only — the tab bar owns the bottom inset). Never
 use `edges={['bottom']}`/all-edges on a tab-hosted screen.
 
-**`<Screen edges>` canonical rule — enforced on every screen:**
-- Screen inside any tab stack (HomeTab / LibraryTab / QuizTab / AITab / ProfileTab) → `edges={['top']}` (tab bar owns the bottom)
-- Screen in RootNavigator (full-screen modal above tabs) → omit `edges` or use `edges={['top', 'bottom']}` (default)
-- Manual `insets.bottom` in `paddingBottom` inside a tab screen → remove it; same double-inset bug as above
-
 **Cross-tab nav:** navigate to another tab's screen with `navigation.navigate('ProfileTab', { screen: 'Paywall' })`
 — convenience prop types are `CompositeScreenProps` so this type-checks. `ProfileTab` has
 `popToTopOnBlur:true`, so it always reopens at the Profile root.

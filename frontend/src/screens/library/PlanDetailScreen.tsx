@@ -69,7 +69,6 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
 
   return (
     <Screen
-      edges={['top']}
       header={
         <ScreenHeader
           title={plan?.title ?? 'Plan'}

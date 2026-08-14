@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
@@ -16,7 +16,7 @@ import { useDebouncedValue } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import type { UserProfile } from '../../types/friends.types';
 
-type Props = RootScreenProps<'SearchUsers'>;
+type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
   const theme = useTheme();

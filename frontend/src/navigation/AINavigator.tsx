@@ -13,8 +13,6 @@ export function AINavigator() {
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
       const tabState = navigation.getState();
-      const selectedRoute = tabState?.routes?.[tabState.index ?? 0];
-      if (selectedRoute?.name === 'AITab') return;
       const route = tabState?.routes?.find(r => r.name === 'AITab');
       const stackState = route?.state;
       if (stackState && (stackState.index ?? 0) > 0) {

@@ -22,7 +22,6 @@ import { useSubscriptionSync } from '../hooks';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
-
 const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
   HomeTab: HomeIcon,
   LibraryTab: LibraryIcon,
@@ -55,7 +54,7 @@ export function AppNavigator() {
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
       <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library', popToTopOnBlur: true }} />
       <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
-      <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat', popToTopOnBlur: true }} />
+      <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
       {/* popToTopOnBlur: leaving Profile resets its stack to the Profile root, so a
           deep-link (e.g. Home bell → Notifications) doesn't leave the tab stuck there. */}
       <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile', popToTopOnBlur: true }} />

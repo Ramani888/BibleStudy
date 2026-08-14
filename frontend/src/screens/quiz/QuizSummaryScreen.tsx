@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } from '../../theme';
-import type { RootScreenProps } from '../../navigation/types';
+import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
+type Params = RootStackParamList['QuizSummary'];
 type Filter = 'all' | 'correct' | 'wrong';
 
 const FILTER_LABELS: { key: Filter; label: string }[] = [
@@ -23,16 +25,18 @@ const MODE_LABEL: Record<string, string> = {
   blanks: 'Fill Blanks', chunks: 'Reorder', read: 'Read',
 };
 
-export function QuizSummaryScreen({ navigation, route }: RootScreenProps<'QuizSummary'>) {
+export function QuizSummaryScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
+  const navigation = useNavigation();
   const insets = useSafeAreaInsets();
-  const { items, title, scorePct, total, correct, exitToHub } = route.params;
+  const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
+  const { items, title, scorePct, total, correct, exitToHub } = params;
 
   const handleBack = useCallback(() => {
     if (exitToHub) {
-      navigation.popToTop();
+      (navigation as any).popToTop();
     } else {
       navigation.goBack();
     }

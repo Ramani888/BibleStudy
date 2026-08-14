@@ -39,7 +39,7 @@ export function CreatePlanScreen({ navigation }: Props) {
     );
   };
 
-  const header = <ScreenHeader title="New Study Plan" handle onClose={() => navigation.goBack()} />;
+  const header = <ScreenHeader title="New Study Plan" handle />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button label="Create Plan" onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
@@ -47,14 +47,14 @@ export function CreatePlanScreen({ navigation }: Props) {
   );
 
   return (
-    <Screen header={header} footer={footer} keyboardAvoiding>
+    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
       <ScrollView
         style={styles.flex}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.inputGroup}>
+        <View>
           <Input placeholder="Plan title" value={title} onChangeText={setTitle} maxLength={200} />
           <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
         </View>
@@ -110,7 +110,6 @@ export function CreatePlanScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: { padding: layout.screenPaddingH, gap: spacing.md },
-  inputGroup: { gap: spacing.md },
   descInput: { minHeight: 72 }, // ponytail: off-grid Figma value
   label: { marginTop: spacing.sm },
   loader: { marginVertical: spacing.lg },

@@ -2,14 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { Button, Typography } from '../../../components/ui';
 import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useQuizAttemptSave } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import type { SummaryItem } from '../../../types';
-import type { RootStackParamList } from '../../../navigation/types';
 
 const QUOTES = [
   { minScore: 90, text: 'Outstanding! Your dedication is bearing real fruit.',    sub: 'Keep that momentum going.' },
@@ -48,7 +46,7 @@ export function QuizResultScreen({
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const navigation = useNavigation();
   const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
   const saved = useRef(false);
   const [best, setBest] = useState<number | null>(null);
@@ -83,7 +81,7 @@ export function QuizResultScreen({
   const quote = getQuote(scorePct);
 
   const openSummary = useCallback(() => {
-    navigation.navigate('QuizSummary', {
+    (navigation as any).navigate('QuizSummary', {
       items: summaryItems,
       title: setTitle,
       scorePct,

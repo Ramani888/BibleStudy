@@ -2,7 +2,7 @@ import React, { useCallback, useMemo } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import { CARD_FILL_LIGHT, layout, radius, spacing, useTheme } from '../../theme';
 import { Avatar } from '../../components/ui/Avatar';
 import { Typography } from '../../components/ui/Typography';
@@ -16,7 +16,7 @@ import { useLeaderboard } from '../../hooks';
 import type { Friendship } from '../../types/friends.types';
 import { getErrorMessage } from '../../api/client';
 
-type Props = RootScreenProps<'Friends'>;
+type Props = ProfileScreenProps<'Friends'>;
 
 export function FriendsScreen({ navigation }: Props) {
   const theme = useTheme();

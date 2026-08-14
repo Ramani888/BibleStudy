@@ -19,24 +19,6 @@ import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { QuizScreen } from '../screens/quiz/QuizScreen';
 import { QuizSummaryScreen } from '../screens/quiz/QuizSummaryScreen';
-// Cross-cutting modal screens
-import { NotesScreen } from '../screens/profile/NotesScreen';
-import { NoteEditorScreen } from '../screens/profile/NoteEditorScreen';
-import { MediaScreen } from '../screens/profile/MediaScreen';
-import { MediaPDFViewerScreen } from '../screens/profile/MediaPDFViewerScreen';
-import { NotificationsScreen } from '../screens/profile/NotificationsScreen';
-import { FriendsScreen } from '../screens/profile/FriendsScreen';
-import { LeaderboardScreen } from '../screens/profile/LeaderboardScreen';
-import { FriendRequestsScreen } from '../screens/profile/FriendRequestsScreen';
-import { SearchUsersScreen } from '../screens/profile/SearchUsersScreen';
-import { UserProfileScreen } from '../screens/profile/UserProfileScreen';
-import { BlockedUsersScreen } from '../screens/profile/BlockedUsersScreen';
-import { PaywallScreen } from '../screens/profile/PaywallScreen';
-import { CreditsScreen } from '../screens/profile/CreditsScreen';
-import { AchievementsScreen } from '../screens/profile/AchievementsScreen';
-import { SetDetailScreen } from '../screens/library/SetDetailScreen';
-import { PublicSetsScreen } from '../screens/library/PublicSetsScreen';
-import { FriendsSetsScreen } from '../screens/library/FriendsSetsScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
@@ -123,25 +105,6 @@ export function RootNavigator() {
             options={{ gestureEnabled: false }}
           />
           <RootStack.Screen name="QuizSummary" component={QuizSummaryScreen} />
-          {/* Cross-cutting modals — back always returns to the caller screen */}
-          <RootStack.Screen name="Notes"          component={NotesScreen}          />
-          <RootStack.Screen name="NoteEditor"     component={NoteEditorScreen}     options={{ presentation: 'modal' }} />
-          <RootStack.Screen name="Media"          component={MediaScreen}          />
-          <RootStack.Screen name="MediaPDFViewer" component={MediaPDFViewerScreen} />
-          <RootStack.Screen name="Notifications"  component={NotificationsScreen}  />
-          <RootStack.Screen name="Friends"        component={FriendsScreen}        />
-          <RootStack.Screen name="Leaderboard"    component={LeaderboardScreen}    />
-          <RootStack.Screen name="FriendRequests" component={FriendRequestsScreen} />
-          <RootStack.Screen name="SearchUsers"    component={SearchUsersScreen}    />
-          <RootStack.Screen name="UserProfile"    component={UserProfileScreen}    />
-          <RootStack.Screen name="BlockedUsers"   component={BlockedUsersScreen}   />
-          <RootStack.Screen name="Paywall"        component={PaywallScreen}        />
-          <RootStack.Screen name="Credits"        component={CreditsScreen}        />
-          <RootStack.Screen name="Achievements"   component={AchievementsScreen}   />
-          {/* view-only; isOwner=false hides all edit actions so Library nav calls never fire */}
-          <RootStack.Screen name="SetDetail"      component={SetDetailScreen as any}   />
-          <RootStack.Screen name="PublicSets"     component={PublicSetsScreen as any}  />
-          <RootStack.Screen name="FriendsSets"    component={FriendsSetsScreen as any} />
         </RootStack.Navigator>
       ) : (
         <AuthNavigator />

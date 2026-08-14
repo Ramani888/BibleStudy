@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
@@ -8,7 +8,7 @@ import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useRec
 import { ConfirmDialog } from '../../components/feedback';
 import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
-import type { QuizScreenProps, QuizStackParamList } from '../../navigation/types';
+import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
 type Params = QuizStackParamList['QuizDetail'];
@@ -19,11 +19,12 @@ const MODE_LABEL: Record<string, string> = {
   blanks: 'Fill Blanks', chunks: 'Reorder', read: 'Read',
 };
 
-export function QuizDetailScreen({ navigation, route }: QuizScreenProps<'QuizDetail'>) {
+export function QuizDetailScreen() {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
-  const { params } = route;
+  const navigation = useNavigation<any>();
+  const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
   const { show, dialogProps } = useConfirmDialog();
   const { data: attempts = [] } = useRecentQuizAttempts(50);
@@ -61,7 +62,7 @@ export function QuizDetailScreen({ navigation, route }: QuizScreenProps<'QuizDet
   const handleReQuiz = useCallback(() => navigation.navigate('Quiz', {
     setIds,
     setTitles,
-    mode: (mode ?? 'mix') as import('../../types').QuizSelectableMode,
+    mode: mode ?? 'mix',
     retakeAttemptId: id,
   }), [navigation, setIds, setTitles, mode, id]);
 
@@ -76,7 +77,6 @@ export function QuizDetailScreen({ navigation, route }: QuizScreenProps<'QuizDet
 
   return (
     <Screen
-      edges={['top']}
       header={
         <ScreenHeader
           title={quizName ?? setsLabel ?? 'Quiz Details'}
@@ -86,7 +86,7 @@ export function QuizDetailScreen({ navigation, route }: QuizScreenProps<'QuizDet
               {storedResponses && storedResponses.length > 0 && (
                 <Pressable
                   style={({ pressed }) => pressed && styles.iconPressed}
-                  onPress={() => navigation.navigate('QuizSummary', {
+                  onPress={() => navigation.navigate('QuizSummary' as any, {
                     items: storedResponses,
                     title: quizName ?? setsLabel,
                     scorePct, total, correct,

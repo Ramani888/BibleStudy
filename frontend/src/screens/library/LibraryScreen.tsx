@@ -250,7 +250,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top']}>
+    <Screen header={header} footer={footer}>
       {/* ── Body ── */}
       {activeTab === 'sets' ? (
         <View style={styles.flex}>

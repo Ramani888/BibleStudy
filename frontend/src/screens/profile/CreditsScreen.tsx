@@ -19,7 +19,7 @@ import { WeeklyChart } from './components/WeeklyChart';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, radius, spacing, useTheme, palette } from '../../theme';
-import type { RootScreenProps } from '../../navigation/types';
+import type { ProfileScreenProps } from '../../navigation/types';
 import type { CreditTransaction, TransactionType } from '../../types';
 import type { CreditStatsPeriod } from '../../hooks/useCredits';
 
@@ -130,7 +130,7 @@ function TrendWindowPill({ value, onToggle }: { value: CreditStatsPeriod; onTogg
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-export function CreditsScreen({ navigation }: RootScreenProps<'Credits'>) {
+export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const theme = useTheme();
   const { colors } = theme;
   const qc = useQueryClient();
@@ -197,7 +197,7 @@ export function CreditsScreen({ navigation }: RootScreenProps<'Credits'>) {
   }, [colors, amountColor]);
 
   return (
-    <Screen header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
       <View style={styles.flex}>
         <FlatList
           data={transactions}

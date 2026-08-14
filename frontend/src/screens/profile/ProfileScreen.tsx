@@ -81,7 +81,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         <Typography preset="h3" color={colors.textPrimary}>Profile</Typography>
       </View>
       <ScrollView
-        contentContainerStyle={[styles.scroll, { paddingBottom: 96 }]}
+        contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 96 }]}
         showsVerticalScrollIndicator={false}
       >
         {/* ── Profile card (gradient) ── */}
