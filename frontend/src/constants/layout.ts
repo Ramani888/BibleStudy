@@ -13,8 +13,7 @@ export const layout = {
   inputHeight:      52,
   buttonHeight:     52,
   buttonHeightSm:   40,
-  tabBarHeight:        64,
-  floatingTabBarHeight: 80, // pill content height (excl. safe area bottom inset)
+  tabBarHeight:     64,
   headerHeight:     56,
   avatarSm:         32,
   avatarMd:         48,

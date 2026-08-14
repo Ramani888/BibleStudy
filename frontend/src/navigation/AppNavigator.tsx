@@ -1,9 +1,10 @@
-import React from 'react';
-import { View } from 'react-native';
-import { createBottomTabNavigator, useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import React, { useMemo } from 'react';
+import { StyleSheet } from 'react-native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { AppTabParamList } from './types';
-import { useTheme } from '../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme, type ThemeColors } from '../theme';
 import {
   HomeIcon,
   LibraryIcon,
@@ -18,14 +19,8 @@ import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
 import { useSubscriptionSync, useSystemBars } from '../hooks';
-import { CustomTabBar } from './CustomTabBar';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
-
-function ScreenWrapper({ children }: { children: React.ReactNode }) {
-  const tabBarHeight = useBottomTabBarHeight();
-  return <View style={{ flex: 1, paddingBottom: tabBarHeight }}>{children}</View>;
-}
 
 const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
   HomeTab: HomeIcon,
@@ -36,17 +31,21 @@ const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
 };
 
 export function AppNavigator() {
+  const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
 
   useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
-  useSystemBars(colors.background);
+  useSystemBars(colors.bottomBar);
 
   return (
     <Tab.Navigator
-      tabBar={(props) => <CustomTabBar {...props} />}
-      screenLayout={({ children }) => <ScreenWrapper>{children}</ScreenWrapper>}
       screenOptions={({ route }) => ({
         headerShown: false,
+        tabBarActiveTintColor: colors.accent,
+        tabBarInactiveTintColor: colors.tabInactive,
+        tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabLabel,
         tabBarIcon: ({ color, size, focused }) => {
           const TabIcon = TAB_ICONS[route.name as keyof AppTabParamList];
           return <TabIcon size={size ?? 24} color={color} filled={focused} />;
@@ -63,3 +62,24 @@ export function AppNavigator() {
     </Tab.Navigator>
   );
 }
+
+const makeStyles = (colors: ThemeColors, bottomInset: number) =>
+  StyleSheet.create({
+    tabBar: {
+      backgroundColor: colors.bottomBar,
+      borderTopColor: colors.border,
+      borderTopWidth: StyleSheet.hairlineWidth,
+      height: layout.tabBarHeight + bottomInset,
+      paddingTop: spacing.xs,
+      paddingBottom: bottomInset + spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    tabLabel: {
+      fontSize: fontSizes.xs,
+      fontWeight: fontWeights.medium,
+    },
+  });
