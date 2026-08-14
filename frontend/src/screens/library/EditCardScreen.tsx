@@ -24,7 +24,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   if (isLoading) {
     return (
-      <Screen header={header} edges={['top']}>
+      <Screen header={header} edges={['top', 'bottom']}>
         <View style={styles.loading}>
           <ActivityIndicator color={colors.accent} size="large" />
         </View>
@@ -33,7 +33,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   }
   if (isError || !card) {
     return (
-      <Screen header={header} edges={['top']}>
+      <Screen header={header} edges={['top', 'bottom']}>
         <ErrorState message={getErrorMessage(error) || 'Card not found'} onRetry={refetch} />
       </Screen>
     );
@@ -46,7 +46,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   );
 
   return (
-    <Screen header={header} footer={footer} edges={['top']} keyboardAvoiding>
+    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
       <View style={styles.flex}>
         <CardForm
           ref={formRef}
