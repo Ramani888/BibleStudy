@@ -1,5 +1,6 @@
 import React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { View } from 'react-native';
+import { createBottomTabNavigator, useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
 
 import type { AppTabParamList } from './types';
 import { useTheme } from '../theme';
@@ -21,6 +22,11 @@ import { CustomTabBar } from './CustomTabBar';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
+function ScreenWrapper({ children }: { children: React.ReactNode }) {
+  const tabBarHeight = useBottomTabBarHeight();
+  return <View style={{ flex: 1, paddingBottom: tabBarHeight }}>{children}</View>;
+}
+
 const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
   HomeTab: HomeIcon,
   LibraryTab: LibraryIcon,
@@ -38,6 +44,7 @@ export function AppNavigator() {
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
+      screenLayout={({ children }) => <ScreenWrapper>{children}</ScreenWrapper>}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size, focused }) => {

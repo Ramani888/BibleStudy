@@ -11,7 +11,7 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
   return (
     <View style={[styles.wrapper, { paddingBottom: insets.bottom + spacing.sm }]}>
-      <View style={[styles.pill, { backgroundColor: colors.bottomBar, shadowColor: colors.textPrimary }]}>
+      <View style={[styles.pill, { backgroundColor: colors.bottomBar }]}>
         {state.routes.map((route, index) => {
           const { options } = descriptors[route.key];
           const isFocused = state.index === index;
@@ -65,10 +65,7 @@ const styles = StyleSheet.create({
     borderRadius: layout.pillRadius,
     paddingVertical: spacing.sm,
     paddingHorizontal: spacing.sm,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
-    shadowRadius: 24,
-    elevation: 12,
+    elevation: 0,
     width: '100%',
   },
   tab: {
