@@ -12,15 +12,15 @@ type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
 export function useHomeNavigation(navigation: HomeNav) {
   const goReview = useCallback((setId: string, setTitle: string) =>
-    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] } }),
+    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] }, initial: false }),
   [navigation]);
 
   const goContinue = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title } }),
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title }, initial: false }),
   [navigation]);
 
   const goCreate = useCallback(() =>
-    navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {} }),
+    navigation.navigate('LibraryTab', { screen: 'CreateSet', params: {}, initial: false }),
   [navigation]);
 
   const onAI = useCallback(() =>
@@ -28,25 +28,25 @@ export function useHomeNavigation(navigation: HomeNav) {
   [navigation]);
 
   const onBell = useCallback(() =>
-    navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' } }),
+    navigation.navigate('ProfileTab', { screen: 'Notifications', params: { from: 'Home' }, initial: false }),
   [navigation]);
 
   const onAvatar = useCallback(() =>
     navigation.navigate('ProfileTab', { screen: 'Profile' }),
   [navigation]);
 
-  const goLibrary     = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),     [navigation]);
-  const goQuizHub     = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),      [navigation]);
-  const goAIChat      = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),       [navigation]);
-  const goNotes       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes' }),        [navigation]);
-  const goMedia       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }),        [navigation]);
-  const goPublicSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets' }),   [navigation]);
-  const goFriends     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends' }),      [navigation]);
-  const goProfile     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),      [navigation]);
-  const goFriendsSets = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets' }), [navigation]);
+  const goLibrary     = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),                                          [navigation]);
+  const goQuizHub     = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),                                           [navigation]);
+  const goAIChat      = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),                                            [navigation]);
+  const goNotes       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes',      initial: false }),                        [navigation]);
+  const goMedia       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media',      initial: false }),                        [navigation]);
+  const goPublicSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets', initial: false }),                        [navigation]);
+  const goFriends     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends',    initial: false }),                        [navigation]);
+  const goProfile     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),                                           [navigation]);
+  const goFriendsSets = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets', initial: false }),                       [navigation]);
 
   const goViewSet = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false } }),
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false }, initial: false }),
   [navigation]);
 
   const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [
