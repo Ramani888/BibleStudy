@@ -42,12 +42,12 @@ export function AppNavigator() {
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.textDisabled,
+        tabBarInactiveTintColor: colors.tabInactive,
         tabBarStyle: styles.tabBar,
         tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ color, size }) => {
+        tabBarIcon: ({ color, size, focused }) => {
           const TabIcon = TAB_ICONS[route.name as keyof AppTabParamList];
-          return <TabIcon size={size ?? 24} color={color} />;
+          return <TabIcon size={size ?? 24} color={color} filled={focused} />;
         },
       })}
     >
@@ -71,6 +71,11 @@ const makeStyles = (colors: ThemeColors, bottomInset: number) =>
       height: layout.tabBarHeight + bottomInset,
       paddingTop: spacing.xs,
       paddingBottom: bottomInset + spacing.xs,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: -2 },
+      shadowOpacity: 0.06,
+      shadowRadius: 8,
+      elevation: 8,
     },
     tabLabel: {
       fontSize: fontSizes.xs,

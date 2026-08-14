@@ -117,7 +117,7 @@ export const ChatInput = React.memo(function ChatInput({
         {/* Text input — grows from minHeight to maxHeight, then scrolls */}
         <TextInput
           ref={inputRef}
-          style={[styles.input, { color: colors.textPrimary }, disabled && styles.inputDisabled]}
+          style={[styles.input, { color: colors.textPrimary }]}
           placeholder="Ask a Bible question…"
           placeholderTextColor={colors.textSecondary}
           value={text}
@@ -126,7 +126,7 @@ export const ChatInput = React.memo(function ChatInput({
           scrollEnabled
           maxLength={MAX_LENGTH}
           returnKeyType="default"
-          editable={!disabled}
+          editable
           textAlignVertical="top"
         />
 
