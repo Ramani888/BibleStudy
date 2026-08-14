@@ -65,7 +65,7 @@ export function AppNavigator() {
 const makeStyles = (colors: ThemeColors, bottomInset: number) =>
   StyleSheet.create({
     tabBar: {
-      backgroundColor: colors.background,
+      backgroundColor: colors.bottomBar,
       borderTopColor: colors.border,
       borderTopWidth: StyleSheet.hairlineWidth,
       height: layout.tabBarHeight + bottomInset,

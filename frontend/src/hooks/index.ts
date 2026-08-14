@@ -71,3 +71,4 @@ export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from '
 export { useNoteStats } from './useNoteStats';
 export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';
 export { usePickMedia } from './usePickMedia';
+export { useSystemBars } from './useSystemBars';
