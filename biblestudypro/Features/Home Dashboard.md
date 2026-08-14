@@ -98,7 +98,7 @@ Home is a **read-only aggregator** — it owns no backend module.
 
 ## Edge cases, rules & gotchas
 
-- **Cross-tab navigation.** Every Home action jumps via `navigation.navigate('<Tab>', { screen, params })`. Home is a tab leaf with no back button — destination tab's own stack handles return.
+- **Cross-tab navigation — `initial: false` required.** Every Home action jumps via `navigation.navigate('<Tab>', { screen, params, initial: false })`. The `initial: false` param is critical for non-root destinations — without it, React Navigation makes the deep screen the *only* route in the target stack (no Library/Profile underneath). Consequence: back pops to HomeTab and clicking the tab later shows the sub-screen instead of the root. Root destinations (`Library`, `AIChat`, `Profile`, `QuizHub`) don't need `initial: false`. Fix: commit `035fb45` (2026-08-14). See [[Navigation & Architecture]].
 - **`sets[0]` vs recent-sorted mismatch.** Featured CONTINUE uses `sets[0]` (raw API order); My Sets rail sorts by `updatedAt` desc. These can point at different sets.
 - **Due-cards deep-link.** DUE state links into QuizSetup for `topSet` only (most due cards). `dueSets` is fetched but not surfaced.
 - **Streak semantics.** Streak = consecutive days with a daily-credit REWARD, not study days. `useAutoDailyClaim` fires on mount **and every foreground resume** — streak advances just by opening the app.
@@ -116,4 +116,4 @@ Home is a **read-only aggregator** — it owns no backend module.
 - Meditation-parity audit passed (Check 12 was the only violation — now fixed)
 
 ## Related
-[[AI Chat]] · [[Study Core]] · [[Gamification]] · [[Navigation]] · [[Social]] · [[Architecture Overview]] · [[Database Schema]]
+[[AI Chat]] · [[Study Core]] · [[Gamification]] · [[Navigation & Architecture]] · [[Social]] · [[Architecture Overview]] · [[Database Schema]]

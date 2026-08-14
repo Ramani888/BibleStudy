@@ -1,7 +1,7 @@
 ---
 title: Gamification
 tags: [feature, gamification]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # Gamification

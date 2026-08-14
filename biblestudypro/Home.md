@@ -1,7 +1,7 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
@@ -9,7 +9,7 @@ updated: 2026-08-08
 Knowledge vault for **BibleStudyPro** — an AI-assisted Bible-study flashcard app
 with a monetization layer (credits + IAP subscriptions), gamification, study
 plans, and a social/community layer. Full-stack: **Node/Express/Prisma/PostgreSQL**
-backend (19 modules) + **React Native 0.84 / React 19** app (~45 screens).
+backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 
 > This is a *code brain*, not a design vault — it documents how the system is
 > built, feature by feature, including edge cases. Notes are cross-linked; open
@@ -26,7 +26,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~45 screens).
 ## 🧭 Start here
 - [[Architecture Overview]] — the whole system on one page
 - [[Database Schema]] — Prisma models & relations
-- [[Navigation]] — screen/tab map of the app
+- [[Navigation & Architecture]] — screen/tab map, navigator tree, safe-area rules, useSystemBars
 
 ## 🖥️ Backend
 - [[Backend Architecture]] — layering, request lifecycle, conventions
@@ -43,7 +43,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~45 screens).
 
 ## 📱 Frontend
 - [[Frontend Architecture]] — directory map, conventions
-- [[Navigation]] — navigators, tabs, stacks
+- [[Navigation & Architecture]] — navigators, tabs, stacks, tab icon state, cross-tab patterns
 - [[State & Data Fetching]] — Zustand + React Query
 - [[Screen Map]] — every screen and its data source
 - [[Hooks & API Layer]] — how screens talk to the backend

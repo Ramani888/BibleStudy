@@ -1,7 +1,7 @@
 ---
 title: Quiz
 tags: [feature, quiz]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # Quiz

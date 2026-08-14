@@ -1,7 +1,7 @@
 ---
 title: Study Plans
 tags: [feature, study-plans]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # Study Plans
@@ -37,6 +37,7 @@ Entry points: **LibraryScreen** header has a Pressable → `StudyPlans` (persona
 - Save disabled until title non-empty AND ≥1 set selected AND not pending.
 - On success: **personal** plan → `navigation.replace('PlanDetail', { planId })` (jumps straight in); **group** plan (`groupId` present) → `navigation.goBack()` to GroupDetail (its list refetches).
 - `groupId` is read defensively: `(route.params as { groupId?: string })?.groupId`.
+- **iOS keyboard gap fix** (commit `a1f4ca8`, 2026-08-14): title input is wrapped in a `KeyboardAvoidingView` and the screen includes a bottom safe-area inset — prevents the input field from being hidden behind the keyboard on iPhone.
 
 **PlanDetailScreen (personal)**
 - Description, aggregate `ProgressBar`, "🎉 Plan complete!" banner when all steps done.

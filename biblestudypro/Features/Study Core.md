@@ -70,10 +70,12 @@ arriving from public/friends browse, which hides all mutating controls.
 - Fields: title (required), description, visibility (`PRIVATE`/`PUBLIC`/`FRIENDS`), layout (`DEFAULT`/`MINIMAL`/`DETAILED`), color (hex), folder.
 - `CreateSet` accepts optional `folderId` param to pre-file the set.
 - Save via `useCreateSet` / `useUpdateSet`.
+- Both are modals (`presentation: 'modal'`); both include a bottom safe-area inset (commit `a1f4ca8`, 2026-08-14) so the Save button is never obscured on iPhone.
 
 ### Create/Edit Card (`CreateCard` / `EditCard`)
 - Fields: question, answer (required), note, image (`imageId`), `isBlurred`, difficulty (`EASY`/`MEDIUM`/`HARD`), and type (`QA`/`STORY`).
 - Save via `useCreateCard` / `useUpdateCard`.
+- Both are modals; both include a bottom safe-area inset (commit `a1f4ca8`, 2026-08-14).
 
 ### Public / Friends browse (`PublicSets` / `FriendsSets`)
 - Infinite-scroll paginated lists (`useInfiniteQuery`, 20/page).

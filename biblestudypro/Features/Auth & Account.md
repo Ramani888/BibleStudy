@@ -1,7 +1,7 @@
 ---
 title: Auth & Account
 tags: [feature, auth]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # Auth & Account
@@ -194,6 +194,10 @@ Deleting a `User` cascades to `RefreshToken`, folders, sets, notes, friendships,
 - Profile photo upload is stubbed ("coming soon" Toast).
 - Access-token revocation is not immediate (stateless, 15m window).
 - No refresh-token rotation.
+
+## System bar sync
+
+`AuthNavigator` calls `useSystemBars(colors.background)` — sets the Android bottom navigation bar to the page background color while on auth screens. `OnboardingScreen` also calls `useSystemBars(colors.background)`. `SplashScreen` calls `useSystemBars(BRAND_BG)` for the branded launch color. See [[Navigation & Architecture]].
 
 ## This session's additions (A–G arc)
 Not part of the monetization A–G arc. The adjacent work was the **Google & Apple Sign-In** feature (recent commits: social packages, service wiring, and the `hasPassword` field for social-only accounts) plus the ATS/bundle-ID fixes for local dev. Auth touches monetization only indirectly (`plan` / `creditBalance` live on `User` and surface on ProfileScreen).
