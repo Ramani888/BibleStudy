@@ -1,7 +1,7 @@
 ---
 title: Study Core
 tags: [feature, study-core]
-updated: 2026-08-08
+updated: 2026-08-14
 ---
 
 # Study Core
@@ -32,6 +32,8 @@ CLAUDE.md map's `study/StudyScreen.tsx` + `useStudySession` never existed.
 
 > Study-plan screens (`StudyPlans`, `PlanDetail`, `CreatePlan`) also live in this
 > stack but belong to the [[Study Plans]] feature (D1/D2), not the study core.
+
+> **Nav note (2026-08-14):** An Aug 13 experiment moved `SetDetail`/`PublicSets`/`FriendsSets` to a root-level stack (above tabs) for cross-tab back-flow. This was fully reverted (`2e623a7`). All screens above remain in the LibraryStack. Cross-tab nav to `SetDetail` from Home uses `navigation.navigate('LibraryTab', { screen: 'SetDetail', params: {...} })`.
 
 ## Features & functionality
 

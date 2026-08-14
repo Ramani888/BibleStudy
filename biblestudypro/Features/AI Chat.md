@@ -1,7 +1,7 @@
 ---
 title: AI Chat
 tags: [feature, ai]
-updated: 2026-08-10b
+updated: 2026-08-14
 ---
 
 # AI Chat
@@ -21,7 +21,7 @@ updated: 2026-08-10b
 
 ### AIChatScreen (`AIChat`)
 - **Empty state**: sparkle icon, headline, and 4 tappable suggestion prompts (`SUGGESTIONS`) that send immediately.
-- **Compose & send** (`ChatInput`): multiline TextInput, 1000-char cap (`MAX_LENGTH`), live char counter that turns red at 900 (`WARN_THRESHOLD`); send button enabled only when non-empty and not disabled.
+- **Compose & send** (`ChatInput`): multiline TextInput, 1000-char cap (`MAX_LENGTH`), live char counter that turns red at 900 (`WARN_THRESHOLD`); input is always editable — send button disabled only by loading state (not by empty input), preventing stuck states.
 - **Optimistic UI**: on send, a user bubble + a `__typing__` placeholder AI bubble are pushed; the placeholder is replaced on success or removed on error.
 - **Credit row** (top of ChatInput): shows `N credits remaining`; when `<= 0` shows "No credits — claim your daily credit or **Upgrade**" (the Upgrade link navigates to `ProfileTab → Paywall`). Balance shown is optimistically decremented by 1 while a request is `isPending`.
 - **Follow-up chips**: up to 3 chips rendered under each AI message; tapping one re-sends it as a new question. Disabled while pending/loading.
@@ -141,6 +141,7 @@ Active conversation state lives in **Zustand** (`useAIChatStore`), not React Que
 - **RAG pipeline** (450567a): Voyage AI embeddings on cards + notes → pgvector retrieval → personal context injected into system prompt per request.
 - **Atomic credits** (b497ca5): TOCTOU race in credit reserve replaced with single atomic SQL UPDATE.
 - **UI polish**: new session via `+` icon (replaced trash); single-container chat input redesign; KAV fix; keyboard dismissed on media attach.
+- **Chat UI streamline** (e3214ed, 2026-08-14): `ChatBubble` simplified — avatar, sparkles badge, and inline credit chip removed. `ChatInput` always editable; send button gated by loading state only (not empty-input). `AIChatScreen` split into `useAIChatAttachment` hook + `ChatMessageItem` sub-component (Phase 4 god-screen split, `163fc52`).
 - **Attachment UX v2** (d1ff479): image thumbnails + upload loading states — see below.
 
 ## Attachment UX (composer + bubble)

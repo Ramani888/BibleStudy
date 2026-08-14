@@ -1,7 +1,7 @@
 ---
 title: Home Dashboard
 tags: [feature, home]
-updated: 2026-08-11
+updated: 2026-08-14
 ---
 
 # Home Dashboard
@@ -14,7 +14,7 @@ updated: 2026-08-11
 |--------|-------|-----------|---------|
 | HomeScreen | `HomeTab` | AppNavigator (bottom tab, no inner stack) | Aggregated dashboard — featured hero card, quick-action grid, recent sets, summary stats, friends/discover rails, activity feed |
 
-`HomeScreen` is the sole screen of `HomeTab`; it is a tab leaf with no inner stack, so all navigation is **cross-tab**. File: `frontend/src/screens/home/HomeScreen.tsx` (self-contained — all sub-components inline: `StickyHeader`, `FeaturedCard`, `QuickAction`, `SetRow`, `SetMiniCard`, `ActivityItem`, `SummaryCard`, `SectionRow`).
+`HomeScreen` is the sole screen of `HomeTab`; it is a tab leaf with no inner stack, so all navigation is **cross-tab**. File: `frontend/src/screens/home/HomeScreen.tsx`. Sub-components inline: `StickyHeader`, `FeaturedCard`, `QuickAction`, `SetRow`, `SetMiniCard`, `ActivityItem`, `SummaryCard`, `SectionRow`. Navigation logic extracted to **`useHomeNavigation`** hook (Phase 4 god-screen split, commit `8935a9e`, 2026-08-12).
 
 ## Section order (top → bottom)
 
