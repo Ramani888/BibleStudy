@@ -1,8 +1,8 @@
 import { useCallback, useMemo } from 'react';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import {
-  CheckCircleIcon, FileTextIcon, FolderIcon, LibraryIcon,
-  SearchIcon, SparklesIcon, UsersIcon, UserIcon,
+  FileTextIcon, FolderIcon, SearchIcon, UsersIcon,
+  CalendarIcon, TrophyIcon, BarChartIcon, PlusCircleIcon,
   type IconComponent,
 } from '../components/icons';
 import type { AppTabParamList } from '../navigation/types';
@@ -35,30 +35,30 @@ export function useHomeNavigation(navigation: HomeNav) {
     navigation.navigate('ProfileTab', { screen: 'Profile' }),
   [navigation]);
 
-  const goLibrary     = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),                                          [navigation]);
-  const goQuizHub     = useCallback(() => navigation.navigate('QuizTab',    { screen: 'QuizHub' }),                                           [navigation]);
-  const goAIChat      = useCallback(() => navigation.navigate('AITab',      { screen: 'AIChat' }),                                            [navigation]);
-  const goNotes       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes',      initial: false }),                        [navigation]);
-  const goMedia       = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media',      initial: false }),                        [navigation]);
-  const goPublicSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets', initial: false }),                        [navigation]);
-  const goFriends     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends',    initial: false }),                        [navigation]);
-  const goProfile     = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Profile' }),                                           [navigation]);
-  const goFriendsSets = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets', initial: false }),                       [navigation]);
+  const goLibrary      = useCallback(() => navigation.navigate('LibraryTab', { screen: 'Library' }),                                           [navigation]);
+  const goNotes        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Notes',        initial: false }),                       [navigation]);
+  const goMedia        = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media',        initial: false }),                       [navigation]);
+  const goPublicSets   = useCallback(() => navigation.navigate('LibraryTab', { screen: 'PublicSets',   initial: false }),                       [navigation]);
+  const goFriends      = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Friends',      initial: false }),                       [navigation]);
+  const goFriendsSets  = useCallback(() => navigation.navigate('LibraryTab', { screen: 'FriendsSets',  initial: false }),                       [navigation]);
+  const goStudyPlans   = useCallback(() => navigation.navigate('LibraryTab', { screen: 'StudyPlans',   initial: false }),                       [navigation]);
+  const goAchievements = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Achievements', initial: false }),                       [navigation]);
+  const goLeaderboard  = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Leaderboard',  initial: false }),                       [navigation]);
 
   const goViewSet = useCallback((s: StudySet) =>
     navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false }, initial: false }),
   [navigation]);
 
   const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [
-    { label: 'Library',  Icon: LibraryIcon,    onPress: goLibrary },
-    { label: 'Quiz',     Icon: CheckCircleIcon, onPress: goQuizHub },
-    { label: 'AI Chat',  Icon: SparklesIcon,    onPress: goAIChat },
-    { label: 'Notes',    Icon: FileTextIcon,    onPress: goNotes },
-    { label: 'Media',    Icon: FolderIcon,      onPress: goMedia },
-    { label: 'Discover', Icon: SearchIcon,      onPress: goPublicSets },
-    { label: 'Friends',  Icon: UsersIcon,       onPress: goFriends },
-    { label: 'Profile',  Icon: UserIcon,        onPress: goProfile },
-  ], [goLibrary, goQuizHub, goAIChat, goNotes, goMedia, goPublicSets, goFriends, goProfile]);
+    { label: 'Create Set',   Icon: PlusCircleIcon, onPress: goCreate },
+    { label: 'Study Plans',  Icon: CalendarIcon,   onPress: goStudyPlans },
+    { label: 'Achievements', Icon: TrophyIcon,     onPress: goAchievements },
+    { label: 'Leaderboard',  Icon: BarChartIcon,   onPress: goLeaderboard },
+    { label: 'Notes',        Icon: FileTextIcon,   onPress: goNotes },
+    { label: 'Media',        Icon: FolderIcon,     onPress: goMedia },
+    { label: 'Discover',     Icon: SearchIcon,     onPress: goPublicSets },
+    { label: 'Friends',      Icon: UsersIcon,      onPress: goFriends },
+  ], [goCreate, goStudyPlans, goAchievements, goLeaderboard, goNotes, goMedia, goPublicSets, goFriends]);
 
   return {
     goReview, goContinue, goCreate,

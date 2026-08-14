@@ -10,13 +10,8 @@ import {
   BellIcon,
   ArrowRightIcon,
   ChevronRightIcon,
-  CheckCircleIcon,
   SparklesIcon,
-  FileTextIcon,
-  FolderIcon,
-  UsersIcon,
   SearchIcon,
-  UserIcon,
   LibraryIcon,
   type IconComponent,
 } from '../../components/icons';
