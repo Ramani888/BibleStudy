@@ -46,8 +46,8 @@ Three mutually exclusive states (priority order):
 **Progress + streak footer**: fill width = `min(streak, 7) / 7`; fill color = `colors.textOnAccent` (white); footer `"{streak} day streak · weekly goal {min(streak,7)}/7"` with flame icon (`colors.warning`).
 
 ### Quick-action grid (`QuickAction` × 8, 4 per row, circular icon + label)
-Cross-tab shortcuts: **Library**, **Quiz**, **AI Chat**, **Notes**, **Media**, **Discover**, **Friends**, **Profile**.
-Positioned at slot 2 (after hero, before My Sets).
+All 8 are genuine deep links (not tab-bar duplicates): **Create Set**, **Study Plans**, **Achievements**, **Leaderboard**, **Notes**, **Media**, **Discover**, **Friends**.
+Positioned at slot 2 (after hero, before My Sets). Logic lives in `useHomeNavigation.ts` → `quickActions`.
 
 ### My Sets (`SetRow`, vertical list, only if `recentSets.length > 0`)
 - Up to 4 sets sorted by `updatedAt` desc.
