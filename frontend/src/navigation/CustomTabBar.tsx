@@ -51,6 +51,10 @@ export function CustomTabBar({ state, descriptors, navigation }: BottomTabBarPro
 
 const styles = StyleSheet.create({
   wrapper: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     alignItems: 'center',
     backgroundColor: 'transparent',
     paddingHorizontal: layout.screenPaddingH,

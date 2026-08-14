@@ -1,8 +1,10 @@
 import React from 'react';
+import { View } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { AppTabParamList } from './types';
-import { useTheme } from '../theme';
+import { useTheme, layout } from '../theme';
 import {
   HomeIcon,
   LibraryIcon,
@@ -31,13 +33,19 @@ const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
 
 export function AppNavigator() {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
-  useSystemBars(colors.background); // floating tab bar — gap shows screen bg, not bar color
+  useSystemBars(colors.background);
 
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
+      screenLayout={({ children }) => (
+        <View style={{ flex: 1, paddingBottom: layout.floatingTabBarHeight + insets.bottom }}>
+          {children}
+        </View>
+      )}
       screenOptions={({ route }) => ({
         headerShown: false,
         tabBarIcon: ({ color, size, focused }) => {
