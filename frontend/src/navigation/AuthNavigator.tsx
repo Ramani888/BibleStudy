@@ -6,10 +6,14 @@ import { RegisterScreen } from '../screens/auth/RegisterScreen';
 import { VerifyEmailScreen } from '../screens/auth/VerifyEmailScreen';
 import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
+import { useTheme } from '../theme';
+import { useSystemBars } from '../hooks';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
 export function AuthNavigator() {
+  const { colors } = useTheme();
+  useSystemBars(colors.background);
   return (
     <Stack.Navigator
       initialRouteName="Login"

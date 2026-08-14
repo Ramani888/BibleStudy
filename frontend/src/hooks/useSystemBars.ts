@@ -8,16 +8,17 @@ import { useTheme } from '../theme';
  * iOS has no settable navigation bar — this is a no-op there.
  * Top status bar is handled by <StatusBar> in App.tsx.
  */
-export function useSystemBars(): void {
+export function useSystemBars(color?: string): void {
   const theme = useTheme();
   const isDark = theme.name === 'dark';
+  const barColor = color ?? theme.colors.bottomBar;
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
     SystemNavigationBar.setNavigationColor(
-      theme.colors.bottomBar,
+      barColor,
       isDark ? 'light' : 'dark',
       'navigation',
     ).catch(() => {});
-  }, [theme.colors.bottomBar, isDark]);
+  }, [barColor, isDark]);
 }

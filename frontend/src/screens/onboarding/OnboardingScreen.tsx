@@ -13,6 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Button, Spacer, Typography } from '../../components/ui';
 import { layout, spacing, fontSizes, lineHeights, useTheme } from '../../theme';
+import { useSystemBars } from '../../hooks';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
@@ -58,6 +59,7 @@ export function OnboardingScreen({ onComplete }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<Slide>>(null);
   const { colors } = useTheme();
+  useSystemBars(colors.background);
 
   const isLast = activeIndex === SLIDES.length - 1;
 

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from 'react';
 import { Animated, StatusBar, StyleSheet, Text, View } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { palette } from '../theme';
+import { useSystemBars } from '../hooks';
 
 /** Fixed brand color — splash is identity, not theme-dependent. */
 const BRAND_BG = palette.indigo500;
@@ -33,6 +34,7 @@ interface SplashScreenProps {
 }
 
 export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
+  useSystemBars(BRAND_BG);
   const opacity = useRef(new Animated.Value(1)).current;
   const onFinishRef = useRef(onFinish);
   onFinishRef.current = onFinish;

@@ -7,6 +7,7 @@ import messaging from '@react-native-firebase/messaging';
 
 import { useAuthStore } from '../store';
 import { useTheme } from '../theme';
+import { useSystemBars } from '../hooks';
 import {
   registerDeviceToken,
   onTokenRefresh,
@@ -26,6 +27,7 @@ const ONBOARDING_KEY = '@onboarding_seen';
 
 function SplashScreen() {
   const { colors } = useTheme();
+  useSystemBars(colors.background);
   return (
     <View style={[styles.splash, { backgroundColor: colors.background }]}>
       <ActivityIndicator size="large" color={colors.accent} />

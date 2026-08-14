@@ -18,7 +18,7 @@ import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
-import { useSubscriptionSync } from '../hooks';
+import { useSubscriptionSync, useSystemBars } from '../hooks';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
@@ -36,6 +36,7 @@ export function AppNavigator() {
   const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
 
   useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
+  useSystemBars(colors.bottomBar);
 
   return (
     <Tab.Navigator

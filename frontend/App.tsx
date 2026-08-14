@@ -13,8 +13,6 @@ import { useTheme, useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 import { configureGoogleSignIn } from './src/utils/socialAuth';
 import { SplashScreen } from './src/screens/SplashScreen';
-import { useSystemBars } from './src/hooks';
-
 // Enable native screens for better performance
 enableScreens(true);
 configureGoogleSignIn();
@@ -25,8 +23,6 @@ function AppBootstrap() {
   const hydrateTheme = useThemeStore(s => s.hydrate);
   const { colors } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
-
-  useSystemBars();
 
   useEffect(() => {
     initialize();
