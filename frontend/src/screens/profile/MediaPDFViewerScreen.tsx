@@ -63,6 +63,7 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
         <WebView
           source={{ uri: viewerUrl }}
           style={styles.pdf}
+          scalesPageToFit={false}
           injectedJavaScript={Platform.OS === 'android' ? GOOGLE_DOCS_ERROR_DETECTOR : undefined}
           onMessage={(e) => { if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true); }}
           onLoadEnd={() => setLoading(false)}
