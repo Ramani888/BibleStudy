@@ -259,13 +259,13 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         {isOwner ? (
           <View style={styles.cardActions}>
             <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              <InfoIcon size={ICON_SIZE} color={colors.textDisabled} />
+              <InfoIcon size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
             <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textDisabled} /> : <EyeIcon size={ICON_SIZE} color={colors.textDisabled} />}
+              {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textSecondary} /> : <EyeIcon size={ICON_SIZE} color={colors.textSecondary} />}
             </Pressable>
             <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              <MoreVerticalIcon size={ICON_SIZE} color={colors.textDisabled} />
+              <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
             </Pressable>
           </View>
         ) : null}
