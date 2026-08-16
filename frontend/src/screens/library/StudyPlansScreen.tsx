@@ -1,16 +1,17 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
-import { usePlans, useManualRefresh } from '../../hooks';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { usePlans, useManualRefresh, useSearchToggle } from '../../hooks';
+import { Screen, ScreenHeader, SearchBar } from '../../components/ui';
 import { Typography } from '../../components/ui/Typography';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
-import { PlusIcon, BookIcon } from '../../components/icons';
+import { PlusIcon, BookIcon, SearchIcon } from '../../components/icons';
 import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
+
+const ICON_SIZE = 20;
 
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
   const theme = useTheme();
@@ -18,6 +19,16 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   const isDark = theme.name === 'dark';
   const { data: plans = [], isLoading, error, refetch } = usePlans();
   const { refreshing, onRefresh } = useManualRefresh(refetch);
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+
+  const filteredPlans = useMemo(() => {
+    if (!search.trim()) return plans;
+    const q = search.trim().toLowerCase();
+    return plans.filter(p =>
+      p.title.toLowerCase().includes(q) ||
+      (p.description ?? '').toLowerCase().includes(q),
+    );
+  }, [plans, search]);
 
   const handleNavCreatePlan = useCallback(() => navigation.navigate('CreatePlan'), [navigation]);
 
@@ -54,29 +65,39 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           title="Study Plans"
           onBack={navigation.goBack}
           right={
-            <Pressable onPress={handleNavCreatePlan} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-              <PlusIcon size={22} color={colors.accent} />
-            </Pressable>
+            <View style={styles.headerRight}>
+              <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
+              </Pressable>
+              <Pressable onPress={handleNavCreatePlan} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                <PlusIcon size={22} color={colors.accent} />
+              </Pressable>
+            </View>
           }
         />
       }
     >
+      {searchVisible && (
+        <View style={styles.searchWrap}>
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search plans…" autoFocus />
+        </View>
+      )}
       {isLoading ? (
         <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
       ) : error ? (
         <ErrorState onRetry={refetch} />
-      ) : plans.length === 0 ? (
+      ) : filteredPlans.length === 0 ? (
         <View style={styles.centered}>
           <EmptyState
             icon={<BookIcon size={48} color={colors.accent} />}
-            title="No study plans yet"
-            subtitle="Tap + to create a guided path through your sets."
+            title={search ? 'No results' : 'No study plans yet'}
+            subtitle={search ? `No plans match "${search}"` : 'Tap + to create a guided path through your sets.'}
           />
         </View>
       ) : (
         <View style={styles.flex}>
         <FlatList
-          data={plans}
+          data={filteredPlans}
           keyExtractor={p => p.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
@@ -92,6 +113,8 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
 const styles = StyleSheet.create({
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   flex: { flex: 1 },
+  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
   list: { padding: layout.screenPaddingH, gap: spacing.md },
   card: {
     borderRadius: layout.cardRadius,

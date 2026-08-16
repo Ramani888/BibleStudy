@@ -20,11 +20,12 @@ import Animated, {
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { MediaFile, MediaFileType, StorageUsage } from '../../types';
-import { useMediaFiles, useStorageUsage } from '../../hooks';
+import { useMediaFiles, useStorageUsage, useSearchToggle } from '../../hooks';
 import { useMediaUpload } from '../../hooks/useMediaUpload';
 import { useMediaActions } from '../../hooks/useMediaActions';
 import { Typography } from '../../components/ui/Typography';
 import { Button } from '../../components/ui/Button';
+import { SearchBar } from '../../components/ui/SearchBar';
 import { EmptyState } from '../../components/feedback/EmptyState';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
@@ -34,7 +35,7 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import {
   AlbumsIcon, CameraIcon, CheckCircleIcon, ChevronRightIcon,
-  FileTextIcon, PencilIcon, PlusIcon, ShareIcon,
+  FileTextIcon, PencilIcon, PlusIcon, SearchIcon, ShareIcon,
   SortIcon, TrashIcon, ClockIcon, ArrowUpIcon,
   type IconComponent,
 } from '../../components/icons';
@@ -180,6 +181,7 @@ export function MediaScreen({ navigation }: Props) {
 
   const [activeTab,    setActiveTab]    = useState<MediaFileType>('IMAGE');
   const [sortOrder,    setSortOrder]    = useState<SortOrder>('newest');
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const [viewerVisible, setViewerVisible] = useState(false);
   const [viewerIndex,  setViewerIndex]  = useState(0);
 
@@ -199,6 +201,12 @@ export function MediaScreen({ navigation }: Props) {
     if (sortOrder === 'oldest') return arr.reverse();
     return arr.sort((a, b) => a.name.localeCompare(b.name));
   }, [activeFiles, sortOrder]);
+
+  const filteredFiles = useMemo(() => {
+    if (!search.trim()) return sortedFiles;
+    const q = search.trim().toLowerCase();
+    return sortedFiles.filter(f => f.name.toLowerCase().includes(q));
+  }, [sortedFiles, search]);
 
   const SortIconComp = SORT_ICONS[sortOrder];
   const cycleSortOrder = useCallback(() =>
@@ -302,9 +310,18 @@ export function MediaScreen({ navigation }: Props) {
           <Pressable onPress={cycleSortOrder} style={s.iconBtn} hitSlop={8}>
             <SortIconComp size={20} color={colors.textSecondary} />
           </Pressable>
+          <Pressable onPress={toggleSearch} style={s.iconBtn} hitSlop={8}>
+            <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
+          </Pressable>
           <Pressable onPress={() => actions.setSelectionMode(true)} style={s.iconBtn} hitSlop={8}>
             <CheckCircleIcon size={20} color={colors.textSecondary} />
           </Pressable>
+        </View>
+      )}
+
+      {searchVisible && !actions.selectionMode && (
+        <View style={styles.searchWrap}>
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search files…" autoFocus />
         </View>
       )}
 
@@ -315,7 +332,7 @@ export function MediaScreen({ navigation }: Props) {
         ) : activeTab === 'IMAGE' ? (
           <FlatList
             key="images"
-            data={sortedFiles}
+            data={filteredFiles}
             keyExtractor={item => item.id}
             renderItem={renderImageItem}
             numColumns={3}
@@ -323,18 +340,18 @@ export function MediaScreen({ navigation }: Props) {
             style={s.list}
             contentContainerStyle={s.imageListContent}
             refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title="No images yet" subtitle="Tap + to upload your first photo" />}
+            ListEmptyComponent={<EmptyState title={search ? 'No results' : 'No images yet'} subtitle={search ? `No images match "${search}"` : 'Tap + to upload your first photo'} />}
           />
         ) : (
           <FlatList
             key="pdfs"
-            data={sortedFiles}
+            data={filteredFiles}
             keyExtractor={item => item.id}
             renderItem={renderPDFItem}
             style={s.list}
             contentContainerStyle={s.pdfListContent}
             refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title="No PDFs yet" subtitle="Tap + to upload your first PDF" />}
+            ListEmptyComponent={<EmptyState title={search ? 'No results' : 'No PDFs yet'} subtitle={search ? `No PDFs match "${search}"` : 'Tap + to upload your first PDF'} />}
           />
         )}
 
@@ -429,6 +446,7 @@ const s = StyleSheet.create({
 });
 
 const styles = StyleSheet.create({
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
   selectionHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     marginHorizontal: layout.screenPaddingH, marginVertical: spacing.md, height: 40,

@@ -1,13 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
-import { Screen, ScreenHeader, Spacer, Typography } from '../../components/ui';
-import { CopyIcon } from '../../components/icons';
+import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
+import { CopyIcon, SearchIcon } from '../../components/icons';
 
-import { useCloneSet, useFriendsSets } from '../../hooks';
+import { useCloneSet, useFriendsSets, useSearchToggle } from '../../hooks';
+
+const ICON_SIZE = 20;
 import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -17,6 +19,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   const { colors } = useTheme();
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
   const {
     data,
@@ -32,6 +35,12 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   const sets = useMemo(() => data?.pages.flatMap(p => p.sets) ?? [], [data]);
   const total = data?.pages[0]?.pagination.total ?? 0;
 
+  const filteredSets = useMemo(() => {
+    if (!search.trim()) return sets;
+    const q = search.trim().toLowerCase();
+    return sets.filter(s => s.title.toLowerCase().includes(q));
+  }, [sets, search]);
+
   const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
     <SetCard
       set={item}
@@ -43,7 +52,17 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   const handleGoBack = useCallback(() => navigation.goBack(), [navigation]);
   const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
 
-  const header = <ScreenHeader title="Friends' Sets" onBack={handleGoBack} />;
+  const header = (
+    <ScreenHeader
+      title="Friends' Sets"
+      onBack={handleGoBack}
+      right={
+        <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+          <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
+        </Pressable>
+      }
+    />
+  );
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Typography preset="caption" color={colors.textSecondary} align="center">
@@ -62,20 +81,25 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   return (
     <Screen header={header} footer={footer}>
+      {searchVisible && (
+        <View style={styles.searchWrap}>
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search sets…" autoFocus />
+        </View>
+      )}
       <View style={styles.flex}>
       <FlatList
-        data={isLoading ? [] : sets}
+        data={isLoading ? [] : filteredSets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.accent} />}
-        onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
+        onEndReached={() => !search && hasNextPage && !isFetchingNextPage && fetchNextPage()}
         onEndReachedThreshold={0.3}
         ItemSeparatorComponent={() => <Spacer size={spacing.md} />}
         ListEmptyComponent={
           <EmptyState
-            title="No sets from friends"
-            subtitle="When your friends mark sets as Friends-only, they'll appear here."
+            title={search ? 'No results' : 'No sets from friends'}
+            subtitle={search ? `No sets match "${search}"` : "When your friends mark sets as Friends-only, they'll appear here."}
           />
         }
         ListFooterComponent={
@@ -117,6 +141,8 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
+  iconPressed: { opacity: 0.85 },
   list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },
   footer: {
     paddingHorizontal: layout.screenPaddingH,

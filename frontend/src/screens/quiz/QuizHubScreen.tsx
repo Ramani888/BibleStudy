@@ -1,13 +1,15 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
-import { Button, Screen, Typography } from '../../components/ui';
+import { Button, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, TrashIcon } from '../../components/icons';
-import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts } from '../../hooks';
+import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
+import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
+
+const ICON_SIZE = 20;
 import { getErrorMessage } from '../../api';
 import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
@@ -36,6 +38,16 @@ export function QuizHubScreen() {
   const { data: attempts = [], isLoading, isError, error, refetch } = useRecentQuizAttempts(20);
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
   const { show, dialogProps } = useConfirmDialog();
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+
+  const filteredAttempts = useMemo(() => {
+    if (!search.trim()) return attempts;
+    const q = search.trim().toLowerCase();
+    return attempts.filter(a =>
+      (a.quizName ?? '').toLowerCase().includes(q) ||
+      (a.setTitle ?? '').toLowerCase().includes(q),
+    );
+  }, [attempts, search]);
 
   // Silent background refresh on focus — does NOT trigger the pull-to-refresh spinner
   useFocusEffect(useCallback(() => { refetch(); }, [refetch]));
@@ -136,22 +148,39 @@ export function QuizHubScreen() {
   ) : undefined;
 
   return (
-    <Screen header={<ScreenHeader title="Quiz" />} footer={footer}>
+    <Screen
+      header={
+        <ScreenHeader
+          title="Quiz"
+          right={
+            <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+              <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
+            </Pressable>
+          }
+        />
+      }
+      footer={footer}
+    >
+      {searchVisible && (
+        <View style={styles.searchWrap}>
+          <SearchBar value={search} onChangeText={setSearch} placeholder="Search quizzes…" autoFocus />
+        </View>
+      )}
       {isError ? (
         <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
       ) : isLoading ? (
         <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
-      ) : attempts.length === 0 ? (
+      ) : filteredAttempts.length === 0 ? (
         <View style={styles.flex}>
           <EmptyState
-            title="No quizzes yet"
-            subtitle="Tap 'Start New Quiz' below to test yourself"
+            title={search ? 'No results' : 'No quizzes yet'}
+            subtitle={search ? `No quizzes match "${search}"` : "Tap 'Start New Quiz' below to test yourself"}
           />
         </View>
       ) : (
         <View style={styles.flex}>
         <FlatList
-          data={attempts}
+          data={filteredAttempts}
           keyExtractor={a => a.id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
@@ -217,6 +246,7 @@ export function QuizHubScreen() {
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
   list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
   listHeader: { marginBottom: spacing.md },
   row: {
