@@ -47,7 +47,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
 
   if (isLoading) {
     return (
-      <Screen header={header} edges={['top', 'bottom']}>
+      <Screen header={header}>
         <View style={styles.loading}>
           <ActivityIndicator color={colors.accent} size="large" />
         </View>
@@ -57,7 +57,7 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
 
   if (isError || !set) {
     return (
-      <Screen header={header} edges={['top', 'bottom']}>
+      <Screen header={header}>
         <ErrorState message="Could not load set." onRetry={refetch} />
       </Screen>
     );

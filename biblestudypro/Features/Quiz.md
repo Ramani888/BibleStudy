@@ -57,13 +57,16 @@ One row per screen. Route = the navigation route name.
 - Builds items via `useQuizSession(cards, mode)`; renders one `QuizItemView` per item.
 - Header: elapsed timer (mm:ss, counts only once cards are ready), title (set title,
   or `quizName`, or "N Sets"), and `index+1 / total` counter. Progress bar fills by position.
-- Per-item: Prev / Next (Next becomes Finish on last item). Responses stored in a
-  `Record<index, response>` and can be revisited.
-- Hardware back during an active quiz prompts "Quit quiz? Your progress will be lost."
-- On completion → `QuizResultScreen` (in `screens/quiz/components`) which records the
-  attempt, shows a **score-aware motivational quote card** (same indigo verse-card style as HomeScreen; ≥90% celebratory / ≥70% encouraging / ≥50% effort / <50% resilience), and offers Retake / Exit; from there the full item review is `QuizSummary`.
-- States: loading, error ("Failed to load cards"), unavailable ("Nothing to quiz here"),
-  complete.
+- **Forward-only** — no Prev button (matches Duolingo/Quizlet; going back would corrupt SM-2 first-attempt data).
+- **Status bar** hidden imperatively via `useFocusEffect` + `StatusBar.setHidden(true, 'fade')`; restores on leave.
+- **Per-item flow (non-MC scored):** answer → full-width **CHECK ANSWER** → feedback panel (green ✓ Correct / red ✗ Incorrect + correct answer on wrong) → full-width **CONTINUE** / **FINISH**.
+- **MC / story_mc:** tap option → auto-submits + shows color-coded result instantly → CONTINUE.
+- **Blanks mode:** word bank tiles (tap to fill next blank, tap filled slot to remove) — no typing.
+- **Read mode:** Tap-to-Reveal (verse dimmed → tap reveals one phrase at a time; CONTINUE locked until all shown).
+- Responses stored in `Record<index, response>`; `useQuizSession.submit(response)` grades and increments `correctCount`.
+- Hardware back during active quiz prompts "Quit quiz? Your progress will be lost."
+- On completion → `QuizResultScreen` records attempt, shows score-aware motivational quote card (≥90% celebratory / ≥70% encouraging / ≥50% effort / <50% resilience), offers Retake / Exit → `QuizSummary`.
+- States: loading, error ("Failed to load cards"), unavailable ("Nothing to quiz here"), complete.
 
 ### QuizSummaryScreen (`QuizSummary`)
 - Score header + filter tabs: All / Correct / Wrong.
@@ -86,11 +89,11 @@ random scored mode per card.
 |------|-----------|-------|--------|--------------|
 | `mc` | QA | Multiple choice | ✅ | Shows the question; pick the answer from 4 options. Needs ≥4 QA cards for distractors. |
 | `type_answer` | QA | Type the answer | ✅ | Shows the question; type the answer (normalized comparison). |
-| `blanks` | STORY | Fill in the blanks | ✅ | ~40% of eligible words (core length ≥3) blanked; fill each blank. |
+| `blanks` | STORY | Fill in the blanks | ✅ | ~40% of eligible words (core length ≥3) blanked; **word bank tiles** shown below verse — tap to fill, tap filled slot to remove. No typing. |
 | `type_verbatim` | STORY | Type it out | ✅ | Type the whole passage verbatim (normalized comparison). |
 | `story_mc` | STORY | Match the verse | ✅ | Shows the reference; pick the matching passage text from 4 options. Needs ≥4 STORY cards. |
 | `chunks` | STORY | Order the chunks | ✅ | Passage split into 4-word chunks, shuffled; reorder them. Needs ≥2 chunks. |
-| `read` | STORY | Read & memorize | ❌ | Displays the passage to read — **unscored** (always counts as correct in summaries; excluded from the score denominator). |
+| `read` | STORY | Tap to Reveal | ❌ | **Tap-to-Reveal**: verse starts dimmed, tap reveals one phrase at a time. CONTINUE locked until all revealed. **Unscored** (excluded from score denominator). |
 
 ### 2 card types
 `CardType` enum = `QA` | `STORY` (Prisma). A card's type decides which modes it can produce:
@@ -221,13 +224,18 @@ All mutations invalidate the whole `['quiz']` query key on success.
   - `quiz_modes` = distinct non-null `mode` count → `quiz_explorer` "Quiz Explorer" (4).
   - `updateAttempt` (retake) does **not** re-trigger the check.
 
-## This session's additions (A–G arc)
+## Session additions
 
-Quiz predates this session's monetization arc; the relevant tie-in is the
-**achievements module** (Phase C): quiz attempts feed four achievement definitions
-(`first_quiz`, `quiz_10`, `perfect_quiz`, `quiz_explorer`) via the shared
-`triggerAchievementCheck` hook in `recordAttempt`. No credit/subscription gating
-was added to quiz — it stays fully free and client-generated.
+**A–G arc:** Quiz predates the monetization arc; the relevant tie-in is the **achievements module** (Phase C): quiz attempts feed four achievement definitions (`first_quiz`, `quiz_10`, `perfect_quiz`, `quiz_explorer`) via `triggerAchievementCheck` in `recordAttempt`. No credit/subscription gating — quiz stays fully free and client-generated.
+
+**2026-08-16 UX overhaul (commit `5d65591`):**
+- Fixed critical bug: `useQuizSession.submit()` was never called from `QuizItemView` — score was always 0%, all answers always "wrong". Wired via new `onSubmit` prop.
+- CHECK ANSWER full-width bar (non-MC scored modes); MC auto-submits on tap.
+- Feedback panel after each answer: green ✓ / red ✗ + correct answer shown on wrong.
+- Removed Prev button — forward-only navigation.
+- Blanks: word bank tiles replace TextInput fields.
+- Read: Tap-to-Reveal replaces plain text display.
+- Status bar imperatively hidden via `useFocusEffect` (declarative `<StatusBar hidden />` was overridden by root App.tsx StatusBar).
 
 ## Related
 

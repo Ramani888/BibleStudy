@@ -3,6 +3,14 @@ import { KeyboardAvoidingView, Platform, StyleSheet, View, ViewStyle } from 'rea
 import { SafeAreaView, type Edge } from 'react-native-safe-area-context';
 import { useTheme } from '../../theme';
 
+// On Android, modals rendered inside a tab stack still show the tab bar,
+// so the tab bar owns the bottom inset. Strip 'bottom' from SafeAreaView
+// edges on Android to avoid double-applying the system nav inset.
+function resolveEdges(edges: Edge[]): Edge[] {
+  if (Platform.OS === 'android') return edges.filter(e => e !== 'bottom') as Edge[];
+  return edges;
+}
+
 interface ScreenProps {
   /** Body content (a FlatList, ScrollView, or plain View). */
   children: React.ReactNode;
@@ -33,7 +41,7 @@ export function Screen({ children, header, footer, edges = ['top'], keyboardAvoi
   );
 
   return (
-    <SafeAreaView edges={edges} style={[styles.safe, { backgroundColor: colors.background }]}>
+    <SafeAreaView edges={resolveEdges(edges)} style={[styles.safe, { backgroundColor: colors.background }]}>
       {header}
       {keyboardAvoiding ? (
         <KeyboardAvoidingView style={styles.fill} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>

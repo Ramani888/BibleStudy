@@ -24,7 +24,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   if (isLoading) {
     return (
-      <Screen header={header} edges={['top', 'bottom']}>
+      <Screen header={header}>
         <View style={styles.loading}>
           <ActivityIndicator color={colors.accent} size="large" />
         </View>
@@ -33,7 +33,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   }
   if (isError || !card) {
     return (
-      <Screen header={header} edges={['top', 'bottom']}>
+      <Screen header={header}>
         <ErrorState message={getErrorMessage(error) || 'Card not found'} onRetry={refetch} />
       </Screen>
     );
@@ -47,28 +47,25 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   return (
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <View style={styles.flex}>
-        <CardForm
-          ref={formRef}
-          defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
-          onSubmittingChange={setSubmitting}
-          onSubmit={async ({ type, question, answer, note }) => {
-            try {
-              await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
-              Toast.show({ type: 'success', text1: 'Card updated!' });
-              navigation.goBack();
-            } catch (err) {
-              Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
-            }
-          }}
-        />
-      </View>
+      <CardForm
+        ref={formRef}
+        defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
+        onSubmittingChange={setSubmitting}
+        onSubmit={async ({ type, question, answer, note }) => {
+          try {
+            await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
+            Toast.show({ type: 'success', text1: 'Card updated!' });
+            navigation.goBack();
+          } catch (err) {
+            Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+          }
+        }}
+      />
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   footer: {
     padding: layout.screenPaddingH,
