@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native';
-import { useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native'; // StatusBar used imperatively via useFocusEffect
+import { useFocusEffect, useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Typography } from '../../components/ui';
@@ -26,6 +26,11 @@ export function QuizScreen() {
   const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = params;
 
   const isFocused = useIsFocused();
+
+  useFocusEffect(useCallback(() => {
+    StatusBar.setHidden(true, 'fade');
+    return () => StatusBar.setHidden(false, 'fade');
+  }, []));
   const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
   const s = useQuizSession(cards, mode);
   const [responses, setResponses] = useState<Record<number, unknown>>({});
@@ -106,12 +111,10 @@ export function QuizScreen() {
     </View>
   );
 
-  // Fix 2: StatusBar hidden on result screen too
   if (s.isComplete) {
     const summaryItems = buildSummaryItems(s.items, responses);
     return (
       <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
-        <StatusBar hidden />
         <QuizResultScreen
           setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
           total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
@@ -127,7 +130,6 @@ export function QuizScreen() {
 
   return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
-      <StatusBar hidden />
       <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
         <View style={styles.timerWrap}>
           <Typography preset="label" color={colors.textSecondary} style={styles.timer}>
@@ -152,9 +154,11 @@ export function QuizScreen() {
           item={s.item}
           initialResponse={responses[s.index]}
           onResponseChange={r => saveResponse(s.index, r)}
-          hasPrev={s.index > 0}
+          onSubmit={s.submit}
+          submitted={s.submitted}
+          lastCorrect={s.lastCorrect}
+          correctAnswer={s.correctAnswer}
           isLast={s.index + 1 >= s.total}
-          onPrev={s.prev}
           onNext={s.next}
           onFinish={finish}
           bottomInset={insets.bottom}

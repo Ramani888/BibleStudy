@@ -254,6 +254,7 @@ export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
     items, item, index, total, progress,
     submitted, lastCorrect,
     correctCount, scoredTotal, scorePct, isComplete,
+    correctAnswer: item ? formatCorrectAnswer(item) : '',
     submit, next, prev, restart,
   };
 }
