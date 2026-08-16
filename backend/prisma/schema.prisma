@@ -338,6 +338,7 @@ model Notification {
 
   @@index([userId, createdAt])
   @@index([userId, read])
+  @@unique([userId, type, referenceId])
 }
 
 model Note {

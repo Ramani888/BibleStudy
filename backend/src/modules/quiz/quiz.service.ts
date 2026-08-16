@@ -1,7 +1,6 @@
 import { prisma } from '../../config/db';
 import { RecordAttemptDtoType } from './quiz.dto';
 import { NotFoundError } from '../../utils/errors';
-import { triggerAchievementCheck } from '../../utils/achievementCheck';
 import { applyReviews } from '../cards/cards.service';
 import { logActivity } from '../../utils/activity';
 
@@ -38,7 +37,6 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
     },
   });
 
-  triggerAchievementCheck(userId); // quiz count / perfect score / modes
   logActivity(userId, 'STUDIED_CARDS', attempt.id);
   await applySpacedRepetition(userId, dto);
   const best = await getBestForSet(userId, primarySetId);

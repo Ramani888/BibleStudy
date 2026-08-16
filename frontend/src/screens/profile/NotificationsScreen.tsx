@@ -23,10 +23,13 @@ import {
   useMarkNotificationRead,
   useMarkAllNotificationsRead,
   useDeleteNotification,
-} from '../../hooks/useNotifications';
+  useNotificationPrefs,
+  TYPE_TO_PREF,
+} from '../../hooks';
 import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
+
 
 function getNotificationIcon(type: Notification['type']): IconComponent {
   switch (type) {
@@ -68,7 +71,16 @@ export function NotificationsScreen({ navigation, route }: Props) {
   const markAllRead = useMarkAllNotificationsRead();
   const deleteNotification = useDeleteNotification();
 
-  const notifications = data?.notifications ?? [];
+  const prefs = useNotificationPrefs();
+
+  const notifications = useMemo(() => {
+    const all = data?.notifications ?? [];
+    return all.filter(n => {
+      const prefKey = TYPE_TO_PREF[n.type];
+      return prefKey ? prefs[prefKey] !== false : true;
+    });
+  }, [data, prefs]);
+
   const unreadCount = data?.unreadCount ?? 0;
   const sections = useMemo(() => groupByDate(notifications), [notifications]);
 

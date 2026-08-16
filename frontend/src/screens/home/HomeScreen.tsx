@@ -30,6 +30,8 @@ import {
   useStreak,
   useDueSummary,
   useNotifications,
+  useNotificationPrefs,
+  TYPE_TO_PREF,
 } from '../../hooks';
 import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate } from '../../utils/formatters';
@@ -278,6 +280,7 @@ export function HomeScreen() {
   const { data: streakData } = useStreak();
   const { data: dueSummary } = useDueSummary();
   const { data: notifData } = useNotifications(1);
+  const notifPrefs = useNotificationPrefs();
   useAutoDailyClaim();
 
   const nav = useHomeNavigation(navigation);
@@ -309,7 +312,13 @@ export function HomeScreen() {
         greeting={getGreeting()}
         name={firstName}
         avatarUri={user?.profileImage}
-        unread={notifData?.unreadCount ?? 0}
+        unread={
+          (notifData?.notifications ?? []).filter(n => {
+            if (n.read) return false;
+            const prefKey = TYPE_TO_PREF[n.type];
+            return prefKey ? notifPrefs[prefKey] !== false : true;
+          }).length
+        }
         onAI={nav.onAI}
         onBell={nav.onBell}
         onAvatar={nav.onAvatar}
