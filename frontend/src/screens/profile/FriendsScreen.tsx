@@ -110,9 +110,7 @@ export function FriendsScreen({ navigation }: Props) {
           ListEmptyComponent={
             <EmptyState
               title="No Friends Yet"
-              subtitle="Search for people to add as friends"
-              ctaLabel="Find Friends"
-              onCta={() => navigation.navigate('SearchUsers')}
+              subtitle="Tap the + icon above to find friends"
             />
           }
         />

@@ -62,9 +62,7 @@ function groupByDate(notifications: Notification[]): { title: string; data: Noti
 }
 
 export function NotificationsScreen({ navigation, route }: Props) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { colors } = useTheme();
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
@@ -124,7 +122,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
         </Pressable>
       </Swipeable>
     );
-  }, [colors, isDark, markRead, deleteNotification, navigation]);
+  }, [colors, markRead, deleteNotification, navigation]);
 
   const renderSectionHeader = useCallback(
     ({ section: { title } }: { section: { title: string } }) => (

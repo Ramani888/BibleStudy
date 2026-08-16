@@ -11,7 +11,6 @@ import {
   AlbumsIcon,
   BellIcon,
   FileTextIcon,
-  FlameIcon,
   LockIcon,
   LogOutIcon,
   SettingsIcon,
