@@ -1,8 +1,8 @@
 import React, { useCallback } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
-import { usePlans } from '../../hooks';
+import { usePlans, useManualRefresh } from '../../hooks';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
@@ -17,6 +17,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   const { colors } = theme;
   const isDark = theme.name === 'dark';
   const { data: plans = [], isLoading, error, refetch } = usePlans();
+  const { refreshing, onRefresh } = useManualRefresh(refetch);
 
   const handleNavCreatePlan = useCallback(() => navigation.navigate('CreatePlan'), [navigation]);
 
@@ -65,13 +66,11 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
       ) : error ? (
         <ErrorState onRetry={refetch} />
       ) : plans.length === 0 ? (
-        <View>
+        <View style={styles.centered}>
           <EmptyState
             icon={<BookIcon size={48} color={colors.accent} />}
             title="No study plans yet"
-            subtitle="Create a guided path through your sets — step by step."
-            ctaLabel="Create a plan"
-            onCta={handleNavCreatePlan}
+            subtitle="Tap + to create a guided path through your sets."
           />
         </View>
       ) : (
@@ -82,6 +81,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
           renderItem={renderItem}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
         />
         </View>
       )}

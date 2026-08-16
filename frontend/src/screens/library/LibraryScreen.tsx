@@ -276,8 +276,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
               <EmptyState
                 title={search ? 'No results' : 'No sets yet'}
                 subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
-                ctaLabel={search ? undefined : 'Create Set'}
-                onCta={search ? undefined : () => navigation.navigate('CreateSet', {})}
                 style={styles.emptyState}
               />
             )

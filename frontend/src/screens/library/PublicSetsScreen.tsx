@@ -115,7 +115,10 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         ItemSeparatorComponent={() => <Spacer size={sp.md} />}
         ListEmptyComponent={
           !isLoading ? (
-            <EmptyState title="No public sets yet" subtitle="Be the first to publish a set!" />
+            <EmptyState
+              title={debouncedSearch ? 'No results' : 'No public sets yet'}
+              subtitle={debouncedSearch ? `No sets match "${debouncedSearch}"` : 'Be the first to publish a set!'}
+            />
           ) : null
         }
         ListFooterComponent={

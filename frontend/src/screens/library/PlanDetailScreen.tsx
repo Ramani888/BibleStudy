@@ -50,12 +50,13 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
           : <View style={[styles.emptyCircle, { borderColor: colors.textDisabled }]} />}
       </Pressable>
       <Pressable
-        style={({ pressed }) => [styles.stepBody, pressed && styles.rowPressed]}
+        style={({ pressed }) => [styles.stepBody, step.set && pressed && styles.rowPressed]}
         onPress={() =>
           step.set
             ? navigation.navigate('SetDetail', { setId: step.set.id, setTitle: step.set.title, isOwner: true })
             : undefined
         }
+        disabled={!step.set}
       >
         <Typography preset="body" numberOfLines={1} color={step.completed ? colors.textSecondary : colors.textPrimary}>
           {index + 1}. {step.title || step.set?.title || 'Set removed'}

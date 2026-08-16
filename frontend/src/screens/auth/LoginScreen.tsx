@@ -97,7 +97,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         {socialOnly && (
           <View style={[styles.socialBanner, { backgroundColor: colors.accentSoft }]}>
             <Typography preset="bodySm" color={palette.indigo800} align="center">
-              This account was created with Google. Use the "Continue with Google" button above to sign in.
+              This account uses social sign-in. Please use the Google or Apple button above to sign in.
             </Typography>
           </View>
         )}

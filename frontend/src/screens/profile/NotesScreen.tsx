@@ -223,7 +223,10 @@ export function NotesScreen({ navigation }: Props) {
         }
         ListEmptyComponent={
           isLoading ? null : (
-            <EmptyState title="No notes yet" subtitle="Tap + to write your first note" />
+            <EmptyState
+                title="No notes yet"
+                subtitle="Tap + to write your first Bible study note"
+              />
           )
         }
       />

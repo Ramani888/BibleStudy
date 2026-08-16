@@ -225,7 +225,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         }
       />
       <Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>
-        {cards.length} {cards.length === 1 ? 'card' : 'cards'}
+        {cardSearch ? filteredCards.length : cards.length} {(cardSearch ? filteredCards.length : cards.length) === 1 ? 'card' : 'cards'}
       </Typography>
       {cardSearchVisible && (
         <View style={styles.searchWrap}>
@@ -434,7 +434,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           onChangeText={setNoteText}
           multiline
           numberOfLines={3}
-          maxLength={2000}
+          maxLength={500}
           placeholderTextColor={colors.textSecondary}
           autoCapitalize="sentences"
         />

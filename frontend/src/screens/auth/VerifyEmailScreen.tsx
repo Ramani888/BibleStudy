@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,6 +18,10 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
   const { email }      = route.params;
   const verifyEmail    = useAuthStore(s => s.verifyEmail);
   const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+  const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => () => { if (cooldownRef.current) clearInterval(cooldownRef.current); }, []);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<VerifyEmailFormData>({
     resolver: zodResolver(verifyEmailSchema),
@@ -37,6 +41,13 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     try {
       await authApi.resendVerification({ email });
       Toast.show({ type: 'success', text1: 'Code resent', text2: 'Check your inbox.' });
+      setCooldown(30);
+      cooldownRef.current = setInterval(() => {
+        setCooldown(s => {
+          if (s <= 1) { clearInterval(cooldownRef.current!); return 0; }
+          return s - 1;
+        });
+      }, 1000);
     } catch (err) {
       Toast.show({ type: 'error', text1: 'Could not resend', text2: getErrorMessage(err) });
     } finally {
@@ -53,9 +64,9 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
       footer={
         <>
           <Button label="Verify Email" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={handleResend} disabled={resending} style={({ pressed }) => pressed && styles.linkPressed}>
-            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
-              {resending ? 'Sending…' : 'Resend code'}
+          <Pressable onPress={handleResend} disabled={resending || cooldown > 0} style={({ pressed }) => pressed && styles.linkPressed}>
+            <Typography preset="bodySm" color={resending || cooldown > 0 ? colors.textDisabled : colors.accent} align="center">
+              {resending ? 'Sending…' : cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
             </Typography>
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>

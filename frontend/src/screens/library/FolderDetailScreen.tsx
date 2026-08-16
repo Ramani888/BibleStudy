@@ -135,7 +135,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         data={filteredSets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{sets.length} {sets.length === 1 ? 'set' : 'sets'}</Typography>}
+        ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{filteredSets.length} {filteredSets.length === 1 ? 'set' : 'sets'}</Typography>}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
         ItemSeparatorComponent={() => <Spacer size={sp.md} />}
