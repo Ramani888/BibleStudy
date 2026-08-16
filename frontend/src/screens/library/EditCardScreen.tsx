@@ -49,6 +49,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
     <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
       <CardForm
         ref={formRef}
+        lockedType
         defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
         onSubmittingChange={setSubmitting}
         onSubmit={async ({ type, question, answer, note }) => {

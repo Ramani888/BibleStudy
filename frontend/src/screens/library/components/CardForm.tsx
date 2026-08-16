@@ -56,10 +56,12 @@ interface CardFormProps {
   defaultValues?: { type?: CardType; question?: string; answer?: string; note?: string | null };
   onSubmit: (data: { type: CardType; question: string; answer: string; note: string }) => Promise<void>;
   onSubmittingChange?: (submitting: boolean) => void;
+  /** Lock the card type — hides the tab switcher. Pass true when editing an existing card. */
+  lockedType?: boolean;
 }
 
 export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardForm(
-  { defaultValues, onSubmit, onSubmittingChange },
+  { defaultValues, onSubmit, onSubmittingChange, lockedType = false },
   ref,
 ) {
   const { colors } = useTheme();
@@ -90,20 +92,22 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
 
   return (
     <View style={styles.flex}>
-      {/* ── Card type switcher ── */}
-      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
-        {(['QA', 'STORY'] as CardType[]).map(t => (
-          <Pressable
-            key={t}
-            style={({ pressed }) => [styles.tab, { borderBottomColor: type === t ? colors.accent : colors.transparent }, pressed && styles.btnPressed]}
-            onPress={() => setValue('type', t)}
-          >
-            <Typography preset="label" color={type === t ? colors.accent : colors.textSecondary}>
-              {t === 'QA' ? 'Q&A Card' : 'Story Card'}
-            </Typography>
-          </Pressable>
-        ))}
-      </View>
+      {/* ── Card type switcher (hidden when editing an existing card) ── */}
+      {!lockedType && (
+        <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
+          {(['QA', 'STORY'] as CardType[]).map(t => (
+            <Pressable
+              key={t}
+              style={({ pressed }) => [styles.tab, { borderBottomColor: type === t ? colors.accent : colors.transparent }, pressed && styles.btnPressed]}
+              onPress={() => setValue('type', t)}
+            >
+              <Typography preset="label" color={type === t ? colors.accent : colors.textSecondary}>
+                {t === 'QA' ? 'Q&A Card' : 'Story Card'}
+              </Typography>
+            </Pressable>
+          ))}
+        </View>
+      )}
 
       <ScrollView
         style={styles.flex}
