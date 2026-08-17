@@ -103,6 +103,10 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
         );
       }
 
+      const expiresAt = user.plan === 'FREE'
+        ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+        : null;
+
       return tx.mediaFile.create({
         data: {
           userId,
@@ -112,6 +116,7 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
           mimeType,
           sizeBytes: finalSize,
           type:      isPdf ? 'PDF' : 'IMAGE',
+          expiresAt,
         },
       });
     });

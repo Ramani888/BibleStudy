@@ -10,6 +10,7 @@ export interface MediaFile {
   sizeBytes: number;
   type: MediaFileType;
   createdAt: string;
+  expiresAt: string | null;
 }
 
 export interface StorageUsage {

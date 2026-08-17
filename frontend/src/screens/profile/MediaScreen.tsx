@@ -71,6 +71,25 @@ function fmtDate(iso: string): string {
   return days < 7 ? `${days}d ago` : new Date(iso).toLocaleDateString();
 }
 
+/** Returns days until expiry, or null if the file doesn't expire. */
+function daysUntilExpiry(expiresAt: string | null): number | null {
+  if (!expiresAt) return null;
+  const ms = new Date(expiresAt).getTime() - Date.now();
+  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+}
+
+function ExpiryBadge({ expiresAt }: { expiresAt: string | null }) {
+  const { colors } = useTheme();
+  const days = daysUntilExpiry(expiresAt);
+  if (days === null || days > 7) return null;
+  const label = days === 0 ? 'Expires today' : `Expires in ${days}d`;
+  return (
+    <View style={[styles.expiryBadge, { backgroundColor: colors.warning ?? '#F59E0B' }]}>
+      <Typography preset="caption" color={palette.white} style={styles.expiryBadgeText}>{label}</Typography>
+    </View>
+  );
+}
+
 // ─── FadeImage ───────────────────────────────────────────────────────────────
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);
@@ -226,6 +245,7 @@ export function MediaScreen({ navigation }: Props) {
             <CheckCircleIcon size={28} color={palette.white} />
           </View>
         )}
+        <ExpiryBadge expiresAt={item.expiresAt} />
       </Pressable>
     );
   }, [actions, colors.overlay]);
@@ -254,6 +274,11 @@ export function MediaScreen({ navigation }: Props) {
           <Typography preset="caption" color={colors.textSecondary}>
             {fmtBytes(item.sizeBytes)} · {fmtDate(item.createdAt)}
           </Typography>
+          {daysUntilExpiry(item.expiresAt) !== null && daysUntilExpiry(item.expiresAt)! <= 7 && (
+            <Typography preset="caption" color={colors.warning ?? '#F59E0B'}>
+              {daysUntilExpiry(item.expiresAt) === 0 ? 'Expires today' : `Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep`}
+            </Typography>
+          )}
         </View>
         {isSelected
           ? <CheckCircleIcon size={22} color={colors.accent} />
@@ -478,6 +503,8 @@ const styles = StyleSheet.create({
     alignItems: 'center', justifyContent: 'center',
   },
   selectionOverlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  expiryBadge: { position: 'absolute', bottom: 4, left: 4, borderRadius: 4, paddingHorizontal: 4, paddingVertical: 2 },
+  expiryBadgeText: { fontSize: 9, fontWeight: '700' },
   fab: {
     position: 'absolute', bottom: spacing.xxxl, right: layout.screenPaddingH,
     width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,

@@ -365,11 +365,13 @@ model MediaFile {
   sizeBytes Int
   type      MediaType
   createdAt DateTime  @default(now())
+  expiresAt DateTime?
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([userId, type])
   @@index([userId, createdAt(sort: Desc)])
+  @@index([expiresAt])
 }
 
 model QuizAttempt {

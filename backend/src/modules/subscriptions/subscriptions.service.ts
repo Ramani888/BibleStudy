@@ -76,6 +76,11 @@ async function applyEntitlement(userId: string, store: Store, def: ProductDef, v
       where: { id: userId },
       data: { plan: def.plan, storageLimit: BigInt(benefits.storageBytes) },
     });
+    // Clear expiry on all files — paid users keep their media indefinitely.
+    await tx.mediaFile.updateMany({
+      where: { userId },
+      data:  { expiresAt: null },
+    });
     if (isNewTransaction) {
       const credits = creditsForPurchase(def);
       await tx.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } });
@@ -108,10 +113,18 @@ export async function getStatus(userId: string) {
 
   const active = sub.expiresAt.getTime() > Date.now();
   if (!active) {
-    await prisma.user.update({
-      where: { id: userId },
-      data: { plan: 'FREE', storageLimit: BigInt(PLAN_BENEFITS.FREE.storageBytes) },
-    });
+    const thirtyDays = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: userId },
+        data:  { plan: 'FREE', storageLimit: BigInt(PLAN_BENEFITS.FREE.storageBytes) },
+      }),
+      // Start 30-day clock on files that don't already have one.
+      prisma.mediaFile.updateMany({
+        where: { userId, expiresAt: null },
+        data:  { expiresAt: thirtyDays },
+      }),
+    ]);
     return { plan: 'FREE' as Plan, active: false, expiresAt: sub.expiresAt };
   }
   return { plan: sub.plan, active: true, expiresAt: sub.expiresAt };

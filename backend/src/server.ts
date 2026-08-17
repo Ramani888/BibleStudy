@@ -9,12 +9,15 @@ import './config/env'; // Load and validate env vars first
 import app from './app';
 import { connectDB, disconnectDB } from './config/db';
 import { env } from './config/env';
+import { startMediaCleanupJob } from './jobs/mediaCleanup';
 
 const PORT = env.PORT || 3001;
 
 async function startServer() {
   try {
     await connectDB();
+
+    startMediaCleanupJob();
 
     const server = app.listen(PORT, () => {
       console.log(`
