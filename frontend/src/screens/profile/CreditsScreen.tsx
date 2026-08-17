@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -12,16 +12,15 @@ import { Badge, Divider, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { EmptyState, ErrorState } from '../../components/feedback';
-import { ChevronDownIcon, StarIcon } from '../../components/icons';
+import { StarIcon } from '../../components/icons';
 import { useQueryClient } from '@tanstack/react-query';
 import { useCreditBalance, useCreditTransactions, useStreak } from '../../hooks';
 import { WeeklyChart } from './components/WeeklyChart';
 import { getErrorMessage } from '../../api';
 import { formatDate } from '../../utils/formatters';
-import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, radius, spacing, useTheme, palette } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { CreditTransaction, TransactionType } from '../../types';
-import type { CreditStatsPeriod } from '../../hooks/useCredits';
 
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
   USAGE:    { label: 'Used',     variant: 'error',   sign: '−' },
@@ -79,63 +78,12 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
   );
 }
 
-// ── Stat tile ────────────────────────────────────────────────────────────────
-
-function StatTile({ label, value, valueColor }: { label: string; value: string | number; valueColor?: string }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
-  return (
-    <View style={[
-      styles.statTile,
-      { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-      !isDark && styles.statTileShadow,
-    ]}>
-      <Typography preset="h4" color={valueColor ?? colors.textPrimary}>{value}</Typography>
-      <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
-    </View>
-  );
-}
-
-// ── TrendWindowPill ───────────────────────────────────────────────────────────
-
-const WINDOW_OPTIONS: { key: CreditStatsPeriod; label: string }[] = [
-  { key: 'week',  label: '7 Days'  },
-  { key: 'month', label: '30 Days' },
-];
-
-function TrendWindowPill({ value, onToggle }: { value: CreditStatsPeriod; onToggle: () => void }) {
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
-  const label = WINDOW_OPTIONS.find(o => o.key === value)?.label ?? '7 Days';
-  return (
-    <Pressable
-      onPress={onToggle}
-      hitSlop={8}
-      style={({ pressed }) => [
-        styles.pill,
-        isDark
-          ? { backgroundColor: colors.chipIdle, borderColor: colors.transparent }
-          : { backgroundColor: colors.surface, borderColor: colors.cardBorder },
-        !isDark && styles.pillShadow,
-        pressed && styles.pillPressed,
-      ]}
-    >
-      <Typography preset="label" color={colors.textPrimary}>{label}</Typography>
-      <ChevronDownIcon size={14} color={colors.textPrimary} />
-    </Pressable>
-  );
-}
-
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const theme = useTheme();
   const { colors } = theme;
   const qc = useQueryClient();
-
-  const [chartWindow, setChartWindow] = useState<CreditStatsPeriod>('week');
 
   const {
     data,
@@ -151,28 +99,12 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
 
   const transactions = useMemo(() => data?.pages.flatMap(p => p.transactions) ?? [], [data]);
 
-  // Compute all-time totals from loaded transactions
-  const { totalEarned, totalUsed } = useMemo(() => {
-    let earned = 0, used = 0;
-    for (const t of transactions) {
-      if (t.type === 'USAGE') used += t.amount;
-      else earned += t.amount;
-    }
-    return { totalEarned: earned, totalUsed: used };
-  }, [transactions]);
-
-  const { data: creditData } = useCreditBalance();
-  const { data: streakData } = useStreak();
-
   const amountColor = useMemo<Record<TransactionType, string>>(() => ({
     USAGE:    colors.alert,
     REWARD:   colors.success,
     PURCHASE: colors.info,
     BONUS:    colors.accent,
   }), [colors]);
-
-  const toggleWindow = useCallback(() =>
-    setChartWindow(w => w === 'week' ? 'month' : 'week'), []);
 
   const renderTxItem = useCallback(({ item }: { item: CreditTransaction }) => {
     const cfg = TYPE_CONFIG[item.type];
@@ -218,22 +150,8 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
               {/* Balance hero card */}
               <BalanceCard onGetMore={() => navigation.navigate('Paywall')} />
 
-              {/* ── Stat grid ── */}
-              <View style={styles.statGrid}>
-                <StatTile label="Balance" value={creditData?.balance ?? 0} valueColor={colors.accent} />
-                <StatTile label="Earned" value={`+${totalEarned}`} valueColor={colors.success} />
-                <StatTile label="Used" value={`−${Math.abs(totalUsed)}`} valueColor={colors.alert} />
-                <StatTile label="Streak" value={`🔥 ${streakData?.streak ?? 0}`} />
-              </View>
-
-              {/* ── Chart section header + TrendWindowPill ── */}
-              <View style={styles.chartHeader}>
-                <Typography preset="h4" color={colors.textPrimary}>Credit Activity</Typography>
-                <TrendWindowPill value={chartWindow} onToggle={toggleWindow} />
-              </View>
-
-              {/* Chart — key forces re-mount when window changes */}
-              <WeeklyChart key={chartWindow} defaultPeriod={chartWindow} />
+              <Spacer size={spacing.xl} />
+              <WeeklyChart />
 
               <Spacer size={spacing.xxl} />
               <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
@@ -294,57 +212,6 @@ const styles = StyleSheet.create({
   balanceAmount: { fontWeight: fontWeights.bold },
   ctaBtn: { borderRadius: layout.pillRadius, paddingVertical: spacing.md, alignItems: 'center', backgroundColor: palette.white },
   ctaBtnText: { fontWeight: fontWeights.semiBold },
-
-  // Stat grid — 2×2
-  statGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.md,
-    marginTop: spacing.lg,
-  },
-  statTile: {
-    width: '47.5%',
-    borderRadius: radius.md,
-    paddingVertical: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    gap: spacing.s2,
-    alignItems: 'center',
-  },
-  statTileShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
-
-  // Chart section header
-  chartHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: spacing.xxl,
-    marginBottom: spacing.md,
-  },
-
-  // TrendWindowPill
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.s7,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
-  pillShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 3,
-  },
-  pillPressed: { opacity: 0.7 },
 
   // Transaction list
   historyTitle: { marginBottom: spacing.md },
