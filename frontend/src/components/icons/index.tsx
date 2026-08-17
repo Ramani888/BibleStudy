@@ -510,3 +510,10 @@ export const TrophyIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeW
     <Path d="M7 3h10l2 6a6 6 0 01-12 0L7 3zM12 15v4M8 19h8M6 6H4c0 4 3 6 5 7M18 6h2c0 4-3 6-5 7" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+export const TimerIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M10 2h4M12 14l4-4" {...stroke(color, strokeWidth)} />
+    <Circle cx="12" cy="14" r="8" {...stroke(color, strokeWidth)} />
+  </Outline>
+);

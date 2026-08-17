@@ -3,7 +3,7 @@ import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon, TrophyIcon } from '../../components/icons';
+import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, TimerIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
 import { ConfirmDialog } from '../../components/feedback';
 import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
@@ -168,7 +168,7 @@ export function QuizDetailScreen() {
               <View style={[styles.divider, { backgroundColor: colors.divider }]} />
               <View style={styles.cardRow}>
                 <View style={styles.cardRowLeft}>
-                  <RefreshIcon size={16} color={colors.textSecondary} />
+                  <TimerIcon size={16} color={colors.textSecondary} />
                   <Typography preset="caption" color={colors.textSecondary}>Time spent</Typography>
                 </View>
                 <Typography preset="body" color={colors.textPrimary}>
@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.xl,
     paddingVertical: spacing.lg,
   },
-  cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   divider: { height: 1 },
 
   // Footer
