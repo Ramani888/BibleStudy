@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { BillingPeriod, TierDef } from '../../types';
-import { TIERS } from '../../types';
+import type { BillingPeriod, FreeTierDef, TierDef } from '../../types';
+import { FREE_TIER, TIERS } from '../../types';
 import { useAuthStore } from '../../store';
 import { useIapSubscriptions } from '../../hooks';
 import { openManageSubscriptions } from '../../utils/iap';
@@ -14,7 +14,10 @@ import { Button } from '../../components/ui/Button';
 import { CheckCircleIcon } from '../../components/icons';
 import { CARD_FILL_LIGHT, palette, spacing, radius, layout, useTheme } from '../../theme';
 
-const FEATURES = [
+type AnyTier = TierDef | FreeTierDef;
+
+// Common features included in every paid plan — merged into the included list for paid tiers.
+const PAID_COMMON = [
   'AI-powered Bible study chat',
   'Unlimited scripture card sets',
   'Spaced repetition review system',
@@ -22,6 +25,11 @@ const FEATURES = [
   'Community friends & leaderboard',
   'Study plans & group sessions',
 ];
+
+function getIncludedFeatures(tier: AnyTier): string[] {
+  if (tier.plan === 'FREE') return tier.benefits;
+  return [...(tier as TierDef).benefits, ...PAID_COMMON];
+}
 
 // ── Radio dot ─────────────────────────────────────────────────────────────────
 
@@ -34,15 +42,46 @@ function Radio({ selected }: { selected: boolean }) {
   );
 }
 
-// ── Plan card ─────────────────────────────────────────────────────────────────
+// ── Free plan card ─────────────────────────────────────────────────────────────
+
+function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () => void }) {
+  const theme = useTheme();
+  const isDark = theme.name === 'dark';
+  return (
+    <Pressable
+      accessibilityRole="radio"
+      accessibilityState={{ selected }}
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.planCard,
+        !isDark && !selected && styles.cardShadow,
+        pressed && styles.cardPressed,
+        {
+          backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
+          borderColor: selected ? theme.colors.accent : theme.colors.cardBorder,
+          borderWidth: selected ? 1.5 : 1,
+        },
+      ]}
+    >
+      <Radio selected={selected} />
+      <View style={styles.planText}>
+        <Typography preset="h4" color={theme.colors.textPrimary}>Free</Typography>
+        <Typography preset="caption" color={theme.colors.textSecondary}>No card needed</Typography>
+      </View>
+      <Typography preset="h4" color={theme.colors.textPrimary}>$0</Typography>
+    </Pressable>
+  );
+}
+
+// ── Paid plan card ─────────────────────────────────────────────────────────────
 
 function PlanCard({ tier, period, selected, onPress }: {
   tier: TierDef; period: BillingPeriod; selected: boolean; onPress: () => void;
 }) {
   const theme = useTheme();
   const isDark = theme.name === 'dark';
-  const opt = tier[period];
   const showBadge = tier.plan === 'PRO' && period === 'annual';
+  const perMonth = (tier.annualPrice / 12).toFixed(2);
 
   return (
     <Pressable
@@ -72,40 +111,36 @@ function PlanCard({ tier, period, selected, onPress }: {
           {period === 'annual' ? 'Billed annually' : 'Billed monthly'}
         </Typography>
       </View>
-      <Typography preset="h4" color={theme.colors.textPrimary}>{opt.priceLabel}</Typography>
+      <View style={styles.priceBlock}>
+        {period === 'annual' ? (
+          <>
+            <Typography preset="h4" color={theme.colors.textPrimary}>${perMonth}/mo</Typography>
+            <Typography preset="caption" color={theme.colors.textSecondary}>${tier.annualPrice.toFixed(2)}/yr</Typography>
+          </>
+        ) : (
+          <Typography preset="h4" color={theme.colors.textPrimary}>${tier.monthlyPrice.toFixed(2)}/mo</Typography>
+        )}
+      </View>
     </Pressable>
   );
 }
 
-// ── Benefits panel ────────────────────────────────────────────────────────────
+// ── Included features (merged section) ────────────────────────────────────────
 
-function BenefitsPanel({ tier }: { tier: TierDef }) {
+function IncludedSection({ tier }: { tier: AnyTier }) {
   const { colors } = useTheme();
+  const features = getIncludedFeatures(tier);
   return (
-    <View style={[styles.benefitsPanel, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-      <Typography preset="label" color={colors.accent} style={styles.benefitsPanelTitle}>
-        What you get with {tier.name}
+    <View style={styles.includedSection}>
+      <Typography preset="h4" color={colors.textPrimary} style={styles.includedTitle}>
+        What's included with {tier.name}
       </Typography>
-      {tier.benefits.map(b => (
-        <View key={b} style={styles.benefitRow}>
+      {features.map(f => (
+        <View key={f} style={styles.featureRow}>
           <CheckCircleIcon size={22} color={colors.accent} />
-          <Typography preset="body" color={colors.textPrimary} style={styles.benefitLabel}>{b}</Typography>
+          <Typography preset="body" color={colors.textPrimary} style={styles.featureLabel}>{f}</Typography>
         </View>
       ))}
-    </View>
-  );
-}
-
-// ── Feature row ───────────────────────────────────────────────────────────────
-
-function FeatureRow({ label }: { label: string }) {
-  const { colors } = useTheme();
-  return (
-    <View style={styles.featureRow}>
-      <CheckCircleIcon size={22} color={colors.accent} />
-      <Typography preset="body" color={colors.textPrimary} style={styles.featureLabel} numberOfLines={1}>
-        {label}
-      </Typography>
     </View>
   );
 }
@@ -119,12 +154,17 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   const isSubscribed = currentPlan !== 'FREE';
 
   const [period, setPeriod] = useState<BillingPeriod>('annual');
-  const [selectedTier, setSelectedTier] = useState<TierDef>(TIERS[1]);
+  const [selectedTier, setSelectedTier] = useState<AnyTier>(FREE_TIER);
   const { buy, restore, loadProducts, processing, error } = useIapSubscriptions();
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
-  const opt = selectedTier[period];
+  const paidTier = selectedTier.plan !== 'FREE' ? (selectedTier as TierDef) : null;
+  const opt = paidTier ? paidTier[period] : null;
+
+  // Savings % for toggle — based on selected paid tier or TIERS[0] as fallback
+  const savingsTier = paidTier ?? TIERS[0];
+  const savingsPct = Math.round((1 - savingsTier.annualPrice / (savingsTier.monthlyPrice * 12)) * 100);
 
   return (
     <Screen header={<ScreenHeader title="Premium" onBack={navigation.goBack} />}>
@@ -143,16 +183,6 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           </Typography>
         </View>
 
-        {/* ── Free plan note ── */}
-        <View style={[styles.freeBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-          <Typography preset="bodySm" color={colors.accent} style={styles.freeBannerTitle}>
-            Always free, no card needed
-          </Typography>
-          <Typography preset="caption" color={colors.textSecondary}>
-            Flashcards · Quizzes · Spaced repetition · Streaks · 1 AI credit every day
-          </Typography>
-        </View>
-
         {/* ── Billing toggle ── */}
         <View style={[styles.toggle, { backgroundColor: colors.surfaceMuted }]}>
           {(['monthly', 'annual'] as BillingPeriod[]).map(p => {
@@ -168,7 +198,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
                 </Typography>
                 {p === 'annual' && (
                   <Typography preset="caption" color={active ? palette.white : colors.success}>
-                    {' '}· save ~33%
+                    {` · save ${savingsPct}%`}
                   </Typography>
                 )}
               </Pressable>
@@ -178,6 +208,10 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
 
         {/* ── Plan cards ── */}
         <View style={styles.plans}>
+          <FreePlanCard
+            selected={selectedTier.plan === 'FREE'}
+            onPress={() => setSelectedTier(FREE_TIER)}
+          />
           {TIERS.map(tier => (
             <PlanCard
               key={tier.plan}
@@ -189,14 +223,8 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           ))}
         </View>
 
-        {/* ── Selected plan benefits ── */}
-        <BenefitsPanel tier={selectedTier} />
-
-        {/* ── What's included ── */}
-        <Typography preset="h4" color={colors.textPrimary} style={styles.includedTitle}>
-          Everything included
-        </Typography>
-        {FEATURES.map(f => <FeatureRow key={f} label={f} />)}
+        {/* ── Merged included features ── */}
+        <IncludedSection tier={selectedTier} />
 
         {/* ── CTA ── */}
         <View style={styles.cta}>
@@ -204,18 +232,24 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             <Typography preset="caption" color={colors.alert} style={styles.errorText}>{error}</Typography>
           )}
           <Button
-            label={currentPlan === selectedTier.plan ? 'Current Plan' : `Subscribe · ${opt.priceLabel}`}
-            onPress={() => buy(opt.productId)}
-            disabled={currentPlan === selectedTier.plan || processing}
+            label={
+              selectedTier.plan === 'FREE' ? 'Free Plan' :
+              currentPlan === selectedTier.plan ? 'Current Plan' :
+              `Subscribe · ${opt!.priceLabel}`
+            }
+            onPress={() => opt && buy(opt.productId)}
+            disabled={selectedTier.plan === 'FREE' || currentPlan === selectedTier.plan || processing}
             loading={processing}
             variant="primary"
             fullWidth
           />
-          <Typography preset="caption" color={colors.textSecondary} style={styles.finePrint}>
-            {period === 'annual'
-              ? `Billed ${opt.priceLabel} annually. Renews until cancelled.`
-              : `Billed ${opt.priceLabel} monthly. Renews until cancelled.`}
-          </Typography>
+          {paidTier && opt && (
+            <Typography preset="caption" color={colors.textSecondary} style={styles.finePrint}>
+              {period === 'annual'
+                ? `Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.`
+                : `Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.`}
+            </Typography>
+          )}
         </View>
 
         {/* ── Links ── */}
@@ -254,17 +288,6 @@ const styles = StyleSheet.create({
   heroTitle: { marginTop: spacing.s2, textAlign: 'center' },
   heroTagline: { fontStyle: 'italic', marginTop: spacing.s6, textAlign: 'center' },
 
-  // Free banner
-  freeBanner: {
-    borderWidth: 1,
-    borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
-    marginTop: spacing.xl,
-    gap: spacing.xs,
-  },
-  freeBannerTitle: { fontWeight: '600' },
-
   // Toggle
   toggle: {
     flexDirection: 'row',
@@ -299,6 +322,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   planText: { flex: 1, gap: spacing.xs },
+  priceBlock: { alignItems: 'flex-end', gap: spacing.xs },
   badge: {
     alignSelf: 'flex-start',
     borderRadius: radius.pill,
@@ -306,19 +330,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
     marginBottom: spacing.s6,
   },
-
-  // Benefits panel
-  benefitsPanel: {
-    marginTop: spacing.lg,
-    borderWidth: 1,
-    borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.xl,
-  },
-  benefitsPanelTitle: { fontWeight: '600', marginBottom: spacing.xs },
-  benefitRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.lg },
-  benefitLabel: { flex: 1 },
 
   // Radio
   radio: {
@@ -332,8 +343,9 @@ const styles = StyleSheet.create({
   radioDot: { width: 11, height: 11, borderRadius: radius.r6 }, // ponytail: off-grid Figma value
   cardPressed: { opacity: 0.7 },
 
-  // Features
-  includedTitle: { marginTop: spacing.s28 },
+  // Merged included section
+  includedSection: { marginTop: spacing.s28 },
+  includedTitle: { marginBottom: spacing.sm },
   featureRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.lg },
   featureLabel: { flex: 1 },
 
