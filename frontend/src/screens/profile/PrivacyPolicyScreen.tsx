@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
-import type { ProfileScreenProps } from '../../navigation/types';
 import { Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -28,8 +28,9 @@ function Section({ title, body }: SectionProps) {
   );
 }
 
-export function PrivacyPolicyScreen({ navigation }: ProfileScreenProps<'PrivacyPolicy'>) {
+export function PrivacyPolicyScreen() {
   const { colors } = useTheme();
+  const navigation = useNavigation();
 
   return (
     <Screen edges={['top']} header={<ScreenHeader title="Privacy Policy" onBack={() => navigation.goBack()} />}>

@@ -14,8 +14,10 @@ import {
   setupForegroundHandler,
   handleNotificationNavigation,
 } from '../utils/notifications';
+import { storage } from '../utils/storage';
 import type { RootStackParamList } from './types';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
+import { TosGateScreen } from '../screens/auth/TosGateScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { QuizScreen } from '../screens/quiz/QuizScreen';
@@ -41,6 +43,8 @@ export function RootNavigator() {
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
+  const [tosAccepted, setTosAccepted] = useState(false);
+  const [tosChecked, setTosChecked] = useState(false);
   const notificationsSetUp = useRef(false);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
 
@@ -51,9 +55,14 @@ export function RootNavigator() {
   }, []);
 
   useEffect(() => {
-    AsyncStorage.getItem(ONBOARDING_KEY).then(val => {
-      setHasOnboarded(val === 'true');
+    Promise.all([
+      AsyncStorage.getItem(ONBOARDING_KEY),
+      storage.getTosAccepted(),
+    ]).then(([onboardingVal, tos]) => {
+      setHasOnboarded(onboardingVal === 'true');
       setOnboardingChecked(true);
+      setTosAccepted(tos);
+      setTosChecked(true);
     });
   }, []);
 
@@ -84,8 +93,8 @@ export function RootNavigator() {
     };
   }, [isAuthenticated, navigate]);
 
-  // Wait for both auth hydration and onboarding check
-  if (!isInitialized || !onboardingChecked) {
+  // Wait for auth hydration, onboarding check, and ToS check
+  if (!isInitialized || !onboardingChecked || !tosChecked) {
     return <SplashScreen />;
   }
 
@@ -93,6 +102,18 @@ export function RootNavigator() {
   if (!hasOnboarded) {
     return (
       <OnboardingScreen onComplete={() => setHasOnboarded(true)} />
+    );
+  }
+
+  // Authenticated via social but never accepted ToS — gate before entering app.
+  if (isAuthenticated && !tosAccepted) {
+    return (
+      <TosGateScreen
+        onAccept={async () => {
+          await storage.setTosAccepted();
+          setTosAccepted(true);
+        }}
+      />
     );
   }
 

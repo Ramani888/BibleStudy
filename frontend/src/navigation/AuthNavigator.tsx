@@ -6,6 +6,8 @@ import { RegisterScreen } from '../screens/auth/RegisterScreen';
 import { VerifyEmailScreen } from '../screens/auth/VerifyEmailScreen';
 import { ForgotPasswordScreen } from '../screens/auth/ForgotPasswordScreen';
 import { ResetPasswordScreen } from '../screens/auth/ResetPasswordScreen';
+import { PrivacyPolicyScreen } from '../screens/profile/PrivacyPolicyScreen';
+import { TermsOfServiceScreen } from '../screens/auth/TermsOfServiceScreen';
 import { useTheme } from '../theme';
 import { useSystemBars } from '../hooks';
 
@@ -24,6 +26,8 @@ export function AuthNavigator() {
       <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
       <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
       <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+      <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicyScreen} />
+      <Stack.Screen name="TermsOfService" component={TermsOfServiceScreen} />
     </Stack.Navigator>
   );
 }

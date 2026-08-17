@@ -17,6 +17,8 @@ export type AuthStackParamList = {
   VerifyEmail: { email: string };
   ForgotPassword: undefined;
   ResetPassword: { email: string };
+  PrivacyPolicy: undefined;
+  TermsOfService: undefined;
 };
 
 // ─── Library Stack (nested inside Library tab) ────────────────────────────────
@@ -46,6 +48,7 @@ export type QuizStackParamList = {
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
 export type AIStackParamList = {
+  AIConsent: undefined;
   // The active conversation lives in the AI chat store (survives navigation).
   // Pass autoSend to open the screen and immediately send a pre-formed question.
   AIChat: { autoSend?: string } | undefined;

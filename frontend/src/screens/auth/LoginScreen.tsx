@@ -90,6 +90,12 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
               <Typography preset="bodySm" color={colors.accent}>Register</Typography>
             </Typography>
           </Pressable>
+          <Typography preset="caption" color={colors.textSecondary} align="center">
+            By continuing with Google or Apple, you agree to our{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('TermsOfService')}>Terms of Service</Typography>
+            {' '}and{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('PrivacyPolicy')}>Privacy Policy</Typography>
+          </Typography>
         </>
       }
     >

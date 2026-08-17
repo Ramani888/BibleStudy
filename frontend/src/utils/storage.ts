@@ -4,6 +4,7 @@ const KEYS = {
   ACCESS_TOKEN: '@bsp/access_token',
   REFRESH_TOKEN: '@bsp/refresh_token',
   AI_POLICY_ACCEPTED: '@bsp/ai_policy_accepted',
+  TOS_ACCEPTED: '@bsp/tos_accepted',
 } as const;
 
 export const storage = {
@@ -39,5 +40,13 @@ export const storage = {
 
   async setAiPolicyAccepted(): Promise<void> {
     await AsyncStorage.setItem(KEYS.AI_POLICY_ACCEPTED, 'true');
+  },
+
+  async getTosAccepted(): Promise<boolean> {
+    return (await AsyncStorage.getItem(KEYS.TOS_ACCEPTED)) === 'true';
+  },
+
+  async setTosAccepted(): Promise<void> {
+    await AsyncStorage.setItem(KEYS.TOS_ACCEPTED, 'true');
   },
 };

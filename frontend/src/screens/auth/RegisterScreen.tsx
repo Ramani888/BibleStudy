@@ -11,6 +11,7 @@ import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { registerSchema, type RegisterFormData } from '../../utils/validators';
 import { useTheme } from '../../theme';
+import { storage } from '../../utils/storage';
 import { googleStatusCodes } from '../../utils/socialAuth';
 import type { AuthScreenProps } from '../../navigation/types';
 
@@ -29,6 +30,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
   });
 
   const onSubmit = async (data: RegisterFormData) => {
+    await storage.setTosAccepted();
     try {
       await register(data);
       Toast.show({ type: 'success', text1: 'Account created!', text2: 'Check your email for a verification code.' });
@@ -39,6 +41,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
   };
 
   const handleGoogle = useCallback(async () => {
+    await storage.setTosAccepted();
     setSocialLoading('google');
     try {
       await loginWithGoogle();
@@ -52,6 +55,7 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
   }, [loginWithGoogle]);
 
   const handleApple = useCallback(async () => {
+    await storage.setTosAccepted();
     setSocialLoading('apple');
     try {
       await loginWithApple();
@@ -72,6 +76,14 @@ export function RegisterScreen({ navigation }: AuthScreenProps<'Register'>) {
       footer={
         <>
           <Button label="Create Account" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+
+          <Typography preset="caption" color={colors.textSecondary} align="center">
+            By creating an account, you agree to our{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('TermsOfService')}>Terms of Service</Typography>
+            {' '}and{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('PrivacyPolicy')}>Privacy Policy</Typography>
+          </Typography>
+
           <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
               Already have an account?{' '}

@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import type { AIStackParamList } from './types';
+import { AIConsentScreen } from '../screens/ai/AIConsentScreen';
 import { AIChatScreen } from '../screens/ai/AIChatScreen';
 import { ChatHistoryScreen } from '../screens/ai/ChatHistoryScreen';
 
@@ -27,6 +28,7 @@ export function AINavigator() {
 
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="AIConsent" component={AIConsentScreen} />
       <Stack.Screen name="AIChat" component={AIChatScreen} />
       <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} />
     </Stack.Navigator>
