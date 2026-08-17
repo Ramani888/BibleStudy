@@ -7,8 +7,10 @@ export const mediaApi = {
       .post<{ data: MediaFile }>('/media/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
         timeout: 60_000,
-        onUploadProgress: e =>
-          onProgress?.(Math.round((e.loaded / (e.total ?? 1)) * 100)),
+        onUploadProgress: e => {
+          if (!e.total) return;
+          onProgress?.(Math.min(100, Math.round((e.loaded / e.total) * 100)));
+        },
       })
       .then(res => res.data.data),
 
