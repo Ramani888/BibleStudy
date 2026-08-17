@@ -8,7 +8,7 @@ import { QuizModeSheet } from '../../components/domain';
 import { Button, Divider, Input, Screen, ScreenHeader, SearchBar, Typography } from '../../components/ui';
 import {
   SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
-  CheckCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
+  BookIcon, CheckCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
   ListIcon, GridIcon,
 } from '../../components/icons';
 
@@ -52,8 +52,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const cachedTitle = allSets.find(s => s.id === setId)?.title;
 
   const moveSetOptions = useMemo(
-    () => allSets.filter(s => s.id !== setId).map(s => ({ id: s.id, label: s.title })),
-    [allSets, setId],
+    () => allSets.map(s => ({ id: s.id, label: s.title })),
+    [allSets],
   );
   useEffect(() => {
     if (cachedTitle) navigation.setOptions({ title: cachedTitle });
@@ -423,6 +423,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title="Move to Set"
         searchPlaceholder="Search sets…"
         options={moveSetOptions}
+        optionIcon={BookIcon}
+        selectedId={setId}
         onSelect={handleMoveCard}
         onClose={handleCloseMovePicker}
         emptyText="No other sets available"

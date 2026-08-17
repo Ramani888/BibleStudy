@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, ColorPicker, Input, Screen, SearchBar, Spacer, Typography } from '../../components/ui';
-import { BookIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
+import { BookIcon, FolderIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
 
 import {
   useConfirmDialog,
@@ -441,9 +441,10 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <SelectSheet
         visible={folderModal.assignFolderOpen}
         title="Move to Folder"
-        searchable={false}
-        options={folders.filter(f => f.id !== currentFolderId).map(f => ({ id: f.id, label: f.name }))}
-        leadingOption={{ label: 'No Folder', onPress: () => handleAssignFolder(null) }}
+        searchPlaceholder="Search folders…"
+        options={folders.map(f => ({ id: f.id, label: f.name, color: f.color }))}
+        optionIcon={FolderIcon}
+        selectedId={currentFolderId ?? undefined}
         onSelect={handleAssignFolder}
         onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
         emptyText="No folders yet"
