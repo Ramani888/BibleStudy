@@ -250,34 +250,53 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   }
 
   // ── Normal card (list / grid) ──
-  const renderCard = useCallback(({ item }: { item: CardType }) => (
-    <View style={[styles.cardItem, !isDark && styles.cardShadow, cardLayout === 'grid' && styles.cardItemGrid]}>
-      <View style={[styles.questionSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
+  const renderCard = useCallback(({ item }: { item: CardType }) => {
+    const isStory = item.type === 'STORY';
+    return (
+    <View style={[
+      styles.cardItem,
+      { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
+      !isDark && styles.cardShadow,
+      cardLayout === 'grid' && styles.cardItemGrid,
+    ]}>
+      {/* Question / Reference — label + icons on top row, text below */}
+      {(!isStory || item.question) ? (
+      <View style={[styles.questionSection, { borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
+        <View style={styles.questionHeader}>
+          <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Reference' : 'Question'}</Typography>
+          {isOwner ? (
+            <View style={styles.cardActions}>
+              <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
+                <InfoIcon size={ICON_SIZE} color={colors.textSecondary} />
+              </Pressable>
+              <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
+                {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textSecondary} /> : <EyeIcon size={ICON_SIZE} color={colors.textSecondary} />}
+              </Pressable>
+              <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
+                <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
+              </Pressable>
+            </View>
+          ) : null}
+        </View>
         <Typography preset="body" style={styles.question} numberOfLines={cardLayout === 'grid' ? 3 : undefined}>
           {item.question}
         </Typography>
-        {isOwner ? (
-          <View style={styles.cardActions}>
-            <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              <InfoIcon size={ICON_SIZE} color={colors.textSecondary} />
-            </Pressable>
-            <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textSecondary} /> : <EyeIcon size={ICON_SIZE} color={colors.textSecondary} />}
-            </Pressable>
-            <Pressable onPress={() => setSelectedCard(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-              <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
-            </Pressable>
-          </View>
-        ) : null}
       </View>
+      ) : null}
 
-      <View style={[styles.answerSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, cardLayout === 'grid' && styles.answerSectionGrid]}>
+      {/* Answer / Passage — distinct bg so it reads as "back of the card" */}
+      <View style={[
+        styles.answerSection,
+        { backgroundColor: isDark ? colors.surface : colors.background },
+        cardLayout === 'grid' && styles.answerSectionGrid,
+      ]}>
         {item.isBlurred && isOwner ? (
           <View style={styles.blurOverlay}>
             <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
           </View>
         ) : (
           <>
+            <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Passage' : 'Answer'}</Typography>
             <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
               {item.answer}
             </Typography>
@@ -294,33 +313,46 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         )}
       </View>
     </View>
-  ), [isDark, colors, cardLayout, isOwner, handleBlurToggle]);
+    );
+  }, [isDark, colors, cardLayout, isOwner, handleBlurToggle]);
 
   // ── Reorder card (drag handle) ──
-  const renderReorderCard = useCallback(({ item, drag, isActive }: RenderItemParams<CardType>) => (
+  const renderReorderCard = useCallback(({ item, drag, isActive }: RenderItemParams<CardType>) => {
+    const isStory = item.type === 'STORY';
+    return (
     <ScaleDecorator>
       <Pressable
         onLongPress={drag}
         delayLongPress={150}
         disabled={isActive}
-        style={({ pressed }) => [styles.cardItem, isActive && styles.cardItemActive, pressed && !isActive && styles.cardPressed]}
+        style={({ pressed }) => [
+          styles.cardItem,
+          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
+          isActive && styles.cardItemActive,
+          pressed && !isActive && styles.cardPressed,
+        ]}
       >
-        <View style={[styles.questionSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.border }]}>
+        <View style={[styles.questionSection, { borderBottomColor: colors.border }]}>
+          <View style={styles.questionHeader}>
+            <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Reference' : 'Question'}</Typography>
+            <View style={styles.cardActions}>
+              <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
+            </View>
+          </View>
           <Typography preset="body" style={styles.question} numberOfLines={2}>
             {item.question}
           </Typography>
-          <View style={styles.cardActions}>
-            <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
-          </View>
         </View>
-        <View style={[styles.answerSection, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]}>
+        <View style={[styles.answerSection, { backgroundColor: isDark ? colors.surface : colors.background }]}>
+          <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Passage' : 'Answer'}</Typography>
           <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={2}>
             {item.answer}
           </Typography>
         </View>
       </Pressable>
     </ScaleDecorator>
-  ), [isDark, colors]);
+    );
+  }, [isDark, colors]);
 
   return (
     <Screen header={header}>
@@ -471,6 +503,7 @@ const styles = StyleSheet.create({
   cardItem: {
     borderRadius: layout.cardRadius,
     overflow: 'hidden',
+    borderWidth: 1,
   },
   cardShadow: {
     shadowColor: '#000',
@@ -484,16 +517,20 @@ const styles = StyleSheet.create({
   iconPressed: { opacity: 0.85 },
   questionSection: {
     padding: spacing.lg,
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: spacing.md,
+    gap: spacing.sm,
     borderBottomWidth: 1,
   },
-  question: { flex: 1, fontWeight: fontWeights.medium, lineHeight: fontSizes.md * lineHeights.normal },
+  questionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  question: { fontWeight: fontWeights.medium, lineHeight: fontSizes.md * lineHeights.normal },
   cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   iconBtn: { padding: spacing.xs },
   answerSection: {
     padding: spacing.lg,
+    gap: spacing.sm,
   },
   answer: { lineHeight: fontSizes.md * lineHeights.normal },
   note: { lineHeight: 20 }, // ponytail: off-grid Figma value
