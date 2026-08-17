@@ -73,3 +73,4 @@ export { useNoteStats } from './useNoteStats';
 export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';
 export { usePickMedia } from './usePickMedia';
 export { useSystemBars } from './useSystemBars';
+export { useNewAchievements } from './useNewAchievements';

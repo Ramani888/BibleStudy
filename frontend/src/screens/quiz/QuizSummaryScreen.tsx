@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { CelebrationBurst } from '../../components/ui/CelebrationBurst';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -99,6 +100,7 @@ export function QuizSummaryScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
+      {scorePct >= 80 && <CelebrationBurst trigger={scorePct} originYFraction={0.25} />}
       <View style={{ paddingTop: insets.top }}>
         <ScreenHeader title="Summary" onBack={handleBack} />
       </View>

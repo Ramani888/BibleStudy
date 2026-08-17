@@ -18,7 +18,8 @@ import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
-import { useSubscriptionSync, useSystemBars } from '../hooks';
+import { useSubscriptionSync, useSystemBars, useNewAchievements } from '../hooks';
+import { AchievementUnlockModal } from '../components/feedback/AchievementUnlockModal';
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
@@ -30,6 +31,11 @@ const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
   ProfileTab: UserIcon,
 };
 
+function AchievementGate() {
+  const { achievement, dismiss } = useNewAchievements();
+  return <AchievementUnlockModal achievement={achievement} onDismiss={dismiss} />;
+}
+
 export function AppNavigator() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
@@ -39,6 +45,7 @@ export function AppNavigator() {
   useSystemBars(colors.bottomBar);
 
   return (
+    <>
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
@@ -60,6 +67,8 @@ export function AppNavigator() {
           deep-link (e.g. Home bell → Notifications) doesn't leave the tab stuck there. */}
       <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile', popToTopOnBlur: true }} />
     </Tab.Navigator>
+    <AchievementGate />
+    </>
   );
 }
 

@@ -54,7 +54,12 @@ export function useQuizBest(setId: string) {
  */
 export function useQuizAttemptSave(retakeAttemptId?: string) {
   const qc = useQueryClient();
-  const invalidate = useCallback(() => qc.invalidateQueries({ queryKey: ['quiz'] }), [qc]);
+  const invalidate = useCallback(() => {
+    qc.invalidateQueries({ queryKey: ['quiz'] });
+    // achievements are unlocked server-side on each quiz save; re-fetch so
+    // useNewAchievements can detect the transition.
+    qc.invalidateQueries({ queryKey: ['achievements'] });
+  }, [qc]);
 
   const create = useMutation({
     mutationFn: (payload: RecordAttemptPayload) => quizApi.recordAttempt(payload),
