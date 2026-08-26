@@ -25,6 +25,7 @@ import {
   useManualRefresh,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
+import { useTranslation } from 'react-i18next';
 import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
@@ -35,6 +36,7 @@ type Tab = 'sets' | 'folders';
 type SortOrder = 'newest' | 'alpha' | 'cards';
 
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch, clear: clearSearch } = useSearchToggle();
@@ -99,61 +101,58 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const sortedFolders = useMemo(() => [...filteredFolders].sort((a, b) => {
     if (sortOrder === 'alpha') return a.name.localeCompare(b.name);
-    if (sortOrder === 'cards') return (folderSetCounts[b.id] ?? 0) - (folderSetCounts[a.id] ?? 0);
     return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-  }), [filteredFolders, sortOrder, folderSetCounts]);
+  }), [filteredFolders, sortOrder]);
 
   const handleDeleteSet = useCallback((id: string) => {
     show({
-      title: 'Delete Set',
-      message: 'This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: t('common:dialogs.deleteConfirmTitle'),
+      message: t('library:dialogs.deleteSetMessage', 'Are you sure you want to delete this study set? This will permanently delete all its cards.'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteSetAsync(id);
-          Toast.show({ type: 'success', text1: 'Set deleted' });
+          Toast.show({ type: 'success', text1: t('library:sets.setDeleted', 'Set deleted') });
         } catch (err) {
-          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+          Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
         }
       },
     });
-  }, [show, deleteSetAsync]);
+  }, [show, deleteSetAsync, t]);
 
   const handleAssignFolder = useCallback((folderId: string | null) => {
     if (!assignTargetSetId) return;
-    updateSet({ id: assignTargetSetId, payload: { folderId } }, {
-      onSuccess: () => {
-        folderModal.closeAssignModal();
-        setSelectedSet(null);
-        setAssignTargetSetId(null);
-        Toast.show({ type: 'success', text1: folderId ? 'Moved to folder' : 'Removed from folder' });
+    updateSet(
+      { id: assignTargetSetId, payload: { folderId } },
+      {
+        onSuccess: () => {
+          folderModal.closeAssignModal();
+          Toast.show({ type: 'success', text1: folderId ? t('library:folders.movedToFolder', 'Moved to folder') : t('library:folders.removedFromFolder', 'Removed from folder') });
+        },
+        onError: (err: any) => {
+          Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
+        },
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
-    });
-  }, [assignTargetSetId, updateSet, folderModal]);
+    );
+  }, [assignTargetSetId, updateSet, folderModal, t]);
 
   const handleDeleteFolder = useCallback((id: string) => {
     show({
-      title: 'Delete Folder',
-      message: 'Sets inside will be moved to No Folder. This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: t('common:dialogs.deleteConfirmTitle'),
+      message: t('library:dialogs.deleteFolderMessage', 'Are you sure you want to delete this folder? Sets inside will not be deleted.'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
-          const result = await deleteFolderAsync(id);
-          const n = result?.affectedSets ?? 0;
-          Toast.show({
-            type: 'success',
-            text1: 'Folder deleted',
-            text2: n > 0 ? `${n} set${n !== 1 ? 's' : ''} moved to No Folder` : undefined,
-          });
+          await deleteFolderAsync(id);
+          Toast.show({ type: 'success', text1: t('library:folders.folderDeleted', 'Folder deleted') });
         } catch (err) {
-          Toast.show({ type: 'error', text1: 'Delete failed', text2: getErrorMessage(err) });
+          Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
         }
       },
     });
-  }, [show, deleteFolderAsync]);
+  }, [show, deleteFolderAsync, t]);
 
   const handleCloseEditFolderModal = useCallback(() => {
     folderModal.closeEditModal();
@@ -162,41 +161,34 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
 
   const currentFolderId = sets.find(s => s.id === assignTargetSetId)?.folderId;
 
-  const renderSetItem = useCallback(({ item }: { item: StudySet }) => (
-    <SetCard
-      set={item}
-      onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
-      onMenuPress={() => setSelectedSet(item)}
-    />
-  ), [navigation]);
+  const renderSetItem = useCallback(
+    ({ item }: { item: StudySet }) => (
+      <SetCard
+        set={item}
+        onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
+        onLongPress={() => setSelectedSet(item)}
+      />
+    ),
+    [navigation],
+  );
 
-  const renderFolderItem = useCallback(({ item }: { item: Folder }) => (
-    <FolderCard
-      folder={item}
-      setCount={folderSetCounts[item.id] ?? 0}
-      onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name, folderColor: item.color })}
-      onMenuPress={() => setSelectedFolder(item)}
-    />
-  ), [navigation, folderSetCounts]);
+  const renderFolderItem = useCallback(
+    ({ item }: { item: Folder }) => (
+      <FolderCard
+        folder={item}
+        setCount={folderSetCounts[item.id] ?? 0}
+        onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name })}
+        onLongPress={() => setSelectedFolder(item)}
+      />
+    ),
+    [navigation, folderSetCounts],
+  );
 
-  // ── Header (no title): actions row + full-width tabs + search ──
+  // ── Header (title + search + sort + tab strip) ──
   const header = (
     <View>
       <View style={styles.headerActions}>
-        {/* Left: other collections */}
-        <View style={styles.headerGroup}>
-          <Pressable onPress={() => navigation.navigate('FriendsSets')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-            <UsersIcon size={ICON_SIZE} color={colors.accent} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('PublicSets')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-            <GlobeIcon size={ICON_SIZE} color={colors.accent} />
-          </Pressable>
-          <Pressable onPress={() => navigation.navigate('StudyPlans')} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-            <BookIcon size={ICON_SIZE} color={colors.accent} />
-          </Pressable>
-        </View>
-
-        {/* Right: current-list controls */}
+        <Typography preset="h3" color={colors.textPrimary}>{t('library:tabs.mySets')}</Typography>
         <View style={styles.headerGroup}>
           <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
             <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
@@ -204,7 +196,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           <Pressable onPress={cycleSortOrder} hitSlop={8} style={({ pressed }) => [styles.sortBtn, pressed && styles.iconPressed]}>
             <SortIcon size={ICON_SIZE} color={colors.accent} />
             <Typography preset="caption" color={colors.accent}>
-              {sortOrder === 'newest' ? 'Recent' : sortOrder === 'alpha' ? 'A–Z' : activeTab === 'sets' ? 'Cards' : 'Sets'}
+              {sortOrder === 'newest' ? t('common:sort.recent', 'Recent') : sortOrder === 'alpha' ? t('common:sort.alpha', 'A–Z') : activeTab === 'sets' ? t('common:sort.cards', 'Cards') : t('common:sort.sets', 'Sets')}
             </Typography>
           </Pressable>
         </View>
@@ -218,7 +210,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
             onPress={() => switchTab(tab)}
           >
             <Typography preset="label" color={activeTab === tab ? colors.accent : colors.textSecondary}>
-              {tab === 'sets' ? 'SETS' : 'FOLDERS'}
+              {tab === 'sets' ? t('library:tabs.mySets').toUpperCase() : t('library:tabs.folders').toUpperCase()}
             </Typography>
           </Pressable>
         ))}
@@ -227,7 +219,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {searchVisible && (
         <View style={styles.searchWrap}>
           <SearchBar
-            placeholder={activeTab === 'sets' ? 'Search sets…' : 'Search folders…'}
+            placeholder={activeTab === 'sets' ? t('library:sets.searchPlaceholder', 'Search sets…') : t('library:folders.searchPlaceholder', 'Search folders…')}
             value={search}
             onChangeText={setSearch}
             containerStyle={styles.searchInput}
@@ -242,7 +234,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Button
-        label={activeTab === 'sets' ? 'Create Set' : 'Create Folder'}
+        label={activeTab === 'sets' ? t('library:sets.createSet') : t('library:folders.createFolder')}
         onPress={handleCreateItem}
         fullWidth
       />
@@ -271,11 +263,11 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           renderItem={renderSetItem}
           ListEmptyComponent={
             setsError ? (
-              <ErrorState message="Failed to load sets" onRetry={refetchSets} />
+              <ErrorState message={t('common:status.failedToLoad', 'Failed to load sets')} onRetry={refetchSets} />
             ) : (
               <EmptyState
-                title={search ? 'No results' : 'No sets yet'}
-                subtitle={search ? `No sets match "${search}"` : 'Create your first study set to get started'}
+                title={search ? t('common:status.noResults', 'No results') : t('library:sets.noSets', 'No sets yet')}
+                subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No sets match "${search}"` }) : t('library:sets.emptyDesc', 'Create your first study set to get started')}
                 style={styles.emptyState}
               />
             )
@@ -301,11 +293,11 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           renderItem={renderFolderItem}
           ListEmptyComponent={
             foldersError ? (
-              <ErrorState message="Failed to load folders" onRetry={refetchFolders} />
+              <ErrorState message={t('common:status.failedToLoad', 'Failed to load folders')} onRetry={refetchFolders} />
             ) : (
               <EmptyState
-                title={search ? 'No results' : 'No folders yet'}
-                subtitle={search ? `No folders match "${search}"` : 'Tap Create Folder to organise your sets'}
+                title={search ? t('common:status.noResults', 'No results') : t('library:folders.noFolders', 'No folders yet')}
+                subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No folders match "${search}"` }) : t('library:folders.emptyDesc', 'Tap Create Folder to organise your sets')}
                 style={styles.emptyState}
               />
             )
@@ -350,17 +342,17 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onClose={closeSelectedFolder}
         actions={[
           {
-            label: 'Create Set',
+            label: t('library:sets.createSet', 'Create Set'),
             icon: PlusCircleIcon,
             onPress: () => selectedFolder && navigation.navigate('CreateSet', { folderId: selectedFolder.id }),
           },
           {
-            label: 'Edit',
+            label: t('common:actions.edit', 'Edit'),
             icon: PencilIcon,
             onPress: () => selectedFolder && folderModal.openEditModal(selectedFolder),
           },
           {
-            label: 'Delete Folder',
+            label: t('library:folders.deleteFolderTitle', 'Delete Folder'),
             icon: TrashIcon,
             destructive: true,
             onPress: () => selectedFolder && handleDeleteFolder(selectedFolder.id),
@@ -371,11 +363,11 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {/* ── New folder modal ── */}
       <AppModal
         visible={folderModal.newFolderModalOpen}
-        title="New Folder"
+        title={t('library:folders.newFolder', 'New Folder')}
         onClose={folderModal.closeCreateModal}
         footer={
           <Button
-            label="Create Folder"
+            label={t('library:folders.createFolder', 'Create Folder')}
             onPress={folderModal.handleCreateFolder}
             loading={folderModal.creatingFolder}
             fullWidth
@@ -384,8 +376,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       >
         <View style={styles.modalBody}>
           <Input
-            label="Folder name"
-            placeholder="e.g. New Testament"
+            label={t('library:folders.folderName', 'Folder name')}
+            placeholder={t('library:folders.folderNamePlaceholder', 'e.g. New Testament')}
             value={folderModal.newFolderName}
             onChangeText={folderModal.setNewFolderName}
             autoCapitalize="words"
@@ -396,7 +388,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           />
           <View>
             <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
-              Color
+              {t('library:folders.color', 'Color')}
             </Typography>
             <ColorPicker value={folderModal.selectedColor} onChange={folderModal.setSelectedColor} />
           </View>
@@ -406,11 +398,11 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {/* ── Edit folder modal ── */}
       <AppModal
         visible={folderModal.editFolderModalOpen}
-        title="Edit Folder"
+        title={t('library:folders.editFolder', 'Edit Folder')}
         onClose={handleCloseEditFolderModal}
         footer={
           <Button
-            label="Save Changes"
+            label={t('common:actions.saveChanges', 'Save Changes')}
             onPress={folderModal.handleEditFolder}
             loading={folderModal.updatingFolder}
             fullWidth
@@ -419,7 +411,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       >
         <View style={styles.modalBody}>
           <Input
-            label="Folder name"
+            label={t('library:folders.folderName', 'Folder name')}
             value={folderModal.editFolderName}
             onChangeText={folderModal.setEditFolderName}
             autoCapitalize="words"
@@ -430,7 +422,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
           />
           <View>
             <Typography preset="label" color={colors.textSecondary} style={styles.colorLabel}>
-              Color
+              {t('library:folders.color', 'Color')}
             </Typography>
             <ColorPicker value={folderModal.editFolderColor} onChange={folderModal.setEditFolderColor} />
           </View>
@@ -440,14 +432,14 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       {/* ── Assign Folder picker ── */}
       <SelectSheet
         visible={folderModal.assignFolderOpen}
-        title="Move to Folder"
-        searchPlaceholder="Search folders…"
+        title={t('library:folders.moveToFolder', 'Move to Folder')}
+        searchPlaceholder={t('library:folders.searchPlaceholder', 'Search folders…')}
         options={folders.map(f => ({ id: f.id, label: f.name, color: f.color }))}
         optionIcon={FolderIcon}
         selectedId={currentFolderId ?? undefined}
         onSelect={handleAssignFolder}
         onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
-        emptyText="No folders yet"
+        emptyText={t('library:folders.noFolders', 'No folders yet')}
       />
 
       <ConfirmDialog {...dialogProps} />

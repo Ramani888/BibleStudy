@@ -21,10 +21,12 @@ import { getErrorMessage } from '../../api/client';
 import { formatDate } from '../../utils/formatters';
 import type { FriendRequest } from '../../types/friends.types';
 
+import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'FriendRequests'>;
 type Tab = 'incoming' | 'outgoing';
 
 export function FriendRequestsScreen({ navigation }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -41,36 +43,49 @@ export function FriendRequestsScreen({ navigation }: Props) {
 
   const handleAccept = useCallback((requestId: string) => {
     accept.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request accepted' }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestAccepted', 'Friend request accepted') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  }, [accept]);
+  }, [accept, t]);
 
   const handleReject = useCallback((requestId: string) => {
     reject.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'info', text1: 'Request declined' }),
+      onSuccess: () => Toast.show({ type: 'info', text1: t('profile:friends.requestDeclined', 'Request declined') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  }, [reject]);
+  }, [reject, t]);
 
   const handleCancel = useCallback((requestId: string) => {
     cancel.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'info', text1: 'Request cancelled' }),
+      onSuccess: () => Toast.show({ type: 'info', text1: t('profile:friends.requestCancelled', 'Request cancelled') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  }, [cancel]);
+  }, [cancel, t]);
 
   const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
+    if (!person) return null;
+
+    const subtitle = person.church ?? formatDate(item.createdAt);
+
     return (
-      <View style={[styles.card, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]}>
-        <Avatar uri={person?.profileImage ?? null} name={person?.name ?? ''} size="sm" />
-        <View style={styles.cardInfo}>
-          <Typography preset="label" numberOfLines={1}>{person?.name ?? ''}</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {formatDate(item.createdAt)}
-          </Typography>
-        </View>
+      <View
+        style={[
+          styles.card,
+          { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
+        ]}
+      >
+        <Pressable
+          style={styles.cardInfo}
+          onPress={() => navigation.navigate('UserProfile', { userId: person.id })}
+        >
+          <Avatar uri={person.profileImage ?? null} name={person.name ?? ''} size="sm" />
+          <View style={styles.cardInfo}>
+            <Typography preset="label" numberOfLines={1}>{person.name}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{subtitle}</Typography>
+          </View>
+        </Pressable>
+
         {tab === 'incoming' ? (
           <View style={styles.requestActions}>
             <Pressable onPress={() => handleAccept(item.id)} hitSlop={8} style={styles.actionBtn}>
@@ -87,14 +102,14 @@ export function FriendRequestsScreen({ navigation }: Props) {
         )}
       </View>
     );
-  }, [tab, colors, isDark, handleAccept, handleReject, handleCancel]);
+  }, [tab, colors, isDark, handleAccept, handleReject, handleCancel, navigation]);
 
-  if (error) return <ErrorState message="Could not load requests" onRetry={refetch} />;
+  if (error) return <ErrorState message={t('profile:friends.couldNotLoadRequests', 'Could not load requests')} onRetry={refetch} />;
 
   return (
     <Screen
       edges={['top']}
-      header={<ScreenHeader title="Friend Requests" onBack={() => navigation.goBack()} />}
+      header={<ScreenHeader title={t('profile:menu.friendRequests')} onBack={() => navigation.goBack()} />}
     >
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         <Pressable
@@ -103,7 +118,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
         >
           <View style={styles.tabContent}>
             <Typography preset="label" color={tab === 'incoming' ? colors.accent : colors.textSecondary}>
-              Incoming
+              {t('profile:friends.incoming', 'Incoming')}
             </Typography>
             {incomingCount > 0 ? (
               <View style={[styles.badge, { backgroundColor: colors.accent }]}>
@@ -117,7 +132,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
           onPress={() => setTab('outgoing')}
         >
           <Typography preset="label" color={tab === 'outgoing' ? colors.accent : colors.textSecondary}>
-            Sent
+            {t('profile:friends.sent', 'Sent')}
           </Typography>
         </Pressable>
       </View>
@@ -132,8 +147,8 @@ export function FriendRequestsScreen({ navigation }: Props) {
         contentContainerStyle={requests.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           <EmptyState
-            title="No Requests"
-            subtitle={tab === 'incoming' ? 'No pending friend requests' : 'No sent requests'}
+            title={t('profile:friends.noRequests', 'No Requests')}
+            subtitle={tab === 'incoming' ? t('profile:friends.noPendingRequests', 'No pending friend requests') : t('profile:friends.noSentRequests', 'No sent requests')}
           />
         }
       />

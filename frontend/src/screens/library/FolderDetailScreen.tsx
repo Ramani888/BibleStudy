@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import { QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
@@ -16,6 +17,7 @@ import type { StudySet } from '../../types';
 const ICON_SIZE = 20;
 
 export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'FolderDetail'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors, spacing: sp } = useTheme();
   const { folderId, folderName, folderColor } = route.params;
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
@@ -64,28 +66,28 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
       onSuccess: () => {
         folderModal.closeAssignModal();
         setAssignTargetSetId(null);
-        Toast.show({ type: 'success', text1: newFolderId ? 'Moved to folder' : 'Removed from folder' });
+        Toast.show({ type: 'success', text1: newFolderId ? t('library:folders.movedToFolder', 'Moved to folder') : t('library:folders.removedFromFolder', 'Removed from folder') });
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [assignTargetSetId, updateSet, folderModal]);
+  }, [assignTargetSetId, updateSet, folderModal, t]);
 
   const handleDeleteSet = useCallback((set: StudySet) => {
     show({
-      title: 'Delete Set',
-      message: 'This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: t('library:dialogs.deleteSetTitle'),
+      message: t('library:dialogs.deleteSetMessage'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteSetAsync(set.id);
-          Toast.show({ type: 'success', text1: 'Set deleted' });
+          Toast.show({ type: 'success', text1: t('library:sets.setDeleted', 'Set deleted') });
         } catch (err) {
-          Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+          Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
         }
       },
     });
-  }, [show, deleteSetAsync]);
+  }, [show, deleteSetAsync, t]);
 
   const header = (
     <ScreenHeader
@@ -101,14 +103,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Create Set" onPress={handleNavCreateSet} fullWidth />
+      <Button label={t('library:sets.createSet')} onPress={handleNavCreateSet} fullWidth />
     </View>
   );
 
   if (isError) {
     return (
       <Screen header={header}>
-        <ErrorState message="Could not load sets." onRetry={refetch} />
+        <ErrorState message={t('library:sets.couldNotLoadSets', 'Could not load sets.')} onRetry={refetch} />
       </Screen>
     );
   }
@@ -120,7 +122,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         {searchVisible && (
           <View style={styles.searchWrap}>
             <SearchBar
-              placeholder="Search sets…"
+              placeholder={t('library:sets.searchPlaceholder', 'Search sets…')}
               value={search}
               onChangeText={setSearch}
               containerStyle={styles.searchInput}
@@ -135,14 +137,14 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         data={filteredSets}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
-        ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{filteredSets.length} {filteredSets.length === 1 ? 'set' : 'sets'}</Typography>}
+        ListHeaderComponent={<Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>{t('library:sets.setCount', { count: filteredSets.length, defaultValue: `${filteredSets.length} sets` })}</Typography>}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
         ItemSeparatorComponent={() => <Spacer size={sp.md} />}
         ListEmptyComponent={
           <EmptyState
-            title={search ? 'No results' : 'No sets in this folder'}
-            subtitle={search ? `No sets match "${search}"` : 'Create a set and assign it to this folder'}
+            title={search ? t('common:status.noResults', 'No results') : t('library:folders.emptyTitle', 'No sets in this folder')}
+            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No sets match "${search}"` }) : t('library:folders.emptySub', 'Create a set and assign it to this folder')}
           />
         }
         renderItem={renderSetItem}
@@ -172,13 +174,13 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
 
       <SelectSheet
         visible={folderModal.assignFolderOpen}
-        title="Move to Folder"
+        title={t('library:folders.moveToFolder', 'Move to Folder')}
         searchable={false}
         options={folderOptions}
-        leadingOption={{ label: 'No Folder', onPress: () => handleAssignFolder(null) }}
+        leadingOption={{ label: t('library:folders.noFolder', 'No Folder'), onPress: () => handleAssignFolder(null) }}
         onSelect={handleAssignFolder}
         onClose={() => { folderModal.closeAssignModal(); setAssignTargetSetId(null); }}
-        emptyText="No other folders"
+        emptyText={t('library:folders.noOtherFolders', 'No other folders')}
       />
 
       <QuizModeSheet

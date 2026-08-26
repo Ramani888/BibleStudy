@@ -1,0 +1,61 @@
+{
+  "actions": {
+    "save": "Salvar",
+    "saveChanges": "Salvar Alterações",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "edit": "Editar",
+    "create": "Criar",
+    "done": "Concluído",
+    "retry": "Tentar novamente",
+    "undo": "Desfazer",
+    "next": "Próximo",
+    "back": "Voltar",
+    "close": "Fechar",
+    "search": "Buscar",
+    "upload": "Enviar",
+    "rename": "Renomear",
+    "share": "Compartilhar",
+    "continue": "Continuar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "learnMore": "Saiba mais",
+    "markAllRead": "Marcar todas como lidas",
+    "searchPlaceholder": "Pesquisar…",
+    "clearSearch": "Limpar pesquisa"
+  },
+  "status": {
+    "loading": "Carregando...",
+    "saving": "Salvando...",
+    "sending": "Enviando...",
+    "generating": "Gerando...",
+    "success": "Sucesso",
+    "error": "Ops!",
+    "noResults": "Nenhum resultado",
+    "noMatchFor": "Nenhum resultado para \"{{query}}\"",
+    "empty": "Nada aqui ainda",
+    "offline": "Você parece estar offline",
+    "copiedToClipboard": "Copiado para a área de transferência",
+    "selected": "Selecionado",
+    "couldNotDelete": "Não foi possível excluir",
+    "unknownError": "Erro desconhecido"
+  },
+  "filter": {
+    "all": "Todos"
+  },
+  "dialogs": {
+    "confirmTitle": "Tem certeza?",
+    "deleteConfirmTitle": "Confirmação de exclusão",
+    "unsavedChanges": "Você tem alterações não salvas. Tem certeza de que deseja sair?",
+    "discard": "Descartar"
+  },
+  "time": {
+    "today": "Hoje",
+    "yesterday": "Ontem",
+    "daysAgo": "Há {{count}} dias",
+    "minAgo": "Há {{count}}m",
+    "hoursAgo": "Há {{count}}h",
+    "at": "às",
+    "earlier": "Anteriores"
+  }
+}

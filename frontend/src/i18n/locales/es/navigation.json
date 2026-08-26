@@ -1,0 +1,9 @@
+{
+  "tabs": {
+    "home": "Inicio",
+    "library": "Biblioteca",
+    "study": "Cuestionario",
+    "ai": "IA",
+    "profile": "Perfil"
+  }
+}

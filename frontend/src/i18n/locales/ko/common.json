@@ -1,0 +1,61 @@
+{
+  "actions": {
+    "save": "저장",
+    "saveChanges": "변경사항 저장",
+    "cancel": "취소",
+    "delete": "삭제",
+    "edit": "수정",
+    "create": "만들기",
+    "done": "완료",
+    "retry": "다시 시도",
+    "undo": "실행 취소",
+    "next": "다음",
+    "back": "뒤로",
+    "close": "닫기",
+    "search": "검색",
+    "upload": "업로드",
+    "rename": "이름 변경",
+    "share": "공유",
+    "continue": "계속",
+    "submit": "제출",
+    "confirm": "확인",
+    "learnMore": "더 알아보기",
+    "markAllRead": "모두 읽음으로 표시",
+    "searchPlaceholder": "검색…",
+    "clearSearch": "검색 지우기"
+  },
+  "status": {
+    "loading": "로딩 중...",
+    "saving": "저장 중...",
+    "sending": "전송 중...",
+    "generating": "생성 중...",
+    "success": "성공",
+    "error": "오류",
+    "noResults": "결과 없음",
+    "noMatchFor": "\"{{query}}\"에 대한 검색 결과가 없습니다",
+    "empty": "아직 아무것도 없습니다",
+    "offline": "오프라인 상태인 것 같습니다",
+    "copiedToClipboard": "클립보드에 복사되었습니다",
+    "selected": "선택됨",
+    "couldNotDelete": "삭제할 수 없습니다",
+    "unknownError": "알 수 없는 오류"
+  },
+  "filter": {
+    "all": "전체"
+  },
+  "dialogs": {
+    "confirmTitle": "확인하시겠습니까?",
+    "deleteConfirmTitle": "삭제 확인",
+    "unsavedChanges": "저장되지 않은 변경사항이 있습니다. 정말 나가시겠습니까?",
+    "discard": "삭제"
+  },
+  "time": {
+    "today": "오늘",
+    "yesterday": "어제",
+    "daysAgo": "{{count}}일 전",
+    "minAgo": "{{count}}분 전",
+    "hoursAgo": "{{count}}시간 전",
+    "at": "",
+    "earlier": "이전"
+  }
+}

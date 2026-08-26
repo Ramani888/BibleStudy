@@ -13,6 +13,7 @@ import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
 import type { QuizStackParamList } from '../../navigation/types';
 
+import { useTranslation } from 'react-i18next';
 type Params = QuizStackParamList['QuizSetup'];
 type SortOrder = 'newest' | 'alpha' | 'cards';
 
@@ -35,6 +36,7 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
 export function QuizSetupScreen() {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -116,31 +118,31 @@ export function QuizSetupScreen() {
             {item.title}
           </Typography>
           <Typography preset="caption" color={colors.textSecondary}>
-            {count === 0 ? 'No cards yet' : `${count} ${count === 1 ? 'card' : 'cards'}`}
+            {count === 0 ? t('library:cards.noCards', 'No cards yet') : t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
           </Typography>
         </View>
       </Pressable>
     );
-  }, [selectedSetIds, colors, handleToggle]);
+  }, [selectedSetIds, colors, handleToggle, t]);
 
   const selectorLabel = selectedSetIds.length === 0
-    ? 'Tap to choose sets…'
+    ? t('quiz:setup.tapToChooseSets', 'Tap to choose sets…')
     : selectedSetIds.length === 1
     ? selectedSetTitles[0]
-    : `${selectedSetIds.length} sets selected`;
+    : t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` });
 
   const canStart = selectedSetIds.length > 0 && cards.length > 0;
 
   return (
     <Screen
-      header={<ScreenHeader title="New Quiz" onBack={() => navigation.goBack()} />}
+      header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
       footer={
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Button
             label={
-              cardsLoading ? 'Loading cards…'
-              : selectedSetIds.length > 0 && cards.length === 0 ? 'No cards in selected sets'
-              : 'Start Quiz'
+              cardsLoading ? t('quiz:setup.loadingCards', 'Loading cards…')
+              : selectedSetIds.length > 0 && cards.length === 0 ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
+              : t('quiz:setup.startQuiz', 'Start Quiz')
             }
             onPress={() => navigation.navigate('Quiz', {
               setIds: selectedSetIds,
@@ -160,9 +162,9 @@ export function QuizSetupScreen() {
 
           {/* ── Quiz Name ── */}
           <View>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>QUIZ NAME</Typography>
+          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
           <Input
-            placeholder="e.g. Week 3 Review…"
+            placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')}
             value={quizName}
             onChangeText={setQuizName}
             returnKeyType="done"
@@ -173,7 +175,7 @@ export function QuizSetupScreen() {
 
           {/* ── Choose Sets row ── */}
           <View>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>CHOOSE SETS</Typography>
+          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
           <Pressable
             style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
             onPress={openSetPicker}
@@ -201,16 +203,16 @@ export function QuizSetupScreen() {
           {/* ── Quiz Type chips ── */}
           {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
             <View style={styles.modeSection}>
-              <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>QUIZ TYPE</Typography>
+              <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.quizTypeLabel', 'QUIZ TYPE')}</Typography>
               {cardsLoading ? (
-                <Typography preset="body" color={colors.textSecondary}>Loading modes…</Typography>
+                <Typography preset="body" color={colors.textSecondary}>{t('common:status.loading', 'Loading modes…')}</Typography>
               ) : (
                 <>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
                     {chipModes.map(m => (
                       <FilterChip
                         key={m}
-                        label={MODE_LABEL[m]}
+                        label={t(`quiz:modes.${m}`, MODE_LABEL[m])}
                         active={m === selectedMode}
                         onPress={() => setSelectedMode(m)}
                         icon={m === 'mix' ? ShuffleIcon : undefined}
@@ -218,7 +220,7 @@ export function QuizSetupScreen() {
                     ))}
                   </ScrollView>
                   <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
-                    {modeDesc[selectedMode]}
+                    {t(`quiz:setup.modeDesc.${selectedMode}`, modeDesc[selectedMode])}
                   </Typography>
                 </>
               )}
@@ -230,7 +232,7 @@ export function QuizSetupScreen() {
       {/* ── Set Picker Sheet ── */}
       <AppModal visible={setPickerOpen} onClose={closeSetPicker} contentStyle={styles.sheetContent}>
         <View style={styles.sheetToolbar}>
-          <Typography preset="h4" style={styles.flex}>Choose Sets</Typography>
+          <Typography preset="h4" style={styles.flex}>{t('library:sets.chooseSets', 'Choose Sets')}</Typography>
           <Pressable
             style={({ pressed }) => pressed && styles.iconPressed}
             onPress={toggleSearch}
@@ -246,13 +248,13 @@ export function QuizSetupScreen() {
             accessibilityRole="button"
           >
             <SortIcon size={20} color={colors.accent} />
-            <Typography preset="caption" color={colors.accent}>{SORT_LABEL[sortOrder]}</Typography>
+            <Typography preset="caption" color={colors.accent}>{t(`quiz:setup.sort.${sortOrder}`, SORT_LABEL[sortOrder])}</Typography>
           </Pressable>
         </View>
 
         {searchVisible && (
           <SearchBar
-            placeholder="Search sets…"
+            placeholder={t('library:sets.searchPlaceholder', 'Search sets…')}
             value={search}
             onChangeText={setSearch}
             autoFocus
@@ -263,7 +265,7 @@ export function QuizSetupScreen() {
         {selectedSetIds.length > 0 && (
           <View style={styles.selectedBadge}>
             <Typography preset="caption" color={colors.accent}>
-              {selectedSetIds.length} set{selectedSetIds.length > 1 ? 's' : ''} selected
+              {t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` })}
             </Typography>
           </View>
         )}
@@ -277,13 +279,13 @@ export function QuizSetupScreen() {
           ListEmptyComponent={
             isLoading
               ? <View style={styles.modalLoading}><ActivityIndicator color={colors.accent} /></View>
-              : <EmptyState title="No sets found" subtitle="Create a set with cards to start quizzing" />
+              : <EmptyState title={t('common:status.noResults', 'No sets found')} subtitle={t('quiz:setup.noSetsSub', 'Create a set with cards to start quizzing')} />
           }
           renderItem={renderSetRow}
         />
 
         <Button
-          label={selectedSetIds.length === 0 ? 'Select sets to continue' : `Done — ${selectedSetIds.length} set${selectedSetIds.length > 1 ? 's' : ''}`}
+          label={selectedSetIds.length === 0 ? t('quiz:setup.selectSetsToContinue', 'Select sets to continue') : t('common:actions.doneCount', { count: selectedSetIds.length, defaultValue: `Done — ${selectedSetIds.length} sets` })}
           onPress={closeSetPicker}
           disabled={selectedSetIds.length === 0}
           fullWidth

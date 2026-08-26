@@ -22,11 +22,13 @@ const COPY: Record<CardType, {
            noteBtn: 'Add Note', noteLabel: 'Note (optional)', notePlaceholder: 'Add a note or reflection…' },
 };
 
+import i18n from '../../../i18n';
+
 const schema = z.object({
   type: z.enum(['QA', 'STORY']),
   question: z.string().trim(),
   answer: z.string().trim(),
-  note: z.string().trim().max(500, 'Max 500 characters').optional(),
+  note: z.string().trim().max(500, i18n.t('library:validation.noteMax', 'Max 500 characters')).optional(),
 }).superRefine((data, ctx) => {
   const isQA = data.type === 'QA';
   const q = data.question.trim();
@@ -34,16 +36,16 @@ const schema = z.object({
 
   // Question: required + min 2 for Q&A; optional but capped for Story (reference)
   if (isQA) {
-    if (q.length < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: 'Question must be at least 2 characters' });
-    if (q.length > 300) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: 'Max 300 characters' });
+    if (q.length < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: i18n.t('library:validation.questionMin', 'Question must be at least 2 characters') });
+    if (q.length > 300) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: i18n.t('library:validation.questionMax', 'Max 300 characters') });
   } else {
-    if (q.length > 100) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: 'Reference must be 100 characters or less' });
+    if (q.length > 100) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['question'], message: i18n.t('library:validation.referenceMax', 'Reference must be 100 characters or less') });
   }
 
   // Answer / Text: required + min 2 for both types; max differs by type
-  if (a.length < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: isQA ? 'Answer must be at least 2 characters' : 'Text must be at least 2 characters' });
-  if (isQA && a.length > 1000) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: 'Max 1000 characters' });
-  if (!isQA && a.length > 2000) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: 'Max 2000 characters' });
+  if (a.length < 2) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: isQA ? i18n.t('library:validation.answerMin', 'Answer must be at least 2 characters') : i18n.t('library:validation.textMin', 'Text must be at least 2 characters') });
+  if (isQA && a.length > 1000) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: i18n.t('library:validation.answerMax', 'Max 1000 characters') });
+  if (!isQA && a.length > 2000) ctx.addIssue({ code: z.ZodIssueCode.custom, path: ['answer'], message: i18n.t('library:validation.textMax', 'Max 2000 characters') });
 });
 
 type CardFormData = z.infer<typeof schema>;
@@ -60,10 +62,13 @@ interface CardFormProps {
   lockedType?: boolean;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardForm(
   { defaultValues, onSubmit, onSubmittingChange, lockedType = false },
   ref,
 ) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
 
   const answerRef = useRef<TextInput>(null);
@@ -95,14 +100,14 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
       {/* ── Card type switcher (hidden when editing an existing card) ── */}
       {!lockedType && (
         <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
-          {(['QA', 'STORY'] as CardType[]).map(t => (
+          {(['QA', 'STORY'] as CardType[]).map(tType => (
             <Pressable
-              key={t}
-              style={({ pressed }) => [styles.tab, { borderBottomColor: type === t ? colors.accent : colors.transparent }, pressed && styles.btnPressed]}
-              onPress={() => setValue('type', t)}
+              key={tType}
+              style={({ pressed }) => [styles.tab, { borderBottomColor: type === tType ? colors.accent : colors.transparent }, pressed && styles.btnPressed]}
+              onPress={() => setValue('type', tType)}
             >
-              <Typography preset="label" color={type === t ? colors.accent : colors.textSecondary}>
-                {t === 'QA' ? 'Q&A Card' : 'Story Card'}
+              <Typography preset="label" color={type === tType ? colors.accent : colors.textSecondary}>
+                {tType === 'QA' ? t('library:cards.qaCard', 'Q&A Card') : t('library:cards.storyCard', 'Story Card')}
               </Typography>
             </Pressable>
           ))}
@@ -147,7 +152,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
                   hitSlop={8}
                   style={({ pressed }) => pressed && styles.btnPressed}
                 >
-                  <Typography preset="caption" color={colors.textSecondary}>Remove</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>{t('common:actions.remove', 'Remove')}</Typography>
                 </Pressable>
               </View>
               <Controller

@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
 import { usePlans, useManualRefresh, useSearchToggle } from '../../hooks';
@@ -14,6 +15,7 @@ import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 const ICON_SIZE = 20;
 
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
+  const { t } = useTranslation(['library', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -62,7 +64,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
     <Screen
       header={
         <ScreenHeader
-          title="Study Plans"
+          title={t('library:studyPlans.title')}
           onBack={navigation.goBack}
           right={
             <View style={styles.headerRight}>
@@ -79,7 +81,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
     >
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search plans…" autoFocus />
+          <SearchBar value={search} onChangeText={setSearch} placeholder={t('library:plans.searchPlaceholder', 'Search plans…')} autoFocus />
         </View>
       )}
       {isLoading ? (
@@ -90,8 +92,8 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
         <View style={styles.centered}>
           <EmptyState
             icon={<BookIcon size={48} color={colors.accent} />}
-            title={search ? 'No results' : 'No study plans yet'}
-            subtitle={search ? `No plans match "${search}"` : 'Tap + to create a guided path through your sets.'}
+            title={search ? t('common:status.noResults', 'No results') : t('library:plans.emptyTitle', 'No study plans yet')}
+            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No plans match "${search}"` }) : t('library:plans.emptySub', 'Tap + to create a guided path through your sets.')}
           />
         </View>
       ) : (

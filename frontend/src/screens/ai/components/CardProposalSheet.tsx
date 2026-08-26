@@ -17,7 +17,10 @@ interface CardProposalSheetProps {
   onClose: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export const CardProposalSheet = React.memo(function CardProposalSheet({ visible, cards, onSave, onClose }: CardProposalSheetProps) {
+  const { t } = useTranslation(['ai', 'library', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -37,7 +40,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
       setSelectedSetId(set.id);
       setNewSetName('');
     } catch (e) {
-      Toast.show({ type: 'error', text1: 'Could not create set', text2: getErrorMessage(e) });
+      Toast.show({ type: 'error', text1: t('library:sets.couldNotCreateSet', 'Could not create set'), text2: getErrorMessage(e) });
     } finally {
       setIsCreating(false);
     }
@@ -63,18 +66,18 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
   }, [onClose]);
 
   return (
-    <AppModal visible={visible} title="Save as Flashcards" onClose={handleClose} showHandle>
+    <AppModal visible={visible} title={t('ai:chat.saveAsCards', 'Save as Flashcards')} onClose={handleClose} showHandle>
       <Typography preset="bodySm" color={colors.textSecondary} style={styles.subheader}>
-        {cards.length} card{cards.length !== 1 ? 's' : ''} ready to save
+        {t('ai:chat.cardsReady', { count: cards.length, defaultValue: `${cards.length} cards ready to save` })}
       </Typography>
 
       {/* Card preview */}
       <ScrollView style={styles.previewScroll} showsVerticalScrollIndicator={false}>
         {cards.map((card, i) => (
           <View key={i} style={[styles.cardRow, { borderBottomColor: colors.border }]}>
-            <Typography preset="label" color={colors.textSecondary}>Q: {card.question}</Typography>
+            <Typography preset="label" color={colors.textSecondary}>{t('library:cards.questionPrefix', 'Q:')} {card.question}</Typography>
             <Typography preset="bodySm" color={colors.textPrimary} style={styles.answerText}>
-              A: {card.answer}
+              {t('library:cards.answerPrefix', 'A:')} {card.answer}
             </Typography>
           </View>
         ))}
@@ -82,7 +85,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
 
       {/* Set selector */}
       <Typography preset="label" color={colors.textSecondary} style={styles.sectionLabel}>
-        Choose a Set
+        {t('library:sets.chooseSet', 'Choose a Set')}
       </Typography>
 
       {/* Inline create — only when the user has no sets to pick from */}
@@ -90,7 +93,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
         <View style={styles.createRow}>
           <View style={styles.createInput}>
             <Input
-              placeholder="New set name…"
+              placeholder={t('library:sets.newSetName', 'New set name…')}
               value={newSetName}
               onChangeText={setNewSetName}
               onSubmitEditing={handleCreateSet}
@@ -99,7 +102,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
             />
           </View>
           <Button
-            label="Create"
+            label={t('common:actions.create', 'Create')}
             variant="secondary"
             onPress={handleCreateSet}
             disabled={!newSetName.trim() || isCreating}
@@ -112,7 +115,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
         <ActivityIndicator color={colors.accent} style={styles.loader} />
       ) : sets.length === 0 ? (
         <Typography preset="bodySm" color={colors.textSecondary} style={styles.emptyText}>
-          No sets yet — create one above.
+          {t('library:sets.noSets', 'No sets yet — create one above.')}
         </Typography>
       ) : (
         <ScrollView style={styles.setList} showsVerticalScrollIndicator={false}>
@@ -131,7 +134,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
               <View style={styles.setInfo}>
                 <Typography preset="body" numberOfLines={1}>{set.title}</Typography>
                 <Typography preset="caption" color={colors.textSecondary}>
-                  {set._count?.cards ?? 0} cards
+                  {t('library:cards.cardCount', { count: set._count?.cards ?? 0, defaultValue: `${set._count?.cards ?? 0} cards` })}
                 </Typography>
               </View>
               {selectedSetId === set.id && (
@@ -144,7 +147,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
 
       <View style={styles.footer}>
         <Button
-          label={`Save ${cards.length} Card${cards.length !== 1 ? 's' : ''}`}
+          label={`${t('common:actions.save', 'Save')} ${cards.length} ${cards.length === 1 ? t('library:cards.card', 'Card') : t('library:cards.cards', 'Cards')}`}
           onPress={handleSave}
           disabled={!selectedSetId || isSaving}
           loading={isSaving}

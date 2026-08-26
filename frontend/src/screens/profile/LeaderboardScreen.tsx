@@ -27,7 +27,10 @@ function getQuote(rank: number) {
   return QUOTES.find(q => rank <= q.maxRank) ?? QUOTES[QUOTES.length - 1];
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboard'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -51,10 +54,10 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
       <Avatar uri={item.profileImage} name={item.name ?? ''} size="sm" />
       <View style={styles.info}>
         <Typography preset="label" numberOfLines={1}>
-          {item.name}{item.isMe ? ' (you)' : ''}
+          {item.name}{item.isMe ? ` (${t('common:status.you', 'you')})` : ''}
         </Typography>
         <Typography preset="caption" color={colors.textSecondary}>
-          Best {item.longestStreak} · {item.achievements} achievement{item.achievements === 1 ? '' : 's'}
+          {t('profile:friends.bestStreakAchievements', { longestStreak: item.longestStreak, achievements: item.achievements, defaultValue: `Best ${item.longestStreak} · ${item.achievements} achievements` })}
         </Typography>
       </View>
       <View style={styles.streak}>
@@ -62,12 +65,12 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         <Typography preset="h4" color={colors.warning}>{item.streak}</Typography>
       </View>
     </View>
-  ), [colors, isDark]);
+  ), [colors, isDark, t]);
 
-  if (error) return <ErrorState message="Could not load leaderboard" onRetry={refetch} />;
+  if (error) return <ErrorState message={t('profile:friends.couldNotLoadLeaderboard', 'Could not load leaderboard')} onRetry={refetch} />;
 
   return (
-    <Screen header={<ScreenHeader title="Leaderboard" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('profile:menu.leaderboard')} onBack={() => navigation.goBack()} />}>
       <View style={styles.flex}>
         <FlatList
         data={rows}
@@ -87,9 +90,9 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
           !isFetching ? (
             <EmptyState
               icon={<TrophyIcon size={48} color={colors.textDisabled} />}
-              title="No one to rank yet"
-              subtitle="Add friends to compete on study streaks."
-              ctaLabel="Find Friends"
+              title={t('profile:leaderboard.noRanking', 'No one to rank yet')}
+              subtitle={t('profile:leaderboard.noRankingSub', 'Add friends to compete on study streaks.')}
+              ctaLabel={t('profile:friends.findFriends', 'Find Friends')}
               onCta={() => navigation.navigate('SearchUsers')}
             />
           ) : null

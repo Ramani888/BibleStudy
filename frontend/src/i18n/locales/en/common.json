@@ -1,0 +1,71 @@
+{
+  "appName": "BibleStudy Pro",
+  "actions": {
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "done": "Done",
+    "doneCount": "Done — {{count}} sets",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "confirm": "Confirm",
+    "submit": "Submit",
+    "retry": "Try Again",
+    "search": "Search",
+    "share": "Share",
+    "copy": "Copy",
+    "undo": "Undo",
+    "upgrade": "Upgrade",
+    "viewAll": "View All",
+    "seeMore": "See More",
+    "filter": "Filter",
+    "clear": "Clear",
+    "clearAll": "Clear All",
+    "select": "Select",
+    "upload": "Upload",
+    "apply": "Apply",
+    "remove": "Remove",
+    "markAllRead": "Mark all read",
+    "searchPlaceholder": "Search…",
+    "clearSearch": "Clear search"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "sending": "Sending…",
+    "uploading": "Uploading...",
+    "success": "Success",
+    "error": "Oops!",
+    "noResults": "No results found",
+    "noMatchFor": "No results for \"{{query}}\"",
+    "empty": "Nothing here yet",
+    "offline": "You appear to be offline",
+    "copiedToClipboard": "Copied to clipboard",
+    "selected": "Selected",
+    "couldNotDelete": "Could not delete",
+    "unknownError": "Unknown error"
+  },
+  "filter": {
+    "all": "All"
+  },
+  "dialogs": {
+    "confirmTitle": "Are you sure?",
+    "deleteConfirmTitle": "Delete Confirmation",
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to leave?",
+    "discard": "Discard"
+  },
+  "time": {
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "daysAgo": "{{count}} days ago",
+    "minAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "at": "at",
+    "earlier": "Earlier"
+  }
+}

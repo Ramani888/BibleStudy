@@ -1,0 +1,61 @@
+{
+  "actions": {
+    "save": "I-save",
+    "saveChanges": "I-save ang mga Pagbabago",
+    "cancel": "Kanselahin",
+    "delete": "Tanggalin",
+    "edit": "I-edit",
+    "create": "Lumikha",
+    "done": "Tapos na",
+    "retry": "Subukan Muli",
+    "undo": "I-undo",
+    "next": "Susunod",
+    "back": "Bumalik",
+    "close": "Isara",
+    "search": "Maghanap",
+    "upload": "I-upload",
+    "rename": "Palitan ang Pangalan",
+    "share": "Ibahagi",
+    "continue": "Magpatuloy",
+    "submit": "Ipasa",
+    "confirm": "Kumpirmahin",
+    "learnMore": "Matuto pa",
+    "markAllRead": "Markahan lahat bilang nabasa",
+    "searchPlaceholder": "Maghanap…",
+    "clearSearch": "I-clear ang paghahanap"
+  },
+  "status": {
+    "loading": "Naglo-load...",
+    "saving": "Inililigtas...",
+    "sending": "Ipinapadala...",
+    "generating": "Bumubuo...",
+    "success": "Tagumpay",
+    "error": "Oops!",
+    "noResults": "Walang resulta",
+    "noMatchFor": "Walang resulta para sa \"{{query}}\"",
+    "empty": "Wala pa rito",
+    "offline": "Mukhang offline ka",
+    "copiedToClipboard": "Nakopya sa clipboard",
+    "selected": "Napili",
+    "couldNotDelete": "Hindi maalis",
+    "unknownError": "Hindi kilalang error"
+  },
+  "filter": {
+    "all": "Lahat"
+  },
+  "dialogs": {
+    "confirmTitle": "Sigurado ka ba?",
+    "deleteConfirmTitle": "Kumpirmahin ang Pagbura",
+    "unsavedChanges": "May mga pagbabagong hindi pa nai-save. Sigurado ka bang gusto mong umalis?",
+    "discard": "I-discard"
+  },
+  "time": {
+    "today": "Ngayong araw",
+    "yesterday": "Kahapon",
+    "daysAgo": "{{count}} araw ang nakalipas",
+    "minAgo": "{{count}}m ang nakalipas",
+    "hoursAgo": "{{count}}h ang nakalipas",
+    "at": "nang",
+    "earlier": "Mas maaga"
+  }
+}

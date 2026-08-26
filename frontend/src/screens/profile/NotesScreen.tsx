@@ -22,6 +22,7 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { PlusIcon, SearchIcon, SwapIcon, TrashIcon } from '../../components/icons';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import { getErrorMessage } from '../../api/client';
+import { useTranslation } from 'react-i18next';
 import { CARD_FILL_LIGHT, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
 
 const FAB_SIZE = 56;
@@ -49,6 +50,7 @@ function formatRelativeDate(iso: string): string {
 type Props = ProfileScreenProps<'Notes'>;
 
 export function NotesScreen({ navigation }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -94,20 +96,20 @@ export function NotesScreen({ navigation }: Props) {
 
   const handleDelete = useCallback((note: Note) => {
     showConfirm({
-      title: 'Delete Note',
-      message: `Delete "${note.title}"? This cannot be undone.`,
-      confirmLabel: 'Delete',
+      title: t('profile:notes.deleteNoteTitle', 'Delete Note'),
+      message: t('profile:notes.deleteNoteMessage', { title: note.title, defaultValue: `Delete "${note.title}"? This cannot be undone.` }),
+      confirmLabel: t('common:actions.delete', 'Delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteNote.mutateAsync(note.id);
-          Toast.show({ type: 'success', text1: 'Note deleted' });
+          Toast.show({ type: 'success', text1: t('profile:notes.noteDeleted', 'Note deleted') });
         } catch (e) {
           Toast.show({ type: 'error', text1: getErrorMessage(e) });
         }
       },
     });
-  }, [showConfirm, deleteNote]);
+  }, [showConfirm, deleteNote, t]);
 
   const renderItem = useCallback(({ item }: { item: Note }) => (
     <Swipeable
@@ -151,13 +153,13 @@ export function NotesScreen({ navigation }: Props) {
     </Swipeable>
   ), [navigation, handleDelete, colors]);
 
-  if (error) return <ErrorState message="Could not load notes" onRetry={refetch} />;
+  if (error) return <ErrorState message={t('profile:notes.couldNotLoadNotes', 'Could not load notes')} onRetry={refetch} />;
 
   return (
     <Screen
       header={
         <ScreenHeader
-          title="My Notes"
+          title={t('profile:notes.title')}
           onBack={() => navigation.goBack()}
           right={
             <View style={styles.headerActions}>
@@ -179,7 +181,7 @@ export function NotesScreen({ navigation }: Props) {
       {searchVisible && (
         <View style={styles.searchWrap}>
           <SearchBar
-            placeholder="Search notes…"
+            placeholder={t('profile:notes.searchPlaceholder', 'Search notes…')}
             value={search}
             onChangeText={setSearch}
             autoFocus
@@ -194,7 +196,7 @@ export function NotesScreen({ navigation }: Props) {
               style={[styles.tagFilterPill, { borderColor: !activeTag ? colors.accent : colors.border, backgroundColor: !activeTag ? colors.accentSoft : colors.background }]}
               onPress={() => setActiveTag(null)}
             >
-              <Typography preset="caption" color={!activeTag ? colors.accent : colors.textSecondary}>All</Typography>
+              <Typography preset="caption" color={!activeTag ? colors.accent : colors.textSecondary}>{t('common:filter.all', 'All')}</Typography>
             </Pressable>
             {NOTE_PREDEFINED_TAGS.map(tag => (
               <Pressable
@@ -224,8 +226,8 @@ export function NotesScreen({ navigation }: Props) {
         ListEmptyComponent={
           isLoading ? null : (
             <EmptyState
-                title="No notes yet"
-                subtitle="Tap + to write your first Bible study note"
+                title={t('profile:notes.noNotes', 'No notes yet')}
+                subtitle={t('profile:notes.noNotesSub', 'Tap + to write your first Bible study note')}
               />
           )
         }

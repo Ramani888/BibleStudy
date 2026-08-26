@@ -1,3 +1,5 @@
+import i18n from '../i18n';
+
 /**
  * Format a date string to a human-readable relative time or date.
  */
@@ -7,11 +9,11 @@ export function formatDate(dateStr: string): string {
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'Today';
-  if (diffDays === 1) return 'Yesterday';
-  if (diffDays < 7) return `${diffDays} days ago`;
+  if (diffDays === 0) return i18n.t('common:time.today', 'Today');
+  if (diffDays === 1) return i18n.t('common:time.yesterday', 'Yesterday');
+  if (diffDays < 7) return i18n.t('common:time.daysAgo', { count: diffDays, defaultValue: `${diffDays} days ago` });
 
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  return date.toLocaleDateString(i18n.language || 'en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
 /** "Today · 3:45 PM", "Yesterday · 9:00 AM", "Aug 5 · 2:30 PM" */
@@ -19,11 +21,11 @@ export function formatDateWithTime(dateStr: string): string {
   const date = new Date(dateStr);
   const now = new Date();
   const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
-  const time = date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const time = date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
-  if (diffDays === 0) return `Today · ${time}`;
-  if (diffDays === 1) return `Yesterday · ${time}`;
-  const day = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffDays === 0) return `${i18n.t('common:time.today', 'Today')} · ${time}`;
+  if (diffDays === 1) return `${i18n.t('common:time.yesterday', 'Yesterday')} · ${time}`;
+  const day = date.toLocaleDateString(i18n.language || 'en-US', { month: 'short', day: 'numeric' });
   return `${day} · ${time}`;
 }
 
@@ -43,9 +45,9 @@ export function formatBytes(bytes: number): string {
 export function formatDateTime(dateString: string | Date): string {
   const date = new Date(dateString);
   return (
-    date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
-    ' at ' +
-    date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    date.toLocaleDateString(i18n.language || 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
+    ` ${i18n.t('common:time.at', 'at')} ` +
+    date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
   );
 }
 
@@ -54,7 +56,7 @@ export function formatDateTime(dateString: string | Date): string {
  * e.g. "May 16, 2026"
  */
 export function formatDateOnly(dateString: string | Date): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
+  return new Date(dateString).toLocaleDateString(i18n.language || 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

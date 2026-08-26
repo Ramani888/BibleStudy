@@ -58,11 +58,14 @@ function getCanCheck(item: QuizItem, response: unknown): boolean {
   }
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function QuizItemView({
   item, initialResponse, onResponseChange, onSubmit,
   submitted, lastCorrect, correctAnswer,
   isLast, onNext, onFinish, bottomInset = 0,
 }: Props) {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -114,11 +117,11 @@ export function QuizItemView({
         {submitted && scored && (
           <View style={[styles.feedbackBanner, { backgroundColor: isCorrect ? colors.successSoft : colors.errorSurface }]}>
             <Typography preset="label" color={isCorrect ? colors.success : colors.difficultyHard} style={styles.feedbackTitle}>
-              {isCorrect ? '✓  Correct!' : '✗  Incorrect'}
+              {isCorrect ? `✓  ${t('quiz:inQuiz.correct')}` : `✗  ${t('quiz:inQuiz.incorrect')}`}
             </Typography>
             {!isCorrect && (
               <View style={styles.correctAnswerWrap}>
-                <Typography preset="caption" color={colors.textSecondary}>Correct answer</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>{t('quiz:inQuiz.correctAnswer')}</Typography>
                 <Typography preset="body" color={colors.textPrimary} style={styles.correctAnswerText}>{correctAnswer}</Typography>
               </View>
             )}
@@ -131,7 +134,7 @@ export function QuizItemView({
         {/* Non-MC scored, not yet submitted → full-width CHECK ANSWER */}
         {!submitted && scored && !isMC && (
           <Button
-            label="CHECK ANSWER"
+            label={t('common:actions.submit', 'CHECK ANSWER')}
             onPress={() => onSubmit(response)}
             disabled={!canCheck}
             style={styles.fullWidth}
@@ -143,7 +146,7 @@ export function QuizItemView({
         {/* After submit, or read mode → full-width CONTINUE / FINISH */}
         {(submitted || !scored) && (
           <Button
-            label={isLast ? 'FINISH' : 'CONTINUE'}
+            label={isLast ? t('common:actions.done', 'FINISH') : t('common:actions.continue', 'CONTINUE')}
             onPress={isLast ? onFinish : onNext}
             disabled={!allRevealed}
             style={styles.fullWidth}
@@ -261,13 +264,14 @@ function MC({ item, response, onChangeResponse, submitted, lastCorrect, correctA
 // ─── Type in ─────────────────────────────────────────────────────────────────
 
 function TypeIn({ item, response, onChangeResponse, submitted }: { item: any; response: string; onChangeResponse: (r: unknown) => void; submitted: boolean }) {
+  const { t } = useTranslation(['quiz', 'common']);
   const { colors } = useTheme();
   return (
     <TextInput
       style={[styles.input, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
       value={response}
       onChangeText={onChangeResponse}
-      placeholder="Your answer…"
+      placeholder={t('quiz:summary.yourAnswer', 'Your answer…')}
       placeholderTextColor={colors.textSecondary}
       multiline={item.mode === 'type_verbatim'}
       autoCapitalize="none"
@@ -376,6 +380,7 @@ function WordBank({ item, onChangeResponse, submitted }: { item: any; onChangeRe
 // ─── Chunks ───────────────────────────────────────────────────────────────────
 
 function Chunks({ item, response, onChangeResponse, submitted }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void; submitted: boolean }) {
+  const { t } = useTranslation(['quiz', 'common']);
   const { colors } = useTheme();
   const chunkKey = (c: string, i: number) => `${i}::${c}`;
   const unkey = (k: string) => k.slice(k.indexOf('::') + 2);
@@ -406,7 +411,7 @@ function Chunks({ item, response, onChangeResponse, submitted }: { item: any; re
         })}
       </View>
       {response.length > 0 && !submitted && (
-        <Button label="Undo" variant="outline" onPress={() => onChangeResponse(response.slice(0, -1))} style={styles.undoBtn} />
+        <Button label={t('common:actions.undo', 'Undo')} variant="outline" onPress={() => onChangeResponse(response.slice(0, -1))} style={styles.undoBtn} />
       )}
     </>
   );
@@ -415,6 +420,7 @@ function Chunks({ item, response, onChangeResponse, submitted }: { item: any; re
 // ─── Tap to Reveal (read mode) ────────────────────────────────────────────────
 
 function TapToReveal({ item, onAllRevealed }: { item: any; onAllRevealed: () => void }) {
+  const { t } = useTranslation('quiz');
   const { colors } = useTheme();
   const phrases = useMemo(() => splitPhrases(item.text), [item.text]);
   const [revealed, setRevealed] = useState(0);
@@ -442,7 +448,7 @@ function TapToReveal({ item, onAllRevealed }: { item: any; onAllRevealed: () => 
       {revealed < phrases.length && (
         <View style={[styles.tapHint, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}>
           <Typography preset="caption" color={colors.textSecondary}>
-            Tap to reveal ({revealed}/{phrases.length})
+            {t('quiz:play.tapToRevealProgress', { revealed, total: phrases.length, defaultValue: `Tap to reveal (${revealed}/${phrases.length})` })}
           </Typography>
         </View>
       )}

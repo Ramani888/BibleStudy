@@ -16,9 +16,11 @@ import { useLeaderboard } from '../../hooks';
 import type { Friendship } from '../../types/friends.types';
 import { getErrorMessage } from '../../api/client';
 
+import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'Friends'>;
 
 export function FriendsScreen({ navigation }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -33,15 +35,15 @@ export function FriendsScreen({ navigation }: Props) {
 
   const handleRemove = useCallback((friendId: string, name: string) => {
     removeFriend.mutate(friendId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: `${name} removed` }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.removedSuccess', { name, defaultValue: `${name} removed` }) }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  }, [removeFriend]);
+  }, [removeFriend, t]);
 
   const renderItem = useCallback(({ item }: { item: Friendship }) => {
     const streak = streakMap.get(item.friendId) ?? 0;
     const subtitle = streak > 0
-      ? `🔥 ${streak} day streak`
+      ? t('home:streak.flameDays', { count: streak, defaultValue: `🔥 ${streak} day streak` })
       : (item.friend.church ?? undefined);
 
     return (
@@ -74,13 +76,13 @@ export function FriendsScreen({ navigation }: Props) {
     );
   }, [streakMap, handleRemove, colors, isDark, navigation]);
 
-  if (error) return <ErrorState message="Could not load friends" onRetry={refetch} />;
+  if (error) return <ErrorState message={t('profile:friends.couldNotLoadFriends', 'Could not load friends')} onRetry={refetch} />;
 
   return (
     <Screen
       header={
         <ScreenHeader
-          title={`Friends${friends.length > 0 ? ` (${friends.length})` : ''}`}
+          title={t('profile:menu.friends')}
           onBack={() => navigation.goBack()}
           right={
             <View style={styles.headerActions}>
@@ -109,8 +111,8 @@ export function FriendsScreen({ navigation }: Props) {
           contentContainerStyle={friends.length === 0 ? styles.emptyContainer : styles.list}
           ListEmptyComponent={
             <EmptyState
-              title="No Friends Yet"
-              subtitle="Tap the + icon above to find friends"
+              title={t('profile:friends.noFriends', 'No Friends Yet')}
+              subtitle={t('profile:friends.noFriendsSub', 'Tap the + icon above to find friends')}
             />
           }
         />

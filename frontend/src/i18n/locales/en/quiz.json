@@ -1,0 +1,88 @@
+{
+  "hub": {
+    "title": "Quiz Hub",
+    "subtitle": "Test your knowledge and memorize scripture",
+    "practiceMode": "Practice Mode",
+    "practiceDescription": "Study at your own pace without timer pressure",
+    "timedMode": "Timed Challenge",
+    "timedDescription": "Score points against the clock",
+    "masteryMode": "Mastery Mode",
+    "masteryDescription": "Smart spaced-repetition testing for cards you need to review",
+    "recentActivity": "Recent Activity",
+    "searchPlaceholder": "Search quizzes…",
+    "noQuizzesYet": "No quizzes yet",
+    "noQuizzesSub": "Take your first quiz above to track your study progress.",
+    "noMatch": "No quizzes found",
+    "itemActions": "Quiz Actions",
+    "viewDetails": "View Details",
+    "viewSummary": "View Summary",
+    "reQuiz": "Re-Quiz",
+    "deleteAttempt": "Delete Attempt"
+  },
+  "setup": {
+    "title": "Quiz Setup",
+    "quizNamePlaceholder": "Quiz Name (optional)",
+    "selectSets": "Select Sets",
+    "startQuiz": "Start Quiz",
+    "selectMode": "Select Mode",
+    "chooseSets": "Choose Sets",
+    "chooseSetsLabel": "Tap to choose sets",
+    "allSets": "All Sets ({{count}})",
+    "noSets": "No sets available",
+    "noSetsSub": "Create some study sets first before taking a quiz.",
+    "startQuizBtn": "Start Quiz",
+    "selectSetsCount": "Select Sets ({{count}} selected)"
+  },
+  "inQuiz": {
+    "questionCount": "Question {{current}} of {{total}}",
+    "revealAnswer": "Reveal Answer",
+    "nextQuestion": "Next Question",
+    "correct": "Correct!",
+    "incorrect": "Keep practicing",
+    "yourAnswer": "Your Answer",
+    "correctAnswer": "Correct Answer",
+    "quitDialogTitle": "Quit Quiz?",
+    "quitDialogMessage": "Your progress in this quiz will be lost."
+  },
+  "results": {
+    "title": "Quiz Complete!",
+    "quizComplete": "Quiz Complete!",
+    "score": "Score",
+    "scoreFraction": "{{correct}} / {{total}} correct",
+    "accuracy": "Accuracy",
+    "timeTaken": "Time Taken",
+    "reviewQuestions": "Review",
+    "tryAgain": "Try Again",
+    "backToHub": "Back to Quiz Hub",
+    "newBest": "New best!",
+    "bestScore": "Best: {{score}}%",
+    "saveFailed": "Save failed: {{message}}",
+    "perfectScore": "Outstanding! Perfect Score!",
+    "goodJob": "Great job! Keep up the faithful study.",
+    "needsPractice": "Good effort! Review the cards you missed to master them."
+  },
+  "detail": {
+    "title": "Quiz Attempt",
+    "deleteTitle": "Delete Quiz",
+    "deleteMessage": "Remove this attempt from your history?",
+    "retake": "Retake Quiz",
+    "timeSpent": "Time spent",
+    "practiced": "Practiced",
+    "lastPracticed": "Last practiced",
+    "firstAttempt": "First attempt"
+  },
+  "summary": {
+    "title": "Quiz Summary",
+    "all": "All",
+    "correct": "Correct",
+    "incorrect": "Incorrect",
+    "noQuestions": "No questions match this filter."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "Type your answer…"
+  },
+  "modes": {
+    "mixMode": "Mix Mode",
+    "mixDesc": "Combines multiple question formats in one quiz."
+  }
+}

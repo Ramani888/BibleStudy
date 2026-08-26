@@ -1,0 +1,40 @@
+{
+  "greeting": {
+    "morning": "Magandang umaga",
+    "afternoon": "Magandang hapon",
+    "evening": "Magandang gabi",
+    "streak": "{{count}} araw na streak! Ipagpatuloy mo yan",
+    "streak_one": "Araw 1 ng streak! Magandang simula"
+  },
+  "stats": {
+    "dueToday": "Dapat pagaralan ngayon",
+    "cardsLearned": "Mga card na natutunan",
+    "streakDays": "Mga araw ng streak",
+    "totalSets": "Kabuuang set",
+    "cardsCount": "{{count}} card"
+  },
+  "dailyVerse": {
+    "title": "Talata ng Araw",
+    "reflection": "Pang-araw-araw na pagninilay",
+    "share": "Ibahagi ang talata",
+    "createCard": "Gumawa ng card mula sa talatang ito",
+    "copied": "Nakopya ang talata sa clipboard"
+  },
+  "recentSets": {
+    "title": "Ipagpatuloy ang Pag-aaral",
+    "seeAll": "Tingnan lahat",
+    "empty": "Walang mga kamakailang set",
+    "emptySub": "Magsimulang mag-aral ng set para makita rito",
+    "cardCount": "{{count}} card",
+    "cardCount_other": "{{count}} mga card",
+    "dueCount": "{{count}} dapat gawin",
+    "dueCount_other": "{{count}} dapat gawin"
+  },
+  "quickActions": {
+    "title": "Mabilisang Aksyon",
+    "newSet": "Bagong Set",
+    "askAI": "Magtanong sa AI",
+    "quickQuiz": "Mabilisang Pagsusulit",
+    "dailyVerse": "Pang-araw-araw na Talata"
+  }
+}

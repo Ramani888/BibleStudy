@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 
+import { useTranslation } from 'react-i18next';
 import { Button, Typography } from '../../../components/ui';
 import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useQuizAttemptSave } from '../../../hooks';
@@ -43,6 +44,7 @@ export function QuizResultScreen({
   total, correct, scorePct, timeSecs,
   summaryItems, retakeAttemptId, isFocused, onExit,
 }: Props) {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -94,7 +96,7 @@ export function QuizResultScreen({
   return (
     <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
       <StarIcon size={RESULT_ICON_SIZE} color={colors.warning} />
-      <Typography preset="h2" align="center">Quiz Complete!</Typography>
+      <Typography preset="h2" align="center">{t('quiz:results.quizComplete', 'Quiz Complete!')}</Typography>
       <Typography preset="body" color={colors.textSecondary} align="center" style={styles.sub}>
         {setTitle}
       </Typography>
@@ -102,7 +104,7 @@ export function QuizResultScreen({
       <View style={styles.scoreWrap}>
         <Typography style={[styles.scoreNumber, { color: scoreColor }]}>{scorePct}%</Typography>
         <Typography preset="caption" color={colors.textSecondary}>
-          {correct} / {total} correct
+          {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct} / ${total} correct` })}
         </Typography>
       </View>
 
@@ -119,12 +121,12 @@ export function QuizResultScreen({
         onPress={openSummary}
         style={({ pressed }) => [styles.reviewBtn, { opacity: pressed ? 0.85 : 1 }]}
         accessibilityRole="button"
-        accessibilityLabel="View summary"
+        accessibilityLabel={t('quiz:summary.title', 'View summary')}
       >
         <View style={[styles.reviewIcon, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
           <ListIcon size={22} color={colors.textSecondary} />
         </View>
-        <Typography preset="caption" color={colors.textSecondary}>Review</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{t('quiz:results.reviewQuestions', 'Review')}</Typography>
       </Pressable>
 
       {best !== null && (
@@ -134,7 +136,7 @@ export function QuizResultScreen({
             : <StarOutlineIcon size={16} color={colors.textSecondary} />
           }
           <Typography preset="caption" color={isNewBest ? colors.warning : colors.textSecondary}>
-            {isNewBest ? 'New best!' : `Best: ${best}%`}
+            {isNewBest ? t('quiz:results.newBest', 'New best!') : t('quiz:results.bestScore', { score: best, defaultValue: `Best: ${best}%` })}
           </Typography>
         </View>
       )}
@@ -142,13 +144,13 @@ export function QuizResultScreen({
       {isError && (
         <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.alert }]}>
           <Typography preset="caption" color={colors.alert}>
-            Save failed: {(error as any)?.message ?? 'Unknown error'}
+            {t('quiz:results.saveFailed', { message: (error as any)?.message ?? t('common:status.unknownError', 'Unknown error'), defaultValue: `Save failed: ${(error as any)?.message ?? 'Unknown error'}` })}
           </Typography>
         </View>
       )}
 
       <Button
-        label={isPending ? 'Saving…' : `Done (${countdown})`}
+        label={isPending ? t('common:status.saving') : `${t('common:actions.done')} (${countdown})`}
         onPress={onExit}
         disabled={isPending}
         fullWidth

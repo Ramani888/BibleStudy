@@ -22,6 +22,8 @@ import { fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../.
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { CreditTransaction, TransactionType } from '../../types';
 
+import { useTranslation } from 'react-i18next';
+
 const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | 'success' | 'info' | 'primary'; sign: string }> = {
   USAGE:    { label: 'Used',     variant: 'error',   sign: '−' },
   REWARD:   { label: 'Reward',   variant: 'success', sign: '+' },
@@ -32,7 +34,7 @@ const TYPE_CONFIG: Record<TransactionType, { label: string; variant: 'error' | '
 // ── Balance card (gradient hero) ─────────────────────────────────────────────
 
 function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
-  const { colors } = useTheme();
+  const { t } = useTranslation('profile');
   const { data, isLoading } = useCreditBalance();
   const { data: streakData } = useStreak();
   const streak = streakData?.streak ?? 0;
@@ -47,7 +49,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
       />
       <View style={styles.balanceHeader}>
         <Typography preset="caption" color="rgba(255,255,255,0.7)" style={styles.balanceLabel}>
-          CURRENT BALANCE
+          {t('profile:credits.availableBalance', 'CURRENT BALANCE')}
         </Typography>
         {streak > 0 && (
           <View style={styles.streakPill}>
@@ -64,7 +66,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
           <Typography preset="h2" color={palette.white} style={styles.balanceAmount}>
             {data?.balance ?? 0}
           </Typography>
-          <Typography preset="bodyLg" color="rgba(255,255,255,0.7)">credits</Typography>
+          <Typography preset="bodyLg" color="rgba(255,255,255,0.7)">{t('profile:credits.credits', 'credits')}</Typography>
         </View>
       )}
 
@@ -72,7 +74,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
         style={({ pressed }) => [styles.ctaBtn, pressed && { opacity: 0.85 }]}
         onPress={onGetMore}
       >
-        <Typography preset="label" color={palette.indigo500} style={styles.ctaBtnText}>Get More Credits</Typography>
+        <Typography preset="label" color={palette.indigo500} style={styles.ctaBtnText}>{t('profile:credits.getMore', 'Get More Credits')}</Typography>
       </Pressable>
     </View>
   );
@@ -81,6 +83,7 @@ function BalanceCard({ onGetMore }: { onGetMore: () => void }) {
 // ── Screen ────────────────────────────────────────────────────────────────────
 
 export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const qc = useQueryClient();
@@ -112,7 +115,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
       <View style={styles.txRow}>
         <View style={styles.txLeft}>
           <View style={styles.txTopRow}>
-            <Badge label={cfg.label} variant={cfg.variant} />
+            <Badge label={t(`profile:credits.types.${item.type.toLowerCase()}`, cfg.label)} variant={cfg.variant} />
             <Typography preset="caption" color={colors.textDisabled}>
               {formatDate(item.createdAt)}
             </Typography>
@@ -129,7 +132,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   }, [colors, amountColor]);
 
   return (
-    <Screen edges={['top']} header={<ScreenHeader title="Credits" onBack={() => navigation.goBack()} />}>
+    <Screen edges={['top']} header={<ScreenHeader title={t('profile:credits.title')} onBack={() => navigation.goBack()} />}>
       <View style={styles.flex}>
         <FlatList
           data={transactions}
@@ -154,7 +157,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
               <WeeklyChart />
 
               <Spacer size={spacing.xxl} />
-              <Typography preset="h4" style={styles.historyTitle}>Transaction History</Typography>
+              <Typography preset="h4" style={styles.historyTitle}>{t('profile:credits.history', 'Transaction History')}</Typography>
               <Divider marginV={0} />
             </>
           }
@@ -164,8 +167,8 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
               <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
             ) : !isLoading ? (
               <EmptyState
-                title="No transactions yet"
-                subtitle="Credits you earn or use will appear here"
+                title={t('profile:credits.noTransactions', 'No transactions yet')}
+                subtitle={t('profile:credits.noTransactionsSub', 'Credits you earn or use will appear here')}
                 style={styles.emptyState}
               />
             ) : (

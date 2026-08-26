@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -26,11 +27,11 @@ const DEFAULTS: NotificationPrefs = {
   system:         true,
 };
 
-const SETTINGS: { key: keyof NotificationPrefs; label: string; description: string }[] = [
-  { key: 'friendRequests', label: 'Friend Requests',  description: 'When someone sends you a friend request' },
-  { key: 'friendAccepted', label: 'Friend Accepted',  description: 'When someone accepts your friend request' },
-  { key: 'achievements',   label: 'Achievements',     description: 'When you unlock a new achievement' },
-  { key: 'system',         label: 'System',           description: 'App announcements and important updates' },
+const SETTING_KEYS: { key: keyof NotificationPrefs; labelKey: string; defaultLabel: string; descKey: string; defaultDesc: string }[] = [
+  { key: 'friendRequests', labelKey: 'friendRequests', defaultLabel: 'Friend Requests', descKey: 'friendRequestsDesc', defaultDesc: 'When someone sends you a friend request' },
+  { key: 'friendAccepted', labelKey: 'friendAccepted', defaultLabel: 'Friend Accepted', descKey: 'friendAcceptedDesc', defaultDesc: 'When someone accepts your friend request' },
+  { key: 'achievements',   labelKey: 'achievements',   defaultLabel: 'Achievements',   descKey: 'achievementsDesc',   defaultDesc: 'When you unlock a new achievement' },
+  { key: 'system',         labelKey: 'system',         defaultLabel: 'System',         descKey: 'systemDesc',         defaultDesc: 'App announcements and important updates' },
 ];
 
 function PreferenceCard({
@@ -55,6 +56,7 @@ function PreferenceCard({
 }
 
 export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'NotificationSettings'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const isDark = theme.name === 'dark';
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
@@ -72,17 +74,17 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
   };
 
   return (
-    <Screen header={<ScreenHeader title="Notifications" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('profile:menu.notifications')} onBack={() => navigation.goBack()} />}>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <Typography preset="caption" color={theme.colors.textSecondary} style={styles.hint}>
-          Choose which notifications you'd like to receive.
+          {t('profile:notificationSettings.hint', "Choose which notifications you'd like to receive.")}
         </Typography>
         <View style={styles.list}>
-          {SETTINGS.map(s => (
+          {SETTING_KEYS.map(s => (
             <PreferenceCard
               key={s.key}
-              title={s.label}
-              description={s.description}
+              title={t(`profile:notificationSettings.${s.labelKey}`, s.defaultLabel)}
+              description={t(`profile:notificationSettings.${s.descKey}`, s.defaultDesc)}
               value={prefs[s.key]}
               onToggle={() => toggle(s.key)}
               isDark={isDark}

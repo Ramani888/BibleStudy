@@ -1,0 +1,40 @@
+{
+  "greeting": {
+    "morning": "Bonjour",
+    "afternoon": "Bon après-midi",
+    "evening": "Bonsoir",
+    "streak": "{{count}} jours d'affilée ! Continuez comme ça",
+    "streak_one": "1er jour d'affilée ! Excellent début"
+  },
+  "stats": {
+    "dueToday": "À réviser aujourd'hui",
+    "cardsLearned": "Cartes apprises",
+    "streakDays": "Jours d'affilée",
+    "totalSets": "Total des séries",
+    "cardsCount": "{{count}} cartes"
+  },
+  "dailyVerse": {
+    "title": "Verset du Jour",
+    "reflection": "Méditation quotidienne",
+    "share": "Partager le verset",
+    "createCard": "Créer une carte avec ce verset",
+    "copied": "Verset copié dans le presse-papiers"
+  },
+  "recentSets": {
+    "title": "Continuer l'Étude",
+    "seeAll": "Voir tout",
+    "empty": "Aucune série récente",
+    "emptySub": "Commencez à étudier une série pour la voir ici",
+    "cardCount": "{{count}} carte",
+    "cardCount_other": "{{count}} cartes",
+    "dueCount": "{{count}} à réviser",
+    "dueCount_other": "{{count}} à réviser"
+  },
+  "quickActions": {
+    "title": "Actions Rapides",
+    "newSet": "Nouvelle Série",
+    "askAI": "Demander à l'IA",
+    "quickQuiz": "Quiz Rapide",
+    "dailyVerse": "Verset Quotidien"
+  }
+}

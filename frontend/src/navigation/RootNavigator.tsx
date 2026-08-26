@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import messaging from '@react-native-firebase/messaging';
 
 import { useAuthStore } from '../store';
@@ -24,8 +23,6 @@ import { QuizScreen } from '../screens/quiz/QuizScreen';
 import { QuizSummaryScreen } from '../screens/quiz/QuizSummaryScreen';
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
-
-const ONBOARDING_KEY = '@onboarding_seen';
 
 function SplashScreen() {
   const { colors } = useTheme();
@@ -56,10 +53,10 @@ export function RootNavigator() {
 
   useEffect(() => {
     Promise.all([
-      AsyncStorage.getItem(ONBOARDING_KEY),
+      storage.getOnboardingSeen(),
       storage.getTosAccepted(),
-    ]).then(([onboardingVal, tos]) => {
-      setHasOnboarded(onboardingVal === 'true');
+    ]).then(([onboarded, tos]) => {
+      setHasOnboarded(onboarded);
       setOnboardingChecked(true);
       setTosAccepted(tos);
       setTosChecked(true);

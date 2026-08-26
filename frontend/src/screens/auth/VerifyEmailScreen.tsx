@@ -11,9 +11,11 @@ import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { verifyEmailSchema, type VerifyEmailFormData } from '../../utils/validators';
 import { spacing, useTheme } from '../../theme';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'VerifyEmail'>) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
   const { email }      = route.params;
   const verifyEmail    = useAuthStore(s => s.verifyEmail);
@@ -32,15 +34,15 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     try {
       await verifyEmail({ email, otp: data.otp });
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Verification failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('auth:verificationFailed', 'Verification failed'), text2: getErrorMessage(err) });
     }
-  }, [email, verifyEmail]);
+  }, [email, verifyEmail, t]);
 
   const handleResend = useCallback(async () => {
     setResending(true);
     try {
       await authApi.resendVerification({ email });
-      Toast.show({ type: 'success', text1: 'Code resent', text2: 'Check your inbox.' });
+      Toast.show({ type: 'success', text1: t('auth:codeResent', 'Code resent'), text2: t('auth:checkInbox', 'Check your inbox.') });
       setCooldown(30);
       cooldownRef.current = setInterval(() => {
         setCooldown(s => {
@@ -49,30 +51,30 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
         });
       }, 1000);
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Could not resend', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('auth:couldNotResend', 'Could not resend'), text2: getErrorMessage(err) });
     } finally {
       setResending(false);
     }
-  }, [email]);
+  }, [email, t]);
 
-  const subtitle = useMemo(() => `We sent a 6-digit code to\n${email}`, [email]);
+  const subtitle = useMemo(() => t('verifyEmailSubtitle', { email }), [email, t]);
 
   return (
     <AuthLayout
-      title="Check your email"
+      title={t('verifyEmail')}
       subtitle={subtitle}
       footer={
         <>
-          <Button label="Verify Email" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('verifyEmail')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending || cooldown > 0} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={resending || cooldown > 0 ? colors.textDisabled : colors.accent} align="center">
-              {resending ? 'Sending…' : cooldown > 0 ? `Resend code in ${cooldown}s` : 'Resend code'}
+              {resending ? t('common:status.sending', 'Sending…') : cooldown > 0 ? t('auth:resendCooldown', { seconds: cooldown, defaultValue: `Resend code in ${cooldown}s` }) : t('resendCode')}
             </Typography>
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
-              Back to{' '}
-              <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
+              {t('auth:backTo', 'Back to')}{' '}
+              <Typography preset="bodySm" color={colors.accent}>{t('signIn')}</Typography>
             </Typography>
           </Pressable>
         </>
@@ -80,7 +82,7 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
     >
       <View>
         <View style={styles.codeContainer}>
-          <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
+          <Typography preset="label" color={colors.textSecondary}>{t('verifyEmail')}</Typography>
           <Controller
             name="otp"
             control={control}

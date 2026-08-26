@@ -23,6 +23,7 @@ import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirm
 import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { detectTags } from '../../utils/tagDetector';
 import { getErrorMessage } from '../../api';
+import { useTranslation } from 'react-i18next';
 import { layout, spacing, useTheme } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, SuggestedCard } from '../../types';
@@ -31,14 +32,8 @@ const ICON_SIZE = 20;
 const EMPTY_ICON_SIZE = 48;
 const TYPING_INDICATOR = '__typing__' as const;
 
-const SUGGESTIONS = [
-  'What does the Gospel of John teach about eternal life?',
-  'Explain the Sermon on the Mount',
-  'What is the significance of the Psalms?',
-  'Who were the twelve apostles?',
-];
-
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
+  const { t } = useTranslation(['ai', 'common']);
   const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
 
@@ -102,7 +97,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       if (isBalanceLoading) return;
 
       if (creditBalance <= 0) {
-        Toast.show({ type: 'error', text1: 'No credits', text2: 'Claim your daily credit from the Home screen.' });
+        Toast.show({ type: 'error', text1: t('ai:chat.noCredits', 'No credits'), text2: t('ai:chat.noCreditsSub', 'Claim your daily credit from the Home screen.') });
         return;
       }
 
@@ -161,12 +156,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           },
           onError: err => {
             setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
-            Toast.show({ type: 'error', text1: 'Could not get response', text2: getErrorMessage(err) });
+            Toast.show({ type: 'error', text1: t('ai:chat.couldNotGetResponse', 'Could not get response'), text2: getErrorMessage(err) });
           },
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att, t],
   );
 
   useEffect(() => {
@@ -218,12 +213,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           },
           onError: err => {
             setMessages(prev => prev.map(m => m.id === item.id ? item : m));
-            Toast.show({ type: 'error', text1: 'Could not regenerate response', text2: getErrorMessage(err) });
+            Toast.show({ type: 'error', text1: t('ai:chat.couldNotRegenerate', 'Could not regenerate response'), text2: getErrorMessage(err) });
           },
         },
       );
     },
-    [messages, sendMessage, sessionId, unmarkSaved, setMessages],
+    [messages, sendMessage, sessionId, unmarkSaved, setMessages, t],
   );
 
   // ─── Sheet actions ────────────────────────────────────────────────────────
@@ -236,8 +231,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const handleCopyMessage = useCallback(() => {
     if (!sheet.message) return;
     Clipboard.setString(sheet.message.text);
-    Toast.show({ type: 'success', text1: 'Copied to clipboard' });
-  }, [sheet.message]);
+    Toast.show({ type: 'success', text1: t('common:status.copiedToClipboard', 'Copied to clipboard') });
+  }, [sheet.message, t]);
 
   const handleShareMessage = useCallback(() => {
     if (!sheet.message) return;
@@ -248,11 +243,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     const chatId = sheet.message?.chatId;
     if (!chatId) return;
     if (bookmarkedChatIds.has(chatId)) {
-      removeBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmark removed' }) });
+      removeBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarkRemoved', 'Bookmark removed') }) });
     } else {
-      addBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: 'Bookmarked' }) });
+      addBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarked', 'Bookmarked') }) });
     }
-  }, [sheet.message, bookmarkedChatIds, removeBookmark, addBookmark]);
+  }, [sheet.message, bookmarkedChatIds, removeBookmark, addBookmark, t]);
 
   const handleExport = useCallback(() => {
     const exportable = messages.filter(m => m.text !== TYPING_INDICATOR);
@@ -265,38 +260,46 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   const handleClearChat = useCallback(() => {
     if (messages.length === 0) return;
-    show({ title: 'New Conversation', message: 'Clear the current chat and start fresh?', confirmLabel: 'Clear', variant: 'danger', onConfirm: () => clearChat() });
-  }, [messages.length, show, clearChat]);
+    show({ title: t('ai:chat.newConversation', 'New Conversation'), message: t('ai:chat.clearConfirmMessage', 'Clear the current chat and start fresh?'), confirmLabel: t('common:actions.clear', 'Clear'), variant: 'danger', onConfirm: () => clearChat() });
+  }, [messages.length, show, clearChat, t]);
 
-  const handleSaveCards = useCallback(async (setId: string) => {
+  const handleSaveCards = useCallback(async (setId: string, selectedCards?: SuggestedCard[]) => {
+    const cardsToSave = selectedCards ?? saveModal.cards;
     try {
-      await bulkCreateCards({ setId, cards: saveModal.cards });
-      Toast.show({ type: 'success', text1: `${saveModal.cards.length} card${saveModal.cards.length !== 1 ? 's' : ''} saved!` });
+      await bulkCreateCards({ setId, cards: cardsToSave });
+      Toast.show({ type: 'success', text1: t('ai:chat.cardsSavedToast', { count: cardsToSave.length, defaultValue: `${cardsToSave.length} cards saved!` }) });
       markSaved(saveModal.messageId);
       if (saveModal.chatId) markCardsSaved(saveModal.chatId);
       setSaveModal({ visible: false, cards: [], messageId: '' });
     } catch (e) {
-      Toast.show({ type: 'error', text1: 'Failed to save cards', text2: getErrorMessage(e) });
+      Toast.show({ type: 'error', text1: t('ai:chat.failedToSaveCards', 'Failed to save cards'), text2: getErrorMessage(e) });
       throw e;
     }
-  }, [bulkCreateCards, saveModal, markCardsSaved, markSaved]);
+  }, [bulkCreateCards, saveModal, markCardsSaved, markSaved, t]);
 
   const isCurrentMessageBookmarked = sheet.message?.chatId ? bookmarkedChatIds.has(sheet.message.chatId) : false;
 
   const sheetActions = useMemo(() => sheet.message ? [
-    { label: 'Copy',  icon: CopyIcon,  onPress: handleCopyMessage },
-    { label: 'Share', icon: ShareIcon, onPress: handleShareMessage },
+    { label: t('common:actions.copy', 'Copy'),  icon: CopyIcon,  onPress: handleCopyMessage },
+    { label: t('common:actions.share', 'Share'), icon: ShareIcon, onPress: handleShareMessage },
     ...(sheet.message.role === 'ai' ? [
-      { label: 'Regenerate', icon: RefreshIcon, onPress: () => sheet.message && handleRegenerate(sheet.message), disabled: isPending },
-      { label: isCurrentMessageBookmarked ? 'Remove Bookmark' : 'Bookmark', icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon, onPress: handleToggleBookmark, disabled: !sheet.message.chatId },
-      { label: 'Save as Card', icon: BookmarkIcon, onPress: () => {
+      { label: t('ai:chat.regenerate', 'Regenerate'), icon: RefreshIcon, onPress: () => sheet.message && handleRegenerate(sheet.message), disabled: isPending },
+      { label: isCurrentMessageBookmarked ? t('ai:chat.removeBookmark', 'Remove Bookmark') : t('ai:chat.bookmark', 'Bookmark'), icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon, onPress: handleToggleBookmark, disabled: !sheet.message.chatId },
+      { label: t('ai:chat.saveAsCard', 'Save as Card'), icon: BookmarkIcon, onPress: () => {
         if (!sheet.message) return;
         setSaveModal({ visible: true, cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }], messageId: sheet.message.id, chatId: sheet.message.chatId });
       }},
     ] : []),
   ] : [],
   [sheet.message, handleCopyMessage, handleShareMessage, handleRegenerate, isPending,
-   isCurrentMessageBookmarked, handleToggleBookmark]);
+   isCurrentMessageBookmarked, handleToggleBookmark, t]);
+
+  const suggestions = useMemo(() => [
+    t('ai:suggestions.0', { defaultValue: 'What does the Gospel of John teach about eternal life?' }),
+    t('ai:suggestions.1', { defaultValue: 'Explain the Sermon on the Mount' }),
+    t('ai:suggestions.2', { defaultValue: 'What is the significance of the Psalms?' }),
+    t('ai:suggestions.3', { defaultValue: 'Who were the twelve apostles?' }),
+  ], [t]);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
@@ -326,8 +329,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             <SparklesIcon size={ICON_SIZE} color={colors.textOnAccent} />
           </View>
           <View>
-            <Typography preset="h4">AI Bible Assistant</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Powered by Claude</Typography>
+            <Typography preset="h4">{t('ai:title')}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('ai:chat.poweredBy', 'Powered by Claude')}</Typography>
           </View>
         </View>
         <View style={styles.headerRight}>
@@ -354,12 +357,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         ListEmptyComponent={
           <View style={styles.emptyWrap}>
             <SparklesIcon size={EMPTY_ICON_SIZE} color={colors.accent} />
-            <Typography preset="h4" align="center">Ask anything about the Bible</Typography>
+            <Typography preset="h4" align="center">{t('ai:empty.headline')}</Typography>
             <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
-              Theology, history, verses, devotional insights — I'm here to help.
+              {t('ai:empty.subtitle')}
             </Typography>
             <View style={styles.suggestions}>
-              {SUGGESTIONS.map(s => (
+              {suggestions.map(s => (
                 <Pressable
                   key={s}
                   style={({ pressed }) => [styles.suggestion, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
@@ -371,7 +374,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
               ))}
             </View>
             <Typography preset="caption" color={colors.textSecondary} align="center" style={styles.emptySub}>
-              AI answers cite Bible verses but may contain errors. Verify important interpretations with your pastor or a trusted commentary.
+              {t('ai:chat.disclaimer', 'AI answers cite Bible verses but may contain errors. Verify important interpretations with your pastor or a trusted commentary.')}
             </Typography>
           </View>
         }
@@ -392,9 +395,9 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onUpgrade={goPaywall}
       />
 
-      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? 'Uploading…' : 'Attach a file'} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
-      <ActionSheet visible={att.pickerVisible} title="Choose from My Media" actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
-      <ActionSheet visible={sheet.visible} title={sheet.message?.role === 'user' ? 'Your message' : 'AI response'} actions={sheetActions} onClose={() => setSheet({ visible: false, message: null })} />
+      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('ai:chat.attachFile', 'Attach a file')} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
+      <ActionSheet visible={att.pickerVisible} title={t('ai:chat.chooseMedia', 'Choose from My Media')} actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
+      <ActionSheet visible={sheet.visible} title={sheet.message?.role === 'user' ? t('ai:chat.yourMessage', 'Your message') : t('ai:chat.aiResponse', 'AI response')} actions={sheetActions} onClose={() => setSheet({ visible: false, message: null })} />
 
       <CardProposalSheet visible={saveModal.visible} cards={saveModal.cards} onSave={handleSaveCards} onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })} />
 
@@ -403,10 +406,10 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       {/* Content policy — one-time, before first attachment */}
       <ConfirmDialog
         visible={att.policyDialogVisible}
-        title="Content Policy"
-        message={"Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines."}
-        confirmLabel="I Agree"
-        cancelLabel="Cancel"
+        title={t('ai:chat.contentPolicy', 'Content Policy')}
+        message={t('ai:chat.contentPolicyMsg', 'Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines.')}
+        confirmLabel={t('common:actions.agree', 'I Agree')}
+        cancelLabel={t('common:actions.cancel', 'Cancel')}
         onConfirm={att.acceptPolicy}
         onCancel={() => att.setPolicyDialogVisible(false)}
       />

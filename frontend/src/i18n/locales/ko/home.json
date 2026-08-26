@@ -1,0 +1,40 @@
+{
+  "greeting": {
+    "morning": "좋은 아침입니다",
+    "afternoon": "좋은 오후입니다",
+    "evening": "좋은 저녁입니다",
+    "streak": "{{count}}일 연속 학습 중! 계속 힘내세요",
+    "streak_one": "연속 학습 1일 차! 좋은 시작입니다"
+  },
+  "stats": {
+    "dueToday": "오늘 복습할 카드",
+    "cardsLearned": "학습 완료한 카드",
+    "streakDays": "연속 학습일",
+    "totalSets": "전체 세트",
+    "cardsCount": "{{count}}개 카드"
+  },
+  "dailyVerse": {
+    "title": "오늘의 말씀",
+    "reflection": "말씀 묵상",
+    "share": "말씀 공유하기",
+    "createCard": "이 말씀으로 카드 만들기",
+    "copied": "말씀이 클립보드에 복사되었습니다"
+  },
+  "recentSets": {
+    "title": "학습 이어하기",
+    "seeAll": "전체 보기",
+    "empty": "최근 세트가 없습니다",
+    "emptySub": "세트 학습을 시작하면 여기에 표시됩니다",
+    "cardCount": "{{count}}개 카드",
+    "cardCount_other": "{{count}}개 카드",
+    "dueCount": "{{count}}개 복습",
+    "dueCount_other": "{{count}}개 복습"
+  },
+  "quickActions": {
+    "title": "빠른 실행",
+    "newSet": "새 세트",
+    "askAI": "AI에게 질문",
+    "quickQuiz": "빠른 퀴즈",
+    "dailyVerse": "오늘의 말씀"
+  }
+}

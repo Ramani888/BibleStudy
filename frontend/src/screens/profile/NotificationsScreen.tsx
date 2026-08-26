@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
+import { useTranslation } from 'react-i18next';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { formatDateTime } from '../../utils/formatters';
 import { layout, palette, spacing, useTheme } from '../../theme';
@@ -65,6 +66,7 @@ function groupByDate(notifications: Notification[]): { title: string; data: Noti
 }
 
 export function NotificationsScreen({ navigation, route }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const { colors } = useTheme();
   const { data, isLoading, isFetching, error, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
@@ -108,23 +110,26 @@ export function NotificationsScreen({ navigation, route }: Props) {
         <Pressable
           style={({ pressed }) => [
             styles.notificationRow,
-            { backgroundColor: colors.surface },
-            !item.read && { backgroundColor: colors.accentSoft },
+            { backgroundColor: item.read ? colors.background : colors.surfaceMuted },
             pressed && styles.rowPressed,
           ]}
           onPress={() => {
             if (!item.read) markRead.mutate(item.id);
-            if (item.type === 'friend_request') navigation.navigate('FriendRequests');
-            else if (item.type === 'friend_accepted') navigation.navigate('Friends');
-            else if (item.type === 'achievement') navigation.navigate('Achievements');
+            if (item.type === 'friend_request' || item.type === 'friend_accepted') {
+              navigation.navigate('Friends');
+            } else if (item.type === 'achievement') {
+              navigation.navigate('Achievements');
+            }
           }}
         >
-          <View style={[styles.iconWrapper, { backgroundColor: colors.surfaceMuted }]}>
-            <NotifIcon size={20} color={item.read ? colors.textSecondary : colors.accent} />
+          <View style={[styles.iconWrapper, { backgroundColor: colors.accentSoft }]}>
+            <NotifIcon size={20} color={colors.accent} />
           </View>
           <View style={styles.info}>
-            <Typography preset="label" numberOfLines={1}>{item.title}</Typography>
-            <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
+            <Typography preset="label" color={colors.textPrimary}>
+              {item.title}
+            </Typography>
+            <Typography preset="bodySm" color={colors.textSecondary} numberOfLines={2}>
               {item.body}
             </Typography>
             <Typography preset="caption" color={colors.textDisabled}>
@@ -137,19 +142,27 @@ export function NotificationsScreen({ navigation, route }: Props) {
   }, [colors, markRead, deleteNotification, navigation]);
 
   const renderSectionHeader = useCallback(
-    ({ section: { title } }: { section: { title: string } }) => (
-      <View style={[styles.sectionHeader, { backgroundColor: colors.background }]}>
-        <Typography preset="caption" color={colors.textSecondary}>{title}</Typography>
-      </View>
-    ),
-    [colors.textSecondary, colors.background],
+    ({ section: { title } }: { section: { title: string } }) => {
+      const sectionTitle =
+        title === 'Today'
+          ? t('common:time.today', 'Today')
+          : title === 'Yesterday'
+          ? t('common:time.yesterday', 'Yesterday')
+          : t('common:time.earlier', 'Earlier');
+      return (
+        <View style={[styles.sectionHeader, { backgroundColor: colors.background }]}>
+          <Typography preset="caption" color={colors.textSecondary}>{sectionTitle}</Typography>
+        </View>
+      );
+    },
+    [colors.textSecondary, colors.background, t],
   );
 
-  if (error) return <ErrorState message="Could not load notifications" onRetry={refetch} />;
+  if (error) return <ErrorState message={t('profile:notifications.couldNotLoadNotifications', 'Could not load notifications')} onRetry={refetch} />;
 
   const headerRight = unreadCount > 0 ? (
     <Pressable onPress={() => markAllRead.mutate()} hitSlop={8} style={({ pressed }) => pressed && styles.iconBtnPressed}>
-      <Typography preset="label" color={colors.accent}>Mark all read</Typography>
+      <Typography preset="label" color={colors.accent}>{t('common:actions.markAllRead')}</Typography>
     </Pressable>
   ) : undefined;
 
@@ -158,7 +171,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
       edges={['top']}
       header={
         <ScreenHeader
-          title="Notifications"
+          title={t('profile:menu.notifications')}
           onBack={() => {
             if (route.params?.from === 'Home') {
               navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
@@ -182,7 +195,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
         contentContainerStyle={sections.length === 0 ? styles.emptyContainer : styles.list}
         ListEmptyComponent={
           !isLoading ? (
-            <EmptyState title="No Notifications" subtitle="You're all caught up!" />
+            <EmptyState title={t('profile:notifications.emptyTitle', 'No Notifications')} subtitle={t('profile:notifications.emptySubtitle', "You're all caught up!")} />
           ) : null
         }
       />

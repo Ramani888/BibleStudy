@@ -11,14 +11,9 @@ import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } fr
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
+import { useTranslation } from 'react-i18next';
 type Params = RootStackParamList['QuizSummary'];
 type Filter = 'all' | 'correct' | 'wrong';
-
-const FILTER_LABELS: { key: Filter; label: string }[] = [
-  { key: 'all',     label: 'All'     },
-  { key: 'correct', label: 'Correct' },
-  { key: 'wrong',   label: 'Wrong'   },
-];
 
 const MODE_LABEL: Record<string, string> = {
   mc: 'Multiple Choice', story_mc: 'Story MC',
@@ -27,6 +22,7 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizSummaryScreen() {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -60,7 +56,7 @@ export function QuizSummaryScreen() {
       <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
         <View style={styles.cardHeader}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.cardIndex}>
-            Q{item.index + 1} · {MODE_LABEL[item.mode] ?? item.mode}
+            Q{item.index + 1} · {t(`quiz:modes.${item.mode}`, MODE_LABEL[item.mode] ?? item.mode)}
           </Typography>
           {isRead
             ? null
@@ -79,14 +75,14 @@ export function QuizSummaryScreen() {
         ) : (
           <>
             <View style={styles.answerRow}>
-              <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>Your answer</Typography>
+              <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>{t('quiz:summary.yourAnswer', 'Your answer')}</Typography>
               <Typography preset="caption" color={item.isCorrect ? colors.success : colors.alert} style={styles.answerValue}>
                 {item.userAnswer}
               </Typography>
             </View>
             {!item.isCorrect && (
               <View style={styles.answerRow}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>Correct</Typography>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>{t('quiz:summary.correctAnswer', 'Correct')}</Typography>
                 <Typography preset="caption" color={colors.success} style={styles.answerValue}>
                   {item.correctAnswer}
                 </Typography>
@@ -96,28 +92,34 @@ export function QuizSummaryScreen() {
         )}
       </View>
     );
-  }, [colors, isDark]);
+  }, [colors, isDark, t]);
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       {scorePct >= 80 && <CelebrationBurst trigger={scorePct} originYFraction={0.25} />}
       <View style={{ paddingTop: insets.top }}>
-        <ScreenHeader title="Summary" onBack={handleBack} />
+        <ScreenHeader title={t('quiz:summary.title')} onBack={handleBack} />
       </View>
 
       {/* Score strip */}
       <View style={[styles.scoreStrip, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.divider }]}>
         <Typography preset="h3" style={{ color: scoreColor }}>{scorePct}%</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>{correct}/{total} correct · {title}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>
+          {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct}/${total} correct` })} · {title}
+        </Typography>
       </View>
 
       {/* Filter tabs */}
       <View style={[styles.tabs, { borderBottomColor: colors.divider }]}>
-        {FILTER_LABELS.map(({ key, label }) => (
+        {[
+          { key: 'all', label: t('common:filter.all', 'All') },
+          { key: 'correct', label: t('quiz:summary.correct', 'Correct') },
+          { key: 'wrong', label: t('quiz:summary.incorrect', 'Incorrect') },
+        ].map(({ key, label }) => (
           <Pressable
             key={key}
             style={({ pressed }) => [styles.tab, filter === key && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, pressed && styles.tabPressed]}
-            onPress={() => setFilter(key)}
+            onPress={() => setFilter(key as any)}
           >
             <Typography
               preset="label"
@@ -138,7 +140,7 @@ export function QuizSummaryScreen() {
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.empty}>
-            <Typography preset="body" color={colors.textSecondary} align="center">No items</Typography>
+            <Typography preset="body" color={colors.textSecondary} align="center">{t('common:status.noResults', 'No items')}</Typography>
           </View>
         }
       />

@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import { SetForm, type SetFormHandle } from './components/SetForm';
 import { Button, Screen, ScreenHeader } from '../../components/ui';
 import { useCreateSet } from '../../hooks';
@@ -9,16 +10,17 @@ import { layout, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'CreateSet'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   const { mutateAsync: createSet } = useCreateSet();
 
   const formRef = useRef<SetFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title="New Set" handle />;
+  const header = <ScreenHeader title={t('library:sets.createSet')} handle />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Create Set" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
+      <Button label={t('library:sets.createSet')} onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
 
@@ -36,7 +38,7 @@ export function CreateSetScreen({ navigation, route }: LibraryScreenProps<'Creat
             onSubmittingChange={setSubmitting}
             onSubmit={async data => {
               await createSet({ ...data, folderId: data.folderId ?? undefined, color: data.color ?? undefined, description: data.description || undefined });
-              Toast.show({ type: 'success', text1: 'Set created!' });
+              Toast.show({ type: 'success', text1: t('library:sets.setCreated', 'Set created!') });
               navigation.goBack();
             }}
           />

@@ -1,0 +1,93 @@
+{
+  "hub": {
+    "title": "Quiz Hub",
+    "subtitle": "Subukan ang iyong kaalaman sa Banal na Kasulatan",
+    "startQuiz": "Magsimula ng Bagong Pagsusulit",
+    "recentActivity": "Kamakailang Aktibidad",
+    "noActivity": "Walang kamakailang pagsusulit",
+    "noActivitySub": "Kumpletuhin ang isang pagsusulit upang makita ang iyong kasaysayan ng pag-aaral dito.",
+    "selectSet": "Pumili ng Study Set",
+    "selectMode": "Pumili ng Mode ng Pagsusulit"
+  },
+  "setup": {
+    "title": "Setup ng Pagsusulit",
+    "mode": "Mode ng Pagsusulit",
+    "modes": {
+      "multipleChoice": "Multiple Choice",
+      "multipleChoiceDesc": "Piliin ang tamang sagot mula sa 4 na pagpipilian",
+      "trueFalse": "Tama o Mali",
+      "trueFalseDesc": "Tukuyin kung tama ang pahayag o talata",
+      "typeIn": "I-type ang Sagot",
+      "typeInDesc": "I-type ang eksaktong sagot para sa mas mahusay na memorya",
+      "fillInBlank": "Punan ang Patlang",
+      "fillInBlankDesc": "Punan ang mga nawawalang salita sa talata"
+    },
+    "questionCount": "Bilang ng mga Tanong",
+    "allCards": "Lahat ng card ({{count}})",
+    "timer": "Limitasyon sa Oras bawat Tanong",
+    "noTimer": "Walang limitasyon sa oras",
+    "seconds": "{{count}} segundo",
+    "start": "Simulan ang Pagsusulit",
+    "pickSet": "Pumili ng set",
+    "chooseSet": "Pumili ng Set para sa Pagsusulit",
+    "allDone": "Tapos na ang lahat!",
+    "noSetsToQuiz": "Walang available na set para sa pagsusulit.",
+    "createSetFirst": "Gumawa muna ng set na may kahit 1 card."
+  },
+  "hud": {
+    "questionOf": "Tanong {{current}} ng {{total}}",
+    "score": "Puntos: {{score}}%",
+    "quit": "Lumabas",
+    "quitConfirmTitle": "Lumabas sa pagsusulit?",
+    "quitConfirmMessage": "Hindi mai-save ang iyong progreso sa pagsusulit na ito.",
+    "quitConfirmAction": "Lumabas sa Pagsusulit",
+    "resumeAction": "Ipagpatuloy"
+  },
+  "banners": {
+    "correct": "Tama!",
+    "incorrect": "Mali",
+    "timeUp": "Tapos na ang oras!",
+    "nextQuestion": "Susunod na Tanong",
+    "finishQuiz": "Tapusin ang Pagsusulit"
+  },
+  "result": {
+    "title": "Tapos na ang Pagsusulit",
+    "scoreLabel": "Iyong Puntos",
+    "perfectScore": "Perpektong Puntos! 🎉",
+    "greatJob": "Magaling! 👏",
+    "keepPracticing": "Magpatuloy sa Pagsasanay! 📖",
+    "needsReview": "Kailangang Balikan 💡",
+    "streakBonus": "+{{count}} Kredito sa Streak Bonus",
+    "timeSpent": "Oras na Nagamit",
+    "correctCount": "{{correct}} sa {{total}} ang Tama",
+    "accuracy": "Katumpakan",
+    "newBest": "Bagong tala!",
+    "bestScore": "Pinakamahusay: {{score}}%",
+    "saveError": "Hindi mai-save ang resulta ng pagsusulit",
+    "reviewSummary": "Suriin ang mga Sagot",
+    "studyAgain": "Mag-aral Muli",
+    "backToLibrary": "Bumalik sa Library"
+  },
+  "summary": {
+    "title": "Buod ng Pagsusulit",
+    "allQuestions": "Lahat ({{count}})",
+    "correctTab": "Tama ({{count}})",
+    "incorrectTab": "Mali ({{count}})",
+    "yourAnswer": "Iyong Sagot:",
+    "correctAnswer": "Tamang Sagot:",
+    "noIncorrect": "Walang maling sagot! Perpekto!",
+    "noCorrect": "Wala pang tamang sagot.",
+    "done": "Tapos na"
+  },
+  "detail": {
+    "headerTitle": "Kasaysayan ng Pagsusulit",
+    "firstAttempt": "Unang Pagsubok",
+    "practiced": "Nasanay nang {{count}} beses",
+    "practiced_other": "Nasanay nang {{count}} beses",
+    "lastPracticed": "Huling nasanay noong {{date}}"
+  },
+  "modesSheet": {
+    "chooseMode": "Pumili ng Mode sa Pag-aaral",
+    "startMode": "Simulan ang {{mode}} Mode"
+  }
+}

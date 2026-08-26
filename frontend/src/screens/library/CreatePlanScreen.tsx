@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import type { LibraryScreenProps } from '../../navigation/types';
 import { useSets, useCreatePlan } from '../../hooks';
 import { Button, Screen, ScreenHeader } from '../../components/ui';
@@ -13,6 +14,7 @@ import { useTheme, spacing, layout } from '../../theme';
 type Props = LibraryScreenProps<'CreatePlan'>;
 
 export function CreatePlanScreen({ navigation }: Props) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   const { data: sets = [], isLoading } = useSets();
   const createPlan = useCreatePlan();
@@ -31,18 +33,18 @@ export function CreatePlanScreen({ navigation }: Props) {
       { title: title.trim(), description: description.trim() || undefined, setIds: selected },
       {
         onSuccess: plan => {
-          Toast.show({ type: 'success', text1: 'Plan created' });
+          Toast.show({ type: 'success', text1: t('library:plans.planCreated', 'Plan created') });
           navigation.replace('PlanDetail', { planId: plan.id });
         },
-        onError: e => Toast.show({ type: 'error', text1: 'Could not create plan', text2: getErrorMessage(e) }),
+        onError: e => Toast.show({ type: 'error', text1: t('library:plans.couldNotCreatePlan', 'Could not create plan'), text2: getErrorMessage(e) }),
       },
     );
   };
 
-  const header = <ScreenHeader title="New Study Plan" handle />;
+  const header = <ScreenHeader title={t('library:plans.createPlan', 'Create Study Plan')} handle />;
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Create Plan" onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
+      <Button label={t('library:plans.createPlan', 'Create Study Plan')} onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
     </View>
   );
 
@@ -55,13 +57,13 @@ export function CreatePlanScreen({ navigation }: Props) {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.inputs}>
-          <Input placeholder="Plan title" value={title} onChangeText={setTitle} maxLength={200} />
-          <Input placeholder="Description (optional)" value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
+          <Input placeholder={t('library:plans.titlePlaceholder', 'Plan title')} value={title} onChangeText={setTitle} maxLength={200} />
+          <Input placeholder={t('library:plans.descPlaceholder', 'Description (optional)')} value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
         </View>
 
         <View>
           <Typography preset="label" color={colors.textSecondary} style={styles.label}>
-            Pick sets in order ({selected.length} selected)
+            {t('library:plans.pickSetsInOrder', { count: selected.length, defaultValue: `Pick sets in order (${selected.length} selected)` })}
           </Typography>
         </View>
 
@@ -69,7 +71,7 @@ export function CreatePlanScreen({ navigation }: Props) {
           <ActivityIndicator color={colors.accent} style={styles.loader} />
         ) : sets.length === 0 ? (
           <Typography preset="bodySm" color={colors.textSecondary} style={styles.empty}>
-            No sets yet — create some sets first.
+            {t('library:sets.noSets', 'No sets yet — create some sets first.')}
           </Typography>
         ) : (
           sets.map(set => {

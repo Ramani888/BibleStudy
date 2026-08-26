@@ -1,0 +1,93 @@
+{
+  "hub": {
+    "title": "Central de Quiz",
+    "subtitle": "Teste seus conhecimentos bíblicos",
+    "startQuiz": "Iniciar Novo Quiz",
+    "recentActivity": "Atividade Recente",
+    "noActivity": "Nenhum quiz recente",
+    "noActivitySub": "Complete um quiz para ver seu histórico de estudo aqui.",
+    "selectSet": "Selecionar um Conjunto de Estudo",
+    "selectMode": "Escolher Modo de Quiz"
+  },
+  "setup": {
+    "title": "Configuração do Quiz",
+    "mode": "Modo de Quiz",
+    "modes": {
+      "multipleChoice": "Múltipla Escolha",
+      "multipleChoiceDesc": "Escolha a resposta correta entre 4 opções",
+      "trueFalse": "Verdadeiro ou Falso",
+      "trueFalseDesc": "Decida se a afirmação ou versículo é verdadeiro",
+      "typeIn": "Digitar Resposta",
+      "typeInDesc": "Digite a resposta exata para máxima retenção",
+      "fillInBlank": "Preencher Lacunas",
+      "fillInBlankDesc": "Preencha as palavras que faltam no versículo"
+    },
+    "questionCount": "Quantidade de Perguntas",
+    "allCards": "Todos os cartões ({{count}})",
+    "timer": "Tempo Limite por Pergunta",
+    "noTimer": "Sem limite de tempo",
+    "seconds": "{{count}} segundos",
+    "start": "Iniciar Quiz",
+    "pickSet": "Escolher um conjunto",
+    "chooseSet": "Escolher Conjunto para Quiz",
+    "allDone": "Tudo pronto!",
+    "noSetsToQuiz": "Nenhum conjunto disponível para quiz.",
+    "createSetFirst": "Crie um conjunto com pelo menos 1 cartão primeiro."
+  },
+  "hud": {
+    "questionOf": "Pergunta {{current}} de {{total}}",
+    "score": "Pontuação: {{score}}%",
+    "quit": "Sair",
+    "quitConfirmTitle": "Sair do quiz?",
+    "quitConfirmMessage": "Seu progresso neste quiz não será salvo.",
+    "quitConfirmAction": "Sair do Quiz",
+    "resumeAction": "Continuar"
+  },
+  "banners": {
+    "correct": "Correto!",
+    "incorrect": "Incorreto",
+    "timeUp": "Tempo esgotado!",
+    "nextQuestion": "Próxima Pergunta",
+    "finishQuiz": "Finalizar Quiz"
+  },
+  "result": {
+    "title": "Quiz Concluído",
+    "scoreLabel": "Sua Pontuação",
+    "perfectScore": "Pontuação Perfeita! 🎉",
+    "greatJob": "Excelente Trabalho! 👏",
+    "keepPracticing": "Continue Praticando! 📖",
+    "needsReview": "Precisa de Revisão 💡",
+    "streakBonus": "+{{count}} Créditos de Bônus de Sequência",
+    "timeSpent": "Tempo Gasto",
+    "correctCount": "{{correct}} de {{total}} Corretas",
+    "accuracy": "Precisão",
+    "newBest": "Novo recorde!",
+    "bestScore": "Melhor: {{score}}%",
+    "saveError": "Não foi possível salvar o resultado do quiz",
+    "reviewSummary": "Revisar Respostas",
+    "studyAgain": "Estudar Novamente",
+    "backToLibrary": "Voltar para Biblioteca"
+  },
+  "summary": {
+    "title": "Resumo do Quiz",
+    "allQuestions": "Todas ({{count}})",
+    "correctTab": "Corretas ({{count}})",
+    "incorrectTab": "Incorretas ({{count}})",
+    "yourAnswer": "Sua Resposta:",
+    "correctAnswer": "Resposta Correta:",
+    "noIncorrect": "Nenhuma resposta incorreta! Trabalho perfeito!",
+    "noCorrect": "Nenhuma resposta correta ainda.",
+    "done": "Concluído"
+  },
+  "detail": {
+    "headerTitle": "Histórico do Quiz",
+    "firstAttempt": "Primeira Tentativa",
+    "practiced": "Praticado {{count}} vez",
+    "practiced_other": "Praticado {{count}} vezes",
+    "lastPracticed": "Praticado pela última vez em {{date}}"
+  },
+  "modesSheet": {
+    "chooseMode": "Escolher Modo de Estudo",
+    "startMode": "Iniciar Modo {{mode}}"
+  }
+}

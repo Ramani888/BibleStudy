@@ -32,7 +32,10 @@ const GOOGLE_DOCS_ERROR_DETECTOR = `
   true;
 `;
 
+import { useTranslation } from 'react-i18next';
+
 export function MediaPDFViewerScreen({ route, navigation }: Props) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
   const { url, name } = route.params;
 
@@ -47,11 +50,11 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
     return (
       <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
         <View style={styles.errorContainer}>
-          <Typography preset="h4" align="center" color={colors.textPrimary}>Preview unavailable</Typography>
+          <Typography preset="h4" align="center" color={colors.textPrimary}>{t('common:status.error', 'Preview unavailable')}</Typography>
           <Typography preset="body" align="center" color={colors.textSecondary} style={styles.errorMessage}>
-            This PDF could not be previewed in-app.
+            {t('profile:media.pdfPreviewError', 'This PDF could not be previewed in-app.')}
           </Typography>
-          <Button label="Open in browser" variant="outline" onPress={() => Linking.openURL(url)} style={styles.errorBtn} />
+          <Button label={t('common:actions.openBrowser', 'Open in browser')} variant="outline" onPress={() => Linking.openURL(url)} style={styles.errorBtn} />
         </View>
       </Screen>
     );

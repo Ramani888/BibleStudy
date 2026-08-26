@@ -19,22 +19,17 @@ import {
   UserIcon,
   UsersIcon,
 } from '../../components/icons';
+import { useTranslation } from 'react-i18next';
 import { useAuthStore } from '../../store';
 import { useSetStats, useConfirmDialog, useCreditBalance, useNoteStats, useStorageUsage, useStreak } from '../../hooks';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { fontFamily, fontSize, layout, palette, radius, spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { Plan } from '../../types';
 
 const APP_VERSION = '1.0.0';
 
-const PLAN_VARIANT: Record<Plan, 'neutral' | 'info' | 'primary'> = {
-  FREE: 'neutral',
-  STARTER: 'info',
-  PRO: 'primary',
-};
-
 export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
+  const { t } = useTranslation(['profile', 'common', 'home']);
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
@@ -67,17 +62,17 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const handleNavSettings     = useCallback(() => navigation.navigate('Settings'), [navigation]);
   const handleSignOut         = useCallback(() =>
     showConfirm({
-      title: 'Sign Out',
-      message: 'Are you sure you want to sign out?',
-      confirmLabel: 'Sign Out',
+      title: t('profile:settings.signOut'),
+      message: t('profile:settings.signOutConfirm'),
+      confirmLabel: t('profile:settings.signOut'),
       variant: 'danger',
       onConfirm: logout,
-    }), [showConfirm, logout]);
+    }), [showConfirm, logout, t]);
 
   return (
     <View style={[styles.safe, { backgroundColor: colors.background }]}>
       <View style={[styles.stickyHeader, { paddingTop: insets.top + 8, backgroundColor: colors.background }]}>
-        <Typography preset="h3" color={colors.textPrimary}>Profile</Typography>
+        <Typography preset="h3" color={colors.textPrimary}>{t('profile:title')}</Typography>
       </View>
       <ScrollView
         contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + 96 }]}
@@ -96,7 +91,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
             <View style={styles.profileText}>
               <Typography preset="h3" color={palette.white} style={styles.profileName}>{user?.name}</Typography>
               <Typography preset="caption" color={palette.white} style={styles.profileSub}>
-                {user?.plan ?? 'FREE'} · {streakData?.streak ?? 0} day streak 🔥
+                {user?.plan ?? 'FREE'} · {t('home:greeting.streakDays', { count: streakData?.streak ?? 0, defaultValue: `${streakData?.streak ?? 0} day streak` })} 🔥
               </Typography>
             </View>
             <Pressable
@@ -113,22 +108,22 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         <View style={[styles.statsRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.statBox}>
             <Typography preset="h4" color={colors.accent}>{creditData?.balance ?? 0}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Credits</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('home:stats.credits')}</Typography>
           </View>
           <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <View style={styles.statBox}>
             <Typography preset="h4" color={colors.accent}>{stats?.totalSets ?? 0}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Sets</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('home:stats.sets')}</Typography>
           </View>
           <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <View style={styles.statBox}>
             <Typography preset="h4" color={colors.accent}>{stats?.totalCards ?? 0}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Cards</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('home:stats.cards', 'Cards')}</Typography>
           </View>
           <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
           <View style={styles.statBox}>
             <Typography preset="h4" color={colors.accent}>{totalNotes}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Notes</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('home:stats.notes')}</Typography>
           </View>
         </View>
 
@@ -139,10 +134,10 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         >
           <View style={styles.storageRow}>
             <Typography preset="caption" color={overQuota ? colors.alert : colors.textSecondary}>
-              {overQuota ? 'Over storage limit — Upgrade' : 'Storage'}
+              {overQuota ? t('profile:storage.overLimit') : t('profile:storage.title')}
             </Typography>
             <Typography preset="caption" color={overQuota ? colors.alert : colors.textSecondary}>
-              {usedMB} MB of {limitMB} MB
+              {t('profile:storage.usage', { used: usedMB, limit: limitMB })}
             </Typography>
           </View>
           <ProgressBar
@@ -153,42 +148,42 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
 
         {/* ── My Study ── */}
         <View>
-        <MenuSection label="My Study">
-          <MenuItem icon={TrophyIcon} label="Achievements" onPress={handleNavAchievements} />
-          <MenuItem icon={FileTextIcon} label="My Notes" onPress={handleNavNotes} />
-          <MenuItem icon={AlbumsIcon} label="My Media" onPress={handleNavMedia} />
+        <MenuSection label={t('profile:sections.myStudy')}>
+          <MenuItem icon={TrophyIcon} label={t('profile:menu.achievements')} onPress={handleNavAchievements} />
+          <MenuItem icon={FileTextIcon} label={t('profile:menu.myNotes')} onPress={handleNavNotes} />
+          <MenuItem icon={AlbumsIcon} label={t('profile:menu.myMedia')} onPress={handleNavMedia} />
         </MenuSection>
 
         {/* ── Community ── */}
-        <MenuSection label="Community">
-          <MenuItem icon={UsersIcon} label="Friends" onPress={handleNavFriends} />
-          <MenuItem icon={BellIcon} label="Notifications" onPress={handleNavNotifSettings} />
+        <MenuSection label={t('profile:sections.community')}>
+          <MenuItem icon={UsersIcon} label={t('profile:menu.friends')} onPress={handleNavFriends} />
+          <MenuItem icon={BellIcon} label={t('profile:menu.notifications')} onPress={handleNavNotifSettings} />
         </MenuSection>
 
         {/* ── Account ── */}
-        <MenuSection label="Account">
-          <MenuItem icon={UserIcon} label="Edit Profile" onPress={handleNavEditProfile} />
+        <MenuSection label={t('profile:sections.account')}>
+          <MenuItem icon={UserIcon} label={t('profile:menu.editProfile')} onPress={handleNavEditProfile} />
           <MenuItem
             icon={StarOutlineIcon}
-            label="My Credits"
-            value={`${creditData?.balance ?? 0} credits`}
+            label={t('profile:menu.myCredits')}
+            value={t('profile:credits.creditsCount', { count: creditData?.balance ?? 0, defaultValue: `${creditData?.balance ?? 0} credits` })}
             onPress={handleNavCredits}
           />
           <MenuItem
             icon={StarOutlineIcon}
-            label={user?.plan && user.plan !== 'FREE' ? 'Manage Plan' : 'Upgrade to Premium'}
+            label={user?.plan && user.plan !== 'FREE' ? t('profile:menu.managePlan') : t('profile:menu.upgradeToPremium')}
             value={user?.plan ?? 'FREE'}
             onPress={handleNavPaywall}
           />
-          <MenuItem icon={LockIcon} label="Change Password" onPress={handleNavChangePass} />
-          <MenuItem icon={SettingsIcon} label="Settings" onPress={handleNavSettings} />
+          <MenuItem icon={LockIcon} label={t('profile:menu.changePassword')} onPress={handleNavChangePass} />
+          <MenuItem icon={SettingsIcon} label={t('profile:menu.settings')} onPress={handleNavSettings} />
         </MenuSection>
 
         {/* ── Sign out ── */}
         <MenuSection label="">
           <MenuItem
             icon={LogOutIcon}
-            label="Sign Out"
+            label={t('profile:menu.signOut')}
             destructive
             showChevron={false}
             onPress={handleSignOut}
@@ -203,7 +198,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           align="center"
           style={styles.version}
         >
-          Version {APP_VERSION}
+          {t('profile:settings.versionLabel', { version: APP_VERSION, defaultValue: `Version ${APP_VERSION}` })}
         </Typography>
       </ScrollView>
 

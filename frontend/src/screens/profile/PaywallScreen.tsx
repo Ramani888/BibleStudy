@@ -45,6 +45,7 @@ function Radio({ selected }: { selected: boolean }) {
 // ── Free plan card ─────────────────────────────────────────────────────────────
 
 function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () => void }) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const isDark = theme.name === 'dark';
   return (
@@ -65,8 +66,8 @@ function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () =>
     >
       <Radio selected={selected} />
       <View style={styles.planText}>
-        <Typography preset="h4" color={theme.colors.textPrimary}>Free</Typography>
-        <Typography preset="caption" color={theme.colors.textSecondary}>No card needed</Typography>
+        <Typography preset="h4" color={theme.colors.textPrimary}>{t('profile:subscription.free', 'Free')}</Typography>
+        <Typography preset="caption" color={theme.colors.textSecondary}>{t('profile:subscription.noCardNeeded', 'No card needed')}</Typography>
       </View>
       <Typography preset="h4" color={theme.colors.textPrimary}>$0</Typography>
     </Pressable>
@@ -78,6 +79,7 @@ function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () =>
 function PlanCard({ tier, period, selected, onPress }: {
   tier: TierDef; period: BillingPeriod; selected: boolean; onPress: () => void;
 }) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const isDark = theme.name === 'dark';
   const showBadge = tier.plan === 'PRO' && period === 'annual';
@@ -103,12 +105,12 @@ function PlanCard({ tier, period, selected, onPress }: {
       <View style={styles.planText}>
         {showBadge && (
           <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
-            <Typography preset="caption" color={palette.white}>Best Value</Typography>
+            <Typography preset="caption" color={palette.white}>{t('profile:subscription.bestValue', 'Best Value')}</Typography>
           </View>
         )}
         <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
         <Typography preset="caption" color={theme.colors.textSecondary}>
-          {period === 'annual' ? 'Billed annually' : 'Billed monthly'}
+          {period === 'annual' ? t('profile:subscription.billedAnnually', 'Billed annually') : t('profile:subscription.billedMonthly', 'Billed monthly')}
         </Typography>
       </View>
       <View style={styles.priceBlock}>
@@ -128,12 +130,13 @@ function PlanCard({ tier, period, selected, onPress }: {
 // ── Included features (merged section) ────────────────────────────────────────
 
 function IncludedSection({ tier }: { tier: AnyTier }) {
+  const { t } = useTranslation(['profile', 'common']);
   const { colors } = useTheme();
   const features = getIncludedFeatures(tier);
   return (
     <View style={styles.includedSection}>
       <Typography preset="h4" color={colors.textPrimary} style={styles.includedTitle}>
-        What's included with {tier.name}
+        {t('profile:subscription.whatsIncluded', { name: tier.name, defaultValue: `What's included with ${tier.name}` })}
       </Typography>
       {features.map(f => (
         <View key={f} style={styles.featureRow}>
@@ -145,9 +148,10 @@ function IncludedSection({ tier }: { tier: AnyTier }) {
   );
 }
 
-// ── Screen ────────────────────────────────────────────────────────────────────
+import { useTranslation } from 'react-i18next';
 
 export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
   const currentPlan = user?.plan ?? 'FREE';
@@ -167,7 +171,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   const savingsPct = Math.round((1 - savingsTier.annualPrice / (savingsTier.monthlyPrice * 12)) * 100);
 
   return (
-    <Screen header={<ScreenHeader title="Premium" onBack={navigation.goBack} />}>
+    <Screen header={<ScreenHeader title={t('profile:menu.upgradeToPremium')} onBack={navigation.goBack} />}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* ── Hero ── */}
@@ -176,10 +180,10 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             BIBLE STUDY PRO
           </Typography>
           <Typography preset="h1" color={colors.textPrimary} style={styles.heroTitle}>
-            Premium
+            {t('profile:subscription.premium', 'Premium')}
           </Typography>
           <Typography preset="body" color={colors.textSecondary} style={styles.heroTagline}>
-            Bible study is free. Credits unlock AI assistance.
+            {t('profile:subscription.tagline', 'Bible study is free. Credits unlock AI assistance.')}
           </Typography>
         </View>
 
@@ -194,11 +198,11 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
                 onPress={() => setPeriod(p)}
               >
                 <Typography preset="label" color={active ? palette.white : colors.textSecondary}>
-                  {p === 'monthly' ? 'Monthly' : 'Annual'}
+                  {p === 'monthly' ? t('profile:paywall.monthly', 'Monthly') : t('profile:paywall.annual', 'Annual')}
                 </Typography>
                 {p === 'annual' && (
                   <Typography preset="caption" color={active ? palette.white : colors.success}>
-                    {` · save ${savingsPct}%`}
+                    {t('profile:paywall.savePct', { pct: savingsPct, defaultValue: ` · save ${savingsPct}%` })}
                   </Typography>
                 )}
               </Pressable>
@@ -233,9 +237,9 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           )}
           <Button
             label={
-              selectedTier.plan === 'FREE' ? 'Free Plan' :
-              currentPlan === selectedTier.plan ? 'Current Plan' :
-              `Subscribe · ${opt!.priceLabel}`
+              selectedTier.plan === 'FREE' ? t('profile:subscription.freePlan', 'Free Plan') :
+              currentPlan === selectedTier.plan ? t('profile:subscription.currentPlan', 'Current Plan') :
+              t('profile:subscription.subscribePrice', { price: opt!.priceLabel, defaultValue: `Subscribe · ${opt!.priceLabel}` })
             }
             onPress={() => opt && buy(opt.productId)}
             disabled={selectedTier.plan === 'FREE' || currentPlan === selectedTier.plan || processing}
@@ -246,8 +250,8 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           {paidTier && opt && (
             <Typography preset="caption" color={colors.textSecondary} style={styles.finePrint}>
               {period === 'annual'
-                ? `Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.`
-                : `Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.`}
+                ? t('profile:paywall.billedAnnuallyFinePrint', { total: paidTier.annualPrice.toFixed(2), monthlyTotal: (paidTier.monthlyPrice * 12).toFixed(2), defaultValue: `Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.` })
+                : t('profile:paywall.billedMonthlyFinePrint', { price: paidTier.monthlyPrice.toFixed(2), defaultValue: `Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.` })}
             </Typography>
           )}
         </View>
@@ -255,18 +259,18 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
         {/* ── Links ── */}
         <View style={styles.links}>
           <Pressable onPress={restore} disabled={processing} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="label" color={colors.accent}>Restore Purchases</Typography>
+            <Typography preset="label" color={colors.accent}>{t('profile:subscription.restore', 'Restore Purchases')}</Typography>
           </Pressable>
           {isSubscribed && (
             <Pressable onPress={openManageSubscriptions} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-              <Typography preset="label" color={colors.textSecondary}>Manage Subscription</Typography>
+              <Typography preset="label" color={colors.textSecondary}>{t('profile:subscription.manage', 'Manage Subscription')}</Typography>
             </Pressable>
           )}
           <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>Terms of Use</Typography>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.terms', 'Terms of Use')}</Typography>
           </Pressable>
           <Pressable onPress={() => Linking.openURL('https://zen2-privacy-policy.surge.sh')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>Privacy Policy</Typography>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.privacy', 'Privacy Policy')}</Typography>
           </Pressable>
         </View>
 

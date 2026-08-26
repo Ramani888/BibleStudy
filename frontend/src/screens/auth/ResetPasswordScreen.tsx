@@ -11,9 +11,11 @@ import { useAuthStore } from '../../store';
 import { authApi, getErrorMessage } from '../../api';
 import { resetPasswordSchema, type ResetPasswordFormData } from '../../utils/validators';
 import { spacing, useTheme } from '../../theme';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'ResetPassword'>) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
   const { email }       = route.params;
   const resetPassword   = useAuthStore(s => s.resetPassword);
@@ -28,37 +30,35 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
   const onSubmit = useCallback(async (data: ResetPasswordFormData) => {
     try {
       await resetPassword({ email, otp: data.otp, newPassword: data.newPassword });
-      Toast.show({ type: 'success', text1: 'Password reset!', text2: 'You can now sign in with your new password.' });
+      Toast.show({ type: 'success', text1: t('auth:passwordResetSuccess', 'Password reset!'), text2: t('auth:canSignInNow', 'You can now sign in with your new password.') });
       navigation.navigate('Login');
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Reset failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('auth:resetFailed', 'Reset failed'), text2: getErrorMessage(err) });
     }
-  }, [email, resetPassword, navigation]);
+  }, [email, resetPassword, navigation, t]);
 
   const handleResend = useCallback(async () => {
     setResending(true);
     try {
       await authApi.forgotPassword({ email });
-      Toast.show({ type: 'success', text1: 'Code resent', text2: 'Check your inbox.' });
+      Toast.show({ type: 'success', text1: t('auth:codeResent', 'Code resent'), text2: t('auth:checkInbox', 'Check your inbox.') });
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Could not resend', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('auth:couldNotResend', 'Could not resend'), text2: getErrorMessage(err) });
     } finally {
       setResending(false);
     }
-  }, [email]);
-
-  const subtitle = useMemo(() => `Enter the code sent to ${email} and choose a new password`, [email]);
+  }, [email, t]);
 
   return (
     <AuthLayout
-      title="New password"
-      subtitle={subtitle}
+      title={t('resetPassword')}
+      subtitle={t('resetPasswordSubtitle')}
       footer={
         <>
-          <Button label="Reset Password" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('resetPassword')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
-              {resending ? 'Sending…' : 'Resend code'}
+              {resending ? t('common:status.sending', 'Sending…') : t('resendCode')}
             </Typography>
           </Pressable>
         </>
@@ -66,7 +66,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
     >
       <View>
         <View style={styles.codeContainer}>
-          <Typography preset="label" color={colors.textSecondary}>Verification code</Typography>
+          <Typography preset="label" color={colors.textSecondary}>{t('verifyEmail')}</Typography>
           <Controller
             name="otp"
             control={control}
@@ -80,8 +80,8 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         <FormField
           name="newPassword"
           control={control}
-          label="New password"
-          placeholder="Min 8 chars, 1 uppercase, 1 number"
+          label={t('password')}
+          placeholder={t('auth:validation.passwordPlaceholder', 'Min 8 chars, 1 uppercase, 1 number')}
           isPassword
           returnKeyType="next"
           onSubmitEditing={() => confirmRef.current?.focus()}
@@ -91,8 +91,8 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         <FormField
           name="confirmPassword"
           control={control}
-          label="Confirm password"
-          placeholder="Repeat your new password"
+          label={t('confirmPassword')}
+          placeholder={t('auth:validation.repeatPasswordPlaceholder', 'Repeat your new password')}
           isPassword
           inputRef={confirmRef}
           returnKeyType="done"

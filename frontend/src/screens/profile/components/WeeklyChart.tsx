@@ -102,12 +102,13 @@ function DivergingBarChart({ stats, selectedIdx, onSelect, colors }: {
   onSelect: (i: number | null) => void;
   colors: Colors;
 }) {
+  const { t } = useTranslation(['profile', 'common']);
   const hasData = stats.some(d => d.earned > 0 || d.used > 0);
 
   if (!hasData) {
     return (
       <View style={[s.centerBox, { height: HALF_H * 2 + 1 }]}>
-        <Typography preset="caption" color={colors.textDisabled}>No activity</Typography>
+        <Typography preset="caption" color={colors.textDisabled}>{t('profile:credits.noActivity', 'No activity')}</Typography>
       </View>
     );
   }
@@ -175,6 +176,7 @@ function DivergingBarChart({ stats, selectedIdx, onSelect, colors }: {
 // ─── DetailCard ───────────────────────────────────────────────────────────────
 
 function DetailCard({ stat, colors }: { stat: DayStat; colors: Colors }) {
+  const { t } = useTranslation(['profile', 'common']);
   const net = stat.earned - stat.used;
   return (
     <View style={[s.detailCard, { backgroundColor: colors.surfaceMuted }]}>
@@ -185,7 +187,7 @@ function DetailCard({ stat, colors }: { stat: DayStat; colors: Colors }) {
       <Typography preset="label" color={colors.alert}>−{stat.used}</Typography>
       <View style={[s.dot, { backgroundColor: colors.border }]} />
       <Typography preset="label" color={net >= 0 ? colors.success : colors.alert}>
-        net {net >= 0 ? '+' : ''}{net}
+        {t('profile:credits.net', 'Net').toLowerCase()} {net >= 0 ? '+' : ''}{net}
       </Typography>
     </View>
   );
@@ -196,23 +198,24 @@ function DetailCard({ stat, colors }: { stat: DayStat; colors: Colors }) {
 function SummaryRow({ totalEarned, totalUsed, net, colors }: {
   totalEarned: number; totalUsed: number; net: number; colors: Colors;
 }) {
+  const { t } = useTranslation(['profile', 'common']);
   return (
     <View style={[s.summaryRow, { borderTopColor: colors.border }]}>
       <View style={s.summaryItem}>
         <Typography preset="h4" color={colors.success}>+{totalEarned}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{t('profile:credits.earned', 'Earned')}</Typography>
       </View>
       <View style={[s.summaryDiv, { backgroundColor: colors.border }]} />
       <View style={s.summaryItem}>
         <Typography preset="h4" color={colors.alert}>−{totalUsed}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{t('profile:credits.used', 'Used')}</Typography>
       </View>
       <View style={[s.summaryDiv, { backgroundColor: colors.border }]} />
       <View style={s.summaryItem}>
         <Typography preset="h4" color={net >= 0 ? colors.success : colors.alert}>
           {net >= 0 ? '+' : ''}{net}
         </Typography>
-        <Typography preset="caption" color={colors.textSecondary}>Net</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>{t('profile:credits.net', 'Net')}</Typography>
       </View>
     </View>
   );
@@ -220,7 +223,10 @@ function SummaryRow({ totalEarned, totalUsed, net, colors }: {
 
 // ─── WeeklyChart ──────────────────────────────────────────────────────────────
 
+import { useTranslation } from 'react-i18next';
+
 export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: SimplePeriod }) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -231,7 +237,7 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Simple
   return (
     <>
       {/* Section title — standalone, above card */}
-      <Typography preset="h4" style={s.sectionTitle}>Credit Activity</Typography>
+      <Typography preset="h4" style={s.sectionTitle}>{t('profile:credits.activity', 'Credit Activity')}</Typography>
 
       <Card style={{ ...s.card, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }} shadow="sm">
 
@@ -246,9 +252,9 @@ export function WeeklyChart({ defaultPeriod = 'week' }: { defaultPeriod?: Simple
         <View style={s.cardTop}>
           <View style={s.legend}>
             <View style={[s.legendDot, { backgroundColor: colors.success }]} />
-            <Typography preset="caption" color={colors.textSecondary}>Earned</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('profile:credits.earned', 'Earned')}</Typography>
             <View style={[s.legendDot, { backgroundColor: colors.alert }]} />
-            <Typography preset="caption" color={colors.textSecondary}>Used</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('profile:credits.used', 'Used')}</Typography>
           </View>
           <IntervalTabs
             options={chart.intervalOptions}

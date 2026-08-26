@@ -13,9 +13,11 @@ import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
 import { layout, spacing, useTheme, palette } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
   const login          = useAuthStore(s => s.login);
   const loginWithGoogle = useAuthStore(s => s.loginWithGoogle);
@@ -37,7 +39,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
       if (axios.isAxiosError(err)) {
         const code = err.response?.data?.error?.code;
         if (code === 'EMAIL_NOT_VERIFIED') {
-          Toast.show({ type: 'info', text1: 'Email not verified', text2: 'Redirecting to verify your email…' });
+          Toast.show({ type: 'info', text1: t('emailNotVerified'), text2: t('redirectingVerify') });
           navigation.navigate('VerifyEmail', { email: getValues('email') });
           return;
         }
@@ -46,7 +48,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
           return;
         }
       }
-      Toast.show({ type: 'error', text1: 'Login failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('loginFailed'), text2: getErrorMessage(err) });
     }
   };
 
@@ -56,45 +58,45 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
       await loginWithGoogle();
     } catch (err: any) {
       if (err?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
-        Toast.show({ type: 'error', text1: 'Google sign-in failed', text2: getErrorMessage(err) });
+        Toast.show({ type: 'error', text1: t('googleFailed'), text2: getErrorMessage(err) });
       }
     } finally {
       setSocialLoading(null);
     }
-  }, [loginWithGoogle]);
+  }, [loginWithGoogle, t]);
 
   const handleApple = useCallback(async () => {
     setSocialLoading('apple');
     try {
       await loginWithApple();
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Apple sign-in failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('appleFailed'), text2: getErrorMessage(err) });
     } finally {
       setSocialLoading(null);
     }
-  }, [loginWithApple]);
+  }, [loginWithApple, t]);
 
   return (
     <AuthLayout
-      title="Welcome back"
-      subtitle="Sign in to continue your study journey"
+      title={t('welcomeBack')}
+      subtitle={t('welcomeBackSubtitle')}
       onGoogle={handleGoogle}
       onApple={handleApple}
       socialLoading={socialLoading}
       footer={
         <>
-          <Button label="Sign In" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('signIn')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={() => navigation.navigate('Register')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
-              Don't have an account?{' '}
-              <Typography preset="bodySm" color={colors.accent}>Register</Typography>
+              {t('dontHaveAccount')}{' '}
+              <Typography preset="bodySm" color={colors.accent}>{t('register')}</Typography>
             </Typography>
           </Pressable>
           <Typography preset="caption" color={colors.textSecondary} align="center">
-            By continuing with Google or Apple, you agree to our{' '}
-            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('TermsOfService')}>Terms of Service</Typography>
-            {' '}and{' '}
-            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('PrivacyPolicy')}>Privacy Policy</Typography>
+            {t('termsAgreement')}{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('TermsOfService')}>{t('termsOfService')}</Typography>
+            {' '}{t('and')}{' '}
+            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('PrivacyPolicy')}>{t('privacyPolicy')}</Typography>
           </Typography>
         </>
       }
@@ -103,15 +105,15 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         {socialOnly && (
           <View style={[styles.socialBanner, { backgroundColor: colors.accentSoft }]}>
             <Typography preset="bodySm" color={palette.indigo800} align="center">
-              This account uses social sign-in. Please use the Google or Apple button above to sign in.
+              {t('socialOnlyNotice')}
             </Typography>
           </View>
         )}
         <FormField
           name="email"
           control={control}
-          label="Email"
-          placeholder="you@example.com"
+          label={t('email')}
+          placeholder={t('emailPlaceholder')}
           keyboardType="email-address"
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
@@ -121,8 +123,8 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         <FormField
           name="password"
           control={control}
-          label="Password"
-          placeholder="Your password"
+          label={t('password')}
+          placeholder={t('passwordPlaceholder')}
           isPassword
           inputRef={passwordRef}
           returnKeyType="done"
@@ -130,7 +132,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
         />
         <Pressable onPress={() => navigation.navigate('ForgotPassword')} style={({ pressed }) => pressed && styles.linkPressed}>
           <Typography preset="label" color={colors.accent} align="right">
-            Forgot password?
+            {t('forgotPassword')}
           </Typography>
         </Pressable>
       </View>

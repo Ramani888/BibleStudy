@@ -12,6 +12,7 @@ import {
   ListIcon, GridIcon,
 } from '../../components/icons';
 
+import { useTranslation } from 'react-i18next';
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
@@ -21,6 +22,7 @@ import type { Card as CardType } from '../../types';
 const ICON_SIZE = 20;
 
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
+  const { t } = useTranslation(['library', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -83,18 +85,18 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   const handleCopyCard = useCallback((id: string) => {
     copyCard(id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Card copied' }),
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Copy failed', text2: getErrorMessage(err) }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('library:cards.cardCopied', 'Card copied') }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [copyCard]);
+  }, [copyCard, t]);
 
   const handleBlurToggle = useCallback((card: CardType) => {
     updateCard({ id: card.id, payload: { isBlurred: !card.isBlurred } }, {
       onSuccess: () =>
-        Toast.show({ type: 'success', text1: card.isBlurred ? 'Card unblurred' : 'Card blurred' }),
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+        Toast.show({ type: 'success', text1: card.isBlurred ? t('library:cards.cardUnblurred', 'Card unblurred') : t('library:cards.cardBlurred', 'Card blurred') }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [updateCard]);
+  }, [updateCard, t]);
 
   const allBlurred = cards.length > 0 && cards.every(c => c.isBlurred);
 
@@ -106,11 +108,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     );
     const failed = results.filter(r => r.status === 'rejected').length;
     if (failed === 0) {
-      Toast.show({ type: 'success', text1: blur ? 'All cards blurred' : 'All cards unblurred' });
+      Toast.show({ type: 'success', text1: blur ? t('library:cards.allCardsBlurred', 'All cards blurred') : t('library:cards.allCardsUnblurred', 'All cards unblurred') });
     } else {
-      Toast.show({ type: 'error', text1: `${toUpdate.length - failed} updated, ${failed} failed` });
+      Toast.show({ type: 'error', text1: t('library:cards.batchUpdateResult', { updated: toUpdate.length - failed, failed, defaultValue: `${toUpdate.length - failed} updated, ${failed} failed` }) });
     }
-  }, [cards, updateCardAsync]);
+  }, [cards, updateCardAsync, t]);
 
   const handleMoveCard = useCallback((targetSetId: string) => {
     if (!moveTargetCard) return;
@@ -118,11 +120,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       onSuccess: () => {
         setMovePickerOpen(false);
         setMoveTargetCard(null);
-        Toast.show({ type: 'success', text1: 'Card moved' });
+        Toast.show({ type: 'success', text1: t('library:cards.cardMoved', 'Card moved') });
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Move failed', text2: getErrorMessage(err) }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [moveTargetCard, moveCard]);
+  }, [moveTargetCard, moveCard, t]);
 
   const handleEnterReorder = useCallback(() => {
     setOrderedCards([...cards]);
@@ -134,11 +136,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       onSuccess: () => {
         setReorderMode(false);
         setOrderedCards([]);
-        Toast.show({ type: 'success', text1: 'Order saved' });
+        Toast.show({ type: 'success', text1: t('library:cards.orderSaved', 'Order saved') });
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Failed to save order', text2: getErrorMessage(err) }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [reorderCards, setId, orderedCards]);
+  }, [reorderCards, setId, orderedCards, t]);
 
   const handleCancelReorder = useCallback(() => {
     setReorderMode(false);
@@ -152,31 +154,31 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       onSuccess: () => {
         setSavingNote(false);
         setNoteCard(null);
-        Toast.show({ type: 'success', text1: 'Note saved' });
+        Toast.show({ type: 'success', text1: t('library:cards.noteSaved', 'Note saved') });
       },
       onError: (err: unknown) => {
         setSavingNote(false);
-        Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+        Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
       },
     });
-  }, [noteCard, noteText, updateCard]);
+  }, [noteCard, noteText, updateCard, t]);
 
   const handleDelete = useCallback((cardId: string) => {
     show({
-      title: 'Delete Card',
-      message: 'This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: t('library:cards.deleteCardTitle', 'Delete card?'),
+      message: t('library:cards.deleteCardMessage', 'This cannot be undone.'),
+      confirmLabel: t('common:actions.delete', 'Delete'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteCardAsync(cardId);
-          Toast.show({ type: 'success', text1: 'Card deleted' });
+          Toast.show({ type: 'success', text1: t('library:cards.cardDeleted', 'Card deleted') });
         } catch (err) {
-          Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+          Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
         }
       },
     });
-  }, [show, deleteCardAsync]);
+  }, [show, deleteCardAsync, t]);
 
   const handleGoBack         = useCallback(() => navigation.goBack(), [navigation]);
   const handleOpenHeaderMenu = useCallback(() => setHeaderMenuOpen(true), []);
@@ -193,13 +195,13 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const header = reorderMode ? (
     <View style={[styles.reorderBar, { borderBottomColor: colors.border }]}>
       <Pressable onPress={handleCancelReorder} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-        <Typography preset="bodySm" color={colors.textSecondary}>Cancel</Typography>
+        <Typography preset="bodySm" color={colors.textSecondary}>{t('common:actions.cancel')}</Typography>
       </Pressable>
-      <Typography preset="bodySm" style={styles.reorderTitle}>Reorder Cards</Typography>
+      <Typography preset="bodySm" style={styles.reorderTitle}>{t('library:cards.reorderCards', 'Reorder Cards')}</Typography>
       <Pressable onPress={handleSaveReorder} disabled={isReordering} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
         {isReordering
           ? <ActivityIndicator size="small" color={colors.accent} />
-          : <Typography preset="bodySm" color={colors.accent} style={styles.reorderTitle}>Save</Typography>
+          : <Typography preset="bodySm" color={colors.accent} style={styles.reorderTitle}>{t('common:actions.save')}</Typography>
         }
       </Pressable>
     </View>
@@ -225,12 +227,12 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         }
       />
       <Typography preset="bodySm" color={colors.textSecondary} style={styles.count}>
-        {cardSearch ? filteredCards.length : cards.length} {(cardSearch ? filteredCards.length : cards.length) === 1 ? 'card' : 'cards'}
+        {t('library:cards.cardCount', { count: cardSearch ? filteredCards.length : cards.length, defaultValue: `${cardSearch ? filteredCards.length : cards.length} cards` })}
       </Typography>
       {cardSearchVisible && (
         <View style={styles.searchWrap}>
           <SearchBar
-            placeholder="Search cards…"
+            placeholder={t('library:cards.searchPlaceholder', 'Search cards…')}
             value={cardSearch}
             onChangeText={setCardSearch}
             containerStyle={styles.searchInput}
@@ -244,7 +246,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   if (isError) {
     return (
       <Screen header={header}>
-        <ErrorState message="Could not load cards." onRetry={refetch} />
+        <ErrorState message={t('library:cards.couldNotLoadCards', 'Could not load cards.')} onRetry={refetch} />
       </Screen>
     );
   }
@@ -263,7 +265,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       {(!isStory || item.question) ? (
       <View style={[styles.questionSection, { borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
         <View style={styles.questionHeader}>
-          <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Reference' : 'Question'}</Typography>
+          <Typography preset="caption" color={colors.textDisabled}>{isStory ? t('library:cards.reference', 'Reference') : t('library:cards.question', 'Question')}</Typography>
           {isOwner ? (
             <View style={styles.cardActions}>
               <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
@@ -292,18 +294,18 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       ]}>
         {item.isBlurred && isOwner ? (
           <View style={styles.blurOverlay}>
-            <Typography preset="bodySm" color={colors.textDisabled}>Tap eye icon to reveal answer</Typography>
+            <Typography preset="bodySm" color={colors.textDisabled}>{t('library:cards.tapToReveal', 'Tap eye icon to reveal answer')}</Typography>
           </View>
         ) : (
           <>
-            <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Passage' : 'Answer'}</Typography>
+            <Typography preset="caption" color={colors.textDisabled}>{isStory ? t('library:cards.passage', 'Passage') : t('library:cards.answer', 'Answer')}</Typography>
             <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
               {item.answer}
             </Typography>
             {item.note && cardLayout === 'list' ? (
               <>
                 <Divider marginV={spacing.sm} />
-                <Typography preset="caption" color={colors.textSecondary}>Note</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.note', 'Note')}</Typography>
                 <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
                   {item.note}
                 </Typography>
@@ -314,7 +316,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       </View>
     </View>
     );
-  }, [isDark, colors, cardLayout, isOwner, handleBlurToggle]);
+  }, [isDark, colors, cardLayout, isOwner, handleBlurToggle, t]);
 
   // ── Reorder card (drag handle) ──
   const renderReorderCard = useCallback(({ item, drag, isActive }: RenderItemParams<CardType>) => {
@@ -334,7 +336,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       >
         <View style={[styles.questionSection, { borderBottomColor: colors.border }]}>
           <View style={styles.questionHeader}>
-            <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Reference' : 'Question'}</Typography>
+            <Typography preset="caption" color={colors.textDisabled}>{isStory ? t('library:cards.reference', 'Reference') : t('library:cards.question', 'Question')}</Typography>
             <View style={styles.cardActions}>
               <ReorderIcon size={ICON_SIZE} color={colors.textSecondary} />
             </View>
@@ -344,7 +346,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           </Typography>
         </View>
         <View style={[styles.answerSection, { backgroundColor: isDark ? colors.surface : colors.background }]}>
-          <Typography preset="caption" color={colors.textDisabled}>{isStory ? 'Passage' : 'Answer'}</Typography>
+          <Typography preset="caption" color={colors.textDisabled}>{isStory ? t('library:cards.passage', 'Passage') : t('library:cards.answer', 'Answer')}</Typography>
           <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={2}>
             {item.answer}
           </Typography>
@@ -352,7 +354,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       </Pressable>
     </ScaleDecorator>
     );
-  }, [isDark, colors]);
+  }, [isDark, colors, t]);
 
   return (
     <Screen header={header}>
@@ -385,9 +387,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               <ActivityIndicator color={colors.accent} style={styles.listLoader} />
             ) : (
               <EmptyState
-                title={cardSearch ? 'No results' : 'No cards yet'}
-                subtitle={cardSearch ? `No cards match "${cardSearch}"` : isOwner ? 'Add cards to start studying this set' : 'This set has no cards yet'}
-                ctaLabel={cardSearch || !isOwner ? undefined : 'Add Cards'}
+                title={cardSearch ? t('library:cards.noResults', 'No results') : t('library:cards.noCardsYet', 'No cards yet')}
+                subtitle={cardSearch ? t('library:cards.noMatch', { query: cardSearch, defaultValue: `No cards match "${cardSearch}"` }) : isOwner ? t('library:cards.addCardsToStudy', 'Add cards to start studying this set') : t('library:cards.noCardsInSet', 'This set has no cards yet')}
+                ctaLabel={cardSearch || !isOwner ? undefined : t('library:cards.addCards', 'Add Cards')}
                 onCta={cardSearch || !isOwner ? undefined : () => navigation.navigate('CreateCard', { setId })}
               />
             )
@@ -400,34 +402,34 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       {/* ── Card action sheet ── */}
       <ActionSheet
         visible={!!selectedCard}
-        title="Card options"
+        title={t('library:cards.cardOptions', 'Card options')}
         onClose={handleCloseSelectedCard}
         actions={[
-          { label: 'Edit', icon: PencilIcon, onPress: () => selectedCard && navigation.navigate('EditCard', { cardId: selectedCard.id, setId }) },
-          { label: 'Copy', icon: CopyIcon, onPress: () => selectedCard && handleCopyCard(selectedCard.id) },
-          { label: 'Move to Set', icon: ArrowRightIcon, onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); } },
+          { label: t('common:actions.edit', 'Edit'), icon: PencilIcon, onPress: () => selectedCard && navigation.navigate('EditCard', { cardId: selectedCard.id, setId }) },
+          { label: t('common:actions.copy', 'Copy'), icon: CopyIcon, onPress: () => selectedCard && handleCopyCard(selectedCard.id) },
+          { label: t('library:cards.moveToSet', 'Move to Set'), icon: ArrowRightIcon, onPress: () => { setMoveTargetCard(selectedCard); setMovePickerOpen(true); } },
           {
-            label: 'Ask AI', icon: SparklesIcon, onPress: () => {
+            label: t('library:cards.askAI', 'Ask AI'), icon: SparklesIcon, onPress: () => {
               if (!selectedCard) return;
               const prompt = `Explain this flashcard:\nQ: ${selectedCard.question}\nA: ${selectedCard.answer}`;
               navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: prompt } });
             },
           },
-          { label: 'Delete', icon: TrashIcon, destructive: true, onPress: () => selectedCard && handleDelete(selectedCard.id) },
+          { label: t('common:actions.delete', 'Delete'), icon: TrashIcon, destructive: true, onPress: () => selectedCard && handleDelete(selectedCard.id) },
         ]}
       />
 
       {/* ── Move to set picker ── */}
       <SelectSheet
         visible={movePickerOpen}
-        title="Move to Set"
-        searchPlaceholder="Search sets…"
+        title={t('library:cards.moveToSet', 'Move to Set')}
+        searchPlaceholder={t('library:sets.searchPlaceholder', 'Search sets…')}
         options={moveSetOptions}
         optionIcon={BookIcon}
         selectedId={setId}
         onSelect={handleMoveCard}
         onClose={handleCloseMovePicker}
-        emptyText="No other sets available"
+        emptyText={t('library:sets.noOtherSets', 'No other sets available')}
       />
 
       {/* ── Header menu ── */}
@@ -436,14 +438,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={cachedTitle ?? setTitle}
         onClose={handleCloseHeaderMenu}
         actions={[
-          { label: 'Quiz', icon: CheckCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
+          { label: t('navigation:tabs.study', 'Quiz'), icon: CheckCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
           ...(isOwner ? [
-            { label: 'Create Card', icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
-            { label: 'Edit Set', icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
-            { label: allBlurred ? 'Unblur All' : 'Blur All', icon: allBlurred ? EyeIcon : EyeOffIcon, onPress: () => handleBlurAll(!allBlurred) },
-            ...(!isLoading && cards.length > 1 ? [{ label: 'Reorder Cards', icon: ReorderIcon, onPress: handleEnterReorder }] : []),
+            { label: t('library:cards.createCard', 'Create Card'), icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
+            { label: t('library:sets.editSet', 'Edit Set'), icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
+            { label: allBlurred ? t('library:cards.unblurAll', 'Unblur All') : t('library:cards.blurAll', 'Blur All'), icon: allBlurred ? EyeIcon : EyeOffIcon, onPress: () => handleBlurAll(!allBlurred) },
+            ...(!isLoading && cards.length > 1 ? [{ label: t('library:cards.reorderCards', 'Reorder Cards'), icon: ReorderIcon, onPress: handleEnterReorder }] : []),
           ] : []),
-          { label: cardLayout === 'grid' ? 'List View' : 'Grid View', icon: cardLayout === 'grid' ? ListIcon : GridIcon, onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list') },
+          { label: cardLayout === 'grid' ? t('library:cards.listView', 'List View') : t('library:cards.gridView', 'Grid View'), icon: cardLayout === 'grid' ? ListIcon : GridIcon, onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list') },
         ]}
       />
 
@@ -458,12 +460,12 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       {/* ── Note popup ── */}
       <AppModal
         visible={!!noteCard}
-        title="Note"
+        title={t('library:cards.note', 'Note')}
         onClose={handleCloseNoteModal}
       >
         <TextInput
           style={[styles.notePopupInput, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
-          placeholder="Add a note…"
+          placeholder={t('library:cards.addNotePlaceholder', 'Add a note…')}
           value={noteText}
           onChangeText={setNoteText}
           multiline
@@ -473,7 +475,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           autoCapitalize="sentences"
         />
         <Divider />
-        <Button label="Save Note" onPress={handleSaveNote} loading={savingNote} fullWidth />
+        <Button label={t('library:cards.saveNote', 'Save Note')} onPress={handleSaveNote} loading={savingNote} fullWidth />
       </AppModal>
 
       <ConfirmDialog {...dialogProps} />

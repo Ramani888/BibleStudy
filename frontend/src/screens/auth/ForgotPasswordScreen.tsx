@@ -11,9 +11,11 @@ import { useAuthStore } from '../../store';
 import { getErrorMessage } from '../../api';
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '../../utils/validators';
 import { useTheme } from '../../theme';
+import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
 export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPassword'>) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
   const forgotPassword = useAuthStore(s => s.forgotPassword);
 
@@ -25,24 +27,24 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
   const onSubmit = async (data: ForgotPasswordFormData) => {
     try {
       await forgotPassword(data);
-      Toast.show({ type: 'success', text1: 'Code sent', text2: 'Check your email for a reset code.' });
+      Toast.show({ type: 'success', text1: t('auth:codeSent', 'Code sent'), text2: t('auth:checkEmailForResetCode', 'Check your email for a reset code.') });
       navigation.navigate('ResetPassword', { email: getValues('email') });
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Request failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('auth:requestFailed', 'Request failed'), text2: getErrorMessage(err) });
     }
   };
 
   return (
     <AuthLayout
-      title="Reset password"
-      subtitle="Enter your email and we'll send you a reset code"
+      title={t('forgotPasswordTitle')}
+      subtitle={t('forgotPasswordSubtitle')}
       footer={
         <>
-          <Button label="Send Reset Code" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('sendResetLink')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">
-              Remember your password?{' '}
-              <Typography preset="bodySm" color={colors.accent}>Sign in</Typography>
+              {t('alreadyHaveAccount')}{' '}
+              <Typography preset="bodySm" color={colors.accent}>{t('signIn')}</Typography>
             </Typography>
           </Pressable>
         </>
@@ -52,8 +54,8 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
         <FormField
           name="email"
           control={control}
-          label="Email"
-          placeholder="you@example.com"
+          label={t('email')}
+          placeholder={t('emailPlaceholder')}
           keyboardType="email-address"
           returnKeyType="done"
           onSubmitEditing={handleSubmit(onSubmit)}

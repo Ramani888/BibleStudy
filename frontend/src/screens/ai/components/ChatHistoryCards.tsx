@@ -19,13 +19,14 @@ const CHEVRON_SIZE = 16;
 const SESSION_ICON_SIZE = 14;
 
 const MessagePair = React.memo(function MessagePair({ chat, index }: { chat: AIChat; index: number }) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   return (
     <>
       {index > 0 && <Divider marginV={spacing.md} />}
       <View style={styles.qRow}>
         <View style={[styles.qBadge, { backgroundColor: colors.infoSurface }]}>
-          <Typography preset="caption" color={colors.info} style={styles.badgeLabel}>Q</Typography>
+          <Typography preset="caption" color={colors.info} style={styles.badgeLabel}>{t('library:cards.questionLetter', 'Q')}</Typography>
         </View>
         <Typography preset="body" style={styles.flex}>{chat.question}</Typography>
       </View>
@@ -42,6 +43,7 @@ const MessagePair = React.memo(function MessagePair({ chat, index }: { chat: AIC
 });
 
 export const BookmarkCard = React.memo(function BookmarkCard({ chat }: { chat: BookmarkedChat }) {
+  const { t } = useTranslation(['ai', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -74,7 +76,7 @@ export const BookmarkCard = React.memo(function BookmarkCard({ chat }: { chat: B
           </Animated.View>
         )}
         <Typography preset="caption" color={colors.textDisabled} style={styles.bookmarkDate}>
-          Bookmarked {formatDate(chat.bookmarkedAt)}
+          {t('ai:chat.bookmarkedAt', { date: formatDate(chat.bookmarkedAt), defaultValue: `Bookmarked ${formatDate(chat.bookmarkedAt)}` })}
         </Typography>
       </Card>
     </Pressable>
@@ -87,13 +89,16 @@ export interface SessionCardProps {
   onContinue: (session: ChatSession) => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export const SessionCard = React.memo(function SessionCard({ session, onLongPress, onContinue }: SessionCardProps) {
+  const { t } = useTranslation(['ai', 'profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
   const [expanded, setExpanded] = useState(false);
-  const questionLabel = session.messageCount === 1 ? 'question' : 'questions';
-  const creditLabel = session.totalCreditsUsed === 1 ? 'credit' : 'credits';
+  const questionLabel = session.messageCount === 1 ? t('ai:chat.question', 'question') : t('ai:chat.questions', 'questions');
+  const creditLabel = session.totalCreditsUsed === 1 ? t('profile:credits.credit', 'credit') : t('profile:credits.credits', 'credits');
   const displayTitle = session.customTitle || session.title;
 
   const handleToggle = useCallback(() => setExpanded(e => !e), []);
@@ -153,7 +158,7 @@ export const SessionCard = React.memo(function SessionCard({ session, onLongPres
           style={({ pressed }) => [styles.continueRow, { borderTopColor: colors.border, opacity: pressed ? 0.7 : 1 }]}
           onPress={handleContinue}
         >
-          <Typography preset="label" color={colors.accent}>Continue conversation</Typography>
+          <Typography preset="label" color={colors.accent}>{t('ai:chat.continueConversation', 'Continue conversation')}</Typography>
           <ArrowRightIcon size={14} color={colors.accent} />
         </Pressable>
 

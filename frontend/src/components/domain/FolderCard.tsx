@@ -1,4 +1,4 @@
-import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { AccentIcon, ListCard } from '../ui';
 import { FolderIcon } from '../icons';
 import type { Folder } from '../../types';
@@ -10,7 +10,8 @@ export function FolderCard({ folder, setCount = 0, onPress, onLongPress, onMenuP
   onLongPress?: () => void;
   onMenuPress?: () => void;
 }) {
-  const subtitle = `${setCount} ${setCount === 1 ? 'set' : 'sets'}`;
+  const { t } = useTranslation('library');
+  const subtitle = t('library:folders.setsCount', { count: setCount, defaultValue: `${setCount} ${setCount === 1 ? 'set' : 'sets'}` });
 
   return (
     <ListCard

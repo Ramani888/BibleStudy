@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
@@ -16,6 +17,7 @@ import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
 
 export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSets'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
@@ -54,7 +56,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
 
   const header = (
     <ScreenHeader
-      title="Friends' Sets"
+      title={t('library:friendsSets.title')}
       onBack={handleGoBack}
       right={
         <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
@@ -66,7 +68,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
       <Typography preset="caption" color={colors.textSecondary} align="center">
-        {total} {total === 1 ? 'set' : 'sets'} shared by friends
+        {t('library:friendsSets.sharedCount', { count: total, defaultValue: `${total} sets shared by friends` })}
       </Typography>
     </View>
   );
@@ -74,7 +76,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
   if (isError) {
     return (
       <Screen header={header}>
-        <ErrorState message="Could not load friends' sets." onRetry={refetch} />
+        <ErrorState message={t('library:sets.couldNotLoadFriendsSets', "Could not load friends' sets.")} onRetry={refetch} />
       </Screen>
     );
   }
@@ -83,7 +85,7 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
     <Screen header={header} footer={footer}>
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search sets…" autoFocus />
+          <SearchBar value={search} onChangeText={setSearch} placeholder={t('library:sets.searchPlaceholder', 'Search sets…')} autoFocus />
         </View>
       )}
       <View style={styles.flex}>
@@ -98,8 +100,8 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         ItemSeparatorComponent={() => <Spacer size={spacing.md} />}
         ListEmptyComponent={
           <EmptyState
-            title={search ? 'No results' : 'No sets from friends'}
-            subtitle={search ? `No sets match "${search}"` : "When your friends mark sets as Friends-only, they'll appear here."}
+            title={search ? t('common:status.noResults', 'No results') : t('library:friendsSets.noSets', 'No sets from friends')}
+            subtitle={search ? t('library:friendsSets.noSetsMatch', { query: search, defaultValue: `No sets match "${search}"` }) : t('library:friendsSets.noSetsSub', "When your friends mark sets as Friends-only, they'll appear here.")}
           />
         }
         ListFooterComponent={
@@ -120,17 +122,17 @@ export function FriendsSetsScreen({ navigation }: LibraryScreenProps<'FriendsSet
         onClose={closeSelectedSet}
         actions={[
           {
-            label: 'Clone to Library',
+            label: t('library:publicSets.copyToLibrary', 'Add to My Library'),
             icon: CopyIcon,
             onPress: () =>
               selectedSet &&
               cloneSet(selectedSet.id, {
                 onSuccess: () => {
                   setSelectedSet(null);
-                  Toast.show({ type: 'success', text1: 'Set cloned to your library!' });
+                  Toast.show({ type: 'success', text1: t('library:publicSets.copiedSuccess', 'Set added to your library!') });
                 },
                 onError: err =>
-                  Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+                  Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
               }),
           },
         ]}

@@ -79,10 +79,11 @@ function daysUntilExpiry(expiresAt: string | null): number | null {
 }
 
 function ExpiryBadge({ expiresAt }: { expiresAt: string | null }) {
+  const { t } = useTranslation('profile');
   const { colors } = useTheme();
   const days = daysUntilExpiry(expiresAt);
   if (days === null || days > 7) return null;
-  const label = days === 0 ? 'Expires today' : `Expires in ${days}d`;
+  const label = days === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDays', { days, defaultValue: `Expires in ${days}d` });
   return (
     <View style={[styles.expiryBadge, { backgroundColor: colors.warning ?? '#F59E0B' }]}>
       <Typography preset="caption" color={palette.white} style={styles.expiryBadgeText}>{label}</Typography>
@@ -113,6 +114,7 @@ function FadeImage({ uri, style }: { uri: string; style: object }) {
 // ─── StorageBar ──────────────────────────────────────────────────────────────
 
 function StorageBar({ used, limit, percent }: StorageUsage) {
+  const { t } = useTranslation('profile');
   const { colors } = useTheme();
   const barColor = percent >= 90 ? colors.alert : percent >= 70 ? colors.warning : colors.accent;
   const anim = useSharedValue(0);
@@ -130,7 +132,7 @@ function StorageBar({ used, limit, percent }: StorageUsage) {
         <Animated.View style={[sbStyles.fill, barStyle]} />
       </View>
       <Typography preset="caption" color={colors.textSecondary}>
-        {fmtBytes(used)} of {fmtBytes(limit)} used · {percent}%
+        {t('profile:media.storageUsedOfLimit', { used: fmtBytes(used), limit: fmtBytes(limit), percent, defaultValue: `${fmtBytes(used)} of ${fmtBytes(limit)} used · ${percent}%` })}
       </Typography>
     </View>
   );
@@ -145,6 +147,7 @@ const sbStyles = StyleSheet.create({
 // ─── UploadToast ─────────────────────────────────────────────────────────────
 
 function UploadToast({ visible, progress, filename }: { visible: boolean; progress: number; filename: string }) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const translateY = useSharedValue(100);
@@ -162,7 +165,7 @@ function UploadToast({ visible, progress, filename }: { visible: boolean; progre
       <ActivityIndicator size="small" color={colors.accent} />
       <View style={utStyles.info}>
         <Typography preset="caption" numberOfLines={1} color={colors.textPrimary}>
-          {filename ? `Uploading ${filename}` : 'Uploading…'}
+          {filename ? t('common:status.uploadingFile', { filename, defaultValue: `Uploading ${filename}` }) : t('common:status.uploading', 'Uploading…')}
         </Typography>
         <View style={[utStyles.track, { backgroundColor: colors.surfaceMuted }]}>
           <View style={[utStyles.bar, { width: `${progress}%`, backgroundColor: colors.accent }]} />
@@ -191,9 +194,10 @@ const utStyles = StyleSheet.create({
 
 // ─── Main Screen ──────────────────────────────────────────────────────────────
 
-type Props = ProfileScreenProps<'Media'>;
+import { useTranslation } from 'react-i18next';
 
-export function MediaScreen({ navigation }: Props) {
+export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -276,7 +280,7 @@ export function MediaScreen({ navigation }: Props) {
           </Typography>
           {daysUntilExpiry(item.expiresAt) !== null && daysUntilExpiry(item.expiresAt)! <= 7 && (
             <Typography preset="caption" color={colors.warning ?? '#F59E0B'}>
-              {daysUntilExpiry(item.expiresAt) === 0 ? 'Expires today' : `Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep`}
+              {daysUntilExpiry(item.expiresAt) === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDaysUpgrade', { days: daysUntilExpiry(item.expiresAt), defaultValue: `Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep` })}
             </Typography>
           )}
         </View>
@@ -289,7 +293,7 @@ export function MediaScreen({ navigation }: Props) {
   }, [actions, navigation, isDark, colors]);
 
   return (
-    <Screen header={<ScreenHeader title="My Media" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('profile:media.title')} onBack={() => navigation.goBack()} />}>
 
       {/* Storage quota bar */}
       {storage && <StorageBar {...storage} />}
@@ -298,9 +302,11 @@ export function MediaScreen({ navigation }: Props) {
       {actions.selectionMode ? (
         <View style={styles.selectionHeader}>
           <Pressable onPress={actions.exitSelectionMode} hitSlop={8}>
-            <Typography preset="caption" color={colors.accent}>Cancel</Typography>
+            <Typography preset="caption" color={colors.accent}>{t('common:actions.cancel', 'Cancel')}</Typography>
           </Pressable>
-          <Typography preset="caption" style={s.selectionCount}>{actions.selectedIds.size} selected</Typography>
+          <Typography preset="caption" style={s.selectionCount}>
+            {t('library:plans.selectedCount', { count: actions.selectedIds.size, defaultValue: `${actions.selectedIds.size} selected` })}
+          </Typography>
           <Pressable onPress={() => actions.handleBulkDelete(actions.selectedIds.size)} disabled={actions.selectedIds.size === 0} hitSlop={8}
             style={actions.selectedIds.size === 0 ? styles.btnDisabled : undefined}>
             <TrashIcon size={20} color={colors.alert} />
@@ -322,7 +328,7 @@ export function MediaScreen({ navigation }: Props) {
                   : <FileTextIcon size={15} color={active ? colors.accent : colors.textSecondary} />
                 }
                 <Typography preset="caption" color={active ? colors.accent : colors.textSecondary} style={active ? s.tabLabelActive : undefined}>
-                  {tab === 'IMAGE' ? 'Images' : 'PDFs'}
+                  {tab === 'IMAGE' ? t('profile:media.images', 'Images') : t('profile:media.pdfs', 'PDFs')}
                 </Typography>
                 {!isLoading && count > 0 && (
                   <View style={[styles.badge, active ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: colors.accent } : { backgroundColor: colors.surfaceMuted }]}>
@@ -346,14 +352,14 @@ export function MediaScreen({ navigation }: Props) {
 
       {searchVisible && !actions.selectionMode && (
         <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search files…" autoFocus />
+          <SearchBar value={search} onChangeText={setSearch} placeholder={t('profile:media.searchPlaceholder', 'Search files…')} autoFocus />
         </View>
       )}
 
       {/* Content */}
       <View style={s.contentArea}>
         {error ? (
-          <ErrorState message="Could not load media" onRetry={refetch} />
+          <ErrorState message={t('profile:media.couldNotLoad', 'Could not load media')} onRetry={refetch} />
         ) : activeTab === 'IMAGE' ? (
           <FlatList
             key="images"
@@ -365,7 +371,7 @@ export function MediaScreen({ navigation }: Props) {
             style={s.list}
             contentContainerStyle={s.imageListContent}
             refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title={search ? 'No results' : 'No images yet'} subtitle={search ? `No images match "${search}"` : 'Tap + to upload your first photo'} />}
+            ListEmptyComponent={<EmptyState title={search ? t('common:status.noResults', 'No results') : t('profile:media.noImagesYet', 'No images yet')} subtitle={search ? t('profile:media.noImagesMatch', { query: search, defaultValue: `No images match "${search}"` }) : t('profile:media.tapToUploadPhoto', 'Tap + to upload your first photo')} />}
           />
         ) : (
           <FlatList
@@ -376,7 +382,7 @@ export function MediaScreen({ navigation }: Props) {
             style={s.list}
             contentContainerStyle={s.pdfListContent}
             refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title={search ? 'No results' : 'No PDFs yet'} subtitle={search ? `No PDFs match "${search}"` : 'Tap + to upload your first PDF'} />}
+            ListEmptyComponent={<EmptyState title={search ? t('common:status.noResults', 'No results') : t('profile:media.noPdfsYet', 'No PDFs yet')} subtitle={search ? t('profile:media.noPdfsMatch', { query: search, defaultValue: `No PDFs match "${search}"` }) : t('profile:media.tapToUploadPdf', 'Tap + to upload your first PDF')} />}
           />
         )}
 
@@ -404,10 +410,10 @@ export function MediaScreen({ navigation }: Props) {
 
       <ActionSheet
         visible={upload.pickSheetVisible}
-        title="Add Image"
+        title={t('profile:media.addImage', 'Add Image')}
         actions={[
-          { label: 'Photo Library', icon: AlbumsIcon, onPress: upload.handlePickImage },
-          { label: 'Take Photo',    icon: CameraIcon, onPress: upload.handlePickFromCamera },
+          { label: t('profile:editProfile.chooseFromLibrary', 'Photo Library'), icon: AlbumsIcon, onPress: upload.handlePickImage },
+          { label: t('profile:editProfile.takePhoto', 'Take Photo'),    icon: CameraIcon, onPress: upload.handlePickFromCamera },
         ]}
         onClose={() => upload.setPickSheetVisible(false)}
       />
@@ -417,19 +423,19 @@ export function MediaScreen({ navigation }: Props) {
         title={actions.actionSheetFile?.name}
         actions={[
           {
-            label: 'Rename', icon: PencilIcon,
+            label: t('common:actions.rename', 'Rename'), icon: PencilIcon,
             onPress: () => {
               if (!actions.actionSheetFile) return;
               actions.setRenameState({ visible: true, file: actions.actionSheetFile, value: actions.actionSheetFile.name.replace(/\.[^.]+$/, '') });
             },
           },
-          { label: 'Share',  icon: ShareIcon, onPress: () => { if (actions.actionSheetFile) actions.handleShare(actions.actionSheetFile); } },
-          { label: 'Delete', icon: TrashIcon, destructive: true, onPress: () => { if (actions.actionSheetFile) actions.handleDelete(actions.actionSheetFile); } },
+          { label: t('common:actions.share', 'Share'),  icon: ShareIcon, onPress: () => { if (actions.actionSheetFile) actions.handleShare(actions.actionSheetFile); } },
+          { label: t('common:actions.delete', 'Delete'), icon: TrashIcon, destructive: true, onPress: () => { if (actions.actionSheetFile) actions.handleDelete(actions.actionSheetFile); } },
         ]}
         onClose={() => actions.setActionSheetFile(null)}
       />
 
-      <AppModal visible={actions.renameState.visible} title="Rename File" onClose={() => actions.setRenameState({ visible: false, file: null, value: '' })}>
+      <AppModal visible={actions.renameState.visible} title={t('profile:media.renameFile', 'Rename File')} onClose={() => actions.setRenameState({ visible: false, file: null, value: '' })}>
         <TextInput
           value={actions.renameState.value}
           onChangeText={v => actions.setRenameState(st => ({ ...st, value: v }))}
@@ -437,11 +443,11 @@ export function MediaScreen({ navigation }: Props) {
           autoFocus selectTextOnFocus returnKeyType="done"
           onSubmitEditing={actions.handleRenameConfirm}
           maxLength={255 - (actions.renameState.file?.name.match(/\.[^.]+$/)?.[0]?.length ?? 0)}
-          placeholder="File name"
+          placeholder={t('profile:media.fileName', 'File name')}
           placeholderTextColor={colors.textSecondary}
         />
         <View style={s.gap3} />
-        <Button label="Save" onPress={actions.handleRenameConfirm} loading={actions.renameMedia.isPending} disabled={!actions.renameState.value.trim() || actions.renameMedia.isPending} />
+        <Button label={t('common:actions.save', 'Save')} onPress={actions.handleRenameConfirm} loading={actions.renameMedia.isPending} disabled={!actions.renameState.value.trim() || actions.renameMedia.isPending} />
         <View style={s.gap2} />
       </AppModal>
 

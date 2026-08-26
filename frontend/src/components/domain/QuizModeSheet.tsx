@@ -7,6 +7,7 @@ import {
 } from '@gorhom/bottom-sheet';
 import type { BottomSheetBackdropProps } from '@gorhom/bottom-sheet';
 
+import { useTranslation } from 'react-i18next';
 import { Divider, Typography } from '../ui';
 import { ChevronRightIcon, ShuffleIcon } from '../icons';
 import { useCards } from '../../hooks';
@@ -23,6 +24,7 @@ interface QuizModeSheetProps {
 }
 
 export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: QuizModeSheetProps) {
+  const { t } = useTranslation(['quiz', 'common']);
   const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
   const isOpenRef = useRef(false);
@@ -68,14 +70,14 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
       <BottomSheetScrollView contentContainerStyle={styles.content}>
         <Typography preset="h4" style={styles.title}>{setTitles[0]}</Typography>
         <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>
-          CHOOSE A QUIZ TYPE
+          {t('quiz:setup.chooseType', 'CHOOSE A QUIZ TYPE')}
         </Typography>
 
         <Pressable style={({ pressed }) => [styles.row, styles.mixRow, { backgroundColor: colors.accentSoft }, pressed && styles.rowPressed]} onPress={() => handleStart('mix')}>
           <ShuffleIcon size={20} color={colors.accent} />
           <View style={styles.flex}>
-            <Typography preset="h4" color={colors.accent}>Mix</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>Random mix of all types</Typography>
+            <Typography preset="h4" color={colors.accent}>{t('quiz:setup.modeMix', 'Mix')}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('quiz:setup.modeMixDesc', 'Random mix of all types')}</Typography>
           </View>
           <ChevronRightIcon size={18} color={colors.accent} />
         </Pressable>
@@ -86,9 +88,9 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
           <React.Fragment key={m}>
             <Pressable style={({ pressed }) => [styles.row, pressed && styles.rowPressed]} onPress={() => handleStart(m)}>
               <View style={styles.flex}>
-                <Typography preset="h4" color={colors.textPrimary}>{MODE_META[m].label}</Typography>
+                <Typography preset="h4" color={colors.textPrimary}>{t(`quiz:modes.${m}`, MODE_META[m].label)}</Typography>
                 {!MODE_META[m].scored && (
-                  <Typography preset="caption" color={colors.textSecondary}>Practice · not scored</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>{t('quiz:setup.practiceNotScored', 'Practice · not scored')}</Typography>
                 )}
               </View>
               <ChevronRightIcon size={18} color={colors.textDisabled} />
@@ -100,7 +102,7 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
         {cards.length > 0 && modes.length === 0 && (
           <View style={styles.empty}>
             <Typography preset="body" color={colors.textSecondary} align="center">
-              Multiple choice needs {MIN_MC_CARDS}+ cards of the same type.
+              {t('quiz:setup.needMinCards', { count: MIN_MC_CARDS, defaultValue: `Multiple choice needs ${MIN_MC_CARDS}+ cards of the same type.` })}
             </Typography>
           </View>
         )}
@@ -108,14 +110,14 @@ export function QuizModeSheet({ visible, setIds, setTitles, onClose, onStart }: 
         {cards.length === 0 && (
           <View style={styles.empty}>
             <Typography preset="body" color={colors.textSecondary} align="center">
-              Add cards to this set to start quizzing.
+              {t('quiz:setup.addCardsToQuiz', 'Add cards to this set to start quizzing.')}
             </Typography>
           </View>
         )}
 
         <Divider />
         <Pressable style={({ pressed }) => [styles.cancel, pressed && styles.cancelPressed]} onPress={() => ref.current?.dismiss()}>
-          <Typography preset="bodyLg" color={colors.textSecondary} align="center">Cancel</Typography>
+          <Typography preset="bodyLg" color={colors.textSecondary} align="center">{t('common:actions.cancel')}</Typography>
         </Pressable>
       </BottomSheetScrollView>
     </BottomSheetModal>

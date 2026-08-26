@@ -44,6 +44,7 @@ function TagFilterBar({ activeTag, onSelect, colors }: {
   onSelect: (tag: string | null) => void;
   colors: ReturnType<typeof useTheme>['colors'];
 }) {
+  const { t } = useTranslation('common');
   return (
     <View style={[styles.tagBarWrapper, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
@@ -51,7 +52,7 @@ function TagFilterBar({ activeTag, onSelect, colors }: {
           style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === null && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
           onPress={() => onSelect(null)}
         >
-          <Typography preset="caption" color={activeTag === null ? colors.textOnAccent : colors.textSecondary}>All</Typography>
+          <Typography preset="caption" color={activeTag === null ? colors.textOnAccent : colors.textSecondary}>{t('common:filter.all', 'All')}</Typography>
         </Pressable>
         {PREDEFINED_TAGS.map(tag => (
           <Pressable
@@ -72,18 +73,19 @@ function RenameModal({ visible, value, isRenaming, onClose, onChange, onSave, co
   onClose: () => void; onChange: (v: string) => void; onSave: () => void;
   colors: ReturnType<typeof useTheme>['colors'];
 }) {
+  const { t } = useTranslation(['ai', 'common']);
   return (
-    <AppModal visible={visible} title="Rename Conversation" onClose={onClose} showHandle>
+    <AppModal visible={visible} title={t('ai:history.renameTitle', 'Rename Conversation')} onClose={onClose} showHandle>
       <TextInput
         style={[styles.renameInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceMuted }]}
         value={value}
         onChangeText={onChange}
-        placeholder="Conversation name…"
+        placeholder={t('ai:history.namePlaceholder', 'Conversation name…')}
         placeholderTextColor={colors.textSecondary}
         autoFocus
         maxLength={200}
       />
-      <Button label={isRenaming ? 'Saving…' : 'Save'} onPress={onSave} disabled={!value.trim() || isRenaming} fullWidth style={styles.renameModalBtn} />
+      <Button label={isRenaming ? t('common:status.saving', 'Saving…') : t('common:actions.save', 'Save')} onPress={onSave} disabled={!value.trim() || isRenaming} fullWidth style={styles.renameModalBtn} />
     </AppModal>
   );
 }
@@ -93,8 +95,9 @@ function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSav
   onClose: () => void; onToggle: (tag: string) => void; onSave: () => void;
   colors: ReturnType<typeof useTheme>['colors'];
 }) {
+  const { t } = useTranslation(['ai', 'common']);
   return (
-    <AppModal visible={visible} title="Edit Tags" onClose={onClose} showHandle>
+    <AppModal visible={visible} title={t('ai:history.editTags', 'Edit Tags')} onClose={onClose} showHandle>
       <View style={styles.tagGrid}>
         {PREDEFINED_TAGS.map(tag => {
           const active = selected.includes(tag);
@@ -109,14 +112,17 @@ function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSav
           );
         })}
       </View>
-      <Button label={isUpdatingTags ? 'Saving…' : 'Save Tags'} onPress={onSave} disabled={isUpdatingTags} fullWidth style={styles.tagsModalBtn} />
+      <Button label={isUpdatingTags ? t('common:status.saving', 'Saving…') : t('common:actions.save', 'Save')} onPress={onSave} disabled={isUpdatingTags} fullWidth style={styles.tagsModalBtn} />
     </AppModal>
   );
 }
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
+import { useTranslation } from 'react-i18next';
+
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
+  const { t } = useTranslation(['ai', 'common']);
   const { colors } = useTheme();
 
   const { data, isLoading, isError, isRefetching, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useAIChatHistory();
@@ -147,21 +153,21 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
 
   const handleLongPress = useCallback((session: ChatSession) => {
     if (!session.sessionId) {
-      Toast.show({ type: 'info', text1: 'Cannot manage this conversation', text2: 'Legacy messages cannot be renamed or deleted.' });
+      Toast.show({ type: 'info', text1: t('ai:history.cannotManage', 'Cannot manage this conversation'), text2: t('ai:history.legacyMessagesInfo', 'Legacy messages cannot be renamed or deleted.') });
       return;
     }
     actions.setSheet({ visible: true, session });
-  }, [actions]);
+  }, [actions, t]);
 
   const renderSession  = useCallback(({ item }: { item: ChatSession })    => <SessionCard  session={item} onLongPress={handleLongPress} onContinue={handleContinue} />, [handleLongPress, handleContinue]);
   const renderBookmark = useCallback(({ item }: { item: BookmarkedChat }) => <BookmarkCard chat={item} />, []);
 
   const hasAnyTaggedSession = allSessions.some(s => s.tags?.length > 0);
 
-  if (isError) return <ErrorState message="Could not load history." onRetry={refetch} />;
+  if (isError) return <ErrorState message={t('ai:history.couldNotLoadHistory', 'Could not load history.')} onRetry={refetch} />;
 
   return (
-    <Screen header={<ScreenHeader title="Chat History" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('ai:history.title')} onBack={() => navigation.goBack()} />}>
 
       {/* View mode toggle */}
       <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
@@ -173,7 +179,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           >
             {mode === 'bookmarked' && <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary} />}
             <Typography preset="label" color={viewMode === mode ? colors.accent : colors.textSecondary}>
-              {mode === 'all' ? 'All' : 'Bookmarked'}
+              {mode === 'all' ? t('ai:history.all') : t('ai:history.bookmarked')}
             </Typography>
           </Pressable>
         ))}
@@ -182,7 +188,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
       {viewMode === 'all' && (
         <>
           <View style={[styles.topBar, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-            <SearchBar placeholder="Search conversations…" value={searchQuery} onChangeText={setSearchQuery} containerStyle={styles.searchBarContainer} />
+            <SearchBar placeholder={t('ai:history.searchPlaceholder', 'Search conversations…')} value={searchQuery} onChangeText={setSearchQuery} containerStyle={styles.searchBarContainer} />
             {allSessions.length > 0 && (
               <Pressable onPress={actions.handleClearAll} hitSlop={8} style={({ pressed }) => [styles.clearBtn, { opacity: pressed ? 0.85 : 1 }]}>
                 <TrashIcon size={18} color={colors.alert} />
@@ -204,7 +210,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           ItemSeparatorComponent={ListSeparator}
           ListEmptyComponent={
             !isBookmarksLoading
-              ? <EmptyState title="No bookmarks yet" subtitle="Long-press any AI response and tap Bookmark to save it here" />
+              ? <EmptyState title={t('ai:history.noBookmarks', 'No bookmarks yet')} subtitle={t('ai:history.noBookmarksSub', 'Long-press any AI response and tap Bookmark to save it here')} />
               : <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
           }
           renderItem={renderBookmark}
@@ -222,7 +228,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           onEndReachedThreshold={0.3}
           ListEmptyComponent={
             !isLoading
-              ? <EmptyState title={searchQuery ? 'No results found' : 'No chat history yet'} subtitle={searchQuery ? 'Try a different search term' : 'Your conversations with the AI assistant will appear here'} />
+              ? <EmptyState title={searchQuery ? t('common:status.noResults', 'No results found') : t('ai:history.noHistory', 'No chat history yet')} subtitle={searchQuery ? t('common:status.tryDifferentSearch', 'Try a different search term') : t('ai:history.noHistorySub', 'Your conversations with the AI assistant will appear here')} />
               : <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
           }
           ListFooterComponent={isFetchingNextPage ? <View style={styles.footerLoader}><ActivityIndicator color={colors.accent} size="small" /></View> : null}
@@ -230,7 +236,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         />
       )}
 
-      <ActionSheet visible={actions.sheet.visible} title="Conversation" actions={actions.sheetActions} onClose={() => actions.setSheet({ visible: false, session: null })} />
+      <ActionSheet visible={actions.sheet.visible} title={t('ai:history.conversation', 'Conversation')} actions={actions.sheetActions} onClose={() => actions.setSheet({ visible: false, session: null })} />
 
       <RenameModal
         visible={actions.renameModal.visible}

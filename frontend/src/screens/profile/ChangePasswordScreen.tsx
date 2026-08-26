@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { FormField } from '../../components/forms';
 import { Button } from '../../components/ui';
@@ -16,6 +17,7 @@ import { makeChangePasswordSchema, type ChangePasswordFormData } from '../../uti
 import { layout, spacing } from '../../theme';
 
 export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangePassword'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const hasPassword = useAuthStore(s => s.user?.hasPassword ?? true);
   const updateUser = useAuthStore(s => s.updateUser);
   const user = useAuthStore(s => s.user);
@@ -35,21 +37,21 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
         newPassword: data.newPassword,
       });
       if (!hasPassword && user) updateUser({ ...user, hasPassword: true });
-      Toast.show({ type: 'success', text1: hasPassword ? 'Password changed!' : 'Password added!' });
+      Toast.show({ type: 'success', text1: hasPassword ? t('profile:changePassword.passwordChanged', 'Password changed!') : t('profile:changePassword.passwordAdded', 'Password added!') });
       reset();
       navigation.goBack();
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
     }
   };
 
   return (
     <Screen
       keyboardAvoiding
-      header={<ScreenHeader title="Change Password" onBack={() => navigation.goBack()} />}
+      header={<ScreenHeader title={t('profile:menu.changePassword')} onBack={() => navigation.goBack()} />}
       footer={
         <View style={styles.footer}>
-          <Button label="Save" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('common:actions.save')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
         </View>
       }
     >
@@ -60,8 +62,8 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
               <FormField
                 name="currentPassword"
                 control={control}
-                label="Current password"
-                placeholder="Enter current password"
+                label={t('profile:changePassword.currentPassword', 'Current password')}
+                placeholder={t('profile:changePassword.currentPasswordPlaceholder', 'Enter current password')}
                 isPassword
                 returnKeyType="next"
                 onSubmitEditing={() => newRef.current?.focus()}
@@ -72,8 +74,8 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
             <FormField
               name="newPassword"
               control={control}
-              label="New password"
-              placeholder="Min 8 chars, 1 uppercase, 1 number"
+              label={t('profile:changePassword.newPassword', 'New password')}
+              placeholder={t('profile:changePassword.newPasswordPlaceholder', 'Min 8 chars, 1 uppercase, 1 number')}
               isPassword
               inputRef={newRef}
               returnKeyType="next"
@@ -84,8 +86,8 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
             <FormField
               name="confirmPassword"
               control={control}
-              label="Confirm new password"
-              placeholder="Repeat new password"
+              label={t('profile:changePassword.confirmPassword', 'Confirm new password')}
+              placeholder={t('profile:changePassword.confirmPasswordPlaceholder', 'Repeat new password')}
               isPassword
               inputRef={confirmRef}
               returnKeyType="done"

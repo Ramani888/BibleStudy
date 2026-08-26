@@ -9,16 +9,19 @@ interface ErrorStateProps {
   style?: ViewStyle;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function ErrorState({
-  message = 'Something went wrong.',
+  message,
   onRetry,
   style,
 }: ErrorStateProps) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
   return (
     <View style={[styles.container, style]}>
       <Typography preset="h4" align="center" color={colors.textPrimary}>
-        Oops!
+        {t('common:status.error', 'Oops!')}
       </Typography>
       <Typography
         preset="body"
@@ -26,10 +29,10 @@ export function ErrorState({
         color={colors.textSecondary}
         style={styles.message}
       >
-        {message}
+        {message ?? t('common:status.error')}
       </Typography>
       {onRetry && (
-        <Button label="Try Again" variant="outline" onPress={onRetry} style={styles.btn} />
+        <Button label={t('common:actions.retry', 'Try Again')} variant="outline" onPress={onRetry} style={styles.btn} />
       )}
     </View>
   );

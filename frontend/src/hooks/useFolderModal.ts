@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 
 import { useCreateFolder, useUpdateFolder } from './useFolders';
@@ -6,6 +7,7 @@ import { getErrorMessage } from '../api';
 import type { Folder } from '../types';
 
 export function useFolderModal() {
+  const { t } = useTranslation(['common', 'library']);
   // ── Create states ──
   const [newFolderModalOpen, setNewFolderModalOpen] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -41,11 +43,11 @@ export function useFolderModal() {
         setNewFolderName('');
         setSelectedColor(null);
         setNewFolderModalOpen(false);
-        Toast.show({ type: 'success', text1: 'Folder created' });
+        Toast.show({ type: 'success', text1: t('library:folders.folderCreated', 'Folder created') });
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [newFolderName, selectedColor, createFolder, creatingFolder]);
+  }, [newFolderName, selectedColor, createFolder, creatingFolder, t]);
 
   // ── Edit handlers ──
   const openEditModal = useCallback((folder: Folder) => {
@@ -67,11 +69,11 @@ export function useFolderModal() {
     updateFolder({ id: editTargetFolder.id, payload: { name: editFolderName.trim(), color: editFolderColor } }, {
       onSuccess: () => {
         closeEditModal();
-        Toast.show({ type: 'success', text1: 'Folder updated' });
+        Toast.show({ type: 'success', text1: t('library:folders.folderUpdated', 'Folder updated') });
       },
-      onError: (err: unknown) => Toast.show({ type: 'error', text1: 'Update failed', text2: getErrorMessage(err) }),
+      onError: (err: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
     });
-  }, [editFolderName, editFolderColor, editTargetFolder, updateFolder, closeEditModal, updatingFolder]);
+  }, [editFolderName, editFolderColor, editTargetFolder, updateFolder, closeEditModal, updatingFolder, t]);
 
   // ── Assign handlers ──
   const openAssignModal = useCallback(() => {

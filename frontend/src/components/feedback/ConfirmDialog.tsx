@@ -4,6 +4,8 @@ import { AppModal } from './Modal';
 import { Button, Divider, Typography } from '../ui';
 import { fontSizes, layout, lineHeights, spacing, useTheme } from '../../theme';
 
+import { useTranslation } from 'react-i18next';
+
 export interface ConfirmDialogProps {
   visible: boolean;
   title: string;
@@ -20,14 +22,17 @@ export function ConfirmDialog({
   visible,
   title,
   message,
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  confirmLabel,
+  cancelLabel,
   variant = 'default',
   loading = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
+  const resolvedConfirm = confirmLabel ?? t('actions.confirm');
+  const resolvedCancel = cancelLabel ?? t('actions.cancel');
   return (
     <AppModal
       visible={visible}
@@ -43,14 +48,14 @@ export function ConfirmDialog({
       <Divider />
       <View style={styles.btnRow}>
         <Button
-          label={cancelLabel}
+          label={resolvedCancel}
           variant="ghost"
           onPress={onCancel}
           disabled={loading}
           style={styles.btn}
         />
         <Button
-          label={confirmLabel}
+          label={resolvedConfirm}
           variant={variant === 'danger' ? 'danger' : 'primary'}
           onPress={onConfirm}
           loading={loading}

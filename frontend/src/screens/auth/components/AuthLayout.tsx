@@ -38,6 +38,8 @@ const BrandLogo = React.memo(function BrandLogo() {
   );
 });
 
+import { useTranslation } from 'react-i18next';
+
 export function AuthLayout({
   title,
   subtitle,
@@ -47,6 +49,7 @@ export function AuthLayout({
   onApple,
   socialLoading,
 }: AuthLayoutProps) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
   const hasSocial = !!(onGoogle && onApple);
 
@@ -78,7 +81,7 @@ export function AuthLayout({
               <View style={styles.dividerRow}>
                 <Divider style={styles.dividerLine} />
                 <Typography preset="bodySm" color={colors.textSecondary} style={styles.orText}>
-                  or
+                  {t('auth:social.or', 'or')}
                 </Typography>
                 <Divider style={styles.dividerLine} />
               </View>

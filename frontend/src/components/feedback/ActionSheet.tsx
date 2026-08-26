@@ -31,7 +31,10 @@ interface ActionSheetProps {
   onClose: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function ActionSheet({ visible, title, actions, onClose }: ActionSheetProps) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
   const ref = useRef<BottomSheetModal>(null);
   const isOpenRef = useRef(false);
@@ -132,7 +135,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
           onPress={() => ref.current?.dismiss()}
         >
           <Typography preset="bodyLg" color={colors.textSecondary} align="center">
-            Cancel
+            {t('common:actions.cancel')}
           </Typography>
         </Pressable>
       </BottomSheetView>

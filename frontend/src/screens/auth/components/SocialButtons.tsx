@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path, G, ClipPath, Rect, Defs } from 'react-native-svg';
+import { useTranslation } from 'react-i18next';
 import { Typography } from '../../../components/ui';
 import { useTheme, spacing, layout } from '../../../theme';
 
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export const SocialButtons = React.memo(function SocialButtons({ onGoogle, onApple, loading }: Props) {
+  const { t } = useTranslation('auth');
   const { colors } = useTheme();
 
   return (
@@ -49,13 +51,15 @@ export const SocialButtons = React.memo(function SocialButtons({ onGoogle, onApp
         style={({ pressed }) => [styles.btn, { borderColor: colors.border, backgroundColor: colors.background }, pressed && styles.pressed]}
         onPress={onGoogle}
         disabled={!!loading}
+        accessibilityRole="button"
+        accessibilityLabel={t('social.google')}
       >
         {loading === 'google' ? (
           <ActivityIndicator size="small" color={colors.textPrimary} />
         ) : (
           <>
             <GoogleIcon />
-            <Typography preset="label" style={styles.label}>Google</Typography>
+            <Typography preset="label" style={styles.label}>{t('social.google')}</Typography>
           </>
         )}
       </Pressable>
@@ -66,13 +70,15 @@ export const SocialButtons = React.memo(function SocialButtons({ onGoogle, onApp
           style={({ pressed }) => [styles.btn, { borderColor: colors.border, backgroundColor: colors.background }, pressed && styles.pressed]}
           onPress={onApple}
           disabled={!!loading}
+          accessibilityRole="button"
+          accessibilityLabel={t('social.apple')}
         >
           {loading === 'apple' ? (
             <ActivityIndicator size="small" color={colors.textPrimary} />
           ) : (
             <>
               <AppleIcon color={colors.textPrimary} />
-              <Typography preset="label" style={styles.label}>Apple</Typography>
+              <Typography preset="label" style={styles.label}>{t('social.apple')}</Typography>
             </>
           )}
         </Pressable>

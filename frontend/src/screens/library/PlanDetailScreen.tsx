@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanStep } from '../../types';
 import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog } from '../../hooks';
@@ -16,6 +17,7 @@ import { getErrorMessage } from '../../api';
 import { layout, radius, spacing, useTheme } from '../../theme';
 
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { planId } = route.params;
   const { colors } = useTheme();
   const { data: plan, isLoading, error, refetch } = usePlan(planId);
@@ -25,17 +27,17 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
 
   const handleDelete = useCallback(() => {
     show({
-      title: 'Delete plan?',
-      message: 'This removes the plan and its progress. Your sets are not affected.',
-      confirmLabel: 'Delete',
+      title: t('library:plans.deletePlanTitle', 'Delete plan?'),
+      message: t('library:plans.deletePlanMessage', 'This removes the plan and its progress. Your sets are not affected.'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: () =>
         deletePlan.mutate(planId, {
           onSuccess: () => navigation.goBack(),
-          onError: e => Toast.show({ type: 'error', text1: 'Could not delete', text2: getErrorMessage(e) }),
+          onError: e => Toast.show({ type: 'error', text1: t('common:status.couldNotDelete', 'Could not delete'), text2: getErrorMessage(e) }),
         }),
     });
-  }, [show, deletePlan, planId, navigation]);
+  }, [show, deletePlan, planId, navigation, t]);
 
   const renderStep = (step: PlanStep, index: number) => (
     <View key={step.id} style={[styles.step, { borderBottomColor: colors.border }]}>
@@ -59,10 +61,10 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
         disabled={!step.set}
       >
         <Typography preset="body" numberOfLines={1} color={step.completed ? colors.textSecondary : colors.textPrimary}>
-          {index + 1}. {step.title || step.set?.title || 'Set removed'}
+          {index + 1}. {step.title || step.set?.title || t('library:sets.setRemoved', 'Set removed')}
         </Typography>
         {step.set && (
-          <Typography preset="caption" color={colors.textSecondary}>{step.set.cardCount} cards</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.cardCount', { count: step.set.cardCount, defaultValue: `${step.set.cardCount} cards` })}</Typography>
         )}
       </Pressable>
     </View>
@@ -72,7 +74,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
     <Screen
       header={
         <ScreenHeader
-          title={plan?.title ?? 'Plan'}
+          title={plan?.title ?? t('library:plans.plan', 'Plan')}
           onBack={navigation.goBack}
           right={
             <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
@@ -97,7 +99,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
             <Typography preset="label" color={colors.accent}>{plan.completedSteps}/{plan.totalSteps}</Typography>
           </View>
           {plan.completedSteps === plan.totalSteps && plan.totalSteps > 0 && (
-            <Typography preset="bodySm" color={colors.success} style={styles.done}>🎉 Plan complete!</Typography>
+            <Typography preset="bodySm" color={colors.success} style={styles.done}>{t('library:plans.planComplete', '🎉 Plan complete!')}</Typography>
           )}
           </View>
           <View>

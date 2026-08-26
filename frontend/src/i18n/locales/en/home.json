@@ -1,0 +1,58 @@
+{
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "featured": {
+    "due": "DUE",
+    "continue": "CONTINUE",
+    "start": "START",
+    "createFirstSet": "Create your first study set",
+    "beginJourney": "Begin your journey",
+    "streakGoal": "{{streak}} day streak · weekly goal {{goal}}/7",
+    "cardsToReview": "{{count}} card to review",
+    "cardsToReview_other": "{{count}} cards to review"
+  },
+  "dailyVerse": {
+    "title": "Verse of the Day",
+    "share": "Share Verse",
+    "saveAsCard": "Save as Flashcard",
+    "reflection": "Reflection",
+    "copied": "Verse copied to clipboard"
+  },
+  "streak": {
+    "day": "{{count}} Day Streak",
+    "days": "{{count}} Days Streak",
+    "keepGoing": "Keep up the great work!",
+    "streakLost": "Study today to maintain your streak"
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "search": "Search",
+    "askAI": "Ask AI",
+    "newSet": "New Set",
+    "library": "Library"
+  },
+  "sections": {
+    "recentSets": "Recent Sets",
+    "seeAll": "See All",
+    "friendsSets": "Friends' Sets",
+    "communitySets": "Community Sets",
+    "friendActivity": "Friend Activity",
+    "quickStats": "Quick Stats"
+  },
+  "stats": {
+    "sets": "Sets",
+    "folders": "Folders",
+    "notes": "Notes",
+    "cards": "Cards",
+    "credits": "Credits"
+  },
+  "empty": {
+    "noRecentSets": "No recent study sets yet",
+    "noFriendsSets": "No public sets from friends yet",
+    "noCommunitySets": "Explore community study sets",
+    "noActivity": "No recent friend activity"
+  }
+}

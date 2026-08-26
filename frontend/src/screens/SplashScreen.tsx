@@ -33,7 +33,10 @@ interface SplashScreenProps {
   onFinish: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
+  const { t } = useTranslation('common');
   useSystemBars(BRAND_BG);
   const opacity = useRef(new Animated.Value(1)).current;
   const onFinishRef = useRef(onFinish);
@@ -71,7 +74,7 @@ export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
         <SvgXml xml={LOGO_SVG} width={120} height={120} />
       </View>
       <Text style={styles.appName}>BibleStudy Pro</Text>
-      <Text style={styles.tagline}>Study · Memorize · Grow</Text>
+      <Text style={styles.tagline}>{t('common:brand.tagline', 'Study · Memorize · Grow')}</Text>
     </Animated.View>
   );
 }

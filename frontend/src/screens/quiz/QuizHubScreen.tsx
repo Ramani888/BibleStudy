@@ -9,12 +9,14 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
 import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
 
-const ICON_SIZE = 20;
+import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '../../api';
 import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
+
+const ICON_SIZE = 20;
 
 type Nav = NativeStackNavigationProp<QuizStackParamList>;
 
@@ -30,6 +32,7 @@ const MODE_DISPLAY: Record<string, string> = {
 };
 
 export function QuizHubScreen() {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -66,13 +69,13 @@ export function QuizHubScreen() {
   const handleDelete = useCallback((item: QuizAttemptWithSet) => {
     closeSheet();
     show({
-      title: 'Delete Quiz',
-      message: 'Remove this attempt from your history?',
-      confirmLabel: 'Delete',
+      title: t('common:dialogs.deleteConfirmTitle'),
+      message: t('quiz:detail.deleteMessage', 'Remove this attempt from your history?'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: () => deleteAttempt(item.id),
     });
-  }, [closeSheet, show, deleteAttempt]);
+  }, [closeSheet, show, deleteAttempt, t]);
 
   const handleDetails = useCallback((item: QuizAttemptWithSet) => {
     closeSheet();
@@ -140,7 +143,7 @@ export function QuizHubScreen() {
   const footer = !isLoading && !isError ? (
     <View style={[styles.footerBar, { borderTopColor: colors.divider }]}>
       <Button
-        label="+ Start New Quiz"
+        label={t('quiz:hub.startNewQuiz', '+ Start New Quiz')}
         onPress={() => navigation.navigate('QuizSetup', undefined)}
         fullWidth
       />
@@ -151,7 +154,7 @@ export function QuizHubScreen() {
     <Screen
       header={
         <ScreenHeader
-          title="Quiz"
+          title={t('navigation:tabs.study', 'Quiz')}
           right={
             <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
               <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
@@ -163,7 +166,7 @@ export function QuizHubScreen() {
     >
       {searchVisible && (
         <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder="Search quizzes…" autoFocus />
+          <SearchBar value={search} onChangeText={setSearch} placeholder={t('quiz:hub.searchPlaceholder', 'Search quizzes…')} autoFocus />
         </View>
       )}
       {isError ? (
@@ -173,8 +176,8 @@ export function QuizHubScreen() {
       ) : filteredAttempts.length === 0 ? (
         <View style={styles.flex}>
           <EmptyState
-            title={search ? 'No results' : 'No quizzes yet'}
-            subtitle={search ? `No quizzes match "${search}"` : "Tap 'Start New Quiz' below to test yourself"}
+            title={search ? t('common:status.noResults', 'No results') : t('quiz:hub.emptyTitle', 'No quizzes yet')}
+            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No quizzes match "${search}"` }) : t('quiz:hub.emptySub', "Tap 'Start New Quiz' below to test yourself")}
           />
         </View>
       ) : (
@@ -189,7 +192,7 @@ export function QuizHubScreen() {
           style={styles.flex}
           ListHeaderComponent={
             <Typography preset="caption" color={colors.textSecondary} style={styles.listHeader}>
-              RECENT ACTIVITY
+              {t('home:sections.recentActivity', 'RECENT ACTIVITY')}
             </Typography>
           }
         />
@@ -202,12 +205,12 @@ export function QuizHubScreen() {
         onClose={closeSheet}
         actions={[
           {
-            label: 'Details',
+            label: t('quiz:hub.details', 'Details'),
             icon: EyeIcon,
             onPress: () => activeItem && handleDetails(activeItem),
           },
           ...(activeItem?.responses && (activeItem.responses as any[]).length > 0 ? [{
-            label: 'Summary',
+            label: t('quiz:summary.title', 'Summary'),
             icon: ListIcon,
             onPress: () => {
               closeSheet();
@@ -221,7 +224,7 @@ export function QuizHubScreen() {
             },
           }] : []),
           {
-            label: 'Re-Quiz',
+            label: t('quiz:summary.reQuiz', 'Re-Quiz'),
             icon: RefreshIcon,
             onPress: () => activeItem && navigation.navigate('Quiz', {
               setIds: activeItem.setIds,
@@ -231,7 +234,7 @@ export function QuizHubScreen() {
             }),
           },
           {
-            label: 'Delete',
+            label: t('common:actions.delete', 'Delete'),
             icon: TrashIcon,
             destructive: true,
             onPress: () => activeItem && handleDelete(activeItem),

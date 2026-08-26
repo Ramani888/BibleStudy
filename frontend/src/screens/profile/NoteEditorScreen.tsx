@@ -23,9 +23,11 @@ import { ShareIcon, TagIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
 import { fontSizes, fontWeights, layout, lineHeights, useTheme, spacing } from '../../theme';
 
+import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'NoteEditor'>;
 
 export function NoteEditorScreen({ navigation, route }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const { colors } = useTheme();
   const noteId = route.params?.noteId;
   const isEdit = !!noteId;
@@ -60,16 +62,16 @@ export function NoteEditorScreen({ navigation, route }: Props) {
     try {
       if (isEdit) {
         await updateNote.mutateAsync({ title: title.trim(), body: body.trim(), tags: selectedTags });
-        Toast.show({ type: 'success', text1: 'Note updated' });
+        Toast.show({ type: 'success', text1: t('profile:notes.noteUpdated', 'Note updated') });
       } else {
         await createNote.mutateAsync({ title: title.trim(), body: body.trim(), tags: selectedTags });
-        Toast.show({ type: 'success', text1: 'Note saved' });
+        Toast.show({ type: 'success', text1: t('profile:notes.noteSaved', 'Note saved') });
       }
       navigation.goBack();
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
-  }, [canSave, isEdit, title, body, selectedTags, updateNote, createNote, navigation]);
+  }, [canSave, isEdit, title, body, selectedTags, updateNote, createNote, navigation, t]);
 
   const handleShare = useCallback(async () => {
     if (!canShare) return;
@@ -94,7 +96,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   }
 
   if (isEdit && loadError) {
-    return <ErrorState message="Could not load note" onRetry={refetch} />;
+    return <ErrorState message={t('profile:notes.couldNotLoadNote', 'Could not load note')} onRetry={refetch} />;
   }
 
   return (
@@ -103,7 +105,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
       keyboardAvoiding
       header={
         <ScreenHeader
-          title={isEdit ? 'Edit Note' : 'New Note'}
+          title={isEdit ? t('profile:notes.editNote', 'Edit Note') : t('profile:notes.newNote', 'New Note')}
           handle
           right={
             <View style={styles.headerActions}>
@@ -118,7 +120,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
                   preset="label"
                   color={canSave ? colors.accent : colors.textDisabled}
                 >
-                  {isSaving ? 'Saving…' : 'Save'}
+                  {isSaving ? t('common:status.saving') : t('common:actions.save')}
                 </Typography>
               </Pressable>
             </View>
@@ -135,7 +137,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
         <View>
           <TextInput
             style={[styles.titleInput, { color: colors.textPrimary }]}
-            placeholder="Title"
+            placeholder={t('profile:notes.titlePlaceholder', 'Title')}
             placeholderTextColor={colors.textSecondary}
             value={title}
             onChangeText={setTitle}
@@ -159,7 +161,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           <TextInput
             ref={bodyRef}
             style={[styles.bodyInput, { color: colors.textPrimary }]}
-            placeholder="Write your note here…"
+            placeholder={t('profile:notes.bodyPlaceholder', 'Write your note here…')}
             placeholderTextColor={colors.textSecondary}
             value={body}
             onChangeText={setBody}
@@ -170,7 +172,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
         </View>
       </ScrollView>
 
-      <AppModal visible={tagModalVisible} title="Add Tags" onClose={() => setTagModalVisible(false)} showHandle>
+      <AppModal visible={tagModalVisible} title={t('profile:notes.addTags', 'Add Tags')} onClose={() => setTagModalVisible(false)} showHandle>
         <View style={styles.tagGrid}>
           {NOTE_PREDEFINED_TAGS.map(tag => {
             const active = selectedTags.includes(tag);
@@ -192,7 +194,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           })}
         </View>
         <Pressable style={[styles.tagDoneBtn, { backgroundColor: colors.accent }]} onPress={() => setTagModalVisible(false)}>
-          <Typography preset="label" color={colors.textOnAccent}>Done</Typography>
+          <Typography preset="label" color={colors.textOnAccent}>{t('common:actions.done', 'Done')}</Typography>
         </Pressable>
       </AppModal>
     </Screen>

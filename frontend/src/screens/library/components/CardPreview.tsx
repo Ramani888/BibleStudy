@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { useTranslation } from 'react-i18next';
 import { Typography } from '../../../components/ui';
 import { CARD_FILL_LIGHT, fontSizes, layout, lineHeights, spacing, useTheme } from '../../../theme';
 
@@ -10,6 +11,7 @@ interface CardPreviewProps {
 }
 
 export function CardPreview({ question, answer }: CardPreviewProps) {
+  const { t } = useTranslation('library');
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -22,7 +24,7 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
           color={question ? colors.textPrimary : colors.textDisabled}
           style={styles.previewText}
         >
-          {question || 'Front (question)'}
+          {question || t('cards.cardPreviewFront')}
         </Typography>
       </View>
       <View style={[styles.previewBottom, { backgroundColor: cardBg, borderTopColor: colors.border }]}>
@@ -31,7 +33,7 @@ export function CardPreview({ question, answer }: CardPreviewProps) {
           color={answer ? colors.textSecondary : colors.textDisabled}
           style={styles.previewText}
         >
-          {answer || 'Back (answer)'}
+          {answer || t('cards.cardPreviewBack')}
         </Typography>
       </View>
     </View>

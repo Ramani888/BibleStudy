@@ -25,6 +25,7 @@ import { formatDateOnly } from '../../utils/formatters';
 import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 import type { StudySet } from '../../types';
 
+import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'UserProfile'>;
 
 const VISIBILITY_LABEL: Record<string, string> = {
@@ -34,6 +35,7 @@ const VISIBILITY_LABEL: Record<string, string> = {
 };
 
 export function UserProfileScreen({ route, navigation }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -53,15 +55,15 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
   if (error || !user) {
     return (
-      <Screen header={<ScreenHeader title="Profile" onBack={() => navigation.goBack()} />}>
-        <ErrorState message="Could not load profile" onRetry={refetch} />
+      <Screen header={<ScreenHeader title={t('profile:sections.account')} onBack={() => navigation.goBack()} />}>
+        <ErrorState message={t('profile:user.couldNotLoadProfile', 'Could not load profile')} onRetry={refetch} />
       </Screen>
     );
   }
 
   const handleSendRequest = () => {
     sendRequest.mutate(userId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request sent' }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestSent', 'Friend request sent') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
@@ -69,7 +71,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const handleCancelRequest = () => {
     if (!user.pendingRequest) return;
     cancelRequest.mutate(user.pendingRequest.id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Request cancelled' }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestCancelled', 'Request cancelled') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
@@ -77,7 +79,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const handleAccept = () => {
     if (!user.pendingRequest) return;
     acceptRequest.mutate(user.pendingRequest.id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request accepted' }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestAccepted', 'Friend request accepted') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
@@ -85,7 +87,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const handleDecline = () => {
     if (!user.pendingRequest) return;
     rejectRequest.mutate(user.pendingRequest.id, {
-      onSuccess: () => Toast.show({ type: 'success', text1: 'Friend request declined' }),
+      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestDeclined', 'Friend request declined') }),
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
   };
@@ -93,7 +95,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const handleRemoveFriend = () => {
     removeFriend.mutate(userId, {
       onSuccess: () => {
-        Toast.show({ type: 'success', text1: 'Friend removed' });
+        Toast.show({ type: 'success', text1: t('profile:friends.friendRemoved', 'Friend removed') });
         navigation.goBack();
       },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
@@ -103,7 +105,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const handleBlock = () => {
     blockUser.mutate(userId, {
       onSuccess: () => {
-        Toast.show({ type: 'success', text1: 'User blocked' });
+        Toast.show({ type: 'success', text1: t('profile:friends.userBlocked', 'User blocked') });
         navigation.goBack();
       },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
@@ -152,7 +154,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
         <View style={styles.metaRow}>
           <CalendarIcon size={16} color={colors.textSecondary} />
           <Typography preset="caption" color={colors.textSecondary}>
-            Member since {formatDateOnly(user.createdAt)}
+            {t('profile:account.memberSince', { date: formatDateOnly(user.createdAt), defaultValue: `Member since ${formatDateOnly(user.createdAt)}` })}
           </Typography>
         </View>
 
@@ -160,7 +162,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
           <View style={styles.metaRow}>
             <UsersIcon size={16} color={colors.textSecondary} />
             <Typography preset="caption" color={colors.textSecondary}>
-              {user.mutualFriendsCount} mutual {user.mutualFriendsCount === 1 ? 'friend' : 'friends'}
+              {t('profile:friends.mutualFriendsCount', { count: user.mutualFriendsCount, defaultValue: `${user.mutualFriendsCount} mutual friends` })}
             </Typography>
           </View>
         ) : null}
@@ -169,26 +171,26 @@ export function UserProfileScreen({ route, navigation }: Props) {
 
         <View style={styles.actions}>
           {user.isFriend ? (
-            <Button label="Remove Friend" variant="outline" onPress={handleRemoveFriend} loading={removeFriend.isPending} fullWidth />
+            <Button label={t('profile:friends.removeFriend', 'Remove Friend')} variant="outline" onPress={handleRemoveFriend} loading={removeFriend.isPending} fullWidth />
           ) : user.pendingRequest?.direction === 'outgoing' ? (
             <>
-              <Button label="Request Pending" variant="secondary" disabled fullWidth />
-              <Button label="Cancel Request" variant="outline" onPress={handleCancelRequest} loading={cancelRequest.isPending} fullWidth />
+              <Button label={t('profile:friends.requestPending', 'Request Pending')} variant="secondary" disabled fullWidth />
+              <Button label={t('profile:friends.cancelRequest', 'Cancel Request')} variant="outline" onPress={handleCancelRequest} loading={cancelRequest.isPending} fullWidth />
             </>
           ) : user.pendingRequest?.direction === 'incoming' ? (
             <>
-              <Button label="Accept" variant="primary" onPress={handleAccept} loading={acceptRequest.isPending} fullWidth />
-              <Button label="Decline" variant="outline" onPress={handleDecline} loading={rejectRequest.isPending} fullWidth />
+              <Button label={t('common:actions.accept', 'Accept')} variant="primary" onPress={handleAccept} loading={acceptRequest.isPending} fullWidth />
+              <Button label={t('common:actions.decline', 'Decline')} variant="outline" onPress={handleDecline} loading={rejectRequest.isPending} fullWidth />
             </>
           ) : (
-            <Button label="Send Friend Request" variant="primary" onPress={handleSendRequest} loading={sendRequest.isPending || isFetching} fullWidth />
+            <Button label={t('profile:friends.sendRequest', 'Send Friend Request')} variant="primary" onPress={handleSendRequest} loading={sendRequest.isPending || isFetching} fullWidth />
           )}
-          <Button label="Block User" variant="danger" onPress={handleBlock} loading={blockUser.isPending} fullWidth style={styles.blockBtn} />
+          <Button label={t('profile:friends.blockUser', 'Block User')} variant="danger" onPress={handleBlock} loading={blockUser.isPending} fullWidth style={styles.blockBtn} />
         </View>
 
         {sets.length > 0 ? (
           <View style={styles.setsSection}>
-            <Typography preset="label" style={styles.setsTitle}>Their Sets</Typography>
+            <Typography preset="label" style={styles.setsTitle}>{t('profile:friends.theirSets', 'Their Sets')}</Typography>
             {sets.map(set => (
               <Pressable
                 key={set.id}
@@ -206,7 +208,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
                 <View style={styles.setInfo}>
                   <Typography preset="label" numberOfLines={1}>{set.title}</Typography>
                   <Typography preset="caption" color={colors.textSecondary}>
-                    {set._count?.cards ?? 0} cards · {VISIBILITY_LABEL[set.visibility] ?? set.visibility}
+                    {t('library:cardsCount_other', { count: set._count?.cards ?? 0, defaultValue: `${set._count?.cards ?? 0} cards` })} · {t(`library:sets.visibility${set.visibility}`, VISIBILITY_LABEL[set.visibility] ?? set.visibility)}
                   </Typography>
                 </View>
               </Pressable>

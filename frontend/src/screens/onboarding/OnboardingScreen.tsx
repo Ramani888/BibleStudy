@@ -8,45 +8,27 @@ import {
   View,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 import { Button, Spacer, Typography } from '../../components/ui';
 import { layout, spacing, fontSizes, lineHeights, useTheme } from '../../theme';
 import { useSystemBars } from '../../hooks';
+import { storage } from '../../utils/storage';
+
+import { useTranslation } from 'react-i18next';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 
 // ─── Slide data ───────────────────────────────────────────────────────────────
 interface Slide {
-  key: string;
+  key: 'welcome' | 'flashcards' | 'ai';
   icon: string;
-  title: string;
-  subtitle: string;
 }
 
-const SLIDES: Slide[] = [
-  {
-    key: 'welcome',
-    icon: 'book-outline',
-    title: 'Welcome to BibleStudy Pro',
-    subtitle:
-      'Your Christian learning ecosystem — study Scripture, grow in faith, and connect with your community.',
-  },
-  {
-    key: 'flashcards',
-    icon: 'layers-outline',
-    title: 'Master Scripture with Flashcards',
-    subtitle:
-      'Organize your study with Folders, Sets & Cards. Track your progress with spaced repetition.',
-  },
-  {
-    key: 'ai',
-    icon: 'chatbubble-ellipses-outline',
-    title: 'AI Bible Study Assistant',
-    subtitle:
-      'Ask Claude AI questions, get verse explanations, and deepen your understanding of Scripture.',
-  },
+const SLIDE_CONFIGS: Slide[] = [
+  { key: 'welcome', icon: 'book-outline' },
+  { key: 'flashcards', icon: 'layers-outline' },
+  { key: 'ai', icon: 'chatbubble-ellipses-outline' },
 ];
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -56,15 +38,16 @@ interface Props {
 
 // ─── Screen ───────────────────────────────────────────────────────────────────
 export function OnboardingScreen({ onComplete }: Props) {
+  const { t } = useTranslation('auth');
   const [activeIndex, setActiveIndex] = useState(0);
   const listRef = useRef<FlatList<Slide>>(null);
   const { colors } = useTheme();
   useSystemBars(colors.background);
 
-  const isLast = activeIndex === SLIDES.length - 1;
+  const isLast = activeIndex === SLIDE_CONFIGS.length - 1;
 
   const markAndComplete = useCallback(async () => {
-    await AsyncStorage.setItem('@onboarding_seen', 'true');
+    await storage.setOnboardingSeen(true);
     onComplete();
   }, [onComplete]);
 
@@ -74,21 +57,25 @@ export function OnboardingScreen({ onComplete }: Props) {
     setActiveIndex(next);
   }, [activeIndex]);
 
-  const renderSlide = useCallback(({ item }: ListRenderItemInfo<Slide>) => (
-    <View style={styles.slide}>
-      <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
-        <Icon name={item.icon} size={72} color={colors.accent} />
+  const renderSlide = useCallback(({ item }: ListRenderItemInfo<Slide>) => {
+    const title = t(`onboarding.slides.${item.key}.title`);
+    const subtitle = t(`onboarding.slides.${item.key}.subtitle`);
+    return (
+      <View style={styles.slide}>
+        <View style={[styles.iconWrap, { backgroundColor: colors.accentSoft }]}>
+          <Icon name={item.icon} size={72} color={colors.accent} />
+        </View>
+        <Spacer size={spacing.xxxl} />
+        <Typography preset="h2" align="center">
+          {title}
+        </Typography>
+        <Spacer size={spacing.lg} />
+        <Typography preset="body" color={colors.textSecondary} align="center" style={styles.subtitle}>
+          {subtitle}
+        </Typography>
       </View>
-      <Spacer size={spacing.xxxl} />
-      <Typography preset="h2" align="center">
-        {item.title}
-      </Typography>
-      <Spacer size={spacing.lg} />
-      <Typography preset="body" color={colors.textSecondary} align="center" style={styles.subtitle}>
-        {item.subtitle}
-      </Typography>
-    </View>
-  ), [colors]);
+    );
+  }, [colors, t]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]}>
@@ -98,7 +85,7 @@ export function OnboardingScreen({ onComplete }: Props) {
         {!isLast && (
           <Pressable onPress={markAndComplete} hitSlop={12} style={({ pressed }) => pressed && styles.skipPressed}>
             <Typography preset="label" color={colors.textSecondary}>
-              Skip
+              {t('onboarding.skip')}
             </Typography>
           </Pressable>
         )}
@@ -108,7 +95,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       {/* Slides */}
       <FlatList
         ref={listRef}
-        data={SLIDES}
+        data={SLIDE_CONFIGS}
         horizontal
         pagingEnabled
         scrollEnabled={false}
@@ -123,7 +110,7 @@ export function OnboardingScreen({ onComplete }: Props) {
       <View style={styles.bottom}>
         {/* Dot indicators */}
         <View style={styles.dotsRow}>
-          {SLIDES.map((_, i) => (
+          {SLIDE_CONFIGS.map((_, i) => (
             <View
               key={i}
               style={[
@@ -139,19 +126,19 @@ export function OnboardingScreen({ onComplete }: Props) {
 
         {isLast ? (
           <>
-            <Button label="Get Started" onPress={markAndComplete} fullWidth />
+            <Button label={t('onboarding.getStarted')} onPress={markAndComplete} fullWidth />
             <Spacer size={spacing.lg} />
             <Pressable onPress={markAndComplete} hitSlop={8} style={({ pressed }) => pressed && styles.loginPressed}>
               <Typography preset="bodySm" color={colors.textSecondary} align="center">
-                Already have an account?{' '}
+                {t('alreadyHaveAccount')}{' '}
                 <Typography preset="bodySm" color={colors.accent}>
-                  Log in
+                  {t('signIn')}
                 </Typography>
               </Typography>
             </Pressable>
           </>
         ) : (
-          <Button label="Next" onPress={goNext} fullWidth />
+          <Button label={t('onboarding.next')} onPress={goNext} fullWidth />
         )}
       </View>
       </View>

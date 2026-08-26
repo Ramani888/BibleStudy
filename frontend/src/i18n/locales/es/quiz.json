@@ -1,0 +1,93 @@
+{
+  "hub": {
+    "title": "Centro de Cuestionarios",
+    "subtitle": "Pon a prueba tu conocimiento de las Escrituras",
+    "startQuiz": "Comenzar Nuevo Cuestionario",
+    "recentActivity": "Actividad Reciente",
+    "noActivity": "No hay cuestionarios recientes",
+    "noActivitySub": "Completa un cuestionario para ver tu historial de estudio aquí.",
+    "selectSet": "Seleccionar un Set de Estudio",
+    "selectMode": "Elegir Modo de Cuestionario"
+  },
+  "setup": {
+    "title": "Configuración del Cuestionario",
+    "mode": "Modo de Cuestionario",
+    "modes": {
+      "multipleChoice": "Opción Múltiple",
+      "multipleChoiceDesc": "Elige la respuesta correcta entre 4 opciones",
+      "trueFalse": "Verdadero o Falso",
+      "trueFalseDesc": "Decide si la declaración o el versículo es verdadero",
+      "typeIn": "Escribir Respuesta",
+      "typeInDesc": "Escribe la respuesta exacta para máxima retención",
+      "fillInBlank": "Completar Espacios",
+      "fillInBlankDesc": "Rellena las palabras que faltan en el versículo"
+    },
+    "questionCount": "Cantidad de Preguntas",
+    "allCards": "Todas las tarjetas ({{count}})",
+    "timer": "Límite de Tiempo por Pregunta",
+    "noTimer": "Sin límite de tiempo",
+    "seconds": "{{count}} segundos",
+    "start": "Comenzar Cuestionario",
+    "pickSet": "Elegir un set",
+    "chooseSet": "Elegir Set para Cuestionario",
+    "allDone": "¡Todo listo!",
+    "noSetsToQuiz": "No hay sets disponibles para cuestionario.",
+    "createSetFirst": "Crea un set con al menos 1 tarjeta primero."
+  },
+  "hud": {
+    "questionOf": "Pregunta {{current}} de {{total}}",
+    "score": "Puntuación: {{score}}%",
+    "quit": "Salir",
+    "quitConfirmTitle": "¿Salir del cuestionario?",
+    "quitConfirmMessage": "Tu progreso en este cuestionario no se guardará.",
+    "quitConfirmAction": "Salir del Cuestionario",
+    "resumeAction": "Continuar"
+  },
+  "banners": {
+    "correct": "¡Correcto!",
+    "incorrect": "Incorrecto",
+    "timeUp": "¡Se acabó el tiempo!",
+    "nextQuestion": "Siguiente Pregunta",
+    "finishQuiz": "Finalizar Cuestionario"
+  },
+  "result": {
+    "title": "Cuestionario Completado",
+    "scoreLabel": "Tu Puntuación",
+    "perfectScore": "¡Puntuación Perfecta! 🎉",
+    "greatJob": "¡Excelente Trabajo! 👏",
+    "keepPracticing": "¡Sigue Practicando! 📖",
+    "needsReview": "Necesita Repaso 💡",
+    "streakBonus": "+{{count}} Créditos de Bono de Racha",
+    "timeSpent": "Tiempo Empleado",
+    "correctCount": "{{correct}} de {{total}} Correctas",
+    "accuracy": "Precisión",
+    "newBest": "¡Nuevo récord!",
+    "bestScore": "Mejor: {{score}}%",
+    "saveError": "No se pudo guardar el resultado del cuestionario",
+    "reviewSummary": "Revisar Respuestas",
+    "studyAgain": "Estudiar de Nuevo",
+    "backToLibrary": "Volver a la Biblioteca"
+  },
+  "summary": {
+    "title": "Resumen del Cuestionario",
+    "allQuestions": "Todas ({{count}})",
+    "correctTab": "Correctas ({{count}})",
+    "incorrectTab": "Incorrectas ({{count}})",
+    "yourAnswer": "Tu Respuesta:",
+    "correctAnswer": "Respuesta Correcta:",
+    "noIncorrect": "¡Sin respuestas incorrectas! ¡Trabajo perfecto!",
+    "noCorrect": "Aún no hay respuestas correctas.",
+    "done": "Listo"
+  },
+  "detail": {
+    "headerTitle": "Historial del Cuestionario",
+    "firstAttempt": "Primer Intento",
+    "practiced": "Practicado {{count}} vez",
+    "practiced_other": "Practicado {{count}} veces",
+    "lastPracticed": "Última práctica {{date}}"
+  },
+  "modesSheet": {
+    "chooseMode": "Elegir Modo de Estudio",
+    "startMode": "Iniciar Modo {{mode}}"
+  }
+}

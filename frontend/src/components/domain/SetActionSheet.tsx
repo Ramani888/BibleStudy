@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ActionSheet } from '../feedback';
 import type { StudySet } from '../../types';
@@ -28,16 +29,17 @@ export function SetActionSheet({
   onAssignFolder,
   isOwner = true,
 }: SetActionSheetProps) {
+  const { t } = useTranslation(['common', 'library']);
   const actions = [
     {
-      label: 'Quiz',
+      label: t('library:tabs.study', 'Quiz'),
       iconName: 'help-circle-outline',
       onPress: onQuiz,
     },
     ...(isOwner
       ? [
           {
-            label: 'Create Card',
+            label: t('library:cards.addCard', 'Create Card'),
             iconName: 'add-circle-outline',
             onPress: onCreateCard,
           },
@@ -46,7 +48,7 @@ export function SetActionSheet({
     ...(isOwner && showAssignFolder && onAssignFolder
       ? [
           {
-            label: 'Assign Folder',
+            label: t('library:folders.assignFolder', 'Assign Folder'),
             iconName: 'folder-outline',
             onPress: onAssignFolder,
           },
@@ -55,12 +57,12 @@ export function SetActionSheet({
     ...(isOwner
       ? [
           {
-            label: 'Edit',
+            label: t('common:actions.edit', 'Edit'),
             iconName: 'pencil-outline',
             onPress: onEdit,
           },
           {
-            label: 'Delete',
+            label: t('common:actions.delete', 'Delete'),
             iconName: 'trash-outline',
             destructive: true as const,
             onPress: onDelete,

@@ -18,7 +18,10 @@ function formatTime(s: number): string {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function QuizScreen() {
+  const { t } = useTranslation(['quiz', 'common']);
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
@@ -57,16 +60,16 @@ export function QuizScreen() {
     if (isLoading || isError || !s.isAvailable || s.isComplete) return;
     const handler = BackHandler.addEventListener('hardwareBackPress', () => {
       showRef.current({
-        title: 'Quit quiz?',
-        message: 'Your progress will be lost.',
-        confirmLabel: 'Quit',
+        title: t('quiz:setup.cancelQuiz', 'Quit quiz?'),
+        message: t('quiz:setup.cancelWarning', 'Your progress will be lost.'),
+        confirmLabel: t('common:actions.confirm', 'Quit'),
         variant: 'danger',
         onConfirm: goBack,
       });
       return true;
     });
     return () => handler.remove();
-  }, [isLoading, isError, s.isAvailable, s.isComplete]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isLoading, isError, s.isAvailable, s.isComplete, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const finish = useCallback(() => {
     if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
@@ -93,21 +96,21 @@ export function QuizScreen() {
   if (isError) return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {safeHeader}
-      <View style={styles.center}><Typography preset="h4" align="center">Failed to load cards</Typography></View>
+      <View style={styles.center}><Typography preset="h4" align="center">{t('common:status.failedToLoad', 'Failed to load cards')}</Typography></View>
     </View>
   );
 
   if (isLoading) return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {safeHeader}
-      <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>Loading…</Typography></View>
+      <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>{t('common:status.loading', 'Loading…')}</Typography></View>
     </View>
   );
 
   if (!s.isAvailable) return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {safeHeader}
-      <View style={styles.center}><Typography preset="h4" align="center">Nothing to quiz here</Typography></View>
+      <View style={styles.center}><Typography preset="h4" align="center">{t('quiz:inQuiz.emptyState', 'Nothing to quiz here')}</Typography></View>
     </View>
   );
 

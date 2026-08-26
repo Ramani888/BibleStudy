@@ -1,0 +1,22 @@
+{
+  "tabs": {
+    "home": "Home",
+    "library": "Library",
+    "study": "Study",
+    "ai": "AI Assistant",
+    "profile": "Profile"
+  },
+  "headers": {
+    "home": "BibleStudy Pro",
+    "library": "Library",
+    "study": "Study",
+    "aiChat": "AI Assistant",
+    "profile": "Profile",
+    "settings": "Settings",
+    "credits": "Credits",
+    "notes": "Notes",
+    "media": "Media",
+    "quiz": "Quiz",
+    "notifications": "Notifications"
+  }
+}

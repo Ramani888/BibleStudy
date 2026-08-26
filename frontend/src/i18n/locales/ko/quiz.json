@@ -1,0 +1,93 @@
+{
+  "hub": {
+    "title": "퀴즈 허브",
+    "subtitle": "성경 말씀 지식을 테스트해 보세요",
+    "startQuiz": "새 퀴즈 시작",
+    "recentActivity": "최근 활동",
+    "noActivity": "최근 퀴즈 활동이 없습니다",
+    "noActivitySub": "퀴즈를 완료하여 학습 기록을 확인하세요.",
+    "selectSet": "학습 세트 선택",
+    "selectMode": "퀴즈 모드 선택"
+  },
+  "setup": {
+    "title": "퀴즈 설정",
+    "mode": "퀴즈 모드",
+    "modes": {
+      "multipleChoice": "객관식",
+      "multipleChoiceDesc": "4개 보기 중 정답을 고르세요",
+      "trueFalse": "참/거짓",
+      "trueFalseDesc": "구절이나 설명이 맞는지 확인하세요",
+      "typeIn": "직접 입력",
+      "typeInDesc": "정답을 직접 타이핑하여 기억을 강화하세요",
+      "fillInBlank": "빈칸 채우기",
+      "fillInBlankDesc": "구절의 빈칸에 들어갈 단어를 맞히세요"
+    },
+    "questionCount": "문항 수",
+    "allCards": "모든 카드 ({{count}}개)",
+    "timer": "문제당 제한 시간",
+    "noTimer": "시간 제한 없음",
+    "seconds": "{{count}}초",
+    "start": "퀴즈 시작",
+    "pickSet": "세트 선택",
+    "chooseSet": "퀴즈를 진행할 세트 선택",
+    "allDone": "모두 완료!",
+    "noSetsToQuiz": "퀴즈를 진행할 수 있는 세트가 없습니다.",
+    "createSetFirst": "최소 1개의 카드가 포함된 세트를 먼저 만드세요."
+  },
+  "hud": {
+    "questionOf": "{{total}}개 중 {{current}}번 문제",
+    "score": "점수: {{score}}%",
+    "quit": "나가기",
+    "quitConfirmTitle": "퀴즈를 종료하시겠습니까?",
+    "quitConfirmMessage": "현재 진행 중인 퀴즈의 진행 상황이 저장되지 않습니다.",
+    "quitConfirmAction": "퀴즈 나가기",
+    "resumeAction": "계속하기"
+  },
+  "banners": {
+    "correct": "정답입니다!",
+    "incorrect": "오답입니다",
+    "timeUp": "시간 초과!",
+    "nextQuestion": "다음 문제",
+    "finishQuiz": "퀴즈 완료"
+  },
+  "result": {
+    "title": "퀴즈 완료",
+    "scoreLabel": "나의 점수",
+    "perfectScore": "만점입니다! 🎉",
+    "greatJob": "훌륭합니다! 👏",
+    "keepPracticing": "계속 연습하세요! 📖",
+    "needsReview": "복습이 필요합니다 💡",
+    "streakBonus": "+{{count}} 연속 학습 보너스 크레딧",
+    "timeSpent": "소요 시간",
+    "correctCount": "{{total}}개 중 {{correct}}개 정답",
+    "accuracy": "정답률",
+    "newBest": "최고 기록 달성!",
+    "bestScore": "최고 기록: {{score}}%",
+    "saveError": "퀴즈 결과를 저장할 수 없습니다",
+    "reviewSummary": "오답/정답 검토",
+    "studyAgain": "다시 학습하기",
+    "backToLibrary": "보관함으로 돌아가기"
+  },
+  "summary": {
+    "title": "퀴즈 결과 요약",
+    "allQuestions": "전체 ({{count}})",
+    "correctTab": "정답 ({{count}})",
+    "incorrectTab": "오답 ({{count}})",
+    "yourAnswer": "내가 쓴 답:",
+    "correctAnswer": "정답:",
+    "noIncorrect": "틀린 문제가 없습니다! 완벽합니다!",
+    "noCorrect": "아직 맞힌 문제가 없습니다.",
+    "done": "완료"
+  },
+  "detail": {
+    "headerTitle": "퀴즈 기록",
+    "firstAttempt": "첫 번째 시도",
+    "practiced": "{{count}}회 연습함",
+    "practiced_other": "{{count}}회 연습함",
+    "lastPracticed": "마지막 연습일: {{date}}"
+  },
+  "modesSheet": {
+    "chooseMode": "학습 모드 선택",
+    "startMode": "{{mode}} 모드 시작"
+  }
+}

@@ -33,6 +33,7 @@ import {
   useNotificationPrefs,
   TYPE_TO_PREF,
 } from '../../hooks';
+import { useTranslation } from 'react-i18next';
 import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { AppTabParamList } from '../../navigation/types';
@@ -43,11 +44,11 @@ type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
 const plural = (n: number) => (n === 1 ? '' : 's');
 
-function getGreeting(): string {
+function getGreeting(t: (key: string) => string): string {
   const h = new Date().getHours();
-  if (h < 12) return 'Good morning';
-  if (h < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (h < 12) return t('greeting.morning');
+  if (h < 17) return t('greeting.afternoon');
+  return t('greeting.evening');
 }
 
 // ─── Sticky Header ─────────────────────────────────────────────────────────────
@@ -87,21 +88,22 @@ const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak
   due?: DueSummary; continueSet: StudySet | null; streak: number;
   onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
 }) {
+  const { t } = useTranslation('home');
   const { colors } = useTheme();
   const hasDue = !!due && due.dueCount > 0 && !!due.topSet;
   const weekProgress = Math.min(streak, 7) / 7;
 
   let badge: string, title: string, subtitle: string, onPress: () => void;
   if (hasDue) {
-    badge = 'DUE'; title = due!.topSet!.title;
-    subtitle = `${due!.dueCount} card${plural(due!.dueCount)} to review`;
+    badge = t('featured.due'); title = due!.topSet!.title;
+    subtitle = t('featured.cardsToReview', { count: due!.dueCount });
     onPress = () => onReview(due!.topSet!.id, due!.topSet!.title);
   } else if (continueSet) {
-    badge = 'CONTINUE'; title = continueSet.title;
-    subtitle = `${continueSet._count?.cards ?? 0} card${plural(continueSet._count?.cards ?? 0)}`;
+    badge = t('featured.continue'); title = continueSet.title;
+    subtitle = t('library:cards.cardCount', { count: continueSet._count?.cards ?? 0, defaultValue: `${continueSet._count?.cards ?? 0} cards` });
     onPress = () => onContinue(continueSet);
   } else {
-    badge = 'START'; title = 'Create your first study set'; subtitle = 'Begin your journey'; onPress = onCreate;
+    badge = t('featured.start'); title = t('featured.createFirstSet'); subtitle = t('featured.beginJourney'); onPress = onCreate;
   }
 
   return (
@@ -119,7 +121,7 @@ const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak
       </View>
       <View style={styles.featuredFooter}>
         <FlameIcon size={14} color={colors.warning} />
-        <Typography preset="caption" color={colors.textOnPrimaryMuted}>{streak} day streak · weekly goal {Math.min(streak, 7)}/7</Typography>
+        <Typography preset="caption" color={colors.textOnPrimaryMuted}>{t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}</Typography>
       </View>
     </AnimatedPressable>
   );
@@ -140,6 +142,7 @@ const QuickAction = React.memo(function QuickAction({ Icon, label, onPress }: { 
 
 // ─── Recent set row ────────────────────────────────────────────────────────────
 const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySet; due: boolean; onSelect: (s: StudySet) => void }) {
+  const { t } = useTranslation(['home', 'library', 'common']);
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
@@ -160,11 +163,13 @@ const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySe
       </View>
       <View style={styles.flex1}>
         <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{set.title}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
+        <Typography preset="caption" color={colors.textSecondary}>
+          {t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
+        </Typography>
       </View>
       {due ? (
         <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}>
-          <Typography preset="caption" color={colors.success}>DUE</Typography>
+          <Typography preset="caption" color={colors.success}>{t('home:featured.due', 'DUE')}</Typography>
         </View>
       ) : (
         <ChevronRightIcon size={18} color={colors.textSecondary} />
@@ -175,6 +180,7 @@ const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySe
 
 // ─── Mini set card (horizontal rails) ─────────────────────────────────────────
 const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { set: StudySet; Icon: IconComponent; onSelect: (s: StudySet) => void }) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
@@ -194,7 +200,9 @@ const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { s
         <Icon size={18} color={colors.textPrimary} />
       </View>
       <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{set.title}</Typography>
-      <Typography preset="caption" color={colors.textSecondary}>{count} card{plural(count)}</Typography>
+      <Typography preset="caption" color={colors.textSecondary}>
+        {t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
+      </Typography>
     </AnimatedPressable>
   );
 });
@@ -265,6 +273,7 @@ const SectionRow = React.memo(function SectionRow({ title, actionLabel, onAction
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 export function HomeScreen() {
+  const { t } = useTranslation(['home', 'common']);
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
   const { colors } = useTheme();
@@ -298,18 +307,18 @@ export function HomeScreen() {
   );
 
   const summaryStats = useMemo(() => [
-    { value: friends?.length ?? 0,     label: 'Friends' },
-    { value: folders?.length ?? 0,     label: 'Folders' },
-    { value: sets?.length ?? 0,        label: 'Sets' },
-    { value: cardTotal,                 label: 'Cards' },
-    { value: creditData?.balance ?? 0, label: 'Credits' },
-    { value: notes?.length ?? 0,       label: 'Notes' },
-  ], [friends, folders, sets, cardTotal, creditData, notes]);
+    { value: friends?.length ?? 0,     label: t('profile:friends.title', 'Friends') },
+    { value: folders?.length ?? 0,     label: t('home:stats.folders', 'Folders') },
+    { value: sets?.length ?? 0,        label: t('home:stats.sets', 'Sets') },
+    { value: cardTotal,                 label: t('library:cards.title', 'Cards') },
+    { value: creditData?.balance ?? 0, label: t('home:stats.credits', 'Credits') },
+    { value: notes?.length ?? 0,       label: t('home:stats.notes', 'Notes') },
+  ], [friends, folders, sets, cardTotal, creditData, notes, t]);
 
   return (
     <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
       <StickyHeader
-        greeting={getGreeting()}
+        greeting={getGreeting(t)}
         name={firstName}
         avatarUri={user?.profileImage}
         unread={
@@ -348,7 +357,7 @@ export function HomeScreen() {
         {recentSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="My Sets" actionLabel="See all" onAction={nav.goLibrary} />
+            <SectionRow title={t('home:sections.recentSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goLibrary} />
             <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
@@ -366,7 +375,7 @@ export function HomeScreen() {
         {friendsSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="From your friends" actionLabel="See all" onAction={nav.goFriendsSets} />
+            <SectionRow title={t('home:sections.friendsSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goFriendsSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {friendsSets.map(s => (
@@ -380,7 +389,7 @@ export function HomeScreen() {
         {activities.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="Recent activity" />
+            <SectionRow title={t('home:sections.friendActivity')} />
             <Spacer size={spacing.md} />
             <View style={styles.activityList}>
               {activities.map(a => <ActivityItem key={a.id} activity={a} />)}
@@ -392,7 +401,7 @@ export function HomeScreen() {
         {publicSets.length > 0 && (
           <>
             <Spacer size={spacing.xxl} />
-            <SectionRow title="Discover" actionLabel="See all" onAction={nav.goPublicSets} />
+            <SectionRow title={t('home:sections.communitySets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goPublicSets} />
             <Spacer size={spacing.md} />
             <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
               {publicSets.map(s => (

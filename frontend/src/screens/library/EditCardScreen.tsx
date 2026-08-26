@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import { CardForm, type CardFormHandle } from './components/CardForm';
 import { ErrorState } from '../../components/feedback';
 import { Button, Screen, ScreenHeader } from '../../components/ui';
@@ -12,6 +13,7 @@ import { useTheme, spacing, layout } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCard'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
 
   const { cardId, setId } = route.params;
@@ -20,7 +22,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   const formRef = useRef<CardFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title="Edit Card" handle />;
+  const header = <ScreenHeader title={t('library:cards.editCard')} handle />;
 
   if (isLoading) {
     return (
@@ -41,7 +43,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Save Changes" onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
+      <Button label={t('common:actions.save')} onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
     </View>
   );
 
@@ -55,10 +57,10 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
         onSubmit={async ({ type, question, answer, note }) => {
           try {
             await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
-            Toast.show({ type: 'success', text1: 'Card updated!' });
+            Toast.show({ type: 'success', text1: t('library:cards.cardUpdated', 'Card updated!') });
             navigation.goBack();
           } catch (err) {
-            Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+            Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
           }
         }}
       />

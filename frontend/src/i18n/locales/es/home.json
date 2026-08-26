@@ -1,0 +1,40 @@
+{
+  "greeting": {
+    "morning": "Buenos días",
+    "afternoon": "Buenas tardes",
+    "evening": "Buenas noches",
+    "streak": "¡Racha de {{count}} días! Sigue así",
+    "streak_one": "¡Día 1 de racha! Gran comienzo"
+  },
+  "stats": {
+    "dueToday": "Pendiente hoy",
+    "cardsLearned": "Tarjetas aprendidas",
+    "streakDays": "Días de racha",
+    "totalSets": "Sets totales",
+    "cardsCount": "{{count}} tarjetas"
+  },
+  "dailyVerse": {
+    "title": "Versículo del Día",
+    "reflection": "Reflexión diaria",
+    "share": "Compartir versículo",
+    "createCard": "Crear tarjeta con este versículo",
+    "copied": "Versículo copiado al portapapeles"
+  },
+  "recentSets": {
+    "title": "Continuar Estudiando",
+    "seeAll": "Ver todo",
+    "empty": "No hay sets recientes",
+    "emptySub": "Comienza a estudiar un set para verlo aquí",
+    "cardCount": "{{count}} tarjeta",
+    "cardCount_other": "{{count}} tarjetas",
+    "dueCount": "{{count}} pendiente",
+    "dueCount_other": "{{count}} pendientes"
+  },
+  "quickActions": {
+    "title": "Acciones Rápidas",
+    "newSet": "Nuevo Set",
+    "askAI": "Preguntar a IA",
+    "quickQuiz": "Cuestionario Rápido",
+    "dailyVerse": "Versículo Diario"
+  }
+}

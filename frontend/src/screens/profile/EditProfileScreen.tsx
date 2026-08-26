@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { FormField } from '../../components/forms';
 import { Avatar, Button, Typography } from '../../components/ui';
@@ -25,6 +26,7 @@ const schema = z.object({
 type EditProfileForm = z.infer<typeof schema>;
 
 export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfile'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const user = useAuthStore(s => s.user);
@@ -61,10 +63,10 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         bio: data.bio || undefined,
         church: data.church || undefined,
       });
-      Toast.show({ type: 'success', text1: 'Profile updated!' });
+      Toast.show({ type: 'success', text1: t('profile:editProfile.profileUpdated', 'Profile updated!') });
       navigation.goBack();
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Update failed', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('profile:editProfile.updateFailed', 'Update failed'), text2: getErrorMessage(err) });
     }
   };
 
@@ -72,10 +74,10 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
     <Screen
       edges={['top']}
       keyboardAvoiding
-      header={<ScreenHeader title="Edit Profile" onBack={() => navigation.goBack()} />}
+      header={<ScreenHeader title={t('profile:menu.editProfile')} onBack={() => navigation.goBack()} />}
       footer={
         <View style={styles.footer}>
-          <Button label="Save Changes" onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
+          <Button label={t('common:actions.save')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
         </View>
       }
     >
@@ -90,7 +92,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             <View style={styles.cameraRow}>
               {isUploading
                 ? <ActivityIndicator size="small" color={colors.accent} />
-                : <><CameraIcon size={16} color={colors.accent} /><Typography preset="label" color={colors.accent}>Change Photo</Typography></>
+                : <><CameraIcon size={16} color={colors.accent} /><Typography preset="label" color={colors.accent}>{t('profile:editProfile.changePhoto', 'Change Photo')}</Typography></>
               }
             </View>
           </Pressable>
@@ -98,11 +100,11 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
 
         <ActionSheet
           visible={photoSheetVisible}
-          title="Change Profile Photo"
+          title={t('profile:editProfile.changePhoto', 'Change Profile Photo')}
           onClose={() => setPhotoSheetVisible(false)}
           actions={[
-            { label: 'Choose from Library', iconName: 'image-outline', onPress: () => handlePickPhoto('library') },
-            { label: 'Take Photo',          iconName: 'camera-outline', onPress: () => handlePickPhoto('camera') },
+            { label: t('profile:editProfile.chooseFromLibrary', 'Choose from Library'), iconName: 'image-outline', onPress: () => handlePickPhoto('library') },
+            { label: t('profile:editProfile.takePhoto', 'Take Photo'), iconName: 'camera-outline', onPress: () => handlePickPhoto('camera') },
           ]}
         />
 
@@ -111,8 +113,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             <FormField
               name="name"
               control={control}
-              label="Full name"
-              placeholder="Your name"
+              label={t('profile:editProfile.fullName', 'Full name')}
+              placeholder={t('profile:editProfile.namePlaceholder', 'Your name')}
               autoCapitalize="words"
               returnKeyType="next"
               onSubmitEditing={() => bioRef.current?.focus()}
@@ -120,8 +122,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             <FormField
               name="bio"
               control={control}
-              label="Bio (optional)"
-              placeholder="Tell us about yourself…"
+              label={t('profile:editProfile.bio', 'Bio (optional)')}
+              placeholder={t('profile:editProfile.bioPlaceholder', 'Tell us about yourself…')}
               autoCapitalize="sentences"
               inputRef={bioRef}
               returnKeyType="next"
@@ -130,8 +132,8 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
             <FormField
               name="church"
               control={control}
-              label="Church (optional)"
-              placeholder="Your church or congregation"
+              label={t('profile:editProfile.church', 'Church (optional)')}
+              placeholder={t('profile:editProfile.churchPlaceholder', 'Your church or congregation')}
               autoCapitalize="words"
               inputRef={churchRef}
               returnKeyType="done"

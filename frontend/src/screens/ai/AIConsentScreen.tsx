@@ -8,7 +8,10 @@ import { spacing, useTheme } from '../../theme';
 import { storage } from '../../utils/storage';
 import type { AIScreenProps } from '../../navigation/types';
 
+import { useTranslation } from 'react-i18next';
+
 export function AIConsentScreen({ navigation }: AIScreenProps<'AIConsent'>) {
+  const { t } = useTranslation(['ai', 'common']);
   const { colors } = useTheme();
   const [checking, setChecking] = useState(true);
 
@@ -39,33 +42,33 @@ export function AIConsentScreen({ navigation }: AIScreenProps<'AIConsent'>) {
         <SparklesIcon size={48} color={colors.accent} />
         <Spacer size={spacing.lg} />
 
-        <Typography preset="h3" align="center">AI Chat uses external services</Typography>
+        <Typography preset="h3" align="center">{t('ai:consent.title', 'AI Chat uses external services')}</Typography>
         <Spacer size={spacing.sm} />
         <Typography preset="body" color={colors.textSecondary} align="center">
-          Your messages are sent to third-party AI providers to generate responses:
+          {t('ai:consent.subtitle', 'Your messages are sent to third-party AI providers to generate responses:')}
         </Typography>
 
         <Spacer size={spacing.lg} />
         <View style={[styles.card, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-          <Typography preset="label">OpenRouter (Gemma)</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>Processes your text messages and questions</Typography>
+          <Typography preset="label">{t('ai:consent.provider1', 'OpenRouter (Gemma)')}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>{t('ai:consent.provider1Desc', 'Processes your text messages and questions')}</Typography>
 
           <Spacer size={spacing.sm} />
 
-          <Typography preset="label">Anthropic Claude</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>Processes media attachments (PDFs, images)</Typography>
+          <Typography preset="label">{t('ai:consent.provider2', 'Anthropic Claude')}</Typography>
+          <Typography preset="caption" color={colors.textSecondary}>{t('ai:consent.provider2Desc', 'Processes media attachments (PDFs, images)')}</Typography>
         </View>
 
         <Spacer size={spacing.md} />
         <Typography preset="caption" color={colors.textSecondary} align="center">
-          Do not share personal information you would not want these services to receive. Messages are not stored by BibleStudy Pro beyond your session.
+          {t('ai:consent.warning', 'Do not share personal information you would not want these services to receive. Messages are not stored by BibleStudy Pro beyond your session.')}
         </Typography>
 
         <Spacer size={spacing.xxxl} />
 
-        <Button label="Accept & Continue" variant="primary" fullWidth onPress={handleAccept} />
+        <Button label={t('common:actions.continue', 'Accept & Continue')} variant="primary" fullWidth onPress={handleAccept} />
         <Spacer size={spacing.sm} />
-        <Button label="Decline" variant="ghost" fullWidth onPress={handleDecline} />
+        <Button label={t('common:actions.cancel', 'Decline')} variant="ghost" fullWidth onPress={handleDecline} />
       </View>
     </SafeAreaView>
   );

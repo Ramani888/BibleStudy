@@ -16,9 +16,11 @@ import { useDebouncedValue } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import type { UserProfile } from '../../types/friends.types';
 
+import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'SearchUsers'>;
 
 export function SearchUsersScreen({ navigation }: Props) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -36,11 +38,11 @@ export function SearchUsersScreen({ navigation }: Props) {
     sendRequest.mutate(user.id, {
       onSuccess: () => {
         setSentIds(prev => new Set(prev).add(user.id));
-        Toast.show({ type: 'success', text1: `Friend request sent to ${user.name}` });
+        Toast.show({ type: 'success', text1: t('profile:friends.requestSentTo', { name: user.name, defaultValue: `Friend request sent to ${user.name}` }) });
       },
       onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
     });
-  }, [sendRequest]);
+  }, [sendRequest, t]);
 
   const renderItem = useCallback(({ item }: { item: UserProfile }) => {
     const isFriend = !!item.isFriend;
@@ -64,7 +66,7 @@ export function SearchUsersScreen({ navigation }: Props) {
         ) : isPending ? (
           <View style={[styles.pendingBadge, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
             <ClockIcon size={14} color={colors.textSecondary} />
-            <Typography preset="caption" color={colors.textSecondary}>Sent</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>{t('profile:friends.requestSent', 'Sent')}</Typography>
           </View>
         ) : (
           <Pressable
@@ -78,13 +80,13 @@ export function SearchUsersScreen({ navigation }: Props) {
         )}
       </Pressable>
     );
-  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, isDark]);
+  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, isDark, t]);
 
   return (
-    <Screen header={<ScreenHeader title="Find Friends" onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={t('profile:menu.friends')} onBack={() => navigation.goBack()} />}>
       <View style={styles.searchWrap}>
         <SearchBar
-          placeholder="Search by name or email…"
+          placeholder={t('profile:friends.searchPlaceholder', 'Search by name or email…')}
           value={query}
           onChangeText={setQuery}
           autoFocus
@@ -105,9 +107,9 @@ export function SearchUsersScreen({ navigation }: Props) {
         contentContainerStyle={styles.list}
         ListEmptyComponent={
           debouncedQuery.length > 1 && !isFetching ? (
-            <EmptyState title="No users found" subtitle={`No results for "${debouncedQuery}"`} />
+            <EmptyState title={t('common:status.noResults', 'No users found')} subtitle={t('common:status.noMatchFor', { query: debouncedQuery, defaultValue: `No results for "${debouncedQuery}"` })} />
           ) : debouncedQuery.length === 0 ? (
-            <EmptyState title="Find Friends" subtitle="Search by name or email to connect with others." />
+            <EmptyState title={t('profile:friends.findFriends', 'Find Friends')} subtitle={t('profile:friends.findFriendsSub', 'Search by name or email to connect with others.')} />
           ) : null
         }
       />

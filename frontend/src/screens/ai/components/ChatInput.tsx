@@ -7,6 +7,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { fontSizes, layout, lineHeights, radius, spacing, useTheme, palette } from '../../../theme';
 import { Typography } from '../../../components/ui';
 import { StarIcon, ArrowUpIcon, FileTextIcon, PlusIcon, CloseIcon } from '../../../components/icons';
@@ -41,6 +42,7 @@ export const ChatInput = React.memo(function ChatInput({
   onClearAttachment,
   onUpgrade,
 }: ChatInputProps) {
+  const { t } = useTranslation('ai');
   const { colors } = useTheme();
   const inputRef = useRef<TextInput>(null);
   const [text, setText] = useState('');
@@ -66,12 +68,12 @@ export const ChatInput = React.memo(function ChatInput({
           <StarIcon size={CREDIT_ICON_SIZE} color={creditBalance > 0 ? colors.textSecondary : colors.alert} />
           <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.alert}>
             {creditBalance > 0
-              ? `Costs ${actionCost} credit${actionCost > 1 ? 's' : ''} · ${creditBalance} remaining`
-              : 'No credits — claim your daily credit or'}
+              ? t('composer.costsInfo', { count: actionCost, balance: creditBalance, defaultValue: `Costs ${actionCost} ${actionCost === 1 ? 'credit' : 'credits'} · ${creditBalance} remaining` })
+              : t('composer.noCreditsPrompt', 'No credits — claim your daily credit or')}
           </Typography>
           {creditBalance <= 0 && onUpgrade && (
             <Pressable onPress={onUpgrade} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-              <Typography preset="caption" color={colors.accent}> Upgrade</Typography>
+              <Typography preset="caption" color={colors.accent}> {t('composer.upgrade', 'Upgrade')}</Typography>
             </Pressable>
           )}
         </View>
@@ -101,7 +103,7 @@ export const ChatInput = React.memo(function ChatInput({
               : <FileTextIcon size={14} color={colors.accent} />
             }
             <Typography preset="caption" color={colors.accent} style={styles.attachName} numberOfLines={1}>
-              {attachmentName ?? 'Uploading…'}
+              {attachmentName ?? t('chat.uploadingPlaceholder', 'Uploading…')}
             </Typography>
             {!isUploading && (
               <Pressable onPress={onClearAttachment} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
@@ -118,7 +120,7 @@ export const ChatInput = React.memo(function ChatInput({
         <TextInput
           ref={inputRef}
           style={[styles.input, { color: colors.textPrimary }]}
-          placeholder="Ask a Bible question…"
+          placeholder={t('composer.placeholder')}
           placeholderTextColor={colors.textSecondary}
           value={text}
           onChangeText={setText}

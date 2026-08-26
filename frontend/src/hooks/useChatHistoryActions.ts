@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import {
   useClearHistory,
@@ -14,6 +15,7 @@ export function useChatHistoryActions(
   navigation: { navigate: (screen: string) => void },
   allSessions: ChatSession[],
 ) {
+  const { t } = useTranslation(['common', 'ai']);
   const { mutate: deleteSession, isPending: isDeleting }       = useDeleteSession();
   const { mutate: clearHistory,  isPending: isClearingHistory } = useClearHistory();
   const { mutate: renameSession, isPending: isRenaming }        = useRenameSession();
@@ -34,14 +36,14 @@ export function useChatHistoryActions(
     if (!sheet.session?.sessionId) return;
     const sessionId = sheet.session.sessionId;
     showConfirm({
-      title: 'Delete Conversation',
-      message: 'This conversation and all its messages will be permanently deleted.',
-      confirmLabel: 'Delete',
+      title: t('ai:history.deleteConfirmTitle', 'Delete conversation?'),
+      message: t('ai:history.deleteConfirmMessage', 'This conversation and all its messages will be permanently deleted.'),
+      confirmLabel: t('common:actions.delete', 'Delete'),
       variant: 'danger',
       onConfirm: () => {
         deleteSession(sessionId, {
-          onSuccess: () => Toast.show({ type: 'success', text1: 'Conversation deleted' }),
-          onError:   () => Toast.show({ type: 'error',   text1: 'Failed to delete' }),
+          onSuccess: () => Toast.show({ type: 'success', text1: t('ai:history.sessionDeleted', 'Conversation deleted') }),
+          onError:   () => Toast.show({ type: 'error',   text1: t('common:status.error', 'Oops!') }),
         });
       },
     });
@@ -50,14 +52,14 @@ export function useChatHistoryActions(
   const handleClearAll = () => {
     if (allSessions.length === 0) return;
     showConfirm({
-      title: 'Clear All History',
-      message: 'All conversations and messages will be permanently deleted. This cannot be undone.',
-      confirmLabel: 'Clear All',
+      title: t('ai:history.clearAllTitle', 'Clear All History'),
+      message: t('ai:history.clearAllMessage', 'All conversations and messages will be permanently deleted. This cannot be undone.'),
+      confirmLabel: t('ai:history.clearAll', 'Clear all history'),
       variant: 'danger',
       onConfirm: () => {
         clearHistory(undefined, {
-          onSuccess: () => Toast.show({ type: 'success', text1: 'History cleared' }),
-          onError:   () => Toast.show({ type: 'error',   text1: 'Failed to clear history' }),
+          onSuccess: () => Toast.show({ type: 'success', text1: t('ai:history.historyCleared', 'History cleared') }),
+          onError:   () => Toast.show({ type: 'error',   text1: t('common:status.error', 'Oops!') }),
         });
       },
     });
@@ -79,9 +81,9 @@ export function useChatHistoryActions(
       {
         onSuccess: () => {
           setRenameModal({ visible: false, session: null, value: '' });
-          Toast.show({ type: 'success', text1: 'Renamed successfully' });
+          Toast.show({ type: 'success', text1: t('ai:history.renamedSuccess', 'Renamed successfully') });
         },
-        onError: () => Toast.show({ type: 'error', text1: 'Failed to rename' }),
+        onError: () => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!') }),
       },
     );
   };
@@ -107,17 +109,17 @@ export function useChatHistoryActions(
       {
         onSuccess: () => {
           setTagsModal({ visible: false, session: null, selected: [] });
-          Toast.show({ type: 'success', text1: 'Tags updated' });
+          Toast.show({ type: 'success', text1: t('ai:history.tagsUpdated', 'Tags updated') });
         },
-        onError: () => Toast.show({ type: 'error', text1: 'Failed to update tags' }),
+        onError: () => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!') }),
       },
     );
   };
 
   const sheetActions = [
-    { label: 'Rename',    icon: PencilIcon, onPress: handleOpenRename,   disabled: !sheet.session?.sessionId },
-    { label: 'Edit Tags', icon: TagIcon,    onPress: handleOpenTags,     disabled: !sheet.session?.sessionId },
-    { label: 'Delete',    icon: TrashIcon,  onPress: handleDeleteSession, destructive: true, disabled: !sheet.session?.sessionId || isDeleting },
+    { label: t('common:actions.rename', 'Rename'),    icon: PencilIcon, onPress: handleOpenRename,   disabled: !sheet.session?.sessionId },
+    { label: t('ai:history.editTags', 'Edit Tags'), icon: TagIcon,    onPress: handleOpenTags,     disabled: !sheet.session?.sessionId },
+    { label: t('common:actions.delete', 'Delete'),    icon: TrashIcon,  onPress: handleDeleteSession, destructive: true, disabled: !sheet.session?.sessionId || isDeleting },
   ];
 
   return {

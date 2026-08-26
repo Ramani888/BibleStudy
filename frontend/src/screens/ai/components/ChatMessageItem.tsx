@@ -23,11 +23,14 @@ type Props = {
   onSaveCards: (cards: SuggestedCard[], messageId: string, chatId?: string) => void;
 };
 
+import { useTranslation } from 'react-i18next';
+
 export function ChatMessageItem({
   item, userName, userImage,
   isPending, isBalanceLoading, savedMessageIds, colors,
   onLongPress, onSend, onSaveCards,
 }: Props) {
+  const { t } = useTranslation(['ai', 'common']);
   return (
     <View>
       {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
@@ -73,12 +76,12 @@ export function ChatMessageItem({
         <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
           <AlbumsIcon size={16} color={colors.accent} />
           <Typography preset="bodySm" color={colors.accent} style={styles.cardBannerText}>
-            {item.suggestedCards.length} flashcard{item.suggestedCards.length !== 1 ? 's' : ''} ready
+            {t('ai:chat.cardsReady', { count: item.suggestedCards.length, defaultValue: `${item.suggestedCards.length} flashcards ready` })}
           </Typography>
           {savedMessageIds.has(item.id) ? (
             <View style={styles.savedChip}>
               <CheckCircleIcon size={14} color={colors.success} />
-              <Typography preset="caption" color={colors.success}> Saved</Typography>
+              <Typography preset="caption" color={colors.success}> {t('common:status.saved', 'Saved')}</Typography>
             </View>
           ) : (
             <Pressable
@@ -86,7 +89,7 @@ export function ChatMessageItem({
               onPress={() => onSaveCards(item.suggestedCards!, item.id, item.chatId)}
               hitSlop={8}
             >
-              <Typography preset="caption" color={colors.textOnAccent}>Save to Set</Typography>
+              <Typography preset="caption" color={colors.textOnAccent}>{t('ai:chat.saveToSet', 'Save to Set')}</Typography>
             </Pressable>
           )}
         </Animated.View>

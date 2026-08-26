@@ -32,6 +32,8 @@ interface SelectSheetProps {
   selectedId?: string;
 }
 
+import { useTranslation } from 'react-i18next';
+
 /** One searchable list-picker for "move to / assign to / choose one" flows. */
 export function SelectSheet({
   visible,
@@ -40,13 +42,16 @@ export function SelectSheet({
   onSelect,
   onClose,
   searchable = true,
-  searchPlaceholder = 'Search…',
-  emptyText = 'No options available',
+  searchPlaceholder,
+  emptyText,
   leadingOption,
   maxHeight = 300,
   optionIcon,
   selectedId,
 }: SelectSheetProps) {
+  const { t } = useTranslation('common');
+  const resolvedSearchPlaceholder = searchPlaceholder ?? t('common:actions.search', 'Search…');
+  const resolvedEmptyText = emptyText ?? t('common:status.noResults', 'No options available');
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
   const [searchOpen, setSearchOpen] = useState(false);
@@ -80,7 +85,7 @@ export function SelectSheet({
 
       {searchOpen && (
         <SearchBar
-          placeholder={searchPlaceholder}
+          placeholder={resolvedSearchPlaceholder}
           value={search}
           onChangeText={setSearch}
           containerStyle={styles.search}
@@ -98,7 +103,7 @@ export function SelectSheet({
       )}
 
       {options.length === 0 ? (
-        <Typography preset="bodySm" color={colors.textSecondary}>{emptyText}</Typography>
+        <Typography preset="bodySm" color={colors.textSecondary}>{resolvedEmptyText}</Typography>
       ) : (
         <ScrollView style={{ maxHeight }} showsVerticalScrollIndicator={false}>
           {filtered.map(o => {
@@ -122,7 +127,7 @@ export function SelectSheet({
           })}
           {filtered.length === 0 && (
             <Typography preset="bodySm" color={colors.textSecondary} style={styles.noMatch}>
-              No matches for "{search}"
+              {t('common:status.noResults', 'No matches found')}
             </Typography>
           )}
         </ScrollView>

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -6,6 +7,7 @@ import { useUploadMedia } from './index';
 import { getErrorMessage } from '../api/client';
 
 export function useMediaUpload() {
+  const { t } = useTranslation(['common', 'profile']);
   const uploadMedia = useUploadMedia();
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadFilename, setUploadFilename] = useState('');
@@ -16,45 +18,45 @@ export function useMediaUpload() {
     setUploadProgress(0);
     try {
       await uploadMedia.mutateAsync({ formData: fd, onProgress: setUploadProgress });
-      Toast.show({ type: 'success', text1: `${name} uploaded` });
+      Toast.show({ type: 'success', text1: t('profile:media.fileUploadedSuccess', { name, defaultValue: `${name} uploaded` }) });
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     }
-  }, [uploadMedia]);
+  }, [uploadMedia, t]);
 
   const handlePickImage = useCallback(async () => {
     const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
-      Toast.show({ type: 'error', text1: 'Photo library permission denied. Enable it in Settings.' });
+      Toast.show({ type: 'error', text1: t('profile:media.photoPermissionDenied', 'Photo library permission denied. Enable it in Settings.') });
       return;
     }
     const asset = result.assets?.[0];
     if (!asset?.uri || !asset.type || !asset.fileName) {
-      if (asset) Toast.show({ type: 'error', text1: 'Could not read image — try a different photo' });
+      if (asset) Toast.show({ type: 'error', text1: t('profile:media.couldNotReadImage', 'Could not read image — try a different photo') });
       return;
     }
     const fd = new FormData();
     fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
     await doUpload(fd, asset.fileName);
-  }, [doUpload]);
+  }, [doUpload, t]);
 
   const handlePickFromCamera = useCallback(async () => {
     const result = await launchCamera({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
-      Toast.show({ type: 'error', text1: 'Camera permission denied. Enable it in Settings.' });
+      Toast.show({ type: 'error', text1: t('profile:media.cameraPermissionDenied', 'Camera permission denied. Enable it in Settings.') });
       return;
     }
     const asset = result.assets?.[0];
     if (!asset?.uri || !asset.type || !asset.fileName) {
-      if (asset) Toast.show({ type: 'error', text1: 'Could not capture photo' });
+      if (asset) Toast.show({ type: 'error', text1: t('profile:media.couldNotCapturePhoto', 'Could not capture photo') });
       return;
     }
     const fd = new FormData();
     fd.append('file', { uri: asset.uri, type: asset.type, name: asset.fileName } as unknown as Blob);
     await doUpload(fd, asset.fileName);
-  }, [doUpload]);
+  }, [doUpload, t]);
 
   const handlePickPDF = useCallback(async () => {
     try {

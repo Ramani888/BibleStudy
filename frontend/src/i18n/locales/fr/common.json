@@ -1,0 +1,61 @@
+{
+  "actions": {
+    "save": "Enregistrer",
+    "saveChanges": "Enregistrer les modifications",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "done": "Terminé",
+    "retry": "Réessayer",
+    "undo": "Annuler",
+    "next": "Suivant",
+    "back": "Retour",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "upload": "Télécharger",
+    "rename": "Renommer",
+    "share": "Partager",
+    "continue": "Continuer",
+    "submit": "Soumettre",
+    "confirm": "Confirmer",
+    "learnMore": "En savoir plus",
+    "markAllRead": "Tout marquer comme lu",
+    "searchPlaceholder": "Rechercher…",
+    "clearSearch": "Effacer la recherche"
+  },
+  "status": {
+    "loading": "Chargement...",
+    "saving": "Enregistrement...",
+    "sending": "Envoi en cours...",
+    "generating": "Génération...",
+    "success": "Succès",
+    "error": "Oups !",
+    "noResults": "Aucun résultat",
+    "noMatchFor": "Aucun résultat pour \"{{query}}\"",
+    "empty": "Rien ici pour le moment",
+    "offline": "Vous semblez être hors ligne",
+    "copiedToClipboard": "Copié dans le presse-papiers",
+    "selected": "Sélectionné",
+    "couldNotDelete": "Impossible de supprimer",
+    "unknownError": "Erreur inconnue"
+  },
+  "filter": {
+    "all": "Tous"
+  },
+  "dialogs": {
+    "confirmTitle": "Êtes-vous sûr ?",
+    "deleteConfirmTitle": "Confirmation de suppression",
+    "unsavedChanges": "Vous avez des modifications non enregistrées. Voulez-vous vraiment quitter ?",
+    "discard": "Ignorer"
+  },
+  "time": {
+    "today": "Aujourd'hui",
+    "yesterday": "Hier",
+    "daysAgo": "Il y a {{count}} jours",
+    "minAgo": "Il y a {{count}} min",
+    "hoursAgo": "Il y a {{count}} h",
+    "at": "à",
+    "earlier": "Plus tôt"
+  }
+}

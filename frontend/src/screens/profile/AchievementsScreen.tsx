@@ -46,6 +46,7 @@ const CARD_SHADOW = {
 // ── Status badge ────────────────────────────────────────────────────────────
 
 function StatusBadge({ achievement: a }: { achievement: Achievement }) {
+  const { t } = useTranslation(['profile', 'common']);
   const { colors } = useTheme();
   const inProgress = !a.unlocked && a.progress > 0;
 
@@ -67,7 +68,7 @@ function StatusBadge({ achievement: a }: { achievement: Achievement }) {
   return (
     <View style={[styles.badge, { backgroundColor: colors.badgeLockedBg }]}>
       <LockIcon size={12} color={colors.textSecondary} />
-      <Typography preset="caption" color={colors.textSecondary}> Locked</Typography>
+      <Typography preset="caption" color={colors.textSecondary}> {t('profile:achievements.locked', 'Locked')}</Typography>
     </View>
   );
 }
@@ -118,9 +119,10 @@ function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achi
   );
 }
 
-// ── Screen ───────────────────────────────────────────────────────────────────
+import { useTranslation } from 'react-i18next';
 
 export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achievements'>) {
+  const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -151,7 +153,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
           <Pressable onPress={navigation.goBack} hitSlop={10} style={styles.back}>
             <BackIcon size={24} color={palette.white} />
           </Pressable>
-          <Typography preset="h4" color={palette.white}>Achievements</Typography>
+          <Typography preset="h4" color={palette.white}>{t('profile:menu.achievements')}</Typography>
         </View>
 
         {/* Trophy + stats */}
@@ -160,9 +162,11 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
             <TrophyIcon size={36} color={palette.white} />
           </View>
           <View style={styles.headerStats}>
-            <Typography preset="h2" color={palette.white}>{unlockedCount} unlocked</Typography>
+            <Typography preset="h2" color={palette.white}>
+              {t('profile:achievements.unlocked', { count: unlockedCount, defaultValue: `${unlockedCount} unlocked` })}
+            </Typography>
             <Typography preset="caption" color="rgba(255,255,255,0.85)" style={styles.remainingText}>
-              {remaining} remaining
+              {t('profile:achievements.remaining', { count: remaining, defaultValue: `${remaining} remaining` })}
             </Typography>
           </View>
         </View>
@@ -191,7 +195,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
           {grouped.map(({ category, items }) => (
             <View key={category} style={styles.section}>
               <Typography preset="label" color={colors.textSecondary} style={styles.sectionTitle}>
-                {CATEGORY_LABELS[category]}
+                {t(`profile:achievements.categories.${category}`, CATEGORY_LABELS[category])}
               </Typography>
               {items.map(a => (
                 <AchievementCard key={a.key} achievement={a} colors={colors} isDark={isDark} />

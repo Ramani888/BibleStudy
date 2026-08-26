@@ -18,6 +18,7 @@ import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
 import { AINavigator } from './AINavigator';
 import { ProfileNavigator } from './ProfileNavigator';
+import { useTranslation } from 'react-i18next';
 import { useSubscriptionSync, useSystemBars, useNewAchievements } from '../hooks';
 import { AchievementUnlockModal } from '../components/feedback/AchievementUnlockModal';
 
@@ -37,6 +38,7 @@ function AchievementGate() {
 }
 
 export function AppNavigator() {
+  const { t } = useTranslation('navigation');
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
@@ -59,13 +61,13 @@ export function AppNavigator() {
         },
       })}
     >
-      <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: 'Home'    }} />
-      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: 'Library' }} />
-      <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: 'Quiz'    }} />
-      <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: 'AI Chat' }} />
+      <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: t('tabs.home') }} />
+      <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: t('tabs.library') }} />
+      <Tab.Screen name="QuizTab"    component={QuizNavigator}    options={{ title: t('tabs.study') }} />
+      <Tab.Screen name="AITab"      component={AINavigator}      options={{ title: t('tabs.ai') }} />
       {/* popToTopOnBlur: leaving Profile resets its stack to the Profile root, so a
           deep-link (e.g. Home bell → Notifications) doesn't leave the tab stuck there. */}
-      <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: 'Profile', popToTopOnBlur: true }} />
+      <Tab.Screen name="ProfileTab" component={ProfileNavigator} options={{ title: t('tabs.profile'), popToTopOnBlur: true }} />
     </Tab.Navigator>
     <AchievementGate />
     </>

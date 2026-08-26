@@ -7,6 +7,8 @@ import Toast from 'react-native-toast-message';
 import { enableScreens } from 'react-native-screens';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
+import './src/i18n';
+import { useLanguageStore } from './src/i18n';
 import { queryClient } from './src/lib/queryClient';
 import { useAuthStore } from './src/store';
 import { useTheme, useThemeStore } from './src/theme';
@@ -21,13 +23,15 @@ function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);
   const isInitialized = useAuthStore(s => s.isInitialized);
   const hydrateTheme = useThemeStore(s => s.hydrate);
+  const hydrateLanguage = useLanguageStore(s => s.hydrate);
   const { colors } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
     initialize();
     hydrateTheme();
-  }, [initialize, hydrateTheme]);
+    hydrateLanguage();
+  }, [initialize, hydrateTheme, hydrateLanguage]);
 
   return (
     <View style={styles.root}>

@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
+import { useTranslation } from 'react-i18next';
 import { SetCard } from '../../components/domain';
 import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
@@ -16,6 +17,7 @@ import type { StudySet } from '../../types';
 const ICON_SIZE = 20;
 
 export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'>) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors, spacing: sp } = useTheme();
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
@@ -56,14 +58,14 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
 
   const countText = (isFetching && !isLoading && !isRefetching && !isFetchingNextPage)
-    ? 'Searching…'
+    ? t('common:status.searching', 'Searching…')
     : debouncedSearch
-      ? `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"`
-      : `${total} public ${total === 1 ? 'set' : 'sets'} available`;
+      ? t('library:publicSets.resultsFor', { count: total, query: debouncedSearch, defaultValue: `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"` })
+      : t('library:publicSets.publicSetsAvailable', { count: total, defaultValue: `${total} public sets available` });
 
   const header = (
     <ScreenHeader
-      title="Browse Public Sets"
+      title={t('library:publicSets.title')}
       onBack={handleGoBack}
       right={
         <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
@@ -82,7 +84,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   if (isError) {
     return (
       <Screen header={header}>
-        <ErrorState message="Could not load public sets." onRetry={refetch} />
+        <ErrorState message={t('library:sets.couldNotLoadPublicSets', 'Could not load public sets.')} onRetry={refetch} />
       </Screen>
     );
   }
@@ -93,7 +95,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         {searchVisible && (
           <View style={styles.searchWrap}>
             <SearchBar
-              placeholder="Search public sets…"
+              placeholder={t('library:sets.searchPublicSets', 'Search public sets…')}
               value={search}
               onChangeText={setSearch}
               containerStyle={styles.searchInput}
@@ -116,8 +118,8 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         ListEmptyComponent={
           !isLoading ? (
             <EmptyState
-              title={debouncedSearch ? 'No results' : 'No public sets yet'}
-              subtitle={debouncedSearch ? `No sets match "${debouncedSearch}"` : 'Be the first to publish a set!'}
+              title={debouncedSearch ? t('library:publicSets.noSets', 'No public sets found') : t('library:publicSets.emptyTitle', 'No public sets yet')}
+              subtitle={debouncedSearch ? t('library:publicSets.noSetsMatch', { query: debouncedSearch, defaultValue: `No sets match "${debouncedSearch}"` }) : t('library:publicSets.emptySubtitle', 'Be the first to publish a set!')}
             />
           ) : null
         }
@@ -139,17 +141,17 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
         onClose={closeSelectedSet}
         actions={[
           {
-            label: 'Clone to Library',
+            label: t('library:publicSets.copyToLibrary', 'Add to My Library'),
             icon: CopyIcon,
             onPress: () =>
               selectedSet &&
               cloneSet(selectedSet.id, {
                 onSuccess: () => {
                   setSelectedSet(null);
-                  Toast.show({ type: 'success', text1: 'Set cloned to your library!' });
+                  Toast.show({ type: 'success', text1: t('library:publicSets.copiedSuccess', 'Set added to your library!') });
                 },
                 onError: err =>
-                  Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) }),
+                  Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
               }),
           },
         ]}

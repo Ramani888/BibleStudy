@@ -1,0 +1,60 @@
+{
+  "actions": {
+    "save": "Guardar",
+    "saveChanges": "Guardar Cambios",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "done": "Listo",
+    "retry": "Reintentar",
+    "undo": "Deshacer",
+    "next": "Siguiente",
+    "back": "Atrás",
+    "close": "Cerrar",
+    "search": "Buscar",
+    "upload": "Subir",
+    "rename": "Renombrar",
+    "share": "Compartir",
+    "continue": "Continuar",
+    "submit": "Enviar",
+    "confirm": "Confirmar",
+    "learnMore": "Más información",
+    "searchPlaceholder": "Buscar…",
+    "clearSearch": "Borrar búsqueda"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "sending": "Enviando...",
+    "generating": "Generando...",
+    "success": "Éxito",
+    "error": "¡Ups!",
+    "noResults": "Sin resultados",
+    "noMatchFor": "No hay resultados para \"{{query}}\"",
+    "empty": "No hay nada aquí todavía",
+    "offline": "Parece que no tienes conexión",
+    "copiedToClipboard": "Copiado al portapapeles",
+    "selected": "Seleccionado",
+    "couldNotDelete": "No se pudo eliminar",
+    "unknownError": "Error desconocido"
+  },
+  "filter": {
+    "all": "Todos"
+  },
+  "dialogs": {
+    "confirmTitle": "¿Estás seguro?",
+    "deleteConfirmTitle": "Confirmar eliminación",
+    "unsavedChanges": "Tienes cambios sin guardar. ¿Seguro que deseas salir?",
+    "discard": "Descartar"
+  },
+  "time": {
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "daysAgo": "Hace {{count}} días",
+    "minAgo": "Hace {{count}}m",
+    "hoursAgo": "Hace {{count}}h",
+    "at": "a las",
+    "earlier": "Anteriores"
+  }
+}

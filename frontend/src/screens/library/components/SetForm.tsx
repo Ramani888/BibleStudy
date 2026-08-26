@@ -41,10 +41,13 @@ const LAYOUT_OPTIONS: { value: CardLayout; label: string }[] = [
   { value: 'DETAILED', label: 'Detailed' },
 ];
 
+import { useTranslation } from 'react-i18next';
+
 export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
   { defaultValues, onSubmit, onSubmittingChange },
   ref,
 ) {
+  const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
   const [cardLayout, setCardLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
@@ -75,7 +78,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
     try {
       await onSubmit({ ...data, visibility, layout: cardLayout, folderId, color: selectedColor });
     } catch (err) {
-      Toast.show({ type: 'error', text1: 'Error', text2: getErrorMessage(err) });
+      Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
     }
   };
 
@@ -90,8 +93,8 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       <FormField
         name="title"
         control={control}
-        label="Title"
-        placeholder="e.g. Romans Study"
+        label={t('library:sets.titleLabel', 'Title')}
+        placeholder={t('library:sets.titlePlaceholder', 'e.g. Romans Study')}
         autoCapitalize="sentences"
         returnKeyType="next"
         maxLength={200}
@@ -100,8 +103,8 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       <FormField
         name="description"
         control={control}
-        label="Description (optional)"
-        placeholder="What is this set about?"
+        label={t('library:sets.descLabel', 'Description (optional)')}
+        placeholder={t('library:sets.descPlaceholder', 'What is this set about?')}
         autoCapitalize="sentences"
         maxLength={1000}
       />
@@ -109,11 +112,11 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       {/* Folder picker */}
       <View>
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          Folder (optional)
+          {t('library:sets.folderOptional', 'Folder (optional)')}
         </Typography>
         <Pressable style={({ pressed }) => [styles.picker, { backgroundColor: colors.surfaceMuted }, pressed && styles.btnPressed]} onPress={() => setFolderPickerOpen(true)}>
           <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
-            {selectedFolder ? selectedFolder.name : 'No folder'}
+            {selectedFolder ? selectedFolder.name : t('library:folders.noFolder', 'No folder')}
           </Typography>
           <ChevronRightIcon size={ICON_SIZE} color={colors.textSecondary} />
         </Pressable>
@@ -122,7 +125,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       {/* Color */}
       <View>
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          Color
+          {t('library:sets.color', 'Color')}
         </Typography>
         <ColorPicker value={selectedColor} onChange={setSelectedColor} />
       </View>
@@ -130,7 +133,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       {/* Visibility */}
       <View>
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          Visibility
+          {t('library:sets.visibility', 'Visibility')}
         </Typography>
         <View style={styles.optionRow}>
           {VISIBILITY_OPTIONS.map(opt => (
@@ -148,13 +151,13 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
                 preset="label"
                 color={visibility === opt.value ? colors.accent : colors.textSecondary}
               >
-                {opt.label}
+                {t(`library:sets.visibility${opt.value}`, opt.label)}
               </Typography>
               <Typography
                 preset="caption"
                 color={visibility === opt.value ? colors.textSecondary : colors.textDisabled}
               >
-                {opt.desc}
+                {t(`library:sets.visibilityDesc${opt.value}`, opt.desc)}
               </Typography>
             </Pressable>
           ))}
@@ -164,7 +167,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       {/* Layout */}
       <View>
         <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          Card Layout
+          {t('library:sets.cardLayout', 'Card Layout')}
         </Typography>
         <View style={styles.optionRow}>
           {LAYOUT_OPTIONS.map(opt => (
@@ -182,7 +185,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
                 preset="label"
                 color={cardLayout === opt.value ? colors.accent : colors.textSecondary}
               >
-                {opt.label}
+                {t(`library:sets.layout${opt.value}`, opt.label)}
               </Typography>
             </Pressable>
           ))}
@@ -192,15 +195,15 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
       {/* Folder picker modal */}
       <AppModal
         visible={folderPickerOpen}
-        title="Choose Folder"
+        title={t('library:folders.chooseFolder', 'Choose Folder')}
         onClose={() => setFolderPickerOpen(false)}
       >
         <ScrollView style={styles.folderScroll} showsVerticalScrollIndicator={false}>
           <Pressable style={({ pressed }) => [styles.folderOption, pressed && styles.rowPressed]} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
             <Typography preset="body" color={!folderId ? colors.accent : colors.textPrimary}>
-              No folder
+              {t('library:folders.noFolder', 'No folder')}
             </Typography>
-            {!folderId && <Badge label="Selected" variant="primary" />}
+            {!folderId && <Badge label={t('common:status.selected', 'Selected')} variant="primary" />}
           </Pressable>
           <Divider marginV={spacing.xs} />
           {folders.map(folder => (
@@ -215,7 +218,7 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
                     {folder.name}
                   </Typography>
                 </View>
-                {folderId === folder.id && <Badge label="Selected" variant="primary" />}
+                {folderId === folder.id && <Badge label={t('common:status.selected', 'Selected')} variant="primary" />}
               </Pressable>
               <Divider marginV={spacing.xs} />
             </React.Fragment>

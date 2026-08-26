@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
@@ -16,6 +17,7 @@ import type { MediaFile } from '../types';
 type MediaFileWithUri = MediaFile & { localUri: string };
 
 export function usePickMedia() {
+  const { t } = useTranslation(['common', 'profile']);
   const uploadMedia = useUploadMedia();
   const [pendingLocalUri, setPendingLocalUri] = useState<string | null>(null);
 
@@ -34,37 +36,37 @@ export function usePickMedia() {
     const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return null;
     if (result.errorCode === 'permission') {
-      Toast.show({ type: 'error', text1: 'Photo library permission denied. Enable it in Settings.' });
+      Toast.show({ type: 'error', text1: t('profile:media.photoPermissionDenied', 'Photo library permission denied. Enable it in Settings.') });
       return null;
     }
     const asset = result.assets?.[0];
     if (!asset?.uri || !asset.type || !asset.fileName) {
-      if (asset) Toast.show({ type: 'error', text1: 'Could not read image — try another photo' });
+      if (asset) Toast.show({ type: 'error', text1: t('profile:media.couldNotReadImage', 'Could not read image — try another photo') });
       return null;
     }
     setPendingLocalUri(asset.uri);
     const file = await upload({ uri: asset.uri, type: asset.type, name: asset.fileName });
     setPendingLocalUri(null);
     return file ? { ...file, localUri: asset.uri } : null;
-  }, [upload]);
+  }, [upload, t]);
 
   const takePhoto = useCallback(async (): Promise<MediaFileWithUri | null> => {
     const result = await launchCamera({ mediaType: 'photo', quality: 1 });
     if (result.didCancel) return null;
     if (result.errorCode === 'permission') {
-      Toast.show({ type: 'error', text1: 'Camera permission denied. Enable it in Settings.' });
+      Toast.show({ type: 'error', text1: t('profile:media.cameraPermissionDenied', 'Camera permission denied. Enable it in Settings.') });
       return null;
     }
     const asset = result.assets?.[0];
     if (!asset?.uri || !asset.type || !asset.fileName) {
-      if (asset) Toast.show({ type: 'error', text1: 'Could not capture photo' });
+      if (asset) Toast.show({ type: 'error', text1: t('profile:media.couldNotCapturePhoto', 'Could not capture photo') });
       return null;
     }
     setPendingLocalUri(asset.uri);
     const file = await upload({ uri: asset.uri, type: asset.type, name: asset.fileName });
     setPendingLocalUri(null);
     return file ? { ...file, localUri: asset.uri } : null;
-  }, [upload]);
+  }, [upload, t]);
 
   const pickPdf = useCallback(async (): Promise<MediaFile | null> => {
     try {

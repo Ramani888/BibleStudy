@@ -11,6 +11,7 @@ import { formatDate, formatDateWithTime, formatDuration } from '../../utils/form
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
 
+import { useTranslation } from 'react-i18next';
 type Params = QuizStackParamList['QuizDetail'];
 
 const MODE_LABEL: Record<string, string> = {
@@ -20,6 +21,7 @@ const MODE_LABEL: Record<string, string> = {
 };
 
 export function QuizDetailScreen() {
+  const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
@@ -51,13 +53,13 @@ export function QuizDetailScreen() {
 
   const handleDelete = useCallback(() => {
     show({
-      title: 'Delete Quiz',
-      message: 'Remove this attempt from your history?',
-      confirmLabel: 'Delete',
+      title: t('quiz:detail.deleteTitle'),
+      message: t('quiz:detail.deleteMessage'),
+      confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: () => deleteAttempt(id, { onSuccess: () => navigation.goBack() }),
     });
-  }, [show, deleteAttempt, id, navigation]);
+  }, [show, deleteAttempt, id, navigation, t]);
 
   const handleReQuiz = useCallback(() => navigation.navigate('Quiz', {
     setIds,
@@ -71,7 +73,7 @@ export function QuizDetailScreen() {
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label="Re-Quiz" onPress={handleReQuiz} fullWidth />
+      <Button label={t('quiz:summary.reQuiz', 'Re-Quiz')} onPress={handleReQuiz} fullWidth />
     </View>
   );
 
@@ -79,7 +81,7 @@ export function QuizDetailScreen() {
     <Screen
       header={
         <ScreenHeader
-          title={quizName ?? setsLabel ?? 'Quiz Details'}
+          title={quizName ?? setsLabel ?? t('quiz:detail.title', 'Quiz Details')}
           onBack={() => navigation.goBack()}
           right={
             <View style={styles.headerActions}>
@@ -155,7 +157,7 @@ export function QuizDetailScreen() {
             <View style={styles.cardRowLeft}>
               <ClockIcon size={16} color={colors.textSecondary} />
               <Typography preset="caption" color={colors.textSecondary}>
-                {isRetaken ? 'Last practiced' : 'Practiced'}
+                {isRetaken ? t('quiz:detail.lastPracticed', 'Last practiced') : t('quiz:detail.practiced', 'Practiced')}
               </Typography>
             </View>
             <Typography preset="body" color={colors.textPrimary}>
@@ -169,7 +171,7 @@ export function QuizDetailScreen() {
               <View style={styles.cardRow}>
                 <View style={styles.cardRowLeft}>
                   <TimerIcon size={16} color={colors.textSecondary} />
-                  <Typography preset="caption" color={colors.textSecondary}>Time spent</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.timeSpent', 'Time spent')}</Typography>
                 </View>
                 <Typography preset="body" color={colors.textPrimary}>
                   {formatDuration(timeSecs)}
@@ -184,7 +186,7 @@ export function QuizDetailScreen() {
               <View style={styles.cardRow}>
                 <View style={styles.cardRowLeft}>
                   <CalendarIcon size={16} color={colors.textSecondary} />
-                  <Typography preset="caption" color={colors.textSecondary}>First attempt</Typography>
+                  <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.firstAttempt', 'First attempt')}</Typography>
                 </View>
                 <Typography preset="body" color={colors.textPrimary}>
                   {formatDate(createdAt)}

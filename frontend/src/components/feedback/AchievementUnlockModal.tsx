@@ -18,7 +18,10 @@ interface AchievementUnlockModalProps {
   onDismiss: () => void;
 }
 
+import { useTranslation } from 'react-i18next';
+
 export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUnlockModalProps) {
+  const { t } = useTranslation(['profile', 'common']);
   const insets = useSafeAreaInsets();
   if (!achievement) return null;
 
@@ -55,13 +58,13 @@ export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUn
           <TrophyIcon size={34} color={palette.white} />
         </View>
 
-        <Typography style={styles.eyebrow}>ACHIEVEMENT UNLOCKED</Typography>
+        <Typography style={styles.eyebrow}>{t('profile:achievements.unlocked', 'ACHIEVEMENT UNLOCKED')}</Typography>
         <Typography style={styles.title}>{achievement.title}</Typography>
         <Typography style={styles.desc}>{achievement.description}</Typography>
 
         {achievement.reward > 0 && (
           <View style={styles.rewardPill}>
-            <Typography style={styles.rewardText}>+{achievement.reward} credits</Typography>
+            <Typography style={styles.rewardText}>+{achievement.reward} {t('profile:credits.credits', 'credits')}</Typography>
           </View>
         )}
 
@@ -72,7 +75,7 @@ export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUn
             end={{ x: 1, y: 0 }}
             style={[StyleSheet.absoluteFill, styles.btnGradient]}
           />
-          <Typography style={styles.btnText}>Continue</Typography>
+          <Typography style={styles.btnText}>{t('common:actions.continue', 'Continue')}</Typography>
         </Pressable>
       </View>
     </View>
