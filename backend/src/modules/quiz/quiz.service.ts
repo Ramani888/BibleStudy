@@ -18,7 +18,7 @@ async function applySpacedRepetition(userId: string, dto: RecordAttemptDtoType) 
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   const primarySetId = dto.setIds[0];
-  const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds } }, select: { id: true } });
+  const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } });
   if (sets.length !== dto.setIds.length) throw new NotFoundError('One or more sets not found');
 
   const scorePct = Math.round((dto.correct / dto.total) * 100);

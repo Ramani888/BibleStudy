@@ -62,9 +62,11 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
   const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then(raw => {
-      if (raw) setPrefs({ ...DEFAULTS, ...JSON.parse(raw) });
-    });
+    AsyncStorage.getItem(STORAGE_KEY)
+      .then(raw => {
+        if (raw) setPrefs({ ...DEFAULTS, ...JSON.parse(raw) });
+      })
+      .catch(() => setPrefs(DEFAULTS)); // corrupt/failed read — fall back to defaults
   }, []);
 
   const toggle = async (key: keyof NotificationPrefs) => {

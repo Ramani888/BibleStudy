@@ -4,7 +4,9 @@ import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
 import { useAuthStore } from '../store/auth.store';
 
-const BASE_URL = Config.API_BASE_URL ?? (__DEV__ ? 'http://localhost:3010/api/v1' : 'http://localhost:3010/api/v1');
+// Config.API_BASE_URL is bundled from .env at build time. The fallbacks only fire on a
+// misconfigured build — dev → local server, release → prod host (never localhost).
+const BASE_URL = Config.API_BASE_URL ?? (__DEV__ ? 'http://localhost:3010/api/v1' : 'http://94.130.176.8/api/v1');
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -23,10 +25,15 @@ apiClient.interceptors.request.use(async (config: InternalAxiosRequestConfig) =>
 
 // ─── Response interceptor — silent token refresh on 401 ──────────────────────
 let isRefreshing = false;
-let refreshQueue: Array<(token: string) => void> = [];
+let refreshQueue: Array<{ resolve: (token: string) => void; reject: (err: unknown) => void }> = [];
 
 function drainQueue(newToken: string) {
-  refreshQueue.forEach(cb => cb(newToken));
+  refreshQueue.forEach(p => p.resolve(newToken));
+  refreshQueue = [];
+}
+
+function rejectQueue(err: unknown) {
+  refreshQueue.forEach(p => p.reject(err));
   refreshQueue = [];
 }
 
@@ -41,10 +48,13 @@ apiClient.interceptors.response.use(
 
     // If already refreshing, queue this request until new token arrives
     if (isRefreshing) {
-      return new Promise(resolve => {
-        refreshQueue.push((token: string) => {
-          original.headers.Authorization = `Bearer ${token}`;
-          resolve(apiClient(original));
+      return new Promise((resolve, reject) => {
+        refreshQueue.push({
+          resolve: (token: string) => {
+            original.headers.Authorization = `Bearer ${token}`;
+            resolve(apiClient(original));
+          },
+          reject,
         });
       });
     }
@@ -70,7 +80,7 @@ apiClient.interceptors.response.use(
       await storage.clearTokens();
       queryClient.clear();
       useAuthStore.getState().reset();
-      refreshQueue = [];
+      rejectQueue(error);
       return Promise.reject(error);
     } finally {
       isRefreshing = false;

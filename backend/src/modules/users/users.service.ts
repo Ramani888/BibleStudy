@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import { prisma } from '../../config/db';
 import { UpdateProfileDtoType, ChangePasswordDtoType } from './users.dto';
 import { NotFoundError, UnauthorizedError } from '../../utils/errors';
+import { deleteUserFilesFromDisk } from '../media/media.service';
 
 const PROFILE_SELECT = {
   id: true, name: true, email: true, password: true, profileImage: true,
@@ -52,6 +53,7 @@ export async function changePassword(userId: string, dto: ChangePasswordDtoType)
 }
 
 export async function deleteAccount(userId: string) {
+  await deleteUserFilesFromDisk(userId); // remove disk bytes before the DB cascade drops the rows
   await prisma.user.delete({ where: { id: userId } });
   return { message: 'Account deleted successfully' };
 }

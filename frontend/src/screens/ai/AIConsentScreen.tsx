@@ -16,13 +16,15 @@ export function AIConsentScreen({ navigation }: AIScreenProps<'AIConsent'>) {
   const [checking, setChecking] = useState(true);
 
   useEffect(() => {
-    storage.getAiPolicyAccepted().then(accepted => {
-      if (accepted) {
-        navigation.replace('AIChat');
-      } else {
-        setChecking(false);
-      }
-    });
+    storage.getAiPolicyAccepted()
+      .then(accepted => {
+        if (accepted) {
+          navigation.replace('AIChat');
+        } else {
+          setChecking(false);
+        }
+      })
+      .catch(() => setChecking(false)); // storage read failed — show consent rather than blank screen
   }, [navigation]);
 
   const handleAccept = async () => {
@@ -61,7 +63,7 @@ export function AIConsentScreen({ navigation }: AIScreenProps<'AIConsent'>) {
 
         <Spacer size={spacing.md} />
         <Typography preset="caption" color={colors.textSecondary} align="center">
-          {t('ai:consent.warning', 'Do not share personal information you would not want these services to receive. Messages are not stored by BibleStudy Pro beyond your session.')}
+          {t('ai:consent.warning', 'Do not share personal information you would not want these services to receive. Messages are not stored by Verdance beyond your session.')}
         </Typography>
 
         <Spacer size={spacing.xxxl} />

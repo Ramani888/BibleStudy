@@ -168,6 +168,15 @@ export async function renameFile(userId: string, fileId: string, name: string) {
   }
 }
 
+/** Best-effort disk cleanup of every file a user owns. Call BEFORE the DB rows are
+ *  removed (e.g. account deletion) — the cascade only frees DB rows, not the bytes. */
+export async function deleteUserFilesFromDisk(userId: string) {
+  const files = await prisma.mediaFile.findMany({ where: { userId }, select: { key: true } });
+  await Promise.all(files.map(f =>
+    fs.unlink(path.join(UPLOADS_DIR, f.key)).catch(() => {}),
+  ));
+}
+
 export async function getStorageUsage(userId: string) {
   const user = await prisma.user.findUniqueOrThrow({
     where:  { id: userId },
