@@ -20,13 +20,13 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Typography preset="h2" color={colors.textPrimary} style={styles.appName}>
-            {t('common:appName', 'BibleStudy Pro')}
+            {t('common:appName', 'Verdance')}
           </Typography>
           <Typography preset="caption" color={colors.textSecondary} style={styles.version}>
             {t('profile:settings.versionLabel', { version: APP_VERSION, defaultValue: `Version ${APP_VERSION}` })}
           </Typography>
           <Typography preset="body" color={colors.textSecondary} style={styles.description}>
-            {t('profile:aboutUs.description', "BibleStudy Pro helps you deepen your understanding of Scripture through AI-powered flashcards, spaced repetition, and collaborative study tools. Whether you study alone or in a group, we're here to make every session more meaningful.")}
+            {t('profile:aboutUs.description', "Verdance helps you deepen your understanding of Scripture through AI-powered flashcards, spaced repetition, and collaborative study tools. Whether you study alone or in a group, we're here to make every session more meaningful.")}
           </Typography>
         </View>
 

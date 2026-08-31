@@ -32,7 +32,7 @@ const BrandLogo = React.memo(function BrandLogo() {
         <SparklesIcon size={26} color={colors.textOnAccent} />
       </View>
       <Typography preset="h4" color={colors.accent} style={styles.logoText}>
-        BibleStudy Pro
+        Verdance
       </Typography>
     </View>
   );

@@ -48,7 +48,7 @@
   "consent": {
     "title": "AI Assistant Notice",
     "headline": "AI-Powered Bible Study",
-    "lead": "BibleStudy Pro uses advanced artificial intelligence (Claude by Anthropic) to provide instant theological insights, chapter summaries, and flashcard generation.",
+    "lead": "Verdance uses advanced artificial intelligence (Claude by Anthropic) to provide instant theological insights, chapter summaries, and flashcard generation.",
     "providerSummary": "Your questions and uploaded study documents are processed securely through Anthropic's Claude API. Responses are generated to help you explore Scripture, cross-references, and historical contexts.",
     "featuresNote": "Our AI features require an active network connection and will consume study credits from your balance.",
     "warningTitle": "A note on theological discernment:",
@@ -57,7 +57,7 @@
     "accept": "I Understand & Accept",
     "decline": "Decline & Exit",
     "declineTitle": "AI Features Disabled",
-    "declineMessage": "You can use all other features of BibleStudy Pro without the AI assistant. You can change this choice at any time in Settings.",
+    "declineMessage": "You can use all other features of Verdance without the AI assistant. You can change this choice at any time in Settings.",
     "declinedInfo": "AI Assistant is currently turned off based on your privacy preference. You can enable it at any time in Settings.",
     "consentRecorded": "Preferences saved",
     "consentDeclined": "AI Assistant disabled",

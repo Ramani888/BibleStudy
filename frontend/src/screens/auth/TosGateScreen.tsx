@@ -21,7 +21,7 @@ export function TosGateScreen({ onAccept }: Props) {
         <Typography preset="h3" align="center">{t('auth:tosGate.title', 'One more step')}</Typography>
         <Spacer size={spacing.md} />
         <Typography preset="body" color={colors.textSecondary} align="center">
-          {t('auth:tosGate.subtitle', 'To use BibleStudy Pro you must agree to our Terms of Service and Privacy Policy.')}
+          {t('auth:tosGate.subtitle', 'To use Verdance you must agree to our Terms of Service and Privacy Policy.')}
         </Typography>
 
         <Spacer size={spacing.lg} />

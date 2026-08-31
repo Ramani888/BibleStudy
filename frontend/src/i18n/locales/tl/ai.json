@@ -48,7 +48,7 @@
   "consent": {
     "title": "Paunawa sa AI Assistant",
     "headline": "Pag-aaral ng Bibliya Gamit ang AI",
-    "lead": "Gumagamit ang BibleStudy Pro ng advanced na artificial intelligence (Claude ng Anthropic) upang magbigay ng teolohikong pananaw, buod ng kabanata, at paglikha ng flashcard.",
+    "lead": "Gumagamit ang Verdance ng advanced na artificial intelligence (Claude ng Anthropic) upang magbigay ng teolohikong pananaw, buod ng kabanata, at paglikha ng flashcard.",
     "providerSummary": "Ligtas na pinoproseso ang iyong mga tanong at dokumento sa pamamagitan ng Anthropic API.",
     "featuresNote": "Nangangailangan ng koneksyon sa internet ang mga AI feature at kumokonsumo ng mga study credit mula sa iyong balanse.",
     "warningTitle": "Isang paalala sa teolohikong pagpapasya:",
@@ -57,7 +57,7 @@
     "accept": "Nauunawaan Ko at Tinatanggap",
     "decline": "Tanggihan at Lumabas",
     "declineTitle": "Naka-disable ang mga AI Feature",
-    "declineMessage": "Maaari mong gamitin ang lahat ng iba pang feature ng BibleStudy Pro nang walang AI assistant.",
+    "declineMessage": "Maaari mong gamitin ang lahat ng iba pang feature ng Verdance nang walang AI assistant.",
     "declinedInfo": "Naka-disable ang AI Assistant batay sa iyong kagustuhan sa privacy. Maaari mo itong i-enable sa Mga Setting.",
     "consentRecorded": "Nai-save ang mga kagustuhan",
     "consentDeclined": "Naka-disable ang AI Assistant",

@@ -47,7 +47,7 @@
   },
   "aboutUs": {
     "title": "About Us",
-    "description": "BibleStudy Pro helps you deepen your understanding of Scripture through AI-powered flashcards, spaced repetition, and collaborative study tools. Whether you study alone or in a group, we're here to make every session more meaningful.",
+    "description": "Verdance helps you deepen your understanding of Scripture through AI-powered flashcards, spaced repetition, and collaborative study tools. Whether you study alone or in a group, we're here to make every session more meaningful.",
     "missionTitle": "Our Mission",
     "missionBody": "To make Bible study accessible, effective, and joyful for believers everywhere — combining timeless wisdom with modern learning science.",
     "contactTitle": "Contact",
@@ -205,7 +205,7 @@
     "privacySec1Title": "Information We Collect",
     "privacySec1Body": "We collect your name, email address, and the content you create (flashcard sets, notes, and study plans) to provide our service. We also collect anonymous usage analytics to improve the app.",
     "privacySec2Title": "How We Use Your Data",
-    "privacySec2Body": "Your data is used solely to deliver BibleStudy Pro's features — generating AI responses, syncing your study progress, and enabling social features like friend leaderboards. We never sell your personal information.",
+    "privacySec2Body": "Your data is used solely to deliver Verdance's features — generating AI responses, syncing your study progress, and enabling social features like friend leaderboards. We never sell your personal information.",
     "privacySec3Title": "AI Processing",
     "privacySec3Body": "Text you send to the AI chat is processed by third-party AI providers (OpenRouter / Anthropic Claude) to generate responses. Media files (images, PDFs) are sent to Anthropic Claude for analysis. These providers operate under their own privacy policies.",
     "privacySec4Title": "Data Storage",

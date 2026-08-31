@@ -73,7 +73,7 @@ export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
       <View style={styles.logoWrap}>
         <SvgXml xml={LOGO_SVG} width={120} height={120} />
       </View>
-      <Text style={styles.appName}>BibleStudy Pro</Text>
+      <Text style={styles.appName}>Verdance</Text>
       <Text style={styles.tagline}>{t('common:brand.tagline', 'Study · Memorize · Grow')}</Text>
     </Animated.View>
   );

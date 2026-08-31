@@ -40,12 +40,12 @@ export function TermsOfServiceScreen() {
 
         <Section
           title={t('auth:tos.sec1Title', 'Acceptance of Terms')}
-          body={t('auth:tos.sec1Body', 'By creating an account or using BibleStudy Pro, you agree to these Terms of Service. If you do not agree, please do not use the app.')}
+          body={t('auth:tos.sec1Body', 'By creating an account or using Verdance, you agree to these Terms of Service. If you do not agree, please do not use the app.')}
         />
 
         <Section
           title={t('auth:tos.sec2Title', 'Use of the App')}
-          body={t('auth:tos.sec2Body', 'BibleStudy Pro is a personal Bible study tool. You may use it only for lawful purposes. You must not use the app to generate, store, or share content that is illegal, harmful, or violates the rights of others.')}
+          body={t('auth:tos.sec2Body', 'Verdance is a personal Bible study tool. You may use it only for lawful purposes. You must not use the app to generate, store, or share content that is illegal, harmful, or violates the rights of others.')}
         />
 
         <Section
@@ -60,7 +60,7 @@ export function TermsOfServiceScreen() {
 
         <Section
           title={t('auth:tos.sec5Title', 'Your Content')}
-          body={t('auth:tos.sec5Body', 'You retain ownership of the flashcards, notes, and study plans you create. By using BibleStudy Pro, you grant us a limited license to store and process your content solely to provide the service to you.')}
+          body={t('auth:tos.sec5Body', 'You retain ownership of the flashcards, notes, and study plans you create. By using Verdance, you grant us a limited license to store and process your content solely to provide the service to you.')}
         />
 
         <Section
@@ -70,7 +70,7 @@ export function TermsOfServiceScreen() {
 
         <Section
           title={t('auth:tos.sec7Title', 'Disclaimer of Warranties')}
-          body={t('auth:tos.sec7Body', "BibleStudy Pro is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that AI responses will be accurate or complete.")}
+          body={t('auth:tos.sec7Body', "Verdance is provided 'as is' without warranties of any kind. We do not guarantee that the service will be uninterrupted, error-free, or that AI responses will be accurate or complete.")}
         />
 
         <Section

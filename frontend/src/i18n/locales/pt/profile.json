@@ -58,7 +58,7 @@
     "couldNotLoad": "Não foi possível carregar os créditos"
   },
   "paywall": {
-    "title": "BibleStudy Pro",
+    "title": "Verdance",
     "headline": "Acelere Seu Crescimento Espiritual",
     "subtitle": "Desbloqueie geração ilimitada de flashcards com IA, explicações profundas de versículos e armazenamento expandido.",
     "monthlyPlan": "Plano Mensal",
@@ -160,9 +160,9 @@
   },
   "aboutUs": {
     "title": "Sobre Nós",
-    "appName": "BibleStudy Pro",
+    "appName": "Verdance",
     "missionTitle": "Nossa Missão",
-    "missionBody": "O BibleStudy Pro foi criado para ajudar os crentes a se conectarem profundamente com a Palavra de Deus por meio de ferramentas de memorização e análise bíblica com IA.",
+    "missionBody": "O Verdance foi criado para ajudar os crentes a se conectarem profundamente com a Palavra de Deus por meio de ferramentas de memorização e análise bíblica com IA.",
     "contactTitle": "Contato",
     "contactBody": "Para feedback, solicitações de recursos ou suporte, entre em contato em:"
   },

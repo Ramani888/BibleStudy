@@ -58,7 +58,7 @@
     "couldNotLoad": "크레딧 정보를 불러올 수 없습니다"
   },
   "paywall": {
-    "title": "BibleStudy Pro",
+    "title": "Verdance",
     "headline": "영적 성장을 가속화하세요",
     "subtitle": "무제한 AI 플래시카드 생성, 심층 구절 해설, 확장된 저장 공간을 이용하세요.",
     "monthlyPlan": "월간 요금제",
@@ -160,9 +160,9 @@
   },
   "aboutUs": {
     "title": "앱 소개",
-    "appName": "BibleStudy Pro",
+    "appName": "Verdance",
     "missionTitle": "우리의 미션",
-    "missionBody": "BibleStudy Pro는 성도들이 말씀 암송 도구와 AI 성경 연구 분석을 통해 하나님의 말씀과 깊이 연결되도록 돕기 위해 만들어졌습니다.",
+    "missionBody": "Verdance는 성도들이 말씀 암송 도구와 AI 성경 연구 분석을 통해 하나님의 말씀과 깊이 연결되도록 돕기 위해 만들어졌습니다.",
     "contactTitle": "문의하기",
     "contactBody": "피드백, 기능 제안 또는 고객 지원 문의는 다음으로 연락해 주세요:"
   },

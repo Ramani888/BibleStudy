@@ -48,7 +48,7 @@
   "consent": {
     "title": "Avis sur l'Assistant IA",
     "headline": "Étude Biblique Assistée par IA",
-    "lead": "BibleStudy Pro utilise une intelligence artificielle avancée (Claude d'Anthropic) pour fournir des analyses théologiques instantanées, des résumés de chapitres et des flashcards.",
+    "lead": "Verdance utilise une intelligence artificielle avancée (Claude d'Anthropic) pour fournir des analyses théologiques instantanées, des résumés de chapitres et des flashcards.",
     "providerSummary": "Vos questions et documents téléversés sont traités en toute sécurité via l'API d'Anthropic.",
     "featuresNote": "Nos fonctionnalités d'IA nécessitent une connexion Internet et consomment des crédits d'étude de votre solde.",
     "warningTitle": "Une remarque sur le discernement théologique :",
@@ -57,7 +57,7 @@
     "accept": "Je Comprends et J'Accepte",
     "decline": "Refuser et Quitter",
     "declineTitle": "Fonctionnalités IA Désactivées",
-    "declineMessage": "Vous pouvez utiliser toutes les autres fonctionnalités de BibleStudy Pro sans l'assistant IA.",
+    "declineMessage": "Vous pouvez utiliser toutes les autres fonctionnalités de Verdance sans l'assistant IA.",
     "declinedInfo": "L'Assistant IA est désactivé selon vos préférences de confidentialité. Vous pouvez l'activer dans les Paramètres.",
     "consentRecorded": "Préférences enregistrées",
     "consentDeclined": "Assistant IA désactivé",

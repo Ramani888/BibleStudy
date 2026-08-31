@@ -104,7 +104,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         <View>
           <MenuSection label={t('profile:settings.appInfo')}>
             <MenuItem icon={BookIcon} label={t('profile:settings.version')} value={APP_VERSION} showChevron={false} onPress={() => {}} />
-            <MenuItem icon={StarOutlineIcon} label={t('common:appName', 'BibleStudy Pro')} value={t('profile:settings.madeWithLove', 'Made with ♥')} showChevron={false} onPress={() => {}} />
+            <MenuItem icon={StarOutlineIcon} label={t('common:appName', 'Verdance')} value={t('profile:settings.madeWithLove', 'Made with ♥')} showChevron={false} onPress={() => {}} />
             <MenuItem icon={InfoIcon} label={t('profile:settings.aboutUs')} onPress={handleNavAboutUs} />
             <MenuItem icon={FileTextIcon} label={t('profile:settings.privacyPolicy')} onPress={handleNavPrivacy} />
           </MenuSection>

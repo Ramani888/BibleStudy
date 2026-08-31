@@ -49,7 +49,7 @@ export function PrivacyPolicyScreen() {
 
         <Section
           title={t('profile:legal.privacySec2Title', 'How We Use Your Data')}
-          body={t('profile:legal.privacySec2Body', "Your data is used solely to deliver BibleStudy Pro's features — generating AI responses, syncing your study progress, and enabling social features like friend leaderboards. We never sell your personal information.")}
+          body={t('profile:legal.privacySec2Body', "Your data is used solely to deliver Verdance's features — generating AI responses, syncing your study progress, and enabling social features like friend leaderboards. We never sell your personal information.")}
         />
 
         <Section
