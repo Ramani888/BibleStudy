@@ -2,8 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
@@ -18,11 +16,6 @@
       android:theme="@style/AppTheme"
       android:usesCleartextTraffic="true"
       android:supportsRtl="true">
-
-      <!-- Google Maps API key (set via react-native-config .env) -->
-      <meta-data
-        android:name="com.google.android.geo.API_KEY"
-        android:value="@string/google_maps_api_key" />
 
       <!-- Firebase Cloud Messaging default notification channel -->
       <meta-data
