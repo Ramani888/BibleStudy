@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Linking, Platform, StyleSheet, View } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { ActivityIndicator, Linking, StyleSheet, View } from 'react-native';
+import Pdf from 'react-native-pdf';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { Button, Typography } from '../../components/ui';
@@ -8,40 +8,16 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { spacing, useTheme } from '../../theme';
 
-type Props = ProfileScreenProps<'MediaPDFViewer'>;
-
-// Android: Google Docs can't reliably preview private/direct S3 URLs —
-// detect its error page and surface a fallback.
-const GOOGLE_DOCS_ERROR_DETECTOR = `
-  (function() {
-    var checks = 0;
-    var timer = setInterval(function() {
-      checks++;
-      var text = document.body ? (document.body.innerText || '') : '';
-      if (
-        text.toLowerCase().includes('unable to generate') ||
-        text.toLowerCase().includes('no preview available') ||
-        text.toLowerCase().includes("can't preview")
-      ) {
-        clearInterval(timer);
-        window.ReactNativeWebView.postMessage('PDF_LOAD_ERROR');
-      }
-      if (checks >= 20) clearInterval(timer);
-    }, 1000);
-  })();
-  true;
-`;
-
 import { useTranslation } from 'react-i18next';
 
+type Props = ProfileScreenProps<'MediaPDFViewer'>;
+
+// Renders natively on-device (react-native-pdf) — the PDF is fetched + cached locally,
+// so private media is never handed to a third-party viewer (e.g. Google Docs).
 export function MediaPDFViewerScreen({ route, navigation }: Props) {
   const { t } = useTranslation('common');
   const { colors } = useTheme();
   const { url, name } = route.params;
-
-  const viewerUrl = Platform.OS === 'android'
-    ? `https://docs.google.com/gview?embedded=true&url=${encodeURIComponent(url)}`
-    : url; // WKWebView on iOS renders PDFs natively from a direct URL
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -63,15 +39,12 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   return (
     <Screen header={<ScreenHeader title={name} onBack={() => navigation.goBack()} />}>
       <View style={styles.pdfWrap}>
-        <WebView
-          source={{ uri: viewerUrl }}
+        <Pdf
+          source={{ uri: url, cache: true }}
           style={styles.pdf}
-          scalesPageToFit={false}
-          injectedJavaScript={Platform.OS === 'android' ? GOOGLE_DOCS_ERROR_DETECTOR : undefined}
-          onMessage={(e) => { if (e.nativeEvent.data === 'PDF_LOAD_ERROR') setError(true); }}
-          onLoadEnd={() => setLoading(false)}
+          onLoadComplete={() => setLoading(false)}
           onError={() => setError(true)}
-          onHttpError={(e) => { if (e.nativeEvent.statusCode >= 400) setError(true); }}
+          trustAllCerts={false}
         />
         {loading && (
           <View style={[StyleSheet.absoluteFill, styles.loadingOverlay, { backgroundColor: colors.background }]}>

@@ -33,6 +33,7 @@
     "react-hook-form": "^7.71.2",
     "react-i18next": "^17.0.12",
     "react-native": "0.84.1",
+    "react-native-blob-util": "^0.24.10",
     "react-native-config": "^1.6.1",
     "react-native-document-picker": "^9.3.1",
     "react-native-draggable-flatlist": "^4.0.3",
