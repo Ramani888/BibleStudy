@@ -2,6 +2,7 @@ import { Platform } from 'react-native';
 import messaging from '@react-native-firebase/messaging';
 import Toast from 'react-native-toast-message';
 import { apiPost } from '../api/client';
+import i18n from '../i18n';
 
 /**
  * Request push notification permission, obtain the FCM device token,
@@ -73,7 +74,7 @@ export function setupForegroundHandler(): () => void {
     if (notification) {
       Toast.show({
         type: 'info',
-        text1: notification.title ?? 'Notification',
+        text1: notification.title ?? i18n.t('common:notification', 'Notification'),
         text2: notification.body ?? '',
       });
     }

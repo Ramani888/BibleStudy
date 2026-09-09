@@ -4,6 +4,7 @@ import {
 } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
 import Config from 'react-native-config';
+import i18n from '../i18n';
 
 // Call once at app start (App.tsx)
 export function configureGoogleSignIn() {
@@ -19,10 +20,10 @@ export async function getGoogleIdToken(): Promise<string> {
   await GoogleSignin.signOut().catch(() => {});
   const result = await GoogleSignin.signIn();
   if (result.type === 'cancelled') {
-    throw Object.assign(new Error('Sign-in cancelled'), { code: statusCodes.SIGN_IN_CANCELLED });
+    throw Object.assign(new Error(i18n.t('auth:errors.signInCancelled', 'Sign-in cancelled')), { code: statusCodes.SIGN_IN_CANCELLED });
   }
   const tokens = await GoogleSignin.getTokens();
-  if (!tokens.idToken) throw new Error('Google Sign-In failed — no ID token');
+  if (!tokens.idToken) throw new Error(i18n.t('auth:errors.googleNoToken', 'Google Sign-In failed — no ID token'));
   return tokens.idToken;
 }
 
@@ -39,7 +40,7 @@ export async function getAppleCredentials() {
     nonce,
   });
 
-  if (!response.identityToken) throw new Error('Apple Sign-In failed — no identity token');
+  if (!response.identityToken) throw new Error(i18n.t('auth:errors.appleNoToken', 'Apple Sign-In failed — no identity token'));
 
   return {
     identityToken: response.identityToken,

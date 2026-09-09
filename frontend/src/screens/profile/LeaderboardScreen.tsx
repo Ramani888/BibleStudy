@@ -15,16 +15,16 @@ import { useLeaderboard } from '../../hooks';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
 
-const QUOTES: { maxRank: number; text: string; sub: string }[] = [
-  { maxRank: 1,        text: "You're leading the way — keep that flame alive! 🔥",  sub: 'The crown is yours. Protect it.' },
-  { maxRank: 3,        text: 'So close to the top — one faithful day can do it.',    sub: 'Push through, the finish is near.' },
-  { maxRank: 10,       text: 'Consistency is your superpower. Keep showing up.',     sub: 'Small steps build mighty habits.' },
-  { maxRank: Infinity, text: 'Every great journey begins with a single step.',       sub: "Today's streak is tomorrow's legacy." },
+const QUOTE_TIERS: { maxRank: number; key: string }[] = [
+  { maxRank: 1,        key: 'rank1' },
+  { maxRank: 3,        key: 'rank3' },
+  { maxRank: 10,       key: 'rank10' },
+  { maxRank: Infinity, key: 'rankOther' },
 ];
 
-function getQuote(rank: number) {
-  if (rank === 0) return { text: 'Every great journey begins with a single step.', sub: 'Start your streak today.' };
-  return QUOTES.find(q => rank <= q.maxRank) ?? QUOTES[QUOTES.length - 1];
+function getQuoteKey(rank: number): string {
+  if (rank === 0) return 'rankZero';
+  return (QUOTE_TIERS.find(q => rank <= q.maxRank) ?? QUOTE_TIERS[QUOTE_TIERS.length - 1]).key;
 }
 
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,11 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   const { data: rows = [], isFetching, error, refetch } = useLeaderboard();
 
   const myRank = rows.findIndex(r => r.isMe) + 1;
-  const quote = getQuote(myRank);
+  const qk = getQuoteKey(myRank);
+  const quote = {
+    text: t(`profile:leaderboard.quotes.${qk}.text`),
+    sub: t(`profile:leaderboard.quotes.${qk}.sub`),
+  };
 
   const renderItem = useCallback(({ item, index }: { item: LeaderboardEntry; index: number }) => (
     <View style={[

@@ -35,6 +35,13 @@ const PREDEFINED_TAGS = [
   'Prayer', 'History', 'Devotional', 'Prophecy',
 ] as const;
 
+// Tag values are stored/filtered in English; only the DISPLAY is translated.
+const TAG_KEY: Record<string, string> = {
+  'Theology': 'theology', 'Old Testament': 'oldTestament', 'New Testament': 'newTestament',
+  'Prayer': 'prayer', 'History': 'history', 'Devotional': 'devotional', 'Prophecy': 'prophecy',
+};
+const tagLabel = (tag: string, t: TFunction) => t(`ai:tags.${TAG_KEY[tag] ?? tag}`, { defaultValue: tag });
+
 const ListSeparator = () => <Spacer size={spacing.md} />;
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
@@ -60,7 +67,7 @@ function TagFilterBar({ activeTag, onSelect, colors }: {
             style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === tag && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
             onPress={() => onSelect(activeTag === tag ? null : tag)}
           >
-            <Typography preset="caption" color={activeTag === tag ? colors.textOnAccent : colors.textSecondary}>{tag}</Typography>
+            <Typography preset="caption" color={activeTag === tag ? colors.textOnAccent : colors.textSecondary}>{tagLabel(tag, t)}</Typography>
           </Pressable>
         ))}
       </ScrollView>
@@ -107,7 +114,7 @@ function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSav
               style={({ pressed }) => [styles.tagOption, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, active && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
               onPress={() => onToggle(tag)}
             >
-              <Typography preset="bodySm" color={active ? colors.textOnAccent : colors.textPrimary}>{tag}</Typography>
+              <Typography preset="bodySm" color={active ? colors.textOnAccent : colors.textPrimary}>{tagLabel(tag, t)}</Typography>
             </Pressable>
           );
         })}
@@ -120,6 +127,7 @@ function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSav
 // ─── Screen ───────────────────────────────────────────────────────────────────
 
 import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
   const { t } = useTranslation(['ai', 'common']);

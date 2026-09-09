@@ -68,6 +68,14 @@
     "minAgo": "{{count}}m ago",
     "hoursAgo": "{{count}}h ago",
     "at": "at",
-    "earlier": "Earlier"
+    "earlier": "Earlier",
+    "justNow": "just now",
+    "minsAgo": "{{count}}m ago",
+    "daysAgoShort": "{{count}}d ago"
+  },
+  "notification": "Notification",
+  "validation": {
+    "max200": "Max 200 characters",
+    "max100": "Max 100 characters"
   }
 }

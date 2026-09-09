@@ -29,6 +29,19 @@ export function formatDateWithTime(dateStr: string): string {
   return `${day} · ${time}`;
 }
 
+/** "just now", "5m ago", "3h ago", "2d ago", then a locale date. */
+export function formatRelativeShort(dateStr: string | Date): string {
+  const date = new Date(dateStr);
+  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (mins < 1) return i18n.t('common:time.justNow', 'just now');
+  if (mins < 60) return i18n.t('common:time.minsAgo', { count: mins, defaultValue: `${mins}m ago` });
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return i18n.t('common:time.hoursAgo', { count: hrs, defaultValue: `${hrs}h ago` });
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return i18n.t('common:time.daysAgoShort', { count: days, defaultValue: `${days}d ago` });
+  return date.toLocaleDateString(i18n.language || 'en-US');
+}
+
 /**
  * Format bytes to human-readable storage size.
  */

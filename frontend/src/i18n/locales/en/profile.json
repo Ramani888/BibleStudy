@@ -65,7 +65,8 @@
     "church": "Church (optional)",
     "churchPlaceholder": "Your church or congregation",
     "profileUpdated": "Profile updated!",
-    "updateFailed": "Update failed"
+    "updateFailed": "Update failed",
+    "nameMin": "Name must be at least 2 characters"
   },
   "changePassword": {
     "title": "Change Password",
@@ -228,5 +229,29 @@
     "day": "Daily",
     "week": "Weekly",
     "month": "Monthly"
+  },
+  "leaderboard": {
+    "quotes": {
+      "rank1": {
+        "text": "You're leading the way — keep that flame alive! 🔥",
+        "sub": "The crown is yours. Protect it."
+      },
+      "rank3": {
+        "text": "So close to the top — one faithful day can do it.",
+        "sub": "Push through, the finish is near."
+      },
+      "rank10": {
+        "text": "Consistency is your superpower. Keep showing up.",
+        "sub": "Small steps build mighty habits."
+      },
+      "rankOther": {
+        "text": "Every great journey begins with a single step.",
+        "sub": "Today's streak is tomorrow's legacy."
+      },
+      "rankZero": {
+        "text": "Every great journey begins with a single step.",
+        "sub": "Start your streak today."
+      }
+    }
   }
 }

@@ -32,7 +32,22 @@
     "noSets": "No sets available",
     "noSetsSub": "Create some study sets first before taking a quiz.",
     "startQuizBtn": "Start Quiz",
-    "selectSetsCount": "Select Sets ({{count}} selected)"
+    "selectSetsCount": "Select Sets ({{count}} selected)",
+    "modeDesc": {
+      "mix": "Random mix of all available types",
+      "mc": "Pick the correct answer from 4 options",
+      "story_mc": "Match reference to the correct passage",
+      "type_answer": "Type the answer from memory",
+      "type_verbatim": "Type the full passage verbatim",
+      "blanks": "Fill in the missing words",
+      "chunks": "Put the passage chunks in order",
+      "read": "Read & memorize — not scored"
+    },
+    "sort": {
+      "newest": "Recent",
+      "alpha": "A–Z",
+      "cards": "Cards"
+    }
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",
@@ -80,7 +95,8 @@
     "all": "All",
     "correct": "Correct",
     "incorrect": "Incorrect",
-    "noQuestions": "No questions match this filter."
+    "noQuestions": "No questions match this filter.",
+    "readMode": "(read)"
   },
   "item": {
     "typeAnswerPlaceholder": "Type your answer…"
@@ -114,5 +130,11 @@
     "blanks": "FILL THE BLANKS",
     "chunks": "PUT IN ORDER",
     "read": "TAP TO REVEAL"
+  },
+  "prompts": {
+    "thisPassage": "this passage",
+    "whichPassage": "Which passage is {{ref}}?",
+    "typeRef": "Type {{ref}}",
+    "typePassage": "Type the passage"
   }
 }

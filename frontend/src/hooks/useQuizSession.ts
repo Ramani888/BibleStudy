@@ -1,4 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
+import i18n from '../i18n';
 import type { Card, QuizItem, QuizMode, QuizSelectableMode, SummaryItem } from '../types';
 
 export const MIN_MC_CARDS = 4; // MC / Story-MC need 4 options
@@ -52,7 +53,7 @@ function cardModes(card: Card, cards: Card[]): QuizMode[] {
 
 // ─── item builders ──────────────────────────────────────────────────────────
 function buildItem(card: Card, mode: QuizMode, cards: Card[]): QuizItem | null {
-  const ref = card.question || 'this passage';
+  const ref = card.question || i18n.t('quiz:prompts.thisPassage', 'this passage');
   switch (mode) {
     case 'mc':
     case 'story_mc': {
@@ -66,7 +67,7 @@ function buildItem(card: Card, mode: QuizMode, cards: Card[]): QuizItem | null {
       return {
         mode,
         cardId: card.id,
-        prompt: mode === 'mc' ? card.question : `Which passage is ${ref}?`,
+        prompt: mode === 'mc' ? card.question : i18n.t('quiz:prompts.whichPassage', { ref, defaultValue: `Which passage is ${ref}?` }),
         options,
         answerIndex: options.indexOf(card.answer),
       };
@@ -74,7 +75,7 @@ function buildItem(card: Card, mode: QuizMode, cards: Card[]): QuizItem | null {
     case 'type_answer':
       return { mode, cardId: card.id, prompt: card.question, answer: card.answer };
     case 'type_verbatim':
-      return { mode, cardId: card.id, prompt: card.question ? `Type ${ref}` : 'Type the passage', answer: card.answer };
+      return { mode, cardId: card.id, prompt: card.question ? i18n.t('quiz:prompts.typeRef', { ref, defaultValue: `Type ${ref}` }) : i18n.t('quiz:prompts.typePassage', 'Type the passage'), answer: card.answer };
     case 'blanks': {
       const tokens = card.answer.split(/\s+/).filter(Boolean);
       const eligible = tokens.map((t, i) => ({ i, ok: core(t).length >= 3 })).filter(e => e.ok).map(e => e.i);
@@ -165,7 +166,7 @@ function formatUserAnswer(item: QuizItem, response: unknown): string {
         ? (response as string[]).map(k => k.slice(k.indexOf('::') + 2)).join(' → ')
         : '—';
     case 'read':
-      return '(read)';
+      return i18n.t('quiz:summary.readMode', '(read)');
   }
 }
 

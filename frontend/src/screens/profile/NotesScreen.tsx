@@ -12,6 +12,7 @@ import Toast from 'react-native-toast-message';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNotes, useDeleteNote, useConfirmDialog, useSearchToggle } from '../../hooks';
+import { formatRelativeShort } from '../../utils/formatters';
 import { SearchBar } from '../../components/ui/SearchBar';
 import { Typography } from '../../components/ui/Typography';
 import { EmptyState } from '../../components/feedback/EmptyState';
@@ -35,17 +36,7 @@ const SORT_LABELS: Record<SortOrder, string> = {
   oldest: 'Oldest',
 };
 
-function formatRelativeDate(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  if (days < 7) return `${days}d ago`;
-  return new Date(iso).toLocaleDateString();
-}
+const formatRelativeDate = formatRelativeShort;
 
 type Props = ProfileScreenProps<'Notes'>;
 

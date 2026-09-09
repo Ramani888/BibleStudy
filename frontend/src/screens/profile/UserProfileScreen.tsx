@@ -119,7 +119,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
     });
 
   return (
-    <Screen header={<ScreenHeader title={user.name ?? 'Profile'} onBack={() => navigation.goBack()} />}>
+    <Screen header={<ScreenHeader title={user.name ?? t('profile:title', 'Profile')} onBack={() => navigation.goBack()} />}>
       <ScrollView
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}

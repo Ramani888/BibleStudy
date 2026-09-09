@@ -127,5 +127,14 @@
     "header": "AI Bible Study — {{date}}",
     "you": "You",
     "ai": "AI"
+  },
+  "tags": {
+    "theology": "Theology",
+    "oldTestament": "Old Testament",
+    "newTestament": "New Testament",
+    "prayer": "Prayer",
+    "history": "History",
+    "devotional": "Devotional",
+    "prophecy": "Prophecy"
   }
 }

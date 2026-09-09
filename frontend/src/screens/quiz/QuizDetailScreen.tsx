@@ -46,7 +46,7 @@ export function QuizDetailScreen() {
 
   const scored = total > 0;
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
-  const modeLabel = mode ? (MODE_LABEL[mode] ?? mode) : '—';
+  const modeLabel = mode ? t(`quiz:modeNames.${mode}`, MODE_LABEL[mode] ?? mode) : '—';
   const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(' · ');
   const isPerfect = scored && scorePct === 100;
   const isRetaken = practicedAt !== createdAt;

@@ -17,11 +17,12 @@ import { useAuthStore } from '../../store';
 import { useUpdateProfile, usePickMedia } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { layout, spacing, useTheme } from '../../theme';
+import i18n from '../../i18n';
 
 const schema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').trim(),
-  bio: z.string().max(200, 'Max 200 characters').optional(),
-  church: z.string().max(100, 'Max 100 characters').optional(),
+  name: z.string().min(2, i18n.t('profile:editProfile.nameMin', 'Name must be at least 2 characters')).trim(),
+  bio: z.string().max(200, i18n.t('common:validation.max200', 'Max 200 characters')).optional(),
+  church: z.string().max(100, i18n.t('common:validation.max100', 'Max 100 characters')).optional(),
 });
 type EditProfileForm = z.infer<typeof schema>;
 

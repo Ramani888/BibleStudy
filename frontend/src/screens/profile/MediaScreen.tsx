@@ -21,6 +21,7 @@ import Animated, {
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { MediaFile, MediaFileType, StorageUsage } from '../../types';
 import { useMediaFiles, useStorageUsage, useSearchToggle } from '../../hooks';
+import { formatRelativeShort } from '../../utils/formatters';
 import { useMediaUpload } from '../../hooks/useMediaUpload';
 import { useMediaActions } from '../../hooks/useMediaActions';
 import { Typography } from '../../components/ui/Typography';
@@ -60,16 +61,7 @@ function fmtBytes(n: number): string {
   return mb >= 1000 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
 }
 
-function fmtDate(iso: string): string {
-  const diff = Date.now() - new Date(iso).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 1) return 'just now';
-  if (mins < 60) return `${mins}m ago`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
-  const days = Math.floor(hrs / 24);
-  return days < 7 ? `${days}d ago` : new Date(iso).toLocaleDateString();
-}
+const fmtDate = formatRelativeShort;
 
 /** Returns days until expiry, or null if the file doesn't expire. */
 function daysUntilExpiry(expiresAt: string | null): number | null {
