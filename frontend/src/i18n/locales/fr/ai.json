@@ -56,11 +56,11 @@
     "aiResponse": "Réponse de l'AI",
     "contentPolicy": "Règles de contenu",
     "contentPolicyMsg": "Veuillez garder les pièces jointes appropriées.\\n\\nN'importez aucun contenu sexuel, violent ou illégal. Toute infraction peut entraîner la suspension du compte.\\n\\nEn continuant, vous acceptez nos règles de contenu.",
-    "cardsSavedToast": "${cardsToSave.length} cartes enregistrées !",
+    "cardsSavedToast": "{{count}} cartes enregistrées !",
     "question": "question",
     "questions": "questions",
     "continueConversation": "Continuer la conversation",
-    "bookmarkedAt": "Mis en favori le ${formatDate(chat.bookmarkedAt)}",
+    "bookmarkedAt": "Enregistré {{date}}",
     "saveToSet": "Enregistrer dans un ensemble"
   },
   "consent": {

@@ -5,7 +5,7 @@
     "evening": "Magandang gabi",
     "streak": "{{count}} araw na streak! Ipagpatuloy mo yan",
     "streak_one": "Araw 1 ng streak! Magandang simula",
-    "streakDays": "${streakData?.streak ?? 0} araw na streak"
+    "streakDays": "{{count}} araw na streak"
   },
   "stats": {
     "dueToday": "Dapat pagaralan ngayon",
@@ -84,7 +84,7 @@
     "days": "{{count}} Araw na Streak",
     "keepGoing": "Ipagpatuloy ang magandang gawa!",
     "streakLost": "Mag-aral ngayon para mapanatili ang streak mo",
-    "flameDays": "🔥 ${streak} araw na streak"
+    "flameDays": "🔥 {{count}} araw na streak"
   },
   "sections": {
     "recentSets": "Kamakailang Sets",

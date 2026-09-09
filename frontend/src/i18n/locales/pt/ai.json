@@ -56,11 +56,11 @@
     "aiResponse": "Resposta da AI",
     "contentPolicy": "Política de conteúdo",
     "contentPolicyMsg": "Por favor, mantenha os anexos apropriados.\\n\\nNão envie conteúdo sexual, violento ou ilegal. Violações podem resultar na suspensão da conta.\\n\\nAo continuar, você concorda com nossas diretrizes de conteúdo.",
-    "cardsSavedToast": "${cardsToSave.length} cards salvos!",
+    "cardsSavedToast": "{{count}} cartões salvos!",
     "question": "pergunta",
     "questions": "perguntas",
     "continueConversation": "Continuar conversa",
-    "bookmarkedAt": "Salvo em ${formatDate(chat.bookmarkedAt)}",
+    "bookmarkedAt": "Marcado {{date}}",
     "saveToSet": "Salvar no conjunto"
   },
   "consent": {

@@ -56,11 +56,11 @@
     "aiResponse": "AI 응답",
     "contentPolicy": "콘텐츠 정책",
     "contentPolicyMsg": "첨부 파일은 적절한 내용으로 유지해 주세요.\\n\\n성적, 폭력적 또는 불법적인 콘텐츠를 업로드하지 마세요. 위반 시 계정이 정지될 수 있습니다.\\n\\n계속하면 콘텐츠 가이드라인에 동의하는 것입니다.",
-    "cardsSavedToast": "${cardsToSave.length}개의 카드가 저장되었습니다!",
+    "cardsSavedToast": "카드 {{count}}개 저장됨!",
     "question": "질문",
     "questions": "질문",
     "continueConversation": "대화 계속하기",
-    "bookmarkedAt": "${formatDate(chat.bookmarkedAt)}에 북마크됨",
+    "bookmarkedAt": "{{date}}에 북마크됨",
     "saveToSet": "세트에 저장"
   },
   "consent": {

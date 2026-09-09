@@ -46,7 +46,7 @@
     "visibilityPublic": "Public",
     "couldNotLoadSet": "Could not load set.",
     "searchPlaceholder": "Search sets…",
-    "setCount": "${filteredSets.length} sets",
+    "setCount": "{{count}} sets",
     "couldNotLoadFriendsSets": "Could not load friends",
     "emptyDesc": "Create your first study set to get started",
     "couldNotLoadPublicSets": "Could not load public sets.",
@@ -180,7 +180,7 @@
     "listView": "List View",
     "gridView": "Grid View",
     "addNotePlaceholder": "Add a note…",
-    "batchUpdateResult": "${toUpdate.length - failed} updated, ${failed} failed",
+    "batchUpdateResult": "{{updated}} updated, {{failed}} failed",
     "noMatch": "No cards match ",
     "qaCard": "Q&A Card",
     "storyCard": "Story Card",
@@ -215,7 +215,7 @@
     "noSetsAvailableSub": "Create flashcard sets first before building a study plan.",
     "emptyTitle": "No study plans yet",
     "emptySub": "Tap + to create a guided path through your sets.",
-    "selectedCount": "${selectedSetIds.length} sets selected"
+    "selectedCount": "{{count}} sets selected"
   },
   "studyPlans": {
     "title": "Study Plans",
@@ -233,8 +233,8 @@
     "noSetsSub": "Try searching for a different Bible topic or keyword.",
     "emptyTitle": "No public sets yet",
     "emptySubtitle": "Be the first to publish a set!",
-    "resultsFor": "${total} result${total !== 1 ? ",
-    "publicSetsAvailable": "${total} public sets available",
+    "resultsFor": "{{count}} results for \"{{query}}\"",
+    "publicSetsAvailable": "{{count}} public sets available",
     "noSetsMatch": "No sets match "
   },
   "friendsSets": {
@@ -242,7 +242,7 @@
     "searchPlaceholder": "Search friends' sets…",
     "noSets": "No sets from friends",
     "noSetsSub": "When your friends publish study sets, they will appear here.",
-    "sharedCount": "${total} sets shared by friends",
+    "sharedCount": "{{count}} sets shared by friends",
     "noSetsMatch": "No sets match "
   },
   "dialogs": {
@@ -264,5 +264,5 @@
     "textMin": "Text must be at least 2 characters",
     "textMax": "Max 2000 characters"
   },
-  "cardsCount_other": "${set._count?.cards ?? 0} cards"
+  "cardsCount_other": "{{count}} cards"
 }

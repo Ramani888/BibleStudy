@@ -46,7 +46,7 @@
     "visibilityPublic": "공개",
     "couldNotLoadSet": "세트를 불러올 수 없습니다.",
     "searchPlaceholder": "세트 검색…",
-    "setCount": "${filteredSets.length}개 세트",
+    "setCount": "세트 {{count}}개",
     "couldNotLoadFriendsSets": "친구 목록을 불러올 수 없습니다",
     "emptyDesc": "첫 번째 공부 세트를 만들어 시작하세요",
     "couldNotLoadPublicSets": "공개 세트를 불러올 수 없습니다.",
@@ -179,7 +179,7 @@
     "listView": "목록 보기",
     "gridView": "그리드 보기",
     "addNotePlaceholder": "노트 추가…",
-    "batchUpdateResult": "${toUpdate.length - failed}개 업데이트됨, ${failed}개 실패",
+    "batchUpdateResult": "{{updated}}개 업데이트됨, {{failed}}개 실패",
     "noMatch": "일치하는 카드 없음 ",
     "qaCard": "질문 & 답 카드",
     "storyCard": "이야기 카드",
@@ -214,7 +214,7 @@
     "noSetsAvailableSub": "계획을 만들기 전에 플래시카드 세트를 먼저 생성하세요.",
     "emptyTitle": "아직 공부 계획이 없습니다",
     "emptySub": "+를 탭하여 세트를 통한 안내된 경로를 만드세요.",
-    "selectedCount": "${selectedSetIds.length}개 세트 선택됨"
+    "selectedCount": "{{count}}개 세트 선택됨"
   },
   "studyPlans": {
     "title": "학습 계획",
@@ -232,8 +232,8 @@
     "noSetsSub": "다른 성경 주제나 키워드로 검색해 보세요.",
     "emptyTitle": "아직 공개 세트가 없습니다",
     "emptySubtitle": "세트를 처음으로 게시해 보세요!",
-    "resultsFor": "${total} result${total !== 1 ? ",
-    "publicSetsAvailable": "사용 가능한 공개 세트 ${total}개",
+    "resultsFor": "\"{{query}}\"에 대한 결과 {{count}}개",
+    "publicSetsAvailable": "공개 세트 {{count}}개 이용 가능",
     "noSetsMatch": "일치하는 세트 없음 "
   },
   "friendsSets": {
@@ -241,7 +241,7 @@
     "searchPlaceholder": "친구 세트 검색…",
     "noSets": "친구 세트가 없습니다",
     "noSetsSub": "친구가 학습 세트를 공개하면 여기에 표시됩니다.",
-    "sharedCount": "친구가 공유한 세트 ${total}개",
+    "sharedCount": "친구가 공유한 세트 {{count}}개",
     "noSetsMatch": "일치하는 세트 없음 "
   },
   "dialogs": {
@@ -263,5 +263,5 @@
     "textMin": "본문은 2자 이상이어야 합니다",
     "textMax": "최대 2000자"
   },
-  "cardsCount_other": "${set._count?.cards ?? 0}개 카드"
+  "cardsCount_other": "카드 {{count}}개"
 }

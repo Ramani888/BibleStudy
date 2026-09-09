@@ -83,7 +83,7 @@
     "modeMixDesc": "Mélange aléatoire de tous les types",
     "practiceNotScored": "Entraînement · non noté",
     "addCardsToQuiz": "Ajoutez des cartes à cet ensemble pour lancer un quiz.",
-    "needMinCards": "Le choix multiple nécessite ${MIN_MC_CARDS}+ cartes du même type.",
+    "needMinCards": "Le choix multiple nécessite {{count}}+ cartes du même type.",
     "cancelQuiz": "Quitter le quiz ?",
     "cancelWarning": "Votre progression sera perdue.",
     "tapToChooseSets": "Touchez pour choisir des ensembles…",
@@ -251,6 +251,6 @@
     "typePassage": "Tapez le passage"
   },
   "play": {
-    "tapToRevealProgress": "Touchez pour révéler (${revealed}/${phrases.length})"
+    "tapToRevealProgress": "Appuyez pour révéler ({{revealed}}/{{total}})"
   }
 }

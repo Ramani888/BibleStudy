@@ -83,7 +83,7 @@
     "modeMixDesc": "Mezcla aleatoria de todos los tipos",
     "practiceNotScored": "Práctica · sin puntuación",
     "addCardsToQuiz": "Agrega tarjetas a este conjunto para empezar el cuestionario.",
-    "needMinCards": "La opción múltiple necesita ${MIN_MC_CARDS}+ tarjetas del mismo tipo.",
+    "needMinCards": "La opción múltiple necesita {{count}}+ tarjetas del mismo tipo.",
     "cancelQuiz": "¿Salir del cuestionario?",
     "cancelWarning": "Perderás tu progreso.",
     "tapToChooseSets": "Toca para elegir conjuntos…",
@@ -251,6 +251,6 @@
     "typePassage": "Escribe el pasaje"
   },
   "play": {
-    "tapToRevealProgress": "Toca para revelar (${revealed}/${phrases.length})"
+    "tapToRevealProgress": "Toca para revelar ({{revealed}}/{{total}})"
   }
 }

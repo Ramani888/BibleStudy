@@ -62,7 +62,7 @@
     "failedToLoad": "Nabigong i-load ang cards",
     "searching": "Naghahanap…",
     "you": "ikaw",
-    "uploadingFile": "Ina-upload ${filename}"
+    "uploadingFile": "Ina-upload ang {{filename}}"
   },
   "filter": {
     "all": "Lahat"

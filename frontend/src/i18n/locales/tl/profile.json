@@ -61,7 +61,7 @@
       }
     },
     "dailyClaimSub": "Bumalik bukas para sa dagdag pa.",
-    "dailyClaimSuccess": "+${data.transaction.amount} credit na-claim!",
+    "dailyClaimSuccess": "+{{count}} credit na-claim!",
     "credit": "credit",
     "noActivity": "Walang aktibidad",
     "net": "Net",
@@ -77,9 +77,9 @@
   "setsCreated": "Nalikhang mga Set",
   "cardsStudied": "Napag-aralang mga Card",
   "achievements": {
-    "unlocked": "${unlockedCount} na-unlock",
+    "unlocked": "{{count}} ang na-unlock",
     "locked": "Naka-lock",
-    "remaining": "${remaining} natitira",
+    "remaining": "{{count}} ang natitira",
     "categories": {
       "study": "Pag-aaral",
       "quiz": "Quiz",
@@ -181,9 +181,9 @@
     "heroTagline": "Palalimin ang iyong pag-aaral ng Kasulatan gamit ang AI-powered flashcards, unlimited chats, at smart media analysis.",
     "monthly": "Buwanan",
     "annual": "Taunan",
-    "savePct": " · makatipid ng ${savingsPct}%",
-    "billedAnnuallyFinePrint": "Sinisingil ng $${paidTier.annualPrice.toFixed(2)} taun-taon (kumpara sa $${(paidTier.monthlyPrice * 12).toFixed(2)} buwanan). Mag-renew hanggang kanselahin.",
-    "billedMonthlyFinePrint": "Sinisingil ng $${paidTier.monthlyPrice.toFixed(2)} buwanan. Mag-renew hanggang kanselahin."
+    "savePct": " · makatipid ng {{pct}}%",
+    "billedAnnuallyFinePrint": "Sinisingil ng ${{total}} kada taon (kumpara sa ${{monthlyTotal}} kada buwan). Nagre-renew hanggang kanselahin.",
+    "billedMonthlyFinePrint": "Sinisingil ng ${{price}} kada buwan. Nagre-renew hanggang kanselahin."
   },
   "notes": {
     "title": "Mga Tala sa Pag-aaral",
@@ -227,7 +227,7 @@
     "deletePartial": "{{ok}} nabura, {{failed}} nabigo",
     "image": "Larawan",
     "pdf": "PDF",
-    "fileUploadedSuccess": "${name} na-upload",
+    "fileUploadedSuccess": "Na-upload ang {{name}}",
     "pdfPreviewError": "Hindi ma-preview ang PDF na ito sa app.",
     "expiresToday": "Mag-e-expire ngayon",
     "images": "Mga Larawan",
@@ -239,9 +239,9 @@
     "addImage": "Magdagdag ng Larawan",
     "renameFile": "Palitan ang Pangalan ng File",
     "fileName": "Pangalan ng file",
-    "expiresInDays": "Mag-e-expire sa ${days}d",
-    "storageUsedOfLimit": "${fmtBytes(used)} sa ${fmtBytes(limit)} nagamit · ${percent}%",
-    "expiresInDaysUpgrade": "Mag-e-expire sa ${daysUntilExpiry(item.expiresAt)}d · Mag-upgrade upang panatilihin",
+    "expiresInDays": "Mag-e-expire sa {{days}}d",
+    "storageUsedOfLimit": "{{used}} sa {{limit}} ang nagamit · {{percent}}%",
+    "expiresInDaysUpgrade": "Mag-e-expire sa {{days}}d · Mag-upgrade para itago",
     "noImagesMatch": "Walang larawan na tumugma sa ",
     "noPdfsMatch": "Walang PDF na tumugma sa "
   },
@@ -271,17 +271,17 @@
     "noBlockedUsersSub": "Lilitaw dito ang mga user na iyong ib-block",
     "incoming": "Papasok",
     "sent": "Naipadala",
-    "removedSuccess": "${name} tinanggal",
-    "bestStreakAchievements": "Pinakamataas ${item.longestStreak} · ${item.achievements} tagumpay",
+    "removedSuccess": "Na-remove si {{name}}",
+    "bestStreakAchievements": "Pinakamahusay {{longestStreak}} · {{achievements}} achievements",
     "findFriendsSub": "Maghanap sa pangalan o email upang kumonekta sa iba.",
-    "requestSentTo": "Friend request naipadala kay ${user.name}",
+    "requestSentTo": "Naipadala ang friend request kay {{name}}",
     "removeFriend": "Tanggalin ang Kaibigan",
     "requestPending": "Nakabinbin na Request",
     "cancelRequest": "Kanselahin ang Request",
     "sendRequest": "Magpadala ng Friend Request",
     "blockUser": "I-block ang User",
     "theirSets": "Ang Kanilang Sets",
-    "mutualFriendsCount": "${user.mutualFriendsCount} magkakilalang kaibigan"
+    "mutualFriendsCount": "{{count}} magkakacommon na kaibigan"
   },
   "user": {
     "couldNotLoadProfile": "Hindi ma-load ang profile",
@@ -411,7 +411,7 @@
   },
   "blockedUsers": {
     "unblock": "I-unblock",
-    "unblockedSuccess": "${name} na-unblock"
+    "unblockedSuccess": "Na-unblock si {{name}}"
   },
   "notificationSettings": {
     "hint": "Piliin kung aling mga abiso ang gusto mo"
@@ -429,10 +429,10 @@
     "restore": "Ibalik ang Mga Pagbili",
     "manage": "Pamahalaan ang Subscription",
     "whatsIncluded": "Ano ang Kasama",
-    "subscribePrice": "Mag-subscribe · ${opt!.priceLabel}",
+    "subscribePrice": "Mag-subscribe · {{price}}",
     "receiptError": "Hindi mabasa ang resibo ng pagbili"
   },
   "account": {
-    "memberSince": "Miyembro simula ${formatDateOnly(user.createdAt)}"
+    "memberSince": "Miyembro mula {{date}}"
   }
 }

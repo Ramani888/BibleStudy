@@ -46,7 +46,7 @@
     "visibilityPublic": "Público",
     "couldNotLoadSet": "Não foi possível carregar o conjunto.",
     "searchPlaceholder": "Buscar conjuntos…",
-    "setCount": "${filteredSets.length} conjuntos",
+    "setCount": "{{count}} conjuntos",
     "couldNotLoadFriendsSets": "Não foi possível carregar os amigos",
     "emptyDesc": "Crie seu primeiro conjunto de estudo para começar",
     "couldNotLoadPublicSets": "Não foi possível carregar os conjuntos públicos.",
@@ -179,7 +179,7 @@
     "listView": "Visualização em lista",
     "gridView": "Visualização em grade",
     "addNotePlaceholder": "Adicionar uma nota…",
-    "batchUpdateResult": "${toUpdate.length - failed} atualizados, ${failed} com falha",
+    "batchUpdateResult": "{{updated}} atualizados, {{failed}} falharam",
     "noMatch": "Nenhum card corresponde a ",
     "qaCard": "Card de P&R",
     "storyCard": "Card de história",
@@ -214,7 +214,7 @@
     "noSetsAvailableSub": "Crie conjuntos de flashcards primeiro antes de montar um plano.",
     "emptyTitle": "Nenhum plano de estudo ainda",
     "emptySub": "Toque em + para criar um caminho guiado pelos seus conjuntos.",
-    "selectedCount": "${selectedSetIds.length} conjuntos selecionados"
+    "selectedCount": "{{count}} conjuntos selecionados"
   },
   "studyPlans": {
     "title": "Planos de Estudo",
@@ -232,8 +232,8 @@
     "noSetsSub": "Tente buscar por outro tópico bíblico ou palavra-chave.",
     "emptyTitle": "Nenhum conjunto público ainda",
     "emptySubtitle": "Seja o primeiro a publicar um conjunto!",
-    "resultsFor": "${total} result${total !== 1 ? ",
-    "publicSetsAvailable": "${total} conjuntos públicos disponíveis",
+    "resultsFor": "{{count}} resultados para \"{{query}}\"",
+    "publicSetsAvailable": "{{count}} conjuntos públicos disponíveis",
     "noSetsMatch": "Nenhum conjunto corresponde a "
   },
   "friendsSets": {
@@ -241,7 +241,7 @@
     "searchPlaceholder": "Buscar conjuntos dos amigos…",
     "noSets": "Nenhum conjunto dos amigos",
     "noSetsSub": "Quando seus amigos publicarem conjuntos de estudo, eles aparecerão aqui.",
-    "sharedCount": "${total} conjuntos compartilhados por amigos",
+    "sharedCount": "{{count}} conjuntos compartilhados por amigos",
     "noSetsMatch": "Nenhum conjunto corresponde a "
   },
   "dialogs": {
@@ -263,5 +263,5 @@
     "textMin": "O texto deve ter pelo menos 2 caracteres",
     "textMax": "Máximo de 2000 caracteres"
   },
-  "cardsCount_other": "${set._count?.cards ?? 0} cards"
+  "cardsCount_other": "{{count}} cartões"
 }

@@ -113,7 +113,7 @@
       "bonus": "Bonus"
     },
     "dailyClaimSub": "Come back tomorrow for more.",
-    "dailyClaimSuccess": "+${data.transaction.amount} credit claimed!",
+    "dailyClaimSuccess": "+{{count}} credit claimed!",
     "credit": "credit",
     "noActivity": "No activity",
     "net": "Net",
@@ -135,9 +135,9 @@
     "privacy": "Privacy Policy",
     "monthly": "Monthly",
     "annual": "Annual",
-    "savePct": " · save ${savingsPct}%",
-    "billedAnnuallyFinePrint": "Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.",
-    "billedMonthlyFinePrint": "Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.",
+    "savePct": " · save {{pct}}%",
+    "billedAnnuallyFinePrint": "Billed ${{total}} annually (vs ${{monthlyTotal}} monthly). Renews until cancelled.",
+    "billedMonthlyFinePrint": "Billed ${{price}} monthly. Renews until cancelled.",
     "features": {
       "freeCredit": "1 AI credit per day",
       "unlimitedSets": "Unlimited flashcard sets & cards",
@@ -203,7 +203,7 @@
     "deletePartial": "{{ok}} deleted, {{failed}} failed",
     "image": "Image",
     "pdf": "PDF",
-    "fileUploadedSuccess": "${name} uploaded",
+    "fileUploadedSuccess": "{{name}} uploaded",
     "pdfPreviewError": "This PDF could not be previewed in-app.",
     "expiresToday": "Expires today",
     "images": "Images",
@@ -215,9 +215,9 @@
     "addImage": "Add Image",
     "renameFile": "Rename File",
     "fileName": "File name",
-    "expiresInDays": "Expires in ${days}d",
-    "storageUsedOfLimit": "${fmtBytes(used)} of ${fmtBytes(limit)} used · ${percent}%",
-    "expiresInDaysUpgrade": "Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep",
+    "expiresInDays": "Expires in {{days}}d",
+    "storageUsedOfLimit": "{{used}} of {{limit}} used · {{percent}}%",
+    "expiresInDaysUpgrade": "Expires in {{days}}d · Upgrade to keep",
     "noImagesMatch": "No images match ",
     "noPdfsMatch": "No PDFs match "
   },
@@ -247,17 +247,17 @@
     "noBlockedUsersSub": "Users you block will appear here",
     "incoming": "Incoming",
     "sent": "Sent",
-    "removedSuccess": "${name} removed",
-    "bestStreakAchievements": "Best ${item.longestStreak} · ${item.achievements} achievements",
+    "removedSuccess": "{{name}} removed",
+    "bestStreakAchievements": "Best {{longestStreak}} · {{achievements}} achievements",
     "findFriendsSub": "Search by name or email to connect with others.",
-    "requestSentTo": "Friend request sent to ${user.name}",
+    "requestSentTo": "Friend request sent to {{name}}",
     "removeFriend": "Remove Friend",
     "requestPending": "Request Pending",
     "cancelRequest": "Cancel Request",
     "sendRequest": "Send Friend Request",
     "blockUser": "Block User",
     "theirSets": "Their Sets",
-    "mutualFriendsCount": "${user.mutualFriendsCount} mutual friends"
+    "mutualFriendsCount": "{{count}} mutual friends"
   },
   "user": {
     "couldNotLoadProfile": "Could not load profile",
@@ -327,9 +327,9 @@
     "noRankingSub": "Add friends to compete on study streaks."
   },
   "achievements": {
-    "unlocked": "${unlockedCount} unlocked",
+    "unlocked": "{{count}} unlocked",
     "locked": "Locked",
-    "remaining": "${remaining} remaining",
+    "remaining": "{{count}} remaining",
     "categories": {
       "study": "Study",
       "quiz": "Quiz",
@@ -340,7 +340,7 @@
   },
   "blockedUsers": {
     "unblock": "Unblock",
-    "unblockedSuccess": "${name} unblocked"
+    "unblockedSuccess": "{{name}} unblocked"
   },
   "notificationSettings": {
     "hint": "Choose which notifications you"
@@ -358,10 +358,10 @@
     "restore": "Restore Purchases",
     "manage": "Manage Subscription",
     "whatsIncluded": "What",
-    "subscribePrice": "Subscribe · ${opt!.priceLabel}",
+    "subscribePrice": "Subscribe · {{price}}",
     "receiptError": "Could not read purchase receipt"
   },
   "account": {
-    "memberSince": "Member since ${formatDateOnly(user.createdAt)}"
+    "memberSince": "Member since {{date}}"
   }
 }

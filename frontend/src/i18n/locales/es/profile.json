@@ -61,7 +61,7 @@
       }
     },
     "dailyClaimSub": "Vuelve mañana por más.",
-    "dailyClaimSuccess": "¡+${data.transaction.amount} crédito reclamado!",
+    "dailyClaimSuccess": "¡+{{count}} crédito reclamado!",
     "credit": "crédito",
     "noActivity": "Sin actividad",
     "net": "Neto",
@@ -77,9 +77,9 @@
   "setsCreated": "Sets Creados",
   "cardsStudied": "Tarjetas Estudiadas",
   "achievements": {
-    "unlocked": "${unlockedCount} desbloqueados",
+    "unlocked": "{{count}} desbloqueados",
     "locked": "Bloqueado",
-    "remaining": "${remaining} restantes",
+    "remaining": "{{count}} restantes",
     "categories": {
       "study": "Estudio",
       "quiz": "Cuestionario",
@@ -181,9 +181,9 @@
     "heroTagline": "Profundiza tu estudio de las Escrituras con tarjetas potenciadas por IA, chats ilimitados y análisis inteligente de archivos.",
     "monthly": "Mensual",
     "annual": "Anual",
-    "savePct": " · ahorra ${savingsPct}%",
-    "billedAnnuallyFinePrint": "Se cobra $${paidTier.annualPrice.toFixed(2)} al año (frente a $${(paidTier.monthlyPrice * 12).toFixed(2)} al mes). Se renueva hasta que se cancele.",
-    "billedMonthlyFinePrint": "Se cobra $${paidTier.monthlyPrice.toFixed(2)} al mes. Se renueva hasta que se cancele."
+    "savePct": " · ahorra {{pct}}%",
+    "billedAnnuallyFinePrint": "Se cobra ${{total}} al año (frente a ${{monthlyTotal}} al mes). Se renueva hasta cancelar.",
+    "billedMonthlyFinePrint": "Se cobra ${{price}} al mes. Se renueva hasta cancelar."
   },
   "notes": {
     "title": "Notas de Estudio",
@@ -227,7 +227,7 @@
     "deletePartial": "{{ok}} eliminados, {{failed}} fallidos",
     "image": "Imagen",
     "pdf": "PDF",
-    "fileUploadedSuccess": "${name} subido",
+    "fileUploadedSuccess": "{{name}} subido",
     "pdfPreviewError": "Este PDF no se pudo previsualizar en la app.",
     "expiresToday": "Caduca hoy",
     "images": "Imágenes",
@@ -239,9 +239,9 @@
     "addImage": "Agregar imagen",
     "renameFile": "Renombrar archivo",
     "fileName": "Nombre del archivo",
-    "expiresInDays": "Caduca en ${days} d",
-    "storageUsedOfLimit": "${fmtBytes(used)} de ${fmtBytes(limit)} usados · ${percent}%",
-    "expiresInDaysUpgrade": "Caduca en ${daysUntilExpiry(item.expiresAt)} d · Mejora para conservarlo",
+    "expiresInDays": "Caduca en {{days}}d",
+    "storageUsedOfLimit": "{{used}} de {{limit}} usados · {{percent}}%",
+    "expiresInDaysUpgrade": "Caduca en {{days}}d · Mejora para conservar",
     "noImagesMatch": "Ninguna imagen coincide con ",
     "noPdfsMatch": "Ningún PDF coincide con "
   },
@@ -271,17 +271,17 @@
     "noBlockedUsersSub": "Los usuarios que bloquees aparecerán aquí",
     "incoming": "Recibidas",
     "sent": "Enviadas",
-    "removedSuccess": "${name} eliminado",
-    "bestStreakAchievements": "Mejor ${item.longestStreak} · ${item.achievements} logros",
+    "removedSuccess": "{{name}} eliminado",
+    "bestStreakAchievements": "Mejor {{longestStreak}} · {{achievements}} logros",
     "findFriendsSub": "Busca por nombre o correo para conectar con otros.",
-    "requestSentTo": "Solicitud de amistad enviada a ${user.name}",
+    "requestSentTo": "Solicitud de amistad enviada a {{name}}",
     "removeFriend": "Eliminar amigo",
     "requestPending": "Solicitud pendiente",
     "cancelRequest": "Cancelar solicitud",
     "sendRequest": "Enviar solicitud de amistad",
     "blockUser": "Bloquear usuario",
     "theirSets": "Sus conjuntos",
-    "mutualFriendsCount": "${user.mutualFriendsCount} amigos en común"
+    "mutualFriendsCount": "{{count}} amigos en común"
   },
   "user": {
     "couldNotLoadProfile": "No se pudo cargar el perfil",
@@ -411,7 +411,7 @@
   },
   "blockedUsers": {
     "unblock": "Desbloquear",
-    "unblockedSuccess": "${name} desbloqueado"
+    "unblockedSuccess": "{{name}} desbloqueado"
   },
   "notificationSettings": {
     "hint": "Elige qué notificaciones"
@@ -429,10 +429,10 @@
     "restore": "Restaurar compras",
     "manage": "Administrar suscripción",
     "whatsIncluded": "Qué incluye",
-    "subscribePrice": "Suscribirse · ${opt!.priceLabel}",
+    "subscribePrice": "Suscribirse · {{price}}",
     "receiptError": "No se pudo leer el recibo de compra"
   },
   "account": {
-    "memberSince": "Miembro desde ${formatDateOnly(user.createdAt)}"
+    "memberSince": "Miembro desde {{date}}"
   }
 }

@@ -5,7 +5,7 @@
     "evening": "Bonsoir",
     "streak": "{{count}} jours d'affilée ! Continuez comme ça",
     "streak_one": "1er jour d'affilée ! Excellent début",
-    "streakDays": "Série de ${streakData?.streak ?? 0} jours"
+    "streakDays": "Série de {{count}} jours"
   },
   "stats": {
     "dueToday": "À réviser aujourd'hui",
@@ -84,7 +84,7 @@
     "days": "{{count}} jours de suite",
     "keepGoing": "Continuez, c'est excellent !",
     "streakLost": "Étudiez aujourd'hui pour garder votre série",
-    "flameDays": "🔥 Série de ${streak} jours"
+    "flameDays": "🔥 Série de {{count}} jours"
   },
   "sections": {
     "recentSets": "Ensembles récents",

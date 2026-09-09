@@ -83,7 +83,7 @@
     "modeMixDesc": "Mistura aleatória de todos os tipos",
     "practiceNotScored": "Prática · não pontuado",
     "addCardsToQuiz": "Adicione cards a este conjunto para começar o quiz.",
-    "needMinCards": "Múltipla escolha precisa de ${MIN_MC_CARDS}+ cards do mesmo tipo.",
+    "needMinCards": "A múltipla escolha precisa de {{count}}+ cartões do mesmo tipo.",
     "cancelQuiz": "Sair do quiz?",
     "cancelWarning": "Seu progresso será perdido.",
     "tapToChooseSets": "Toque para escolher conjuntos…",
@@ -251,6 +251,6 @@
     "typePassage": "Digite a passagem"
   },
   "play": {
-    "tapToRevealProgress": "Toque para revelar (${revealed}/${phrases.length})"
+    "tapToRevealProgress": "Toque para revelar ({{revealed}}/{{total}})"
   }
 }

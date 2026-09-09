@@ -46,7 +46,7 @@
     "visibilityPublic": "Pampubliko",
     "couldNotLoadSet": "Hindi ma-load ang set.",
     "searchPlaceholder": "Maghanap ng sets…",
-    "setCount": "${filteredSets.length} sets",
+    "setCount": "{{count}} set",
     "couldNotLoadFriendsSets": "Hindi ma-load ang mga kaibigan",
     "emptyDesc": "Gumawa ng iyong unang study set upang makapagsimula",
     "couldNotLoadPublicSets": "Hindi ma-load ang mga pampublikong set.",
@@ -179,7 +179,7 @@
     "listView": "List View",
     "gridView": "Grid View",
     "addNotePlaceholder": "Magdagdag ng tala…",
-    "batchUpdateResult": "${toUpdate.length - failed} na-update, ${failed} nabigo",
+    "batchUpdateResult": "{{updated}} na-update, {{failed}} nabigo",
     "noMatch": "Walang cards na tumugma sa ",
     "qaCard": "Q&A Card",
     "storyCard": "Story Card",
@@ -214,7 +214,7 @@
     "noSetsAvailableSub": "Lumikha muna ng mga flashcard set bago gumawa ng plano.",
     "emptyTitle": "Wala pang plano sa pag-aaral",
     "emptySub": "I-tap ang + upang gumawa ng gabay na landas sa iyong sets.",
-    "selectedCount": "${selectedSetIds.length} sets napili"
+    "selectedCount": "{{count}} set ang napili"
   },
   "studyPlans": {
     "title": "Mga Plano sa Pag-aaral",
@@ -232,8 +232,8 @@
     "noSetsSub": "Subukang maghanap ng ibang paksa o keyword sa Bibliya.",
     "emptyTitle": "Wala pang pampublikong set",
     "emptySubtitle": "Maging una sa pag-publish ng set!",
-    "resultsFor": "${total} result${total !== 1 ? ",
-    "publicSetsAvailable": "${total} pampublikong sets na magagamit",
+    "resultsFor": "{{count}} resulta para sa \"{{query}}\"",
+    "publicSetsAvailable": "{{count}} pampublikong set ang available",
     "noSetsMatch": "Walang set na tumugma sa "
   },
   "friendsSets": {
@@ -241,7 +241,7 @@
     "searchPlaceholder": "Maghanap ng mga set ng kaibigan…",
     "noSets": "Walang mga set ng kaibigan",
     "noSetsSub": "Kapag nag-publish ng study set ang iyong mga kaibigan, lalabas ito rito.",
-    "sharedCount": "${total} sets ibinahagi ng mga kaibigan",
+    "sharedCount": "{{count}} set na ibinahagi ng mga kaibigan",
     "noSetsMatch": "Walang set na tumugma sa "
   },
   "dialogs": {
@@ -263,5 +263,5 @@
     "textMin": "Dapat ay may hindi bababa sa 2 karakter ang teksto",
     "textMax": "Pinakamataas na 2000 karakter"
   },
-  "cardsCount_other": "${set._count?.cards ?? 0} cards"
+  "cardsCount_other": "{{count}} card"
 }

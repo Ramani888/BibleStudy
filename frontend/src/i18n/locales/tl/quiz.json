@@ -83,7 +83,7 @@
     "modeMixDesc": "Random na halo ng lahat ng uri",
     "practiceNotScored": "Practice · hindi iskor",
     "addCardsToQuiz": "Magdagdag ng cards sa set na ito upang magsimulang mag-quiz.",
-    "needMinCards": "Ang multiple choice ay nangangailangan ng ${MIN_MC_CARDS}+ cards na parehong uri.",
+    "needMinCards": "Ang multiple choice ay nangangailangan ng {{count}}+ card na parehong uri.",
     "cancelQuiz": "Iwan ang quiz?",
     "cancelWarning": "Mawawala ang iyong progreso.",
     "tapToChooseSets": "I-tap upang pumili ng sets…",
@@ -251,6 +251,6 @@
     "typePassage": "I-type ang talata"
   },
   "play": {
-    "tapToRevealProgress": "I-tap upang ipakita (${revealed}/${phrases.length})"
+    "tapToRevealProgress": "I-tap para ipakita ({{revealed}}/{{total}})"
   }
 }

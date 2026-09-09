@@ -62,7 +62,7 @@
     "failedToLoad": "카드를 불러오지 못했습니다",
     "searching": "검색 중…",
     "you": "나",
-    "uploadingFile": "${filename} 업로드 중"
+    "uploadingFile": "{{filename}} 업로드 중"
   },
   "filter": {
     "all": "전체"

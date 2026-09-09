@@ -61,7 +61,7 @@
     "failedToLoad": "Failed to load cards",
     "searching": "Searching…",
     "you": "you",
-    "uploadingFile": "Uploading ${filename}"
+    "uploadingFile": "Uploading {{filename}}"
   },
   "filter": {
     "all": "All"

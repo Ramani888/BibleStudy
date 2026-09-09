@@ -62,7 +62,7 @@
     "failedToLoad": "Échec du chargement des cartes",
     "searching": "Recherche…",
     "you": "vous",
-    "uploadingFile": "Envoi de ${filename}"
+    "uploadingFile": "Téléversement de {{filename}}"
   },
   "filter": {
     "all": "Tous"

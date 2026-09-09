@@ -56,11 +56,11 @@
     "aiResponse": "Sagot ng AI",
     "contentPolicy": "Patakaran sa Nilalaman",
     "contentPolicyMsg": "Pakiusap panatilihing angkop ang mga lakip.\\n\\nHuwag mag-upload ng seksuwal, marahas, o ilegal na nilalaman. Ang mga paglabag ay maaaring magresulta sa pag-suspinde ng account.\\n\\nSa pagpapatuloy, sumasang-ayon ka sa aming mga alituntunin sa nilalaman.",
-    "cardsSavedToast": "${cardsToSave.length} cards na-save!",
+    "cardsSavedToast": "{{count}} card ang na-save!",
     "question": "tanong",
     "questions": "mga tanong",
     "continueConversation": "Ipagpatuloy ang usapan",
-    "bookmarkedAt": "Na-bookmark ${formatDate(chat.bookmarkedAt)}",
+    "bookmarkedAt": "Na-bookmark {{date}}",
     "saveToSet": "I-save sa Set"
   },
   "consent": {

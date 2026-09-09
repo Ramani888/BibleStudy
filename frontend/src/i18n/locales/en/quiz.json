@@ -57,7 +57,7 @@
     "modeMixDesc": "Random mix of all types",
     "practiceNotScored": "Practice · not scored",
     "addCardsToQuiz": "Add cards to this set to start quizzing.",
-    "needMinCards": "Multiple choice needs ${MIN_MC_CARDS}+ cards of the same type.",
+    "needMinCards": "Multiple choice needs {{count}}+ cards of the same type.",
     "cancelQuiz": "Quit quiz?",
     "cancelWarning": "Your progress will be lost.",
     "tapToChooseSets": "Tap to choose sets…",
@@ -161,7 +161,7 @@
     "typePassage": "Type the passage"
   },
   "play": {
-    "tapToRevealProgress": "Tap to reveal (${revealed}/${phrases.length})"
+    "tapToRevealProgress": "Tap to reveal ({{revealed}}/{{total}})"
   },
   "result": {
     "quotes": {

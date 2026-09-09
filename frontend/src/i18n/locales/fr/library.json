@@ -46,7 +46,7 @@
     "visibilityPublic": "Public",
     "couldNotLoadSet": "Impossible de charger l'ensemble.",
     "searchPlaceholder": "Rechercher des ensembles…",
-    "setCount": "${filteredSets.length} ensembles",
+    "setCount": "{{count}} ensembles",
     "couldNotLoadFriendsSets": "Impossible de charger les amis",
     "emptyDesc": "Créez votre premier ensemble d'étude pour commencer",
     "couldNotLoadPublicSets": "Impossible de charger les ensembles publics.",
@@ -179,7 +179,7 @@
     "listView": "Vue liste",
     "gridView": "Vue grille",
     "addNotePlaceholder": "Ajouter une note…",
-    "batchUpdateResult": "${toUpdate.length - failed} mises à jour, ${failed} échecs",
+    "batchUpdateResult": "{{updated}} mis à jour, {{failed}} échoués",
     "noMatch": "Aucune carte ne correspond à ",
     "qaCard": "Carte Q&R",
     "storyCard": "Carte récit",
@@ -214,7 +214,7 @@
     "noSetsAvailableSub": "Créez d'abord des séries de cartes avant d'élaborer un plan.",
     "emptyTitle": "Aucun plan d'étude pour l'instant",
     "emptySub": "Touchez + pour créer un parcours guidé à travers vos ensembles.",
-    "selectedCount": "${selectedSetIds.length} ensembles sélectionnés"
+    "selectedCount": "{{count}} ensembles sélectionnés"
   },
   "studyPlans": {
     "title": "Plans d'Étude",
@@ -232,8 +232,8 @@
     "noSetsSub": "Essayez de rechercher un autre sujet biblique ou mot-clé.",
     "emptyTitle": "Aucun ensemble public pour l'instant",
     "emptySubtitle": "Soyez le premier à publier un ensemble !",
-    "resultsFor": "${total} result${total !== 1 ? ",
-    "publicSetsAvailable": "${total} ensembles publics disponibles",
+    "resultsFor": "{{count}} résultats pour \"{{query}}\"",
+    "publicSetsAvailable": "{{count}} ensembles publics disponibles",
     "noSetsMatch": "Aucun ensemble ne correspond à "
   },
   "friendsSets": {
@@ -241,7 +241,7 @@
     "searchPlaceholder": "Rechercher les séries des amis…",
     "noSets": "Aucune série d'amis",
     "noSetsSub": "Lorsque vos amis publieront des séries d'étude, elles apparaîtront ici.",
-    "sharedCount": "${total} ensembles partagés par des amis",
+    "sharedCount": "{{count}} ensembles partagés par des amis",
     "noSetsMatch": "Aucun ensemble ne correspond à "
   },
   "dialogs": {
@@ -263,5 +263,5 @@
     "textMin": "Le texte doit comporter au moins 2 caractères",
     "textMax": "2000 caractères maximum"
   },
-  "cardsCount_other": "${set._count?.cards ?? 0} cartes"
+  "cardsCount_other": "{{count}} cartes"
 }

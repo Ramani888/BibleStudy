@@ -56,11 +56,11 @@
     "aiResponse": "AI response",
     "contentPolicy": "Content Policy",
     "contentPolicyMsg": "Please keep attachments appropriate.\\n\\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\\n\\nBy continuing, you agree to our content guidelines.",
-    "cardsSavedToast": "${cardsToSave.length} cards saved!",
+    "cardsSavedToast": "{{count}} cards saved!",
     "question": "question",
     "questions": "questions",
     "continueConversation": "Continue conversation",
-    "bookmarkedAt": "Bookmarked ${formatDate(chat.bookmarkedAt)}",
+    "bookmarkedAt": "Bookmarked {{date}}",
     "saveToSet": "Save to Set"
   },
   "consent": {

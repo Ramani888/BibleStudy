@@ -62,7 +62,7 @@
     "failedToLoad": "No se pudieron cargar las tarjetas",
     "searching": "Buscando…",
     "you": "tú",
-    "uploadingFile": "Subiendo ${filename}"
+    "uploadingFile": "Subiendo {{filename}}"
   },
   "filter": {
     "all": "Todos"

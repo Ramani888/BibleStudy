@@ -62,7 +62,7 @@
     "failedToLoad": "Falha ao carregar os cards",
     "searching": "Buscando…",
     "you": "você",
-    "uploadingFile": "Enviando ${filename}"
+    "uploadingFile": "Enviando {{filename}}"
   },
   "filter": {
     "all": "Todos"
