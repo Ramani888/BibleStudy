@@ -22,8 +22,20 @@
     "learnMore": "Más información",
     "searchPlaceholder": "Buscar…",
     "clearSearch": "Borrar búsqueda",
-    "moreOptions": "More options",
-    "goBack": "Go back"
+    "moreOptions": "Más opciones",
+    "goBack": "Volver",
+    "doneCount": "Listo — {{count}} sets",
+    "copy": "Copiar",
+    "upgrade": "Mejorar",
+    "viewAll": "Ver todo",
+    "seeMore": "Ver más",
+    "filter": "Filtrar",
+    "clear": "Borrar",
+    "clearAll": "Borrar todo",
+    "select": "Seleccionar",
+    "apply": "Aplicar",
+    "remove": "Quitar",
+    "markAllRead": "Marcar todo como leído"
   },
   "status": {
     "loading": "Cargando...",
@@ -39,7 +51,8 @@
     "copiedToClipboard": "Copiado al portapapeles",
     "selected": "Seleccionado",
     "couldNotDelete": "No se pudo eliminar",
-    "unknownError": "Error desconocido"
+    "unknownError": "Error desconocido",
+    "uploading": "Subiendo..."
   },
   "filter": {
     "all": "Todos"
@@ -57,6 +70,14 @@
     "minAgo": "Hace {{count}}m",
     "hoursAgo": "Hace {{count}}h",
     "at": "a las",
-    "earlier": "Anteriores"
+    "earlier": "Anteriores",
+    "justNow": "ahora mismo",
+    "minsAgo": "hace {{count}} min",
+    "daysAgoShort": "hace {{count}} d"
+  },
+  "notification": "Notificación",
+  "validation": {
+    "max200": "Máximo 200 caracteres",
+    "max100": "Máximo 100 caracteres"
   }
 }

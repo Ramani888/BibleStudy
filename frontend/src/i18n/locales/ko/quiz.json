@@ -8,7 +8,22 @@
     "noActivitySub": "퀴즈를 완료하여 학습 기록을 확인하세요.",
     "selectSet": "학습 세트 선택",
     "selectMode": "퀴즈 모드 선택",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "세트 {{count}}개",
+    "practiceMode": "연습 모드",
+    "practiceDescription": "타이머 부담 없이 자신의 속도로 공부하세요",
+    "timedMode": "시간 도전",
+    "timedDescription": "시간과 겨루며 점수를 획득하세요",
+    "masteryMode": "마스터 모드",
+    "masteryDescription": "복습이 필요한 카드를 위한 스마트 간격 반복 테스트",
+    "searchPlaceholder": "퀴즈 검색…",
+    "noQuizzesYet": "아직 퀴즈가 없습니다",
+    "noQuizzesSub": "위에서 첫 퀴즈를 풀어 학습 진행 상황을 확인하세요.",
+    "noMatch": "퀴즈를 찾을 수 없습니다",
+    "itemActions": "퀴즈 작업",
+    "viewDetails": "상세 보기",
+    "viewSummary": "요약 보기",
+    "reQuiz": "다시 풀기",
+    "deleteAttempt": "기록 삭제"
   },
   "setup": {
     "title": "퀴즈 설정",
@@ -33,7 +48,32 @@
     "chooseSet": "퀴즈를 진행할 세트 선택",
     "allDone": "모두 완료!",
     "noSetsToQuiz": "퀴즈를 진행할 수 있는 세트가 없습니다.",
-    "createSetFirst": "최소 1개의 카드가 포함된 세트를 먼저 만드세요."
+    "createSetFirst": "최소 1개의 카드가 포함된 세트를 먼저 만드세요.",
+    "quizNamePlaceholder": "퀴즈 이름 (선택)",
+    "selectSets": "세트 선택",
+    "startQuiz": "퀴즈 시작",
+    "selectMode": "모드 선택",
+    "chooseSets": "세트 선택",
+    "chooseSetsLabel": "탭하여 세트를 선택하세요",
+    "allSets": "전체 세트 ({{count}})",
+    "noSets": "사용 가능한 세트가 없습니다",
+    "noSetsSub": "퀴즈를 풀기 전에 먼저 학습 세트를 만드세요.",
+    "startQuizBtn": "퀴즈 시작",
+    "selectSetsCount": "세트 선택 ({{count}}개 선택됨)",
+    "modeDesc": {
+      "mix": "사용 가능한 모든 유형을 무작위로 조합",
+      "mc": "4개의 보기에서 정답을 고르세요",
+      "story_mc": "성경 구절을 알맞은 본문과 연결하세요",
+      "type_answer": "기억을 떠올려 답을 입력하세요",
+      "type_verbatim": "본문 전체를 그대로 입력하세요",
+      "blanks": "빈칸에 알맞은 단어를 채우세요",
+      "chunks": "본문 조각을 순서대로 배열하세요",
+      "read": "읽고 암기하기 — 채점 없음"
+    },
+    "sort": {
+      "newest": "최신순",
+      "cards": "카드순"
+    }
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",
@@ -78,7 +118,12 @@
     "correctAnswer": "정답:",
     "noIncorrect": "틀린 문제가 없습니다! 완벽합니다!",
     "noCorrect": "아직 맞힌 문제가 없습니다.",
-    "done": "완료"
+    "done": "완료",
+    "all": "전체",
+    "correct": "정답",
+    "incorrect": "오답",
+    "noQuestions": "이 필터에 해당하는 문제가 없습니다.",
+    "readMode": "(읽기)"
   },
   "detail": {
     "headerTitle": "퀴즈 기록",
@@ -86,40 +131,84 @@
     "practiced": "{{count}}회 연습함",
     "practiced_other": "{{count}}회 연습함",
     "lastPracticed": "마지막 연습일: {{date}}",
-    "correctCount": "{{correct}} / {{total}} correct",
-    "setsCount": "{{count}} sets",
-    "viewSummary": "View summary"
+    "correctCount": "{{total}}개 중 {{correct}}개 정답",
+    "setsCount": "세트 {{count}}개",
+    "viewSummary": "요약 보기",
+    "title": "퀴즈 기록",
+    "deleteTitle": "퀴즈 삭제",
+    "deleteMessage": "이 기록을 내역에서 삭제할까요?",
+    "retake": "퀴즈 다시 풀기",
+    "timeSpent": "소요 시간"
   },
   "modesSheet": {
     "chooseMode": "학습 모드 선택",
     "startMode": "{{mode}} 모드 시작"
   },
   "modes": {
-    "mc": "Multiple choice",
-    "story_mc": "Match the verse",
-    "type_answer": "Type the answer",
-    "type_verbatim": "Type it out",
-    "blanks": "Fill in the blanks",
-    "chunks": "Order the chunks",
-    "read": "Read & memorize"
+    "mc": "객관식",
+    "story_mc": "구절 맞추기",
+    "type_answer": "답 입력",
+    "type_verbatim": "그대로 입력",
+    "blanks": "빈칸 채우기",
+    "chunks": "조각 순서 맞추기",
+    "read": "읽고 암기하기",
+    "mixMode": "믹스 모드",
+    "mixDesc": "하나의 퀴즈에서 여러 문제 형식을 조합합니다."
   },
   "modeNames": {
-    "mix": "Mix",
-    "mc": "Multiple Choice",
-    "story_mc": "Story MC",
-    "type_answer": "Type Answer",
-    "type_verbatim": "Type Verbatim",
-    "blanks": "Fill Blanks",
-    "chunks": "Reorder",
-    "read": "Read"
+    "mix": "믹스",
+    "mc": "객관식",
+    "story_mc": "스토리 MC",
+    "type_answer": "답 입력",
+    "type_verbatim": "그대로 입력",
+    "blanks": "빈칸 채우기",
+    "chunks": "순서 맞추기",
+    "read": "읽기"
   },
   "modeHeaders": {
-    "mc": "QUESTION",
-    "story_mc": "MATCH THE VERSE",
-    "type_answer": "QUESTION",
-    "type_verbatim": "TYPE THE PASSAGE",
-    "blanks": "FILL THE BLANKS",
-    "chunks": "PUT IN ORDER",
-    "read": "TAP TO REVEAL"
+    "mc": "문제",
+    "story_mc": "구절 맞추기",
+    "type_answer": "문제",
+    "type_verbatim": "본문 입력하기",
+    "blanks": "빈칸 채우기",
+    "chunks": "순서대로 배열하기",
+    "read": "탭하여 보기"
+  },
+  "inQuiz": {
+    "questionCount": "{{total}}문제 중 {{current}}번",
+    "revealAnswer": "정답 보기",
+    "nextQuestion": "다음 문제",
+    "correct": "정답!",
+    "incorrect": "계속 연습하세요",
+    "yourAnswer": "내 답",
+    "correctAnswer": "정답",
+    "quitDialogTitle": "퀴즈를 종료할까요?",
+    "quitDialogMessage": "이 퀴즈의 진행 상황이 사라집니다."
+  },
+  "results": {
+    "title": "퀴즈 완료!",
+    "quizComplete": "퀴즈 완료!",
+    "score": "점수",
+    "scoreFraction": "{{total}}개 중 {{correct}}개 정답",
+    "accuracy": "정확도",
+    "timeTaken": "소요 시간",
+    "reviewQuestions": "복습",
+    "tryAgain": "다시 시도",
+    "backToHub": "퀴즈 허브로 돌아가기",
+    "newBest": "최고 기록 경신!",
+    "bestScore": "최고: {{score}}%",
+    "saveFailed": "저장 실패: {{message}}",
+    "perfectScore": "훌륭해요! 만점입니다!",
+    "goodJob": "잘했어요! 신실한 공부를 계속 이어가세요.",
+    "needsPractice": "좋은 노력이에요! 틀린 카드를 복습하여 완전히 익히세요."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "답을 입력하세요…"
+  },
+  "prompts": {
+    "thisPassage": "이 본문",
+    "whichPassage": "{{ref}}은(는) 어느 본문인가요?",
+    "typeRef": "{{ref}} 입력",
+    "typePassage": "본문을 입력하세요"
   }
 }

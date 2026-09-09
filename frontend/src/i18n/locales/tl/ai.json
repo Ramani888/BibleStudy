@@ -115,17 +115,26 @@
     "creditsUsed": "{{count}} credits ang nagamit"
   },
   "attach": {
-    "mediaCost": "Media costs 3–5 credits",
-    "upgrade": "Upgrade to Premium",
-    "chooseMyMedia": "Choose from My Media",
+    "mediaCost": "Ang media ay nagkakahalaga ng 3–5 credits",
+    "upgrade": "Mag-upgrade sa Premium",
+    "chooseMyMedia": "Pumili mula sa My Media",
     "photoLibrary": "Photo Library",
-    "takePhoto": "Take Photo",
-    "choosePdf": "Choose PDF",
-    "noFiles": "No files in My Media"
+    "takePhoto": "Kumuha ng Larawan",
+    "choosePdf": "Pumili ng PDF",
+    "noFiles": "Walang file sa My Media"
   },
   "export": {
     "header": "AI Bible Study — {{date}}",
-    "you": "You",
+    "you": "Ikaw",
     "ai": "AI"
+  },
+  "tags": {
+    "theology": "Teolohiya",
+    "oldTestament": "Lumang Tipan",
+    "newTestament": "Bagong Tipan",
+    "prayer": "Panalangin",
+    "history": "Kasaysayan",
+    "devotional": "Debosyonal",
+    "prophecy": "Propesiya"
   }
 }

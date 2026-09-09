@@ -8,7 +8,22 @@
     "noActivitySub": "Kumpletuhin ang isang pagsusulit upang makita ang iyong kasaysayan ng pag-aaral dito.",
     "selectSet": "Pumili ng Study Set",
     "selectMode": "Pumili ng Mode ng Pagsusulit",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "{{count}} Sets",
+    "practiceMode": "Practice Mode",
+    "practiceDescription": "Mag-aral sa sarili mong bilis nang walang timer pressure",
+    "timedMode": "Timed Challenge",
+    "timedDescription": "Mag-iskor ng puntos laban sa oras",
+    "masteryMode": "Mastery Mode",
+    "masteryDescription": "Matalinong spaced-repetition testing para sa mga card na kailangan mong balikan",
+    "searchPlaceholder": "Maghanap ng quizzes…",
+    "noQuizzesYet": "Wala pang quizzes",
+    "noQuizzesSub": "Subukan ang iyong unang quiz sa itaas para masubaybayan ang iyong study progress.",
+    "noMatch": "Walang nahanap na quizzes",
+    "itemActions": "Quiz Actions",
+    "viewDetails": "Tingnan ang Detalye",
+    "viewSummary": "Tingnan ang Summary",
+    "reQuiz": "Ulitin ang Quiz",
+    "deleteAttempt": "Burahin ang Attempt"
   },
   "setup": {
     "title": "Setup ng Pagsusulit",
@@ -33,7 +48,32 @@
     "chooseSet": "Pumili ng Set para sa Pagsusulit",
     "allDone": "Tapos na ang lahat!",
     "noSetsToQuiz": "Walang available na set para sa pagsusulit.",
-    "createSetFirst": "Gumawa muna ng set na may kahit 1 card."
+    "createSetFirst": "Gumawa muna ng set na may kahit 1 card.",
+    "quizNamePlaceholder": "Pangalan ng Quiz (opsyonal)",
+    "selectSets": "Pumili ng Sets",
+    "startQuiz": "Simulan ang Quiz",
+    "selectMode": "Pumili ng Mode",
+    "chooseSets": "Pumili ng Sets",
+    "chooseSetsLabel": "I-tap para pumili ng sets",
+    "allSets": "Lahat ng Sets ({{count}})",
+    "noSets": "Walang available na sets",
+    "noSetsSub": "Gumawa muna ng ilang study set bago kumuha ng quiz.",
+    "startQuizBtn": "Simulan ang Quiz",
+    "selectSetsCount": "Pumili ng Sets ({{count}} napili)",
+    "modeDesc": {
+      "mix": "Random na halo ng lahat ng available na uri",
+      "mc": "Piliin ang tamang sagot mula sa 4 na opsyon",
+      "story_mc": "Itugma ang reference sa tamang talata",
+      "type_answer": "I-type ang sagot mula sa memorya",
+      "type_verbatim": "I-type ang buong talata nang eksakto",
+      "blanks": "Punan ang mga nawawalang salita",
+      "chunks": "Isaayos ang mga bahagi ng talata",
+      "read": "Basahin at isaulo — hindi iniiskor"
+    },
+    "sort": {
+      "newest": "Kamakailan",
+      "cards": "Cards"
+    }
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",
@@ -78,7 +118,12 @@
     "correctAnswer": "Tamang Sagot:",
     "noIncorrect": "Walang maling sagot! Perpekto!",
     "noCorrect": "Wala pang tamang sagot.",
-    "done": "Tapos na"
+    "done": "Tapos na",
+    "all": "Lahat",
+    "correct": "Tama",
+    "incorrect": "Mali",
+    "noQuestions": "Walang tanong na tumutugma sa filter na ito.",
+    "readMode": "(basahin)"
   },
   "detail": {
     "headerTitle": "Kasaysayan ng Pagsusulit",
@@ -86,9 +131,14 @@
     "practiced": "Nasanay nang {{count}} beses",
     "practiced_other": "Nasanay nang {{count}} beses",
     "lastPracticed": "Huling nasanay noong {{date}}",
-    "correctCount": "{{correct}} / {{total}} correct",
+    "correctCount": "{{correct}} / {{total}} tama",
     "setsCount": "{{count}} sets",
-    "viewSummary": "View summary"
+    "viewSummary": "Tingnan ang summary",
+    "title": "Quiz Attempt",
+    "deleteTitle": "Burahin ang Quiz",
+    "deleteMessage": "Alisin ang attempt na ito sa iyong history?",
+    "retake": "Ulitin ang Quiz",
+    "timeSpent": "Oras na ginugol"
   },
   "modesSheet": {
     "chooseMode": "Pumili ng Mode sa Pag-aaral",
@@ -96,12 +146,14 @@
   },
   "modes": {
     "mc": "Multiple choice",
-    "story_mc": "Match the verse",
-    "type_answer": "Type the answer",
-    "type_verbatim": "Type it out",
-    "blanks": "Fill in the blanks",
-    "chunks": "Order the chunks",
-    "read": "Read & memorize"
+    "story_mc": "Itugma ang talata",
+    "type_answer": "I-type ang sagot",
+    "type_verbatim": "I-type nang buo",
+    "blanks": "Punan ang patlang",
+    "chunks": "Isaayos ang mga bahagi",
+    "read": "Basahin at isaulo",
+    "mixMode": "Mix Mode",
+    "mixDesc": "Pinagsasama ang maraming format ng tanong sa isang quiz."
   },
   "modeNames": {
     "mix": "Mix",
@@ -114,12 +166,49 @@
     "read": "Read"
   },
   "modeHeaders": {
-    "mc": "QUESTION",
-    "story_mc": "MATCH THE VERSE",
-    "type_answer": "QUESTION",
-    "type_verbatim": "TYPE THE PASSAGE",
-    "blanks": "FILL THE BLANKS",
-    "chunks": "PUT IN ORDER",
-    "read": "TAP TO REVEAL"
+    "mc": "TANONG",
+    "story_mc": "ITUGMA ANG TALATA",
+    "type_answer": "TANONG",
+    "type_verbatim": "I-TYPE ANG TALATA",
+    "blanks": "PUNAN ANG PATLANG",
+    "chunks": "ISAAYOS SA TAMANG PAGKAKASUNOD",
+    "read": "I-TAP PARA IPAKITA"
+  },
+  "inQuiz": {
+    "questionCount": "Tanong {{current}} ng {{total}}",
+    "revealAnswer": "Ipakita ang Sagot",
+    "nextQuestion": "Susunod na Tanong",
+    "correct": "Tama!",
+    "incorrect": "Patuloy na magsanay",
+    "yourAnswer": "Iyong Sagot",
+    "correctAnswer": "Tamang Sagot",
+    "quitDialogTitle": "Ihinto ang Quiz?",
+    "quitDialogMessage": "Mawawala ang iyong progreso sa quiz na ito."
+  },
+  "results": {
+    "title": "Tapos na ang Quiz!",
+    "quizComplete": "Tapos na ang Quiz!",
+    "score": "Iskor",
+    "scoreFraction": "{{correct}} / {{total}} tama",
+    "accuracy": "Katumpakan",
+    "timeTaken": "Oras na Ginugol",
+    "reviewQuestions": "Balikan",
+    "tryAgain": "Subukan Muli",
+    "backToHub": "Bumalik sa Quiz Hub",
+    "newBest": "Bagong best!",
+    "bestScore": "Best: {{score}}%",
+    "saveFailed": "Nabigo ang pag-save: {{message}}",
+    "perfectScore": "Kahanga-hanga! Perfect Score!",
+    "goodJob": "Magaling! Ipagpatuloy ang tapat na pag-aaral.",
+    "needsPractice": "Magandang pagsisikap! Balikan ang mga card na namali para masapatan mo ang mga ito."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "I-type ang iyong sagot…"
+  },
+  "prompts": {
+    "thisPassage": "ang talatang ito",
+    "whichPassage": "Aling talata ang {{ref}}?",
+    "typeRef": "I-type ang {{ref}}",
+    "typePassage": "I-type ang talata"
   }
 }

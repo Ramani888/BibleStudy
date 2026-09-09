@@ -5,5 +5,18 @@
     "study": "퀴즈",
     "ai": "AI",
     "profile": "프로필"
+  },
+  "headers": {
+    "home": "Verdance",
+    "library": "라이브러리",
+    "study": "학습",
+    "aiChat": "AI 도우미",
+    "profile": "프로필",
+    "settings": "설정",
+    "credits": "크레딧",
+    "notes": "노트",
+    "media": "미디어",
+    "quiz": "퀴즈",
+    "notifications": "알림"
   }
 }

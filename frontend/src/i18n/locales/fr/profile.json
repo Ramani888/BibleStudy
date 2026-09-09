@@ -1,14 +1,64 @@
 {
   "title": "Profil",
-  "editProfile": "Modifier le Profil",
-  "changePassword": "Changer de Mot de Passe",
+  "editProfile": {
+    "title": "Modifier le profil",
+    "changePhoto": "Changer la photo de profil",
+    "chooseFromLibrary": "Choisir dans la bibliothèque",
+    "takePhoto": "Prendre une photo",
+    "fullName": "Nom complet",
+    "namePlaceholder": "Votre nom",
+    "bio": "Bio (facultatif)",
+    "bioPlaceholder": "Parlez-nous de vous…",
+    "church": "Église (facultatif)",
+    "churchPlaceholder": "Votre église ou congrégation",
+    "profileUpdated": "Profil mis à jour !",
+    "updateFailed": "Échec de la mise à jour",
+    "nameMin": "Le nom doit comporter au moins 2 caractères"
+  },
+  "changePassword": {
+    "title": "Changer le mot de passe",
+    "currentPassword": "Mot de passe actuel",
+    "currentPasswordPlaceholder": "Saisissez le mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "newPasswordPlaceholder": "Min. 8 caractères, 1 majuscule, 1 chiffre",
+    "confirmPassword": "Confirmer le nouveau mot de passe",
+    "confirmPasswordPlaceholder": "Répétez le nouveau mot de passe",
+    "passwordChanged": "Mot de passe modifié !",
+    "passwordAdded": "Mot de passe ajouté !"
+  },
   "myCredits": "Mes Crédits",
   "credits": {
     "types": {
-      "usage": "Used",
-      "reward": "Reward",
-      "purchase": "Purchase",
+      "usage": "Utilisé",
+      "reward": "Récompense",
+      "purchase": "Achat",
       "bonus": "Bonus"
+    },
+    "title": "Crédits et abonnement",
+    "balance": "Votre solde",
+    "availableBalance": "SOLDE DISPONIBLE",
+    "credits": "crédits",
+    "getMore": "Obtenir plus de crédits",
+    "history": "Historique des transactions",
+    "noTransactions": "Aucune transaction pour l'instant",
+    "noTransactionsSub": "Les crédits gagnés ou utilisés apparaîtront ici",
+    "creditsCount": "{{count}} crédit",
+    "creditsCount_other": "{{count}} crédits",
+    "claimDaily": "Réclamer le crédit gratuit du jour",
+    "claimed": "Réclamé pour aujourd'hui",
+    "upgradeCardTitle": "Débloquez l'IA biblique illimitée",
+    "upgradeCardSubtitle": "Questions illimitées, analyse de PDF, modèles haute vitesse, et plus encore.",
+    "chart": {
+      "title": "Activité des crédits",
+      "noActivity": "Aucune activité de crédits sur cette période",
+      "earned": "Gagnés",
+      "used": "Utilisés",
+      "net": "Net",
+      "tabs": {
+        "7d": "7 jours",
+        "30d": "30 jours",
+        "all": "Tout"
+      }
     }
   },
   "streak": "Série d'Étude",
@@ -89,7 +139,8 @@
     "restorePurchases": "Restaurer les Achats",
     "manageSubscription": "Gérer l'Abonnement",
     "terms": "Conditions d'Utilisation",
-    "privacy": "Politique de Confidentialité"
+    "privacy": "Politique de Confidentialité",
+    "heroTagline": "Approfondissez votre étude des Écritures avec des cartes mémoire propulsées par l'IA, des chats illimités et une analyse média intelligente."
   },
   "notes": {
     "title": "Notes d'Étude",
@@ -130,7 +181,7 @@
     "deleteFileMessage": "Supprimer \"{{name}}\" ? Cette action est irréversible.",
     "fileDeleted": "Fichier supprimé",
     "fileRenamed": "Fichier renommé",
-    "deletePartial": "{{ok}} deleted, {{failed}} failed"
+    "deletePartial": "{{ok}} supprimés, {{failed}} échoués"
   },
   "friends": {
     "title": "Amis",
@@ -164,7 +215,12 @@
     "sendFriendRequest": "Envoyer une Demande d'Ami",
     "cancelFriendRequest": "Annuler la Demande",
     "acceptFriendRequest": "Accepter la Demande",
-    "declineFriendRequest": "Refuser la Demande"
+    "declineFriendRequest": "Refuser la Demande",
+    "requestPending": "Demande en attente",
+    "cancelRequest": "Annuler la demande",
+    "accept": "Accepter",
+    "decline": "Refuser",
+    "theirSets": "Leurs ensembles"
   },
   "aboutUs": {
     "title": "À Propos de Nous",
@@ -172,7 +228,9 @@
     "missionTitle": "Notre Mission",
     "missionBody": "Verdance a été créé pour aider les croyants à s'engager profondément avec la Parole de Dieu grâce à des outils de mémorisation et d'analyse biblique assistée par IA.",
     "contactTitle": "Contact",
-    "contactBody": "Pour tout commentaire, suggestion ou demande d'assistance, contactez-nous à :"
+    "contactBody": "Pour tout commentaire, suggestion ou demande d'assistance, contactez-nous à :",
+    "description": "Verdance vous aide à approfondir votre compréhension des Écritures grâce à des cartes mémoire propulsées par l'IA, à la répétition espacée et à des outils d'étude collaborative. Que vous étudiiez seul ou en groupe, nous rendons chaque session plus enrichissante.",
+    "contactIntro": "Des questions ou des commentaires ? Contactez-nous à"
   },
   "privacy": {
     "title": "Politique de Confidentialité",
@@ -193,8 +251,82 @@
     "sec7Body": "Pour toute question sur cette Politique de Confidentialité, contactez-nous à :\nddtechservices.work@gmail.com"
   },
   "chart": {
-    "day": "Daily",
-    "week": "Weekly",
-    "month": "Monthly"
+    "day": "Quotidien",
+    "week": "Hebdomadaire",
+    "month": "Mensuel"
+  },
+  "sections": {
+    "myStudy": "Mon étude",
+    "community": "Communauté",
+    "account": "Compte"
+  },
+  "menu": {
+    "achievements": "Réussites",
+    "myNotes": "Mes notes",
+    "myMedia": "Mes médias",
+    "friends": "Amis",
+    "notifications": "Notifications",
+    "editProfile": "Modifier le profil",
+    "myCredits": "Mes crédits",
+    "managePlan": "Gérer l'abonnement",
+    "upgradeToPremium": "Passer à Premium",
+    "changePassword": "Changer le mot de passe",
+    "settings": "Paramètres",
+    "signOut": "Se déconnecter",
+    "friendRequests": "Demandes d'amis",
+    "leaderboard": "Classement",
+    "blockedUsers": "Utilisateurs bloqués"
+  },
+  "storage": {
+    "title": "Stockage",
+    "overLimit": "Limite de stockage dépassée — Améliorer",
+    "usage": "{{used}} Mo sur {{limit}} Mo"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "emptyTitle": "Aucune notification",
+    "emptySubtitle": "Vous êtes à jour !",
+    "couldNotLoadNotifications": "Impossible de charger les notifications"
+  },
+  "legal": {
+    "lastUpdated": "Dernière mise à jour : {{date}}",
+    "privacySec1Title": "Informations que nous collectons",
+    "privacySec1Body": "Nous collectons votre nom, votre adresse e-mail et le contenu que vous créez (ensembles de cartes, notes et plans d'étude) afin de fournir notre service. Nous collectons également des statistiques d'utilisation anonymes pour améliorer l'application.",
+    "privacySec2Title": "Comment nous utilisons vos données",
+    "privacySec2Body": "Vos données servent uniquement à fournir les fonctionnalités de Verdance — générer des réponses IA, synchroniser votre progression d'étude et activer les fonctions sociales comme les classements entre amis. Nous ne vendons jamais vos informations personnelles.",
+    "privacySec3Title": "Traitement par l'IA",
+    "privacySec3Body": "Le texte que vous envoyez au chat IA est traité par des fournisseurs d'IA tiers (OpenRouter / Anthropic Claude) pour générer des réponses. Les fichiers médias (images, PDF) sont envoyés à Anthropic Claude pour analyse. Ces fournisseurs opèrent selon leurs propres politiques de confidentialité.",
+    "privacySec4Title": "Stockage des données",
+    "privacySec4Body": "Vos données sont stockées en toute sécurité sur nos serveurs. Les mots de passe sont hachés et ne sont jamais stockés en clair. Nous utilisons un chiffrement conforme aux normes du secteur pour les données en transit (TLS) et au repos.",
+    "privacySec5Title": "Conservation et suppression des données",
+    "privacySec5Body": "Vous pouvez supprimer votre compte à tout moment depuis Paramètres → Supprimer le compte. Cela efface définitivement toutes vos données personnelles, ensembles, cartes, notes et médias sous 30 jours.",
+    "privacySec6Title": "Services tiers",
+    "privacySec6Body": "Nous utilisons Apple In-App Purchase pour les abonnements, Firebase Cloud Messaging pour les notifications push et des fournisseurs d'IA pour les fonctions de chat. Chaque service a sa propre politique de confidentialité régissant le traitement des données.",
+    "privacySec7Title": "Nous contacter",
+    "privacySec7Body": "Pour toute question relative à la confidentialité ou demande concernant vos données, contactez-nous à :\nddtechservices.work@gmail.com"
+  },
+  "leaderboard": {
+    "quotes": {
+      "rank1": {
+        "text": "Vous montrez la voie — gardez cette flamme vivante ! 🔥",
+        "sub": "La couronne est à vous. Protégez-la."
+      },
+      "rank3": {
+        "text": "Si près du sommet — un jour de fidélité suffit.",
+        "sub": "Tenez bon, l'arrivée est proche."
+      },
+      "rank10": {
+        "text": "La constance est votre superpouvoir. Continuez.",
+        "sub": "Les petits pas bâtissent de grandes habitudes."
+      },
+      "rankOther": {
+        "text": "Tout grand parcours commence par un premier pas.",
+        "sub": "La série d'aujourd'hui est l'héritage de demain."
+      },
+      "rankZero": {
+        "text": "Tout grand parcours commence par un premier pas.",
+        "sub": "Commencez votre série aujourd'hui."
+      }
+    }
   }
 }

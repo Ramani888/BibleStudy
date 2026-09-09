@@ -8,7 +8,22 @@
     "noActivitySub": "Complete um quiz para ver seu histórico de estudo aqui.",
     "selectSet": "Selecionar um Conjunto de Estudo",
     "selectMode": "Escolher Modo de Quiz",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "{{count}} conjuntos",
+    "practiceMode": "Modo prática",
+    "practiceDescription": "Estude no seu ritmo, sem pressão de tempo",
+    "timedMode": "Desafio cronometrado",
+    "timedDescription": "Marque pontos contra o relógio",
+    "masteryMode": "Modo domínio",
+    "masteryDescription": "Teste inteligente com repetição espaçada para os cartões que você precisa revisar",
+    "searchPlaceholder": "Buscar quizzes…",
+    "noQuizzesYet": "Nenhum quiz ainda",
+    "noQuizzesSub": "Faça seu primeiro quiz acima para acompanhar seu progresso de estudo.",
+    "noMatch": "Nenhum quiz encontrado",
+    "itemActions": "Ações do quiz",
+    "viewDetails": "Ver detalhes",
+    "viewSummary": "Ver resumo",
+    "reQuiz": "Refazer quiz",
+    "deleteAttempt": "Excluir tentativa"
   },
   "setup": {
     "title": "Configuração do Quiz",
@@ -33,7 +48,32 @@
     "chooseSet": "Escolher Conjunto para Quiz",
     "allDone": "Tudo pronto!",
     "noSetsToQuiz": "Nenhum conjunto disponível para quiz.",
-    "createSetFirst": "Crie um conjunto com pelo menos 1 cartão primeiro."
+    "createSetFirst": "Crie um conjunto com pelo menos 1 cartão primeiro.",
+    "quizNamePlaceholder": "Nome do quiz (opcional)",
+    "selectSets": "Selecionar conjuntos",
+    "startQuiz": "Iniciar quiz",
+    "selectMode": "Selecionar modo",
+    "chooseSets": "Escolher conjuntos",
+    "chooseSetsLabel": "Toque para escolher conjuntos",
+    "allSets": "Todos os conjuntos ({{count}})",
+    "noSets": "Nenhum conjunto disponível",
+    "noSetsSub": "Crie alguns conjuntos de estudo antes de fazer um quiz.",
+    "startQuizBtn": "Iniciar quiz",
+    "selectSetsCount": "Selecionar conjuntos ({{count}} selecionados)",
+    "modeDesc": {
+      "mix": "Mistura aleatória de todos os tipos disponíveis",
+      "mc": "Escolha a resposta correta entre 4 opções",
+      "story_mc": "Associe a referência à passagem correta",
+      "type_answer": "Digite a resposta de memória",
+      "type_verbatim": "Digite a passagem completa, palavra por palavra",
+      "blanks": "Preencha as palavras que faltam",
+      "chunks": "Coloque os trechos da passagem em ordem",
+      "read": "Leia e memorize — sem pontuação"
+    },
+    "sort": {
+      "newest": "Recentes",
+      "cards": "Cartões"
+    }
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",
@@ -78,7 +118,12 @@
     "correctAnswer": "Resposta Correta:",
     "noIncorrect": "Nenhuma resposta incorreta! Trabalho perfeito!",
     "noCorrect": "Nenhuma resposta correta ainda.",
-    "done": "Concluído"
+    "done": "Concluído",
+    "all": "Todas",
+    "correct": "Corretas",
+    "incorrect": "Incorretas",
+    "noQuestions": "Nenhuma pergunta corresponde a este filtro.",
+    "readMode": "(leitura)"
   },
   "detail": {
     "headerTitle": "Histórico do Quiz",
@@ -86,40 +131,84 @@
     "practiced": "Praticado {{count}} vez",
     "practiced_other": "Praticado {{count}} vezes",
     "lastPracticed": "Praticado pela última vez em {{date}}",
-    "correctCount": "{{correct}} / {{total}} correct",
-    "setsCount": "{{count}} sets",
-    "viewSummary": "View summary"
+    "correctCount": "{{correct}} / {{total}} corretas",
+    "setsCount": "{{count}} conjuntos",
+    "viewSummary": "Ver resumo",
+    "title": "Tentativa de quiz",
+    "deleteTitle": "Excluir quiz",
+    "deleteMessage": "Remover esta tentativa do seu histórico?",
+    "retake": "Refazer quiz",
+    "timeSpent": "Tempo gasto"
   },
   "modesSheet": {
     "chooseMode": "Escolher Modo de Estudo",
     "startMode": "Iniciar Modo {{mode}}"
   },
   "modes": {
-    "mc": "Multiple choice",
-    "story_mc": "Match the verse",
-    "type_answer": "Type the answer",
-    "type_verbatim": "Type it out",
-    "blanks": "Fill in the blanks",
-    "chunks": "Order the chunks",
-    "read": "Read & memorize"
+    "mc": "Múltipla escolha",
+    "story_mc": "Associe o versículo",
+    "type_answer": "Digite a resposta",
+    "type_verbatim": "Digite tudo",
+    "blanks": "Preencha as lacunas",
+    "chunks": "Ordene os trechos",
+    "read": "Ler e memorizar",
+    "mixMode": "Modo misto",
+    "mixDesc": "Combina vários formatos de pergunta em um só quiz."
   },
   "modeNames": {
-    "mix": "Mix",
-    "mc": "Multiple Choice",
-    "story_mc": "Story MC",
-    "type_answer": "Type Answer",
-    "type_verbatim": "Type Verbatim",
-    "blanks": "Fill Blanks",
-    "chunks": "Reorder",
-    "read": "Read"
+    "mix": "Misto",
+    "mc": "Múltipla escolha",
+    "story_mc": "Associar MC",
+    "type_answer": "Digitar resposta",
+    "type_verbatim": "Digitar literal",
+    "blanks": "Preencher lacunas",
+    "chunks": "Reordenar",
+    "read": "Ler"
   },
   "modeHeaders": {
-    "mc": "QUESTION",
-    "story_mc": "MATCH THE VERSE",
-    "type_answer": "QUESTION",
-    "type_verbatim": "TYPE THE PASSAGE",
-    "blanks": "FILL THE BLANKS",
-    "chunks": "PUT IN ORDER",
-    "read": "TAP TO REVEAL"
+    "mc": "PERGUNTA",
+    "story_mc": "ASSOCIE O VERSÍCULO",
+    "type_answer": "PERGUNTA",
+    "type_verbatim": "DIGITE A PASSAGEM",
+    "blanks": "PREENCHA AS LACUNAS",
+    "chunks": "COLOQUE EM ORDEM",
+    "read": "TOQUE PARA REVELAR"
+  },
+  "inQuiz": {
+    "questionCount": "Pergunta {{current}} de {{total}}",
+    "revealAnswer": "Revelar resposta",
+    "nextQuestion": "Próxima pergunta",
+    "correct": "Correto!",
+    "incorrect": "Continue praticando",
+    "yourAnswer": "Sua resposta",
+    "correctAnswer": "Resposta correta",
+    "quitDialogTitle": "Sair do quiz?",
+    "quitDialogMessage": "Seu progresso neste quiz será perdido."
+  },
+  "results": {
+    "title": "Quiz concluído!",
+    "quizComplete": "Quiz concluído!",
+    "score": "Pontuação",
+    "scoreFraction": "{{correct}} / {{total}} corretas",
+    "accuracy": "Precisão",
+    "timeTaken": "Tempo gasto",
+    "reviewQuestions": "Revisar",
+    "tryAgain": "Tentar de novo",
+    "backToHub": "Voltar à Central de Quiz",
+    "newBest": "Novo recorde!",
+    "bestScore": "Melhor: {{score}}%",
+    "saveFailed": "Falha ao salvar: {{message}}",
+    "perfectScore": "Excelente! Pontuação perfeita!",
+    "goodJob": "Ótimo trabalho! Continue com o estudo fiel.",
+    "needsPractice": "Bom esforço! Revise os cartões que errou para dominá-los."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "Digite sua resposta…"
+  },
+  "prompts": {
+    "thisPassage": "esta passagem",
+    "whichPassage": "Qual passagem é {{ref}}?",
+    "typeRef": "Digite {{ref}}",
+    "typePassage": "Digite a passagem"
   }
 }

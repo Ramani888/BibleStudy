@@ -1,14 +1,64 @@
 {
   "title": "프로필",
-  "editProfile": "프로필 수정",
-  "changePassword": "비밀번호 변경",
+  "editProfile": {
+    "title": "프로필 편집",
+    "changePhoto": "프로필 사진 변경",
+    "chooseFromLibrary": "보관함에서 선택",
+    "takePhoto": "사진 촬영",
+    "fullName": "이름",
+    "namePlaceholder": "이름을 입력하세요",
+    "bio": "소개 (선택)",
+    "bioPlaceholder": "자신을 소개해 주세요…",
+    "church": "교회 (선택)",
+    "churchPlaceholder": "출석하는 교회 또는 공동체",
+    "profileUpdated": "프로필이 업데이트되었습니다!",
+    "updateFailed": "업데이트 실패",
+    "nameMin": "이름은 최소 2자 이상이어야 합니다"
+  },
+  "changePassword": {
+    "title": "비밀번호 변경",
+    "currentPassword": "현재 비밀번호",
+    "currentPasswordPlaceholder": "현재 비밀번호 입력",
+    "newPassword": "새 비밀번호",
+    "newPasswordPlaceholder": "최소 8자, 대문자 1개, 숫자 1개",
+    "confirmPassword": "새 비밀번호 확인",
+    "confirmPasswordPlaceholder": "새 비밀번호 다시 입력",
+    "passwordChanged": "비밀번호가 변경되었습니다!",
+    "passwordAdded": "비밀번호가 추가되었습니다!"
+  },
   "myCredits": "내 크레딧",
   "credits": {
     "types": {
-      "usage": "Used",
-      "reward": "Reward",
-      "purchase": "Purchase",
-      "bonus": "Bonus"
+      "usage": "사용",
+      "reward": "보상",
+      "purchase": "구매",
+      "bonus": "보너스"
+    },
+    "title": "크레딧 및 구독",
+    "balance": "내 잔액",
+    "availableBalance": "사용 가능 잔액",
+    "credits": "크레딧",
+    "getMore": "크레딧 더 받기",
+    "history": "거래 내역",
+    "noTransactions": "아직 거래 내역이 없습니다",
+    "noTransactionsSub": "적립하거나 사용한 크레딧이 여기에 표시됩니다",
+    "creditsCount": "크레딧 {{count}}개",
+    "creditsCount_other": "크레딧 {{count}}개",
+    "claimDaily": "매일 무료 크레딧 받기",
+    "claimed": "오늘 받기 완료",
+    "upgradeCardTitle": "무제한 성경 AI 이용하기",
+    "upgradeCardSubtitle": "무제한 질문, PDF 분석, 고속 모델 등 다양한 기능을 이용하세요.",
+    "chart": {
+      "title": "크레딧 활동",
+      "noActivity": "이 기간에 크레딧 활동이 없습니다",
+      "earned": "적립",
+      "used": "사용",
+      "net": "순변동",
+      "tabs": {
+        "7d": "7일",
+        "30d": "30일",
+        "all": "전체 기간"
+      }
     }
   },
   "streak": "학습 연속 기록",
@@ -89,7 +139,8 @@
     "restorePurchases": "구매 복원",
     "manageSubscription": "구독 관리",
     "terms": "서비스 이용약관",
-    "privacy": "개인정보 처리방침"
+    "privacy": "개인정보 처리방침",
+    "heroTagline": "AI 기반 플래시카드, 무제한 채팅, 스마트 미디어 분석으로 성경 공부를 더욱 깊이 있게 하세요."
   },
   "notes": {
     "title": "학습 노트",
@@ -130,7 +181,7 @@
     "deleteFileMessage": "\"{{name}}\"을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
     "fileDeleted": "파일이 삭제되었습니다",
     "fileRenamed": "파일 이름이 변경되었습니다",
-    "deletePartial": "{{ok}} deleted, {{failed}} failed"
+    "deletePartial": "{{ok}}개 삭제됨, {{failed}}개 실패"
   },
   "friends": {
     "title": "친구",
@@ -164,7 +215,12 @@
     "sendFriendRequest": "친구 요청 보내기",
     "cancelFriendRequest": "요청 취소",
     "acceptFriendRequest": "요청 수락",
-    "declineFriendRequest": "요청 거절"
+    "declineFriendRequest": "요청 거절",
+    "requestPending": "요청 대기 중",
+    "cancelRequest": "요청 취소",
+    "accept": "수락",
+    "decline": "거절",
+    "theirSets": "이 사용자의 세트"
   },
   "aboutUs": {
     "title": "앱 소개",
@@ -172,7 +228,9 @@
     "missionTitle": "우리의 미션",
     "missionBody": "Verdance는 성도들이 말씀 암송 도구와 AI 성경 연구 분석을 통해 하나님의 말씀과 깊이 연결되도록 돕기 위해 만들어졌습니다.",
     "contactTitle": "문의하기",
-    "contactBody": "피드백, 기능 제안 또는 고객 지원 문의는 다음으로 연락해 주세요:"
+    "contactBody": "피드백, 기능 제안 또는 고객 지원 문의는 다음으로 연락해 주세요:",
+    "description": "Verdance는 AI 기반 플래시카드, 간격 반복 학습, 협업 도구를 통해 성경에 대한 이해를 깊게 하도록 돕습니다. 혼자 공부하든 그룹으로 공부하든, 모든 학습 시간을 더 의미 있게 만들어 드립니다.",
+    "contactIntro": "질문이나 의견이 있으신가요? 아래로 연락 주세요"
   },
   "privacy": {
     "title": "개인정보 처리방침",
@@ -193,8 +251,82 @@
     "sec7Body": "개인정보 처리방침에 관한 문의:\nddtechservices.work@gmail.com"
   },
   "chart": {
-    "day": "Daily",
-    "week": "Weekly",
-    "month": "Monthly"
+    "day": "일간",
+    "week": "주간",
+    "month": "월간"
+  },
+  "sections": {
+    "myStudy": "내 학습",
+    "community": "커뮤니티",
+    "account": "계정"
+  },
+  "menu": {
+    "achievements": "업적",
+    "myNotes": "내 노트",
+    "myMedia": "내 미디어",
+    "friends": "친구",
+    "notifications": "알림",
+    "editProfile": "프로필 편집",
+    "myCredits": "내 크레딧",
+    "managePlan": "요금제 관리",
+    "upgradeToPremium": "프리미엄으로 업그레이드",
+    "changePassword": "비밀번호 변경",
+    "settings": "설정",
+    "signOut": "로그아웃",
+    "friendRequests": "친구 요청",
+    "leaderboard": "순위표",
+    "blockedUsers": "차단한 사용자"
+  },
+  "storage": {
+    "title": "저장 공간",
+    "overLimit": "저장 공간 초과 — 업그레이드",
+    "usage": "{{limit}} MB 중 {{used}} MB 사용"
+  },
+  "notifications": {
+    "title": "알림",
+    "emptyTitle": "알림 없음",
+    "emptySubtitle": "모두 확인했습니다!",
+    "couldNotLoadNotifications": "알림을 불러올 수 없습니다"
+  },
+  "legal": {
+    "lastUpdated": "마지막 업데이트: {{date}}",
+    "privacySec1Title": "수집하는 정보",
+    "privacySec1Body": "서비스 제공을 위해 이름, 이메일 주소, 사용자가 만든 콘텐츠(플래시카드 세트, 노트, 학습 계획)를 수집합니다. 또한 앱 개선을 위해 익명 사용 분석 데이터를 수집합니다.",
+    "privacySec2Title": "데이터 이용 방식",
+    "privacySec2Body": "귀하의 데이터는 오직 Verdance의 기능 제공 — AI 응답 생성, 학습 진행 동기화, 친구 순위표와 같은 소셜 기능 지원 — 을 위해서만 사용됩니다. 저희는 귀하의 개인정보를 절대 판매하지 않습니다.",
+    "privacySec3Title": "AI 처리",
+    "privacySec3Body": "AI 채팅으로 보낸 텍스트는 응답 생성을 위해 제3자 AI 제공업체(OpenRouter / Anthropic Claude)에서 처리됩니다. 미디어 파일(이미지, PDF)은 분석을 위해 Anthropic Claude로 전송됩니다. 이러한 제공업체는 각자의 개인정보 처리방침에 따라 운영됩니다.",
+    "privacySec4Title": "데이터 저장",
+    "privacySec4Body": "귀하의 데이터는 저희 서버에 안전하게 저장됩니다. 비밀번호는 해시 처리되며 평문으로 저장되지 않습니다. 전송 중(TLS) 및 저장 시 데이터에 대해 업계 표준 암호화를 사용합니다.",
+    "privacySec5Title": "데이터 보관 및 삭제",
+    "privacySec5Body": "설정 → 계정 삭제에서 언제든지 계정을 삭제할 수 있습니다. 이 경우 모든 개인 데이터, 세트, 카드, 노트, 미디어가 30일 이내에 영구적으로 삭제됩니다.",
+    "privacySec6Title": "제3자 서비스",
+    "privacySec6Body": "구독에는 Apple 인앱 구매를, 푸시 알림에는 Firebase 클라우드 메시징을, 채팅 기능에는 AI 제공업체를 이용합니다. 각 서비스는 데이터 처리 방식을 규정하는 자체 개인정보 처리방침을 갖고 있습니다.",
+    "privacySec7Title": "문의하기",
+    "privacySec7Body": "개인정보 관련 질문이나 데이터 요청은 아래로 문의해 주세요:\nddtechservices.work@gmail.com"
+  },
+  "leaderboard": {
+    "quotes": {
+      "rank1": {
+        "text": "당신이 앞장서고 있어요 — 그 불꽃을 계속 지켜가세요! 🔥",
+        "sub": "왕관은 당신의 것입니다. 지켜내세요."
+      },
+      "rank3": {
+        "text": "정상이 코앞이에요 — 하루만 꾸준히 하면 됩니다.",
+        "sub": "끝까지 밀어붙이세요, 결승선이 가까워요."
+      },
+      "rank10": {
+        "text": "꾸준함이 당신의 초능력이에요. 계속 나타나세요.",
+        "sub": "작은 걸음이 강력한 습관을 만듭니다."
+      },
+      "rankOther": {
+        "text": "모든 위대한 여정은 한 걸음에서 시작됩니다.",
+        "sub": "오늘의 연속 기록이 내일의 유산이 됩니다."
+      },
+      "rankZero": {
+        "text": "모든 위대한 여정은 한 걸음에서 시작됩니다.",
+        "sub": "오늘 연속 기록을 시작하세요."
+      }
+    }
   }
 }

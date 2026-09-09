@@ -11,14 +11,20 @@
     "cardsLearned": "Cartões aprendidos",
     "streakDays": "Dias de sequência",
     "totalSets": "Total de conjuntos",
-    "cardsCount": "{{count}} cartões"
+    "cardsCount": "{{count}} cartões",
+    "sets": "Conjuntos",
+    "folders": "Pastas",
+    "notes": "Notas",
+    "cards": "Cartões",
+    "credits": "Créditos"
   },
   "dailyVerse": {
     "title": "Versículo do Dia",
     "reflection": "Reflexão diária",
     "share": "Compartilhar versículo",
     "createCard": "Criar cartão com este versículo",
-    "copied": "Versículo copiado para a área de transferência"
+    "copied": "Versículo copiado para a área de transferência",
+    "saveAsCard": "Salvar como cartão"
   },
   "recentSets": {
     "title": "Continuar Estudando",
@@ -36,28 +42,60 @@
     "askAI": "Perguntar à IA",
     "quickQuiz": "Quiz Rápido",
     "dailyVerse": "Versículo Diário",
-    "createSet": "Create Set",
-    "studyPlans": "Study Plans",
-    "achievements": "Achievements",
-    "leaderboard": "Leaderboard",
-    "notes": "Notes",
-    "media": "Media",
-    "discover": "Discover",
-    "friends": "Friends"
+    "createSet": "Criar conjunto",
+    "studyPlans": "Planos de estudo",
+    "achievements": "Conquistas",
+    "leaderboard": "Ranking",
+    "notes": "Notas",
+    "media": "Mídia",
+    "discover": "Descobrir",
+    "friends": "Amigos",
+    "search": "Buscar",
+    "library": "Biblioteca"
   },
   "a11y": {
-    "goToProfile": "Go to profile",
-    "aiChat": "AI Chat",
-    "notifications": "Notifications",
-    "openSet": "Open {{title}}"
+    "goToProfile": "Ir para o perfil",
+    "aiChat": "Chat com IA",
+    "notifications": "Notificações",
+    "openSet": "Abrir {{title}}"
   },
   "activity": {
-    "unknownUser": "Someone",
-    "addedFriend": "{{name}} added a new friend",
-    "createdSet": "{{name}} created a new set",
-    "createdCard": "{{name}} created a new card",
-    "studiedCards": "{{name}} studied some cards",
-    "wroteNote": "{{name}} wrote a note",
-    "wasActive": "{{name}} was active"
+    "unknownUser": "Alguém",
+    "addedFriend": "{{name}} adicionou um novo amigo",
+    "createdSet": "{{name}} criou um novo conjunto",
+    "createdCard": "{{name}} criou um novo cartão",
+    "studiedCards": "{{name}} estudou alguns cartões",
+    "wroteNote": "{{name}} escreveu uma nota",
+    "wasActive": "{{name}} esteve ativo"
+  },
+  "featured": {
+    "due": "PENDENTE",
+    "continue": "CONTINUAR",
+    "start": "COMEÇAR",
+    "createFirstSet": "Crie seu primeiro conjunto de estudo",
+    "beginJourney": "Comece sua jornada",
+    "streakGoal": "Sequência de {{streak}} dias · meta semanal {{goal}}/7",
+    "cardsToReview": "{{count}} cartão para revisar",
+    "cardsToReview_other": "{{count}} cartões para revisar"
+  },
+  "streak": {
+    "day": "Sequência de {{count}} dia",
+    "days": "Sequência de {{count}} dias",
+    "keepGoing": "Continue com o ótimo trabalho!",
+    "streakLost": "Estude hoje para manter sua sequência"
+  },
+  "sections": {
+    "recentSets": "Conjuntos recentes",
+    "seeAll": "Ver tudo",
+    "friendsSets": "Conjuntos dos amigos",
+    "communitySets": "Conjuntos da comunidade",
+    "friendActivity": "Atividade dos amigos",
+    "quickStats": "Resumo rápido"
+  },
+  "empty": {
+    "noRecentSets": "Nenhum conjunto de estudo recente ainda",
+    "noFriendsSets": "Nenhum conjunto público de amigos ainda",
+    "noCommunitySets": "Explore conjuntos de estudo da comunidade",
+    "noActivity": "Nenhuma atividade recente de amigos"
   }
 }

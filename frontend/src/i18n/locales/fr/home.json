@@ -11,14 +11,20 @@
     "cardsLearned": "Cartes apprises",
     "streakDays": "Jours d'affilée",
     "totalSets": "Total des séries",
-    "cardsCount": "{{count}} cartes"
+    "cardsCount": "{{count}} cartes",
+    "sets": "Ensembles",
+    "folders": "Dossiers",
+    "notes": "Notes",
+    "cards": "Cartes",
+    "credits": "Crédits"
   },
   "dailyVerse": {
     "title": "Verset du Jour",
     "reflection": "Méditation quotidienne",
     "share": "Partager le verset",
     "createCard": "Créer une carte avec ce verset",
-    "copied": "Verset copié dans le presse-papiers"
+    "copied": "Verset copié dans le presse-papiers",
+    "saveAsCard": "Enregistrer comme carte"
   },
   "recentSets": {
     "title": "Continuer l'Étude",
@@ -36,28 +42,60 @@
     "askAI": "Demander à l'IA",
     "quickQuiz": "Quiz Rapide",
     "dailyVerse": "Verset Quotidien",
-    "createSet": "Create Set",
-    "studyPlans": "Study Plans",
-    "achievements": "Achievements",
-    "leaderboard": "Leaderboard",
+    "createSet": "Créer un ensemble",
+    "studyPlans": "Plans d'étude",
+    "achievements": "Réussites",
+    "leaderboard": "Classement",
     "notes": "Notes",
-    "media": "Media",
-    "discover": "Discover",
-    "friends": "Friends"
+    "media": "Médias",
+    "discover": "Découvrir",
+    "friends": "Amis",
+    "search": "Rechercher",
+    "library": "Bibliothèque"
   },
   "a11y": {
-    "goToProfile": "Go to profile",
-    "aiChat": "AI Chat",
+    "goToProfile": "Aller au profil",
+    "aiChat": "Chat IA",
     "notifications": "Notifications",
-    "openSet": "Open {{title}}"
+    "openSet": "Ouvrir {{title}}"
   },
   "activity": {
-    "unknownUser": "Someone",
-    "addedFriend": "{{name}} added a new friend",
-    "createdSet": "{{name}} created a new set",
-    "createdCard": "{{name}} created a new card",
-    "studiedCards": "{{name}} studied some cards",
-    "wroteNote": "{{name}} wrote a note",
-    "wasActive": "{{name}} was active"
+    "unknownUser": "Quelqu'un",
+    "addedFriend": "{{name}} a ajouté un nouvel ami",
+    "createdSet": "{{name}} a créé un nouvel ensemble",
+    "createdCard": "{{name}} a créé une nouvelle carte",
+    "studiedCards": "{{name}} a étudié des cartes",
+    "wroteNote": "{{name}} a écrit une note",
+    "wasActive": "{{name}} était actif"
+  },
+  "featured": {
+    "due": "À RÉVISER",
+    "continue": "CONTINUER",
+    "start": "COMMENCER",
+    "createFirstSet": "Créez votre premier ensemble d'étude",
+    "beginJourney": "Commencez votre parcours",
+    "streakGoal": "{{streak}} jours de suite · objectif hebdo {{goal}}/7",
+    "cardsToReview": "{{count}} carte à réviser",
+    "cardsToReview_other": "{{count}} cartes à réviser"
+  },
+  "streak": {
+    "day": "{{count}} jour de suite",
+    "days": "{{count}} jours de suite",
+    "keepGoing": "Continuez, c'est excellent !",
+    "streakLost": "Étudiez aujourd'hui pour garder votre série"
+  },
+  "sections": {
+    "recentSets": "Ensembles récents",
+    "seeAll": "Tout voir",
+    "friendsSets": "Ensembles des amis",
+    "communitySets": "Ensembles de la communauté",
+    "friendActivity": "Activité des amis",
+    "quickStats": "Statistiques rapides"
+  },
+  "empty": {
+    "noRecentSets": "Aucun ensemble d'étude récent",
+    "noFriendsSets": "Aucun ensemble public d'amis pour l'instant",
+    "noCommunitySets": "Explorez les ensembles d'étude de la communauté",
+    "noActivity": "Aucune activité récente d'amis"
   }
 }

@@ -5,5 +5,18 @@
     "study": "Cuestionario",
     "ai": "IA",
     "profile": "Perfil"
+  },
+  "headers": {
+    "home": "Verdance",
+    "library": "Biblioteca",
+    "study": "Estudiar",
+    "aiChat": "Asistente IA",
+    "profile": "Perfil",
+    "settings": "Ajustes",
+    "credits": "Créditos",
+    "notes": "Notas",
+    "media": "Archivos",
+    "quiz": "Cuestionario",
+    "notifications": "Notificaciones"
   }
 }

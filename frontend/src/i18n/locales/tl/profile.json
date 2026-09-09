@@ -1,14 +1,64 @@
 {
   "title": "Profile",
-  "editProfile": "I-edit ang Profile",
-  "changePassword": "Palitan ang Password",
+  "editProfile": {
+    "title": "I-edit ang Profile",
+    "changePhoto": "Palitan ang Profile Photo",
+    "chooseFromLibrary": "Pumili mula sa Library",
+    "takePhoto": "Kumuha ng Larawan",
+    "fullName": "Buong pangalan",
+    "namePlaceholder": "Iyong pangalan",
+    "bio": "Bio (opsyonal)",
+    "bioPlaceholder": "Ikwento ang tungkol sa iyo…",
+    "church": "Simbahan (opsyonal)",
+    "churchPlaceholder": "Iyong simbahan o kongregasyon",
+    "profileUpdated": "Na-update ang profile!",
+    "updateFailed": "Nabigo ang pag-update",
+    "nameMin": "Ang pangalan ay dapat hindi bababa sa 2 character"
+  },
+  "changePassword": {
+    "title": "Palitan ang Password",
+    "currentPassword": "Kasalukuyang password",
+    "currentPasswordPlaceholder": "Ilagay ang kasalukuyang password",
+    "newPassword": "Bagong password",
+    "newPasswordPlaceholder": "Min 8 char, 1 malaking titik, 1 numero",
+    "confirmPassword": "Kumpirmahin ang bagong password",
+    "confirmPasswordPlaceholder": "Ulitin ang bagong password",
+    "passwordChanged": "Napalitan ang password!",
+    "passwordAdded": "Naidagdag ang password!"
+  },
   "myCredits": "Aking Mga Kredito",
   "credits": {
     "types": {
-      "usage": "Used",
-      "reward": "Reward",
-      "purchase": "Purchase",
+      "usage": "Nagamit",
+      "reward": "Gantimpala",
+      "purchase": "Binili",
       "bonus": "Bonus"
+    },
+    "title": "Credits at Subscription",
+    "balance": "Iyong Balance",
+    "availableBalance": "AVAILABLE BALANCE",
+    "credits": "credits",
+    "getMore": "Kumuha ng Higit pang Credits",
+    "history": "History ng Transaksyon",
+    "noTransactions": "Wala pang transaksyon",
+    "noTransactionsSub": "Lilitaw dito ang credits na kikitain o gagamitin mo",
+    "creditsCount": "{{count}} Credit",
+    "creditsCount_other": "{{count}} Credits",
+    "claimDaily": "I-claim ang Libreng Araw-araw na Credit",
+    "claimed": "Na-claim para Ngayong Araw",
+    "upgradeCardTitle": "I-unlock ang Unlimited Bible AI",
+    "upgradeCardSubtitle": "Walang limitasyong tanong, PDF analysis, high-speed models, at higit pa.",
+    "chart": {
+      "title": "Credit Activity",
+      "noActivity": "Walang credit activity sa panahong ito",
+      "earned": "Kinita",
+      "used": "Nagamit",
+      "net": "Net",
+      "tabs": {
+        "7d": "7 Araw",
+        "30d": "30 Araw",
+        "all": "Lahat ng Panahon"
+      }
     }
   },
   "streak": "Streak sa Pag-aaral",
@@ -89,7 +139,8 @@
     "restorePurchases": "Ibalik ang mga Binili",
     "manageSubscription": "Pamahalaan ang Subscription",
     "terms": "Mga Tuntunin ng Serbisyo",
-    "privacy": "Patakaran sa Pagkapribado"
+    "privacy": "Patakaran sa Pagkapribado",
+    "heroTagline": "Palalimin ang iyong pag-aaral ng Kasulatan gamit ang AI-powered flashcards, unlimited chats, at smart media analysis."
   },
   "notes": {
     "title": "Mga Tala sa Pag-aaral",
@@ -130,7 +181,7 @@
     "deleteFileMessage": "Tanggalin ang \"{{name}}\"? Hindi na ito mababawi.",
     "fileDeleted": "Natanggal ang file",
     "fileRenamed": "Napalitan ang pangalan ng file",
-    "deletePartial": "{{ok}} deleted, {{failed}} failed"
+    "deletePartial": "{{ok}} nabura, {{failed}} nabigo"
   },
   "friends": {
     "title": "Mga Kaibigan",
@@ -164,7 +215,12 @@
     "sendFriendRequest": "Magpadala ng Friend Request",
     "cancelFriendRequest": "Kanselahin ang Kahilingan",
     "acceptFriendRequest": "Tanggapin ang Kahilingan",
-    "declineFriendRequest": "Tanggihan ang Kahilingan"
+    "declineFriendRequest": "Tanggihan ang Kahilingan",
+    "requestPending": "Nakabinbing Request",
+    "cancelRequest": "Kanselahin ang Request",
+    "accept": "Tanggapin",
+    "decline": "Tanggihan",
+    "theirSets": "Kanilang Sets"
   },
   "aboutUs": {
     "title": "Tungkol sa Amin",
@@ -172,7 +228,9 @@
     "missionTitle": "Aming Misyon",
     "missionBody": "Ang Verdance ay nilikha upang tulungan ang mga mananampalataya na malalim na makipag-ugnayan sa Salita ng Diyos sa pamamagitan ng mga tool sa pagsasaulo at pagsusuri sa tulong ng AI.",
     "contactTitle": "Makipag-ugnayan",
-    "contactBody": "Para sa feedback, mga kahilingan sa feature, o suporta, mangyaring makipag-ugnayan sa:"
+    "contactBody": "Para sa feedback, mga kahilingan sa feature, o suporta, mangyaring makipag-ugnayan sa:",
+    "description": "Tinutulungan ka ng Verdance na palalimin ang iyong pag-unawa sa Kasulatan sa pamamagitan ng AI-powered flashcards, spaced repetition, at collaborative study tools. Nag-aaral ka man nang mag-isa o kasama ng grupo, narito kami para gawing mas makabuluhan ang bawat session.",
+    "contactIntro": "May tanong o feedback? Kontakin kami sa"
   },
   "privacy": {
     "title": "Patakaran sa Pagkapribado",
@@ -193,8 +251,82 @@
     "sec7Body": "Para sa mga tanong tungkol sa Patakarang ito sa Pagkapribado:\nddtechservices.work@gmail.com"
   },
   "chart": {
-    "day": "Daily",
-    "week": "Weekly",
-    "month": "Monthly"
+    "day": "Araw-araw",
+    "week": "Lingguhan",
+    "month": "Buwanan"
+  },
+  "sections": {
+    "myStudy": "Aking Pag-aaral",
+    "community": "Community",
+    "account": "Account"
+  },
+  "menu": {
+    "achievements": "Achievements",
+    "myNotes": "Aking Notes",
+    "myMedia": "Aking Media",
+    "friends": "Mga Kaibigan",
+    "notifications": "Mga Abiso",
+    "editProfile": "I-edit ang Profile",
+    "myCredits": "Aking Credits",
+    "managePlan": "Pamahalaan ang Plan",
+    "upgradeToPremium": "Mag-upgrade sa Premium",
+    "changePassword": "Palitan ang Password",
+    "settings": "Settings",
+    "signOut": "Mag-sign Out",
+    "friendRequests": "Mga Friend Request",
+    "leaderboard": "Leaderboard",
+    "blockedUsers": "Mga Naka-block na User"
+  },
+  "storage": {
+    "title": "Storage",
+    "overLimit": "Lampas sa storage limit — Mag-upgrade",
+    "usage": "{{used}} MB ng {{limit}} MB"
+  },
+  "notifications": {
+    "title": "Mga Abiso",
+    "emptyTitle": "Walang Abiso",
+    "emptySubtitle": "Wala ka nang naiwang basahin!",
+    "couldNotLoadNotifications": "Hindi ma-load ang mga abiso"
+  },
+  "legal": {
+    "lastUpdated": "Huling na-update: {{date}}",
+    "privacySec1Title": "Impormasyong Kinokolekta Namin",
+    "privacySec1Body": "Kinokolekta namin ang iyong pangalan, email address, at ang content na ginagawa mo (flashcard sets, notes, at study plans) para maibigay ang aming serbisyo. Kumokolekta rin kami ng anonymous usage analytics para pagbutihin ang app.",
+    "privacySec2Title": "Paano Namin Ginagamit ang Iyong Data",
+    "privacySec2Body": "Ang iyong data ay ginagamit lamang para maihatid ang mga feature ng Verdance — pagbuo ng AI responses, pag-sync ng iyong study progress, at pagpapagana ng social features tulad ng friend leaderboards. Hindi namin kailanman ibinebenta ang iyong personal na impormasyon.",
+    "privacySec3Title": "AI Processing",
+    "privacySec3Body": "Ang teksto na ipinapadala mo sa AI chat ay pinoproseso ng third-party AI providers (OpenRouter / Anthropic Claude) para bumuo ng mga sagot. Ang media files (mga larawan, PDF) ay ipinapadala sa Anthropic Claude para sa analysis. Ang mga provider na ito ay pinapatakbo ayon sa kanilang sariling privacy policies.",
+    "privacySec4Title": "Data Storage",
+    "privacySec4Body": "Ang iyong data ay ligtas na naka-imbak sa aming mga server. Ang mga password ay naka-hash at hindi kailanman iniimbak bilang plain text. Gumagamit kami ng industry-standard encryption para sa data in transit (TLS) at at rest.",
+    "privacySec5Title": "Data Retention at Deletion",
+    "privacySec5Body": "Maaari mong burahin ang iyong account anumang oras mula sa Settings → Delete Account. Permanenteng inaalis nito ang lahat ng iyong personal na data, sets, cards, notes, at media sa loob ng 30 araw.",
+    "privacySec6Title": "Third-Party Services",
+    "privacySec6Body": "Gumagamit kami ng Apple In-App Purchase para sa mga subscription, Firebase Cloud Messaging para sa push notifications, at AI providers para sa chat features. Ang bawat serbisyo ay may sariling privacy policy na namamahala kung paano nila pinangangasiwaan ang data.",
+    "privacySec7Title": "Kontakin Kami",
+    "privacySec7Body": "Para sa mga tanong tungkol sa privacy o data requests, kontakin kami sa:\nddtechservices.work@gmail.com"
+  },
+  "leaderboard": {
+    "quotes": {
+      "rank1": {
+        "text": "Nanguguna ka — panatilihing buhay ang apoy na iyan! 🔥",
+        "sub": "Sa iyo ang korona. Ingatan mo."
+      },
+      "rank3": {
+        "text": "Napakalapit na sa tuktok — isang tapat na araw ang kailangan.",
+        "sub": "Ituloy mo, malapit na ang wakas."
+      },
+      "rank10": {
+        "text": "Ang pagiging matatag ang iyong superpower. Patuloy na sumipot.",
+        "sub": "Maliliit na hakbang ang bumubuo ng malalakas na gawi."
+      },
+      "rankOther": {
+        "text": "Ang bawat dakilang paglalakbay ay nagsisimula sa isang hakbang.",
+        "sub": "Ang streak ngayon ay legacy bukas."
+      },
+      "rankZero": {
+        "text": "Ang bawat dakilang paglalakbay ay nagsisimula sa isang hakbang.",
+        "sub": "Simulan ang iyong streak ngayon."
+      }
+    }
   }
 }

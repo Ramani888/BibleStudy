@@ -5,5 +5,18 @@
     "study": "Pagsusulit",
     "ai": "AI",
     "profile": "Profile"
+  },
+  "headers": {
+    "home": "Verdance",
+    "library": "Library",
+    "study": "Pag-aaral",
+    "aiChat": "AI Assistant",
+    "profile": "Profile",
+    "settings": "Settings",
+    "credits": "Credits",
+    "notes": "Notes",
+    "media": "Media",
+    "quiz": "Quiz",
+    "notifications": "Mga Abiso"
   }
 }

@@ -115,17 +115,26 @@
     "creditsUsed": "{{count}} créditos usados"
   },
   "attach": {
-    "mediaCost": "Media costs 3–5 credits",
-    "upgrade": "Upgrade to Premium",
-    "chooseMyMedia": "Choose from My Media",
-    "photoLibrary": "Photo Library",
-    "takePhoto": "Take Photo",
-    "choosePdf": "Choose PDF",
-    "noFiles": "No files in My Media"
+    "mediaCost": "Los archivos cuestan de 3 a 5 créditos",
+    "upgrade": "Cambia a Premium",
+    "chooseMyMedia": "Elegir de Mis archivos",
+    "photoLibrary": "Fototeca",
+    "takePhoto": "Tomar foto",
+    "choosePdf": "Elegir PDF",
+    "noFiles": "No hay archivos en Mis archivos"
   },
   "export": {
-    "header": "AI Bible Study — {{date}}",
-    "you": "You",
-    "ai": "AI"
+    "header": "Estudio bíblico con IA — {{date}}",
+    "you": "Tú",
+    "ai": "IA"
+  },
+  "tags": {
+    "theology": "Teología",
+    "oldTestament": "Antiguo Testamento",
+    "newTestament": "Nuevo Testamento",
+    "prayer": "Oración",
+    "history": "Historia",
+    "devotional": "Devocional",
+    "prophecy": "Profecía"
   }
 }

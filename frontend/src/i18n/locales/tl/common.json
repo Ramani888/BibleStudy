@@ -23,8 +23,19 @@
     "markAllRead": "Markahan lahat bilang nabasa",
     "searchPlaceholder": "Maghanap…",
     "clearSearch": "I-clear ang paghahanap",
-    "moreOptions": "More options",
-    "goBack": "Go back"
+    "moreOptions": "Higit pang opsyon",
+    "goBack": "Bumalik",
+    "doneCount": "Tapos na — {{count}} sets",
+    "copy": "Kopyahin",
+    "upgrade": "Mag-upgrade",
+    "viewAll": "Tingnan Lahat",
+    "seeMore": "Tingnan Pa",
+    "filter": "I-filter",
+    "clear": "I-clear",
+    "clearAll": "I-clear Lahat",
+    "select": "Pumili",
+    "apply": "Ilapat",
+    "remove": "Alisin"
   },
   "status": {
     "loading": "Naglo-load...",
@@ -32,7 +43,7 @@
     "sending": "Ipinapadala...",
     "generating": "Bumubuo...",
     "success": "Tagumpay",
-    "error": "Oops!",
+    "error": "Naku!",
     "noResults": "Walang resulta",
     "noMatchFor": "Walang resulta para sa \"{{query}}\"",
     "empty": "Wala pa rito",
@@ -40,7 +51,8 @@
     "copiedToClipboard": "Nakopya sa clipboard",
     "selected": "Napili",
     "couldNotDelete": "Hindi maalis",
-    "unknownError": "Hindi kilalang error"
+    "unknownError": "Hindi kilalang error",
+    "uploading": "Ina-upload..."
   },
   "filter": {
     "all": "Lahat"
@@ -58,6 +70,14 @@
     "minAgo": "{{count}}m ang nakalipas",
     "hoursAgo": "{{count}}h ang nakalipas",
     "at": "nang",
-    "earlier": "Mas maaga"
+    "earlier": "Mas maaga",
+    "justNow": "ngayon lang",
+    "minsAgo": "{{count}}m nakalipas",
+    "daysAgoShort": "{{count}}d nakalipas"
+  },
+  "notification": "Abiso",
+  "validation": {
+    "max200": "Hanggang 200 character lang",
+    "max100": "Hanggang 100 character lang"
   }
 }

@@ -8,7 +8,22 @@
     "noActivitySub": "Completa un cuestionario para ver tu historial de estudio aquí.",
     "selectSet": "Seleccionar un Set de Estudio",
     "selectMode": "Elegir Modo de Cuestionario",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "{{count}} sets",
+    "practiceMode": "Modo práctica",
+    "practiceDescription": "Estudia a tu ritmo, sin la presión del tiempo",
+    "timedMode": "Reto cronometrado",
+    "timedDescription": "Suma puntos contra el reloj",
+    "masteryMode": "Modo dominio",
+    "masteryDescription": "Prueba inteligente de repetición espaciada para las tarjetas que necesitas repasar",
+    "searchPlaceholder": "Buscar cuestionarios…",
+    "noQuizzesYet": "Aún no hay cuestionarios",
+    "noQuizzesSub": "Haz tu primer cuestionario arriba para seguir tu progreso de estudio.",
+    "noMatch": "No se encontraron cuestionarios",
+    "itemActions": "Acciones del cuestionario",
+    "viewDetails": "Ver detalles",
+    "viewSummary": "Ver resumen",
+    "reQuiz": "Repetir cuestionario",
+    "deleteAttempt": "Eliminar intento"
   },
   "setup": {
     "title": "Configuración del Cuestionario",
@@ -33,7 +48,32 @@
     "chooseSet": "Elegir Set para Cuestionario",
     "allDone": "¡Todo listo!",
     "noSetsToQuiz": "No hay sets disponibles para cuestionario.",
-    "createSetFirst": "Crea un set con al menos 1 tarjeta primero."
+    "createSetFirst": "Crea un set con al menos 1 tarjeta primero.",
+    "quizNamePlaceholder": "Nombre del cuestionario (opcional)",
+    "selectSets": "Seleccionar sets",
+    "startQuiz": "Empezar cuestionario",
+    "selectMode": "Seleccionar modo",
+    "chooseSets": "Elegir sets",
+    "chooseSetsLabel": "Toca para elegir sets",
+    "allSets": "Todos los sets ({{count}})",
+    "noSets": "No hay sets disponibles",
+    "noSetsSub": "Crea algunos sets de estudio antes de hacer un cuestionario.",
+    "startQuizBtn": "Empezar cuestionario",
+    "selectSetsCount": "Seleccionar sets ({{count}} seleccionados)",
+    "modeDesc": {
+      "mix": "Mezcla aleatoria de todos los tipos disponibles",
+      "mc": "Elige la respuesta correcta entre 4 opciones",
+      "story_mc": "Relaciona la referencia con el pasaje correcto",
+      "type_answer": "Escribe la respuesta de memoria",
+      "type_verbatim": "Escribe el pasaje completo, palabra por palabra",
+      "blanks": "Completa las palabras que faltan",
+      "chunks": "Ordena los fragmentos del pasaje",
+      "read": "Lee y memoriza — sin puntuación"
+    },
+    "sort": {
+      "newest": "Recientes",
+      "cards": "Tarjetas"
+    }
   },
   "hud": {
     "questionOf": "Pregunta {{current}} de {{total}}",
@@ -78,7 +118,12 @@
     "correctAnswer": "Respuesta Correcta:",
     "noIncorrect": "¡Sin respuestas incorrectas! ¡Trabajo perfecto!",
     "noCorrect": "Aún no hay respuestas correctas.",
-    "done": "Listo"
+    "done": "Listo",
+    "all": "Todas",
+    "correct": "Correctas",
+    "incorrect": "Incorrectas",
+    "noQuestions": "Ninguna pregunta coincide con este filtro.",
+    "readMode": "(lectura)"
   },
   "detail": {
     "headerTitle": "Historial del Cuestionario",
@@ -86,40 +131,84 @@
     "practiced": "Practicado {{count}} vez",
     "practiced_other": "Practicado {{count}} veces",
     "lastPracticed": "Última práctica {{date}}",
-    "correctCount": "{{correct}} / {{total}} correct",
+    "correctCount": "{{correct}} / {{total}} correctas",
     "setsCount": "{{count}} sets",
-    "viewSummary": "View summary"
+    "viewSummary": "Ver resumen",
+    "title": "Intento de cuestionario",
+    "deleteTitle": "Eliminar cuestionario",
+    "deleteMessage": "¿Quitar este intento de tu historial?",
+    "retake": "Repetir cuestionario",
+    "timeSpent": "Tiempo empleado"
   },
   "modesSheet": {
     "chooseMode": "Elegir Modo de Estudio",
     "startMode": "Iniciar Modo {{mode}}"
   },
   "modes": {
-    "mc": "Multiple choice",
-    "story_mc": "Match the verse",
-    "type_answer": "Type the answer",
-    "type_verbatim": "Type it out",
-    "blanks": "Fill in the blanks",
-    "chunks": "Order the chunks",
-    "read": "Read & memorize"
+    "mc": "Opción múltiple",
+    "story_mc": "Relaciona el versículo",
+    "type_answer": "Escribe la respuesta",
+    "type_verbatim": "Escríbelo completo",
+    "blanks": "Completa los espacios",
+    "chunks": "Ordena los fragmentos",
+    "read": "Lee y memoriza",
+    "mixMode": "Modo mixto",
+    "mixDesc": "Combina varios formatos de pregunta en un solo cuestionario."
   },
   "modeNames": {
-    "mix": "Mix",
-    "mc": "Multiple Choice",
-    "story_mc": "Story MC",
-    "type_answer": "Type Answer",
-    "type_verbatim": "Type Verbatim",
-    "blanks": "Fill Blanks",
-    "chunks": "Reorder",
-    "read": "Read"
+    "mix": "Mixto",
+    "mc": "Opción múltiple",
+    "story_mc": "OM de pasaje",
+    "type_answer": "Escribir respuesta",
+    "type_verbatim": "Escribir literal",
+    "blanks": "Completar espacios",
+    "chunks": "Reordenar",
+    "read": "Leer"
   },
   "modeHeaders": {
-    "mc": "QUESTION",
-    "story_mc": "MATCH THE VERSE",
-    "type_answer": "QUESTION",
-    "type_verbatim": "TYPE THE PASSAGE",
-    "blanks": "FILL THE BLANKS",
-    "chunks": "PUT IN ORDER",
-    "read": "TAP TO REVEAL"
+    "mc": "PREGUNTA",
+    "story_mc": "RELACIONA EL VERSÍCULO",
+    "type_answer": "PREGUNTA",
+    "type_verbatim": "ESCRIBE EL PASAJE",
+    "blanks": "COMPLETA LOS ESPACIOS",
+    "chunks": "PONLOS EN ORDEN",
+    "read": "TOCA PARA REVELAR"
+  },
+  "inQuiz": {
+    "questionCount": "Pregunta {{current}} de {{total}}",
+    "revealAnswer": "Revelar respuesta",
+    "nextQuestion": "Siguiente pregunta",
+    "correct": "¡Correcto!",
+    "incorrect": "Sigue practicando",
+    "yourAnswer": "Tu respuesta",
+    "correctAnswer": "Respuesta correcta",
+    "quitDialogTitle": "¿Salir del cuestionario?",
+    "quitDialogMessage": "Perderás tu progreso en este cuestionario."
+  },
+  "results": {
+    "title": "¡Cuestionario completado!",
+    "quizComplete": "¡Cuestionario completado!",
+    "score": "Puntuación",
+    "scoreFraction": "{{correct}} / {{total}} correctas",
+    "accuracy": "Precisión",
+    "timeTaken": "Tiempo empleado",
+    "reviewQuestions": "Repasar",
+    "tryAgain": "Intentar de nuevo",
+    "backToHub": "Volver al centro de cuestionarios",
+    "newBest": "¡Nuevo récord!",
+    "bestScore": "Mejor: {{score}}%",
+    "saveFailed": "Error al guardar: {{message}}",
+    "perfectScore": "¡Impresionante! ¡Puntuación perfecta!",
+    "goodJob": "¡Buen trabajo! Sigue con tu estudio fiel.",
+    "needsPractice": "¡Buen esfuerzo! Repasa las tarjetas que fallaste para dominarlas."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "Escribe tu respuesta…"
+  },
+  "prompts": {
+    "thisPassage": "este pasaje",
+    "whichPassage": "¿Qué pasaje es {{ref}}?",
+    "typeRef": "Escribe {{ref}}",
+    "typePassage": "Escribe el pasaje"
   }
 }

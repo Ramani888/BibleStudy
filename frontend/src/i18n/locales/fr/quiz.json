@@ -8,7 +8,22 @@
     "noActivitySub": "Complétez un quiz pour voir votre historique d'étude ici.",
     "selectSet": "Sélectionner une Série d'Étude",
     "selectMode": "Choisir le Mode de Quiz",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "{{count}} ensembles",
+    "practiceMode": "Mode entraînement",
+    "practiceDescription": "Étudiez à votre rythme, sans pression du chrono",
+    "timedMode": "Défi chronométré",
+    "timedDescription": "Marquez des points contre la montre",
+    "masteryMode": "Mode maîtrise",
+    "masteryDescription": "Test intelligent en répétition espacée pour les cartes à réviser",
+    "searchPlaceholder": "Rechercher des quiz…",
+    "noQuizzesYet": "Aucun quiz pour l'instant",
+    "noQuizzesSub": "Faites votre premier quiz ci-dessus pour suivre votre progression.",
+    "noMatch": "Aucun quiz trouvé",
+    "itemActions": "Actions du quiz",
+    "viewDetails": "Voir les détails",
+    "viewSummary": "Voir le récapitulatif",
+    "reQuiz": "Refaire le quiz",
+    "deleteAttempt": "Supprimer la tentative"
   },
   "setup": {
     "title": "Configuration du Quiz",
@@ -33,7 +48,32 @@
     "chooseSet": "Choisir une Série pour le Quiz",
     "allDone": "Tout est prêt !",
     "noSetsToQuiz": "Aucune série disponible pour le quiz.",
-    "createSetFirst": "Créez d'abord une série avec au moins 1 carte."
+    "createSetFirst": "Créez d'abord une série avec au moins 1 carte.",
+    "quizNamePlaceholder": "Nom du quiz (facultatif)",
+    "selectSets": "Sélectionner des ensembles",
+    "startQuiz": "Démarrer le quiz",
+    "selectMode": "Sélectionner un mode",
+    "chooseSets": "Choisir des ensembles",
+    "chooseSetsLabel": "Touchez pour choisir des ensembles",
+    "allSets": "Tous les ensembles ({{count}})",
+    "noSets": "Aucun ensemble disponible",
+    "noSetsSub": "Créez d'abord des ensembles d'étude avant de faire un quiz.",
+    "startQuizBtn": "Démarrer le quiz",
+    "selectSetsCount": "Sélectionner des ensembles ({{count}} sélectionnés)",
+    "modeDesc": {
+      "mix": "Mélange aléatoire de tous les types disponibles",
+      "mc": "Choisissez la bonne réponse parmi 4 options",
+      "story_mc": "Associez la référence au bon passage",
+      "type_answer": "Tapez la réponse de mémoire",
+      "type_verbatim": "Tapez le passage entier mot pour mot",
+      "blanks": "Remplissez les mots manquants",
+      "chunks": "Remettez les fragments du passage dans l'ordre",
+      "read": "Lire et mémoriser — sans score"
+    },
+    "sort": {
+      "newest": "Récent",
+      "cards": "Cartes"
+    }
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",
@@ -78,7 +118,12 @@
     "correctAnswer": "Bonne Réponse :",
     "noIncorrect": "Aucune mauvaise réponse ! Travail parfait !",
     "noCorrect": "Aucune réponse correcte pour le moment.",
-    "done": "Terminé"
+    "done": "Terminé",
+    "all": "Toutes",
+    "correct": "Correctes",
+    "incorrect": "Incorrectes",
+    "noQuestions": "Aucune question ne correspond à ce filtre.",
+    "readMode": "(lecture)"
   },
   "detail": {
     "headerTitle": "Historique du Quiz",
@@ -86,40 +131,84 @@
     "practiced": "Pratiqué {{count}} fois",
     "practiced_other": "Pratiqué {{count}} fois",
     "lastPracticed": "Dernière pratique le {{date}}",
-    "correctCount": "{{correct}} / {{total}} correct",
-    "setsCount": "{{count}} sets",
-    "viewSummary": "View summary"
+    "correctCount": "{{correct}} / {{total}} correctes",
+    "setsCount": "{{count}} ensembles",
+    "viewSummary": "Voir le récapitulatif",
+    "title": "Tentative de quiz",
+    "deleteTitle": "Supprimer le quiz",
+    "deleteMessage": "Retirer cette tentative de votre historique ?",
+    "retake": "Refaire le quiz",
+    "timeSpent": "Temps passé"
   },
   "modesSheet": {
     "chooseMode": "Choisir le Mode d'Étude",
     "startMode": "Démarrer le Mode {{mode}}"
   },
   "modes": {
-    "mc": "Multiple choice",
-    "story_mc": "Match the verse",
-    "type_answer": "Type the answer",
-    "type_verbatim": "Type it out",
-    "blanks": "Fill in the blanks",
-    "chunks": "Order the chunks",
-    "read": "Read & memorize"
+    "mc": "Choix multiple",
+    "story_mc": "Associer le verset",
+    "type_answer": "Taper la réponse",
+    "type_verbatim": "Taper le texte",
+    "blanks": "Remplir les blancs",
+    "chunks": "Ordonner les fragments",
+    "read": "Lire et mémoriser",
+    "mixMode": "Mode mixte",
+    "mixDesc": "Combine plusieurs formats de questions dans un seul quiz."
   },
   "modeNames": {
-    "mix": "Mix",
-    "mc": "Multiple Choice",
-    "story_mc": "Story MC",
-    "type_answer": "Type Answer",
-    "type_verbatim": "Type Verbatim",
-    "blanks": "Fill Blanks",
-    "chunks": "Reorder",
-    "read": "Read"
+    "mix": "Mixte",
+    "mc": "Choix multiple",
+    "story_mc": "QCM récit",
+    "type_answer": "Taper la réponse",
+    "type_verbatim": "Taper mot pour mot",
+    "blanks": "Remplir les blancs",
+    "chunks": "Réordonner",
+    "read": "Lire"
   },
   "modeHeaders": {
     "mc": "QUESTION",
-    "story_mc": "MATCH THE VERSE",
+    "story_mc": "ASSOCIEZ LE VERSET",
     "type_answer": "QUESTION",
-    "type_verbatim": "TYPE THE PASSAGE",
-    "blanks": "FILL THE BLANKS",
-    "chunks": "PUT IN ORDER",
-    "read": "TAP TO REVEAL"
+    "type_verbatim": "TAPEZ LE PASSAGE",
+    "blanks": "REMPLISSEZ LES BLANCS",
+    "chunks": "METTEZ DANS L'ORDRE",
+    "read": "TOUCHEZ POUR RÉVÉLER"
+  },
+  "inQuiz": {
+    "questionCount": "Question {{current}} sur {{total}}",
+    "revealAnswer": "Révéler la réponse",
+    "nextQuestion": "Question suivante",
+    "correct": "Correct !",
+    "incorrect": "Continuez à vous entraîner",
+    "yourAnswer": "Votre réponse",
+    "correctAnswer": "Bonne réponse",
+    "quitDialogTitle": "Quitter le quiz ?",
+    "quitDialogMessage": "Votre progression dans ce quiz sera perdue."
+  },
+  "results": {
+    "title": "Quiz terminé !",
+    "quizComplete": "Quiz terminé !",
+    "score": "Score",
+    "scoreFraction": "{{correct}} / {{total}} correctes",
+    "accuracy": "Précision",
+    "timeTaken": "Temps écoulé",
+    "reviewQuestions": "Réviser",
+    "tryAgain": "Réessayer",
+    "backToHub": "Retour à l'espace quiz",
+    "newBest": "Nouveau record !",
+    "bestScore": "Record : {{score}} %",
+    "saveFailed": "Échec de l'enregistrement : {{message}}",
+    "perfectScore": "Remarquable ! Score parfait !",
+    "goodJob": "Bravo ! Poursuivez votre étude fidèle.",
+    "needsPractice": "Bel effort ! Révisez les cartes manquées pour les maîtriser."
+  },
+  "item": {
+    "typeAnswerPlaceholder": "Tapez votre réponse…"
+  },
+  "prompts": {
+    "thisPassage": "ce passage",
+    "whichPassage": "Quel passage est {{ref}} ?",
+    "typeRef": "Tapez {{ref}}",
+    "typePassage": "Tapez le passage"
   }
 }

@@ -11,14 +11,20 @@
     "cardsLearned": "학습 완료한 카드",
     "streakDays": "연속 학습일",
     "totalSets": "전체 세트",
-    "cardsCount": "{{count}}개 카드"
+    "cardsCount": "{{count}}개 카드",
+    "sets": "세트",
+    "folders": "폴더",
+    "notes": "노트",
+    "cards": "카드",
+    "credits": "크레딧"
   },
   "dailyVerse": {
     "title": "오늘의 말씀",
     "reflection": "말씀 묵상",
     "share": "말씀 공유하기",
     "createCard": "이 말씀으로 카드 만들기",
-    "copied": "말씀이 클립보드에 복사되었습니다"
+    "copied": "말씀이 클립보드에 복사되었습니다",
+    "saveAsCard": "플래시카드로 저장"
   },
   "recentSets": {
     "title": "학습 이어하기",
@@ -36,28 +42,60 @@
     "askAI": "AI에게 질문",
     "quickQuiz": "빠른 퀴즈",
     "dailyVerse": "오늘의 말씀",
-    "createSet": "Create Set",
-    "studyPlans": "Study Plans",
-    "achievements": "Achievements",
-    "leaderboard": "Leaderboard",
-    "notes": "Notes",
-    "media": "Media",
-    "discover": "Discover",
-    "friends": "Friends"
+    "createSet": "세트 만들기",
+    "studyPlans": "학습 계획",
+    "achievements": "업적",
+    "leaderboard": "순위표",
+    "notes": "노트",
+    "media": "미디어",
+    "discover": "둘러보기",
+    "friends": "친구",
+    "search": "검색",
+    "library": "라이브러리"
   },
   "a11y": {
-    "goToProfile": "Go to profile",
-    "aiChat": "AI Chat",
-    "notifications": "Notifications",
-    "openSet": "Open {{title}}"
+    "goToProfile": "프로필로 이동",
+    "aiChat": "AI 채팅",
+    "notifications": "알림",
+    "openSet": "{{title}} 열기"
   },
   "activity": {
-    "unknownUser": "Someone",
-    "addedFriend": "{{name}} added a new friend",
-    "createdSet": "{{name}} created a new set",
-    "createdCard": "{{name}} created a new card",
-    "studiedCards": "{{name}} studied some cards",
-    "wroteNote": "{{name}} wrote a note",
-    "wasActive": "{{name}} was active"
+    "unknownUser": "누군가",
+    "addedFriend": "{{name}}님이 새 친구를 추가했습니다",
+    "createdSet": "{{name}}님이 새 세트를 만들었습니다",
+    "createdCard": "{{name}}님이 새 카드를 만들었습니다",
+    "studiedCards": "{{name}}님이 카드를 공부했습니다",
+    "wroteNote": "{{name}}님이 노트를 작성했습니다",
+    "wasActive": "{{name}}님이 활동했습니다"
+  },
+  "featured": {
+    "due": "복습 필요",
+    "continue": "이어서 하기",
+    "start": "시작",
+    "createFirstSet": "첫 번째 학습 세트를 만들어 보세요",
+    "beginJourney": "여정을 시작하세요",
+    "streakGoal": "{{streak}}일 연속 · 주간 목표 {{goal}}/7",
+    "cardsToReview": "복습할 카드 {{count}}장",
+    "cardsToReview_other": "복습할 카드 {{count}}장"
+  },
+  "streak": {
+    "day": "{{count}}일 연속",
+    "days": "{{count}}일 연속",
+    "keepGoing": "이 좋은 흐름을 계속 이어가세요!",
+    "streakLost": "연속 기록을 유지하려면 오늘 공부하세요"
+  },
+  "sections": {
+    "recentSets": "최근 세트",
+    "seeAll": "전체 보기",
+    "friendsSets": "친구의 세트",
+    "communitySets": "커뮤니티 세트",
+    "friendActivity": "친구 활동",
+    "quickStats": "간단 통계"
+  },
+  "empty": {
+    "noRecentSets": "아직 최근 학습 세트가 없습니다",
+    "noFriendsSets": "아직 친구의 공개 세트가 없습니다",
+    "noCommunitySets": "커뮤니티 학습 세트를 둘러보세요",
+    "noActivity": "최근 친구 활동이 없습니다"
   }
 }

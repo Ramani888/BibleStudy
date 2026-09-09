@@ -115,17 +115,26 @@
     "creditsUsed": "{{count}} 크레딧 사용됨"
   },
   "attach": {
-    "mediaCost": "Media costs 3–5 credits",
-    "upgrade": "Upgrade to Premium",
-    "chooseMyMedia": "Choose from My Media",
-    "photoLibrary": "Photo Library",
-    "takePhoto": "Take Photo",
-    "choosePdf": "Choose PDF",
-    "noFiles": "No files in My Media"
+    "mediaCost": "미디어는 3~5 크레딧이 필요합니다",
+    "upgrade": "프리미엄으로 업그레이드",
+    "chooseMyMedia": "내 미디어에서 선택",
+    "photoLibrary": "사진 보관함",
+    "takePhoto": "사진 촬영",
+    "choosePdf": "PDF 선택",
+    "noFiles": "내 미디어에 파일이 없습니다"
   },
   "export": {
-    "header": "AI Bible Study — {{date}}",
-    "you": "You",
+    "header": "AI 성경 공부 — {{date}}",
+    "you": "나",
     "ai": "AI"
+  },
+  "tags": {
+    "theology": "신학",
+    "oldTestament": "구약",
+    "newTestament": "신약",
+    "prayer": "기도",
+    "history": "역사",
+    "devotional": "묵상",
+    "prophecy": "예언"
   }
 }

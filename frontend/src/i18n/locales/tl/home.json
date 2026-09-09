@@ -11,14 +11,20 @@
     "cardsLearned": "Mga card na natutunan",
     "streakDays": "Mga araw ng streak",
     "totalSets": "Kabuuang set",
-    "cardsCount": "{{count}} card"
+    "cardsCount": "{{count}} card",
+    "sets": "Sets",
+    "folders": "Folders",
+    "notes": "Notes",
+    "cards": "Cards",
+    "credits": "Credits"
   },
   "dailyVerse": {
     "title": "Talata ng Araw",
     "reflection": "Pang-araw-araw na pagninilay",
     "share": "Ibahagi ang talata",
     "createCard": "Gumawa ng card mula sa talatang ito",
-    "copied": "Nakopya ang talata sa clipboard"
+    "copied": "Nakopya ang talata sa clipboard",
+    "saveAsCard": "I-save bilang Flashcard"
   },
   "recentSets": {
     "title": "Ipagpatuloy ang Pag-aaral",
@@ -36,28 +42,60 @@
     "askAI": "Magtanong sa AI",
     "quickQuiz": "Mabilisang Pagsusulit",
     "dailyVerse": "Pang-araw-araw na Talata",
-    "createSet": "Create Set",
+    "createSet": "Gumawa ng Set",
     "studyPlans": "Study Plans",
     "achievements": "Achievements",
     "leaderboard": "Leaderboard",
     "notes": "Notes",
     "media": "Media",
-    "discover": "Discover",
-    "friends": "Friends"
+    "discover": "Tuklasin",
+    "friends": "Mga Kaibigan",
+    "search": "Hanapin",
+    "library": "Library"
   },
   "a11y": {
-    "goToProfile": "Go to profile",
+    "goToProfile": "Pumunta sa profile",
     "aiChat": "AI Chat",
-    "notifications": "Notifications",
-    "openSet": "Open {{title}}"
+    "notifications": "Mga Abiso",
+    "openSet": "Buksan ang {{title}}"
   },
   "activity": {
-    "unknownUser": "Someone",
-    "addedFriend": "{{name}} added a new friend",
-    "createdSet": "{{name}} created a new set",
-    "createdCard": "{{name}} created a new card",
-    "studiedCards": "{{name}} studied some cards",
-    "wroteNote": "{{name}} wrote a note",
-    "wasActive": "{{name}} was active"
+    "unknownUser": "May isang tao",
+    "addedFriend": "Nagdagdag si {{name}} ng bagong kaibigan",
+    "createdSet": "Gumawa si {{name}} ng bagong set",
+    "createdCard": "Gumawa si {{name}} ng bagong card",
+    "studiedCards": "Nag-aral si {{name}} ng ilang card",
+    "wroteNote": "Sumulat si {{name}} ng note",
+    "wasActive": "Aktibo si {{name}}"
+  },
+  "featured": {
+    "due": "DAPAT NANG ARALIN",
+    "continue": "IPAGPATULOY",
+    "start": "SIMULAN",
+    "createFirstSet": "Gawin ang iyong unang study set",
+    "beginJourney": "Simulan ang iyong paglalakbay",
+    "streakGoal": "{{streak}} araw na streak · lingguhang layunin {{goal}}/7",
+    "cardsToReview": "{{count}} card na aaralin",
+    "cardsToReview_other": "{{count}} card na aaralin"
+  },
+  "streak": {
+    "day": "{{count}} Araw na Streak",
+    "days": "{{count}} Araw na Streak",
+    "keepGoing": "Ipagpatuloy ang magandang gawa!",
+    "streakLost": "Mag-aral ngayon para mapanatili ang streak mo"
+  },
+  "sections": {
+    "recentSets": "Kamakailang Sets",
+    "seeAll": "Tingnan Lahat",
+    "friendsSets": "Sets ng Mga Kaibigan",
+    "communitySets": "Community Sets",
+    "friendActivity": "Aktibidad ng Kaibigan",
+    "quickStats": "Mabilisang Stats"
+  },
+  "empty": {
+    "noRecentSets": "Wala pang kamakailang study set",
+    "noFriendsSets": "Wala pang public set mula sa mga kaibigan",
+    "noCommunitySets": "Tuklasin ang community study sets",
+    "noActivity": "Walang kamakailang aktibidad ng kaibigan"
   }
 }
