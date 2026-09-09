@@ -95,7 +95,7 @@ export function QuizDetailScreen() {
                   })}
                   hitSlop={12}
                   accessibilityRole="button"
-                  accessibilityLabel="View summary"
+                  accessibilityLabel={t('quiz:detail.viewSummary', 'View summary')}
                 >
                   <ListIcon size={20} color={colors.textSecondary} />
                 </Pressable>
@@ -133,7 +133,7 @@ export function QuizDetailScreen() {
             <View style={styles.correctRow}>
               <CheckCircleIcon size={14} color={colors.textSecondary} />
               <Typography preset="caption" color={colors.textSecondary}>
-                {correct} / {total} correct
+                {t('quiz:detail.correctCount', { correct, total })}
               </Typography>
             </View>
           )}
@@ -146,7 +146,7 @@ export function QuizDetailScreen() {
           </View>
           {setIds.length > 1 && (
             <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-              <Typography preset="caption" color={colors.textSecondary}>{setIds.length} sets</Typography>
+              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.setsCount', { count: setIds.length })}</Typography>
             </View>
           )}
         </View>

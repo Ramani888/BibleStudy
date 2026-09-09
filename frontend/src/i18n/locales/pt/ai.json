@@ -113,5 +113,19 @@
     "questionsCount": "{{count}} pergunta",
     "questionsCount_other": "{{count}} perguntas",
     "creditsUsed": "{{count}} créditos usados"
+  },
+  "attach": {
+    "mediaCost": "Media costs 3–5 credits",
+    "upgrade": "Upgrade to Premium",
+    "chooseMyMedia": "Choose from My Media",
+    "photoLibrary": "Photo Library",
+    "takePhoto": "Take Photo",
+    "choosePdf": "Choose PDF",
+    "noFiles": "No files in My Media"
+  },
+  "export": {
+    "header": "AI Bible Study — {{date}}",
+    "you": "You",
+    "ai": "AI"
   }
 }

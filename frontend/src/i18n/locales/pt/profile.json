@@ -3,7 +3,14 @@
   "editProfile": "Editar Perfil",
   "changePassword": "Alterar Senha",
   "myCredits": "Meus Créditos",
-  "credits": "Créditos",
+  "credits": {
+    "types": {
+      "usage": "Used",
+      "reward": "Reward",
+      "purchase": "Purchase",
+      "bonus": "Bonus"
+    }
+  },
   "streak": "Sequência de Estudo",
   "streakCount": "Sequência de {{count}} dias",
   "streakCount_one": "Sequência de 1 dia",
@@ -122,7 +129,8 @@
     "deleteFileTitle": "Excluir {{type}}",
     "deleteFileMessage": "Excluir \"{{name}}\"? Isso não pode ser desfeito.",
     "fileDeleted": "Arquivo excluído",
-    "fileRenamed": "Arquivo renomeado"
+    "fileRenamed": "Arquivo renomeado",
+    "deletePartial": "{{ok}} deleted, {{failed}} failed"
   },
   "friends": {
     "title": "Amigos",
@@ -183,5 +191,10 @@
     "sec6Body": "Nossos serviços não são direcionados a crianças menores de 13 anos.",
     "sec7Title": "Contato",
     "sec7Body": "Para dúvidas sobre esta Política de Privacidade, entre em contato em:\nddtechservices.work@gmail.com"
+  },
+  "chart": {
+    "day": "Daily",
+    "week": "Weekly",
+    "month": "Monthly"
   }
 }

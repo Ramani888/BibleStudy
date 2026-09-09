@@ -21,7 +21,9 @@
     "confirm": "Confirmar",
     "learnMore": "Más información",
     "searchPlaceholder": "Buscar…",
-    "clearSearch": "Borrar búsqueda"
+    "clearSearch": "Borrar búsqueda",
+    "moreOptions": "More options",
+    "goBack": "Go back"
   },
   "status": {
     "loading": "Cargando...",

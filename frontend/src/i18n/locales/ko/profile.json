@@ -3,7 +3,14 @@
   "editProfile": "프로필 수정",
   "changePassword": "비밀번호 변경",
   "myCredits": "내 크레딧",
-  "credits": "크레딧",
+  "credits": {
+    "types": {
+      "usage": "Used",
+      "reward": "Reward",
+      "purchase": "Purchase",
+      "bonus": "Bonus"
+    }
+  },
   "streak": "학습 연속 기록",
   "streakCount": "{{count}}일 연속",
   "streakCount_one": "1일 연속",
@@ -122,7 +129,8 @@
     "deleteFileTitle": "{{type}} 삭제",
     "deleteFileMessage": "\"{{name}}\"을(를) 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
     "fileDeleted": "파일이 삭제되었습니다",
-    "fileRenamed": "파일 이름이 변경되었습니다"
+    "fileRenamed": "파일 이름이 변경되었습니다",
+    "deletePartial": "{{ok}} deleted, {{failed}} failed"
   },
   "friends": {
     "title": "친구",
@@ -183,5 +191,10 @@
     "sec6Body": "본 서비스는 만 14세 미만 아동을 대상으로 하지 않습니다.",
     "sec7Title": "문의하기",
     "sec7Body": "개인정보 처리방침에 관한 문의:\nddtechservices.work@gmail.com"
+  },
+  "chart": {
+    "day": "Daily",
+    "week": "Weekly",
+    "month": "Monthly"
   }
 }

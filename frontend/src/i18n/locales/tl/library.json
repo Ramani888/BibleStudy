@@ -32,7 +32,16 @@
     "setCreated": "Nalikha na ang set!",
     "setUpdated": "Na-update na ang set!",
     "setDeleted": "Natanggal ang set",
-    "setRemoved": "Naalis ang set"
+    "setRemoved": "Naalis ang set",
+    "visibilityPRIVATE": "Private",
+    "visibilityPUBLIC": "Public",
+    "visibilityFRIENDS": "Friends",
+    "visibilityDescPRIVATE": "Only you",
+    "visibilityDescPUBLIC": "Everyone",
+    "visibilityDescFRIENDS": "Shared link",
+    "layoutDEFAULT": "Default",
+    "layoutMINIMAL": "Minimal",
+    "layoutDETAILED": "Detailed"
   },
   "folders": {
     "title": "Mga Folder",
@@ -112,7 +121,17 @@
     "missingWords": "Nakatagong mga Salita",
     "missingWordsPlaceholder": "Mga salitang itatago (paghiwalayin ng kuwit)",
     "cardPreviewFront": "Harap (tanong)",
-    "cardPreviewBack": "Likod (sagot)"
+    "cardPreviewBack": "Likod (sagot)",
+    "questionLabel": "Question",
+    "answerLabel": "Answer",
+    "hintButton": "Add Hint",
+    "hintLabel": "Hint (optional)",
+    "referenceLabel": "Reference (optional)",
+    "referencePlaceholder": "e.g. John 3:16",
+    "textLabel": "Text",
+    "noteButton": "Add Note",
+    "noteLabel": "Note (optional)",
+    "cardNotFound": "Card not found"
   },
   "plans": {
     "title": "Mga Plano sa Pag-aaral",

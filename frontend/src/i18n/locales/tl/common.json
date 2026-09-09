@@ -22,7 +22,9 @@
     "learnMore": "Matuto pa",
     "markAllRead": "Markahan lahat bilang nabasa",
     "searchPlaceholder": "Maghanap…",
-    "clearSearch": "I-clear ang paghahanap"
+    "clearSearch": "I-clear ang paghahanap",
+    "moreOptions": "More options",
+    "goBack": "Go back"
   },
   "status": {
     "loading": "Naglo-load...",

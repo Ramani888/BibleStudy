@@ -113,15 +113,15 @@ export function QuizHubScreen() {
 
         <View style={styles.rowText}>
           <Typography preset="h4" color={colors.textPrimary} numberOfLines={1}>
-            {item.quizName ?? (item.setIds.length > 1 ? `${item.setIds.length} Sets` : item.setTitle)}
+            {item.quizName ?? (item.setIds.length > 1 ? t('quiz:hub.setsCount', { count: item.setIds.length }) : item.setTitle)}
           </Typography>
           {!!item.quizName && (
             <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
-              {item.setIds.length > 1 ? `${item.setIds.length} Sets` : item.setTitle}
+              {item.setIds.length > 1 ? t('quiz:hub.setsCount', { count: item.setIds.length }) : item.setTitle}
             </Typography>
           )}
           <Typography preset="caption" color={colors.textSecondary}>
-            {MODE_DISPLAY[item.mode ?? 'mix'] ?? item.mode} · {formatDateWithTime(item.practicedAt ?? item.createdAt)}
+            {t(`quiz:modeNames.${item.mode ?? 'mix'}`, MODE_DISPLAY[item.mode ?? 'mix'] ?? item.mode)} · {formatDateWithTime(item.practicedAt ?? item.createdAt)}
           </Typography>
         </View>
 
@@ -132,13 +132,13 @@ export function QuizHubScreen() {
           onPress={e => { e.stopPropagation(); openSheet(item); }}
           style={({ pressed }) => pressed && styles.iconPressed}
           accessibilityRole="button"
-          accessibilityLabel="More options"
+          accessibilityLabel={t('common:actions.moreOptions', 'More options')}
         >
           <MoreVerticalIcon size={20} color={colors.textSecondary} />
         </Pressable>
       </Pressable>
     );
-  }, [handleDetails, openSheet, colors, isDark]);
+  }, [handleDetails, openSheet, colors, isDark, t]);
 
   const footer = !isLoading && !isError ? (
     <View style={[styles.footerBar, { borderTopColor: colors.divider }]}>

@@ -36,7 +36,7 @@ export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCa
   if (isError || !card) {
     return (
       <Screen header={header}>
-        <ErrorState message={getErrorMessage(error) || 'Card not found'} onRetry={refetch} />
+        <ErrorState message={getErrorMessage(error) || t('library:cards.cardNotFound', 'Card not found')} onRetry={refetch} />
       </Screen>
     );
   }

@@ -22,7 +22,9 @@
     "learnMore": "Saiba mais",
     "markAllRead": "Marcar todas como lidas",
     "searchPlaceholder": "Pesquisar…",
-    "clearSearch": "Limpar pesquisa"
+    "clearSearch": "Limpar pesquisa",
+    "moreOptions": "More options",
+    "goBack": "Go back"
   },
   "status": {
     "loading": "Carregando...",

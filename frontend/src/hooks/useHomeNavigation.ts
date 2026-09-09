@@ -1,4 +1,5 @@
 import { useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import {
   FileTextIcon, FolderIcon, SearchIcon, UsersIcon,
@@ -11,6 +12,7 @@ import type { StudySet } from '../types';
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
 export function useHomeNavigation(navigation: HomeNav) {
+  const { t } = useTranslation('home');
   const goReview = useCallback((setId: string, setTitle: string) =>
     navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] }, initial: false }),
   [navigation]);
@@ -50,15 +52,15 @@ export function useHomeNavigation(navigation: HomeNav) {
   [navigation]);
 
   const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; onPress: () => void }>>(() => [
-    { label: 'Create Set',   Icon: PlusCircleIcon, onPress: goCreate },
-    { label: 'Study Plans',  Icon: CalendarIcon,   onPress: goStudyPlans },
-    { label: 'Achievements', Icon: TrophyIcon,     onPress: goAchievements },
-    { label: 'Leaderboard',  Icon: BarChartIcon,   onPress: goLeaderboard },
-    { label: 'Notes',        Icon: FileTextIcon,   onPress: goNotes },
-    { label: 'Media',        Icon: FolderIcon,     onPress: goMedia },
-    { label: 'Discover',     Icon: SearchIcon,     onPress: goPublicSets },
-    { label: 'Friends',      Icon: UsersIcon,      onPress: goFriends },
-  ], [goCreate, goStudyPlans, goAchievements, goLeaderboard, goNotes, goMedia, goPublicSets, goFriends]);
+    { label: t('home:quickActions.createSet', 'Create Set'),     Icon: PlusCircleIcon, onPress: goCreate },
+    { label: t('home:quickActions.studyPlans', 'Study Plans'),   Icon: CalendarIcon,   onPress: goStudyPlans },
+    { label: t('home:quickActions.achievements', 'Achievements'), Icon: TrophyIcon,     onPress: goAchievements },
+    { label: t('home:quickActions.leaderboard', 'Leaderboard'),  Icon: BarChartIcon,   onPress: goLeaderboard },
+    { label: t('home:quickActions.notes', 'Notes'),              Icon: FileTextIcon,   onPress: goNotes },
+    { label: t('home:quickActions.media', 'Media'),              Icon: FolderIcon,     onPress: goMedia },
+    { label: t('home:quickActions.discover', 'Discover'),        Icon: SearchIcon,     onPress: goPublicSets },
+    { label: t('home:quickActions.friends', 'Friends'),          Icon: UsersIcon,      onPress: goFriends },
+  ], [t, goCreate, goStudyPlans, goAchievements, goLeaderboard, goNotes, goMedia, goPublicSets, goFriends]);
 
   return {
     goReview, goContinue, goCreate,

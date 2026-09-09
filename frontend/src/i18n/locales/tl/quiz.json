@@ -7,7 +7,8 @@
     "noActivity": "Walang kamakailang pagsusulit",
     "noActivitySub": "Kumpletuhin ang isang pagsusulit upang makita ang iyong kasaysayan ng pag-aaral dito.",
     "selectSet": "Pumili ng Study Set",
-    "selectMode": "Pumili ng Mode ng Pagsusulit"
+    "selectMode": "Pumili ng Mode ng Pagsusulit",
+    "setsCount": "{{count}} Sets"
   },
   "setup": {
     "title": "Setup ng Pagsusulit",
@@ -84,10 +85,41 @@
     "firstAttempt": "Unang Pagsubok",
     "practiced": "Nasanay nang {{count}} beses",
     "practiced_other": "Nasanay nang {{count}} beses",
-    "lastPracticed": "Huling nasanay noong {{date}}"
+    "lastPracticed": "Huling nasanay noong {{date}}",
+    "correctCount": "{{correct}} / {{total}} correct",
+    "setsCount": "{{count}} sets",
+    "viewSummary": "View summary"
   },
   "modesSheet": {
     "chooseMode": "Pumili ng Mode sa Pag-aaral",
     "startMode": "Simulan ang {{mode}} Mode"
+  },
+  "modes": {
+    "mc": "Multiple choice",
+    "story_mc": "Match the verse",
+    "type_answer": "Type the answer",
+    "type_verbatim": "Type it out",
+    "blanks": "Fill in the blanks",
+    "chunks": "Order the chunks",
+    "read": "Read & memorize"
+  },
+  "modeNames": {
+    "mix": "Mix",
+    "mc": "Multiple Choice",
+    "story_mc": "Story MC",
+    "type_answer": "Type Answer",
+    "type_verbatim": "Type Verbatim",
+    "blanks": "Fill Blanks",
+    "chunks": "Reorder",
+    "read": "Read"
+  },
+  "modeHeaders": {
+    "mc": "QUESTION",
+    "story_mc": "MATCH THE VERSE",
+    "type_answer": "QUESTION",
+    "type_verbatim": "TYPE THE PASSAGE",
+    "blanks": "FILL THE BLANKS",
+    "chunks": "PUT IN ORDER",
+    "read": "TAP TO REVEAL"
   }
 }

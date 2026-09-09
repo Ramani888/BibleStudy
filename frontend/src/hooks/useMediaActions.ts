@@ -44,7 +44,7 @@ export function useMediaActions() {
           const ok = results.length - failed;
           Toast.show(failed === 0
             ? { type: 'success', text1: t('profile:media.filesDeleted', { count: ok, defaultValue: `${ok} file(s) deleted` }) }
-            : { type: 'error', text1: `${ok} deleted, ${failed} failed` });
+            : { type: 'error', text1: t('profile:media.deletePartial', { ok, failed, defaultValue: `${ok} deleted, ${failed} failed` }) });
           exitSelectionMode();
         } catch (e) {
           Toast.show({ type: 'error', text1: getErrorMessage(e) });

@@ -33,7 +33,7 @@ const EMPTY_ICON_SIZE = 48;
 const TYPING_INDICATOR = '__typing__' as const;
 
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
-  const { t } = useTranslation(['ai', 'common']);
+  const { t, i18n } = useTranslation(['ai', 'common']);
   const { colors } = useTheme();
   const user = useAuthStore(s => s.user);
 
@@ -252,11 +252,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const handleExport = useCallback(() => {
     const exportable = messages.filter(m => m.text !== TYPING_INDICATOR);
     if (exportable.length === 0) return;
-    const lines = exportable.map(m => m.role === 'user' ? `You: ${m.text}` : `AI: ${m.text}`).join('\n\n');
-    const header = `AI Bible Study — ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+    const youLabel = t('ai:export.you', 'You');
+    const aiLabel = t('ai:export.ai', 'AI');
+    const lines = exportable.map(m => m.role === 'user' ? `${youLabel}: ${m.text}` : `${aiLabel}: ${m.text}`).join('\n\n');
+    const date = new Date().toLocaleDateString(i18n.language || 'en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    const header = t('ai:export.header', { date, defaultValue: `AI Bible Study — ${date}` });
     const divider = '─'.repeat(36);
     Share.share({ message: `${header}\n${divider}\n\n${lines}` });
-  }, [messages]);
+  }, [messages, t, i18n]);
 
   const handleClearChat = useCallback(() => {
     if (messages.length === 0) return;

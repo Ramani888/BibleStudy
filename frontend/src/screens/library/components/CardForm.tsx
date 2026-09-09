@@ -12,15 +12,15 @@ import type { CardType } from '../../../types';
 
 const ICON_SIZE = 20;
 
-const COPY: Record<CardType, {
+const cardCopy = (t: (key: string) => string): Record<CardType, {
   qLabel: string; qPlaceholder: string; aLabel: string; aPlaceholder: string;
   noteBtn: string; noteLabel: string; notePlaceholder: string;
-}> = {
-  QA:    { qLabel: 'Question', qPlaceholder: 'Enter the question…', aLabel: 'Answer', aPlaceholder: 'Enter the answer…',
-           noteBtn: 'Add Hint', noteLabel: 'Hint (optional)', notePlaceholder: 'Add a hint…' },
-  STORY: { qLabel: 'Reference (optional)', qPlaceholder: 'e.g. John 3:16', aLabel: 'Text', aPlaceholder: 'Enter the verse or passage…',
-           noteBtn: 'Add Note', noteLabel: 'Note (optional)', notePlaceholder: 'Add a note or reflection…' },
-};
+}> => ({
+  QA:    { qLabel: t('library:cards.questionLabel'), qPlaceholder: t('library:cards.questionPlaceholder'), aLabel: t('library:cards.answerLabel'), aPlaceholder: t('library:cards.answerPlaceholder'),
+           noteBtn: t('library:cards.hintButton'), noteLabel: t('library:cards.hintLabel'), notePlaceholder: t('library:cards.hintPlaceholder') },
+  STORY: { qLabel: t('library:cards.referenceLabel'), qPlaceholder: t('library:cards.referencePlaceholder'), aLabel: t('library:cards.textLabel'), aPlaceholder: t('library:cards.passagePlaceholder'),
+           noteBtn: t('library:cards.noteButton'), noteLabel: t('library:cards.noteLabel'), notePlaceholder: t('library:cards.notePlaceholder') },
+});
 
 import i18n from '../../../i18n';
 
@@ -85,7 +85,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   });
 
   const type = watch('type');
-  const copy = COPY[type];
+  const copy = cardCopy(t)[type];
 
   useImperativeHandle(ref, () => ({
     submit: handleSubmit(data => onSubmit({ ...data, note: data.note ?? '' })),

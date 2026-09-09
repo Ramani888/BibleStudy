@@ -7,7 +7,8 @@
     "noActivity": "Aucun quiz récent",
     "noActivitySub": "Complétez un quiz pour voir votre historique d'étude ici.",
     "selectSet": "Sélectionner une Série d'Étude",
-    "selectMode": "Choisir le Mode de Quiz"
+    "selectMode": "Choisir le Mode de Quiz",
+    "setsCount": "{{count}} Sets"
   },
   "setup": {
     "title": "Configuration du Quiz",
@@ -84,10 +85,41 @@
     "firstAttempt": "Première Tentative",
     "practiced": "Pratiqué {{count}} fois",
     "practiced_other": "Pratiqué {{count}} fois",
-    "lastPracticed": "Dernière pratique le {{date}}"
+    "lastPracticed": "Dernière pratique le {{date}}",
+    "correctCount": "{{correct}} / {{total}} correct",
+    "setsCount": "{{count}} sets",
+    "viewSummary": "View summary"
   },
   "modesSheet": {
     "chooseMode": "Choisir le Mode d'Étude",
     "startMode": "Démarrer le Mode {{mode}}"
+  },
+  "modes": {
+    "mc": "Multiple choice",
+    "story_mc": "Match the verse",
+    "type_answer": "Type the answer",
+    "type_verbatim": "Type it out",
+    "blanks": "Fill in the blanks",
+    "chunks": "Order the chunks",
+    "read": "Read & memorize"
+  },
+  "modeNames": {
+    "mix": "Mix",
+    "mc": "Multiple Choice",
+    "story_mc": "Story MC",
+    "type_answer": "Type Answer",
+    "type_verbatim": "Type Verbatim",
+    "blanks": "Fill Blanks",
+    "chunks": "Reorder",
+    "read": "Read"
+  },
+  "modeHeaders": {
+    "mc": "QUESTION",
+    "story_mc": "MATCH THE VERSE",
+    "type_answer": "QUESTION",
+    "type_verbatim": "TYPE THE PASSAGE",
+    "blanks": "FILL THE BLANKS",
+    "chunks": "PUT IN ORDER",
+    "read": "TAP TO REVEAL"
   }
 }

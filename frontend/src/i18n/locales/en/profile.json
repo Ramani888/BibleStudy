@@ -104,6 +104,12 @@
         "30d": "30 Days",
         "all": "All Time"
       }
+    },
+    "types": {
+      "usage": "Used",
+      "reward": "Reward",
+      "purchase": "Purchase",
+      "bonus": "Bonus"
     }
   },
   "paywall": {
@@ -157,7 +163,8 @@
     "deleteFileTitle": "Delete {{type}}",
     "deleteFileMessage": "Delete \"{{name}}\"? This cannot be undone.",
     "fileDeleted": "File deleted",
-    "fileRenamed": "File renamed"
+    "fileRenamed": "File renamed",
+    "deletePartial": "{{ok}} deleted, {{failed}} failed"
   },
   "friends": {
     "title": "Friends",
@@ -216,5 +223,10 @@
     "privacySec6Body": "We use Apple In-App Purchase for subscriptions, Firebase Cloud Messaging for push notifications, and AI providers for chat features. Each service has its own privacy policy governing how they handle data.",
     "privacySec7Title": "Contact Us",
     "privacySec7Body": "For privacy-related questions or data requests, contact us at:\nddtechservices.work@gmail.com"
+  },
+  "chart": {
+    "day": "Daily",
+    "week": "Weekly",
+    "month": "Monthly"
   }
 }

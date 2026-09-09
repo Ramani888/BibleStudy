@@ -32,7 +32,16 @@
     "setCreated": "세트가 생성되었습니다!",
     "setUpdated": "세트가 수정되었습니다!",
     "setDeleted": "세트가 삭제되었습니다",
-    "setRemoved": "세트가 제거되었습니다"
+    "setRemoved": "세트가 제거되었습니다",
+    "visibilityPRIVATE": "Private",
+    "visibilityPUBLIC": "Public",
+    "visibilityFRIENDS": "Friends",
+    "visibilityDescPRIVATE": "Only you",
+    "visibilityDescPUBLIC": "Everyone",
+    "visibilityDescFRIENDS": "Shared link",
+    "layoutDEFAULT": "Default",
+    "layoutMINIMAL": "Minimal",
+    "layoutDETAILED": "Detailed"
   },
   "folders": {
     "title": "폴더",
@@ -112,7 +121,17 @@
     "missingWords": "빈칸 단어",
     "missingWordsPlaceholder": "빈칸으로 만들 단어(쉼표로 구분)",
     "cardPreviewFront": "앞면 (질문)",
-    "cardPreviewBack": "뒷면 (답변)"
+    "cardPreviewBack": "뒷면 (답변)",
+    "questionLabel": "Question",
+    "answerLabel": "Answer",
+    "hintButton": "Add Hint",
+    "hintLabel": "Hint (optional)",
+    "referenceLabel": "Reference (optional)",
+    "referencePlaceholder": "e.g. John 3:16",
+    "textLabel": "Text",
+    "noteButton": "Add Note",
+    "noteLabel": "Note (optional)",
+    "cardNotFound": "Card not found"
   },
   "plans": {
     "title": "학습 계획",

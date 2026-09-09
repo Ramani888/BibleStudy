@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Keyboard } from 'react-native';
 import { AlbumsIcon, CameraIcon, FileTextIcon, StarIcon, StarOutlineIcon } from '../components/icons';
 import { useMediaFiles, usePickMedia } from './index';
@@ -8,6 +9,7 @@ import type { MediaFile, MediaFileType } from '../types';
 const MIN_MEDIA_COST = 3;
 
 export function useAIChatAttachment(creditBalance: number, goPaywall: () => void) {
+  const { t } = useTranslation(['ai', 'common']);
   const [attachment, setAttachment] = useState<{ id: string; name: string; type: MediaFileType; localUri?: string } | null>(null);
   const [attachMenuVisible, setAttachMenuVisible] = useState(false);
   const [pickerVisible, setPickerVisible]         = useState(false);
@@ -43,16 +45,16 @@ export function useAIChatAttachment(creditBalance: number, goPaywall: () => void
 
   const attachMenuActions = useMemo(() => creditBalance < MIN_MEDIA_COST
     ? [
-        { label: 'Media costs 3–5 credits', icon: StarOutlineIcon, onPress: () => {}, disabled: true },
-        { label: 'Upgrade to Premium', icon: StarIcon, onPress: goPaywall },
+        { label: t('ai:attach.mediaCost', 'Media costs 3–5 credits'), icon: StarOutlineIcon, onPress: () => {}, disabled: true },
+        { label: t('ai:attach.upgrade', 'Upgrade to Premium'), icon: StarIcon, onPress: goPaywall },
       ]
     : [
-        { label: 'Choose from My Media', icon: AlbumsIcon, onPress: () => setPickerVisible(true) },
-        { label: 'Photo Library', icon: AlbumsIcon, onPress: () => attachFromDevice(pickImage) },
-        { label: 'Take Photo', icon: CameraIcon, onPress: () => attachFromDevice(takePhoto) },
-        { label: 'Choose PDF', icon: FileTextIcon, onPress: () => attachFromDevice(pickPdf) },
+        { label: t('ai:attach.chooseMyMedia', 'Choose from My Media'), icon: AlbumsIcon, onPress: () => setPickerVisible(true) },
+        { label: t('ai:attach.photoLibrary', 'Photo Library'), icon: AlbumsIcon, onPress: () => attachFromDevice(pickImage) },
+        { label: t('ai:attach.takePhoto', 'Take Photo'), icon: CameraIcon, onPress: () => attachFromDevice(takePhoto) },
+        { label: t('ai:attach.choosePdf', 'Choose PDF'), icon: FileTextIcon, onPress: () => attachFromDevice(pickPdf) },
       ],
-  [creditBalance, goPaywall, attachFromDevice, pickImage, takePhoto, pickPdf]);
+  [t, creditBalance, goPaywall, attachFromDevice, pickImage, takePhoto, pickPdf]);
 
   const pickerActions = useMemo(() => media.length > 0
     ? media.map(f => ({
@@ -60,8 +62,8 @@ export function useAIChatAttachment(creditBalance: number, goPaywall: () => void
         icon: f.type === 'PDF' ? FileTextIcon : AlbumsIcon,
         onPress: () => setAttachment({ id: f.id, name: f.name, type: f.type }),
       }))
-    : [{ label: 'No files in My Media', icon: FileTextIcon, onPress: () => {}, disabled: true }],
-  [media]);
+    : [{ label: t('ai:attach.noFiles', 'No files in My Media'), icon: FileTextIcon, onPress: () => {}, disabled: true }],
+  [t, media]);
 
   return {
     attachment, setAttachment,

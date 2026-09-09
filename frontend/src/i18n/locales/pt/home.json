@@ -35,6 +35,29 @@
     "newSet": "Novo Conjunto",
     "askAI": "Perguntar à IA",
     "quickQuiz": "Quiz Rápido",
-    "dailyVerse": "Versículo Diário"
+    "dailyVerse": "Versículo Diário",
+    "createSet": "Create Set",
+    "studyPlans": "Study Plans",
+    "achievements": "Achievements",
+    "leaderboard": "Leaderboard",
+    "notes": "Notes",
+    "media": "Media",
+    "discover": "Discover",
+    "friends": "Friends"
+  },
+  "a11y": {
+    "goToProfile": "Go to profile",
+    "aiChat": "AI Chat",
+    "notifications": "Notifications",
+    "openSet": "Open {{title}}"
+  },
+  "activity": {
+    "unknownUser": "Someone",
+    "addedFriend": "{{name}} added a new friend",
+    "createdSet": "{{name}} created a new set",
+    "createdCard": "{{name}} created a new card",
+    "studiedCards": "{{name}} studied some cards",
+    "wroteNote": "{{name}} wrote a note",
+    "wasActive": "{{name}} was active"
   }
 }

@@ -93,7 +93,7 @@ export function QuizItemView({
       >
         {/* Question card */}
         <View style={[styles.questionCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item)}</Typography>
+          <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item, t)}</Typography>
           {!!promptText(item) && (
             <Typography preset="h3" color={colors.textPrimary}>{promptText(item)}</Typography>
           )}
@@ -157,16 +157,8 @@ export function QuizItemView({
   );
 }
 
-function modeLabel(item: QuizItem): string {
-  switch (item.mode) {
-    case 'mc':            return 'QUESTION';
-    case 'story_mc':      return 'MATCH THE VERSE';
-    case 'type_answer':   return 'QUESTION';
-    case 'type_verbatim': return 'TYPE THE PASSAGE';
-    case 'blanks':        return 'FILL THE BLANKS';
-    case 'chunks':        return 'PUT IN ORDER';
-    case 'read':          return 'TAP TO REVEAL';
-  }
+function modeLabel(item: QuizItem, t: (key: string) => string): string {
+  return t(`quiz:modeHeaders.${item.mode}`);
 }
 
 function promptText(item: QuizItem): string {

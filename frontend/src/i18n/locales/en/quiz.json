@@ -17,7 +17,8 @@
     "viewDetails": "View Details",
     "viewSummary": "View Summary",
     "reQuiz": "Re-Quiz",
-    "deleteAttempt": "Delete Attempt"
+    "deleteAttempt": "Delete Attempt",
+    "setsCount": "{{count}} Sets"
   },
   "setup": {
     "title": "Quiz Setup",
@@ -69,7 +70,10 @@
     "timeSpent": "Time spent",
     "practiced": "Practiced",
     "lastPracticed": "Last practiced",
-    "firstAttempt": "First attempt"
+    "firstAttempt": "First attempt",
+    "correctCount": "{{correct}} / {{total}} correct",
+    "setsCount": "{{count}} sets",
+    "viewSummary": "View summary"
   },
   "summary": {
     "title": "Quiz Summary",
@@ -83,6 +87,32 @@
   },
   "modes": {
     "mixMode": "Mix Mode",
-    "mixDesc": "Combines multiple question formats in one quiz."
+    "mixDesc": "Combines multiple question formats in one quiz.",
+    "mc": "Multiple choice",
+    "story_mc": "Match the verse",
+    "type_answer": "Type the answer",
+    "type_verbatim": "Type it out",
+    "blanks": "Fill in the blanks",
+    "chunks": "Order the chunks",
+    "read": "Read & memorize"
+  },
+  "modeNames": {
+    "mix": "Mix",
+    "mc": "Multiple Choice",
+    "story_mc": "Story MC",
+    "type_answer": "Type Answer",
+    "type_verbatim": "Type Verbatim",
+    "blanks": "Fill Blanks",
+    "chunks": "Reorder",
+    "read": "Read"
+  },
+  "modeHeaders": {
+    "mc": "QUESTION",
+    "story_mc": "MATCH THE VERSE",
+    "type_answer": "QUESTION",
+    "type_verbatim": "TYPE THE PASSAGE",
+    "blanks": "FILL THE BLANKS",
+    "chunks": "PUT IN ORDER",
+    "read": "TAP TO REVEAL"
   }
 }

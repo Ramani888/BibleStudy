@@ -3,7 +3,14 @@
   "editProfile": "I-edit ang Profile",
   "changePassword": "Palitan ang Password",
   "myCredits": "Aking Mga Kredito",
-  "credits": "Kredito",
+  "credits": {
+    "types": {
+      "usage": "Used",
+      "reward": "Reward",
+      "purchase": "Purchase",
+      "bonus": "Bonus"
+    }
+  },
   "streak": "Streak sa Pag-aaral",
   "streakCount": "{{count}} araw na streak",
   "streakCount_one": "1 araw na streak",
@@ -122,7 +129,8 @@
     "deleteFileTitle": "Tanggalin ang {{type}}",
     "deleteFileMessage": "Tanggalin ang \"{{name}}\"? Hindi na ito mababawi.",
     "fileDeleted": "Natanggal ang file",
-    "fileRenamed": "Napalitan ang pangalan ng file"
+    "fileRenamed": "Napalitan ang pangalan ng file",
+    "deletePartial": "{{ok}} deleted, {{failed}} failed"
   },
   "friends": {
     "title": "Mga Kaibigan",
@@ -183,5 +191,10 @@
     "sec6Body": "Ang aming mga serbisyo ay hindi nakadirekta sa mga batang wala pang 13 taong gulang.",
     "sec7Title": "Makipag-ugnayan",
     "sec7Body": "Para sa mga tanong tungkol sa Patakarang ito sa Pagkapribado:\nddtechservices.work@gmail.com"
+  },
+  "chart": {
+    "day": "Daily",
+    "week": "Weekly",
+    "month": "Monthly"
   }
 }

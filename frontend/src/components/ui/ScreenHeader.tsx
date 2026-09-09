@@ -1,5 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { BackIcon, CloseIcon } from '../icons';
 import { Typography } from './Typography';
 import { layout, radius, spacing, useTheme } from '../../theme';
@@ -21,14 +22,15 @@ interface ScreenHeaderProps {
 
 /** Custom in-screen header (SVG nav icon + title + actions) matching Home. */
 export function ScreenHeader({ title, onBack, onClose, right, handle, titleNumberOfLines = 1 }: ScreenHeaderProps) {
+  const { t } = useTranslation('common');
   const { colors } = useTheme();
 
   const leading = handle ? null : onBack ? (
-    <Pressable onPress={onBack} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel="Go back">
+    <Pressable onPress={onBack} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel={t('common:actions.goBack', 'Go back')}>
       <BackIcon size={NAV_ICON_SIZE} color={colors.textPrimary} />
     </Pressable>
   ) : onClose ? (
-    <Pressable onPress={onClose} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel="Close">
+    <Pressable onPress={onClose} hitSlop={8} style={({ pressed }) => [styles.navBtn, pressed && { opacity: 0.85 }]} accessibilityRole="button" accessibilityLabel={t('common:actions.close', 'Close')}>
       <CloseIcon size={NAV_ICON_SIZE} color={colors.textPrimary} />
     </Pressable>
   ) : null;

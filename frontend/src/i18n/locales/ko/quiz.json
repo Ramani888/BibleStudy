@@ -7,7 +7,8 @@
     "noActivity": "최근 퀴즈 활동이 없습니다",
     "noActivitySub": "퀴즈를 완료하여 학습 기록을 확인하세요.",
     "selectSet": "학습 세트 선택",
-    "selectMode": "퀴즈 모드 선택"
+    "selectMode": "퀴즈 모드 선택",
+    "setsCount": "{{count}} Sets"
   },
   "setup": {
     "title": "퀴즈 설정",
@@ -84,10 +85,41 @@
     "firstAttempt": "첫 번째 시도",
     "practiced": "{{count}}회 연습함",
     "practiced_other": "{{count}}회 연습함",
-    "lastPracticed": "마지막 연습일: {{date}}"
+    "lastPracticed": "마지막 연습일: {{date}}",
+    "correctCount": "{{correct}} / {{total}} correct",
+    "setsCount": "{{count}} sets",
+    "viewSummary": "View summary"
   },
   "modesSheet": {
     "chooseMode": "학습 모드 선택",
     "startMode": "{{mode}} 모드 시작"
+  },
+  "modes": {
+    "mc": "Multiple choice",
+    "story_mc": "Match the verse",
+    "type_answer": "Type the answer",
+    "type_verbatim": "Type it out",
+    "blanks": "Fill in the blanks",
+    "chunks": "Order the chunks",
+    "read": "Read & memorize"
+  },
+  "modeNames": {
+    "mix": "Mix",
+    "mc": "Multiple Choice",
+    "story_mc": "Story MC",
+    "type_answer": "Type Answer",
+    "type_verbatim": "Type Verbatim",
+    "blanks": "Fill Blanks",
+    "chunks": "Reorder",
+    "read": "Read"
+  },
+  "modeHeaders": {
+    "mc": "QUESTION",
+    "story_mc": "MATCH THE VERSE",
+    "type_answer": "QUESTION",
+    "type_verbatim": "TYPE THE PASSAGE",
+    "blanks": "FILL THE BLANKS",
+    "chunks": "PUT IN ORDER",
+    "read": "TAP TO REVEAL"
   }
 }

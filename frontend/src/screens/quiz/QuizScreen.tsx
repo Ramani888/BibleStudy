@@ -86,7 +86,7 @@ export function QuizScreen() {
         onPress={goBack}
         hitSlop={12}
         accessibilityRole="button"
-        accessibilityLabel="Go back"
+        accessibilityLabel={t('common:actions.goBack', 'Go back')}
       >
         <BackIcon size={24} color={colors.textPrimary} />
       </Pressable>

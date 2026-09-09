@@ -32,7 +32,16 @@
     "setCreated": "Set created!",
     "setUpdated": "Set updated!",
     "setDeleted": "Set deleted",
-    "setRemoved": "Set removed"
+    "setRemoved": "Set removed",
+    "visibilityPRIVATE": "Private",
+    "visibilityPUBLIC": "Public",
+    "visibilityFRIENDS": "Friends",
+    "visibilityDescPRIVATE": "Only you",
+    "visibilityDescPUBLIC": "Everyone",
+    "visibilityDescFRIENDS": "Shared link",
+    "layoutDEFAULT": "Default",
+    "layoutMINIMAL": "Minimal",
+    "layoutDETAILED": "Detailed"
   },
   "folders": {
     "title": "Folders",
@@ -110,7 +119,17 @@
     "missingWords": "Missing Words",
     "missingWordsPlaceholder": "Words to blank out (comma separated)",
     "cardPreviewFront": "Front (question)",
-    "cardPreviewBack": "Back (answer)"
+    "cardPreviewBack": "Back (answer)",
+    "questionLabel": "Question",
+    "answerLabel": "Answer",
+    "hintButton": "Add Hint",
+    "hintLabel": "Hint (optional)",
+    "referenceLabel": "Reference (optional)",
+    "referencePlaceholder": "e.g. John 3:16",
+    "textLabel": "Text",
+    "noteButton": "Add Note",
+    "noteLabel": "Note (optional)",
+    "cardNotFound": "Card not found"
   },
   "plans": {
     "title": "Study Plans",

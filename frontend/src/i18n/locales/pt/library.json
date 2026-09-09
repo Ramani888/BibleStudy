@@ -32,7 +32,16 @@
     "setCreated": "Conjunto criado!",
     "setUpdated": "Conjunto atualizado!",
     "setDeleted": "Conjunto excluído",
-    "setRemoved": "Conjunto removido"
+    "setRemoved": "Conjunto removido",
+    "visibilityPRIVATE": "Private",
+    "visibilityPUBLIC": "Public",
+    "visibilityFRIENDS": "Friends",
+    "visibilityDescPRIVATE": "Only you",
+    "visibilityDescPUBLIC": "Everyone",
+    "visibilityDescFRIENDS": "Shared link",
+    "layoutDEFAULT": "Default",
+    "layoutMINIMAL": "Minimal",
+    "layoutDETAILED": "Detailed"
   },
   "folders": {
     "title": "Pastas",
@@ -112,7 +121,17 @@
     "missingWords": "Palavras Ocultas",
     "missingWordsPlaceholder": "Palavras a ocultar (separadas por vírgula)",
     "cardPreviewFront": "Frente (pergunta)",
-    "cardPreviewBack": "Verso (resposta)"
+    "cardPreviewBack": "Verso (resposta)",
+    "questionLabel": "Question",
+    "answerLabel": "Answer",
+    "hintButton": "Add Hint",
+    "hintLabel": "Hint (optional)",
+    "referenceLabel": "Reference (optional)",
+    "referencePlaceholder": "e.g. John 3:16",
+    "textLabel": "Text",
+    "noteButton": "Add Note",
+    "noteLabel": "Note (optional)",
+    "cardNotFound": "Card not found"
   },
   "plans": {
     "title": "Planos de Estudo",

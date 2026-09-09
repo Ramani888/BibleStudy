@@ -42,8 +42,6 @@ import type { Activity } from '../../types/activities.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
-const plural = (n: number) => (n === 1 ? '' : 's');
-
 function getGreeting(t: (key: string) => string): string {
   const h = new Date().getHours();
   if (h < 12) return t('greeting.morning');
@@ -56,10 +54,11 @@ const StickyHeader = React.memo(function StickyHeader({ greeting, name, avatarUr
   greeting: string; name: string; avatarUri?: string | null; unread: number;
   onAI: () => void; onBell: () => void; onAvatar: () => void;
 }) {
+  const { t } = useTranslation('home');
   const { colors } = useTheme();
   return (
     <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      <Pressable style={({ pressed }) => [styles.headerLeft, pressed && styles.headerLeftPressed]} onPress={onAvatar} accessibilityRole="button" accessibilityLabel="Go to profile">
+      <Pressable style={({ pressed }) => [styles.headerLeft, pressed && styles.headerLeftPressed]} onPress={onAvatar} accessibilityRole="button" accessibilityLabel={t('a11y.goToProfile')}>
         <Avatar uri={avatarUri} name={name} size="sm" />
         <View style={styles.greetingCol}>
           <Typography preset="caption" color={colors.textSecondary}>{greeting},</Typography>
@@ -67,10 +66,10 @@ const StickyHeader = React.memo(function StickyHeader({ greeting, name, avatarUr
         </View>
       </Pressable>
       <View style={styles.headerActions}>
-        <Pressable onPress={onAI} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel="AI Chat">
+        <Pressable onPress={onAI} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel={t('a11y.aiChat')}>
           <SparklesIcon size={20} color={colors.textPrimary} />
         </Pressable>
-        <Pressable onPress={onBell} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel="Notifications">
+        <Pressable onPress={onBell} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel={t('a11y.notifications')}>
           <BellIcon size={20} color={colors.textPrimary} />
           {unread > 0 && (
             <View style={[styles.bellBadge, { backgroundColor: colors.alert }]}>
@@ -156,7 +155,7 @@ const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySe
       ]}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`Open ${set.title}`}
+      accessibilityLabel={t('home:a11y.openSet', { title: set.title })}
     >
       <View style={[styles.setIcon, { borderColor: colors.border }]}>
         <LibraryIcon size={18} color={colors.textPrimary} />
@@ -180,7 +179,7 @@ const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySe
 
 // ─── Mini set card (horizontal rails) ─────────────────────────────────────────
 const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { set: StudySet; Icon: IconComponent; onSelect: (s: StudySet) => void }) {
-  const { t } = useTranslation(['library', 'common']);
+  const { t } = useTranslation(['home', 'library', 'common']);
   const { colors, name: themeName } = useTheme();
   const isDark = themeName === 'dark';
   const count = set._count?.cards ?? 0;
@@ -194,7 +193,7 @@ const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { s
       ]}
       onPress={handlePress}
       accessibilityRole="button"
-      accessibilityLabel={`Open ${set.title}`}
+      accessibilityLabel={t('home:a11y.openSet', { title: set.title })}
     >
       <View style={[styles.miniIcon, { borderColor: colors.border }]}>
         <Icon size={18} color={colors.textPrimary} />
@@ -208,25 +207,26 @@ const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { s
 });
 
 // ─── Activity feed item ────────────────────────────────────────────────────────
-function activityText(a: Activity): string {
-  const name = a.user?.name ?? 'Someone';
+function activityText(a: Activity, t: (key: string, opts?: Record<string, unknown>) => string): string {
+  const name = a.user?.name ?? t('activity.unknownUser');
   switch (a.type) {
-    case 'ADDED_FRIEND':  return `${name} added a new friend`;
-    case 'CREATED_SET':   return `${name} created a new set`;
-    case 'CREATED_CARD':  return `${name} created a new card`;
-    case 'STUDIED_CARDS': return `${name} studied some cards`;
-    case 'CREATED_NOTE':  return `${name} wrote a note`;
-    default: return `${name} was active`;
+    case 'ADDED_FRIEND':  return t('activity.addedFriend', { name });
+    case 'CREATED_SET':   return t('activity.createdSet', { name });
+    case 'CREATED_CARD':  return t('activity.createdCard', { name });
+    case 'STUDIED_CARDS': return t('activity.studiedCards', { name });
+    case 'CREATED_NOTE':  return t('activity.wroteNote', { name });
+    default: return t('activity.wasActive', { name });
   }
 }
 
 const ActivityItem = React.memo(function ActivityItem({ activity }: { activity: Activity }) {
+  const { t } = useTranslation('home');
   const { colors } = useTheme();
   return (
     <View style={styles.activityItem}>
       <Avatar uri={activity.user?.profileImage} name={activity.user?.name} size="sm" />
       <View style={styles.flex1}>
-        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{activityText(activity)}</Typography>
+        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{activityText(activity, t)}</Typography>
         <Typography preset="caption" color={colors.textSecondary}>{formatDate(activity.createdAt)}</Typography>
       </View>
     </View>

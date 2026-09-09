@@ -35,6 +35,29 @@
     "newSet": "새 세트",
     "askAI": "AI에게 질문",
     "quickQuiz": "빠른 퀴즈",
-    "dailyVerse": "오늘의 말씀"
+    "dailyVerse": "오늘의 말씀",
+    "createSet": "Create Set",
+    "studyPlans": "Study Plans",
+    "achievements": "Achievements",
+    "leaderboard": "Leaderboard",
+    "notes": "Notes",
+    "media": "Media",
+    "discover": "Discover",
+    "friends": "Friends"
+  },
+  "a11y": {
+    "goToProfile": "Go to profile",
+    "aiChat": "AI Chat",
+    "notifications": "Notifications",
+    "openSet": "Open {{title}}"
+  },
+  "activity": {
+    "unknownUser": "Someone",
+    "addedFriend": "{{name}} added a new friend",
+    "createdSet": "{{name}} created a new set",
+    "createdCard": "{{name}} created a new card",
+    "studiedCards": "{{name}} studied some cards",
+    "wroteNote": "{{name}} wrote a note",
+    "wasActive": "{{name}} was active"
   }
 }

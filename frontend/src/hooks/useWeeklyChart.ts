@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useCreditBalance, useCreditStats } from './useCredits';
 import type { CreditInterval } from './useCredits';
 
@@ -25,6 +26,7 @@ export const PERIOD_OPTIONS: { key: SimplePeriod; label: string }[] = [
 ];
 
 export function useWeeklyChart(defaultPeriod: SimplePeriod = 'week') {
+  const { t } = useTranslation('profile');
   const [period,        setPeriod]        = useState<SimplePeriod>(defaultPeriod);
   const [chartInterval, setChartInterval] = useState<CreditInterval>(DEFAULT_INTERVAL[defaultPeriod]);
   const [selectedIdx,   setSelectedIdx]   = useState<number | null>(null);
@@ -38,7 +40,7 @@ export function useWeeklyChart(defaultPeriod: SimplePeriod = 'week') {
   const totalUsed   = safeStats.reduce((s, d) => s + d.used,   0);
   const net         = totalEarned - totalUsed;
   const hasSummary  = !isLoading && (totalEarned > 0 || totalUsed > 0);
-  const intervalOptions = INTERVAL_OPTIONS[period];
+  const intervalOptions = INTERVAL_OPTIONS[period].map(o => ({ ...o, label: t(`profile:chart.${o.key}`, o.label) }));
 
   const handlePeriod = (p: SimplePeriod) => {
     setPeriod(p);

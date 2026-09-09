@@ -32,7 +32,9 @@
     "remove": "Remove",
     "markAllRead": "Mark all read",
     "searchPlaceholder": "Search…",
-    "clearSearch": "Clear search"
+    "clearSearch": "Clear search",
+    "moreOptions": "More options",
+    "goBack": "Go back"
   },
   "status": {
     "loading": "Loading...",

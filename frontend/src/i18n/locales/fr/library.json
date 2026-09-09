@@ -32,7 +32,16 @@
     "setCreated": "Série créée !",
     "setUpdated": "Série mise à jour !",
     "setDeleted": "Série supprimée",
-    "setRemoved": "Série retirée"
+    "setRemoved": "Série retirée",
+    "visibilityPRIVATE": "Private",
+    "visibilityPUBLIC": "Public",
+    "visibilityFRIENDS": "Friends",
+    "visibilityDescPRIVATE": "Only you",
+    "visibilityDescPUBLIC": "Everyone",
+    "visibilityDescFRIENDS": "Shared link",
+    "layoutDEFAULT": "Default",
+    "layoutMINIMAL": "Minimal",
+    "layoutDETAILED": "Detailed"
   },
   "folders": {
     "title": "Dossiers",
@@ -112,7 +121,17 @@
     "missingWords": "Mots Masqués",
     "missingWordsPlaceholder": "Mots à masquer (séparés par des virgules)",
     "cardPreviewFront": "Recto (question)",
-    "cardPreviewBack": "Verso (réponse)"
+    "cardPreviewBack": "Verso (réponse)",
+    "questionLabel": "Question",
+    "answerLabel": "Answer",
+    "hintButton": "Add Hint",
+    "hintLabel": "Hint (optional)",
+    "referenceLabel": "Reference (optional)",
+    "referencePlaceholder": "e.g. John 3:16",
+    "textLabel": "Text",
+    "noteButton": "Add Note",
+    "noteLabel": "Note (optional)",
+    "cardNotFound": "Card not found"
   },
   "plans": {
     "title": "Plans d'Étude",
