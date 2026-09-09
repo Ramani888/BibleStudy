@@ -1,10 +1,31 @@
 import rateLimit from 'express-rate-limit';
+import type { Request } from 'express';
 import { PLAN_BENEFITS } from '../config/plans';
 import { getEffectivePlan } from '../modules/subscriptions/subscriptions.service';
+import { verifyAccessToken } from '../utils/jwt';
+
+// Key by user id when a valid Bearer token is present, else by IP. This runs as a
+// global limiter (before authMiddleware), so we decode the token here ourselves;
+// keying per-user stops shared-NAT/carrier users from splitting one IP budget.
+function userOrIpKey(req: Request): string {
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) {
+    try {
+      return `user:${verifyAccessToken(authHeader.substring(7)).userId}`;
+    } catch {
+      // invalid/expired token → fall back to IP
+    }
+  }
+  return req.ip ?? 'anon';
+}
 
 export const generalRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100,
+  // 1000/15min (~66/min) per user (or per IP when unauthenticated). A React-Query
+  // app fires many reads per screen + refetches after staleTime; 100 was hit in one
+  // active session.
+  max: 1000,
+  keyGenerator: userOrIpKey,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
