@@ -1,5 +1,20 @@
 # Store Setup — Verdance launch checklist
 
+## ▶ RESUME (2026-09-09 EOD) — both stores blocked on payment/identity verification
+**Apple:** app `Verdance: Bible Study & Memory` created (`com.getverdance.app`). Paid Apps agreement
+accepted but **Pending User Info** — waiting on **banking (processing ~24h)**; the **US W-8BEN tax
+form** can't be added until banking clears. Then: Paid Apps → Active → create the 4 products →
+add App Store Connect API key to RevenueCat.
+**Google:** app created (`com.getverdance.app`, Draft). Merchant payments profile created (Ramani
+Divyesh, INR, India; 15% fee auto). **PA-CB KYC in progress via BillDesk** — business type
+**Individual**, submit **PAN** (name must EXACTLY match). After Google review (~few days): merchant
+active → create 4 subscriptions → Setup→API access → service-account JSON to RevenueCat.
+**RevenueCat:** iOS + Android apps created (`com.getverdance.app`); still need products/entitlements/
+offering, SDK keys, webhook secret (all gated on store products existing).
+**Tomorrow first check:** is Apple banking done? did BillDesk KYC email get completed? Then proceed.
+
+
+
 Everything needed in App Store Connect + Play Console + RevenueCat to ship.
 Identity is already migrated (bundle/applicationId = `com.getverdance.app`, Firebase
 `verdance-bb5c2`). This file tracks the store/console work that remains.
