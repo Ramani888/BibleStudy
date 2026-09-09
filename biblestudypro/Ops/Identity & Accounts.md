@@ -11,7 +11,9 @@ updated: 2026-09-09
 ## App name (user-facing) = **Verdance** (both platforms)
 - iOS: `CFBundleDisplayName = Verdance` (`ios/frontend/Info.plist`)
 - Android: `app_name = Verdance` (`android/app/src/main/res/values/strings.xml`)
-- Store listings (App Store Connect + Play Console): **Verdance**
+- **Store listing title (the long one):** **Verdance: Bible Study & Memory**
+  - Subtitle: **Flashcards, Quizzes & AI**
+  - (Launcher/home-screen name stays the short **Verdance**.)
 - Internal only (NOT the launcher label): `app.json` `name: BibleStudyPro` (RN AppRegistry
   component id — do not change), `displayName: "BibleStudy Pro"` (unused/stale).
 
