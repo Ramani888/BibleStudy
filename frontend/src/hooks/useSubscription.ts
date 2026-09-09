@@ -6,6 +6,7 @@ import { subscriptionsApi, authApi, getErrorMessage } from '../api';
 import { useAuthStore } from '../store/auth.store';
 import { getPlatformReceipt, currentStore, syncEntitlementOnOpen, ALL_PRODUCT_IDS } from '../utils/iap';
 import type { SubscriptionStatus } from '../types';
+import i18n from '../i18n';
 
 /** Backend-recorded status (cheap; recomputes expiry, downgrades a lapsed record to FREE). */
 export function useSubscriptionStatus() {
@@ -50,7 +51,7 @@ export function useIapSubscriptions() {
   const handleSuccess = useCallback(async (purchase: Purchase) => {
     try {
       const receipt = await getPlatformReceipt((purchase as { purchaseToken?: string | null }).purchaseToken);
-      if (!receipt) throw new Error('Could not read purchase receipt');
+      if (!receipt) throw new Error(i18n.t('profile:subscription.receiptError', 'Could not read purchase receipt'));
       await subscriptionsApi.verify({ platform: currentStore(), productId: purchase.productId, receipt });
       await finishTransaction({ purchase, isConsumable: false });
       await refreshUser();

@@ -2,7 +2,8 @@
   "greeting": {
     "morning": "Good morning",
     "afternoon": "Good afternoon",
-    "evening": "Good evening"
+    "evening": "Good evening",
+    "streakDays": "${streakData?.streak ?? 0} day streak"
   },
   "featured": {
     "due": "DUE",
@@ -25,7 +26,8 @@
     "day": "{{count}} Day Streak",
     "days": "{{count}} Days Streak",
     "keepGoing": "Keep up the great work!",
-    "streakLost": "Study today to maintain your streak"
+    "streakLost": "Study today to maintain your streak",
+    "flameDays": "🔥 ${streak} day streak"
   },
   "quickActions": {
     "title": "Quick Actions",
@@ -48,7 +50,8 @@
     "friendsSets": "Friends' Sets",
     "communitySets": "Community Sets",
     "friendActivity": "Friend Activity",
-    "quickStats": "Quick Stats"
+    "quickStats": "Quick Stats",
+    "recentActivity": "RECENT ACTIVITY"
   },
   "stats": {
     "sets": "Sets",

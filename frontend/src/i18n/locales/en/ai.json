@@ -43,7 +43,25 @@
     "bookmark": "Bookmark",
     "contentPolicyTitle": "Notice",
     "contentPolicyMessage": "Your message was flagged by our safety system. Please keep conversations focused on biblical study and theological inquiry.",
-    "contentPolicyUnderstand": "I Understand"
+    "contentPolicyUnderstand": "I Understand",
+    "noCredits": "No credits",
+    "noCreditsSub": "Claim your daily credit from the Home screen.",
+    "newConversation": "New Conversation",
+    "clearConfirmMessage": "Clear the current chat and start fresh?",
+    "saveAsCard": "Save as Card",
+    "disclaimer": "AI answers cite Bible verses but may contain errors. Verify important interpretations with your pastor or a trusted commentary.",
+    "attachFile": "Attach a file",
+    "chooseMedia": "Choose from My Media",
+    "yourMessage": "Your message",
+    "aiResponse": "AI response",
+    "contentPolicy": "Content Policy",
+    "contentPolicyMsg": "Please keep attachments appropriate.\\n\\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\\n\\nBy continuing, you agree to our content guidelines.",
+    "cardsSavedToast": "${cardsToSave.length} cards saved!",
+    "question": "question",
+    "questions": "questions",
+    "continueConversation": "Continue conversation",
+    "bookmarkedAt": "Bookmarked ${formatDate(chat.bookmarkedAt)}",
+    "saveToSet": "Save to Set"
   },
   "consent": {
     "title": "AI Assistant Notice",
@@ -61,7 +79,13 @@
     "declinedInfo": "AI Assistant is currently turned off based on your privacy preference. You can enable it at any time in Settings.",
     "consentRecorded": "Preferences saved",
     "consentDeclined": "AI Assistant disabled",
-    "couldNotSaveConsent": "Could not save preferences"
+    "couldNotSaveConsent": "Could not save preferences",
+    "subtitle": "Your messages are sent to third-party AI providers to generate responses:",
+    "provider1": "OpenRouter (Gemma)",
+    "provider1Desc": "Processes your text messages and questions",
+    "provider2": "Anthropic Claude",
+    "provider2Desc": "Processes media attachments (PDFs, images)",
+    "warning": "Do not share personal information you would not want these services to receive. Messages are not stored by Verdance beyond your session."
   },
   "cards": {
     "ready": "{{count}} flashcard ready",
@@ -112,7 +136,13 @@
     "legacyMessagesInfo": "Legacy messages cannot be renamed or deleted.",
     "questionsCount": "{{count}} question",
     "questionsCount_other": "{{count}} questions",
-    "creditsUsed": "{{count}} credits used"
+    "creditsUsed": "{{count}} credits used",
+    "renameTitle": "Rename Conversation",
+    "namePlaceholder": "Conversation name…",
+    "noBookmarks": "No bookmarks yet",
+    "noBookmarksSub": "Long-press any AI response and tap Bookmark to save it here",
+    "noHistory": "No chat history yet",
+    "conversation": "Conversation"
   },
   "attach": {
     "mediaCost": "Media costs 3–5 credits",

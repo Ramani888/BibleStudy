@@ -26,6 +26,31 @@ const PAID_COMMON = [
   'Study plans & group sessions',
 ];
 
+// Map each benefit string (source-of-truth in subscription.types.ts, kept English there)
+// to an i18n key so the paywall list localizes without touching the config file.
+const FEATURE_KEY: Record<string, string> = {
+  '1 AI credit per day': 'freeCredit',
+  'Unlimited flashcard sets & cards': 'unlimitedSets',
+  'Spaced repetition review': 'spacedReview',
+  'Quizzes & study streaks': 'quizStreaks',
+  'Friends & leaderboard': 'friendsLeaderboard',
+  '250 MB media storage': 'storage250',
+  '100 AI credits per month': 'credits100',
+  'Image & PDF analysis': 'imagePdfAnalysis',
+  '2 GB media storage': 'storage2gb',
+  'Credit usage statistics': 'creditStats',
+  '500 AI credits per month': 'credits500',
+  'Priority AI responses': 'priorityAi',
+  '10 GB media storage': 'storage10gb',
+  'Advanced study analytics': 'advancedAnalytics',
+  'AI-powered Bible study chat': 'aiChat',
+  'Unlimited scripture card sets': 'unlimitedScripture',
+  'Spaced repetition review system': 'spacedSystem',
+  'PDF & image media uploads': 'mediaUploads',
+  'Community friends & leaderboard': 'communityLeaderboard',
+  'Study plans & group sessions': 'studyPlans',
+};
+
 function getIncludedFeatures(tier: AnyTier): string[] {
   if (tier.plan === 'FREE') return tier.benefits;
   return [...(tier as TierDef).benefits, ...PAID_COMMON];
@@ -141,7 +166,7 @@ function IncludedSection({ tier }: { tier: AnyTier }) {
       {features.map(f => (
         <View key={f} style={styles.featureRow}>
           <CheckCircleIcon size={22} color={colors.accent} />
-          <Typography preset="body" color={colors.textPrimary} style={styles.featureLabel}>{f}</Typography>
+          <Typography preset="body" color={colors.textPrimary} style={styles.featureLabel}>{FEATURE_KEY[f] ? t(`profile:paywall.features.${FEATURE_KEY[f]}`, f) : f}</Typography>
         </View>
       ))}
     </View>
@@ -177,7 +202,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
         {/* ── Hero ── */}
         <View style={styles.hero}>
           <Typography preset="caption" color={colors.accent} style={styles.brand}>
-            BIBLE STUDY PRO
+            {t('common:appName', 'Verdance')}
           </Typography>
           <Typography preset="h1" color={colors.textPrimary} style={styles.heroTitle}>
             {t('profile:subscription.premium', 'Premium')}

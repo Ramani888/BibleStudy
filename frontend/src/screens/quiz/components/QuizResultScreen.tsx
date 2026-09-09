@@ -10,15 +10,15 @@ import { useQuizAttemptSave } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import type { SummaryItem } from '../../../types';
 
-const QUOTES = [
-  { minScore: 90, text: 'Outstanding! Your dedication is bearing real fruit.',    sub: 'Keep that momentum going.' },
-  { minScore: 70, text: 'Great work — every review sharpens the mind and spirit.', sub: "You're building something lasting." },
-  { minScore: 50, text: 'Good effort — consistency is the key to mastery.',        sub: 'Come back tomorrow and go further.' },
-  { minScore: 0,  text: "Don't be discouraged — struggle is where growth happens.", sub: 'Every attempt makes you stronger.' },
+const QUOTE_TIERS: { minScore: number; key: string }[] = [
+  { minScore: 90, key: 'excellent' },
+  { minScore: 70, key: 'great' },
+  { minScore: 50, key: 'good' },
+  { minScore: 0,  key: 'keepGoing' },
 ];
 
-function getQuote(score: number) {
-  return QUOTES.find(q => score >= q.minScore) ?? QUOTES[QUOTES.length - 1];
+function getQuoteKey(score: number): string {
+  return (QUOTE_TIERS.find(q => score >= q.minScore) ?? QUOTE_TIERS[QUOTE_TIERS.length - 1]).key;
 }
 
 const RESULT_ICON_SIZE = 56;
@@ -80,7 +80,11 @@ export function QuizResultScreen({
 
   const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
   const isNewBest = best !== null && scorePct >= best;
-  const quote = getQuote(scorePct);
+  const qk = getQuoteKey(scorePct);
+  const quote = {
+    text: t(`quiz:result.quotes.${qk}.text`),
+    sub: t(`quiz:result.quotes.${qk}.sub`),
+  };
 
   const openSummary = useCallback(() => {
     (navigation as any).navigate('QuizSummary', {

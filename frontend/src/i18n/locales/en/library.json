@@ -3,7 +3,8 @@
     "mySets": "My Sets",
     "folders": "Folders",
     "plans": "Plans",
-    "explore": "Explore"
+    "explore": "Explore",
+    "study": "Quiz"
   },
   "sets": {
     "title": "Study Sets",
@@ -41,7 +42,25 @@
     "visibilityDescFRIENDS": "Shared link",
     "layoutDEFAULT": "Default",
     "layoutMINIMAL": "Minimal",
-    "layoutDETAILED": "Detailed"
+    "layoutDETAILED": "Detailed",
+    "visibilityPublic": "Public",
+    "couldNotLoadSet": "Could not load set.",
+    "searchPlaceholder": "Search sets…",
+    "setCount": "${filteredSets.length} sets",
+    "couldNotLoadFriendsSets": "Could not load friends",
+    "emptyDesc": "Create your first study set to get started",
+    "couldNotLoadPublicSets": "Could not load public sets.",
+    "searchPublicSets": "Search public sets…",
+    "noOtherSets": "No other sets available",
+    "titleLabel": "Title",
+    "titlePlaceholder": "e.g. Romans Study",
+    "descLabel": "Description (optional)",
+    "descPlaceholder": "What is this set about?",
+    "folderOptional": "Folder (optional)",
+    "color": "Color",
+    "visibility": "Visibility",
+    "cardLayout": "Card Layout",
+    "chooseSets": "Choose Sets"
   },
   "folders": {
     "title": "Folders",
@@ -65,7 +84,18 @@
     "noSetsInFolder": "No sets in this folder",
     "noSetsInFolderSub": "Tap the button below to add your first study set to this folder.",
     "setsCount": "{{count}} set",
-    "setsCount_other": "{{count}} sets"
+    "setsCount_other": "{{count}} sets",
+    "folderCreated": "Folder created",
+    "folderUpdated": "Folder updated",
+    "emptyTitle": "No sets in this folder",
+    "emptySub": "Create a set and assign it to this folder",
+    "moveToFolder": "Move to Folder",
+    "noFolder": "No folder",
+    "noOtherFolders": "No other folders",
+    "noFolders": "No folders yet",
+    "emptyDesc": "Tap Create Folder to organise your sets",
+    "deleteFolderTitle": "Delete Folder",
+    "color": "Color"
   },
   "cards": {
     "addCard": "Add Card",
@@ -129,7 +159,32 @@
     "textLabel": "Text",
     "noteButton": "Add Note",
     "noteLabel": "Note (optional)",
-    "cardNotFound": "Card not found"
+    "cardNotFound": "Card not found",
+    "questionLetter": "Q",
+    "title": "Cards",
+    "reorderCards": "Reorder Cards",
+    "searchPlaceholder": "Search cards…",
+    "couldNotLoadCards": "Could not load cards.",
+    "reference": "Reference",
+    "tapToReveal": "Tap eye icon to reveal answer",
+    "passage": "Passage",
+    "note": "Note",
+    "noResults": "No results",
+    "addCardsToStudy": "Add cards to start studying this set",
+    "noCardsInSet": "This set has no cards yet",
+    "addCards": "Add Cards",
+    "askAI": "Ask AI",
+    "createCard": "Create Card",
+    "unblurAll": "Unblur All",
+    "blurAll": "Blur All",
+    "listView": "List View",
+    "gridView": "Grid View",
+    "addNotePlaceholder": "Add a note…",
+    "batchUpdateResult": "${toUpdate.length - failed} updated, ${failed} failed",
+    "noMatch": "No cards match ",
+    "qaCard": "Q&A Card",
+    "storyCard": "Story Card",
+    "noCards": "No cards yet"
   },
   "plans": {
     "title": "Study Plans",
@@ -157,7 +212,10 @@
     "stepOrderHelp": "Tap sets in the order you want to study them.",
     "minSetsRequired": "Select at least 1 set to create a plan.",
     "noSetsAvailable": "No sets available",
-    "noSetsAvailableSub": "Create flashcard sets first before building a study plan."
+    "noSetsAvailableSub": "Create flashcard sets first before building a study plan.",
+    "emptyTitle": "No study plans yet",
+    "emptySub": "Tap + to create a guided path through your sets.",
+    "selectedCount": "${selectedSetIds.length} sets selected"
   },
   "studyPlans": {
     "title": "Study Plans",
@@ -172,13 +230,20 @@
     "copyToLibrary": "Add to My Library",
     "copiedSuccess": "Set added to your library!",
     "noSets": "No public sets found",
-    "noSetsSub": "Try searching for a different Bible topic or keyword."
+    "noSetsSub": "Try searching for a different Bible topic or keyword.",
+    "emptyTitle": "No public sets yet",
+    "emptySubtitle": "Be the first to publish a set!",
+    "resultsFor": "${total} result${total !== 1 ? ",
+    "publicSetsAvailable": "${total} public sets available",
+    "noSetsMatch": "No sets match "
   },
   "friendsSets": {
     "title": "Friends' Sets",
     "searchPlaceholder": "Search friends' sets…",
     "noSets": "No sets from friends",
-    "noSetsSub": "When your friends publish study sets, they will appear here."
+    "noSetsSub": "When your friends publish study sets, they will appear here.",
+    "sharedCount": "${total} sets shared by friends",
+    "noSetsMatch": "No sets match "
   },
   "dialogs": {
     "deleteSetTitle": "Delete Set",
@@ -198,5 +263,6 @@
     "answerMax": "Max 1000 characters",
     "textMin": "Text must be at least 2 characters",
     "textMax": "Max 2000 characters"
-  }
+  },
+  "cardsCount_other": "${set._count?.cards ?? 0} cards"
 }

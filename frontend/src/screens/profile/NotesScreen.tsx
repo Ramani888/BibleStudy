@@ -160,7 +160,7 @@ export function NotesScreen({ navigation }: Props) {
               <Pressable style={styles.sortBtn} onPress={cycleSortOrder} hitSlop={8}>
                 <SwapIcon size={16} color={colors.textSecondary} />
                 <Typography preset="caption" color={colors.textSecondary}>
-                  {SORT_LABELS[sortOrder]}
+                  {t(`common:sort.${sortOrder === 'newest' ? 'recent' : sortOrder}`, SORT_LABELS[sortOrder])}
                 </Typography>
               </Pressable>
             </View>

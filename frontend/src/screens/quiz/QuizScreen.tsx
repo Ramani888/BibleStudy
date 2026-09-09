@@ -76,7 +76,7 @@ export function QuizScreen() {
     s.next();
   }, [s]);
 
-  const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : `${setTitles.length} Sets`);
+  const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : t('quiz:hub.setsCount', { count: setTitles.length }));
 
   // Fix 1: back button on error/loading/unavailable states (gesture is disabled globally)
   const safeHeader = (

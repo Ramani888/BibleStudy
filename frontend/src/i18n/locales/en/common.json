@@ -34,7 +34,12 @@
     "searchPlaceholder": "Search…",
     "clearSearch": "Clear search",
     "moreOptions": "More options",
-    "goBack": "Go back"
+    "goBack": "Go back",
+    "rename": "Rename",
+    "agree": "I Agree",
+    "openBrowser": "Open in browser",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "status": {
     "loading": "Loading...",
@@ -50,7 +55,13 @@
     "copiedToClipboard": "Copied to clipboard",
     "selected": "Selected",
     "couldNotDelete": "Could not delete",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "tryDifferentSearch": "Try a different search term",
+    "saved": "Saved",
+    "failedToLoad": "Failed to load cards",
+    "searching": "Searching…",
+    "you": "you",
+    "uploadingFile": "Uploading ${filename}"
   },
   "filter": {
     "all": "All"
@@ -77,5 +88,15 @@
   "validation": {
     "max200": "Max 200 characters",
     "max100": "Max 100 characters"
+  },
+  "brand": {
+    "tagline": "Study · Memorize · Grow"
+  },
+  "sort": {
+    "recent": "Recent",
+    "alpha": "A–Z",
+    "cards": "Cards",
+    "sets": "Sets",
+    "oldest": "Oldest"
   }
 }

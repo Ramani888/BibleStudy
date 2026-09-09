@@ -18,7 +18,11 @@
     "viewSummary": "View Summary",
     "reQuiz": "Re-Quiz",
     "deleteAttempt": "Delete Attempt",
-    "setsCount": "{{count}} Sets"
+    "setsCount": "{{count}} Sets",
+    "startNewQuiz": "+ Start New Quiz",
+    "emptyTitle": "No quizzes yet",
+    "emptySub": "Tap ",
+    "details": "Details"
   },
   "setup": {
     "title": "Quiz Setup",
@@ -47,7 +51,22 @@
       "newest": "Recent",
       "alpha": "A–Z",
       "cards": "Cards"
-    }
+    },
+    "chooseType": "CHOOSE A QUIZ TYPE",
+    "modeMix": "Mix",
+    "modeMixDesc": "Random mix of all types",
+    "practiceNotScored": "Practice · not scored",
+    "addCardsToQuiz": "Add cards to this set to start quizzing.",
+    "needMinCards": "Multiple choice needs ${MIN_MC_CARDS}+ cards of the same type.",
+    "cancelQuiz": "Quit quiz?",
+    "cancelWarning": "Your progress will be lost.",
+    "tapToChooseSets": "Tap to choose sets…",
+    "loadingCards": "Loading cards…",
+    "noCardsInSets": "No cards in selected sets",
+    "nameLabel": "QUIZ NAME",
+    "namePlaceholder": "e.g. Week 3 Review…",
+    "quizTypeLabel": "QUIZ TYPE",
+    "selectSetsToContinue": "Select sets to continue"
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",
@@ -58,7 +77,8 @@
     "yourAnswer": "Your Answer",
     "correctAnswer": "Correct Answer",
     "quitDialogTitle": "Quit Quiz?",
-    "quitDialogMessage": "Your progress in this quiz will be lost."
+    "quitDialogMessage": "Your progress in this quiz will be lost.",
+    "emptyState": "Nothing to quiz here"
   },
   "results": {
     "title": "Quiz Complete!",
@@ -96,7 +116,10 @@
     "correct": "Correct",
     "incorrect": "Incorrect",
     "noQuestions": "No questions match this filter.",
-    "readMode": "(read)"
+    "readMode": "(read)",
+    "reQuiz": "Re-Quiz",
+    "yourAnswer": "Your answer…",
+    "correctAnswer": "Correct"
   },
   "item": {
     "typeAnswerPlaceholder": "Type your answer…"
@@ -136,5 +159,28 @@
     "whichPassage": "Which passage is {{ref}}?",
     "typeRef": "Type {{ref}}",
     "typePassage": "Type the passage"
+  },
+  "play": {
+    "tapToRevealProgress": "Tap to reveal (${revealed}/${phrases.length})"
+  },
+  "result": {
+    "quotes": {
+      "excellent": {
+        "text": "Outstanding! Your dedication is bearing real fruit.",
+        "sub": "Keep that momentum going."
+      },
+      "great": {
+        "text": "Great work — every review sharpens the mind and spirit.",
+        "sub": "You're building something lasting."
+      },
+      "good": {
+        "text": "Good effort — consistency is the key to mastery.",
+        "sub": "Come back tomorrow and go further."
+      },
+      "keepGoing": {
+        "text": "Don't be discouraged — struggle is where growth happens.",
+        "sub": "Every attempt makes you stronger."
+      }
+    }
   }
 }

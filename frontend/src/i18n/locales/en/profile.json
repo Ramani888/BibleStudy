@@ -111,7 +111,15 @@
       "reward": "Reward",
       "purchase": "Purchase",
       "bonus": "Bonus"
-    }
+    },
+    "dailyClaimSub": "Come back tomorrow for more.",
+    "dailyClaimSuccess": "+${data.transaction.amount} credit claimed!",
+    "credit": "credit",
+    "noActivity": "No activity",
+    "net": "Net",
+    "earned": "Earned",
+    "used": "Used",
+    "activity": "Credit Activity"
   },
   "paywall": {
     "heroTagline": "Deepen your Scripture study with AI-powered flashcards, unlimited chats, and smart media analysis.",
@@ -124,7 +132,34 @@
     "restorePurchases": "Restore Purchases",
     "manageSubscription": "Manage Subscription",
     "terms": "Terms of Service",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "monthly": "Monthly",
+    "annual": "Annual",
+    "savePct": " · save ${savingsPct}%",
+    "billedAnnuallyFinePrint": "Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.",
+    "billedMonthlyFinePrint": "Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.",
+    "features": {
+      "freeCredit": "1 AI credit per day",
+      "unlimitedSets": "Unlimited flashcard sets & cards",
+      "spacedReview": "Spaced repetition review",
+      "quizStreaks": "Quizzes & study streaks",
+      "friendsLeaderboard": "Friends & leaderboard",
+      "storage250": "250 MB media storage",
+      "credits100": "100 AI credits per month",
+      "imagePdfAnalysis": "Image & PDF analysis",
+      "storage2gb": "2 GB media storage",
+      "creditStats": "Credit usage statistics",
+      "credits500": "500 AI credits per month",
+      "priorityAi": "Priority AI responses",
+      "storage10gb": "10 GB media storage",
+      "advancedAnalytics": "Advanced study analytics",
+      "aiChat": "AI-powered Bible study chat",
+      "unlimitedScripture": "Unlimited scripture card sets",
+      "spacedSystem": "Spaced repetition review system",
+      "mediaUploads": "PDF & image media uploads",
+      "communityLeaderboard": "Community friends & leaderboard",
+      "studyPlans": "Study plans & group sessions"
+    }
   },
   "notes": {
     "title": "Study Notes",
@@ -165,7 +200,26 @@
     "deleteFileMessage": "Delete \"{{name}}\"? This cannot be undone.",
     "fileDeleted": "File deleted",
     "fileRenamed": "File renamed",
-    "deletePartial": "{{ok}} deleted, {{failed}} failed"
+    "deletePartial": "{{ok}} deleted, {{failed}} failed",
+    "image": "Image",
+    "pdf": "PDF",
+    "fileUploadedSuccess": "${name} uploaded",
+    "pdfPreviewError": "This PDF could not be previewed in-app.",
+    "expiresToday": "Expires today",
+    "images": "Images",
+    "pdfs": "PDFs",
+    "noImagesYet": "No images yet",
+    "tapToUploadPhoto": "Tap + to upload your first photo",
+    "noPdfsYet": "No PDFs yet",
+    "tapToUploadPdf": "Tap + to upload your first PDF",
+    "addImage": "Add Image",
+    "renameFile": "Rename File",
+    "fileName": "File name",
+    "expiresInDays": "Expires in ${days}d",
+    "storageUsedOfLimit": "${fmtBytes(used)} of ${fmtBytes(limit)} used · ${percent}%",
+    "expiresInDaysUpgrade": "Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep",
+    "noImagesMatch": "No images match ",
+    "noPdfsMatch": "No PDFs match "
   },
   "friends": {
     "title": "Friends",
@@ -189,7 +243,21 @@
     "requestAccepted": "Friend request accepted",
     "requestDeclined": "Friend request declined",
     "friendRemoved": "Friend removed",
-    "userBlocked": "User blocked"
+    "userBlocked": "User blocked",
+    "noBlockedUsersSub": "Users you block will appear here",
+    "incoming": "Incoming",
+    "sent": "Sent",
+    "removedSuccess": "${name} removed",
+    "bestStreakAchievements": "Best ${item.longestStreak} · ${item.achievements} achievements",
+    "findFriendsSub": "Search by name or email to connect with others.",
+    "requestSentTo": "Friend request sent to ${user.name}",
+    "removeFriend": "Remove Friend",
+    "requestPending": "Request Pending",
+    "cancelRequest": "Cancel Request",
+    "sendRequest": "Send Friend Request",
+    "blockUser": "Block User",
+    "theirSets": "Their Sets",
+    "mutualFriendsCount": "${user.mutualFriendsCount} mutual friends"
   },
   "user": {
     "couldNotLoadProfile": "Could not load profile",
@@ -223,7 +291,9 @@
     "privacySec6Title": "Third-Party Services",
     "privacySec6Body": "We use Apple In-App Purchase for subscriptions, Firebase Cloud Messaging for push notifications, and AI providers for chat features. Each service has its own privacy policy governing how they handle data.",
     "privacySec7Title": "Contact Us",
-    "privacySec7Body": "For privacy-related questions or data requests, contact us at:\nddtechservices.work@gmail.com"
+    "privacySec7Body": "For privacy-related questions or data requests, contact us at:\nddtechservices.work@gmail.com",
+    "terms": "Terms of Use",
+    "privacy": "Privacy Policy"
   },
   "chart": {
     "day": "Daily",
@@ -252,6 +322,46 @@
         "text": "Every great journey begins with a single step.",
         "sub": "Start your streak today."
       }
+    },
+    "noRanking": "No one to rank yet",
+    "noRankingSub": "Add friends to compete on study streaks."
+  },
+  "achievements": {
+    "unlocked": "${unlockedCount} unlocked",
+    "locked": "Locked",
+    "remaining": "${remaining} remaining",
+    "categories": {
+      "study": "Study",
+      "quiz": "Quiz",
+      "streak": "Streak",
+      "social": "Community",
+      "ai": "AI"
     }
+  },
+  "blockedUsers": {
+    "unblock": "Unblock",
+    "unblockedSuccess": "${name} unblocked"
+  },
+  "notificationSettings": {
+    "hint": "Choose which notifications you"
+  },
+  "subscription": {
+    "free": "Free",
+    "noCardNeeded": "No card needed",
+    "bestValue": "Best Value",
+    "billedAnnually": "Billed annually",
+    "billedMonthly": "Billed monthly",
+    "premium": "Premium",
+    "tagline": "Bible study is free. Credits unlock AI assistance.",
+    "freePlan": "Free Plan",
+    "currentPlan": "Current Plan",
+    "restore": "Restore Purchases",
+    "manage": "Manage Subscription",
+    "whatsIncluded": "What",
+    "subscribePrice": "Subscribe · ${opt!.priceLabel}",
+    "receiptError": "Could not read purchase receipt"
+  },
+  "account": {
+    "memberSince": "Member since ${formatDateOnly(user.createdAt)}"
   }
 }
