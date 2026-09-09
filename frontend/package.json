@@ -5,7 +5,7 @@
   "scripts": {
     "android": "react-native run-android",
     "app-icon": "node scripts/generate-app-icon.mjs",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --extra-params '-allowProvisioningUpdates'",
     "lint": "eslint .",
     "start": "react-native start",
     "test": "jest",
