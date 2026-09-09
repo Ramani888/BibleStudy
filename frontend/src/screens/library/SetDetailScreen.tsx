@@ -243,14 +243,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     </View>
   );
 
-  if (isError) {
-    return (
-      <Screen header={header}>
-        <ErrorState message={t('library:cards.couldNotLoadCards', 'Could not load cards.')} onRetry={refetch} />
-      </Screen>
-    );
-  }
-
   // ── Normal card (list / grid) ──
   const renderCard = useCallback(({ item }: { item: CardType }) => {
     const isStory = item.type === 'STORY';
@@ -355,6 +347,14 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     </ScaleDecorator>
     );
   }, [isDark, colors, t]);
+
+  if (isError) {
+    return (
+      <Screen header={header}>
+        <ErrorState message={t('library:cards.couldNotLoadCards', 'Could not load cards.')} onRetry={refetch} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen header={header}>
