@@ -14,10 +14,12 @@ import { useAuthStore } from './src/store';
 import { useTheme, useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 import { configureGoogleSignIn } from './src/utils/socialAuth';
+import { configureRevenueCat } from './src/lib/purchases';
 import { SplashScreen } from './src/screens/SplashScreen';
 // Enable native screens for better performance
 enableScreens(true);
 configureGoogleSignIn();
+configureRevenueCat();
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);

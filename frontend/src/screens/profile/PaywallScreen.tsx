@@ -6,7 +6,7 @@ import type { BillingPeriod, FreeTierDef, TierDef } from '../../types';
 import { FREE_TIER, TIERS } from '../../types';
 import { useAuthStore } from '../../store';
 import { useIapSubscriptions } from '../../hooks';
-import { openManageSubscriptions } from '../../utils/iap';
+import { openManageSubscriptions } from '../../lib/purchases';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
