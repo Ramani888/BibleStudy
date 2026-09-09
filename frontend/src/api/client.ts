@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/auth.store';
 
 // Config.API_BASE_URL is bundled from .env at build time. The fallbacks only fire on a
 // misconfigured build — dev → local server, release → prod host (never localhost).
-const BASE_URL = Config.API_BASE_URL ?? (__DEV__ ? 'http://localhost:3010/api/v1' : 'http://94.130.176.8/api/v1');
+const BASE_URL = Config.API_BASE_URL ?? (__DEV__ ? 'http://localhost:3010/api/v1' : 'https://api.getverdance.com/api/v1');
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,
