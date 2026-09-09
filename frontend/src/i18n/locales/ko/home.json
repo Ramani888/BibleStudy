@@ -5,7 +5,8 @@
     "evening": "좋은 저녁입니다",
     "streak": "{{count}}일 연속 학습 중! 계속 힘내세요",
     "streak_one": "연속 학습 1일 차! 좋은 시작입니다",
-    "streakDays": "{{count}}일 연속"
+    "streakDays": "{{count}}일 연속",
+    "streakDays_other": "{{count}}일 연속"
   },
   "stats": {
     "dueToday": "오늘 복습할 카드",
@@ -84,7 +85,8 @@
     "days": "{{count}}일 연속",
     "keepGoing": "이 좋은 흐름을 계속 이어가세요!",
     "streakLost": "연속 기록을 유지하려면 오늘 공부하세요",
-    "flameDays": "🔥 {{count}}일 연속"
+    "flameDays": "🔥 {{count}}일 연속",
+    "flameDays_other": "🔥 {{count}}일 연속"
   },
   "sections": {
     "recentSets": "최근 세트",

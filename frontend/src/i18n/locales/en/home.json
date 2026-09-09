@@ -3,7 +3,8 @@
     "morning": "Good morning",
     "afternoon": "Good afternoon",
     "evening": "Good evening",
-    "streakDays": "{{count}} day streak"
+    "streakDays": "{{count}} day streak",
+    "streakDays_other": "{{count}} days streak"
   },
   "featured": {
     "due": "DUE",
@@ -27,7 +28,8 @@
     "days": "{{count}} Days Streak",
     "keepGoing": "Keep up the great work!",
     "streakLost": "Study today to maintain your streak",
-    "flameDays": "🔥 {{count}} day streak"
+    "flameDays": "🔥 {{count}} day streak",
+    "flameDays_other": "🔥 {{count}} days streak"
   },
   "quickActions": {
     "title": "Quick Actions",

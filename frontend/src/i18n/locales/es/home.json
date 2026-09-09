@@ -5,7 +5,8 @@
     "evening": "Buenas noches",
     "streak": "¡Racha de {{count}} días! Sigue así",
     "streak_one": "¡Día 1 de racha! Gran comienzo",
-    "streakDays": "Racha de {{count}} días"
+    "streakDays": "Racha de {{count}} día",
+    "streakDays_other": "Racha de {{count}} días"
   },
   "stats": {
     "dueToday": "Pendiente hoy",
@@ -84,7 +85,8 @@
     "days": "Racha de {{count}} días",
     "keepGoing": "¡Sigue así, vas muy bien!",
     "streakLost": "Estudia hoy para mantener tu racha",
-    "flameDays": "🔥 Racha de {{count}} días"
+    "flameDays": "🔥 Racha de {{count}} día",
+    "flameDays_other": "🔥 Racha de {{count}} días"
   },
   "sections": {
     "recentSets": "Sets recientes",
