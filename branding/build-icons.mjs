@@ -84,5 +84,28 @@ jobs.push(alpha(fg, 160).toFile(`${LAUNCH}/launch-logo.png`));
 jobs.push(alpha(fg, 320).toFile(`${LAUNCH}/launch-logo@2x.png`));
 jobs.push(alpha(fg, 480).toFile(`${LAUNCH}/launch-logo@3x.png`));
 
-await Promise.all(jobs);
-console.log(`OK: generated ${jobs.length} PNGs`);
+// Web: favicon + social-share (OG) image for the hosted privacy/terms pages
+const LEGAL = `${ROOT}/legal`;
+mkdirSync(LEGAL, { recursive: true });
+const og = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs><linearGradient id="g" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+    <stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
+  <rect width="1200" height="630" fill="url(#g)"/>
+  <g transform="translate(510,150) scale(0.62)">
+    <path d="M0 0 L150 318 L300 0" stroke="#fff" stroke-width="40" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M150 318 C90 194 90 80 150 -36 C210 80 210 194 150 318 Z" fill="#fff"/>
+  </g>
+  <text x="600" y="470" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif"
+        font-size="96" font-weight="500" letter-spacing="10" fill="#fff">Verdance</text>
+  <text x="600" y="530" text-anchor="middle" font-family="Helvetica, Arial, sans-serif"
+        font-size="30" letter-spacing="6" fill="#EEF0FF" opacity="0.9">GROW IN THE WORD</text>
+</svg>`;
+await Promise.all([
+  sharp(buf(og)).resize(1200, 630).flatten({ background: '#6366F1' }).png().toFile(`${LEGAL}/og-image.png`),
+  opaque(square, 512).toFile(`${LEGAL}/favicon-512.png`),
+  opaque(square, 180).toFile(`${LEGAL}/apple-touch-icon.png`),
+  opaque(square, 48).toFile(`${LEGAL}/favicon-48.png`),
+  opaque(square, 32).toFile(`${LEGAL}/favicon-32.png`),
+]);
+
+console.log(`OK: generated ${jobs.length} app PNGs + 5 web assets`);
