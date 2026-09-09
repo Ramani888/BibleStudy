@@ -1,7 +1,7 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-08-14
+updated: 2026-09-09
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
@@ -49,6 +49,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Hooks & API Layer]] — how screens talk to the backend
 - [[Theme & Components]] — design tokens + component library
 - [[Design Language (Calm Serene)]] — app-wide redesign reference (start here for styling)
+- [[Localization (i18n)]] — 6 locales, deterministic completeness scan, translation caveats
 
 ## 🛠️ Ops
 - [[Local Dev Setup]] — running locally (Postgres 5434)
