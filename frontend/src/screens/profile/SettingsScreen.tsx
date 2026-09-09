@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
-import { ConfirmDialog } from '../../components/feedback';
+import { ConfirmDialog, SelectSheet } from '../../components/feedback';
 import { Switch, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -15,7 +15,7 @@ import { useAuthStore } from '../../store';
 import { useConfirmDialog } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { spacing, useTheme, useThemeStore } from '../../theme';
-import { useLanguageStore, SUPPORTED_LANGUAGES } from '../../i18n';
+import { useLanguageStore, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../../i18n';
 
 const APP_VERSION = '1.0.0';
 
@@ -30,7 +30,22 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   const isDark = theme.name === 'dark';
   const setMode = useThemeStore(s => s.setMode);
   const currentLang = useLanguageStore(s => s.language);
+  const setLanguage = useLanguageStore(s => s.setLanguage);
   const languageName = SUPPORTED_LANGUAGES[currentLang]?.nativeName || 'English';
+  const [langSheetVisible, setLangSheetVisible] = useState(false);
+
+  const languageOptions = useMemo(
+    () => Object.values(SUPPORTED_LANGUAGES).map(l => ({ id: l.code, label: l.nativeName })),
+    [],
+  );
+
+  const handleSelectLanguage = useCallback(
+    async (id: string) => {
+      setLangSheetVisible(false);
+      await setLanguage(id as SupportedLanguage);
+    },
+    [setLanguage],
+  );
 
   const handleSignOut = useCallback(() => {
     show({
@@ -82,14 +97,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
               icon={GlobeIcon}
               label={t('profile:settings.language')}
               value={languageName}
-              showChevron={false}
-              onPress={() => {
-                Toast.show({
-                  type: 'info',
-                  text1: t('profile:settings.language'),
-                  text2: `${languageName} is active`,
-                });
-              }}
+              onPress={() => setLangSheetVisible(true)}
             />
           </MenuSection>
         </View>
@@ -112,6 +120,15 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
       </ScrollView>
 
       <ConfirmDialog {...dialogProps} />
+      <SelectSheet
+        visible={langSheetVisible}
+        title={t('profile:settings.language')}
+        options={languageOptions}
+        selectedId={currentLang}
+        searchable={false}
+        onSelect={handleSelectLanguage}
+        onClose={() => setLangSheetVisible(false)}
+      />
     </Screen>
   );
 }
