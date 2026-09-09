@@ -35,6 +35,7 @@ const envSchema = z.object({
   // IAP subscriptions (optional — receipt verification disabled per-store when absent)
   APPLE_IAP_SHARED_SECRET: z.string().optional().default(''), // App Store Connect → app-specific shared secret
   GOOGLE_PLAY_SA_JSON:     z.string().optional().default(''), // Play service-account JSON (stringified); enables Google verify
+  RC_WEBHOOK_AUTH:         z.string().optional().default(''), // RevenueCat webhook Authorization header value (shared secret)
 
   // Firebase (optional — push notifications disabled when absent)
   FIREBASE_PROJECT_ID: z.string().optional().default(''),

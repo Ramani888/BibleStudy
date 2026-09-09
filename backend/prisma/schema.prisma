@@ -201,11 +201,20 @@ model Subscription {
   store                 Store
   productId             String
   expiresAt             DateTime
-  originalTransactionId String   @unique
-  lastTransactionId     String
+  originalTransactionId String?  @unique
+  lastTransactionId     String?
+  rcAppUserId           String?  // RevenueCat app_user_id (== our userId once logIn'd)
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
   user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Idempotency ledger for RevenueCat webhooks (RC retries on non-2xx). One row per event.id.
+model ProcessedWebhookEvent {
+  id        String   @id            // RevenueCat event.id
+  type      String
+  appUserId String?
+  createdAt DateTime @default(now())
 }
 
 model CreditTransaction {

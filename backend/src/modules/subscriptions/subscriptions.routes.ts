@@ -6,6 +6,9 @@ import { VerifyPurchaseDto } from './subscriptions.dto';
 
 const router = Router();
 
+// RevenueCat webhook — public route (auth via Authorization header), MUST be before authMiddleware.
+router.post('/rc-webhook', subscriptionsController.rcWebhook);
+
 router.use(authMiddleware);
 
 router.post('/verify', validate(VerifyPurchaseDto), subscriptionsController.verifyPurchase);
