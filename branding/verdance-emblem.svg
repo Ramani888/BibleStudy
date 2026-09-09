@@ -1,0 +1,22 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#8B5CF6"/>
+      <stop offset="1" stop-color="#6366F1"/>
+    </linearGradient>
+    <linearGradient id="mark" x1="512" y1="336" x2="512" y2="690" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EEF0FF"/>
+    </linearGradient>
+  </defs>
+
+  <!-- app-theme gradient tile (violet500 -> indigo500) -->
+  <rect width="1024" height="1024" rx="228" fill="url(#tile)"/>
+
+  <!-- V arms meeting at the leaf's lower tip. Monoline, geometric. -->
+  <path d="M360 372 L512 690 L664 372" stroke="url(#mark)" stroke-width="40"
+        stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+
+  <!-- leaf = vesica (overlap of two circles), cradled by the V -->
+  <path d="M512 690 C 452 566 452 452 512 336 C 572 452 572 566 512 690 Z" fill="url(#mark)"/>
+</svg>
