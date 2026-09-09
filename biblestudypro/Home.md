@@ -53,6 +53,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Brand & Assets]] — Verdance logo, icons/splash/notification, store + web assets (all from `branding/build-icons.mjs`)
 
 ## 🛠️ Ops
+- [[Identity & Accounts]] — ⭐ authoritative app name, bundle IDs, Firebase/OAuth accounts
 - [[Local Dev Setup]] — running locally (Postgres 5434)
 - [[Deployment (Hetzner)]] — the VPS setup (currently stopped)
 - [[Migration History]] — Prisma migration timeline & the reconciliation
