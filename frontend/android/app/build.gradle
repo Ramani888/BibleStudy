@@ -82,7 +82,7 @@ android {
 
     namespace "com.biblestudypro.app"
     defaultConfig {
-        applicationId "com.biblestudypro.app"
+        applicationId "com.getverdance.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

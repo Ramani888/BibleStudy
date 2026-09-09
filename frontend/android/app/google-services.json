@@ -1,26 +1,59 @@
 {
   "project_info": {
-    "project_number": "820831909172",
-    "project_id": "biblestudy-2b14c",
-    "storage_bucket": "biblestudy-2b14c.firebasestorage.app"
+    "project_number": "169277764350",
+    "project_id": "verdance-bb5c2",
+    "storage_bucket": "verdance-bb5c2.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:820831909172:android:12990f215124d8f2ee2161",
+        "mobilesdk_app_id": "1:169277764350:android:d0e43cf70ec247df30ebaf",
         "android_client_info": {
-          "package_name": "com.biblestudypro.app"
+          "package_name": "com.getverdance.app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "169277764350-gqbe89aj4l0pa7duhh3sen5eult9s8db.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.getverdance.app",
+            "certificate_hash": "e57783bdb61317083204c17d38d1d5570a6ed231"
+          }
+        },
+        {
+          "client_id": "169277764350-k98c1r9qbi456udvd69r3859m64h685s.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.getverdance.app",
+            "certificate_hash": "e7c628dcad71fe1e42e51200c37f631348390811"
+          }
+        },
+        {
+          "client_id": "169277764350-kbrebkkq0ag11cp2l7mlq32voaipo6d4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
-          "current_key": "AIzaSyAoZqe5rj5_ei-rmlpw-k6jGrlBztsbSOE"
+          "current_key": "AIzaSyBc1Bv2UtPiBlan9MeMrX1disNV_Uz7rPU"
         }
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "169277764350-kbrebkkq0ag11cp2l7mlq32voaipo6d4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "169277764350-k1ldne34ha1gj88vi7ckdp4almbv3e15.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.getverdance.app"
+              }
+            }
+          ]
         }
       }
     }
