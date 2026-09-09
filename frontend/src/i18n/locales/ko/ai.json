@@ -43,7 +43,25 @@
     "bookmark": "북마크 추가",
     "contentPolicyTitle": "알림",
     "contentPolicyMessage": "메시지가 보안 시스템에 감지되었습니다. 성경 공부와 관련된 대화만 진행해 주세요.",
-    "contentPolicyUnderstand": "확인했습니다"
+    "contentPolicyUnderstand": "확인했습니다",
+    "noCredits": "크레딧 없음",
+    "noCreditsSub": "홈 화면에서 매일 크레딧을 받으세요.",
+    "newConversation": "새 대화",
+    "clearConfirmMessage": "현재 채팅을 지우고 새로 시작할까요?",
+    "saveAsCard": "카드로 저장",
+    "disclaimer": "AI 답변은 성경 구절을 인용하지만 오류가 있을 수 있습니다. 중요한 해석은 목사님이나 신뢰할 수 있는 주석서로 확인하세요.",
+    "attachFile": "파일 첨부",
+    "chooseMedia": "내 미디어에서 선택",
+    "yourMessage": "메시지",
+    "aiResponse": "AI 응답",
+    "contentPolicy": "콘텐츠 정책",
+    "contentPolicyMsg": "첨부 파일은 적절한 내용으로 유지해 주세요.\\n\\n성적, 폭력적 또는 불법적인 콘텐츠를 업로드하지 마세요. 위반 시 계정이 정지될 수 있습니다.\\n\\n계속하면 콘텐츠 가이드라인에 동의하는 것입니다.",
+    "cardsSavedToast": "${cardsToSave.length}개의 카드가 저장되었습니다!",
+    "question": "질문",
+    "questions": "질문",
+    "continueConversation": "대화 계속하기",
+    "bookmarkedAt": "${formatDate(chat.bookmarkedAt)}에 북마크됨",
+    "saveToSet": "세트에 저장"
   },
   "consent": {
     "title": "AI 어시스턴트 고지사항",
@@ -61,7 +79,13 @@
     "declinedInfo": "개인정보 보호 설정에 따라 AI 어시스턴트가 비활성화되었습니다. 설정에서 다시 활성화할 수 있습니다.",
     "consentRecorded": "설정이 저장되었습니다",
     "consentDeclined": "AI 어시스턴트가 비활성화되었습니다",
-    "couldNotSaveConsent": "설정을 저장할 수 없습니다"
+    "couldNotSaveConsent": "설정을 저장할 수 없습니다",
+    "subtitle": "응답 생성을 위해 회원님의 메시지가 제3자 AI 제공업체로 전송됩니다:",
+    "provider1": "OpenRouter (Gemma)",
+    "provider1Desc": "텍스트 메시지와 질문을 처리합니다",
+    "provider2": "Anthropic Claude",
+    "provider2Desc": "미디어 첨부 파일(PDF, 이미지)을 처리합니다",
+    "warning": "이 서비스에 제공하고 싶지 않은 개인 정보는 공유하지 마세요. 메시지는 세션 이후 Verdance에 저장되지 않습니다."
   },
   "cards": {
     "ready": "{{count}}개 카드 준비됨",
@@ -112,7 +136,13 @@
     "legacyMessagesInfo": "이전 메시지는 수정하거나 삭제할 수 없습니다.",
     "questionsCount": "{{count}}개 질문",
     "questionsCount_other": "{{count}}개 질문",
-    "creditsUsed": "{{count}} 크레딧 사용됨"
+    "creditsUsed": "{{count}} 크레딧 사용됨",
+    "renameTitle": "대화 이름 변경",
+    "namePlaceholder": "대화 이름…",
+    "noBookmarks": "아직 북마크가 없습니다",
+    "noBookmarksSub": "AI 응답을 길게 눌러 북마크를 탭하면 여기에 저장됩니다",
+    "noHistory": "아직 채팅 기록이 없습니다",
+    "conversation": "대화"
   },
   "attach": {
     "mediaCost": "미디어는 3~5 크레딧이 필요합니다",

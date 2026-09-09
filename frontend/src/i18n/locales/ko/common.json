@@ -35,7 +35,11 @@
     "clearAll": "모두 지우기",
     "select": "선택",
     "apply": "적용",
-    "remove": "삭제"
+    "remove": "삭제",
+    "agree": "동의합니다",
+    "openBrowser": "브라우저에서 열기",
+    "accept": "수락",
+    "decline": "거절"
   },
   "status": {
     "loading": "로딩 중...",
@@ -52,7 +56,13 @@
     "selected": "선택됨",
     "couldNotDelete": "삭제할 수 없습니다",
     "unknownError": "알 수 없는 오류",
-    "uploading": "업로드 중..."
+    "uploading": "업로드 중...",
+    "tryDifferentSearch": "다른 검색어를 시도해 보세요",
+    "saved": "저장됨",
+    "failedToLoad": "카드를 불러오지 못했습니다",
+    "searching": "검색 중…",
+    "you": "나",
+    "uploadingFile": "${filename} 업로드 중"
   },
   "filter": {
     "all": "전체"
@@ -79,5 +89,14 @@
   "validation": {
     "max200": "최대 200자",
     "max100": "최대 100자"
+  },
+  "brand": {
+    "tagline": "공부 · 암송 · 성장"
+  },
+  "sort": {
+    "recent": "최근",
+    "cards": "카드",
+    "sets": "세트",
+    "oldest": "오래된순"
   }
 }

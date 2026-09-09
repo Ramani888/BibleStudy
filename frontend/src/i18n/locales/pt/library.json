@@ -3,7 +3,8 @@
     "mySets": "Meus Conjuntos",
     "folders": "Pastas",
     "plans": "Planos",
-    "explore": "Explorar"
+    "explore": "Explorar",
+    "study": "Quiz"
   },
   "sets": {
     "title": "Conjuntos de Estudo",
@@ -41,7 +42,25 @@
     "visibilityDescFRIENDS": "Link compartilhado",
     "layoutDEFAULT": "Padrão",
     "layoutMINIMAL": "Minimalista",
-    "layoutDETAILED": "Detalhado"
+    "layoutDETAILED": "Detalhado",
+    "visibilityPublic": "Público",
+    "couldNotLoadSet": "Não foi possível carregar o conjunto.",
+    "searchPlaceholder": "Buscar conjuntos…",
+    "setCount": "${filteredSets.length} conjuntos",
+    "couldNotLoadFriendsSets": "Não foi possível carregar os amigos",
+    "emptyDesc": "Crie seu primeiro conjunto de estudo para começar",
+    "couldNotLoadPublicSets": "Não foi possível carregar os conjuntos públicos.",
+    "searchPublicSets": "Buscar conjuntos públicos…",
+    "noOtherSets": "Nenhum outro conjunto disponível",
+    "titleLabel": "Título",
+    "titlePlaceholder": "ex. Estudo de Romanos",
+    "descLabel": "Descrição (opcional)",
+    "descPlaceholder": "Sobre o que é este conjunto?",
+    "folderOptional": "Pasta (opcional)",
+    "color": "Cor",
+    "visibility": "Visibilidade",
+    "cardLayout": "Layout do card",
+    "chooseSets": "Escolher conjuntos"
   },
   "folders": {
     "title": "Pastas",
@@ -67,7 +86,16 @@
     "noSetsInFolder": "Nenhum conjunto nesta pasta",
     "noSetsInFolderSub": "Toque no botão abaixo para adicionar seu primeiro conjunto a esta pasta.",
     "setsCount": "{{count}} conjunto",
-    "setsCount_other": "{{count}} conjuntos"
+    "setsCount_other": "{{count}} conjuntos",
+    "emptyTitle": "Nenhum conjunto nesta pasta",
+    "emptySub": "Crie um conjunto e atribua-o a esta pasta",
+    "moveToFolder": "Mover para pasta",
+    "noFolder": "Sem pasta",
+    "noOtherFolders": "Nenhuma outra pasta",
+    "noFolders": "Nenhuma pasta ainda",
+    "emptyDesc": "Toque em Criar pasta para organizar seus conjuntos",
+    "deleteFolderTitle": "Excluir pasta",
+    "color": "Cor"
   },
   "cards": {
     "addCard": "Adicionar Cartão",
@@ -131,7 +159,31 @@
     "textLabel": "Texto",
     "noteButton": "Adicionar nota",
     "noteLabel": "Nota (opcional)",
-    "cardNotFound": "Cartão não encontrado"
+    "cardNotFound": "Cartão não encontrado",
+    "title": "Cards",
+    "reorderCards": "Reordenar cards",
+    "searchPlaceholder": "Buscar cards…",
+    "couldNotLoadCards": "Não foi possível carregar os cards.",
+    "reference": "Referência",
+    "tapToReveal": "Toque no ícone de olho para revelar a resposta",
+    "passage": "Passagem",
+    "note": "Nota",
+    "noResults": "Nenhum resultado",
+    "addCardsToStudy": "Adicione cards para começar a estudar este conjunto",
+    "noCardsInSet": "Este conjunto ainda não tem cards",
+    "addCards": "Adicionar cards",
+    "askAI": "Perguntar à AI",
+    "createCard": "Criar card",
+    "unblurAll": "Revelar tudo",
+    "blurAll": "Desfocar tudo",
+    "listView": "Visualização em lista",
+    "gridView": "Visualização em grade",
+    "addNotePlaceholder": "Adicionar uma nota…",
+    "batchUpdateResult": "${toUpdate.length - failed} atualizados, ${failed} com falha",
+    "noMatch": "Nenhum card corresponde a ",
+    "qaCard": "Card de P&R",
+    "storyCard": "Card de história",
+    "noCards": "Nenhum card ainda"
   },
   "plans": {
     "title": "Planos de Estudo",
@@ -159,7 +211,10 @@
     "stepOrderHelp": "Toque nos conjuntos na ordem em que deseja estudá-los.",
     "minSetsRequired": "Selecione pelo menos 1 conjunto para criar um plano.",
     "noSetsAvailable": "Nenhum conjunto disponível",
-    "noSetsAvailableSub": "Crie conjuntos de flashcards primeiro antes de montar um plano."
+    "noSetsAvailableSub": "Crie conjuntos de flashcards primeiro antes de montar um plano.",
+    "emptyTitle": "Nenhum plano de estudo ainda",
+    "emptySub": "Toque em + para criar um caminho guiado pelos seus conjuntos.",
+    "selectedCount": "${selectedSetIds.length} conjuntos selecionados"
   },
   "studyPlans": {
     "title": "Planos de Estudo",
@@ -174,13 +229,20 @@
     "copyToLibrary": "Adicionar à Minha Biblioteca",
     "copiedSuccess": "Conjunto adicionado à sua biblioteca!",
     "noSets": "Nenhum conjunto público encontrado",
-    "noSetsSub": "Tente buscar por outro tópico bíblico ou palavra-chave."
+    "noSetsSub": "Tente buscar por outro tópico bíblico ou palavra-chave.",
+    "emptyTitle": "Nenhum conjunto público ainda",
+    "emptySubtitle": "Seja o primeiro a publicar um conjunto!",
+    "resultsFor": "${total} result${total !== 1 ? ",
+    "publicSetsAvailable": "${total} conjuntos públicos disponíveis",
+    "noSetsMatch": "Nenhum conjunto corresponde a "
   },
   "friendsSets": {
     "title": "Conjuntos dos Amigos",
     "searchPlaceholder": "Buscar conjuntos dos amigos…",
     "noSets": "Nenhum conjunto dos amigos",
-    "noSetsSub": "Quando seus amigos publicarem conjuntos de estudo, eles aparecerão aqui."
+    "noSetsSub": "Quando seus amigos publicarem conjuntos de estudo, eles aparecerão aqui.",
+    "sharedCount": "${total} conjuntos compartilhados por amigos",
+    "noSetsMatch": "Nenhum conjunto corresponde a "
   },
   "dialogs": {
     "deleteSetTitle": "Excluir Conjunto",
@@ -200,5 +262,6 @@
     "answerMax": "Máximo de 1000 caracteres",
     "textMin": "O texto deve ter pelo menos 2 caracteres",
     "textMax": "Máximo de 2000 caracteres"
-  }
+  },
+  "cardsCount_other": "${set._count?.cards ?? 0} cards"
 }

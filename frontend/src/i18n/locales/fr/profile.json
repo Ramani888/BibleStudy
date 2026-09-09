@@ -59,7 +59,15 @@
         "30d": "30 jours",
         "all": "Tout"
       }
-    }
+    },
+    "dailyClaimSub": "Revenez demain pour en obtenir davantage.",
+    "dailyClaimSuccess": "+${data.transaction.amount} crédit réclamé !",
+    "credit": "crédit",
+    "noActivity": "Aucune activité",
+    "net": "Net",
+    "earned": "Gagnés",
+    "used": "Utilisés",
+    "activity": "Activité des crédits"
   },
   "streak": "Série d'Étude",
   "streakCount": "Série de {{count}} jours",
@@ -68,7 +76,18 @@
   "bestStreak": "Meilleure série",
   "setsCreated": "Séries Créées",
   "cardsStudied": "Cartes Étudiées",
-  "achievements": "Succès",
+  "achievements": {
+    "unlocked": "${unlockedCount} débloquées",
+    "locked": "Verrouillé",
+    "remaining": "${remaining} restantes",
+    "categories": {
+      "study": "Étude",
+      "quiz": "Quiz",
+      "streak": "Série",
+      "social": "Communauté",
+      "ai": "AI"
+    }
+  },
   "unlockedCount": "{{unlocked}} sur {{total}} débloqués",
   "weeklyActivity": "Activité Hebdomadaire",
   "upgradeToPro": "Passer à Pro",
@@ -128,7 +147,26 @@
       "spacedRepetition": "Algorithme avancé de répétition espacée",
       "unlimitedSets": "Séries d'étude et dossiers illimités",
       "offlineAccess": "Accès hors ligne complet à toutes vos séries",
-      "prioritySupport": "Support prioritaire et badges exclusifs"
+      "prioritySupport": "Support prioritaire et badges exclusifs",
+      "freeCredit": "1 crédit AI par jour",
+      "spacedReview": "Révision par répétition espacée",
+      "quizStreaks": "Quiz et séries d'étude",
+      "friendsLeaderboard": "Amis et classement",
+      "storage250": "250 MB de stockage média",
+      "credits100": "100 crédits AI par mois",
+      "imagePdfAnalysis": "Analyse d'images et de PDF",
+      "storage2gb": "2 GB de stockage média",
+      "creditStats": "Statistiques d'utilisation des crédits",
+      "credits500": "500 crédits AI par mois",
+      "priorityAi": "Réponses AI prioritaires",
+      "storage10gb": "10 GB de stockage média",
+      "advancedAnalytics": "Analyses d'étude avancées",
+      "aiChat": "Discussion d'étude biblique par AI",
+      "unlimitedScripture": "Ensembles de cartes bibliques illimités",
+      "spacedSystem": "Système de révision par répétition espacée",
+      "mediaUploads": "Envois de médias PDF et images",
+      "communityLeaderboard": "Amis de la communauté et classement",
+      "studyPlans": "Plans d'étude et sessions de groupe"
     },
     "freeTier": "Gratuit",
     "freeTierSub": "Aucune carte requise",
@@ -140,7 +178,12 @@
     "manageSubscription": "Gérer l'Abonnement",
     "terms": "Conditions d'Utilisation",
     "privacy": "Politique de Confidentialité",
-    "heroTagline": "Approfondissez votre étude des Écritures avec des cartes mémoire propulsées par l'IA, des chats illimités et une analyse média intelligente."
+    "heroTagline": "Approfondissez votre étude des Écritures avec des cartes mémoire propulsées par l'IA, des chats illimités et une analyse média intelligente.",
+    "monthly": "Mensuel",
+    "annual": "Annuel",
+    "savePct": " · économisez ${savingsPct}%",
+    "billedAnnuallyFinePrint": "Facturé ${paidTier.annualPrice.toFixed(2)} $ par an (contre ${(paidTier.monthlyPrice * 12).toFixed(2)} $ par mois). Renouvellement jusqu'à annulation.",
+    "billedMonthlyFinePrint": "Facturé ${paidTier.monthlyPrice.toFixed(2)} $ par mois. Renouvellement jusqu'à annulation."
   },
   "notes": {
     "title": "Notes d'Étude",
@@ -181,7 +224,26 @@
     "deleteFileMessage": "Supprimer \"{{name}}\" ? Cette action est irréversible.",
     "fileDeleted": "Fichier supprimé",
     "fileRenamed": "Fichier renommé",
-    "deletePartial": "{{ok}} supprimés, {{failed}} échoués"
+    "deletePartial": "{{ok}} supprimés, {{failed}} échoués",
+    "image": "Image",
+    "pdf": "PDF",
+    "fileUploadedSuccess": "${name} envoyé",
+    "pdfPreviewError": "Ce PDF n'a pas pu être prévisualisé dans l'application.",
+    "expiresToday": "Expire aujourd'hui",
+    "images": "Images",
+    "pdfs": "PDF",
+    "noImagesYet": "Aucune image pour l'instant",
+    "tapToUploadPhoto": "Touchez + pour envoyer votre première photo",
+    "noPdfsYet": "Aucun PDF pour l'instant",
+    "tapToUploadPdf": "Touchez + pour envoyer votre premier PDF",
+    "addImage": "Ajouter une image",
+    "renameFile": "Renommer le fichier",
+    "fileName": "Nom du fichier",
+    "expiresInDays": "Expire dans ${days} j",
+    "storageUsedOfLimit": "${fmtBytes(used)} sur ${fmtBytes(limit)} utilisés · ${percent}%",
+    "expiresInDaysUpgrade": "Expire dans ${daysUntilExpiry(item.expiresAt)} j · Passez à un forfait supérieur pour conserver",
+    "noImagesMatch": "Aucune image ne correspond à ",
+    "noPdfsMatch": "Aucun PDF ne correspond à "
   },
   "friends": {
     "title": "Amis",
@@ -205,7 +267,21 @@
     "requestAccepted": "Demande d'ami acceptée",
     "requestDeclined": "Demande d'ami refusée",
     "friendRemoved": "Ami retiré",
-    "userBlocked": "Utilisateur bloqué"
+    "userBlocked": "Utilisateur bloqué",
+    "noBlockedUsersSub": "Les utilisateurs que vous bloquez apparaîtront ici",
+    "incoming": "Reçues",
+    "sent": "Envoyées",
+    "removedSuccess": "${name} supprimé",
+    "bestStreakAchievements": "Meilleure série ${item.longestStreak} · ${item.achievements} récompenses",
+    "findFriendsSub": "Recherchez par nom ou e-mail pour vous connecter avec d'autres.",
+    "requestSentTo": "Demande d'ami envoyée à ${user.name}",
+    "removeFriend": "Retirer l'ami",
+    "requestPending": "Demande en attente",
+    "cancelRequest": "Annuler la demande",
+    "sendRequest": "Envoyer une demande d'ami",
+    "blockUser": "Bloquer l'utilisateur",
+    "theirSets": "Ses ensembles",
+    "mutualFriendsCount": "${user.mutualFriendsCount} amis en commun"
   },
   "user": {
     "couldNotLoadProfile": "Impossible de charger le profil",
@@ -303,7 +379,9 @@
     "privacySec6Title": "Services tiers",
     "privacySec6Body": "Nous utilisons Apple In-App Purchase pour les abonnements, Firebase Cloud Messaging pour les notifications push et des fournisseurs d'IA pour les fonctions de chat. Chaque service a sa propre politique de confidentialité régissant le traitement des données.",
     "privacySec7Title": "Nous contacter",
-    "privacySec7Body": "Pour toute question relative à la confidentialité ou demande concernant vos données, contactez-nous à :\nddtechservices.work@gmail.com"
+    "privacySec7Body": "Pour toute question relative à la confidentialité ou demande concernant vos données, contactez-nous à :\nddtechservices.work@gmail.com",
+    "terms": "Conditions d'utilisation",
+    "privacy": "Politique de confidentialité"
   },
   "leaderboard": {
     "quotes": {
@@ -327,6 +405,34 @@
         "text": "Tout grand parcours commence par un premier pas.",
         "sub": "Commencez votre série aujourd'hui."
       }
-    }
+    },
+    "noRanking": "Personne à classer pour l'instant",
+    "noRankingSub": "Ajoutez des amis pour rivaliser sur les séries d'étude."
+  },
+  "blockedUsers": {
+    "unblock": "Débloquer",
+    "unblockedSuccess": "${name} débloqué"
+  },
+  "notificationSettings": {
+    "hint": "Choisissez les notifications que vous"
+  },
+  "subscription": {
+    "free": "Gratuit",
+    "noCardNeeded": "Aucune carte requise",
+    "bestValue": "Meilleur rapport qualité-prix",
+    "billedAnnually": "Facturé annuellement",
+    "billedMonthly": "Facturé mensuellement",
+    "premium": "Premium",
+    "tagline": "L'étude biblique est gratuite. Les crédits débloquent l'assistance AI.",
+    "freePlan": "Forfait gratuit",
+    "currentPlan": "Forfait actuel",
+    "restore": "Restaurer les achats",
+    "manage": "Gérer l'abonnement",
+    "whatsIncluded": "Ce qui",
+    "subscribePrice": "S'abonner · ${opt!.priceLabel}",
+    "receiptError": "Impossible de lire le reçu d'achat"
+  },
+  "account": {
+    "memberSince": "Membre depuis ${formatDateOnly(user.createdAt)}"
   }
 }

@@ -3,7 +3,8 @@
     "mySets": "Mis Sets",
     "folders": "Carpetas",
     "plans": "Planes",
-    "explore": "Explorar"
+    "explore": "Explorar",
+    "study": "Cuestionario"
   },
   "sets": {
     "title": "Sets de Estudio",
@@ -41,7 +42,25 @@
     "visibilityDescFRIENDS": "Enlace compartido",
     "layoutDEFAULT": "Predeterminado",
     "layoutMINIMAL": "Minimalista",
-    "layoutDETAILED": "Detallado"
+    "layoutDETAILED": "Detallado",
+    "visibilityPublic": "Público",
+    "couldNotLoadSet": "No se pudo cargar el conjunto.",
+    "searchPlaceholder": "Buscar conjuntos…",
+    "setCount": "${filteredSets.length} conjuntos",
+    "couldNotLoadFriendsSets": "No se pudieron cargar los amigos",
+    "emptyDesc": "Crea tu primer conjunto de estudio para empezar",
+    "couldNotLoadPublicSets": "No se pudieron cargar los conjuntos públicos.",
+    "searchPublicSets": "Buscar conjuntos públicos…",
+    "noOtherSets": "No hay otros conjuntos disponibles",
+    "titleLabel": "Título",
+    "titlePlaceholder": "p. ej. Estudio de Romanos",
+    "descLabel": "Descripción (opcional)",
+    "descPlaceholder": "¿De qué trata este conjunto?",
+    "folderOptional": "Carpeta (opcional)",
+    "color": "Color",
+    "visibility": "Visibilidad",
+    "cardLayout": "Diseño de tarjeta",
+    "chooseSets": "Elegir conjuntos"
   },
   "folders": {
     "title": "Carpetas",
@@ -66,8 +85,17 @@
     "noFoldersSub": "Crea carpetas para organizar tus sets de estudio.",
     "noSetsInFolder": "No hay sets en esta carpeta",
     "noSetsInFolderSub": "Toca el botón abajo para agregar tu primer set a esta carpeta.",
-    "setsCount": "{{count}} set",
-    "setsCount_other": "{{count}} sets"
+    "setsCount": "{{count}} conjunto",
+    "setsCount_other": "{{count}} conjuntos",
+    "emptyTitle": "No hay conjuntos en esta carpeta",
+    "emptySub": "Crea un conjunto y asígnalo a esta carpeta",
+    "moveToFolder": "Mover a carpeta",
+    "noFolder": "Sin carpeta",
+    "noOtherFolders": "No hay otras carpetas",
+    "noFolders": "Aún no hay carpetas",
+    "emptyDesc": "Toca Crear carpeta para organizar tus conjuntos",
+    "deleteFolderTitle": "Eliminar carpeta",
+    "color": "Color"
   },
   "cards": {
     "addCard": "Agregar Tarjeta",
@@ -131,7 +159,31 @@
     "textLabel": "Texto",
     "noteButton": "Añadir nota",
     "noteLabel": "Nota (opcional)",
-    "cardNotFound": "Tarjeta no encontrada"
+    "cardNotFound": "Tarjeta no encontrada",
+    "title": "Tarjetas",
+    "reorderCards": "Reordenar tarjetas",
+    "searchPlaceholder": "Buscar tarjetas…",
+    "couldNotLoadCards": "No se pudieron cargar las tarjetas.",
+    "reference": "Referencia",
+    "tapToReveal": "Toca el ícono del ojo para revelar la respuesta",
+    "passage": "Pasaje",
+    "note": "Nota",
+    "noResults": "Sin resultados",
+    "addCardsToStudy": "Agrega tarjetas para empezar a estudiar este conjunto",
+    "noCardsInSet": "Este conjunto aún no tiene tarjetas",
+    "addCards": "Agregar tarjetas",
+    "askAI": "Preguntar a la IA",
+    "createCard": "Crear tarjeta",
+    "unblurAll": "Mostrar todo",
+    "blurAll": "Ocultar todo",
+    "listView": "Vista de lista",
+    "gridView": "Vista de cuadrícula",
+    "addNotePlaceholder": "Agregar una nota…",
+    "batchUpdateResult": "${toUpdate.length - failed} actualizadas, ${failed} fallidas",
+    "noMatch": "Ninguna tarjeta coincide con ",
+    "qaCard": "Tarjeta de P y R",
+    "storyCard": "Tarjeta de historia",
+    "noCards": "Aún no hay tarjetas"
   },
   "plans": {
     "title": "Planes de Estudio",
@@ -159,7 +211,10 @@
     "stepOrderHelp": "Toca los sets en el orden en que deseas estudiarlos.",
     "minSetsRequired": "Selecciona al menos 1 set para crear un plan.",
     "noSetsAvailable": "No hay sets disponibles",
-    "noSetsAvailableSub": "Crea sets de tarjetas primero antes de construir un plan."
+    "noSetsAvailableSub": "Crea sets de tarjetas primero antes de construir un plan.",
+    "emptyTitle": "Aún no hay planes de estudio",
+    "emptySub": "Toca + para crear una ruta guiada a través de tus conjuntos.",
+    "selectedCount": "${selectedSetIds.length} conjuntos seleccionados"
   },
   "studyPlans": {
     "title": "Planes de Estudio",
@@ -174,13 +229,20 @@
     "copyToLibrary": "Agregar a Mi Biblioteca",
     "copiedSuccess": "¡Set agregado a tu biblioteca!",
     "noSets": "No se encontraron sets públicos",
-    "noSetsSub": "Prueba buscando un tema bíblico o palabra clave diferente."
+    "noSetsSub": "Prueba buscando un tema bíblico o palabra clave diferente.",
+    "emptyTitle": "Aún no hay conjuntos públicos",
+    "emptySubtitle": "¡Sé el primero en publicar un conjunto!",
+    "resultsFor": "${total} result${total !== 1 ? ",
+    "publicSetsAvailable": "${total} conjuntos públicos disponibles",
+    "noSetsMatch": "Ningún conjunto coincide con "
   },
   "friendsSets": {
     "title": "Sets de Amigos",
     "searchPlaceholder": "Buscar sets de amigos…",
     "noSets": "No hay sets de amigos",
-    "noSetsSub": "Cuando tus amigos publiquen sets de estudio, aparecerán aquí."
+    "noSetsSub": "Cuando tus amigos publiquen sets de estudio, aparecerán aquí.",
+    "sharedCount": "${total} conjuntos compartidos por amigos",
+    "noSetsMatch": "Ningún conjunto coincide con "
   },
   "dialogs": {
     "deleteSetTitle": "Eliminar Set",
@@ -200,5 +262,6 @@
     "answerMax": "Máximo 1000 caracteres",
     "textMin": "El texto debe tener al menos 2 caracteres",
     "textMax": "Máximo 2000 caracteres"
-  }
+  },
+  "cardsCount_other": "${set._count?.cards ?? 0} tarjetas"
 }

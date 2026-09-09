@@ -4,7 +4,8 @@
     "afternoon": "Magandang hapon",
     "evening": "Magandang gabi",
     "streak": "{{count}} araw na streak! Ipagpatuloy mo yan",
-    "streak_one": "Araw 1 ng streak! Magandang simula"
+    "streak_one": "Araw 1 ng streak! Magandang simula",
+    "streakDays": "${streakData?.streak ?? 0} araw na streak"
   },
   "stats": {
     "dueToday": "Dapat pagaralan ngayon",
@@ -13,8 +14,8 @@
     "totalSets": "Kabuuang set",
     "cardsCount": "{{count}} card",
     "sets": "Sets",
-    "folders": "Folders",
-    "notes": "Notes",
+    "folders": "Mga Folder",
+    "notes": "Mga Tala",
     "cards": "Cards",
     "credits": "Credits"
   },
@@ -43,10 +44,10 @@
     "quickQuiz": "Mabilisang Pagsusulit",
     "dailyVerse": "Pang-araw-araw na Talata",
     "createSet": "Gumawa ng Set",
-    "studyPlans": "Study Plans",
-    "achievements": "Achievements",
+    "studyPlans": "Mga Plano sa Pag-aaral",
+    "achievements": "Mga Tagumpay",
     "leaderboard": "Leaderboard",
-    "notes": "Notes",
+    "notes": "Mga Tala",
     "media": "Media",
     "discover": "Tuklasin",
     "friends": "Mga Kaibigan",
@@ -82,15 +83,17 @@
     "day": "{{count}} Araw na Streak",
     "days": "{{count}} Araw na Streak",
     "keepGoing": "Ipagpatuloy ang magandang gawa!",
-    "streakLost": "Mag-aral ngayon para mapanatili ang streak mo"
+    "streakLost": "Mag-aral ngayon para mapanatili ang streak mo",
+    "flameDays": "🔥 ${streak} araw na streak"
   },
   "sections": {
     "recentSets": "Kamakailang Sets",
     "seeAll": "Tingnan Lahat",
     "friendsSets": "Sets ng Mga Kaibigan",
-    "communitySets": "Community Sets",
+    "communitySets": "Mga Community Set",
     "friendActivity": "Aktibidad ng Kaibigan",
-    "quickStats": "Mabilisang Stats"
+    "quickStats": "Mabilisang Stats",
+    "recentActivity": "KAMAKAILANG AKTIBIDAD"
   },
   "empty": {
     "noRecentSets": "Wala pang kamakailang study set",

@@ -49,7 +49,7 @@
     "upgradeCardTitle": "I-unlock ang Unlimited Bible AI",
     "upgradeCardSubtitle": "Walang limitasyong tanong, PDF analysis, high-speed models, at higit pa.",
     "chart": {
-      "title": "Credit Activity",
+      "title": "Aktibidad ng Credit",
       "noActivity": "Walang credit activity sa panahong ito",
       "earned": "Kinita",
       "used": "Nagamit",
@@ -59,7 +59,15 @@
         "30d": "30 Araw",
         "all": "Lahat ng Panahon"
       }
-    }
+    },
+    "dailyClaimSub": "Bumalik bukas para sa dagdag pa.",
+    "dailyClaimSuccess": "+${data.transaction.amount} credit na-claim!",
+    "credit": "credit",
+    "noActivity": "Walang aktibidad",
+    "net": "Net",
+    "earned": "Kinita",
+    "used": "Nagamit",
+    "activity": "Aktibidad ng Credit"
   },
   "streak": "Streak sa Pag-aaral",
   "streakCount": "{{count}} araw na streak",
@@ -68,7 +76,18 @@
   "bestStreak": "Pinakamahusay na streak",
   "setsCreated": "Nalikhang mga Set",
   "cardsStudied": "Napag-aralang mga Card",
-  "achievements": "Mga Tagumpay",
+  "achievements": {
+    "unlocked": "${unlockedCount} na-unlock",
+    "locked": "Naka-lock",
+    "remaining": "${remaining} natitira",
+    "categories": {
+      "study": "Pag-aaral",
+      "quiz": "Quiz",
+      "streak": "Streak",
+      "social": "Komunidad",
+      "ai": "AI"
+    }
+  },
   "unlockedCount": "{{unlocked}} sa {{total}} ang na-unlock",
   "weeklyActivity": "Lingguhang Aktibidad",
   "upgradeToPro": "Mag-upgrade sa Pro",
@@ -128,7 +147,26 @@
       "spacedRepetition": "Advanced na spaced repetition algorithm",
       "unlimitedSets": "Walang limitasyong mga study set at folder",
       "offlineAccess": "Buong offline access sa lahat ng iyong set",
-      "prioritySupport": "Priority support at mga eksklusibong badge"
+      "prioritySupport": "Priority support at mga eksklusibong badge",
+      "freeCredit": "1 AI credit kada araw",
+      "spacedReview": "Spaced repetition na pagsusuri",
+      "quizStreaks": "Mga quiz at streak sa pag-aaral",
+      "friendsLeaderboard": "Mga kaibigan at leaderboard",
+      "storage250": "250 MB na media storage",
+      "credits100": "100 AI credits kada buwan",
+      "imagePdfAnalysis": "Pagsusuri ng larawan at PDF",
+      "storage2gb": "2 GB na media storage",
+      "creditStats": "Estadistika ng paggamit ng credit",
+      "credits500": "500 AI credits kada buwan",
+      "priorityAi": "Priority na sagot ng AI",
+      "storage10gb": "10 GB na media storage",
+      "advancedAnalytics": "Advanced na analytics sa pag-aaral",
+      "aiChat": "AI-powered na chat sa pag-aaral ng Bibliya",
+      "unlimitedScripture": "Walang limitasyong scripture card sets",
+      "spacedSystem": "Spaced repetition na sistema ng pagsusuri",
+      "mediaUploads": "PDF at larawan na media uploads",
+      "communityLeaderboard": "Mga kaibigan sa komunidad at leaderboard",
+      "studyPlans": "Mga plano sa pag-aaral at group session"
     },
     "freeTier": "Libre",
     "freeTierSub": "Walang kinakailangang credit card",
@@ -140,7 +178,12 @@
     "manageSubscription": "Pamahalaan ang Subscription",
     "terms": "Mga Tuntunin ng Serbisyo",
     "privacy": "Patakaran sa Pagkapribado",
-    "heroTagline": "Palalimin ang iyong pag-aaral ng Kasulatan gamit ang AI-powered flashcards, unlimited chats, at smart media analysis."
+    "heroTagline": "Palalimin ang iyong pag-aaral ng Kasulatan gamit ang AI-powered flashcards, unlimited chats, at smart media analysis.",
+    "monthly": "Buwanan",
+    "annual": "Taunan",
+    "savePct": " · makatipid ng ${savingsPct}%",
+    "billedAnnuallyFinePrint": "Sinisingil ng $${paidTier.annualPrice.toFixed(2)} taun-taon (kumpara sa $${(paidTier.monthlyPrice * 12).toFixed(2)} buwanan). Mag-renew hanggang kanselahin.",
+    "billedMonthlyFinePrint": "Sinisingil ng $${paidTier.monthlyPrice.toFixed(2)} buwanan. Mag-renew hanggang kanselahin."
   },
   "notes": {
     "title": "Mga Tala sa Pag-aaral",
@@ -181,7 +224,26 @@
     "deleteFileMessage": "Tanggalin ang \"{{name}}\"? Hindi na ito mababawi.",
     "fileDeleted": "Natanggal ang file",
     "fileRenamed": "Napalitan ang pangalan ng file",
-    "deletePartial": "{{ok}} nabura, {{failed}} nabigo"
+    "deletePartial": "{{ok}} nabura, {{failed}} nabigo",
+    "image": "Larawan",
+    "pdf": "PDF",
+    "fileUploadedSuccess": "${name} na-upload",
+    "pdfPreviewError": "Hindi ma-preview ang PDF na ito sa app.",
+    "expiresToday": "Mag-e-expire ngayon",
+    "images": "Mga Larawan",
+    "pdfs": "Mga PDF",
+    "noImagesYet": "Wala pang larawan",
+    "tapToUploadPhoto": "I-tap ang + upang i-upload ang iyong unang larawan",
+    "noPdfsYet": "Wala pang PDF",
+    "tapToUploadPdf": "I-tap ang + upang i-upload ang iyong unang PDF",
+    "addImage": "Magdagdag ng Larawan",
+    "renameFile": "Palitan ang Pangalan ng File",
+    "fileName": "Pangalan ng file",
+    "expiresInDays": "Mag-e-expire sa ${days}d",
+    "storageUsedOfLimit": "${fmtBytes(used)} sa ${fmtBytes(limit)} nagamit · ${percent}%",
+    "expiresInDaysUpgrade": "Mag-e-expire sa ${daysUntilExpiry(item.expiresAt)}d · Mag-upgrade upang panatilihin",
+    "noImagesMatch": "Walang larawan na tumugma sa ",
+    "noPdfsMatch": "Walang PDF na tumugma sa "
   },
   "friends": {
     "title": "Mga Kaibigan",
@@ -205,7 +267,21 @@
     "requestAccepted": "Tinanggap ang friend request",
     "requestDeclined": "Tinanggihan ang friend request",
     "friendRemoved": "Naalis ang kaibigan",
-    "userBlocked": "Na-block ang user"
+    "userBlocked": "Na-block ang user",
+    "noBlockedUsersSub": "Lilitaw dito ang mga user na iyong ib-block",
+    "incoming": "Papasok",
+    "sent": "Naipadala",
+    "removedSuccess": "${name} tinanggal",
+    "bestStreakAchievements": "Pinakamataas ${item.longestStreak} · ${item.achievements} tagumpay",
+    "findFriendsSub": "Maghanap sa pangalan o email upang kumonekta sa iba.",
+    "requestSentTo": "Friend request naipadala kay ${user.name}",
+    "removeFriend": "Tanggalin ang Kaibigan",
+    "requestPending": "Nakabinbin na Request",
+    "cancelRequest": "Kanselahin ang Request",
+    "sendRequest": "Magpadala ng Friend Request",
+    "blockUser": "I-block ang User",
+    "theirSets": "Ang Kanilang Sets",
+    "mutualFriendsCount": "${user.mutualFriendsCount} magkakilalang kaibigan"
   },
   "user": {
     "couldNotLoadProfile": "Hindi ma-load ang profile",
@@ -257,11 +333,11 @@
   },
   "sections": {
     "myStudy": "Aking Pag-aaral",
-    "community": "Community",
+    "community": "Komunidad",
     "account": "Account"
   },
   "menu": {
-    "achievements": "Achievements",
+    "achievements": "Mga Tagumpay",
     "myNotes": "Aking Notes",
     "myMedia": "Aking Media",
     "friends": "Mga Kaibigan",
@@ -271,7 +347,7 @@
     "managePlan": "Pamahalaan ang Plan",
     "upgradeToPremium": "Mag-upgrade sa Premium",
     "changePassword": "Palitan ang Password",
-    "settings": "Settings",
+    "settings": "Mga Setting",
     "signOut": "Mag-sign Out",
     "friendRequests": "Mga Friend Request",
     "leaderboard": "Leaderboard",
@@ -294,16 +370,18 @@
     "privacySec1Body": "Kinokolekta namin ang iyong pangalan, email address, at ang content na ginagawa mo (flashcard sets, notes, at study plans) para maibigay ang aming serbisyo. Kumokolekta rin kami ng anonymous usage analytics para pagbutihin ang app.",
     "privacySec2Title": "Paano Namin Ginagamit ang Iyong Data",
     "privacySec2Body": "Ang iyong data ay ginagamit lamang para maihatid ang mga feature ng Verdance — pagbuo ng AI responses, pag-sync ng iyong study progress, at pagpapagana ng social features tulad ng friend leaderboards. Hindi namin kailanman ibinebenta ang iyong personal na impormasyon.",
-    "privacySec3Title": "AI Processing",
+    "privacySec3Title": "Pagproseso ng AI",
     "privacySec3Body": "Ang teksto na ipinapadala mo sa AI chat ay pinoproseso ng third-party AI providers (OpenRouter / Anthropic Claude) para bumuo ng mga sagot. Ang media files (mga larawan, PDF) ay ipinapadala sa Anthropic Claude para sa analysis. Ang mga provider na ito ay pinapatakbo ayon sa kanilang sariling privacy policies.",
-    "privacySec4Title": "Data Storage",
+    "privacySec4Title": "Pag-imbak ng Data",
     "privacySec4Body": "Ang iyong data ay ligtas na naka-imbak sa aming mga server. Ang mga password ay naka-hash at hindi kailanman iniimbak bilang plain text. Gumagamit kami ng industry-standard encryption para sa data in transit (TLS) at at rest.",
     "privacySec5Title": "Data Retention at Deletion",
     "privacySec5Body": "Maaari mong burahin ang iyong account anumang oras mula sa Settings → Delete Account. Permanenteng inaalis nito ang lahat ng iyong personal na data, sets, cards, notes, at media sa loob ng 30 araw.",
-    "privacySec6Title": "Third-Party Services",
+    "privacySec6Title": "Mga Third-Party na Serbisyo",
     "privacySec6Body": "Gumagamit kami ng Apple In-App Purchase para sa mga subscription, Firebase Cloud Messaging para sa push notifications, at AI providers para sa chat features. Ang bawat serbisyo ay may sariling privacy policy na namamahala kung paano nila pinangangasiwaan ang data.",
     "privacySec7Title": "Kontakin Kami",
-    "privacySec7Body": "Para sa mga tanong tungkol sa privacy o data requests, kontakin kami sa:\nddtechservices.work@gmail.com"
+    "privacySec7Body": "Para sa mga tanong tungkol sa privacy o data requests, kontakin kami sa:\nddtechservices.work@gmail.com",
+    "terms": "Mga Tuntunin ng Paggamit",
+    "privacy": "Patakaran sa Privacy"
   },
   "leaderboard": {
     "quotes": {
@@ -327,6 +405,34 @@
         "text": "Ang bawat dakilang paglalakbay ay nagsisimula sa isang hakbang.",
         "sub": "Simulan ang iyong streak ngayon."
       }
-    }
+    },
+    "noRanking": "Wala pang ira-rank",
+    "noRankingSub": "Magdagdag ng mga kaibigan upang makipagtagisan sa study streaks."
+  },
+  "blockedUsers": {
+    "unblock": "I-unblock",
+    "unblockedSuccess": "${name} na-unblock"
+  },
+  "notificationSettings": {
+    "hint": "Piliin kung aling mga abiso ang gusto mo"
+  },
+  "subscription": {
+    "free": "Libre",
+    "noCardNeeded": "Walang card na kailangan",
+    "bestValue": "Pinakasulit",
+    "billedAnnually": "Sinisingil taun-taon",
+    "billedMonthly": "Sinisingil buwanan",
+    "premium": "Premium",
+    "tagline": "Libre ang pag-aaral ng Bibliya. Ang credits ang nagbubukas ng tulong ng AI.",
+    "freePlan": "Libreng Plano",
+    "currentPlan": "Kasalukuyang Plano",
+    "restore": "Ibalik ang Mga Pagbili",
+    "manage": "Pamahalaan ang Subscription",
+    "whatsIncluded": "Ano ang Kasama",
+    "subscribePrice": "Mag-subscribe · ${opt!.priceLabel}",
+    "receiptError": "Hindi mabasa ang resibo ng pagbili"
+  },
+  "account": {
+    "memberSince": "Miyembro simula ${formatDateOnly(user.createdAt)}"
   }
 }

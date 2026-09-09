@@ -23,7 +23,11 @@
     "viewDetails": "Ver detalhes",
     "viewSummary": "Ver resumo",
     "reQuiz": "Refazer quiz",
-    "deleteAttempt": "Excluir tentativa"
+    "deleteAttempt": "Excluir tentativa",
+    "startNewQuiz": "+ Iniciar novo quiz",
+    "emptyTitle": "Nenhum quiz ainda",
+    "emptySub": "Toque em ",
+    "details": "Detalhes"
   },
   "setup": {
     "title": "Configuração do Quiz",
@@ -73,7 +77,22 @@
     "sort": {
       "newest": "Recentes",
       "cards": "Cartões"
-    }
+    },
+    "chooseType": "ESCOLHA UM TIPO DE QUIZ",
+    "modeMix": "Misto",
+    "modeMixDesc": "Mistura aleatória de todos os tipos",
+    "practiceNotScored": "Prática · não pontuado",
+    "addCardsToQuiz": "Adicione cards a este conjunto para começar o quiz.",
+    "needMinCards": "Múltipla escolha precisa de ${MIN_MC_CARDS}+ cards do mesmo tipo.",
+    "cancelQuiz": "Sair do quiz?",
+    "cancelWarning": "Seu progresso será perdido.",
+    "tapToChooseSets": "Toque para escolher conjuntos…",
+    "loadingCards": "Carregando cards…",
+    "noCardsInSets": "Nenhum card nos conjuntos selecionados",
+    "nameLabel": "NOME DO QUIZ",
+    "namePlaceholder": "ex. Revisão da semana 3…",
+    "quizTypeLabel": "TIPO DE QUIZ",
+    "selectSetsToContinue": "Selecione conjuntos para continuar"
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",
@@ -107,7 +126,25 @@
     "saveError": "Não foi possível salvar o resultado do quiz",
     "reviewSummary": "Revisar Respostas",
     "studyAgain": "Estudar Novamente",
-    "backToLibrary": "Voltar para Biblioteca"
+    "backToLibrary": "Voltar para Biblioteca",
+    "quotes": {
+      "excellent": {
+        "text": "Excelente! Sua dedicação está dando frutos de verdade.",
+        "sub": "Mantenha esse ritmo."
+      },
+      "great": {
+        "text": "Ótimo trabalho — cada revisão aguça a mente e o espírito.",
+        "sub": "Você está construindo algo duradouro."
+      },
+      "good": {
+        "text": "Bom esforço — a consistência é a chave para a maestria.",
+        "sub": "Volte amanhã e vá mais longe."
+      },
+      "keepGoing": {
+        "text": "Não desanime — é na dificuldade que o crescimento acontece.",
+        "sub": "Cada tentativa te deixa mais forte."
+      }
+    }
   },
   "summary": {
     "title": "Resumo do Quiz",
@@ -123,7 +160,8 @@
     "correct": "Corretas",
     "incorrect": "Incorretas",
     "noQuestions": "Nenhuma pergunta corresponde a este filtro.",
-    "readMode": "(leitura)"
+    "readMode": "(leitura)",
+    "reQuiz": "Refazer quiz"
   },
   "detail": {
     "headerTitle": "Histórico do Quiz",
@@ -183,7 +221,8 @@
     "yourAnswer": "Sua resposta",
     "correctAnswer": "Resposta correta",
     "quitDialogTitle": "Sair do quiz?",
-    "quitDialogMessage": "Seu progresso neste quiz será perdido."
+    "quitDialogMessage": "Seu progresso neste quiz será perdido.",
+    "emptyState": "Nada para o quiz aqui"
   },
   "results": {
     "title": "Quiz concluído!",
@@ -210,5 +249,8 @@
     "whichPassage": "Qual passagem é {{ref}}?",
     "typeRef": "Digite {{ref}}",
     "typePassage": "Digite a passagem"
+  },
+  "play": {
+    "tapToRevealProgress": "Toque para revelar (${revealed}/${phrases.length})"
   }
 }

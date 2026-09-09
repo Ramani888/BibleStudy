@@ -23,7 +23,11 @@
     "viewDetails": "상세 보기",
     "viewSummary": "요약 보기",
     "reQuiz": "다시 풀기",
-    "deleteAttempt": "기록 삭제"
+    "deleteAttempt": "기록 삭제",
+    "startNewQuiz": "+ 새 퀴즈 시작",
+    "emptyTitle": "아직 퀴즈가 없습니다",
+    "emptySub": "탭하세요 ",
+    "details": "상세"
   },
   "setup": {
     "title": "퀴즈 설정",
@@ -73,7 +77,22 @@
     "sort": {
       "newest": "최신순",
       "cards": "카드순"
-    }
+    },
+    "chooseType": "퀴즈 유형 선택",
+    "modeMix": "혼합",
+    "modeMixDesc": "모든 유형의 무작위 혼합",
+    "practiceNotScored": "연습 · 점수 없음",
+    "addCardsToQuiz": "이 세트에 카드를 추가하여 퀴즈를 시작하세요.",
+    "needMinCards": "객관식은 같은 유형의 카드가 ${MIN_MC_CARDS}개 이상 필요합니다.",
+    "cancelQuiz": "퀴즈를 종료할까요?",
+    "cancelWarning": "진행 상황이 사라집니다.",
+    "tapToChooseSets": "탭하여 세트 선택…",
+    "loadingCards": "카드 불러오는 중…",
+    "noCardsInSets": "선택한 세트에 카드가 없습니다",
+    "nameLabel": "퀴즈 이름",
+    "namePlaceholder": "예: 3주차 복습…",
+    "quizTypeLabel": "퀴즈 유형",
+    "selectSetsToContinue": "계속하려면 세트를 선택하세요"
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",
@@ -107,7 +126,25 @@
     "saveError": "퀴즈 결과를 저장할 수 없습니다",
     "reviewSummary": "오답/정답 검토",
     "studyAgain": "다시 학습하기",
-    "backToLibrary": "보관함으로 돌아가기"
+    "backToLibrary": "보관함으로 돌아가기",
+    "quotes": {
+      "excellent": {
+        "text": "훌륭합니다! 당신의 헌신이 참된 열매를 맺고 있습니다.",
+        "sub": "그 기세를 계속 이어가세요."
+      },
+      "great": {
+        "text": "잘했습니다 — 모든 복습이 마음과 영을 예리하게 합니다.",
+        "sub": "당신은 오래 지속될 무언가를 세우고 있습니다."
+      },
+      "good": {
+        "text": "좋은 노력입니다 — 꾸준함이 숙달의 열쇠입니다.",
+        "sub": "내일 다시 와서 더 나아가세요."
+      },
+      "keepGoing": {
+        "text": "낙심하지 마세요 — 씨름하는 곳에서 성장이 일어납니다.",
+        "sub": "모든 시도가 당신을 더 강하게 만듭니다."
+      }
+    }
   },
   "summary": {
     "title": "퀴즈 결과 요약",
@@ -123,7 +160,8 @@
     "correct": "정답",
     "incorrect": "오답",
     "noQuestions": "이 필터에 해당하는 문제가 없습니다.",
-    "readMode": "(읽기)"
+    "readMode": "(읽기)",
+    "reQuiz": "다시 풀기"
   },
   "detail": {
     "headerTitle": "퀴즈 기록",
@@ -183,7 +221,8 @@
     "yourAnswer": "내 답",
     "correctAnswer": "정답",
     "quitDialogTitle": "퀴즈를 종료할까요?",
-    "quitDialogMessage": "이 퀴즈의 진행 상황이 사라집니다."
+    "quitDialogMessage": "이 퀴즈의 진행 상황이 사라집니다.",
+    "emptyState": "퀴즈로 낼 항목이 없습니다"
   },
   "results": {
     "title": "퀴즈 완료!",
@@ -210,5 +249,8 @@
     "whichPassage": "{{ref}}은(는) 어느 본문인가요?",
     "typeRef": "{{ref}} 입력",
     "typePassage": "본문을 입력하세요"
+  },
+  "play": {
+    "tapToRevealProgress": "탭하여 보기 (${revealed}/${phrases.length})"
   }
 }

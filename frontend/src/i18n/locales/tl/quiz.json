@@ -19,11 +19,15 @@
     "noQuizzesYet": "Wala pang quizzes",
     "noQuizzesSub": "Subukan ang iyong unang quiz sa itaas para masubaybayan ang iyong study progress.",
     "noMatch": "Walang nahanap na quizzes",
-    "itemActions": "Quiz Actions",
+    "itemActions": "Mga Aksyon sa Quiz",
     "viewDetails": "Tingnan ang Detalye",
     "viewSummary": "Tingnan ang Summary",
     "reQuiz": "Ulitin ang Quiz",
-    "deleteAttempt": "Burahin ang Attempt"
+    "deleteAttempt": "Burahin ang Attempt",
+    "startNewQuiz": "+ Magsimula ng Bagong Quiz",
+    "emptyTitle": "Wala pang quiz",
+    "emptySub": "I-tap ang ",
+    "details": "Mga Detalye"
   },
   "setup": {
     "title": "Setup ng Pagsusulit",
@@ -73,7 +77,22 @@
     "sort": {
       "newest": "Kamakailan",
       "cards": "Cards"
-    }
+    },
+    "chooseType": "PUMILI NG URI NG QUIZ",
+    "modeMix": "Halo",
+    "modeMixDesc": "Random na halo ng lahat ng uri",
+    "practiceNotScored": "Practice · hindi iskor",
+    "addCardsToQuiz": "Magdagdag ng cards sa set na ito upang magsimulang mag-quiz.",
+    "needMinCards": "Ang multiple choice ay nangangailangan ng ${MIN_MC_CARDS}+ cards na parehong uri.",
+    "cancelQuiz": "Iwan ang quiz?",
+    "cancelWarning": "Mawawala ang iyong progreso.",
+    "tapToChooseSets": "I-tap upang pumili ng sets…",
+    "loadingCards": "Nilo-load ang cards…",
+    "noCardsInSets": "Walang cards sa napiling sets",
+    "nameLabel": "PANGALAN NG QUIZ",
+    "namePlaceholder": "hal. Linggo 3 na Pagsusuri…",
+    "quizTypeLabel": "URI NG QUIZ",
+    "selectSetsToContinue": "Pumili ng sets upang magpatuloy"
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",
@@ -107,7 +126,25 @@
     "saveError": "Hindi mai-save ang resulta ng pagsusulit",
     "reviewSummary": "Suriin ang mga Sagot",
     "studyAgain": "Mag-aral Muli",
-    "backToLibrary": "Bumalik sa Library"
+    "backToLibrary": "Bumalik sa Library",
+    "quotes": {
+      "excellent": {
+        "text": "Kahanga-hanga! Ang iyong dedikasyon ay namumunga nang tunay.",
+        "sub": "Panatilihin ang momentum na iyon."
+      },
+      "great": {
+        "text": "Magaling — bawat pagsusuri ay humahasa sa isip at espiritu.",
+        "sub": "May itinatayo kang pangmatagalan."
+      },
+      "good": {
+        "text": "Magandang pagsisikap — ang pagkakapare-pareho ang susi sa kahusayan.",
+        "sub": "Bumalik bukas at magpatuloy pa."
+      },
+      "keepGoing": {
+        "text": "Huwag panghinaan ng loob — sa pakikibaka nagaganap ang paglago.",
+        "sub": "Bawat pagtatangka ay nagpapalakas sa iyo."
+      }
+    }
   },
   "summary": {
     "title": "Buod ng Pagsusulit",
@@ -123,7 +160,8 @@
     "correct": "Tama",
     "incorrect": "Mali",
     "noQuestions": "Walang tanong na tumutugma sa filter na ito.",
-    "readMode": "(basahin)"
+    "readMode": "(basahin)",
+    "reQuiz": "Ulitin ang Quiz"
   },
   "detail": {
     "headerTitle": "Kasaysayan ng Pagsusulit",
@@ -134,7 +172,7 @@
     "correctCount": "{{correct}} / {{total}} tama",
     "setsCount": "{{count}} sets",
     "viewSummary": "Tingnan ang summary",
-    "title": "Quiz Attempt",
+    "title": "Pagtatangka sa Quiz",
     "deleteTitle": "Burahin ang Quiz",
     "deleteMessage": "Alisin ang attempt na ito sa iyong history?",
     "retake": "Ulitin ang Quiz",
@@ -156,14 +194,14 @@
     "mixDesc": "Pinagsasama ang maraming format ng tanong sa isang quiz."
   },
   "modeNames": {
-    "mix": "Mix",
+    "mix": "Halo",
     "mc": "Multiple Choice",
     "story_mc": "Story MC",
-    "type_answer": "Type Answer",
-    "type_verbatim": "Type Verbatim",
-    "blanks": "Fill Blanks",
-    "chunks": "Reorder",
-    "read": "Read"
+    "type_answer": "I-type ang Sagot",
+    "type_verbatim": "I-type nang Salita-sa-Salita",
+    "blanks": "Punan ang Patlang",
+    "chunks": "Ayusin Muli",
+    "read": "Basahin"
   },
   "modeHeaders": {
     "mc": "TANONG",
@@ -183,7 +221,8 @@
     "yourAnswer": "Iyong Sagot",
     "correctAnswer": "Tamang Sagot",
     "quitDialogTitle": "Ihinto ang Quiz?",
-    "quitDialogMessage": "Mawawala ang iyong progreso sa quiz na ito."
+    "quitDialogMessage": "Mawawala ang iyong progreso sa quiz na ito.",
+    "emptyState": "Walang ma-quiz dito"
   },
   "results": {
     "title": "Tapos na ang Quiz!",
@@ -196,7 +235,7 @@
     "tryAgain": "Subukan Muli",
     "backToHub": "Bumalik sa Quiz Hub",
     "newBest": "Bagong best!",
-    "bestScore": "Best: {{score}}%",
+    "bestScore": "Pinakamataas: {{score}}%",
     "saveFailed": "Nabigo ang pag-save: {{message}}",
     "perfectScore": "Kahanga-hanga! Perfect Score!",
     "goodJob": "Magaling! Ipagpatuloy ang tapat na pag-aaral.",
@@ -210,5 +249,8 @@
     "whichPassage": "Aling talata ang {{ref}}?",
     "typeRef": "I-type ang {{ref}}",
     "typePassage": "I-type ang talata"
+  },
+  "play": {
+    "tapToRevealProgress": "I-tap upang ipakita (${revealed}/${phrases.length})"
   }
 }

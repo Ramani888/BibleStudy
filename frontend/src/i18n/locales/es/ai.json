@@ -43,7 +43,25 @@
     "bookmark": "Guardar Marcador",
     "contentPolicyTitle": "Aviso",
     "contentPolicyMessage": "Tu mensaje fue marcado por nuestro sistema de seguridad. Por favor mantén las conversaciones enfocadas en el estudio bíblico.",
-    "contentPolicyUnderstand": "Entiendo"
+    "contentPolicyUnderstand": "Entiendo",
+    "noCredits": "Sin créditos",
+    "noCreditsSub": "Reclama tu crédito diario desde la pantalla de Inicio.",
+    "newConversation": "Nueva conversación",
+    "clearConfirmMessage": "¿Borrar el chat actual y empezar de nuevo?",
+    "saveAsCard": "Guardar como tarjeta",
+    "disclaimer": "Las respuestas de la IA citan versículos bíblicos, pero pueden contener errores. Verifica las interpretaciones importantes con tu pastor o un comentario de confianza.",
+    "attachFile": "Adjuntar un archivo",
+    "chooseMedia": "Elegir de Mis archivos",
+    "yourMessage": "Tu mensaje",
+    "aiResponse": "Respuesta de la IA",
+    "contentPolicy": "Política de contenido",
+    "contentPolicyMsg": "Mantén los archivos adjuntos apropiados.\\n\\nNo subas contenido sexual, violento o ilegal. Las infracciones pueden resultar en la suspensión de la cuenta.\\n\\nAl continuar, aceptas nuestras normas de contenido.",
+    "cardsSavedToast": "¡${cardsToSave.length} tarjetas guardadas!",
+    "question": "pregunta",
+    "questions": "preguntas",
+    "continueConversation": "Continuar conversación",
+    "bookmarkedAt": "Guardado el ${formatDate(chat.bookmarkedAt)}",
+    "saveToSet": "Guardar en conjunto"
   },
   "consent": {
     "title": "Aviso del Asistente de IA",
@@ -61,7 +79,13 @@
     "declinedInfo": "El Asistente de IA está desactivado según tus preferencias de privacidad. Puedes activarlo en Configuración.",
     "consentRecorded": "Preferencias guardadas",
     "consentDeclined": "Asistente de IA desactivado",
-    "couldNotSaveConsent": "No se pudieron guardar las preferencias"
+    "couldNotSaveConsent": "No se pudieron guardar las preferencias",
+    "subtitle": "Tus mensajes se envían a proveedores de IA externos para generar respuestas:",
+    "provider1": "OpenRouter (Gemma)",
+    "provider1Desc": "Procesa tus mensajes de texto y preguntas",
+    "provider2": "Anthropic Claude",
+    "provider2Desc": "Procesa archivos multimedia (PDF, imágenes)",
+    "warning": "No compartas información personal que no quieras que reciban estos servicios. Verdance no almacena los mensajes más allá de tu sesión."
   },
   "cards": {
     "ready": "{{count}} tarjeta lista",
@@ -112,7 +136,13 @@
     "legacyMessagesInfo": "Los mensajes antiguos no se pueden renombrar ni eliminar.",
     "questionsCount": "{{count}} pregunta",
     "questionsCount_other": "{{count}} preguntas",
-    "creditsUsed": "{{count}} créditos usados"
+    "creditsUsed": "{{count}} créditos usados",
+    "renameTitle": "Renombrar conversación",
+    "namePlaceholder": "Nombre de la conversación…",
+    "noBookmarks": "Aún no hay guardados",
+    "noBookmarksSub": "Mantén pulsada cualquier respuesta de la IA y toca Guardar para agregarla aquí",
+    "noHistory": "Aún no hay historial de chat",
+    "conversation": "Conversación"
   },
   "attach": {
     "mediaCost": "Los archivos cuestan de 3 a 5 créditos",

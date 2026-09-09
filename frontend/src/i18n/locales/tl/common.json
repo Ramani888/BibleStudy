@@ -35,7 +35,11 @@
     "clearAll": "I-clear Lahat",
     "select": "Pumili",
     "apply": "Ilapat",
-    "remove": "Alisin"
+    "remove": "Alisin",
+    "agree": "Sumasang-ayon Ako",
+    "openBrowser": "Buksan sa browser",
+    "accept": "Tanggapin",
+    "decline": "Tanggihan"
   },
   "status": {
     "loading": "Naglo-load...",
@@ -52,7 +56,13 @@
     "selected": "Napili",
     "couldNotDelete": "Hindi maalis",
     "unknownError": "Hindi kilalang error",
-    "uploading": "Ina-upload..."
+    "uploading": "Ina-upload...",
+    "tryDifferentSearch": "Sumubok ng ibang termino sa paghahanap",
+    "saved": "Na-save",
+    "failedToLoad": "Nabigong i-load ang cards",
+    "searching": "Naghahanap…",
+    "you": "ikaw",
+    "uploadingFile": "Ina-upload ${filename}"
   },
   "filter": {
     "all": "Lahat"
@@ -79,5 +89,14 @@
   "validation": {
     "max200": "Hanggang 200 character lang",
     "max100": "Hanggang 100 character lang"
+  },
+  "brand": {
+    "tagline": "Pag-aral · Pagsaulo · Paglago"
+  },
+  "sort": {
+    "recent": "Kamakailan",
+    "cards": "Cards",
+    "sets": "Sets",
+    "oldest": "Pinakaluma"
   }
 }

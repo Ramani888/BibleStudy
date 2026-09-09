@@ -35,7 +35,11 @@
     "select": "Seleccionar",
     "apply": "Aplicar",
     "remove": "Quitar",
-    "markAllRead": "Marcar todo como leído"
+    "markAllRead": "Marcar todo como leído",
+    "agree": "Acepto",
+    "openBrowser": "Abrir en el navegador",
+    "accept": "Aceptar",
+    "decline": "Rechazar"
   },
   "status": {
     "loading": "Cargando...",
@@ -52,7 +56,13 @@
     "selected": "Seleccionado",
     "couldNotDelete": "No se pudo eliminar",
     "unknownError": "Error desconocido",
-    "uploading": "Subiendo..."
+    "uploading": "Subiendo...",
+    "tryDifferentSearch": "Prueba con otro término de búsqueda",
+    "saved": "Guardado",
+    "failedToLoad": "No se pudieron cargar las tarjetas",
+    "searching": "Buscando…",
+    "you": "tú",
+    "uploadingFile": "Subiendo ${filename}"
   },
   "filter": {
     "all": "Todos"
@@ -79,5 +89,14 @@
   "validation": {
     "max200": "Máximo 200 caracteres",
     "max100": "Máximo 100 caracteres"
+  },
+  "brand": {
+    "tagline": "Estudia · Memoriza · Crece"
+  },
+  "sort": {
+    "recent": "Reciente",
+    "cards": "Tarjetas",
+    "sets": "Conjuntos",
+    "oldest": "Más antiguo"
   }
 }

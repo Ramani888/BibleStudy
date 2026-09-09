@@ -43,7 +43,25 @@
     "bookmark": "Salvar Marcador",
     "contentPolicyTitle": "Aviso",
     "contentPolicyMessage": "Sua mensagem foi sinalizada pelo nosso sistema de segurança. Mantenha as conversas focadas no estudo bíblico.",
-    "contentPolicyUnderstand": "Entendi"
+    "contentPolicyUnderstand": "Entendi",
+    "noCredits": "Sem créditos",
+    "noCreditsSub": "Resgate seu crédito diário na tela Início.",
+    "newConversation": "Nova conversa",
+    "clearConfirmMessage": "Limpar a conversa atual e começar do zero?",
+    "saveAsCard": "Salvar como card",
+    "disclaimer": "As respostas da AI citam versículos bíblicos, mas podem conter erros. Verifique interpretações importantes com seu pastor ou um comentário confiável.",
+    "attachFile": "Anexar um arquivo",
+    "chooseMedia": "Escolher de Minha mídia",
+    "yourMessage": "Sua mensagem",
+    "aiResponse": "Resposta da AI",
+    "contentPolicy": "Política de conteúdo",
+    "contentPolicyMsg": "Por favor, mantenha os anexos apropriados.\\n\\nNão envie conteúdo sexual, violento ou ilegal. Violações podem resultar na suspensão da conta.\\n\\nAo continuar, você concorda com nossas diretrizes de conteúdo.",
+    "cardsSavedToast": "${cardsToSave.length} cards salvos!",
+    "question": "pergunta",
+    "questions": "perguntas",
+    "continueConversation": "Continuar conversa",
+    "bookmarkedAt": "Salvo em ${formatDate(chat.bookmarkedAt)}",
+    "saveToSet": "Salvar no conjunto"
   },
   "consent": {
     "title": "Aviso do Assistente de IA",
@@ -61,7 +79,13 @@
     "declinedInfo": "O Assistente de IA está desativado com base nas suas preferências de privacidade. Você pode ativá-lo em Configurações.",
     "consentRecorded": "Preferências salvas",
     "consentDeclined": "Assistente de IA desativado",
-    "couldNotSaveConsent": "Não foi possível salvar as preferências"
+    "couldNotSaveConsent": "Não foi possível salvar as preferências",
+    "subtitle": "Suas mensagens são enviadas a provedores de AI terceiros para gerar respostas:",
+    "provider1": "OpenRouter (Gemma)",
+    "provider1Desc": "Processa suas mensagens de texto e perguntas",
+    "provider2": "Anthropic Claude",
+    "provider2Desc": "Processa anexos de mídia (PDFs, imagens)",
+    "warning": "Não compartilhe informações pessoais que você não queira que esses serviços recebam. As mensagens não são armazenadas pela Verdance além da sua sessão."
   },
   "cards": {
     "ready": "{{count}} cartão pronto",
@@ -112,7 +136,13 @@
     "legacyMessagesInfo": "Mensagens legadas não podem ser renomeadas ou excluídas.",
     "questionsCount": "{{count}} pergunta",
     "questionsCount_other": "{{count}} perguntas",
-    "creditsUsed": "{{count}} créditos usados"
+    "creditsUsed": "{{count}} créditos usados",
+    "renameTitle": "Renomear conversa",
+    "namePlaceholder": "Nome da conversa…",
+    "noBookmarks": "Nenhum favorito ainda",
+    "noBookmarksSub": "Toque e segure em qualquer resposta da AI e toque em Favoritar para salvá-la aqui",
+    "noHistory": "Nenhum histórico de conversa ainda",
+    "conversation": "Conversa"
   },
   "attach": {
     "mediaCost": "Mídia custa 3–5 créditos",

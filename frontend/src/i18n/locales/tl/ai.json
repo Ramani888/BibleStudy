@@ -43,7 +43,25 @@
     "bookmark": "Magdagdag ng Bookmark",
     "contentPolicyTitle": "Paunawa",
     "contentPolicyMessage": "Ang iyong mensahe ay na-flag ng aming sistema ng kaligtasan. Mangyaring panatilihing nakatuon ang usapan sa pag-aaral ng Bibliya.",
-    "contentPolicyUnderstand": "Naiintindihan Ko"
+    "contentPolicyUnderstand": "Naiintindihan Ko",
+    "noCredits": "Walang credits",
+    "noCreditsSub": "Kunin ang iyong araw-araw na credit mula sa Home screen.",
+    "newConversation": "Bagong Usapan",
+    "clearConfirmMessage": "I-clear ang kasalukuyang chat at magsimula muli?",
+    "saveAsCard": "I-save bilang Card",
+    "disclaimer": "Ang mga sagot ng AI ay bumabanggit ng mga talata sa Bibliya ngunit maaaring may mali. I-verify ang mahahalagang interpretasyon sa iyong pastor o mapagkakatiwalaang komentaryo.",
+    "attachFile": "Maglakip ng file",
+    "chooseMedia": "Pumili mula sa My Media",
+    "yourMessage": "Ang iyong mensahe",
+    "aiResponse": "Sagot ng AI",
+    "contentPolicy": "Patakaran sa Nilalaman",
+    "contentPolicyMsg": "Pakiusap panatilihing angkop ang mga lakip.\\n\\nHuwag mag-upload ng seksuwal, marahas, o ilegal na nilalaman. Ang mga paglabag ay maaaring magresulta sa pag-suspinde ng account.\\n\\nSa pagpapatuloy, sumasang-ayon ka sa aming mga alituntunin sa nilalaman.",
+    "cardsSavedToast": "${cardsToSave.length} cards na-save!",
+    "question": "tanong",
+    "questions": "mga tanong",
+    "continueConversation": "Ipagpatuloy ang usapan",
+    "bookmarkedAt": "Na-bookmark ${formatDate(chat.bookmarkedAt)}",
+    "saveToSet": "I-save sa Set"
   },
   "consent": {
     "title": "Paunawa sa AI Assistant",
@@ -61,7 +79,13 @@
     "declinedInfo": "Naka-disable ang AI Assistant batay sa iyong kagustuhan sa privacy. Maaari mo itong i-enable sa Mga Setting.",
     "consentRecorded": "Nai-save ang mga kagustuhan",
     "consentDeclined": "Naka-disable ang AI Assistant",
-    "couldNotSaveConsent": "Hindi mai-save ang mga kagustuhan"
+    "couldNotSaveConsent": "Hindi mai-save ang mga kagustuhan",
+    "subtitle": "Ang iyong mga mensahe ay ipinapadala sa mga third-party na AI provider upang makabuo ng mga sagot:",
+    "provider1": "OpenRouter (Gemma)",
+    "provider1Desc": "Pinoproseso ang iyong mga text message at tanong",
+    "provider2": "Anthropic Claude",
+    "provider2Desc": "Pinoproseso ang mga media na lakip (PDF, larawan)",
+    "warning": "Huwag ibahagi ang personal na impormasyong ayaw mong matanggap ng mga serbisyong ito. Hindi iniimbak ng Verdance ang mga mensahe lampas sa iyong session."
   },
   "cards": {
     "ready": "{{count}} card ang handa",
@@ -112,7 +136,13 @@
     "legacyMessagesInfo": "Ang mga lumang mensahe ay hindi mapapalitan ng pangalan o mabubura.",
     "questionsCount": "{{count}} tanong",
     "questionsCount_other": "{{count}} mga tanong",
-    "creditsUsed": "{{count}} credits ang nagamit"
+    "creditsUsed": "{{count}} credits ang nagamit",
+    "renameTitle": "Palitan ang Pangalan ng Usapan",
+    "namePlaceholder": "Pangalan ng usapan…",
+    "noBookmarks": "Wala pang bookmark",
+    "noBookmarksSub": "Pindutin nang matagal ang anumang sagot ng AI at i-tap ang Bookmark upang i-save dito",
+    "noHistory": "Wala pang kasaysayan ng chat",
+    "conversation": "Usapan"
   },
   "attach": {
     "mediaCost": "Ang media ay nagkakahalaga ng 3–5 credits",
@@ -124,7 +154,7 @@
     "noFiles": "Walang file sa My Media"
   },
   "export": {
-    "header": "AI Bible Study — {{date}}",
+    "header": "AI Pag-aaral ng Bibliya — {{date}}",
     "you": "Ikaw",
     "ai": "AI"
   },

@@ -23,7 +23,11 @@
     "viewDetails": "Voir les détails",
     "viewSummary": "Voir le récapitulatif",
     "reQuiz": "Refaire le quiz",
-    "deleteAttempt": "Supprimer la tentative"
+    "deleteAttempt": "Supprimer la tentative",
+    "startNewQuiz": "+ Démarrer un nouveau quiz",
+    "emptyTitle": "Aucun quiz pour l'instant",
+    "emptySub": "Touchez ",
+    "details": "Détails"
   },
   "setup": {
     "title": "Configuration du Quiz",
@@ -73,7 +77,22 @@
     "sort": {
       "newest": "Récent",
       "cards": "Cartes"
-    }
+    },
+    "chooseType": "CHOISISSEZ UN TYPE DE QUIZ",
+    "modeMix": "Mélange",
+    "modeMixDesc": "Mélange aléatoire de tous les types",
+    "practiceNotScored": "Entraînement · non noté",
+    "addCardsToQuiz": "Ajoutez des cartes à cet ensemble pour lancer un quiz.",
+    "needMinCards": "Le choix multiple nécessite ${MIN_MC_CARDS}+ cartes du même type.",
+    "cancelQuiz": "Quitter le quiz ?",
+    "cancelWarning": "Votre progression sera perdue.",
+    "tapToChooseSets": "Touchez pour choisir des ensembles…",
+    "loadingCards": "Chargement des cartes…",
+    "noCardsInSets": "Aucune carte dans les ensembles sélectionnés",
+    "nameLabel": "NOM DU QUIZ",
+    "namePlaceholder": "ex. Révision semaine 3…",
+    "quizTypeLabel": "TYPE DE QUIZ",
+    "selectSetsToContinue": "Sélectionnez des ensembles pour continuer"
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",
@@ -107,7 +126,25 @@
     "saveError": "Impossible d'enregistrer le résultat du quiz",
     "reviewSummary": "Revoir les Réponses",
     "studyAgain": "Étudier à Nouveau",
-    "backToLibrary": "Retour à la Bibliothèque"
+    "backToLibrary": "Retour à la Bibliothèque",
+    "quotes": {
+      "excellent": {
+        "text": "Remarquable ! Votre dévouement porte de véritables fruits.",
+        "sub": "Gardez cet élan."
+      },
+      "great": {
+        "text": "Excellent travail — chaque révision aiguise l'esprit et l'âme.",
+        "sub": "Vous bâtissez quelque chose de durable."
+      },
+      "good": {
+        "text": "Bel effort — la constance est la clé de la maîtrise.",
+        "sub": "Revenez demain et allez plus loin."
+      },
+      "keepGoing": {
+        "text": "Ne vous découragez pas — c'est dans l'effort que naît la croissance.",
+        "sub": "Chaque tentative vous rend plus fort."
+      }
+    }
   },
   "summary": {
     "title": "Résumé du Quiz",
@@ -123,7 +160,8 @@
     "correct": "Correctes",
     "incorrect": "Incorrectes",
     "noQuestions": "Aucune question ne correspond à ce filtre.",
-    "readMode": "(lecture)"
+    "readMode": "(lecture)",
+    "reQuiz": "Refaire le quiz"
   },
   "detail": {
     "headerTitle": "Historique du Quiz",
@@ -183,7 +221,8 @@
     "yourAnswer": "Votre réponse",
     "correctAnswer": "Bonne réponse",
     "quitDialogTitle": "Quitter le quiz ?",
-    "quitDialogMessage": "Votre progression dans ce quiz sera perdue."
+    "quitDialogMessage": "Votre progression dans ce quiz sera perdue.",
+    "emptyState": "Rien à réviser ici"
   },
   "results": {
     "title": "Quiz terminé !",
@@ -210,5 +249,8 @@
     "whichPassage": "Quel passage est {{ref}} ?",
     "typeRef": "Tapez {{ref}}",
     "typePassage": "Tapez le passage"
+  },
+  "play": {
+    "tapToRevealProgress": "Touchez pour révéler (${revealed}/${phrases.length})"
   }
 }

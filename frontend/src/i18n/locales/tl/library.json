@@ -3,7 +3,8 @@
     "mySets": "Aking Mga Set",
     "folders": "Mga Folder",
     "plans": "Mga Plano",
-    "explore": "Galugarin"
+    "explore": "Galugarin",
+    "study": "Quiz"
   },
   "sets": {
     "title": "Mga Study Set",
@@ -34,14 +35,32 @@
     "setDeleted": "Natanggal ang set",
     "setRemoved": "Naalis ang set",
     "visibilityPRIVATE": "Pribado",
-    "visibilityPUBLIC": "Public",
+    "visibilityPUBLIC": "Pampubliko",
     "visibilityFRIENDS": "Mga Kaibigan",
     "visibilityDescPRIVATE": "Ikaw lang",
     "visibilityDescPUBLIC": "Lahat",
     "visibilityDescFRIENDS": "Nakabahaging link",
     "layoutDEFAULT": "Default",
     "layoutMINIMAL": "Minimal",
-    "layoutDETAILED": "Detalyado"
+    "layoutDETAILED": "Detalyado",
+    "visibilityPublic": "Pampubliko",
+    "couldNotLoadSet": "Hindi ma-load ang set.",
+    "searchPlaceholder": "Maghanap ng sets…",
+    "setCount": "${filteredSets.length} sets",
+    "couldNotLoadFriendsSets": "Hindi ma-load ang mga kaibigan",
+    "emptyDesc": "Gumawa ng iyong unang study set upang makapagsimula",
+    "couldNotLoadPublicSets": "Hindi ma-load ang mga pampublikong set.",
+    "searchPublicSets": "Maghanap ng pampublikong sets…",
+    "noOtherSets": "Walang ibang set na magagamit",
+    "titleLabel": "Pamagat",
+    "titlePlaceholder": "hal. Pag-aaral ng Roma",
+    "descLabel": "Paglalarawan (opsyonal)",
+    "descPlaceholder": "Tungkol saan ang set na ito?",
+    "folderOptional": "Folder (opsyonal)",
+    "color": "Kulay",
+    "visibility": "Visibility",
+    "cardLayout": "Card Layout",
+    "chooseSets": "Pumili ng Sets"
   },
   "folders": {
     "title": "Mga Folder",
@@ -67,7 +86,16 @@
     "noSetsInFolder": "Walang mga set sa folder na ito",
     "noSetsInFolderSub": "Pindutin ang button sa ibaba upang magdagdag ng set sa folder na ito.",
     "setsCount": "{{count}} set",
-    "setsCount_other": "{{count}} mga set"
+    "setsCount_other": "{{count}} mga set",
+    "emptyTitle": "Walang set sa folder na ito",
+    "emptySub": "Gumawa ng set at italaga ito sa folder na ito",
+    "moveToFolder": "Ilipat sa Folder",
+    "noFolder": "Walang folder",
+    "noOtherFolders": "Walang ibang folder",
+    "noFolders": "Wala pang folder",
+    "emptyDesc": "I-tap ang Gumawa ng Folder upang ayusin ang iyong sets",
+    "deleteFolderTitle": "Tanggalin ang Folder",
+    "color": "Kulay"
   },
   "cards": {
     "addCard": "Magdagdag ng Card",
@@ -131,7 +159,31 @@
     "textLabel": "Teksto",
     "noteButton": "Magdagdag ng Note",
     "noteLabel": "Note (opsyonal)",
-    "cardNotFound": "Hindi nahanap ang card"
+    "cardNotFound": "Hindi nahanap ang card",
+    "title": "Cards",
+    "reorderCards": "Ayusin ang Cards",
+    "searchPlaceholder": "Maghanap ng cards…",
+    "couldNotLoadCards": "Hindi ma-load ang cards.",
+    "reference": "Sanggunian",
+    "tapToReveal": "I-tap ang icon ng mata upang ipakita ang sagot",
+    "passage": "Sipi",
+    "note": "Tala",
+    "noResults": "Walang resulta",
+    "addCardsToStudy": "Magdagdag ng cards upang simulan ang pag-aaral ng set na ito",
+    "noCardsInSet": "Wala pang cards ang set na ito",
+    "addCards": "Magdagdag ng Cards",
+    "askAI": "Tanungin ang AI",
+    "createCard": "Gumawa ng Card",
+    "unblurAll": "Alisin ang Blur sa Lahat",
+    "blurAll": "I-blur Lahat",
+    "listView": "List View",
+    "gridView": "Grid View",
+    "addNotePlaceholder": "Magdagdag ng tala…",
+    "batchUpdateResult": "${toUpdate.length - failed} na-update, ${failed} nabigo",
+    "noMatch": "Walang cards na tumugma sa ",
+    "qaCard": "Q&A Card",
+    "storyCard": "Story Card",
+    "noCards": "Wala pang cards"
   },
   "plans": {
     "title": "Mga Plano sa Pag-aaral",
@@ -159,7 +211,10 @@
     "stepOrderHelp": "Pindutin ang mga set sa pagkakasunod-sunod na nais mong pag-aralan.",
     "minSetsRequired": "Pumili ng kahit 1 set para makagawa ng plano.",
     "noSetsAvailable": "Walang available na mga set",
-    "noSetsAvailableSub": "Lumikha muna ng mga flashcard set bago gumawa ng plano."
+    "noSetsAvailableSub": "Lumikha muna ng mga flashcard set bago gumawa ng plano.",
+    "emptyTitle": "Wala pang plano sa pag-aaral",
+    "emptySub": "I-tap ang + upang gumawa ng gabay na landas sa iyong sets.",
+    "selectedCount": "${selectedSetIds.length} sets napili"
   },
   "studyPlans": {
     "title": "Mga Plano sa Pag-aaral",
@@ -174,13 +229,20 @@
     "copyToLibrary": "Idagdag sa Aking Library",
     "copiedSuccess": "Naidagdag ang set sa iyong library!",
     "noSets": "Walang natagpuang pampublikong set",
-    "noSetsSub": "Subukang maghanap ng ibang paksa o keyword sa Bibliya."
+    "noSetsSub": "Subukang maghanap ng ibang paksa o keyword sa Bibliya.",
+    "emptyTitle": "Wala pang pampublikong set",
+    "emptySubtitle": "Maging una sa pag-publish ng set!",
+    "resultsFor": "${total} result${total !== 1 ? ",
+    "publicSetsAvailable": "${total} pampublikong sets na magagamit",
+    "noSetsMatch": "Walang set na tumugma sa "
   },
   "friendsSets": {
     "title": "Mga Set ng Kaibigan",
     "searchPlaceholder": "Maghanap ng mga set ng kaibigan…",
     "noSets": "Walang mga set ng kaibigan",
-    "noSetsSub": "Kapag nag-publish ng study set ang iyong mga kaibigan, lalabas ito rito."
+    "noSetsSub": "Kapag nag-publish ng study set ang iyong mga kaibigan, lalabas ito rito.",
+    "sharedCount": "${total} sets ibinahagi ng mga kaibigan",
+    "noSetsMatch": "Walang set na tumugma sa "
   },
   "dialogs": {
     "deleteSetTitle": "Tanggalin ang Set",
@@ -200,5 +262,6 @@
     "answerMax": "Pinakamataas na 1000 karakter",
     "textMin": "Dapat ay may hindi bababa sa 2 karakter ang teksto",
     "textMax": "Pinakamataas na 2000 karakter"
-  }
+  },
+  "cardsCount_other": "${set._count?.cards ?? 0} cards"
 }

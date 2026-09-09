@@ -35,7 +35,11 @@
     "clearAll": "Tout effacer",
     "select": "Sélectionner",
     "apply": "Appliquer",
-    "remove": "Retirer"
+    "remove": "Retirer",
+    "agree": "J'accepte",
+    "openBrowser": "Ouvrir dans le navigateur",
+    "accept": "Accepter",
+    "decline": "Refuser"
   },
   "status": {
     "loading": "Chargement...",
@@ -52,7 +56,13 @@
     "selected": "Sélectionné",
     "couldNotDelete": "Impossible de supprimer",
     "unknownError": "Erreur inconnue",
-    "uploading": "Envoi en cours..."
+    "uploading": "Envoi en cours...",
+    "tryDifferentSearch": "Essayez un autre terme de recherche",
+    "saved": "Enregistré",
+    "failedToLoad": "Échec du chargement des cartes",
+    "searching": "Recherche…",
+    "you": "vous",
+    "uploadingFile": "Envoi de ${filename}"
   },
   "filter": {
     "all": "Tous"
@@ -79,5 +89,14 @@
   "validation": {
     "max200": "200 caractères maximum",
     "max100": "100 caractères maximum"
+  },
+  "brand": {
+    "tagline": "Étudier · Mémoriser · Grandir"
+  },
+  "sort": {
+    "recent": "Récent",
+    "cards": "Cartes",
+    "sets": "Ensembles",
+    "oldest": "Plus ancien"
   }
 }

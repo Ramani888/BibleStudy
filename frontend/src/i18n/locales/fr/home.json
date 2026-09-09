@@ -4,7 +4,8 @@
     "afternoon": "Bon après-midi",
     "evening": "Bonsoir",
     "streak": "{{count}} jours d'affilée ! Continuez comme ça",
-    "streak_one": "1er jour d'affilée ! Excellent début"
+    "streak_one": "1er jour d'affilée ! Excellent début",
+    "streakDays": "Série de ${streakData?.streak ?? 0} jours"
   },
   "stats": {
     "dueToday": "À réviser aujourd'hui",
@@ -82,7 +83,8 @@
     "day": "{{count}} jour de suite",
     "days": "{{count}} jours de suite",
     "keepGoing": "Continuez, c'est excellent !",
-    "streakLost": "Étudiez aujourd'hui pour garder votre série"
+    "streakLost": "Étudiez aujourd'hui pour garder votre série",
+    "flameDays": "🔥 Série de ${streak} jours"
   },
   "sections": {
     "recentSets": "Ensembles récents",
@@ -90,7 +92,8 @@
     "friendsSets": "Ensembles des amis",
     "communitySets": "Ensembles de la communauté",
     "friendActivity": "Activité des amis",
-    "quickStats": "Statistiques rapides"
+    "quickStats": "Statistiques rapides",
+    "recentActivity": "ACTIVITÉ RÉCENTE"
   },
   "empty": {
     "noRecentSets": "Aucun ensemble d'étude récent",

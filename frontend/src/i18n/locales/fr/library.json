@@ -3,7 +3,8 @@
     "mySets": "Mes Séries",
     "folders": "Dossiers",
     "plans": "Plans",
-    "explore": "Explorer"
+    "explore": "Explorer",
+    "study": "Quiz"
   },
   "sets": {
     "title": "Séries d'Étude",
@@ -41,7 +42,25 @@
     "visibilityDescFRIENDS": "Lien partagé",
     "layoutDEFAULT": "Par défaut",
     "layoutMINIMAL": "Minimal",
-    "layoutDETAILED": "Détaillé"
+    "layoutDETAILED": "Détaillé",
+    "visibilityPublic": "Public",
+    "couldNotLoadSet": "Impossible de charger l'ensemble.",
+    "searchPlaceholder": "Rechercher des ensembles…",
+    "setCount": "${filteredSets.length} ensembles",
+    "couldNotLoadFriendsSets": "Impossible de charger les amis",
+    "emptyDesc": "Créez votre premier ensemble d'étude pour commencer",
+    "couldNotLoadPublicSets": "Impossible de charger les ensembles publics.",
+    "searchPublicSets": "Rechercher des ensembles publics…",
+    "noOtherSets": "Aucun autre ensemble disponible",
+    "titleLabel": "Titre",
+    "titlePlaceholder": "ex. Étude des Romains",
+    "descLabel": "Description (facultatif)",
+    "descPlaceholder": "De quoi parle cet ensemble ?",
+    "folderOptional": "Dossier (facultatif)",
+    "color": "Couleur",
+    "visibility": "Visibilité",
+    "cardLayout": "Disposition des cartes",
+    "chooseSets": "Choisir des ensembles"
   },
   "folders": {
     "title": "Dossiers",
@@ -67,7 +86,16 @@
     "noSetsInFolder": "Aucune série dans ce dossier",
     "noSetsInFolderSub": "Touchez le bouton ci-dessous pour ajouter votre première série à ce dossier.",
     "setsCount": "{{count}} série",
-    "setsCount_other": "{{count}} séries"
+    "setsCount_other": "{{count}} séries",
+    "emptyTitle": "Aucun ensemble dans ce dossier",
+    "emptySub": "Créez un ensemble et affectez-le à ce dossier",
+    "moveToFolder": "Déplacer vers un dossier",
+    "noFolder": "Aucun dossier",
+    "noOtherFolders": "Aucun autre dossier",
+    "noFolders": "Aucun dossier pour l'instant",
+    "emptyDesc": "Touchez Créer un dossier pour organiser vos ensembles",
+    "deleteFolderTitle": "Supprimer le dossier",
+    "color": "Couleur"
   },
   "cards": {
     "addCard": "Ajouter une Carte",
@@ -131,7 +159,31 @@
     "textLabel": "Texte",
     "noteButton": "Ajouter une note",
     "noteLabel": "Note (facultatif)",
-    "cardNotFound": "Carte introuvable"
+    "cardNotFound": "Carte introuvable",
+    "title": "Cartes",
+    "reorderCards": "Réorganiser les cartes",
+    "searchPlaceholder": "Rechercher des cartes…",
+    "couldNotLoadCards": "Impossible de charger les cartes.",
+    "reference": "Référence",
+    "tapToReveal": "Touchez l'icône œil pour révéler la réponse",
+    "passage": "Passage",
+    "note": "Note",
+    "noResults": "Aucun résultat",
+    "addCardsToStudy": "Ajoutez des cartes pour commencer à étudier cet ensemble",
+    "noCardsInSet": "Cet ensemble ne contient pas encore de cartes",
+    "addCards": "Ajouter des cartes",
+    "askAI": "Demander à l'AI",
+    "createCard": "Créer une carte",
+    "unblurAll": "Tout révéler",
+    "blurAll": "Tout masquer",
+    "listView": "Vue liste",
+    "gridView": "Vue grille",
+    "addNotePlaceholder": "Ajouter une note…",
+    "batchUpdateResult": "${toUpdate.length - failed} mises à jour, ${failed} échecs",
+    "noMatch": "Aucune carte ne correspond à ",
+    "qaCard": "Carte Q&R",
+    "storyCard": "Carte récit",
+    "noCards": "Aucune carte pour l'instant"
   },
   "plans": {
     "title": "Plans d'Étude",
@@ -159,7 +211,10 @@
     "stepOrderHelp": "Touchez les séries dans l'ordre où vous souhaitez les étudier.",
     "minSetsRequired": "Sélectionnez au moins 1 série pour créer un plan.",
     "noSetsAvailable": "Aucune série disponible",
-    "noSetsAvailableSub": "Créez d'abord des séries de cartes avant d'élaborer un plan."
+    "noSetsAvailableSub": "Créez d'abord des séries de cartes avant d'élaborer un plan.",
+    "emptyTitle": "Aucun plan d'étude pour l'instant",
+    "emptySub": "Touchez + pour créer un parcours guidé à travers vos ensembles.",
+    "selectedCount": "${selectedSetIds.length} ensembles sélectionnés"
   },
   "studyPlans": {
     "title": "Plans d'Étude",
@@ -174,13 +229,20 @@
     "copyToLibrary": "Ajouter à Ma Bibliothèque",
     "copiedSuccess": "Série ajoutée à votre bibliothèque !",
     "noSets": "Aucune série publique trouvée",
-    "noSetsSub": "Essayez de rechercher un autre sujet biblique ou mot-clé."
+    "noSetsSub": "Essayez de rechercher un autre sujet biblique ou mot-clé.",
+    "emptyTitle": "Aucun ensemble public pour l'instant",
+    "emptySubtitle": "Soyez le premier à publier un ensemble !",
+    "resultsFor": "${total} result${total !== 1 ? ",
+    "publicSetsAvailable": "${total} ensembles publics disponibles",
+    "noSetsMatch": "Aucun ensemble ne correspond à "
   },
   "friendsSets": {
     "title": "Séries des Amis",
     "searchPlaceholder": "Rechercher les séries des amis…",
     "noSets": "Aucune série d'amis",
-    "noSetsSub": "Lorsque vos amis publieront des séries d'étude, elles apparaîtront ici."
+    "noSetsSub": "Lorsque vos amis publieront des séries d'étude, elles apparaîtront ici.",
+    "sharedCount": "${total} ensembles partagés par des amis",
+    "noSetsMatch": "Aucun ensemble ne correspond à "
   },
   "dialogs": {
     "deleteSetTitle": "Supprimer la Série",
@@ -200,5 +262,6 @@
     "answerMax": "1000 caractères maximum",
     "textMin": "Le texte doit comporter au moins 2 caractères",
     "textMax": "2000 caractères maximum"
-  }
+  },
+  "cardsCount_other": "${set._count?.cards ?? 0} cartes"
 }

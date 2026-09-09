@@ -23,7 +23,11 @@
     "viewDetails": "Ver detalles",
     "viewSummary": "Ver resumen",
     "reQuiz": "Repetir cuestionario",
-    "deleteAttempt": "Eliminar intento"
+    "deleteAttempt": "Eliminar intento",
+    "startNewQuiz": "+ Iniciar nuevo cuestionario",
+    "emptyTitle": "Aún no hay cuestionarios",
+    "emptySub": "Toca ",
+    "details": "Detalles"
   },
   "setup": {
     "title": "Configuración del Cuestionario",
@@ -73,7 +77,22 @@
     "sort": {
       "newest": "Recientes",
       "cards": "Tarjetas"
-    }
+    },
+    "chooseType": "ELIGE UN TIPO DE CUESTIONARIO",
+    "modeMix": "Mixto",
+    "modeMixDesc": "Mezcla aleatoria de todos los tipos",
+    "practiceNotScored": "Práctica · sin puntuación",
+    "addCardsToQuiz": "Agrega tarjetas a este conjunto para empezar el cuestionario.",
+    "needMinCards": "La opción múltiple necesita ${MIN_MC_CARDS}+ tarjetas del mismo tipo.",
+    "cancelQuiz": "¿Salir del cuestionario?",
+    "cancelWarning": "Perderás tu progreso.",
+    "tapToChooseSets": "Toca para elegir conjuntos…",
+    "loadingCards": "Cargando tarjetas…",
+    "noCardsInSets": "No hay tarjetas en los conjuntos seleccionados",
+    "nameLabel": "NOMBRE DEL CUESTIONARIO",
+    "namePlaceholder": "p. ej. Repaso de la semana 3…",
+    "quizTypeLabel": "TIPO DE CUESTIONARIO",
+    "selectSetsToContinue": "Selecciona conjuntos para continuar"
   },
   "hud": {
     "questionOf": "Pregunta {{current}} de {{total}}",
@@ -107,7 +126,25 @@
     "saveError": "No se pudo guardar el resultado del cuestionario",
     "reviewSummary": "Revisar Respuestas",
     "studyAgain": "Estudiar de Nuevo",
-    "backToLibrary": "Volver a la Biblioteca"
+    "backToLibrary": "Volver a la Biblioteca",
+    "quotes": {
+      "excellent": {
+        "text": "¡Excelente! Tu dedicación está dando frutos reales.",
+        "sub": "Mantén ese impulso."
+      },
+      "great": {
+        "text": "Gran trabajo: cada repaso agudiza la mente y el espíritu.",
+        "sub": "Estás construyendo algo duradero."
+      },
+      "good": {
+        "text": "Buen esfuerzo: la constancia es la clave del dominio.",
+        "sub": "Vuelve mañana y avanza más."
+      },
+      "keepGoing": {
+        "text": "No te desanimes: el esfuerzo es donde ocurre el crecimiento.",
+        "sub": "Cada intento te hace más fuerte."
+      }
+    }
   },
   "summary": {
     "title": "Resumen del Cuestionario",
@@ -123,7 +160,8 @@
     "correct": "Correctas",
     "incorrect": "Incorrectas",
     "noQuestions": "Ninguna pregunta coincide con este filtro.",
-    "readMode": "(lectura)"
+    "readMode": "(lectura)",
+    "reQuiz": "Repetir cuestionario"
   },
   "detail": {
     "headerTitle": "Historial del Cuestionario",
@@ -132,7 +170,7 @@
     "practiced_other": "Practicado {{count}} veces",
     "lastPracticed": "Última práctica {{date}}",
     "correctCount": "{{correct}} / {{total}} correctas",
-    "setsCount": "{{count}} sets",
+    "setsCount": "{{count}} conjuntos",
     "viewSummary": "Ver resumen",
     "title": "Intento de cuestionario",
     "deleteTitle": "Eliminar cuestionario",
@@ -183,7 +221,8 @@
     "yourAnswer": "Tu respuesta",
     "correctAnswer": "Respuesta correcta",
     "quitDialogTitle": "¿Salir del cuestionario?",
-    "quitDialogMessage": "Perderás tu progreso en este cuestionario."
+    "quitDialogMessage": "Perderás tu progreso en este cuestionario.",
+    "emptyState": "Nada que evaluar aquí"
   },
   "results": {
     "title": "¡Cuestionario completado!",
@@ -210,5 +249,8 @@
     "whichPassage": "¿Qué pasaje es {{ref}}?",
     "typeRef": "Escribe {{ref}}",
     "typePassage": "Escribe el pasaje"
+  },
+  "play": {
+    "tapToRevealProgress": "Toca para revelar (${revealed}/${phrases.length})"
   }
 }

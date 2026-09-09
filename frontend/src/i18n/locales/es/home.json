@@ -4,7 +4,8 @@
     "afternoon": "Buenas tardes",
     "evening": "Buenas noches",
     "streak": "¡Racha de {{count}} días! Sigue así",
-    "streak_one": "¡Día 1 de racha! Gran comienzo"
+    "streak_one": "¡Día 1 de racha! Gran comienzo",
+    "streakDays": "Racha de ${streakData?.streak ?? 0} días"
   },
   "stats": {
     "dueToday": "Pendiente hoy",
@@ -12,7 +13,7 @@
     "streakDays": "Días de racha",
     "totalSets": "Sets totales",
     "cardsCount": "{{count}} tarjetas",
-    "sets": "Sets",
+    "sets": "Conjuntos",
     "folders": "Carpetas",
     "notes": "Notas",
     "cards": "Tarjetas",
@@ -82,7 +83,8 @@
     "day": "Racha de {{count}} día",
     "days": "Racha de {{count}} días",
     "keepGoing": "¡Sigue así, vas muy bien!",
-    "streakLost": "Estudia hoy para mantener tu racha"
+    "streakLost": "Estudia hoy para mantener tu racha",
+    "flameDays": "🔥 Racha de ${streak} días"
   },
   "sections": {
     "recentSets": "Sets recientes",
@@ -90,7 +92,8 @@
     "friendsSets": "Sets de amigos",
     "communitySets": "Sets de la comunidad",
     "friendActivity": "Actividad de amigos",
-    "quickStats": "Estadísticas rápidas"
+    "quickStats": "Estadísticas rápidas",
+    "recentActivity": "ACTIVIDAD RECIENTE"
   },
   "empty": {
     "noRecentSets": "Aún no hay sets de estudio recientes",

@@ -4,7 +4,8 @@
     "afternoon": "좋은 오후입니다",
     "evening": "좋은 저녁입니다",
     "streak": "{{count}}일 연속 학습 중! 계속 힘내세요",
-    "streak_one": "연속 학습 1일 차! 좋은 시작입니다"
+    "streak_one": "연속 학습 1일 차! 좋은 시작입니다",
+    "streakDays": "${streakData?.streak ?? 0}일 연속"
   },
   "stats": {
     "dueToday": "오늘 복습할 카드",
@@ -82,7 +83,8 @@
     "day": "{{count}}일 연속",
     "days": "{{count}}일 연속",
     "keepGoing": "이 좋은 흐름을 계속 이어가세요!",
-    "streakLost": "연속 기록을 유지하려면 오늘 공부하세요"
+    "streakLost": "연속 기록을 유지하려면 오늘 공부하세요",
+    "flameDays": "🔥 ${streak}일 연속"
   },
   "sections": {
     "recentSets": "최근 세트",
@@ -90,7 +92,8 @@
     "friendsSets": "친구의 세트",
     "communitySets": "커뮤니티 세트",
     "friendActivity": "친구 활동",
-    "quickStats": "간단 통계"
+    "quickStats": "간단 통계",
+    "recentActivity": "최근 활동"
   },
   "empty": {
     "noRecentSets": "아직 최근 학습 세트가 없습니다",
