@@ -50,6 +50,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Theme & Components]] — design tokens + component library
 - [[Design Language (Calm Serene)]] — app-wide redesign reference (start here for styling)
 - [[Localization (i18n)]] — 6 locales, deterministic completeness scan, translation caveats
+- [[Brand & Assets]] — Verdance logo, icons/splash/notification, store + web assets (all from `branding/build-icons.mjs`)
 
 ## 🛠️ Ops
 - [[Local Dev Setup]] — running locally (Postgres 5434)
