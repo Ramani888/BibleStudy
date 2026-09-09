@@ -43,12 +43,14 @@ export function AnimatedPressable({
     scale.value = withSpring(scaleTo, { damping: 15, stiffness: 200 });
     opacity.value = withTiming(0.82, { duration: 80 });
     onPressIn?.(e);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [scaleTo, onPressIn]);
 
   const handlePressOut = useCallback<NonNullable<PressableProps['onPressOut']>>((e) => {
     scale.value = withSpring(1, { damping: 15, stiffness: 200 });
     opacity.value = withTiming(1, { duration: 80 });
     onPressOut?.(e);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onPressOut]);
 
   return (

@@ -47,7 +47,6 @@ export function QuizResultScreen({
   const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
-  const isDark = theme.name === 'dark';
   const navigation = useNavigation();
   const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
   const saved = useRef(false);

@@ -11,7 +11,7 @@ import Toast from 'react-native-toast-message';
 import { FolderCard, QuizModeSheet, SetActionSheet, SetCard } from '../../components/domain';
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
 import { Button, ColorPicker, Input, Screen, SearchBar, Spacer, Typography } from '../../components/ui';
-import { BookIcon, FolderIcon, GlobeIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon, UsersIcon } from '../../components/icons';
+import { FolderIcon, PencilIcon, PlusCircleIcon, SearchIcon, SortIcon, TrashIcon } from '../../components/icons';
 
 import {
   useConfirmDialog,

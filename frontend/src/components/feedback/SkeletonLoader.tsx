@@ -34,6 +34,7 @@ export function Skeleton({ width = '100%', height = 16, borderRadius = 8, style 
       withTiming(1, { duration: 1200, easing: Easing.linear }),
       -1,
     );
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const animStyle = useAnimatedStyle(() => ({

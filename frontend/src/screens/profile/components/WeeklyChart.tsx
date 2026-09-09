@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Card, Typography } from '../../../components/ui';
-import { CARD_FILL_LIGHT, layout, radius, spacing, useTheme } from '../../../theme';
+import { CARD_FILL_LIGHT, radius, spacing, useTheme } from '../../../theme';
 import type { DayStat } from '../../../hooks/useCredits';
 import {
   useWeeklyChart,

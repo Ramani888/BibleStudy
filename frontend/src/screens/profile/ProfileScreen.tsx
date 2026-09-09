@@ -6,7 +6,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
 import { ConfirmDialog } from '../../components/feedback';
-import { Avatar, Badge, Typography } from '../../components/ui';
+import { Avatar, Typography } from '../../components/ui';
 import {
   AlbumsIcon,
   BellIcon,

@@ -4,7 +4,7 @@ import { AppModal } from './Modal';
 import { AccentIcon, Divider, Typography } from '../ui';
 import { CheckCircleIcon, SearchIcon } from '../icons';
 import type { IconComponent } from '../icons';
-import { layout, spacing, useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { SearchBar } from '../ui';
 
 export interface SelectOption {

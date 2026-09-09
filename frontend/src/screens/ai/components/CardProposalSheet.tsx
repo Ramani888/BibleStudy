@@ -44,7 +44,7 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
     } finally {
       setIsCreating(false);
     }
-  }, [newSetName, isCreating, createSet]);
+  }, [newSetName, isCreating, createSet, t]);
 
   const handleSave = useCallback(async () => {
     if (!selectedSetId) return;

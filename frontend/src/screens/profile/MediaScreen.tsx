@@ -282,7 +282,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         }
       </Pressable>
     );
-  }, [actions, navigation, isDark, colors]);
+  }, [actions, navigation, isDark, colors, t]);
 
   return (
     <Screen header={<ScreenHeader title={t('profile:media.title')} onBack={() => navigation.goBack()} />}>

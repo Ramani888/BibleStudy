@@ -129,7 +129,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
         </Typography>
       </View>
     );
-  }, [colors, amountColor]);
+  }, [colors, amountColor, t]);
 
   return (
     <Screen edges={['top']} header={<ScreenHeader title={t('profile:credits.title')} onBack={() => navigation.goBack()} />}>

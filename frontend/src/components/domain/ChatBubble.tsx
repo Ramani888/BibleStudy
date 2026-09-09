@@ -117,7 +117,7 @@ function AIMarkdown({ text, color }: { text: string; color: string }) {
 
 // ── ChatBubble ────────────────────────────────────────────────────────────────
 
-export function ChatBubble({ role, text, creditsUsed, userName, userImage, isTyping = false, timestamp }: ChatBubbleProps) {
+export function ChatBubble({ role, text, isTyping = false, timestamp }: ChatBubbleProps) {
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';

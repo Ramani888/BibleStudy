@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
-import { fontSizes, fontWeights, layout, spacing, Theme, useTheme } from '../../theme';
+import { fontSizes, fontWeights, layout, spacing, useTheme } from '../../theme';
 import { Typography } from '../ui/Typography';
 
 const OTP_LENGTH = 6;

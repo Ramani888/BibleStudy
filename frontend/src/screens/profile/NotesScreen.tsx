@@ -142,7 +142,7 @@ export function NotesScreen({ navigation }: Props) {
         )}
       </Pressable>
     </Swipeable>
-  ), [navigation, handleDelete, colors]);
+  ), [navigation, handleDelete, colors, isDark]);
 
   if (error) return <ErrorState message={t('profile:notes.couldNotLoadNotes', 'Could not load notes')} onRetry={refetch} />;
 

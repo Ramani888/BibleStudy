@@ -74,7 +74,7 @@ export function FriendsScreen({ navigation }: Props) {
         </Pressable>
       </Pressable>
     );
-  }, [streakMap, handleRemove, colors, isDark, navigation]);
+  }, [streakMap, handleRemove, colors, isDark, navigation, t]);
 
   if (error) return <ErrorState message={t('profile:friends.couldNotLoadFriends', 'Could not load friends')} onRetry={refetch} />;
 

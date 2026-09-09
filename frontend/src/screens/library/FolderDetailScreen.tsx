@@ -25,7 +25,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const [assignTargetSetId, setAssignTargetSetId] = useState<string | null>(null);
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
-  const { data: sets = [], isLoading, isError, refetch } = useSets(folderId);
+  const { data: sets = [], isError, refetch } = useSets(folderId);
   const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { mutate: updateSet } = useUpdateSet();
