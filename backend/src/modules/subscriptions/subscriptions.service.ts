@@ -1,4 +1,5 @@
 import type { Plan, Store } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { AppError } from '../../utils/errors';
@@ -138,4 +139,83 @@ export async function getEffectivePlan(userId: string): Promise<Plan> {
   });
   if (!sub || sub.expiresAt.getTime() <= Date.now()) return 'FREE';
   return sub.plan;
+}
+
+// ── RevenueCat webhook (source of truth for entitlements once migrated) ──────────
+export interface RcWebhookEvent {
+  id: string;
+  type: string;
+  app_user_id?: string;
+  original_app_user_id?: string;
+  product_id?: string;
+  expiration_at_ms?: number | null;
+  transaction_id?: string | null;
+  original_transaction_id?: string | null;
+  store?: string;
+}
+
+export type RcResult = { status: 'duplicate' | 'ignored' | 'applied'; detail?: string };
+
+// RC store → our Store enum (we only sell on Apple/Google).
+const RC_STORE_MAP: Record<string, Store> = { APP_STORE: 'APPLE', MAC_APP_STORE: 'APPLE', PLAY_STORE: 'GOOGLE' };
+const RC_ACTIVATE = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION', 'PRODUCT_CHANGE']);
+const RC_GRANT_CREDITS = new Set(['INITIAL_PURCHASE', 'RENEWAL']); // money events only
+const RC_TERMINATE = new Set(['EXPIRATION', 'SUBSCRIPTION_PAUSED']);
+
+/**
+ * Idempotent RevenueCat webhook handler. Reuses the same grant/downgrade logic as the
+ * legacy receipt path, but keyed on RC event.id (RC retries on non-2xx). The ProcessedWebhookEvent
+ * insert is the dedupe guard — a replayed event.id hits the @id unique constraint (P2002) and the
+ * whole transaction rolls back, so nothing is granted twice.
+ */
+export async function handleRcWebhook(event: RcWebhookEvent): Promise<RcResult> {
+  const userId = event.app_user_id;
+  try {
+    return await prisma.$transaction(async (tx) => {
+      await tx.processedWebhookEvent.create({ data: { id: event.id, type: event.type, appUserId: userId ?? null } });
+
+      if (!userId) return { status: 'ignored', detail: 'no app_user_id' };
+      const user = await tx.user.findUnique({ where: { id: userId }, select: { id: true } });
+      if (!user) return { status: 'ignored', detail: 'unknown user' };
+
+      if (RC_TERMINATE.has(event.type)) {
+        const thirtyDays = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+        await tx.user.update({ where: { id: userId }, data: { plan: 'FREE', storageLimit: BigInt(PLAN_BENEFITS.FREE.storageBytes) } });
+        await tx.mediaFile.updateMany({ where: { userId, expiresAt: null }, data: { expiresAt: thirtyDays } });
+        return { status: 'applied', detail: `downgraded (${event.type})` };
+      }
+
+      if (RC_ACTIVATE.has(event.type)) {
+        const def = event.product_id ? getProduct(event.product_id) : undefined;
+        const store = event.store ? RC_STORE_MAP[event.store] : undefined;
+        if (!def || !store || !event.expiration_at_ms) return { status: 'ignored', detail: 'unmapped product/store/expiry' };
+        const expiresAt = new Date(event.expiration_at_ms);
+        const benefits = PLAN_BENEFITS[def.plan];
+
+        await tx.subscription.upsert({
+          where: { userId },
+          create: {
+            userId, plan: def.plan, store, productId: def.productId, expiresAt, rcAppUserId: userId,
+            originalTransactionId: event.original_transaction_id ?? null, lastTransactionId: event.transaction_id ?? null,
+          },
+          update: { plan: def.plan, store, productId: def.productId, expiresAt, rcAppUserId: userId, lastTransactionId: event.transaction_id ?? null },
+        });
+        await tx.user.update({ where: { id: userId }, data: { plan: def.plan, storageLimit: BigInt(benefits.storageBytes) } });
+        await tx.mediaFile.updateMany({ where: { userId }, data: { expiresAt: null } });
+
+        if (RC_GRANT_CREDITS.has(event.type)) {
+          const credits = creditsForPurchase(def);
+          await tx.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } });
+          await tx.creditTransaction.create({ data: { userId, type: 'PURCHASE', amount: credits, description: `${def.plan} ${def.period} subscription` } });
+        }
+        return { status: 'applied', detail: `${event.type} ${def.plan}` };
+      }
+
+      // CANCELLATION (keep access until expiry), BILLING_ISSUE (grace), TEST, TRANSFER … — recorded only.
+      return { status: 'ignored', detail: event.type };
+    });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') return { status: 'duplicate' };
+    throw e;
+  }
 }

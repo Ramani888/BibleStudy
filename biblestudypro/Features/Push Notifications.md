@@ -37,10 +37,11 @@ updated: 2026-08-10
 
 ## Firebase project
 
-- **Project ID**: `biblestudy-2b14c`
-- **iOS bundle**: `com.biblestudypro.app` · GOOGLE_APP_ID `1:820831909172:ios:6f7e802808c95144ee2161`
-- **Android package**: `com.biblestudypro.app`
-- **GCM Sender ID**: `820831909172`
+- **Project ID**: `verdance-bb5c2` (migrated 2026-09-09; old `biblestudy-2b14c` abandoned — see [[Identity & Accounts]])
+- **iOS bundle**: `com.getverdance.app` · GOOGLE_APP_ID `1:169277764350:ios:9d5686ca35ae6de430ebaf`
+- **Android package**: `com.getverdance.app`
+- **Sender ID / project number**: `169277764350`
+- **APNs auth key**: Key ID `Y66XF82J66`, Team `CG433GC6BU` (uploaded, dev+prod)
 
 ## Architecture
 

@@ -1,7 +1,7 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
@@ -53,6 +53,8 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Brand & Assets]] — Verdance logo, icons/splash/notification, store + web assets (all from `branding/build-icons.mjs`)
 
 ## 🛠️ Ops
+- [[Identity & Accounts]] — ⭐ authoritative app name, bundle IDs, Firebase/OAuth accounts
+- [[Store Launch (App Store + Play)]] — App Store + Play submission status, reviewer account, screenshots
 - [[Local Dev Setup]] — running locally (Postgres 5434)
 - [[Deployment (Hetzner)]] — the VPS setup (currently stopped)
 - [[Migration History]] — Prisma migration timeline & the reconciliation

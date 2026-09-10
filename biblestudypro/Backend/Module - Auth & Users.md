@@ -36,14 +36,15 @@ Routes: `POST /api/v1/auth/google`, `POST /api/v1/auth/apple`
 - Web OAuth Client ID: `206724613277-l6ch6sre18joco08p17rq8jk2grsai60.apps.googleusercontent.com` ✅
 
 ### Apple Sign-In
-- Backend verifies identity token via `apple-signin-auth` using `APPLE_BUNDLE_ID=com.biblestudypro.app` in `backend/.env` ✅
+- Backend verifies identity token via `apple-signin-auth` using `APPLE_BUNDLE_ID=com.getverdance.app` in `backend/.env` ✅ (changed 2026-09-09)
 - Frontend uses `@invertase/react-native-apple-authentication`
 - Requires: Apple Developer account + Sign In with Apple capability enabled for `com.biblestudypro.app`
 - **Only works on physical iOS device**, not simulator
 
-### Bundle / Package IDs (set 2026-08-07)
-- iOS: `com.biblestudypro.app` (in `ios/frontend.xcodeproj/project.pbxproj`)
-- Android: `com.biblestudypro.app` (in `android/app/build.gradle`)
+### Bundle / Package IDs (changed 2026-09-09 → see [[Identity & Accounts]])
+- iOS: `com.getverdance.app` (in `ios/frontend.xcodeproj/project.pbxproj`)
+- Android applicationId: `com.getverdance.app` (in `android/app/build.gradle`); internal namespace kept `com.biblestudypro.app`
+- Old `com.biblestudypro.app` was on an inaccessible Apple team — replaced.
 
 ## Notes
 - `User` is the cascade root for the whole schema.

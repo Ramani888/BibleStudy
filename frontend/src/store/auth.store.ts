@@ -5,6 +5,7 @@ import { usersApi } from '../api/users.api';
 import { storage } from '../utils/storage';
 import { getGoogleIdToken, getAppleCredentials } from '../utils/socialAuth';
 import { removeDeviceToken } from '../utils/notifications';
+import { logoutRevenueCat } from '../lib/purchases';
 import { queryClient } from '../lib/queryClient';
 import type {
   User,
@@ -105,6 +106,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await removeDeviceToken();
       await authApi.logout();
     } finally {
+      await logoutRevenueCat();
       await storage.clearTokens();
       get().reset();
     }
@@ -115,6 +117,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await removeDeviceToken();
       await usersApi.deleteAccount();
     } finally {
+      await logoutRevenueCat();
       await storage.clearTokens();
       get().reset();
     }

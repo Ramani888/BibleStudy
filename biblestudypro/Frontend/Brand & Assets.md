@@ -5,7 +5,9 @@ updated: 2026-09-09
 
 # Brand & Assets
 
-Public brand = **Verdance** (codename/bundle stay BibleStudyPro/`com.biblestudypro.app`).
+Public brand = **Verdance**. Display name (both platforms) = **Verdance**. Bundle ID /
+applicationId = **`com.getverdance.app`** (changed 2026-09-09 — see [[Identity & Accounts]]).
+RN AppRegistry name stays `BibleStudyPro`.
 
 ## Logo
 - Mark: a white **"V cradling a leaf"** monoline (leaf = the vesica overlap of two

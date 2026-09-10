@@ -26,6 +26,8 @@
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
@@ -37,7 +39,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.206724613277-cbh8i1berlf1g6fr03hs5enuapenamh4</string>
+				<string>com.googleusercontent.apps.169277764350-k1ldne34ha1gj88vi7ckdp4almbv3e15</string>
 			</array>
 		</dict>
 	</array>

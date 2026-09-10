@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Verdance</string>
+    <!-- react-native-config reads <pkg>.BuildConfig via getPackageName() (=applicationId
+         com.getverdance.app), but BuildConfig is generated under the namespace. Point it there,
+         else every Config.* is undefined at runtime. -->
+    <string name="build_config_package">com.biblestudypro.app</string>
 </resources>
