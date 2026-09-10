@@ -3,60 +3,825 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Verdance — Grow in the Word</title>
-  <meta name="description" content="AI-assisted Bible study that helps your faith grow — flashcards, spaced-repetition review, quizzes, and study together with friends." />
+  <title>Verdance — Grow in the Word | AI Bible Study, Flashcards & Quizzes</title>
+  <meta name="description" content="Verdance is a calm, AI-assisted Bible study app — ask any biblical question with verse citations, turn passages into flashcards, review with spaced repetition, quiz yourself, and study together with friends and your church." />
+  <link rel="canonical" href="https://getverdance.com/" />
+  <meta name="theme-color" content="#6366F1" />
+
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
   <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png" />
   <link rel="apple-touch-icon" href="apple-touch-icon.png" />
+  <link rel="preload" as="image" href="screens/01-home.png" fetchpriority="high" />
+
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://getverdance.com/" />
   <meta property="og:title" content="Verdance — Grow in the Word" />
-  <meta property="og:description" content="AI-assisted Bible study that helps your faith grow." />
+  <meta property="og:description" content="AI-assisted Bible study that helps your faith grow — flashcards, spaced-repetition review, quizzes, and studying together." />
   <meta property="og:image" content="https://getverdance.com/og-image.png" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Verdance — Grow in the Word" />
+  <meta name="twitter:description" content="AI-assisted Bible study that helps your faith grow." />
+  <meta name="twitter:image" content="https://getverdance.com/og-image.png" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://getverdance.com/#org",
+        "name": "Verdance",
+        "url": "https://getverdance.com/",
+        "logo": "https://getverdance.com/favicon-512.png"
+      },
+      {
+        "@type": "MobileApplication",
+        "name": "Verdance",
+        "operatingSystem": "iOS, Android",
+        "applicationCategory": "EducationApplication",
+        "description": "AI-assisted Bible study app with flashcards, spaced-repetition review, quizzes, study plans, and social study groups.",
+        "url": "https://getverdance.com/",
+        "image": "https://getverdance.com/og-image.png",
+        "publisher": { "@id": "https://getverdance.com/#org" },
+        "offers": [
+          { "@type": "Offer", "price": "0", "priceCurrency": "USD", "name": "Free" },
+          { "@type": "Offer", "price": "4.99", "priceCurrency": "USD", "name": "Starter (monthly)" },
+          { "@type": "Offer", "price": "9.99", "priceCurrency": "USD", "name": "Pro (monthly)" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          { "@type": "Question", "name": "Is Verdance free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Free plan lets you study, quiz, use social features, and ask AI questions with earned daily credits. Starter and Pro add more monthly AI credits, media in chat, and storage." } },
+          { "@type": "Question", "name": "How is Verdance different from ChatGPT?", "acceptedAnswer": { "@type": "Answer", "text": "Verdance is a purpose-built study system, not a chat box: flashcards, spaced-repetition review, quizzes, study plans, and group study tracked over time. AI is one feature inside it, tuned for scripture with verse citations." } },
+          { "@type": "Question", "name": "Can I study with my church or group?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create groups, share study plans, and track everyone's progress on a group leaderboard. Social features are free on every plan." } },
+          { "@type": "Question", "name": "What platforms is Verdance on?", "acceptedAnswer": { "@type": "Answer", "text": "Verdance is coming soon to the Apple App Store and Google Play for iPhone and Android." } }
+        ]
+      }
+    ]
+  }
+  </script>
+
   <style>
-    :root{ --violet:#8B5CF6; --indigo:#6366F1; --ink:#0F1117; --muted:#5c5a72; --soft:#EEF0FF; }
+    :root{
+      --violet:#8B5CF6; --indigo:#6366F1; --indigo-deep:#30208F;
+      --violet-soft:#A78BFA; --soft:#EEF0FF; --bg:#FCF8FF;
+      --gold:#C9A227;
+      --ink:#0F1117; --muted:#5c5a72; --line:#e8e4f6; --card:#ffffff;
+      --grad:linear-gradient(135deg,var(--violet),var(--indigo));
+      --maxw:1140px;
+    }
     *{ box-sizing:border-box; margin:0; padding:0; }
-    body{ font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-      color:var(--ink); line-height:1.6; -webkit-font-smoothing:antialiased; }
-    .hero{ background:linear-gradient(135deg,var(--violet),var(--indigo)); color:#fff;
-      text-align:center; padding:88px 24px 96px; }
-    .logo{ width:96px; height:96px; margin:0 auto 24px; display:block; }
-    .brand{ font-family:Georgia,"Times New Roman",serif; font-size:44px; letter-spacing:4px; font-weight:500; }
-    .tag{ font-size:18px; letter-spacing:3px; text-transform:uppercase; opacity:.9; margin-top:8px; }
-    .sub{ max-width:600px; margin:22px auto 0; font-size:19px; opacity:.95; }
-    .soon{ display:inline-block; margin-top:34px; padding:10px 22px; border:1px solid rgba(255,255,255,.5);
-      border-radius:999px; font-size:14px; letter-spacing:1px; }
-    .features{ max-width:920px; margin:0 auto; padding:72px 24px; display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:36px; }
-    .feature h3{ font-size:19px; margin-bottom:6px; color:var(--indigo); }
-    .feature p{ color:var(--muted); font-size:15px; }
-    footer{ border-top:1px solid #eee; padding:32px 24px; text-align:center; color:var(--muted); font-size:14px; }
-    footer a{ color:var(--indigo); text-decoration:none; margin:0 10px; }
-    footer a:hover{ text-decoration:underline; }
+    html{ scroll-behavior:smooth; overflow-x:clip; }
+    body{
+      font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+      color:var(--ink); background:var(--bg); line-height:1.65; -webkit-font-smoothing:antialiased;
+      overflow-x:clip;
+    }
+    [id]{ scroll-margin-top:84px; }
+    .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 24px; }
+    a{ color:inherit; text-decoration:none; }
+    img{ max-width:100%; height:auto; display:block; }
+    section{ position:relative; }
+
+    /* ---------- background aurora ---------- */
+    .aurora{ position:fixed; inset:0; z-index:-1; overflow:hidden; pointer-events:none; }
+    .aurora span{ position:absolute; border-radius:50%; filter:blur(90px); opacity:.35; }
+    .aurora .a{ width:520px; height:520px; background:var(--violet); top:-160px; left:-120px; }
+    .aurora .b{ width:460px; height:460px; background:var(--indigo); top:20%; right:-140px; opacity:.28; }
+    .aurora .c{ width:420px; height:420px; background:var(--violet-soft); bottom:-140px; left:30%; opacity:.22; }
+
+    /* ---------- nav ---------- */
+    header.nav{ position:sticky; top:0; z-index:50; backdrop-filter:blur(14px);
+      background:rgba(252,248,255,.72); border-bottom:1px solid transparent; transition:border-color .3s,background .3s; }
+    header.nav.scrolled{ border-color:var(--line); background:rgba(252,248,255,.9); }
+    .nav-inner{ display:flex; align-items:center; justify-content:space-between; height:68px; }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:600; }
+    .brand svg{ width:34px; height:34px; }
+    .brand .name{ font-family:Inter,sans-serif; font-size:23px; letter-spacing:-.2px; font-weight:700; }
+    .nav-links{ display:flex; gap:32px; }
+    .nav-links a{ position:relative; color:var(--muted); font-size:15px; font-weight:500; transition:color .2s; }
+    .nav-links a::after{ content:""; position:absolute; left:0; right:0; bottom:-7px; height:2px; border-radius:2px;
+      background:var(--grad); transform:scaleX(0); transform-origin:0 50%; transition:transform .3s cubic-bezier(.2,.8,.2,1); }
+    .nav-links a:hover, .nav-links a.active{ color:var(--ink); }
+    .nav-links a:hover::after, .nav-links a.active::after{ transform:scaleX(1); }
+    .btn{ display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:15px;
+      padding:11px 22px; border-radius:999px; transition:transform .2s,box-shadow .2s; cursor:pointer; border:none; }
+    .btn-primary{ position:relative; overflow:hidden; background:var(--grad); color:#fff; box-shadow:0 8px 24px -8px var(--indigo); }
+    .btn-primary::after{ content:""; position:absolute; top:0; left:-130%; width:60%; height:100%; transform:skewX(-20deg);
+      background:linear-gradient(100deg,transparent,rgba(255,255,255,.45),transparent); transition:left .6s ease; }
+    .btn-primary:hover{ transform:translateY(-2px); box-shadow:0 14px 30px -8px var(--indigo); }
+    .btn-primary:hover::after{ left:140%; }
+    @media(max-width:820px){ .nav-links{ display:none; } }
+
+    /* ---------- hero ---------- */
+    .hero{ padding:72px 0 40px; }
+    .hero-grid{ display:grid; grid-template-columns:1.05fr .95fr; gap:48px; align-items:center; }
+    .eyebrow{ display:inline-flex; align-items:center; gap:8px; font-size:13px; font-weight:600;
+      letter-spacing:.5px; text-transform:uppercase; color:var(--indigo);
+      background:var(--soft); padding:7px 14px; border-radius:999px; }
+    h1.hero-title{ font-family:Inter,sans-serif; font-weight:800; line-height:1.0;
+      font-size:clamp(42px,6.4vw,74px); letter-spacing:-2px; margin:22px 0 6px; }
+    .hero-title .mark{ position:relative; white-space:nowrap; }
+    .hero-title .mark svg{ position:absolute; left:0; bottom:-8px; width:100%; height:14px; }
+    .lede{ font-size:clamp(17px,2vw,20px); color:var(--muted); max-width:540px; margin:18px 0 30px; }
+    .badges{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
+    .store-badge{ display:inline-flex; align-items:center; gap:10px; background:var(--ink); color:#fff;
+      padding:12px 18px; border-radius:14px; opacity:.55; position:relative; cursor:default; }
+    .store-badge svg{ width:24px; height:24px; fill:#fff; }
+    .store-badge .lines small{ display:block; font-size:10px; letter-spacing:.5px; opacity:.8; }
+    .store-badge .lines strong{ display:block; font-size:16px; font-weight:600; line-height:1.1; }
+    .soon-pill{ position:absolute; top:-10px; right:-8px; background:var(--violet); color:#fff;
+      font-size:10px; font-weight:700; letter-spacing:.5px; padding:3px 8px; border-radius:999px; text-transform:uppercase; }
+    .trust{ margin-top:22px; font-size:14px; color:var(--muted); display:flex; gap:8px; align-items:center; }
+
+    /* phone */
+    .phone{ position:relative; width:min(320px,80%); margin:0 auto; }
+    .phone::before{ content:""; position:absolute; left:-3px; top:104px; width:3px; height:30px; background:#05060a;
+      border-radius:3px 0 0 3px; box-shadow:0 42px 0 #05060a, 0 84px 0 #05060a; }
+    .phone::after{ content:""; position:absolute; right:-3px; top:128px; width:3px; height:64px; background:#05060a;
+      border-radius:0 3px 3px 0; }
+    .phone .frame{ position:relative; border-radius:46px; padding:12px; background:#05060a;
+      box-shadow:0 2px 3px rgba(0,0,0,.35), 0 14px 24px -12px rgba(0,0,0,.4), 0 44px 84px -30px rgba(48,32,143,.6); }
+    .phone .frame img{ border-radius:32px; }
+    .phone .notch{ position:absolute; top:26px; left:50%; transform:translateX(-50%);
+      width:11px; height:11px; background:#05060a; border:1px solid #23252e; border-radius:50%; z-index:2; }
+    .float-card{ position:absolute; background:#fff; border:1px solid var(--line); border-radius:16px;
+      padding:12px 16px; box-shadow:0 20px 40px -18px rgba(48,32,143,.35); display:flex; gap:10px; align-items:center; }
+    .float-card .ic{ width:34px; height:34px; border-radius:10px; background:var(--soft); display:grid; place-items:center; }
+    .float-card .ic svg{ width:18px; height:18px; stroke:var(--indigo); }
+    .float-card b{ display:block; font-size:14px; line-height:1.3; } .float-card span{ display:block; font-size:12px; color:var(--muted); }
+    .fc-1{ top:14%; left:-6%; } .fc-2{ bottom:16%; right:-8%; }
+    @media(max-width:900px){
+      .hero-grid{ grid-template-columns:1fr; text-align:center; }
+      .lede{ margin-left:auto; margin-right:auto; } .badges{ justify-content:center; }
+      .trust{ justify-content:center; } .phone{ margin-top:20px; }
+      .fc-1{ left:2%; } .fc-2{ right:2%; }
+    }
+
+    /* ---------- section headings ---------- */
+    .sec{ padding:clamp(84px,12vh,132px) 0; }
+    .sec-head{ display:flex; align-items:baseline; gap:16px;
+      border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:52px; position:relative; }
+    .sec-head::after{ content:""; position:absolute; left:0; bottom:-1px; width:64px; height:1px;
+      background:linear-gradient(90deg,var(--gold),transparent); }
+    .sec-num{ font-size:13px; font-weight:700; color:var(--gold); letter-spacing:2px; }
+    .sec-head h2{ font-family:Inter,sans-serif; font-weight:700; font-size:clamp(28px,4vw,44px);
+      letter-spacing:-1px; line-height:1.05; }
+    .sec-head p{ color:var(--muted); margin-left:auto; max-width:360px; font-size:15px; }
+    @media(max-width:760px){ .sec-head{ flex-wrap:wrap; } .sec-head p{ margin:8px 0 0; } }
+
+    /* feature grid */
+    .grid{ display:grid; gap:22px; }
+    .cols-3{ grid-template-columns:repeat(3,1fr); }
+    .cols-4{ grid-template-columns:repeat(4,1fr); }
+    @media(max-width:899px){ .cols-3{ grid-template-columns:repeat(2,1fr); } .cols-4{ grid-template-columns:repeat(2,1fr); } }
+    @media(max-width:560px){ .cols-3,.cols-4{ grid-template-columns:1fr; } }
+    .tile{ position:relative; overflow:hidden; border-radius:22px; padding:28px;
+      display:flex; flex-direction:column; justify-content:center;
+      background:linear-gradient(180deg,rgba(247,244,255,.92),rgba(243,239,255,.7));
+      backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.75);
+      box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 18px 44px -30px rgba(48,32,143,.4);
+      transition:transform .3s cubic-bezier(.2,.8,.2,1),box-shadow .3s; }
+    .tile::before{ content:""; position:absolute; inset:0; border-radius:inherit; opacity:0; transition:opacity .35s;
+      background:radial-gradient(340px circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,.16),transparent 60%); }
+    .tile:hover{ transform:translateY(-6px); box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 30px 60px -28px rgba(48,32,143,.5); }
+    .tile:hover::before{ opacity:1; }
+    .tile > *{ position:relative; z-index:1; }
+    .tile .ico{ width:48px; height:48px; border-radius:14px; background:var(--grad); display:grid; place-items:center; margin-bottom:16px; }
+    .tile .ico svg{ width:24px; height:24px; stroke:#fff; fill:none; stroke-width:1.8; }
+    .tile h3{ font-size:18px; margin-bottom:6px; }
+    .tile p{ color:var(--muted); font-size:14.5px; }
+
+    /* split feature (image + text) */
+    .split{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+    .split.rev .col-text{ order:2; }
+    @media(max-width:860px){ .split{ grid-template-columns:1fr; gap:32px; } .split.rev .col-text{ order:0; } }
+    .split h3{ font-family:Inter,sans-serif; font-size:clamp(25px,3.4vw,36px); font-weight:700; letter-spacing:-.6px; margin-bottom:14px; line-height:1.12; }
+    .split p{ color:var(--muted); margin-bottom:16px; }
+    .checklist{ list-style:none; display:grid; gap:12px; }
+    .checklist li{ display:flex; gap:12px; align-items:flex-start; font-size:15px; }
+    .checklist .ck{ flex:none; width:24px; height:24px; border-radius:50%; background:var(--soft); display:grid; place-items:center; margin-top:1px; }
+    .checklist .ck svg{ width:13px; height:13px; stroke:var(--indigo); stroke-width:2.4; fill:none; }
+
+    /* phone fan */
+    .fan{ display:flex; justify-content:center; align-items:flex-end; gap:0; margin-top:20px; min-height:520px; }
+    .fan .phone{ width:clamp(190px,20vw,240px); margin:0 -22px; }
+    .fan .phone:nth-child(1){ transform:rotate(-8deg) translateY(24px); z-index:1; }
+    .fan .phone:nth-child(2){ transform:translateY(-14px) scale(1.06); z-index:3; }
+    .fan .phone:nth-child(3){ transform:rotate(8deg) translateY(24px); z-index:1; }
+    @media(max-width:900px){ .fan{ flex-direction:column; align-items:center; gap:28px; min-height:0; }
+      .fan .phone{ margin:0; width:250px; transform:none !important; } }
+
+    /* pricing */
+    .plans{ display:grid; grid-template-columns:repeat(3,1fr); gap:22px; align-items:stretch; }
+    @media(max-width:820px){ .plans{ grid-template-columns:1fr; max-width:420px; margin:0 auto; } }
+    .plan{ position:relative; overflow:hidden; border-radius:24px; padding:32px; display:flex; flex-direction:column;
+      background:linear-gradient(180deg,rgba(247,244,255,.94),rgba(243,239,255,.72)); backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,.75);
+      box-shadow:0 1px 0 rgba(255,255,255,.9) inset, 0 18px 44px -30px rgba(48,32,143,.4); }
+    .plan:not(.feat)::before{ content:""; position:absolute; inset:0; border-radius:inherit; opacity:0; transition:opacity .35s;
+      background:radial-gradient(360px circle at var(--mx,50%) var(--my,50%),rgba(139,92,246,.14),transparent 60%); }
+    .plan:not(.feat):hover::before{ opacity:1; }
+    .plan > *{ position:relative; z-index:1; }
+    .plan.feat{ background:var(--grad); color:#fff; border:none; overflow:visible; box-shadow:0 30px 60px -28px var(--indigo); position:relative; }
+    .plan.feat .muted{ color:rgba(255,255,255,.85); }
+    .plan .tag{ font-size:13px; font-weight:700; letter-spacing:1px; text-transform:uppercase; }
+    .plan .price{ font-family:Inter,sans-serif; font-size:44px; font-weight:800; letter-spacing:-1.5px; margin:10px 0 2px; }
+    .plan .price span{ font-family:Inter,sans-serif; font-size:15px; font-weight:500; opacity:.7; }
+    .plan .yr{ font-size:13px; opacity:.7; margin-bottom:18px; }
+    .plan ul{ list-style:none; display:grid; gap:11px; margin:10px 0 24px; font-size:14.5px; }
+    .plan ul li{ display:flex; gap:9px; } .plan ul li::before{ content:"✓"; font-weight:700; }
+    .plan.feat ul li::before{ color:#fff; } .plan:not(.feat) ul li::before{ color:var(--indigo); }
+    .plan .cta{ margin-top:auto; text-align:center; padding:12px; border-radius:12px; font-weight:600; }
+    .plan:not(.feat) .cta{ border:1.5px solid var(--line); color:var(--indigo); }
+    .plan.feat .cta{ background:#fff; color:var(--indigo); }
+    .badge-pop{ position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--indigo-deep); color:#fff;
+      font-size:11px; font-weight:700; letter-spacing:.5px; padding:5px 14px; border-radius:999px; text-transform:uppercase; }
+
+    /* FAQ */
+    .faq{ max-width:760px; margin:0 auto; display:grid; gap:12px; }
+    details{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:4px 22px; }
+    summary{ list-style:none; cursor:pointer; padding:18px 0; font-weight:600; font-size:16.5px; display:flex; justify-content:space-between; align-items:center; }
+    summary::-webkit-details-marker{ display:none; }
+    summary::after{ content:"+"; font-size:24px; color:var(--indigo); font-weight:400; transition:transform .2s; }
+    details[open] summary::after{ transform:rotate(45deg); }
+    details p{ color:var(--muted); padding:0 0 20px; font-size:15px; }
+
+    /* mission (dark) */
+    .mission{ background:var(--indigo-deep); color:#fff; border-radius:28px; padding:clamp(36px,6vw,72px);
+      display:grid; grid-template-columns:1.4fr 1fr; gap:40px; align-items:center; overflow:hidden; position:relative; }
+    .mission::before{ content:""; position:absolute; width:420px; height:420px; border-radius:50%;
+      background:var(--violet); filter:blur(120px); opacity:.5; top:-120px; right:-80px; }
+    .mission h2{ font-family:Inter,sans-serif; font-size:clamp(28px,4vw,44px); font-weight:700; letter-spacing:-1px; margin-bottom:16px; position:relative; }
+    .mission p{ color:rgba(255,255,255,.82); position:relative; margin-bottom:14px; }
+    .mission .emblem{ position:relative; text-align:center; }
+    .mission .emblem svg{ width:min(220px,60%); height:auto; filter:drop-shadow(0 20px 40px rgba(0,0,0,.4)); }
+    @media(max-width:760px){ .mission{ grid-template-columns:1fr; text-align:center; } }
+
+    /* CTA band */
+    .cta-band{ text-align:center; padding:90px 0; }
+    .cta-band h2{ font-family:Inter,sans-serif; font-size:clamp(32px,5vw,54px); font-weight:800; letter-spacing:-1.5px; margin-bottom:10px; }
+    .cta-band p{ color:var(--muted); margin-bottom:28px; font-size:18px; }
+
+    /* footer */
+    footer{ border-top:1px solid var(--line); padding:48px 0 40px; }
+    .foot-grid{ display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; }
+    .foot-links{ display:flex; gap:22px; flex-wrap:wrap; }
+    .foot-links a{ color:var(--muted); font-size:14px; } .foot-links a:hover{ color:var(--ink); }
+    .copy{ color:var(--muted); font-size:13px; margin-top:20px; }
+
+    /* skip-to-content (keyboard a11y) */
+    .skip{ position:absolute; left:12px; top:-60px; z-index:70; background:var(--ink); color:#fff;
+      padding:10px 16px; border-radius:10px; font-weight:600; font-size:14px; transition:top .2s; }
+    .skip:focus{ top:12px; }
+
+    /* ---------- luxury layer ---------- */
+    body::after{ content:""; position:fixed; inset:0; z-index:1; pointer-events:none; opacity:.028;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+    .col-phone{ position:relative; }
+    .col-phone::before{ content:""; position:absolute; z-index:-1; left:15%; top:12%; width:70%; height:70%;
+      background:radial-gradient(circle,rgba(139,92,246,.3),transparent 70%); filter:blur(70px); }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-top:18px; }
+    .chips span{ font-size:13px; color:var(--indigo); background:var(--soft); padding:8px 12px; border-radius:999px;
+      border:1px solid rgba(139,92,246,.16); }
+    /* bento feature grid (desktop) */
+    @media(min-width:900px){
+      #features .grid.cols-3{ grid-auto-rows:1fr; }
+      #features .grid.cols-3 .tile{ display:flex; flex-direction:column; justify-content:center; }
+      #features .grid.cols-3 .tile:first-child{ grid-column:span 2; grid-row:span 2; justify-content:flex-start; }
+      #features .grid.cols-3 .tile:first-child .chips{ margin-top:auto; padding-top:22px; }
+      #features .grid.cols-3 .tile:first-child .ico{ width:58px; height:58px; }
+      #features .grid.cols-3 .tile:first-child .ico svg{ width:28px; height:28px; }
+      #features .grid.cols-3 .tile:first-child h3{ font-size:26px; }
+      #features .grid.cols-3 .tile:first-child p{ font-size:16.5px; max-width:82%; }
+    }
+    /* back to top */
+    .totop{ position:fixed; right:22px; bottom:22px; z-index:45; width:50px; height:50px; border-radius:50%; border:none;
+      background:var(--grad); color:#fff; cursor:pointer; display:grid; place-items:center; opacity:0;
+      transform:translateY(18px) scale(.9); pointer-events:none; transition:opacity .35s,transform .35s;
+      box-shadow:0 14px 30px -8px var(--indigo); }
+    .totop.show{ opacity:1; transform:none; pointer-events:auto; }
+    .totop:hover{ transform:translateY(-3px) !important; }
+    .totop svg{ width:22px; height:22px; stroke:#fff; fill:none; stroke-width:2; }
+
+    /* scroll progress bar */
+    .progress{ position:fixed; top:0; left:0; height:3px; width:100%; transform:scaleX(0); transform-origin:0 50%;
+      background:var(--grad); z-index:60; }
+
+    /* hamburger + mobile menu */
+    .hamb{ display:none; flex-direction:column; gap:5px; width:44px; height:44px; align-items:center; justify-content:center;
+      background:none; border:none; cursor:pointer; }
+    .hamb span{ display:block; width:22px; height:2px; background:var(--ink); border-radius:2px; transition:transform .3s,opacity .3s; }
+    .hamb[aria-expanded="true"] span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+    .hamb[aria-expanded="true"] span:nth-child(2){ opacity:0; }
+    .hamb[aria-expanded="true"] span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+    .mobile-menu{ position:fixed; top:68px; left:0; right:0; bottom:0; z-index:55; display:flex; flex-direction:column;
+      padding:26px 26px calc(env(safe-area-inset-bottom,0px) + 26px);
+      background:radial-gradient(120% 55% at 100% 0%, rgba(139,92,246,.12), transparent 62%), var(--bg);
+      border-top:1px solid var(--line); overflow-y:auto; -webkit-overflow-scrolling:touch;
+      transform:translateY(-100%); opacity:0; visibility:hidden;
+      transition:transform .42s cubic-bezier(.16,1,.3,1), opacity .3s ease, visibility .42s; }
+    .mobile-menu.open{ transform:none; opacity:1; visibility:visible; }
+    .mm-eyebrow{ font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gold); margin-bottom:10px; }
+    .mm-links{ display:flex; flex-direction:column; }
+    .mm-links a{ display:flex; align-items:center; gap:16px; padding:17px 2px; border-bottom:1px solid var(--line);
+      font-family:Inter,sans-serif; font-size:clamp(25px,7.5vw,32px); font-weight:700; letter-spacing:-.4px; color:var(--ink);
+      opacity:0; transform:translateX(-18px); transition:opacity .5s ease, transform .5s cubic-bezier(.16,1,.3,1); }
+    .mobile-menu.open .mm-links a{ opacity:1; transform:none; }
+    .mobile-menu.open .mm-links a:nth-child(1){ transition-delay:.10s; }
+    .mobile-menu.open .mm-links a:nth-child(2){ transition-delay:.16s; }
+    .mobile-menu.open .mm-links a:nth-child(3){ transition-delay:.22s; }
+    .mobile-menu.open .mm-links a:nth-child(4){ transition-delay:.28s; }
+    .mobile-menu.open .mm-links a:nth-child(5){ transition-delay:.34s; }
+    .mm-n{ font-family:Inter,sans-serif; font-size:12px; font-weight:700; letter-spacing:1px; color:var(--gold); width:22px; }
+    .mm-t{ flex:1; line-height:1.1; }
+    .mm-ar{ color:var(--violet-soft); font-size:20px; transition:transform .3s ease, color .3s; }
+    .mm-links a:hover .mm-ar, .mm-links a:active .mm-ar{ transform:translateX(6px); color:var(--indigo); }
+    .mm-cta{ display:flex; width:100%; justify-content:center; text-align:center; margin-top:28px; padding:16px; font-size:16px; }
+    .mm-foot{ margin-top:auto; padding-top:26px; }
+    .mm-note{ font-size:13px; letter-spacing:.5px; color:var(--muted); margin-bottom:14px; }
+    .mm-legal{ display:flex; flex-wrap:wrap; gap:18px; }
+    .mm-legal a{ color:var(--muted); font-size:14px; }
+    .mm-legal a:hover{ color:var(--ink); }
+    html.nav-open{ overflow:hidden; }
+    @media(max-width:820px){ .hamb{ display:flex; } .nav-inner > .btn-primary{ display:none; } }
+    @media(min-width:821px){ .mobile-menu{ display:none; } }
+
+    /* keyboard accessibility */
+    a:focus-visible, button:focus-visible, summary:focus-visible{ outline:2px solid var(--indigo); outline-offset:3px; border-radius:6px; }
+
+    /* hero word reveal + tilt */
+    .hw{ display:inline-block; } .hw-i{ display:inline-block; will-change:transform; }
+    .col-phone{ perspective:1100px; }
+    #heroPhone{ transform-style:preserve-3d; transition:transform .12s ease-out; }
+    .magnetic{ will-change:transform; transition:transform .25s cubic-bezier(.2,.8,.2,1); }
+
+    /* feature icon pop + staggered reveal */
+    .tile .ico{ transition:transform .55s cubic-bezier(.2,.8,.2,1); }
+    .tile.reveal .ico{ transform:scale(.5) rotate(-8deg); }
+    .tile.revealed .ico{ transform:none; }
+    .grid .reveal:nth-child(2){ transition-delay:.07s; }
+    .grid .reveal:nth-child(3){ transition-delay:.14s; }
+    .grid .reveal:nth-child(4){ transition-delay:.06s; }
+    .grid .reveal:nth-child(5){ transition-delay:.13s; }
+    .grid .reveal:nth-child(6){ transition-delay:.2s; }
+
+    /* stats strip */
+    .stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; text-align:center; margin-bottom:52px; }
+    .stats .n{ font-family:Inter,sans-serif; font-size:clamp(38px,6vw,64px); font-weight:800; letter-spacing:-1.5px; line-height:1;
+      background:var(--grad); -webkit-background-clip:text; background-clip:text; color:transparent; }
+    .stats .l{ color:var(--muted); font-size:14px; margin-top:6px; }
+    @media(max-width:560px){ .stats{ gap:10px; } .stats .l{ font-size:12px; } }
+
+    /* pricing reveal glow */
+    .plan.feat.revealed{ animation:planGlow 2.4s ease-in-out .25s 1; }
+    @keyframes planGlow{ 50%{ box-shadow:0 30px 90px -18px var(--violet); } }
+
+    /* reveal animation base (progressively enhanced by GSAP) */
+    .reveal{ opacity:0; transform:translateY(28px); }
+    .revealed{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
+    @media(prefers-reduced-motion:reduce){
+      .reveal{ opacity:1 !important; transform:none !important; }
+      html{ scroll-behavior:auto; }
+    }
+    /* no-JS fallback: show everything */
+    .no-js .reveal{ opacity:1; transform:none; }
   </style>
 </head>
-<body>
-  <section class="hero">
-    <svg class="logo" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="Verdance">
-      <path d="M360 372 L512 690 L664 372" stroke="#fff" stroke-width="40" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M512 690 C452 566 452 452 512 336 C572 452 572 566 512 690 Z" fill="#fff"/>
-    </svg>
-    <div class="brand">Verdance</div>
-    <div class="tag">Grow in the Word</div>
-    <p class="sub">AI-assisted Bible study that helps your faith grow — flashcards, spaced-repetition
-      review, quizzes, and studying together with friends.</p>
-    <span class="soon">Coming soon to the App Store &amp; Google Play</span>
+<body class="no-js">
+  <a class="skip" href="#top">Skip to content</a>
+  <div class="progress" aria-hidden="true"></div>
+  <div class="aurora" aria-hidden="true"><span class="a"></span><span class="b"></span><span class="c"></span></div>
+
+  <!-- ===== NAV ===== -->
+  <header class="nav" id="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="#top" aria-label="Verdance home">
+        <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="nt" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
+          <rect width="1024" height="1024" rx="228" fill="url(#nt)"/>
+          <path d="M360 372 L512 690 L664 372" stroke="#fff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <path d="M512 690 C452 566 452 452 512 336 C572 452 572 566 512 690 Z" fill="#fff"/>
+        </svg>
+        <span class="name">Verdance</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#study">Study</a>
+        <a href="#social">Together</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#about">About</a>
+      </nav>
+      <a class="btn btn-primary magnetic" href="#get">Get the App</a>
+      <button class="hamb" aria-label="Menu" aria-expanded="false" aria-controls="mobileMenu"><span></span><span></span><span></span></button>
+    </div>
+  </header>
+  <div class="mobile-menu" id="mobileMenu">
+    <div class="mm-eyebrow">Navigate</div>
+    <nav class="mm-links">
+      <a href="#features"><span class="mm-n">01</span><span class="mm-t">Features</span><span class="mm-ar">→</span></a>
+      <a href="#study"><span class="mm-n">02</span><span class="mm-t">Study</span><span class="mm-ar">→</span></a>
+      <a href="#social"><span class="mm-n">03</span><span class="mm-t">Together</span><span class="mm-ar">→</span></a>
+      <a href="#pricing"><span class="mm-n">04</span><span class="mm-t">Pricing</span><span class="mm-ar">→</span></a>
+      <a href="#about"><span class="mm-n">05</span><span class="mm-t">About</span><span class="mm-ar">→</span></a>
+    </nav>
+    <a class="btn btn-primary mm-cta" href="#get">Get the App</a>
+    <div class="mm-foot">
+      <div class="mm-note">Coming soon · iPhone &amp; Android</div>
+      <div class="mm-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="delete-account.html">Delete Account</a><a href="mailto:ddtechservices.work@gmail.com">Contact</a></div>
+    </div>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div class="col-text">
+        <span class="eyebrow reveal">✦ AI-assisted Bible study</span>
+        <h1 class="hero-title" id="heroTitle">
+          <span class="hw"><span class="hw-i">Grow</span></span>
+          <span class="hw"><span class="hw-i">in</span></span>
+          <span class="hw"><span class="hw-i">the</span></span>
+          <span class="hw"><span class="hw-i mark">Word<svg viewBox="0 0 220 14" preserveAspectRatio="none"><path d="M3 9 C 60 3, 160 3, 217 8" stroke="#A78BFA" stroke-width="5" fill="none" stroke-linecap="round"/></svg></span></span><span class="hw"><span class="hw-i">.</span></span>
+        </h1>
+        <p class="lede reveal">Ask any biblical question and get thoughtful answers with verse citations.
+          Turn passages into flashcards, remember them with spaced repetition, quiz yourself,
+          and study together with your friends and church — all in one calm, beautiful app.</p>
+        <div class="badges reveal" id="get">
+          <span class="store-badge" role="img" aria-label="Coming soon to the App Store">
+            <span class="soon-pill">Soon</span>
+            <svg viewBox="0 0 24 24"><path d="M16.5 3c.1 1-.3 2-1 2.7-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.8-.8 2-1.3 2.8-1.3zM19 17c-.4 1-.6 1.4-1.1 2.3-.7 1.2-1.7 2.7-3 2.7-1.1 0-1.4-.7-3-.7s-1.9.7-3 .7c-1.3 0-2.2-1.3-3-2.5-2-3-2.2-6.4-1-8.3.9-1.3 2.2-2.1 3.5-2.1 1.3 0 2.2.8 3.3.8 1 0 1.7-.8 3.3-.8 1.1 0 2.3.6 3.2 1.7-2.8 1.5-2.4 5.5.1 6.2z"/></svg>
+            <span class="lines"><small>Coming soon on the</small><strong>App Store</strong></span>
+          </span>
+          <span class="store-badge" role="img" aria-label="Coming soon on Google Play">
+            <span class="soon-pill">Soon</span>
+            <svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.4.7-.4 1.2v17c0 .5.1.9.4 1.2l.1.1L13 12.6v-.2L3.7 2.2zM17 16.3l-3-3v-.2l3-3 3.5 2c1 .6 1 1.5 0 2.1zM13.5 12.9l3.1 3.1-9.8 5.6c-.5.3-1 .3-1.4 0zm0-1.8L5.4 5.5c.4-.3.9-.3 1.4 0l9.8 5.6z"/></svg>
+            <span class="lines"><small>Coming soon on</small><strong>Google Play</strong></span>
+          </span>
+        </div>
+        <div class="trust reveal">📖 For iPhone &amp; Android · Free to start · No ads</div>
+      </div>
+
+      <div class="col-phone reveal">
+        <div class="phone" id="heroPhone">
+          <div class="notch"></div>
+          <div class="frame"><img src="screens/01-home.png" width="720" height="1600" alt="Verdance home screen showing a study streak, weekly goal, and recent flashcard sets" fetchpriority="high" /></div>
+          <div class="float-card fc-1">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 16.5 7.1 18.2 8 12.7 4 8.8 9.5 8z"/></svg></span>
+            <div><b>8-day streak</b><span>Weekly goal 7/7</span></div>
+          </div>
+          <div class="float-card fc-2">
+            <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.8"><path d="M5 12l4 4L19 6"/></svg></span>
+            <div><b>12 cards due</b><span>Review now</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </section>
 
-  <section class="features">
-    <div class="feature"><h3>Study with AI</h3><p>Ask questions, generate flashcards, and dig into passages with an AI Bible study assistant.</p></div>
-    <div class="feature"><h3>Remember more</h3><p>Spaced-repetition review surfaces the right card at the right time, so what you learn sticks.</p></div>
-    <div class="feature"><h3>Grow together</h3><p>Study plans, streaks, quizzes, and a friends leaderboard to keep you and your group going.</p></div>
+  <!-- ===== 01 FEATURES ===== -->
+  <section class="sec" id="features">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">(01)</span>
+        <h2>Study, deepened</h2>
+        <p>Everything you need to understand scripture and make it stick — in one place.</p>
+      </div>
+      <div class="grid cols-3">
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h3>AI Bible Assistant</h3><p>Ask any theological or scripture question. Answers come with verse citations and three follow-ups to go deeper. Powered by Claude.</p>
+          <div class="chips"><span>“Context of Philippians 4:13?”</span><span>“Explain the Prodigal Son”</span><span>“Make 5 cards on Romans 8”</span></div></div>
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M3 9h18"/></svg></div>
+          <h3>Flashcards &amp; sets</h3><p>Generate flashcards from a passage or your own notes, then organize them into study sets you actually revisit.</p></div>
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9"/><path d="M12 7v5l3 2"/></svg></div>
+          <h3>Spaced repetition</h3><p>An SM-2 review engine surfaces the right card at the right moment, so what you learn today you still remember months from now.</p></div>
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <h3>Quizzes, 7 modes</h3><p>Multiple choice, fill-in-the-blank, timed and more — turn any set into a quiz and track your scores.</p></div>
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <h3>Study plans</h3><p>Follow an ordered plan through a book or theme, check off each step, and watch your progress fill up.</p></div>
+        <div class="tile reveal spotlight"><div class="ico"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M8 13h8M8 17h5"/></svg></div>
+          <h3>Notes &amp; media</h3><p>Keep your notes and upload your own PDFs and images — commentaries, study guides — into your personal library.</p></div>
+      </div>
+    </div>
   </section>
 
+  <!-- ===== 02 REMEMBER MORE (split) ===== -->
+  <section class="sec" id="study">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">(02)</span>
+        <h2>Remember more</h2>
+        <p>Reading once fades. Verdance is built so scripture stays with you.</p>
+      </div>
+      <div class="split" id="srSplit">
+        <div class="col-text reveal">
+          <h3>The right card, at the right time</h3>
+          <p>Every quiz answer feeds a spaced-repetition schedule. Get a card right and it comes back
+            later; miss it and it returns sooner. You spend your time exactly where your memory is weakest.</p>
+          <ul class="checklist">
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> Proven SM-2 review algorithm working quietly in the background</li>
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> A daily "due" count so you always know what to review</li>
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> Streaks and weekly goals that turn study into a habit</li>
+          </ul>
+        </div>
+        <div class="col-phone reveal">
+          <div class="phone"><div class="notch"></div>
+            <div class="frame"><img src="screens/04-quiz.png" width="720" height="1600" loading="lazy" alt="Verdance quiz screen with a fill-in-the-blank question about Psalm 23" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 03 TOGETHER (split reversed) ===== -->
+  <section class="sec" id="social">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">(03)</span>
+        <h2>Grow together</h2>
+        <p>Faith grows in community. So does a study habit.</p>
+      </div>
+      <div class="stats reveal">
+        <div><div class="n" data-count="7">7</div><div class="l">Quiz modes</div></div>
+        <div><div class="n" data-count="17">17</div><div class="l">Achievements to unlock</div></div>
+        <div><div class="n" data-count="5">5</div><div class="l">Study tools in one app</div></div>
+      </div>
+      <div class="split rev">
+        <div class="col-phone reveal">
+          <div class="phone"><div class="notch"></div>
+            <div class="frame"><img src="screens/06-profile.png" width="720" height="1600" loading="lazy" alt="Verdance profile screen showing achievements and stats" /></div>
+          </div>
+        </div>
+        <div class="col-text reveal">
+          <h3>Study with friends &amp; your church</h3>
+          <p>Add friends, create groups, and follow a study plan together — everyone works the same
+            steps at their own pace while a group leaderboard keeps you all encouraged. Social features
+            are always free, on every plan.</p>
+          <ul class="checklist">
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> Friends, groups, and shared group study plans</li>
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> Leaderboards ranked by study streak</li>
+            <li><span class="ck"><svg viewBox="0 0 24 24"><path d="M5 12l4 4L19 6"/></svg></span> Achievements and milestones as you grow</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 04 EVERYTHING (phone fan) ===== -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">(04)</span>
+        <h2>Everything in one place</h2>
+        <p>Ask, learn, review, quiz, and track — without ever leaving the app.</p>
+      </div>
+      <div class="fan">
+        <div class="phone reveal"><div class="notch"></div><div class="frame"><img src="screens/02-library.png" width="720" height="1600" loading="lazy" alt="Verdance library of study sets" /></div></div>
+        <div class="phone reveal"><div class="notch"></div><div class="frame"><img src="screens/05-ai.png" width="720" height="1600" loading="lazy" alt="Verdance AI Bible Assistant with suggested questions" /></div></div>
+        <div class="phone reveal"><div class="notch"></div><div class="frame"><img src="screens/03-cards.png" width="720" height="1600" loading="lazy" alt="Verdance flashcards inside a study set" /></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 05 NOT A CHATBOT ===== -->
+  <section class="sec" id="about">
+    <div class="wrap">
+      <div class="mission reveal">
+        <div>
+          <h2>Not just another chatbot</h2>
+          <p>A blank AI text box gives you answers and forgets them the moment you close it. Verdance is
+            a purpose-built study system: your flashcards, your review schedule, your quizzes, your plans,
+            and your group — tracked over time.</p>
+          <p>We don't sell AI. We sell a calmer, deeper way to learn and remember scripture, with the
+            people you're growing alongside. That's the part a chatbot structurally can't do.</p>
+        </div>
+        <div class="emblem">
+          <svg viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+            <defs><linearGradient id="mt" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs>
+            <rect width="1024" height="1024" rx="228" fill="url(#mt)"/>
+            <path d="M360 372 L512 690 L664 372" stroke="#fff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            <path d="M512 690 C452 566 452 452 512 336 C572 452 572 566 512 690 Z" fill="#fff"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 06 PRICING ===== -->
+  <section class="sec" id="pricing">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">(06)</span>
+        <h2>Simple pricing</h2>
+        <p>Start free. Upgrade for more AI, media, and storage. Annual saves ~2 months.</p>
+      </div>
+      <div class="plans">
+        <div class="plan reveal spotlight">
+          <span class="tag" style="color:var(--indigo)">Free</span>
+          <div class="price">$0</div>
+          <div class="yr">Forever</div>
+          <ul>
+            <li>AI chat with earned daily credits</li>
+            <li>Flashcards, sets &amp; quizzes</li>
+            <li>Spaced-repetition review</li>
+            <li>Friends, groups &amp; leaderboards</li>
+            <li>250 MB storage</li>
+          </ul>
+          <div class="cta">Coming soon</div>
+        </div>
+        <div class="plan feat reveal">
+          <span class="badge-pop">Most popular</span>
+          <span class="tag">Pro</span>
+          <div class="price">$9.99<span>/mo</span></div>
+          <div class="yr">or $79.99/year</div>
+          <ul>
+            <li>500 AI credits every month</li>
+            <li>PDF &amp; image analysis in chat</li>
+            <li>10 GB storage</li>
+            <li>Higher AI rate limits</li>
+            <li>Everything in Starter</li>
+          </ul>
+          <div class="cta">Coming soon</div>
+        </div>
+        <div class="plan reveal spotlight">
+          <span class="tag" style="color:var(--indigo)">Starter</span>
+          <div class="price">$4.99<span>/mo</span></div>
+          <div class="yr">or $39.99/year</div>
+          <ul>
+            <li>100 AI credits every month</li>
+            <li>PDF &amp; image analysis in chat</li>
+            <li>2 GB storage</li>
+            <li>Faster AI rate limits</li>
+            <li>Everything in Free</li>
+          </ul>
+          <div class="cta">Coming soon</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section class="sec">
+    <div class="wrap">
+      <div class="sec-head reveal"><span class="sec-num">(07)</span><h2>Questions</h2></div>
+      <div class="faq">
+        <details class="reveal"><summary>Is Verdance free?</summary><p>Yes. The Free plan lets you study, quiz, use every social feature, and ask AI questions with credits you earn from daily logins and streaks. Starter and Pro add monthly AI credits, media in chat, and more storage.</p></details>
+        <details class="reveal"><summary>How is this different from ChatGPT?</summary><p>Verdance is a study system, not a chat box. Flashcards, spaced-repetition review, quizzes, study plans, and group study — all tracked over time. The AI is one feature inside it, tuned for scripture with verse citations.</p></details>
+        <details class="reveal"><summary>Can I study with my church or small group?</summary><p>Yes. Create a group, share a study plan, and everyone follows the same steps while a group leaderboard keeps you encouraged. Social features are free on every plan.</p></details>
+        <details class="reveal"><summary>Which devices does it support?</summary><p>Verdance is coming soon to the Apple App Store and Google Play, for both iPhone and Android.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA BAND ===== -->
+  <section class="cta-band">
+    <div class="wrap">
+      <h2 class="reveal">Study, deepened.</h2>
+      <p class="reveal">Verdance is coming soon to iPhone &amp; Android.</p>
+      <div class="badges reveal" style="justify-content:center">
+        <span class="store-badge"><span class="soon-pill">Soon</span>
+          <svg viewBox="0 0 24 24"><path d="M16.5 3c.1 1-.3 2-1 2.7-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.8-.8 2-1.3 2.8-1.3zM19 17c-.4 1-.6 1.4-1.1 2.3-.7 1.2-1.7 2.7-3 2.7-1.1 0-1.4-.7-3-.7s-1.9.7-3 .7c-1.3 0-2.2-1.3-3-2.5-2-3-2.2-6.4-1-8.3.9-1.3 2.2-2.1 3.5-2.1 1.3 0 2.2.8 3.3.8 1 0 1.7-.8 3.3-.8 1.1 0 2.3.6 3.2 1.7-2.8 1.5-2.4 5.5.1 6.2z"/></svg>
+          <span class="lines"><small>Coming soon on the</small><strong>App Store</strong></span></span>
+        <span class="store-badge"><span class="soon-pill">Soon</span>
+          <svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.4.7-.4 1.2v17c0 .5.1.9.4 1.2l.1.1L13 12.6v-.2L3.7 2.2zM17 16.3l-3-3v-.2l3-3 3.5 2c1 .6 1 1.5 0 2.1zM13.5 12.9l3.1 3.1-9.8 5.6c-.5.3-1 .3-1.4 0zm0-1.8L5.4 5.5c.4-.3.9-.3 1.4 0l9.8 5.6z"/></svg>
+          <span class="lines"><small>Coming soon on</small><strong>Google Play</strong></span></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
   <footer>
-    <div><a href="privacy.html">Privacy Policy</a> · <a href="terms.html">Terms of Service</a></div>
-    <p style="margin-top:12px;">&copy; 2026 Verdance. All rights reserved.</p>
+    <div class="wrap">
+      <div class="foot-grid">
+        <a class="brand" href="#top">
+          <svg viewBox="0 0 1024 1024" style="width:30px;height:30px"><defs><linearGradient id="ft" x1="0" y1="0" x2="1024" y2="1024" gradientUnits="userSpaceOnUse"><stop stop-color="#8B5CF6"/><stop offset="1" stop-color="#6366F1"/></linearGradient></defs><rect width="1024" height="1024" rx="228" fill="url(#ft)"/><path d="M360 372 L512 690 L664 372" stroke="#fff" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M512 690 C452 566 452 452 512 336 C572 452 572 566 512 690 Z" fill="#fff"/></svg>
+          <span class="name">Verdance</span>
+        </a>
+        <div class="foot-links">
+          <a href="#features">Features</a>
+          <a href="#pricing">Pricing</a>
+          <a href="privacy.html">Privacy</a>
+          <a href="terms.html">Terms</a>
+          <a href="delete-account.html">Delete Account</a>
+          <a href="mailto:ddtechservices.work@gmail.com">Contact</a>
+        </div>
+      </div>
+      <p class="copy">&copy; 2026 Verdance. Grow in the Word. All rights reserved.</p>
+    </div>
   </footer>
+
+  <button class="totop" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+  <!-- ===== motion (progressive enhancement) ===== -->
+  <script>
+    document.body.classList.remove('no-js');
+    (function(){
+      var nav = document.getElementById('nav');
+      var prog = document.querySelector('.progress');
+      var toTop = document.getElementById('toTop');
+      function onScroll(){
+        nav.classList.toggle('scrolled', scrollY > 8);
+        if(toTop) toTop.classList.toggle('show', scrollY > 640);
+        if(prog){ var h=document.documentElement, max=h.scrollHeight-h.clientHeight;
+          prog.style.transform = 'scaleX(' + (max>0 ? scrollY/max : 0) + ')'; }
+      }
+      addEventListener('scroll', onScroll, {passive:true}); onScroll();
+      if(toTop) toTop.addEventListener('click', function(){ scrollTo({top:0, behavior:'smooth'}); });
+
+      // Scroll-spy: highlight the nav link for the section in view
+      var spyLinks = {};
+      document.querySelectorAll('.nav-links a[href^="#"]').forEach(function(a){ spyLinks[a.getAttribute('href').slice(1)] = a; });
+      var spyIO = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting){
+          Object.keys(spyLinks).forEach(function(k){ spyLinks[k].classList.remove('active'); });
+          if(spyLinks[e.target.id]) spyLinks[e.target.id].classList.add('active');
+        }});
+      }, {rootMargin:'-45% 0px -50% 0px'});
+      ['features','study','social','pricing','about'].forEach(function(id){ var s=document.getElementById(id); if(s) spyIO.observe(s); });
+
+      // Mobile menu — always available, independent of motion prefs
+      var hamb=document.querySelector('.hamb'), menu=document.getElementById('mobileMenu');
+      if(hamb && menu){
+        function setMenu(open){
+          hamb.setAttribute('aria-expanded', String(open));
+          menu.classList.toggle('open', open);
+          document.documentElement.classList.toggle('nav-open', open); // reliable scroll-lock on the scroller
+        }
+        hamb.addEventListener('click', function(){ setMenu(hamb.getAttribute('aria-expanded') !== 'true'); });
+        menu.querySelectorAll('a').forEach(function(a){ a.addEventListener('click', function(){ setMenu(false); }); });
+        addEventListener('keydown', function(e){ if(e.key === 'Escape') setMenu(false); });
+        // Resizing up to desktop must reset the menu so the page never stays scroll-locked
+        var mq = matchMedia('(min-width:821px)');
+        (mq.addEventListener ? mq.addEventListener.bind(mq,'change') : mq.addListener.bind(mq))(function(e){ if(e.matches) setMenu(false); });
+      }
+
+      function countUp(el){ var target=+el.getAttribute('data-count'), start=null, dur=1100;
+        function step(t){ if(!start)start=t; var p=Math.min((t-start)/dur,1);
+          el.textContent=Math.round(target*(1-Math.pow(1-p,3))); if(p<1)requestAnimationFrame(step); }
+        requestAnimationFrame(step); }
+
+      var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce){ document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('revealed'); }); return; }
+
+      // Scroll reveals (baseline; also fires the count-up)
+      var io = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('revealed');
+          if(e.target.querySelectorAll) e.target.querySelectorAll('[data-count]').forEach(countUp);
+          io.unobserve(e.target); } });
+      }, {threshold:0.12, rootMargin:'0px 0px -8% 0px'});
+      document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+      var isTouch = matchMedia('(hover:none)').matches;
+
+      // Spotlight: radial glow follows the cursor inside cards
+      if(!isTouch) document.querySelectorAll('.spotlight').forEach(function(el){
+        el.addEventListener('mousemove', function(e){ var r=el.getBoundingClientRect();
+          el.style.setProperty('--mx', (e.clientX-r.left)+'px'); el.style.setProperty('--my', (e.clientY-r.top)+'px'); });
+      });
+
+      // Magnetic buttons
+      if(!isTouch) document.querySelectorAll('.magnetic').forEach(function(el){
+        el.addEventListener('mousemove', function(e){ var r=el.getBoundingClientRect();
+          el.style.transform='translate('+((e.clientX-r.left-r.width/2)*.3)+'px,'+((e.clientY-r.top-r.height/2)*.45)+'px)'; });
+        el.addEventListener('mouseleave', function(){ el.style.transform=''; });
+      });
+
+      // Hero phone 3D tilt toward cursor
+      if(!isTouch){ var hp=document.getElementById('heroPhone'), cp=hp&&hp.closest('.col-phone');
+        if(cp){ cp.addEventListener('mousemove', function(e){ var r=cp.getBoundingClientRect();
+            var px=(e.clientX-r.left)/r.width-.5, py=(e.clientY-r.top)/r.height-.5;
+            hp.style.transform='rotateY('+(px*9)+'deg) rotateX('+(-py*9)+'deg)'; });
+          cp.addEventListener('mouseleave', function(){ hp.style.transform=''; }); } }
+
+      function load(src, cb){ var s=document.createElement('script'); s.src=src; s.onload=cb; s.onerror=function(){}; document.head.appendChild(s); }
+
+      load('https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', function(){
+        if(!window.gsap) return;
+        // Hero headline: words rise + fade in sequence
+        gsap.from('#heroTitle .hw-i', { yPercent:60, opacity:0, duration:.9, ease:'power3.out', stagger:.08, delay:.1 });
+        load('https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js', function(){
+          gsap.registerPlugin(ScrollTrigger);
+          gsap.to('.hero .col-phone', { yPercent:-6, ease:'none',
+            scrollTrigger:{ trigger:'#top', start:'top top', end:'bottom top', scrub:true } });
+          gsap.to('.aurora .a', { y:120, scrollTrigger:{ trigger:'body', start:'top top', end:'bottom bottom', scrub:1 } });
+          gsap.to('.aurora .b', { y:-100, scrollTrigger:{ trigger:'body', start:'top top', end:'bottom bottom', scrub:1.5 } });
+
+          // Pin-and-scrub: reveal the spaced-repetition checklist step by step (desktop only)
+          var sr=document.getElementById('srSplit');
+          if(sr && matchMedia('(min-width:861px)').matches){
+            var items=gsap.utils.toArray('#srSplit .checklist li');
+            gsap.set(items,{opacity:.3});
+            var tl=gsap.timeline({ scrollTrigger:{ trigger:'#srSplit', start:'center center', end:'+=90%', pin:true, scrub:.6 } });
+            items.forEach(function(li){ tl.to(li,{opacity:1, x:8, duration:.5}).to(li,{x:0, duration:.25}); });
+            tl.from('#srSplit .col-phone .phone',{scale:.93, duration:1.2}, 0);
+          }
+        });
+      });
+    })();
+  </script>
 </body>
 </html>
