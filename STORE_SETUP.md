@@ -1,17 +1,35 @@
 # Store Setup — Verdance launch checklist
 
-## ▶ RESUME (2026-09-09 EOD) — both stores blocked on payment/identity verification
-**Apple:** app `Verdance: Bible Study & Memory` created (`com.getverdance.app`). Paid Apps agreement
-accepted but **Pending User Info** — waiting on **banking (processing ~24h)**; the **US W-8BEN tax
-form** can't be added until banking clears. Then: Paid Apps → Active → create the 4 products →
-add App Store Connect API key to RevenueCat.
-**Google:** app created (`com.getverdance.app`, Draft). Merchant payments profile created (Ramani
-Divyesh, INR, India; 15% fee auto). **PA-CB KYC in progress via BillDesk** — business type
-**Individual**, submit **PAN** (name must EXACTLY match). After Google review (~few days): merchant
-active → create 4 subscriptions → Setup→API access → service-account JSON to RevenueCat.
-**RevenueCat:** iOS + Android apps created (`com.getverdance.app`); still need products/entitlements/
-offering, SDK keys, webhook secret (all gated on store products existing).
-**Tomorrow first check:** is Apple banking done? did BillDesk KYC email get completed? Then proceed.
+## ▶ RESUME (2026-09-10) — Play "App content" DONE; website live; both stores still gated on verification
+**Website (getverdance.com):** LIVE on the Hetzner box via Caddy (static files in `/var/www/getverdance/`,
+Cloudflare `@`+`www` A-records → 94.130.176.8 grey-cloud). Pages: `/privacy.html` (updated w/ Google Play
+Billing + Firebase + children + legal-entity fixes), `/terms.html`, `/delete-account.html`, `/` landing.
+Use `https://getverdance.com/privacy.html` + `/delete-account.html` in BOTH stores.
+**Reviewer test account (prod):** `reviewer@getverdance.com` / `Verdance2026Review` — created via prod API,
+`emailVerified` flipped true in DB, login verified. Used for Play "Sign in details". (FREE plan; bump to
+PRO in DB if reviewers must see premium UI.)
+**Google Play — App content ✅ ALL DONE:** privacy policy, sign-in details, ads=No, content rating
+(Everyone; AI-content=Yes but all content categories No; educational=Yes; digital-goods=Yes/no-lootbox),
+target audience=13+ (avoids Families policy), data safety (Collected-not-Shared, encrypted-in-transit=Yes,
+delete URL set; types: Name/Email/UserIDs/PurchaseHistory/Photos/Files/UGC/AppInteractions/CrashLogs/
+Diagnostics/DeviceIDs), government=No, financial=none, **advertising ID=No** (verified: no ad/analytics SDK,
+no AD_ID permission — only FCM/Google-SignIn/RevenueCat), health=none. Store settings: category=**Education**,
+tags=Education/Study guide/Test preparation, contact email+website set.
+**Google Play — still TODO:** store-listing graphics (feature graphic 1024×500 + ≥2 phone screenshots 1080×1920
+via AppDrift; icon 512×512 ready), upload a build (internal testing), then **12-tester / 14-day CLOSED TEST**
+(new-personal-account rule — the real long pole) before Production. BillDesk PA-CB KYC fully submitted
+(App ID **2609094782**) — awaiting review.
+**Apple:** app `Verdance: Bible Study & Memory` (`com.getverdance.app`). DSA trader declaration + ID upload
+DONE. **Address-change request submitted** (Membership Info Update → Address → Rajkot/Lilapur 360050, to match
+Google/PAN). **W-8BEN tax form still BANKING-LOCKED** (US checkbox greyed until banking finishes ~24h). Then:
+Paid Apps → Active → 4 products → ASC API key to RevenueCat.
+**RevenueCat:** iOS + Android apps created; products/entitlements/offering, SDK keys, webhook secret still
+gated on store products existing.
+**Next first checks:** Apple banking done? → add W-8BEN. Google KYC approved? → make 4 subs. Also: build
+screenshots + recruit 12 Android testers to start the 14-day closed-test clock.
+
+**Store-listing copy (paste-ready):** name=`Verdance: Bible Study & Memory` (30/30) · short=`AI Bible study
+with flashcards, spaced-repetition review, and quizzes.` (70) · full description drafted (in chat / brain).
 
 
 
