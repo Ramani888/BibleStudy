@@ -58,11 +58,55 @@ Identity is already migrated (bundle/applicationId = `com.getverdance.app`, Fire
 ---
 
 ## A. Apple — App Store Connect
-- [ ] **Paid Applications Agreement** signed + Tax + Banking (App Store Connect → Business). ← gates everything
+- [ ] **Paid Applications Agreement** signed + Tax + Banking (App Store Connect → Business). ← gates *selling* only (not listing metadata)
 - [ ] **Create app**: Apps → ＋ → iOS, name `Verdance`, bundle `com.getverdance.app`, SKU `verdance-ios-001`, primary language English (U.S.).
 - [ ] **Subscription group** `Verdance Membership` + the **4 products** above (price + localization + review info each).
 - [ ] App Privacy (nutrition label), age rating, category — can do alongside listing.
 - [ ] RevenueCat iOS "Credentials need attention" clears automatically once the above exist → click refresh.
+
+### A1. App Store listing copy (paste-ready, 2026-09-10) — fillable NOW, no banking needed
+App is **iPhone-only** (`TARGETED_DEVICE_FAMILY = 1`) → only 6.7" iPhone screenshots required (no iPad set).
+Encryption prompt suppressed via `ITSAppUsesNonExemptEncryption=false` in `Info.plist` (standard HTTPS = exempt).
+
+| Field | Value |
+|---|---|
+| App Name (30/30) | `Verdance: Bible Study & Memory` |
+| Subtitle (29/30) | `AI Flashcards & Bible Quizzes` |
+| Keywords (97/100, no spaces) | `scripture,verse,memorization,christian,devotional,gospel,faith,catechism,spaced,repetition,prayer` |
+| Support URL | `https://getverdance.com` |
+| Marketing URL | `https://getverdance.com` |
+| Copyright | `2026 Divyesh Ramani` |
+| Category | Primary **Education**, Secondary **Reference** |
+| Screenshots (6.7", 1290×2796) | `branding/store-screenshots/framed/*.png` (7 shots — the complete required set) |
+
+**Promotional Text** (~162/170, editable without review):
+`Turn Bible study into a daily habit. AI-made flashcards, spaced-repetition review, quizzes, and study plans — track streaks and grow with friends. Start free today.`
+
+**Description** (< 4000):
+```
+Verdance turns Bible study into a habit that sticks.
+
+Create flashcards in seconds with AI, review them with proven spaced-repetition, and test yourself with quizzes — all in one focused, distraction-free app.
+
+WHY VERDANCE
+• AI flashcards — paste a passage or topic and get clean question-and-answer cards instantly.
+• Spaced repetition — a smart schedule (SM-2) resurfaces each card right before you forget it, so memory work actually lasts.
+• Quizzes — seven quiz modes turn any set into a fast, fun self-test.
+• Study plans — follow guided plans like "30 Days in the Gospels," or build your own.
+• Streaks & achievements — daily goals, streaks, and unlockable milestones keep you coming back.
+• Study with friends — compare streaks on the leaderboard and stay accountable together.
+• Notes & media — keep your reflections and reference images alongside your cards.
+
+BUILT FOR EVERY LEARNER
+Whether you're memorizing verses, prepping for a class, catching up on catechism, or just building a steadier devotional rhythm — Verdance meets you where you are.
+
+FREE TO START
+Study for free. Upgrade any time for more AI generations and higher limits.
+
+Start your first set today and make Scripture stick.
+```
+
+**Other sections:** App Privacy = mirror Play data-safety (Linked-to-user: Name, Email, User ID, Purchase history, Photos, User content, Device ID, Usage, Diagnostics; **not** used for tracking). Age Rating = answer content categories None (→4+); AI/UGC question = Yes (friends feed + AI chat + notes; may nudge to 9+/12+). App Review Info = demo `reviewer@getverdance.com` / `Verdance2026Review` + note "AI needs no login; sign in for study data; subs are sandbox-only in review" + contact. Export Compliance = exempt (handled by Info.plist key above).
 
 ## B. Google — Play Console
 - [ ] Confirm Play Console is on the **work Google account**.
