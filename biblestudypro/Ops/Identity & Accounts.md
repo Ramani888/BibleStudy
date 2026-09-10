@@ -1,6 +1,6 @@
 ---
 tags: [ops, identity, accounts]
-updated: 2026-09-09
+updated: 2026-09-10
 ---
 
 # Identity & Accounts
@@ -12,7 +12,7 @@ updated: 2026-09-09
 - iOS: `CFBundleDisplayName = Verdance` (`ios/frontend/Info.plist`)
 - Android: `app_name = Verdance` (`android/app/src/main/res/values/strings.xml`)
 - **Store listing title (the long one):** **Verdance: Bible Study & Memory**
-  - Subtitle: **Flashcards, Quizzes & AI**
+  - Subtitle (shipped both stores): **AI Flashcards & Bible Quizzes**
   - (Launcher/home-screen name stays the short **Verdance**.)
 - Internal only (NOT the launcher label): `app.json` `name: BibleStudyPro` (RN AppRegistry
   component id — do not change), `displayName: "BibleStudy Pro"` (unused/stale).
