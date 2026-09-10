@@ -12,6 +12,12 @@ updated: 2026-09-10
 App: **Verdance** · title **Verdance: Bible Study & Memory** · bundle `com.getverdance.app`
 · Apple ID `6810234440` · website getverdance.com · API `https://api.getverdance.com`.
 
+> **Branch state (2026-09-10):** `feat/revenuecat` **merged → master** (`f54c164`, no-ff, both ends
+> type-check clean). Master is now the current source of truth (identity migration + RevenueCat
+> scaffolding + all launch prep). **Next work stream = landing page** — branch fresh off master
+> (`feat/landing-page`); static site in `legal/`, served from getverdance.com via Caddy. RevenueCat
+> wiring is still dormant/untested and gated on Apple banking (below).
+
 ## Reviewer demo account (both stores)
 `reviewer@getverdance.com` / `Verdance2026Review` — registered on **prod** API, `emailVerified`
 flipped true in prod Postgres (login is gated on it). FREE plan / 3 credits. Seeded with 4 sets,
@@ -46,7 +52,22 @@ rule) before Production. BillDesk PA-CB KYC submitted (App ID 2609094782), await
 - **Native**: iPhone-only (`TARGETED_DEVICE_FAMILY=1`) so no iPad screenshots required;
   `ITSAppUsesNonExemptEncryption=false` in Info.plist (export-compliance exempt).
 - **STILL TODO**: attach a build (Xcode/TestFlight); **4 IAP products + Submit** gated on Paid Apps
-  agreement + W-8BEN + **banking** (finishing ~24h) → then RevenueCat iOS creds auto-clear.
+  agreement + W-8BEN + **banking** → then RevenueCat iOS creds auto-clear.
+- **Banking (in progress 2026-09-10):** Free Apps Agreement = Active; Paid Apps = Pending User Info;
+  **W-8BEN** being submitted (foreign/India, no US tax residency, no US business activities,
+  Individual/Sole-proprietor, title "Owner" — irreversible once submitted, no PAN/treaty fields);
+  ICICI bank = Processing; DSA compliance = In Review. When banking flips Active → create 4 products.
+
+## Order of remaining subscription wiring (once banking clears)
+`.env` is baked at build time (`react-native-config`), so **wire first, build once**:
+1. Apple: subscription group + 4 products → app-specific shared secret + ASC API key (.p8).
+2. Play: create 4 products → service-account JSON (Google verify is a stub until then).
+3. RevenueCat: import via Apple key + Play JSON → entitlements `starter`/`pro` → offering `default`
+   → **SDK keys (iOS+Android, currently EMPTY in `frontend/.env`)** + webhook secret.
+4. Wire `frontend/.env` (RC keys) + backend `.env` (`RC_WEBHOOK_AUTH`, `APPLE_IAP_SHARED_SECRET`,
+   identity vars) + `prisma migrate deploy` on prod.
+5. **Then** build + upload TestFlight → sandbox purchase → verify webhook grants credits.
+Product IDs (unchanged): `com.biblestudypro.{starter,pro}.{monthly,annual}` — $4.99/$39.99/$9.99/$79.99.
 
 ## Known launch bug fixed this session
 Android `react-native-config` returned undefined for all `Config.*` because applicationId
