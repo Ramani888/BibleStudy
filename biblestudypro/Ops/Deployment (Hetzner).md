@@ -24,3 +24,4 @@ SSH as `root@94.130.176.8` → pull → rebuild → `pm2 reload`
 
 ## See also
 - [[Local Dev Setup]] — local development workflow
+- [[Landing Page]] — getverdance.com marketing site (Caddy `file_server` from `/var/www/getverdance/`)
