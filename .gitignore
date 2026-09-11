@@ -44,3 +44,6 @@ backend/uploads/
 
 # Sensitive credentials (stored in Obsidian vault for reference only)
 biblestudypro/Ops/Google Credentials.md
+
+# Local Playwright/agent screenshot artifacts
+.playwright-mcp/
