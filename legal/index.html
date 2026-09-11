@@ -382,11 +382,29 @@
     .plan.feat.revealed{ animation:planGlow 2.4s ease-in-out .25s 1; }
     @keyframes planGlow{ 50%{ box-shadow:0 30px 90px -18px var(--violet); } }
 
+    /* ---------- Peekly-inspired ambient polish (additive; degrades cleanly) ---------- */
+    /* 1. whole aurora field drifts slowly on its own; GSAP still scrubs the .a/.b blobs on scroll */
+    @keyframes auroraDrift{ from{ transform:translate3d(0,0,0) scale(1); } to{ transform:translate3d(1.6%,-1.6%,0) scale(1.06); } }
+    .aurora{ animation:auroraDrift 26s ease-in-out infinite alternate; }
+    /* 2. hero float-cards bob gently, out of phase */
+    @keyframes floatBob{ 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-9px); } }
+    .float-card{ animation:floatBob 6.5s ease-in-out infinite; }
+    .fc-2{ animation-duration:7.8s; animation-delay:-2.6s; }
+    /* 3. hero highlight word: gradient text with a slow shine sweep (underline SVG unaffected) */
+    .hero-title .mark{ background:linear-gradient(100deg,var(--violet) 0%,var(--indigo) 42%,var(--violet-soft) 54%,var(--indigo) 66%,var(--violet) 100%);
+      background-size:220% 100%; -webkit-background-clip:text; background-clip:text; color:transparent; animation:wordShine 6.5s linear infinite; }
+    @keyframes wordShine{ from{ background-position:180% 0; } to{ background-position:-40% 0; } }
+    /* 4. soft violet glow band above the footer */
+    footer{ position:relative; overflow:hidden; }
+    footer::before{ content:""; position:absolute; top:-1px; left:50%; transform:translateX(-50%); z-index:-1; pointer-events:none;
+      width:min(760px,92%); height:200px; background:radial-gradient(60% 100% at 50% 0%,rgba(139,92,246,.22),transparent 70%); filter:blur(30px); }
+
     /* reveal animation base (progressively enhanced by GSAP) */
     .reveal{ opacity:0; transform:translateY(28px); }
     .revealed{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
     @media(prefers-reduced-motion:reduce){
       .reveal{ opacity:1 !important; transform:none !important; }
+      .aurora,.float-card,.hero-title .mark{ animation:none !important; }
       html{ scroll-behavior:auto; }
     }
     /* no-JS fallback: show everything */
