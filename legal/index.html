@@ -398,13 +398,23 @@
     footer{ position:relative; overflow:hidden; }
     footer::before{ content:""; position:absolute; top:-1px; left:50%; transform:translateX(-50%); z-index:-1; pointer-events:none;
       width:min(760px,92%); height:200px; background:radial-gradient(60% 100% at 50% 0%,rgba(139,92,246,.22),transparent 70%); filter:blur(30px); }
+    /* 5. "ask" marquee — slow, pauses on hover, edge-faded; two identical halves loop at -50% */
+    .ask-band{ overflow:hidden; padding:18px 0 22px;
+      -webkit-mask-image:linear-gradient(to right,transparent,#000 11%,#000 89%,transparent);
+      mask-image:linear-gradient(to right,transparent,#000 11%,#000 89%,transparent); }
+    .ask-track{ display:flex; width:max-content; animation:askScroll 48s linear infinite; }
+    .ask-band:hover .ask-track{ animation-play-state:paused; }
+    .ask-dup{ display:contents; }
+    .ask-pill{ flex:none; margin-right:14px; white-space:nowrap; font-size:14.5px; color:var(--indigo);
+      background:var(--soft); border:1px solid rgba(139,92,246,.16); padding:11px 18px; border-radius:999px; }
+    @keyframes askScroll{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
 
     /* reveal animation base (progressively enhanced by GSAP) */
     .reveal{ opacity:0; transform:translateY(28px); }
     .revealed{ opacity:1; transform:none; transition:opacity .7s ease,transform .7s ease; }
     @media(prefers-reduced-motion:reduce){
       .reveal{ opacity:1 !important; transform:none !important; }
-      .aurora,.float-card,.hero-title .mark{ animation:none !important; }
+      .aurora,.float-card,.hero-title .mark,.ask-track{ animation:none !important; }
       html{ scroll-behavior:auto; }
     }
     /* no-JS fallback: show everything */
@@ -500,6 +510,30 @@
       </div>
     </div>
   </section>
+
+  <!-- ===== ASK MARQUEE ===== -->
+  <div class="ask-band" aria-label="Examples of questions you can ask Verdance">
+    <div class="ask-track">
+      <span class="ask-pill">“Context of Philippians 4:13?”</span>
+      <span class="ask-pill">“Explain the Prodigal Son”</span>
+      <span class="ask-pill">“Make 5 cards on Romans 8”</span>
+      <span class="ask-pill">“What does ‘agape’ mean?”</span>
+      <span class="ask-pill">“Summarize the Sermon on the Mount”</span>
+      <span class="ask-pill">“Key themes in the Book of Job”</span>
+      <span class="ask-pill">“Timeline of Holy Week”</span>
+      <span class="ask-pill">“Quiz me on the Beatitudes”</span>
+      <span class="ask-dup" aria-hidden="true">
+        <span class="ask-pill">“Context of Philippians 4:13?”</span>
+        <span class="ask-pill">“Explain the Prodigal Son”</span>
+        <span class="ask-pill">“Make 5 cards on Romans 8”</span>
+        <span class="ask-pill">“What does ‘agape’ mean?”</span>
+        <span class="ask-pill">“Summarize the Sermon on the Mount”</span>
+        <span class="ask-pill">“Key themes in the Book of Job”</span>
+        <span class="ask-pill">“Timeline of Holy Week”</span>
+        <span class="ask-pill">“Quiz me on the Beatitudes”</span>
+      </span>
+    </div>
+  </div>
 
   <!-- ===== 01 FEATURES ===== -->
   <section class="sec" id="features">
