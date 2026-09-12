@@ -1,0 +1,43 @@
+# Verdance — Growth & Revenue To-Do
+
+> Actionable checklist derived from [[Growth-and-Revenue]] (deep research, 2026-09-12).
+> **Scope: growth + revenue only** — launch blockers (IAP products, Claude funding, Hetzner,
+> device testing) are tracked elsewhere, not here.
+>
+> **Priority:** P1 = do first / highest leverage · P2 = important · P3 = later/contingent
+> **Effort:** 🟢 no code (copy/config/messaging) · 🟡 config or small change · 🔴 needs new work
+
+---
+
+## Before launch
+
+- [ ] **Waitlist on getverdance.com** — email + country/city; invite in launch-day waves to concentrate installs. `P1` `🔴`
+- [ ] **"Tell a pastor" referral** — make this the #1 pre-launch ask (Faithly: "worth more than money"). `P1` `🟢`
+- [ ] **Recruit 3–5 small-group leaders** as pre-launch pilot users (activates group invite codes + friends graph so day-one isn't empty). `P1` `🟢`
+- [ ] **Lock wedge messaging** — "Cancel anytime, no surprise charges" (vs Hallow) + "modern Bible flashcards" (vs Anki's dated/paid app). `P1` `🟢`
+- [ ] **Localize store listing + screenshots** in **pt-BR and es** (Brazil = YouVersion's #2 country; you already ship the locales). `P1` `🔴`
+- [ ] **Set regional price tiers** ~60–80% off US defaults for LatAm / SE Asia / E. Europe (App Store Connect + Play Console). Treat 60–80% as a starting point to A/B. `P2` `🟡`
+- [ ] **Offline audit** — confirm flashcards/sets work (or degrade gracefully) offline; key for emerging markets. `P2` `🟡`
+
+## At launch
+
+- [ ] **Coordinated share event** — a scheduled "share your set/streak with your group" push + in-app CTA, timed to a **Sunday** (download spikes are real). `P1` `🔴`
+- [ ] **WhatsApp deep-link sharing** for sets + group invites (not copy-a-code). Use direct share links — WhatsApp Channels don't push-notify. `P1` `🔴`
+- [ ] **ASO long-tail keywords** — target "Bible study flashcards / Bible quiz / memorize scripture / Bible study group" (underserved vs read/pray/devotional). Fill localized keyword fields per store. Don't self-censor off head terms. `P1` `🔴`
+- [ ] **Screenshots that show the system** — streak, Home "due" count, group leaderboard (not just a logo). `P2` `🔴`
+- [ ] **Rating prompts after wins** — trigger on completed quiz / unlocked achievement / streak milestone. `P2` `🟡`
+
+## After launch
+
+- [ ] **Make annual the highlighted Paywall option** ($39.99/yr Starter) — cheap annual retains 53.7% Y1 vs 6.7% pricey monthly. `P1` `🟢`
+- [ ] **In-context upgrade prompts** at credit-empty and over-quota moments (surface existing Phase G banners/CTAs). Freemium only converts if conversion is *earned*. `P1` `🟡`
+- [ ] **Seed 10 Christian micro-creators** with a branded set to share; measure installs; double down on what converts. `P2` `🔴`
+- [ ] **Church B2B pilot** — give 3–5 small-group leaders free group access, watch if seats fill + renew, *then* design per-seat pricing from real behavior (⚠️ no verified church-sales playbook exists — validate before building B2B billing). `P2` `🔴`
+- [ ] **(Contingent) Long free trial** — ONLY if you ever add a trial to the locked plan: make it 17–32 days and surface it install-day (82% of trials start day one). Not in current plan. `P3` `🔴`
+
+---
+
+**Highest-leverage first 5 (do now, mostly zero code):** waitlist · "tell a pastor" referral ·
+annual as default Paywall option · wedge messaging · rating prompts after wins.
+
+See [[Growth-and-Revenue]] for evidence, sources, caveats, and the 6 refuted claims (don't act on those).
