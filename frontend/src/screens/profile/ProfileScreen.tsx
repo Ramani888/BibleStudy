@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -14,6 +14,7 @@ import {
   LockIcon,
   LogOutIcon,
   SettingsIcon,
+  ShareIcon,
   StarOutlineIcon,
   TrophyIcon,
   UserIcon,
@@ -60,6 +61,11 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const handleNavPaywall      = useCallback(() => navigation.navigate('Paywall'), [navigation]);
   const handleNavChangePass   = useCallback(() => navigation.navigate('ChangePassword'), [navigation]);
   const handleNavSettings     = useCallback(() => navigation.navigate('Settings'), [navigation]);
+  const handleInviteFriends   = useCallback(async () => {
+    try {
+      await Share.share({ message: t('profile:share.inviteMessage', { defaultValue: "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com" }) });
+    } catch {}
+  }, [t]);
   const handleSignOut         = useCallback(() =>
     showConfirm({
       title: t('profile:settings.signOut'),
@@ -157,6 +163,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         {/* ── Community ── */}
         <MenuSection label={t('profile:sections.community')}>
           <MenuItem icon={UsersIcon} label={t('profile:menu.friends')} onPress={handleNavFriends} />
+          <MenuItem icon={ShareIcon} label={t('profile:menu.inviteFriends', 'Invite friends')} onPress={handleInviteFriends} />
           <MenuItem icon={BellIcon} label={t('profile:menu.notifications')} onPress={handleNavNotifSettings} />
         </MenuSection>
 

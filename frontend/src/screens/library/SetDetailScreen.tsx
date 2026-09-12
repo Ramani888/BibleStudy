@@ -68,7 +68,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
         .join('\n\n');
       const divider = '─'.repeat(Math.min(title.length, 40));
-      await Share.share({ message: `${title}\n${divider}\n\n${cardList}` });
+      // Pull recipients back to the app — turns every shared set into a soft referral.
+      const footer = t('library:setDetail.shareFooter', { defaultValue: '📖 Studied with Verdance — grow in the Word: https://getverdance.com' });
+      await Share.share({ message: `${title}\n${divider}\n\n${cardList}\n\n${footer}` });
     } catch {}
   }, [cachedTitle, setTitle, cards]);
 
