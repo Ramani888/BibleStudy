@@ -109,6 +109,8 @@ function PlanCard({ tier, period, selected, onPress }: {
   const isDark = theme.name === 'dark';
   const showBadge = tier.plan === 'PRO' && period === 'annual';
   const perMonth = (tier.annualPrice / 12).toFixed(2);
+  const savingsPct = Math.round((1 - tier.annualPrice / (tier.monthlyPrice * 12)) * 100);
+  const showSavings = period === 'annual' && !showBadge;
 
   return (
     <Pressable
@@ -131,6 +133,11 @@ function PlanCard({ tier, period, selected, onPress }: {
         {showBadge && (
           <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
             <Typography preset="caption" color={palette.white}>{t('profile:subscription.bestValue', 'Best Value')}</Typography>
+          </View>
+        )}
+        {showSavings && (
+          <View style={[styles.savingsBadge, { borderColor: theme.colors.accent }]}>
+            <Typography preset="caption" color={theme.colors.accent}>{t('profile:subscription.savePctBadge', { pct: savingsPct, defaultValue: `Save ${savingsPct}%` })}</Typography>
           </View>
         )}
         <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
@@ -183,7 +190,8 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   const isSubscribed = currentPlan !== 'FREE';
 
   const [period, setPeriod] = useState<BillingPeriod>('annual');
-  const [selectedTier, setSelectedTier] = useState<AnyTier>(FREE_TIER);
+  // Pre-select Starter (annual by default) to nudge toward the higher-retention annual plan.
+  const [selectedTier, setSelectedTier] = useState<AnyTier>(TIERS[0]);
   const { buy, restore, loadProducts, processing, error } = useIapSubscriptions();
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
@@ -213,7 +221,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
         </View>
 
         {/* ── Billing toggle ── */}
-        <View style={[styles.toggle, { backgroundColor: colors.surfaceMuted }]}>
+        <View style={[styles.toggle, { backgroundColor: colors.surfaceMuted, borderColor: period === 'annual' ? colors.accent : 'transparent' }]}>
           {(['monthly', 'annual'] as BillingPeriod[]).map(p => {
             const active = period === p;
             return (
@@ -321,6 +329,7 @@ const styles = StyleSheet.create({
   toggle: {
     flexDirection: 'row',
     borderRadius: layout.cardRadius,
+    borderWidth: 1.5,
     padding: spacing.xs,
     marginTop: spacing.xxl,
   },
@@ -355,6 +364,14 @@ const styles = StyleSheet.create({
   badge: {
     alignSelf: 'flex-start',
     borderRadius: radius.pill,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    marginBottom: spacing.s6,
+  },
+  savingsBadge: {
+    alignSelf: 'flex-start',
+    borderRadius: radius.pill,
+    borderWidth: 1,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.xs,
     marginBottom: spacing.s6,
