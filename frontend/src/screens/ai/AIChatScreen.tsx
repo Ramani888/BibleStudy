@@ -156,12 +156,19 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           },
           onError: err => {
             setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
+            // Out of credits / over quota (402) → surface an upgrade prompt in context.
+            const status = (err as { response?: { status?: number } })?.response?.status;
+            if (status === 402) {
+              Toast.show({ type: 'error', text1: t('ai:chat.outOfCredits', 'Out of credits'), text2: t('ai:chat.upgradeToKeepGoing', 'Upgrade to keep using AI chat.') });
+              goPaywall();
+              return;
+            }
             Toast.show({ type: 'error', text1: t('ai:chat.couldNotGetResponse', 'Could not get response'), text2: getErrorMessage(err) });
           },
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att, t],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att, goPaywall, t],
   );
 
   useEffect(() => {
