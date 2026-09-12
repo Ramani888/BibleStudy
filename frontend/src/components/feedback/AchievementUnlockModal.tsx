@@ -8,6 +8,7 @@ import { TrophyIcon } from '../icons';
 import { Typography } from '../ui/Typography';
 import { CelebrationBurst } from '../ui/CelebrationBurst';
 import { palette, radius, spacing } from '../../theme';
+import { requestReviewOnce } from '../../utils/requestReview';
 import type { Achievement } from '../../types';
 
 const BADGE_OUTER = 89;
@@ -68,7 +69,7 @@ export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUn
           </View>
         )}
 
-        <Pressable onPress={onDismiss} style={styles.continueBtn}>
+        <Pressable onPress={() => { onDismiss(); requestReviewOnce('achievement'); }} style={styles.continueBtn}>
           <LinearGradient
             colors={[palette.violet500, palette.indigo500]}
             start={{ x: 0, y: 0 }}

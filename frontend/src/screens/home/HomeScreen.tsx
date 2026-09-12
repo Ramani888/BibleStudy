@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -17,6 +17,7 @@ import {
 } from '../../components/icons';
 import { useAuthStore } from '../../store';
 import { useHomeNavigation } from '../../hooks/useHomeNavigation';
+import { requestReviewOnce } from '../../utils/requestReview';
 import {
   useSets,
   usePublicSets,
@@ -298,6 +299,10 @@ export function HomeScreen() {
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
   const activities  = useMemo(() => (activityData?.pages.flatMap(p => p.activities) ?? []).slice(0, 5), [activityData]);
   const streak      = streakData?.streak ?? 0;
+  // Ask for an app-store rating once when the user hits a streak milestone.
+  useEffect(() => {
+    if ([3, 7, 30, 100].includes(streak)) requestReviewOnce(`streak_${streak}`);
+  }, [streak]);
   const firstName   = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
   const cardTotal   = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);

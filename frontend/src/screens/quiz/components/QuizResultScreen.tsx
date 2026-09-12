@@ -8,6 +8,7 @@ import { Button, Typography } from '../../../components/ui';
 import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
 import { useQuizAttemptSave } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
+import { requestReviewOnce } from '../../../utils/requestReview';
 import type { SummaryItem } from '../../../types';
 
 const QUOTE_TIERS: { minScore: number; key: string }[] = [
@@ -58,7 +59,7 @@ export function QuizResultScreen({
     if (saved.current || total === 0) return;
     saved.current = true;
     save({ setIds, total, correct, mode, quizName, timeSecs, responses: summaryItems })
-      .then(res => { setBest(res.best ?? null); })
+      .then(res => { setBest(res.best ?? null); if (scorePct >= 80) requestReviewOnce('quiz_high_score'); })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
