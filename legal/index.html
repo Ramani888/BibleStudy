@@ -279,6 +279,8 @@
     .wl-msg{ min-height:20px; margin-top:14px; font-size:15px; font-weight:600; }
     .wl-msg.ok{ color:var(--indigo); }
     .wl-msg.err{ color:#c0392b; }
+    .wl-count{ color:var(--muted); font-size:14px; margin-top:8px; }
+    .wl-hp{ position:absolute; left:-9999px; width:1px; height:1px; opacity:0; }
 
     /* footer */
     footer{ border-top:1px solid var(--line); padding:48px 0 40px; }
@@ -750,9 +752,11 @@
       <form class="wl-form reveal" id="wlForm" novalidate>
         <input type="email" id="wlEmail" name="email" placeholder="you@example.com" required aria-label="Email address" autocomplete="email">
         <input type="text" id="wlCountry" name="country" class="wl-country" placeholder="Country (optional)" aria-label="Country" autocomplete="country-name">
+        <input type="text" id="wlCompany" name="company" class="wl-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <button type="submit" class="btn btn-primary" id="wlSubmit">Get early access</button>
       </form>
       <p class="wl-msg" id="wlMsg" role="status" aria-live="polite"></p>
+      <p class="wl-count" id="wlCount" aria-live="polite"></p>
       <p class="wl-note reveal">Free to start · Cancel anytime · We'll only email you about launch.</p>
       <p class="wl-pastor reveal">Know a pastor or small-group leader? <a href="mailto:?subject=Verdance%20%E2%80%94%20Bible%20study%20app&amp;body=Thought%20you%27d%20like%20this%20%E2%80%94%20https%3A%2F%2Fgetverdance.com" style="color:var(--indigo);font-weight:600">Forward Verdance to them</a> — it's the biggest way to help us launch.</p>
       <div class="badges reveal" style="justify-content:center;margin-top:28px">
@@ -792,22 +796,41 @@
   <!-- Waitlist form → backend -->
   <script>
     (function(){
+      var API = 'https://api.getverdance.com/api/v1/waitlist';
+      var THRESHOLD = 25; // only show social-proof count / position once it's meaningful
       var f = document.getElementById('wlForm'); if(!f) return;
-      var msg = document.getElementById('wlMsg'), btn = document.getElementById('wlSubmit');
+      var msg = document.getElementById('wlMsg'), btn = document.getElementById('wlSubmit'), cnt = document.getElementById('wlCount');
+
+      // Social proof: show "Join N others" on load once past the threshold.
+      fetch(API + '/count').then(function(r){ return r.json(); }).then(function(res){
+        var n = res && res.data && res.data.count;
+        if(typeof n === 'number' && n >= THRESHOLD){ cnt.textContent = 'Join ' + n.toLocaleString() + ' others on the waitlist.'; }
+      }).catch(function(){});
+
       f.addEventListener('submit', function(e){
         e.preventDefault();
         var email = document.getElementById('wlEmail').value.trim();
         var country = document.getElementById('wlCountry').value.trim();
+        var company = document.getElementById('wlCompany').value; // honeypot
         if(!email){ msg.className='wl-msg err'; msg.textContent='Please enter your email.'; return; }
         btn.disabled = true; msg.className='wl-msg'; msg.textContent='Joining…';
-        fetch('https://api.getverdance.com/api/v1/waitlist', {
+        fetch(API, {
           method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ email: email, country: country || undefined })
+          body: JSON.stringify({ email: email, country: country || undefined, company: company || undefined })
         }).then(function(r){
           return r.json().catch(function(){ return {}; }).then(function(d){ return { ok:r.ok, d:d }; });
         }).then(function(res){
-          if(res.ok){ f.reset(); msg.className='wl-msg ok'; msg.textContent="You're on the list! We'll email you at launch."; }
-          else { msg.className='wl-msg err'; msg.textContent=(res.d && res.d.message) ? res.d.message : 'Something went wrong — please try again.'; btn.disabled=false; }
+          if(res.ok){
+            f.reset();
+            var pos = res.d && res.d.data && res.d.data.position;
+            msg.className='wl-msg ok';
+            msg.textContent = (typeof pos === 'number' && pos >= THRESHOLD)
+              ? "You're #" + pos.toLocaleString() + " in line! We'll email you at launch."
+              : "You're on the list! We'll email you at launch.";
+            cnt.textContent = '';
+          } else {
+            msg.className='wl-msg err'; msg.textContent=(res.d && res.d.message) ? res.d.message : 'Something went wrong — please try again.'; btn.disabled=false;
+          }
         }).catch(function(){
           msg.className='wl-msg err'; msg.textContent='Network error — please try again.'; btn.disabled=false;
         });

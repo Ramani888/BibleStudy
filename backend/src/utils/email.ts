@@ -60,6 +60,28 @@ export async function sendVerificationEmail(email: string, otp: string): Promise
   });
 }
 
+export async function sendWaitlistWelcomeEmail(email: string): Promise<void> {
+  const transporter = createTransporter();
+
+  await transporter.sendMail({
+    from: `"Verdance" <${env.EMAIL_USER}>`,
+    to: email,
+    subject: "You're on the Verdance waitlist 🌱",
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #0F1117;">
+        <h2 style="color: #6366F1;">You're on the list 🌱</h2>
+        <p>Thanks for joining the Verdance waitlist. We're building a calmer, deeper way to
+        study Scripture — modern flashcards, spaced-repetition review, quizzes, and group study.</p>
+        <p><strong>We'll email you the day Verdance launches in your area.</strong></p>
+        <p style="margin-top: 24px;">One favor: know a pastor or small-group leader who'd love this?
+        Forward them <a href="https://getverdance.com" style="color: #6366F1;">getverdance.com</a> —
+        it's the biggest way to help us launch.</p>
+        <p style="color: #6B7280; margin-top: 24px;">Grow in the Word,<br>The Verdance team</p>
+      </div>
+    `,
+  });
+}
+
 export async function sendPasswordResetEmail(email: string, otp: string): Promise<void> {
   const transporter = createTransporter();
 

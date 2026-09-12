@@ -6,7 +6,8 @@ import { CreateWaitlistDto } from './waitlist.dto';
 
 const router = Router();
 
-// Public, unauthenticated endpoint for the marketing site. Rate-limited to deter spam.
+// Public, unauthenticated endpoints for the marketing site.
+router.get('/count', waitlistController.count);
 router.post('/', authRateLimit, validate(CreateWaitlistDto), waitlistController.join);
 
 export default router;

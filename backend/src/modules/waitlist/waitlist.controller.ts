@@ -10,3 +10,12 @@ export async function join(req: Request, res: Response): Promise<void> {
     handleControllerError(res, error, 'Failed to join waitlist');
   }
 }
+
+export async function count(_req: Request, res: Response): Promise<void> {
+  try {
+    const total = await waitlistService.getWaitlistCount();
+    sendSuccess(res, { count: total }, 'Waitlist count');
+  } catch (error) {
+    handleControllerError(res, error, 'Failed to get waitlist count');
+  }
+}
