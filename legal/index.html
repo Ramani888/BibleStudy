@@ -268,6 +268,10 @@
     .cta-band h2{ font-family:Inter,sans-serif; font-size:clamp(32px,5vw,54px); font-weight:800; letter-spacing:-1.5px; margin-bottom:10px; }
     .cta-band p{ color:var(--muted); margin-bottom:28px; font-size:18px; }
 
+    /* waitlist */
+    .wl-note{ color:var(--muted); font-size:14px; margin-top:16px; }
+    .wl-pastor{ color:var(--muted); font-size:15px; margin-top:10px; }
+
     /* footer */
     footer{ border-top:1px solid var(--line); padding:48px 0 40px; }
     .foot-grid{ display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; }
@@ -731,11 +735,14 @@
   </section>
 
   <!-- ===== CTA BAND ===== -->
-  <section class="cta-band">
+  <section class="cta-band" id="waitlist">
     <div class="wrap">
       <h2 class="reveal">Study, deepened.</h2>
-      <p class="reveal">Verdance is coming soon to iPhone &amp; Android.</p>
-      <div class="badges reveal" style="justify-content:center">
+      <p class="reveal">Verdance is coming soon to iPhone &amp; Android. Join the waitlist and we'll email you the day it launches.</p>
+      <button class="btn btn-primary reveal" data-tally-open="2Ep4Kb" data-tally-layout="modal" data-tally-width="500" data-tally-emoji-text="📖" data-tally-emoji-animation="wave">Join the waitlist</button>
+      <p class="wl-note reveal">Free to start · Cancel anytime · We'll only email you about launch.</p>
+      <p class="wl-pastor reveal">Know a pastor or small-group leader? <a href="mailto:?subject=Verdance%20%E2%80%94%20Bible%20study%20app&amp;body=Thought%20you%27d%20like%20this%20%E2%80%94%20https%3A%2F%2Fgetverdance.com" style="color:var(--indigo);font-weight:600">Forward Verdance to them</a> — it's the biggest way to help us launch.</p>
+      <div class="badges reveal" style="justify-content:center;margin-top:28px">
         <span class="store-badge"><span class="soon-pill">Soon</span>
           <svg viewBox="0 0 24 24"><path d="M16.5 3c.1 1-.3 2-1 2.7-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.8-.8 2-1.3 2.8-1.3zM19 17c-.4 1-.6 1.4-1.1 2.3-.7 1.2-1.7 2.7-3 2.7-1.1 0-1.4-.7-3-.7s-1.9.7-3 .7c-1.3 0-2.2-1.3-3-2.5-2-3-2.2-6.4-1-8.3.9-1.3 2.2-2.1 3.5-2.1 1.3 0 2.2.8 3.3.8 1 0 1.7-.8 3.3-.8 1.1 0 2.3.6 3.2 1.7-2.8 1.5-2.4 5.5.1 6.2z"/></svg>
           <span class="lines"><small>Coming soon on the</small><strong>App Store</strong></span></span>
@@ -768,6 +775,9 @@
   </footer>
 
   <button class="totop" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
+
+  <!-- Tally embed (waitlist popup) -->
+  <script async src="https://tally.so/widgets/embed.js"></script>
 
   <!-- ===== motion (progressive enhancement) ===== -->
   <script>
