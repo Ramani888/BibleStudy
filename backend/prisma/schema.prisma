@@ -469,3 +469,13 @@ enum ActivityType {
   STUDIED_CARDS
   CREATED_NOTE
 }
+
+// Pre-launch marketing waitlist (public sign-ups from getverdance.com).
+model Waitlist {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  country   String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

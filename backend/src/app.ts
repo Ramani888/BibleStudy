@@ -26,6 +26,7 @@ import quizRoutes from './modules/quiz/quiz.routes';
 import achievementsRoutes from './modules/achievements/achievements.routes';
 import plansRoutes from './modules/plans/plans.routes';
 import subscriptionsRoutes from './modules/subscriptions/subscriptions.routes';
+import waitlistRoutes from './modules/waitlist/waitlist.routes';
 
 const app = express();
 
@@ -41,6 +42,9 @@ app.use(
   cors({
     origin: (origin, callback) => {
       if (!origin) return callback(null, true); // mobile / curl / server-to-server
+      // Marketing site (waitlist sign-ups) posts from the browser with an Origin header.
+      const marketingOrigins = ['https://getverdance.com', 'https://www.getverdance.com'];
+      if (marketingOrigins.includes(origin)) return callback(null, true);
       if (env.CLIENT_URL && origin === env.CLIENT_URL) return callback(null, true);
       if (env.NODE_ENV === 'development') return callback(null, true);
       callback(null, false);
@@ -98,6 +102,7 @@ app.use('/api/v1/quiz',            quizRoutes);
 app.use('/api/v1/achievements',    achievementsRoutes);
 app.use('/api/v1/plans',           plansRoutes);
 app.use('/api/v1/subscriptions',   subscriptionsRoutes);
+app.use('/api/v1/waitlist',        waitlistRoutes);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

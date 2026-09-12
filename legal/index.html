@@ -269,8 +269,16 @@
     .cta-band p{ color:var(--muted); margin-bottom:28px; font-size:18px; }
 
     /* waitlist */
+    .wl-form{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; max-width:540px; margin:0 auto; }
+    .wl-form input[type=email]{ flex:1 1 240px; min-width:0; padding:13px 18px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:15px; font-family:inherit; color:var(--ink); }
+    .wl-form input.wl-country{ flex:0 1 160px; padding:13px 18px; border-radius:999px; border:1px solid var(--line); background:var(--card); font-size:15px; font-family:inherit; color:var(--ink); }
+    .wl-form input:focus{ outline:none; border-color:var(--violet); }
+    .wl-form button:disabled{ opacity:.6; cursor:default; }
     .wl-note{ color:var(--muted); font-size:14px; margin-top:16px; }
     .wl-pastor{ color:var(--muted); font-size:15px; margin-top:10px; }
+    .wl-msg{ min-height:20px; margin-top:14px; font-size:15px; font-weight:600; }
+    .wl-msg.ok{ color:var(--indigo); }
+    .wl-msg.err{ color:#c0392b; }
 
     /* footer */
     footer{ border-top:1px solid var(--line); padding:48px 0 40px; }
@@ -739,7 +747,12 @@
     <div class="wrap">
       <h2 class="reveal">Study, deepened.</h2>
       <p class="reveal">Verdance is coming soon to iPhone &amp; Android. Join the waitlist and we'll email you the day it launches.</p>
-      <button class="btn btn-primary reveal" data-tally-open="2Ep4Kb" data-tally-layout="modal" data-tally-width="500" data-tally-emoji-text="📖" data-tally-emoji-animation="wave">Join the waitlist</button>
+      <form class="wl-form reveal" id="wlForm" novalidate>
+        <input type="email" id="wlEmail" name="email" placeholder="you@example.com" required aria-label="Email address" autocomplete="email">
+        <input type="text" id="wlCountry" name="country" class="wl-country" placeholder="Country (optional)" aria-label="Country" autocomplete="country-name">
+        <button type="submit" class="btn btn-primary" id="wlSubmit">Get early access</button>
+      </form>
+      <p class="wl-msg" id="wlMsg" role="status" aria-live="polite"></p>
       <p class="wl-note reveal">Free to start · Cancel anytime · We'll only email you about launch.</p>
       <p class="wl-pastor reveal">Know a pastor or small-group leader? <a href="mailto:?subject=Verdance%20%E2%80%94%20Bible%20study%20app&amp;body=Thought%20you%27d%20like%20this%20%E2%80%94%20https%3A%2F%2Fgetverdance.com" style="color:var(--indigo);font-weight:600">Forward Verdance to them</a> — it's the biggest way to help us launch.</p>
       <div class="badges reveal" style="justify-content:center;margin-top:28px">
@@ -776,8 +789,31 @@
 
   <button class="totop" id="toTop" aria-label="Back to top"><svg viewBox="0 0 24 24"><path d="M12 19V5M5 12l7-7 7 7"/></svg></button>
 
-  <!-- Tally embed (waitlist popup) -->
-  <script async src="https://tally.so/widgets/embed.js"></script>
+  <!-- Waitlist form → backend -->
+  <script>
+    (function(){
+      var f = document.getElementById('wlForm'); if(!f) return;
+      var msg = document.getElementById('wlMsg'), btn = document.getElementById('wlSubmit');
+      f.addEventListener('submit', function(e){
+        e.preventDefault();
+        var email = document.getElementById('wlEmail').value.trim();
+        var country = document.getElementById('wlCountry').value.trim();
+        if(!email){ msg.className='wl-msg err'; msg.textContent='Please enter your email.'; return; }
+        btn.disabled = true; msg.className='wl-msg'; msg.textContent='Joining…';
+        fetch('https://api.getverdance.com/api/v1/waitlist', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ email: email, country: country || undefined })
+        }).then(function(r){
+          return r.json().catch(function(){ return {}; }).then(function(d){ return { ok:r.ok, d:d }; });
+        }).then(function(res){
+          if(res.ok){ f.reset(); msg.className='wl-msg ok'; msg.textContent="You're on the list! We'll email you at launch."; }
+          else { msg.className='wl-msg err'; msg.textContent=(res.d && res.d.message) ? res.d.message : 'Something went wrong — please try again.'; btn.disabled=false; }
+        }).catch(function(){
+          msg.className='wl-msg err'; msg.textContent='Network error — please try again.'; btn.disabled=false;
+        });
+      });
+    })();
+  </script>
 
   <!-- ===== motion (progressive enhancement) ===== -->
   <script>
