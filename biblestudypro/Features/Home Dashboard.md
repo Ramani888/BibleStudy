@@ -107,6 +107,15 @@ Home is a **read-only aggregator** — it owns no backend module.
 - **Heavy fan-out on mount.** 13 queries fire on Home focus; most share cache keys with their home tabs.
 - **Recent activity is display-only** — no navigation target, max 5 items.
 
+## Sunday share-event CTA (2026-09-13, commit `a9b7691`)
+Inline `ShareEventCard` (memo, defined in `HomeScreen.tsx` like `FeaturedCard`/`SetRow`)
+renders under the hero **only on Sundays** (`new Date().getDay() === 0`) and only until
+dismissed for that day. Dismissal persists a **local-date** key (`YYYY-M-D` via
+`getFullYear/getMonth/getDate`, matching `getDay`'s locality so it doesn't slip across the
+UTC boundary) to AsyncStorage `@bsp/share_event_dismissed`. Tapping "Share now" opens the OS
+share sheet with `home:shareEvent.message` (streak + getverdance.com link). It's the in-app
+half of the weekly growth loop; the push half is [[Push Notifications]] `jobs/shareEvent`.
+
 ## Design system compliance (2026-08-11 audit)
 - Hero `backgroundColor`: `colors.accent` (indigo/violet) — changed from `colors.featuredSurface` (dark/black)
 - Hero badge bg: `colors.textOnAccent` (white); badge text: `colors.accent`

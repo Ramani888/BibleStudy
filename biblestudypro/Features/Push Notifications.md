@@ -105,6 +105,19 @@ One row per physical device. `token @unique` means the same FCM token can't be d
 | Friend request sent | `friends.service.sendFriendRequest` | receiver |
 | Friend request accepted | `friends.service.respondToFriendRequest` | original sender |
 | Achievement unlocked | `achievements.service.triggerAchievementCheck` | self |
+| **Sunday share event** | `jobs/shareEvent` cron (Sun 16:00 UTC) | every user with a device token |
+
+## Scheduled push — Sunday share event (2026-09-13, commit `a9b7691`)
+Growth loop: `startShareEventJob()` (wired in `server.ts` next to `startMediaCleanupJob`)
+runs `cron '0 16 * * 0'`, queries `deviceToken.findMany({ distinct: ['userId'] })`, and
+calls `sendPushToUser(..., { type: 'share_event' })` per user — *"Share your progress 🙌
+— send your set or streak to your group"*. `type: 'share_event'` deep-links to Home
+(`handleNotificationNavigation`) and maps to the existing `system` in-app toggle
+(`TYPE_TO_PREF`). In-app half of the loop = a Sunday-gated CTA card on Home (see
+[[Home Dashboard]]). **Ceilings:** single UTC send-time (not per-user tz); push copy
+is English-only from the backend; delivery reaches all push-enabled users (OS-level
+opt-out only — no `marketingOptIn` field). "Your group" = real-world group (WhatsApp
+etc.) — there is no in-app Groups feature.
 
 ## Related
 [[Social]] · [[Gamification]] · [[Auth & Account]] · [[Architecture Overview]]

@@ -17,11 +17,11 @@
 - [ ] **Lock wedge messaging** — "Cancel anytime, no surprise charges" (vs Hallow) + "modern Bible flashcards" (vs Anki's dated/paid app). `P1` `🟢`
 - [ ] **Localize store listing + screenshots** in **pt-BR and es** (Brazil = YouVersion's #2 country; you already ship the locales). `P1` `🔴`
 - [ ] **Set regional price tiers** ~60–80% off US defaults for LatAm / SE Asia / E. Europe (App Store Connect + Play Console). Treat 60–80% as a starting point to A/B. `P2` `🟡`
-- [ ] **Offline audit** — confirm flashcards/sets work (or degrade gracefully) offline; key for emerging markets. `P2` `🟡`
+- [x] **Offline audit** — DONE 2026-09-13 (`28b4c1d`): persisted RQ cache (sets/cards/folders) + NetInfo onlineManager + offline banner; reads degrade gracefully, writes still need connection. See [[Study Core]]. `P2` `🟡`
 
 ## At launch
 
-- [ ] **Coordinated share event** — a scheduled "share your set/streak with your group" push + in-app CTA, timed to a **Sunday** (download spikes are real). `P1` `🔴`
+- [x] **Coordinated share event** — DONE 2026-09-13 (`a9b7691`): Sunday 16:00 UTC cron push + Sunday-gated Home CTA card → share sheet w/ getverdance link. See [[Push Notifications]] · [[Home Dashboard]]. `P1` `🔴`
 - [ ] **WhatsApp deep-link sharing** for sets + group invites (not copy-a-code). Use direct share links — WhatsApp Channels don't push-notify. `P1` `🔴`
 - [ ] **ASO long-tail keywords** — target "Bible study flashcards / Bible quiz / memorize scripture / Bible study group" (underserved vs read/pray/devotional). Fill localized keyword fields per store. Don't self-censor off head terms. `P1` `🔴`
 - [ ] **Screenshots that show the system** — streak, Home "due" count, group leaderboard (not just a logo). `P2` `🔴`

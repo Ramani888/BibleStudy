@@ -216,5 +216,17 @@ ease climbs, miss resets to 0/+1d/ease-drop, non-owner cannot mutate).
 `getSetById` + `listCardsBySet` so group members can study a plan's sets without
 cloning.
 
+## Offline support (2026-09-13, commit `28b4c1d`)
+React Query cache is persisted to AsyncStorage (`lib/queryClient.ts` →
+`PersistQueryClientProvider` in `App.tsx`), **scoped to study content only** via
+`shouldDehydrateQuery` (keys `sets`/`cards`/`card`/`folders`, success state only) —
+so public/friends sets and volatile data (ai/credits) stay memory-only. `gcTime` bumped
+1h→24h so restored cache isn't GC'd on launch; `maxAge` 7d. `onlineManager` wired to
+`@react-native-community/netinfo` (a **native module** — needs `pod install` + rebuild)
+so queries pause/resume instead of erroring offline; `OfflineBanner` shows the existing
+`common:status.offline` string app-wide. **Ceiling:** reads only — a set never opened
+online won't be cached, and offline *writes* (study/create) still require a connection
+(no mutation queue). Backs the "offline access to all your sets" paywall claim for reading.
+
 ## Related
 [[Study Plans]] · [[Quiz]] · [[Auth & Account]] · [[Architecture Overview]] · [[Database Schema]]
