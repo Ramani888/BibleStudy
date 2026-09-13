@@ -1,32 +1,12 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Animated, StatusBar, StyleSheet, Text, View } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { palette } from '../theme';
+import { VerdanceLogo } from '../components/ui';
 import { useSystemBars } from '../hooks';
 
 /** Fixed brand color — splash is identity, not theme-dependent. */
 const BRAND_BG = palette.indigo500;
 const MIN_VISIBLE_MS = 2000;
-
-/** Open Bible — white paths on brand bg. */
-const LOGO_SVG = `<svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Open book left page -->
-  <path d="M8 36 C8 32 12 28 16 28 L56 28 L56 96 C56 96 44 92 28 94 C16 96 8 90 8 84 Z" fill="white" fill-opacity="0.92"/>
-  <!-- Open book right page -->
-  <path d="M112 36 C112 32 108 28 104 28 L64 28 L64 96 C64 96 76 92 92 94 C104 96 112 90 112 84 Z" fill="white"/>
-  <!-- Spine highlight -->
-  <rect x="54" y="28" width="12" height="68" rx="2" fill="white" fill-opacity="0.5"/>
-  <!-- Left page lines -->
-  <rect x="18" y="44" width="28" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="18" y="54" width="22" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="18" y="64" width="26" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="18" y="74" width="20" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <!-- Right page lines -->
-  <rect x="74" y="44" width="28" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="74" y="54" width="22" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="74" y="64" width="26" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-  <rect x="74" y="74" width="20" height="3" rx="1.5" fill="#6366F1" fill-opacity="0.4"/>
-</svg>`;
 
 interface SplashScreenProps {
   isReady: boolean;
@@ -71,7 +51,7 @@ export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
     <Animated.View style={[StyleSheet.absoluteFill, styles.root, { opacity }]}>
       <StatusBar barStyle="light-content" backgroundColor={BRAND_BG} />
       <View style={styles.logoWrap}>
-        <SvgXml xml={LOGO_SVG} width={120} height={120} />
+        <VerdanceLogo size={120} />
       </View>
       <Text style={styles.appName}>Verdance</Text>
       <Text style={styles.tagline}>{t('common:brand.tagline', 'Study · Memorize · Grow')}</Text>

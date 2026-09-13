@@ -2,6 +2,7 @@ export { Typography } from './Typography';
 export { AnimatedPressable } from './AnimatedPressable';
 export type { TypographyProps } from './Typography';
 export { Button } from './Button';
+export { VerdanceLogo } from './VerdanceLogo';
 export { Input } from './Input';
 export { Card, PressableCard } from './Card';
 export { Badge } from './Badge';

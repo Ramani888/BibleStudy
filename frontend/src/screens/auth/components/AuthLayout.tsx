@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SparklesIcon } from '../../../components/icons';
-import { Divider, Typography } from '../../../components/ui';
+import { Divider, Typography, VerdanceLogo } from '../../../components/ui';
 import { useTheme, spacing, layout } from '../../../theme';
 import { SocialButtons } from './SocialButtons';
 
@@ -29,7 +28,7 @@ const BrandLogo = React.memo(function BrandLogo() {
   return (
     <View style={styles.logoRow}>
       <View style={[styles.logoIcon, { backgroundColor: colors.accent }]}>
-        <SparklesIcon size={26} color={colors.textOnAccent} />
+        <VerdanceLogo size={26} color={colors.textOnAccent} />
       </View>
       <Typography preset="h4" color={colors.accent} style={styles.logoText}>
         Verdance
