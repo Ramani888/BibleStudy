@@ -110,23 +110,28 @@ const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak
   }
 
   return (
-    <AnimatedPressable style={[styles.featured, { backgroundColor: colors.accent }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
-      <View style={styles.featuredTop}>
-        <View style={[styles.badge, { backgroundColor: colors.textOnAccent }]}>
-          <Typography preset="caption" color={colors.accent}>{badge}</Typography>
+    <View style={styles.heroStack}>
+      {/* Decorative stacked "wallet" layers peeking behind the hero (flat — tint only). */}
+      <View pointerEvents="none" style={[styles.heroLayer, styles.heroLayerBack, { backgroundColor: colors.accent }]} />
+      <View pointerEvents="none" style={[styles.heroLayer, styles.heroLayerMid, { backgroundColor: colors.accent }]} />
+      <AnimatedPressable style={[styles.featured, { backgroundColor: colors.accent }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
+        <View style={styles.featuredTop}>
+          <View style={[styles.badge, { backgroundColor: colors.textOnAccent }]}>
+            <Typography preset="caption" color={colors.accent}>{badge}</Typography>
+          </View>
+          <ArrowRightIcon size={18} color={colors.textOnAccent} />
         </View>
-        <ArrowRightIcon size={18} color={colors.textOnAccent} />
-      </View>
-      <Typography preset="h4" color={colors.textOnAccent} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
-      <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
-      <View style={[styles.progressTrack, { backgroundColor: colors.overlayLight }]}>
-        <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.textOnAccent }]} />
-      </View>
-      <View style={styles.featuredFooter}>
-        <FlameIcon size={14} color={colors.warning} />
-        <Typography preset="caption" color={colors.textOnPrimaryMuted}>{t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}</Typography>
-      </View>
-    </AnimatedPressable>
+        <Typography preset="h4" color={colors.textOnAccent} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
+        <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
+        <View style={[styles.progressTrack, { backgroundColor: colors.overlayLight }]}>
+          <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.textOnAccent }]} />
+        </View>
+        <View style={styles.featuredFooter}>
+          <FlameIcon size={14} color={colors.warning} />
+          <Typography preset="caption" color={colors.textOnPrimaryMuted}>{t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}</Typography>
+        </View>
+      </AnimatedPressable>
+    </View>
   );
 });
 
@@ -472,6 +477,10 @@ const styles = StyleSheet.create({
   headerIconPressed: { opacity: 0.85 },
 
   // Featured card
+  heroStack: { paddingTop: spacing.s22 },
+  heroLayer: { position: 'absolute', height: spacing.huge, borderRadius: layout.cardRadiusLg },
+  heroLayerBack: { top: 0, left: spacing.s28, right: spacing.s28, opacity: 0.3 },
+  heroLayerMid: { top: spacing.s10, left: spacing.lg, right: spacing.lg, opacity: 0.55 },
   featured: { borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm },
   featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   badge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
