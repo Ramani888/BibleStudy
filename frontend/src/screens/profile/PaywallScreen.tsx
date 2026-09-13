@@ -300,7 +300,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
           <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.terms', 'Terms of Use')}</Typography>
           </Pressable>
-          <Pressable onPress={() => Linking.openURL('https://zen2-privacy-policy.surge.sh')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
+          <Pressable onPress={() => Linking.openURL('https://getverdance.com/privacy.html')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.privacy', 'Privacy Policy')}</Typography>
           </Pressable>
         </View>
