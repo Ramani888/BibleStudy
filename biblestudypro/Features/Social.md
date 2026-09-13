@@ -137,6 +137,12 @@ Prisma (`backend/prisma/schema.prisma`), all `onDelete: Cascade` from User:
 - **Activity feed is home-only:** `useFriendsActivityFeed` renders inside HomeScreen; there is no dedicated activity screen, and `GET /activities` (my feed) has no client consumer.
 - **`achievement` notifications** originate from [[Gamification]] (achievement unlocks), routed through the same `sendPushToUser` path.
 
+## Set sharing & referral (2026-09-13, commits `7d8f006`+`72ebe4b`)
+- **Per-set share links.** Public `GET /api/v1/sets/shared/:id` (unauth, defined *before* `authMiddleware` in `sets.routes`; `getSharedSet` service returns PUBLIC-only sets — private/friends 404) backs the `getverdance.com/s.html?id=<id>` landing page (`legal/s.html`, served static by Caddy from `/var/www/getverdance`). `utils/share.ts` `buildSetShareLink` emits the `/s` link for PUBLIC sets, homepage otherwise; the share *message* still carries the full card text regardless.
+- **WhatsApp 1-tap.** `shareToWhatsApp` opens `https://wa.me/?text=` (universal link — works both platforms, no iOS `LSApplicationQueriesSchemes` entry needed), falling back to the system sheet. SetDetail share button → ActionSheet [WhatsApp · More…].
+- **Tell-a-pastor (#2).** Profile "Invite" → ActionSheet [Invite a friend · Tell your pastor / group leader] with tailored copy. Invite/footer strings are default-only (English) like their siblings — not in locale JSON.
+- **Deferred:** native universal/App Links (open the set inside an installed app) — share recipients rarely have the app, so the web landing is the growth surface; needs iOS entitlement+AASA / Android assetlinks + rebuilds.
+
 ## Change log
 - **2026-08-10**: Friends feature fully redesigned (commit `123332b`) — card rows throughout, streak on friends list, leaderboard quote card, requests timestamps + badge, UserProfile "Their Sets" section, new `GET /sets/user/:userId` backend endpoint.
 - **2026-08-10**: NotificationsScreen redesigned (commit `40418c7`) — date grouping, swipe-to-delete, mark-all-read in header, tap-to-navigate per type, back button fix.

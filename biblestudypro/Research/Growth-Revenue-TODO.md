@@ -12,7 +12,7 @@
 ## Before launch
 
 - [ ] **Waitlist on getverdance.com** — email + country/city; invite in launch-day waves to concentrate installs. `P1` `🔴`
-- [ ] **"Tell a pastor" referral** — make this the #1 pre-launch ask (Faithly: "worth more than money"). `P1` `🟢`
+- [x] **"Tell a pastor" referral** — DONE 2026-09-13 (`72ebe4b`): Profile "Invite" sheet has a dedicated "Tell your pastor / group leader" ask with tailored copy. See [[Social]]. `P1` `🟢`
 - [ ] **Recruit 3–5 small-group leaders** as pre-launch pilot users (activates group invite codes + friends graph so day-one isn't empty). `P1` `🟢`
 - [ ] **Lock wedge messaging** — "Cancel anytime, no surprise charges" (vs Hallow) + "modern Bible flashcards" (vs Anki's dated/paid app). `P1` `🟢`
 - [ ] **Localize store listing + screenshots** in **pt-BR and es** (Brazil = YouVersion's #2 country; you already ship the locales). `P1` `🔴`
@@ -22,7 +22,7 @@
 ## At launch
 
 - [x] **Coordinated share event** — DONE 2026-09-13 (`a9b7691`): Sunday 16:00 UTC cron push + Sunday-gated Home CTA card → share sheet w/ getverdance link. See [[Push Notifications]] · [[Home Dashboard]]. `P1` `🔴`
-- [ ] **WhatsApp deep-link sharing** for sets + group invites (not copy-a-code). Use direct share links — WhatsApp Channels don't push-notify. `P1` `🔴`
+- [x] **WhatsApp deep-link sharing** — DONE 2026-09-13 (`7d8f006`+`72ebe4b`): per-set `getverdance.com/s` links backed by a public set endpoint + landing page, 1-tap wa.me WhatsApp share. (Group invites N/A — no in-app Groups feature; native universal-links to open the app deferred as low-ROI.) See [[Social]]. `P1` `🔴`
 - [ ] **ASO long-tail keywords** — target "Bible study flashcards / Bible quiz / memorize scripture / Bible study group" (underserved vs read/pray/devotional). Fill localized keyword fields per store. Don't self-censor off head terms. `P1` `🔴`
 - [ ] **Screenshots that show the system** — streak, Home "due" count, group leaderboard (not just a logo). `P2` `🔴`
 - [ ] **Rating prompts after wins** — trigger on completed quiz / unlocked achievement / streak milestone. `P2` `🟡`
