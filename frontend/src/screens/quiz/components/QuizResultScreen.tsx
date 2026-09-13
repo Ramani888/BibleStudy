@@ -154,9 +154,9 @@ export function QuizResultScreen({
       )}
 
       <Button
-        label={isPending ? t('common:status.saving') : `${t('common:actions.done')} (${countdown})`}
+        label={`${t('common:actions.done')} (${countdown})`}
+        loading={isPending}
         onPress={onExit}
-        disabled={isPending}
         fullWidth
       />
     </Animated.View>

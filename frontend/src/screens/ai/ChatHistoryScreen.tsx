@@ -92,7 +92,7 @@ function RenameModal({ visible, value, isRenaming, onClose, onChange, onSave, co
         autoFocus
         maxLength={200}
       />
-      <Button label={isRenaming ? t('common:status.saving', 'Saving…') : t('common:actions.save', 'Save')} onPress={onSave} disabled={!value.trim() || isRenaming} fullWidth style={styles.renameModalBtn} />
+      <Button label={t('common:actions.save', 'Save')} loading={isRenaming} onPress={onSave} disabled={!value.trim()} fullWidth style={styles.renameModalBtn} />
     </AppModal>
   );
 }
@@ -119,7 +119,7 @@ function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSav
           );
         })}
       </View>
-      <Button label={isUpdatingTags ? t('common:status.saving', 'Saving…') : t('common:actions.save', 'Save')} onPress={onSave} disabled={isUpdatingTags} fullWidth style={styles.tagsModalBtn} />
+      <Button label={t('common:actions.save', 'Save')} loading={isUpdatingTags} onPress={onSave} fullWidth style={styles.tagsModalBtn} />
     </AppModal>
   );
 }
