@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import Svg, { Path, Circle } from 'react-native-svg';
+import { palette } from '../../theme';
 
 export interface IconProps {
   size?: number;
@@ -17,7 +18,9 @@ export interface IconProps {
 
 export type IconComponent = React.FC<IconProps>;
 
-const DEFAULT_COLOR = '#000000';
+// Neutral mid-gray fallback (visible on both light + dark) for icons rendered
+// without an explicit color. Prefer passing color={colors.*} from the theme.
+const DEFAULT_COLOR = palette.slate500;
 
 /** Shared wrapper for stroke-based outline icons. */
 function Outline({ size = 24, children }: { size?: number; children: React.ReactNode }) {

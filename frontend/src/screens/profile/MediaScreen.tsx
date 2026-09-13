@@ -76,7 +76,7 @@ function ExpiryBadge({ expiresAt }: { expiresAt: string | null }) {
   if (days === null || days > 7) return null;
   const label = days === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDays', { days, defaultValue: `Expires in ${days}d` });
   return (
-    <View style={[styles.expiryBadge, { backgroundColor: colors.warning ?? '#F59E0B' }]}>
+    <View style={[styles.expiryBadge, { backgroundColor: colors.warning }]}>
       <Typography preset="caption" color={palette.white} style={styles.expiryBadgeText}>{label}</Typography>
     </View>
   );
@@ -268,7 +268,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
             {fmtBytes(item.sizeBytes)} · {fmtDate(item.createdAt)}
           </Typography>
           {daysUntilExpiry(item.expiresAt) !== null && daysUntilExpiry(item.expiresAt)! <= 7 && (
-            <Typography preset="caption" color={colors.warning ?? '#F59E0B'}>
+            <Typography preset="caption" color={colors.warning}>
               {daysUntilExpiry(item.expiresAt) === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDaysUpgrade', { days: daysUntilExpiry(item.expiresAt), defaultValue: `Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep` })}
             </Typography>
           )}
