@@ -57,11 +57,10 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   const handleGoBack = useCallback(() => navigation.goBack(), [navigation]);
   const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
 
-  const countText = (isFetching && !isLoading && !isRefetching && !isFetchingNextPage)
-    ? t('common:status.searching', 'Searching…')
-    : debouncedSearch
-      ? t('library:publicSets.resultsFor', { count: total, query: debouncedSearch, defaultValue: `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"` })
-      : t('library:publicSets.publicSetsAvailable', { count: total, defaultValue: `${total} public sets available` });
+  const isSearching = isFetching && !isLoading && !isRefetching && !isFetchingNextPage;
+  const countText = debouncedSearch
+    ? t('library:publicSets.resultsFor', { count: total, query: debouncedSearch, defaultValue: `${total} result${total !== 1 ? 's' : ''} for "${debouncedSearch}"` })
+    : t('library:publicSets.publicSetsAvailable', { count: total, defaultValue: `${total} public sets available` });
 
   const header = (
     <ScreenHeader
@@ -77,7 +76,11 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Typography preset="caption" color={colors.textSecondary} align="center">{countText}</Typography>
+      {isSearching ? (
+        <ActivityIndicator size="small" color={colors.accent} />
+      ) : (
+        <Typography preset="caption" color={colors.textSecondary} align="center">{countText}</Typography>
+      )}
     </View>
   );
 
