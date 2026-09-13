@@ -102,5 +102,11 @@
     "noFriendsSets": "Wala pang public set mula sa mga kaibigan",
     "noCommunitySets": "Tuklasin ang community study sets",
     "noActivity": "Walang kamakailang aktibidad ng kaibigan"
+  },
+  "shareEvent": {
+    "title": "Ibahagi ang iyong progreso 🙌",
+    "subtitle": "Ipadala ang iyong set o streak sa iyong grupo — sabay na lumago sa Salita.",
+    "cta": "Ibahagi na",
+    "message": "🔥 {{streak}}-araw na streak sa Verdance! Sumali at lumago sa Salita: https://getverdance.com"
   }
 }

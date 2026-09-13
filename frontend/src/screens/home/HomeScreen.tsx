@@ -1,15 +1,17 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { Pressable, Share, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
-import { Avatar, Spacer, Typography, AnimatedPressable } from '../../components/ui';
+import { Avatar, Button, Spacer, Typography, AnimatedPressable } from '../../components/ui';
 import {
   FlameIcon,
   BellIcon,
   ArrowRightIcon,
   ChevronRightIcon,
+  CloseIcon,
   SparklesIcon,
   SearchIcon,
   LibraryIcon,
@@ -124,6 +126,32 @@ const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak
         <Typography preset="caption" color={colors.textOnPrimaryMuted}>{t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}</Typography>
       </View>
     </AnimatedPressable>
+  );
+});
+
+// ─── Sunday share-event CTA ─────────────────────────────────────────────────────
+const ShareEventCard = React.memo(function ShareEventCard({ streak, onDismiss }: { streak: number; onDismiss: () => void }) {
+  const { t } = useTranslation(['home', 'library', 'common']);
+  const { colors } = useTheme();
+
+  const onShare = useCallback(() => {
+    const message = t('home:shareEvent.message', {
+      streak,
+      defaultValue: '🔥 {{streak}}-day streak on Verdance! Join me and grow in the Word: https://getverdance.com',
+    });
+    Share.share({ message }).catch(() => {});
+  }, [t, streak]);
+
+  return (
+    <View style={[styles.shareEvent, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
+      <Pressable onPress={onDismiss} hitSlop={10} style={styles.shareEventClose} accessibilityRole="button" accessibilityLabel={t('common:actions.close', 'Close')}>
+        <CloseIcon size={16} color={colors.textSecondary} />
+      </Pressable>
+      <Typography preset="h4" color={colors.textPrimary}>{t('home:shareEvent.title', 'Share your progress 🙌')}</Typography>
+      <Typography preset="bodySm" color={colors.textSecondary}>{t('home:shareEvent.subtitle', 'Send your set or streak to your group — grow in the Word together.')}</Typography>
+      <Spacer size={spacing.sm} />
+      <Button label={t('home:shareEvent.cta', 'Share now')} onPress={onShare} />
+    </View>
   );
 });
 
@@ -303,6 +331,22 @@ export function HomeScreen() {
   useEffect(() => {
     if ([3, 7, 30, 100].includes(streak)) requestReviewOnce(`streak_${streak}`);
   }, [streak]);
+
+  // Sunday share-event CTA — shown on Sundays until dismissed for that day.
+  // Local-date key (matches getDay's locality) so dismissal doesn't slip across the UTC boundary.
+  const [showShareEvent, setShowShareEvent] = useState(false);
+  const todayKey = useCallback(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+  }, []);
+  useEffect(() => {
+    if (new Date().getDay() !== 0) return; // Sunday only
+    AsyncStorage.getItem('@bsp/share_event_dismissed').then(v => setShowShareEvent(v !== todayKey()));
+  }, [todayKey]);
+  const dismissShareEvent = useCallback(() => {
+    setShowShareEvent(false);
+    AsyncStorage.setItem('@bsp/share_event_dismissed', todayKey()).catch(() => {});
+  }, [todayKey]);
   const firstName   = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
   const cardTotal   = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);
@@ -349,6 +393,14 @@ export function HomeScreen() {
           onContinue={nav.goContinue}
           onCreate={nav.goCreate}
         />
+
+        {/* Sunday share-event CTA */}
+        {showShareEvent && (
+          <>
+            <Spacer size={spacing.md} />
+            <ShareEventCard streak={streak} onDismiss={dismissShareEvent} />
+          </>
+        )}
 
         {/* Quick actions */}
         <Spacer size={spacing.xxl} />
@@ -424,6 +476,8 @@ export function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1 },
+  shareEvent: { borderRadius: layout.cardRadiusLg, borderWidth: 1, padding: spacing.xl, gap: spacing.xs },
+  shareEventClose: { position: 'absolute', top: spacing.md, right: spacing.md, zIndex: 1 },
   scrollView: { flex: 1 },
   scroll: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
   flex1: { flex: 1 },

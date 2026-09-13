@@ -95,6 +95,9 @@ export function handleNotificationNavigation(
     case 'friend_accepted':
       navigate('ProfileTab', { screen: 'Friends' });
       break;
+    case 'share_event':
+      navigate('HomeTab', {});
+      break;
     default:
       navigate('ProfileTab', { screen: 'Notifications' });
       break;

@@ -102,5 +102,11 @@
     "noFriendsSets": "Aucun ensemble public d'amis pour l'instant",
     "noCommunitySets": "Explorez les ensembles d'étude de la communauté",
     "noActivity": "Aucune activité récente d'amis"
+  },
+  "shareEvent": {
+    "title": "Partagez vos progrès 🙌",
+    "subtitle": "Envoyez votre série à votre groupe — grandissez ensemble dans la Parole.",
+    "cta": "Partager",
+    "message": "🔥 Série de {{streak}} jours sur Verdance ! Rejoignez-moi et grandissez dans la Parole : https://getverdance.com"
   }
 }

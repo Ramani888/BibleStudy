@@ -102,5 +102,11 @@
     "noFriendsSets": "아직 친구의 공개 세트가 없습니다",
     "noCommunitySets": "커뮤니티 학습 세트를 둘러보세요",
     "noActivity": "최근 친구 활동이 없습니다"
+  },
+  "shareEvent": {
+    "title": "진행 상황을 공유하세요 🙌",
+    "subtitle": "세트나 연속 기록을 그룹에 보내고 함께 말씀 안에서 성장하세요.",
+    "cta": "공유하기",
+    "message": "🔥 Verdance에서 {{streak}}일 연속 달성! 함께 말씀 안에서 성장해요: https://getverdance.com"
   }
 }

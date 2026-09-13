@@ -82,5 +82,11 @@
     "studiedCards": "{{name}} studied some cards",
     "wroteNote": "{{name}} wrote a note",
     "wasActive": "{{name}} was active"
+  },
+  "shareEvent": {
+    "title": "Share your progress 🙌",
+    "subtitle": "Send your set or streak to your group — grow in the Word together.",
+    "cta": "Share now",
+    "message": "🔥 {{streak}}-day streak on Verdance! Join me and grow in the Word: https://getverdance.com"
   }
 }

@@ -23,6 +23,7 @@ export const TYPE_TO_PREF: Record<string, keyof NotificationPrefs> = {
   friend_request:  'friendRequests',
   friend_accepted: 'friendAccepted',
   system:          'system',
+  share_event:     'system',
 };
 
 // Re-reads prefs from AsyncStorage every time the screen comes into focus.

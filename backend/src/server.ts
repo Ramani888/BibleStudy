@@ -10,6 +10,7 @@ import app from './app';
 import { connectDB, disconnectDB } from './config/db';
 import { env } from './config/env';
 import { startMediaCleanupJob } from './jobs/mediaCleanup';
+import { startShareEventJob } from './jobs/shareEvent';
 
 const PORT = env.PORT || 3001;
 
@@ -18,6 +19,7 @@ async function startServer() {
     await connectDB();
 
     startMediaCleanupJob();
+    startShareEventJob();
 
     const server = app.listen(PORT, () => {
       console.log(`

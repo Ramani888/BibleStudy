@@ -102,5 +102,11 @@
     "noFriendsSets": "Aún no hay sets públicos de amigos",
     "noCommunitySets": "Explora los sets de estudio de la comunidad",
     "noActivity": "No hay actividad reciente de amigos"
+  },
+  "shareEvent": {
+    "title": "Comparte tu progreso 🙌",
+    "subtitle": "Envía tu set o racha a tu grupo: crezcan juntos en la Palabra.",
+    "cta": "Compartir ahora",
+    "message": "🔥 ¡Racha de {{streak}} días en Verdance! Únete y crece en la Palabra: https://getverdance.com"
   }
 }
