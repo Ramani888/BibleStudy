@@ -116,12 +116,16 @@ export function NoteEditorScreen({ navigation, route }: Props) {
                 <ShareIcon size={22} color={canShare ? colors.textSecondary : colors.textDisabled} />
               </Pressable>
               <Pressable onPress={handleSave} disabled={!canSave} hitSlop={8}>
-                <Typography
-                  preset="label"
-                  color={canSave ? colors.accent : colors.textDisabled}
-                >
-                  {isSaving ? t('common:status.saving') : t('common:actions.save')}
-                </Typography>
+                {isSaving ? (
+                  <ActivityIndicator size="small" color={colors.accent} />
+                ) : (
+                  <Typography
+                    preset="label"
+                    color={canSave ? colors.accent : colors.textDisabled}
+                  >
+                    {t('common:actions.save')}
+                  </Typography>
+                )}
               </Pressable>
             </View>
           }
