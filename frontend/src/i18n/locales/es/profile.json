@@ -86,7 +86,8 @@
       "streak": "Racha",
       "social": "Comunidad",
       "ai": "IA"
-    }
+    },
+    "unlockedBanner": "Logro desbloqueado"
   },
   "unlockedCount": "{{unlocked}} de {{total}} desbloqueados",
   "weeklyActivity": "Actividad Semanal",

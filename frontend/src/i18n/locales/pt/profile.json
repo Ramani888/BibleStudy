@@ -86,7 +86,8 @@
       "streak": "Sequência",
       "social": "Comunidade",
       "ai": "AI"
-    }
+    },
+    "unlockedBanner": "Conquista desbloqueada"
   },
   "unlockedCount": "{{unlocked}} de {{total}} desbloqueadas",
   "weeklyActivity": "Atividade Semanal",

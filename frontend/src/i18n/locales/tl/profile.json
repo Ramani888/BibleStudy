@@ -86,7 +86,8 @@
       "streak": "Streak",
       "social": "Komunidad",
       "ai": "AI"
-    }
+    },
+    "unlockedBanner": "Nakamit na Tagumpay"
   },
   "unlockedCount": "{{unlocked}} sa {{total}} ang na-unlock",
   "weeklyActivity": "Lingguhang Aktibidad",

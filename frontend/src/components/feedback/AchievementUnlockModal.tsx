@@ -59,7 +59,7 @@ export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUn
           <TrophyIcon size={34} color={palette.white} />
         </View>
 
-        <Typography style={styles.eyebrow}>{t('profile:achievements.unlocked', 'ACHIEVEMENT UNLOCKED')}</Typography>
+        <Typography style={styles.eyebrow}>{t('profile:achievements.unlockedBanner', 'Achievement Unlocked')}</Typography>
         <Typography style={styles.title}>{achievement.title}</Typography>
         <Typography style={styles.desc}>{achievement.description}</Typography>
 
@@ -107,6 +107,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.8,
+    textTransform: 'uppercase',
     color: palette.indigo500,
     textAlign: 'center',
     marginBottom: spacing.sm,

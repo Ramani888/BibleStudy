@@ -336,7 +336,8 @@
       "streak": "Streak",
       "social": "Community",
       "ai": "AI"
-    }
+    },
+    "unlockedBanner": "Achievement Unlocked"
   },
   "blockedUsers": {
     "unblock": "Unblock",

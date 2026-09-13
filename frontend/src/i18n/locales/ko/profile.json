@@ -86,7 +86,8 @@
       "streak": "연속 기록",
       "social": "커뮤니티",
       "ai": "AI"
-    }
+    },
+    "unlockedBanner": "업적 달성"
   },
   "unlockedCount": "{{total}}개 중 {{unlocked}}개 달성",
   "weeklyActivity": "주간 활동",
