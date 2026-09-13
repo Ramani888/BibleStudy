@@ -140,10 +140,10 @@ export function QuizSetupScreen() {
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
           <Button
             label={
-              cardsLoading ? t('quiz:setup.loadingCards', 'Loading cards…')
-              : selectedSetIds.length > 0 && cards.length === 0 ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
+              selectedSetIds.length > 0 && cards.length === 0 && !cardsLoading ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
               : t('quiz:setup.startQuiz', 'Start Quiz')
             }
+            loading={cardsLoading}
             onPress={() => navigation.navigate('Quiz', {
               setIds: selectedSetIds,
               setTitles: selectedSetTitles,
@@ -151,7 +151,7 @@ export function QuizSetupScreen() {
               retakeAttemptId: params?.retakeAttemptId,
               quizName: quizName.trim() || undefined,
             })}
-            disabled={!canStart || cardsLoading}
+            disabled={!canStart}
             fullWidth
           />
         </View>
