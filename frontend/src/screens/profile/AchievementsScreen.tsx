@@ -125,12 +125,17 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   const remaining = achievements.length - unlockedCount;
 
   const grouped = useMemo(() => {
+    // Status rank: unlocked → in-progress → locked, then ascending threshold.
+    const rank = (a: Achievement) => (a.unlocked ? 0 : a.progress > 0 ? 1 : 2);
     const map = new Map<AchievementCategory, Achievement[]>();
     for (const a of achievements) {
       if (!map.has(a.category)) map.set(a.category, []);
       map.get(a.category)!.push(a);
     }
-    return CATEGORY_ORDER.filter(c => map.has(c)).map(c => ({ category: c, items: map.get(c)! }));
+    return CATEGORY_ORDER.filter(c => map.has(c)).map(c => ({
+      category: c,
+      items: map.get(c)!.slice().sort((a, b) => rank(a) - rank(b) || a.threshold - b.threshold),
+    }));
   }, [achievements]);
 
   return (
