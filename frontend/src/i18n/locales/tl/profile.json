@@ -352,7 +352,8 @@
     "signOut": "Mag-sign Out",
     "friendRequests": "Mga Friend Request",
     "leaderboard": "Leaderboard",
-    "blockedUsers": "Mga Naka-block na User"
+    "blockedUsers": "Mga Naka-block na User",
+    "inviteFriends": "Mag-imbita ng mga kaibigan"
   },
   "storage": {
     "title": "Storage",
@@ -435,5 +436,8 @@
   },
   "account": {
     "memberSince": "Miyembro mula {{date}}"
+  },
+  "share": {
+    "inviteMessage": "Ginagamit ko ang Verdance para mag-aral ng Bibliya — flashcards, quizzes, at daily streaks. Sumali ka: https://getverdance.com"
   }
 }

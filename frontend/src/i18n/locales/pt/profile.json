@@ -352,7 +352,8 @@
     "signOut": "Sair",
     "friendRequests": "Solicitações de amizade",
     "leaderboard": "Ranking",
-    "blockedUsers": "Usuários bloqueados"
+    "blockedUsers": "Usuários bloqueados",
+    "inviteFriends": "Convidar amigos"
   },
   "storage": {
     "title": "Armazenamento",
@@ -435,5 +436,8 @@
   },
   "account": {
     "memberSince": "Membro desde {{date}}"
+  },
+  "share": {
+    "inviteMessage": "Estou usando o Verdance para estudar a Bíblia — cartões, quizzes e sequências diárias. Junte-se a mim: https://getverdance.com"
   }
 }

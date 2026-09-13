@@ -20,7 +20,8 @@
     "signOut": "Sign Out",
     "friendRequests": "Friend Requests",
     "leaderboard": "Leaderboard",
-    "blockedUsers": "Blocked Users"
+    "blockedUsers": "Blocked Users",
+    "inviteFriends": "Invite friends"
   },
   "storage": {
     "title": "Storage",
@@ -364,5 +365,8 @@
   },
   "account": {
     "memberSince": "Member since {{date}}"
+  },
+  "share": {
+    "inviteMessage": "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com"
   }
 }

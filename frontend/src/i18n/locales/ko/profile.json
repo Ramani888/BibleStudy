@@ -352,7 +352,8 @@
     "signOut": "로그아웃",
     "friendRequests": "친구 요청",
     "leaderboard": "순위표",
-    "blockedUsers": "차단한 사용자"
+    "blockedUsers": "차단한 사용자",
+    "inviteFriends": "친구 초대"
   },
   "storage": {
     "title": "저장 공간",
@@ -435,5 +436,8 @@
   },
   "account": {
     "memberSince": "{{date}}부터 회원"
+  },
+  "share": {
+    "inviteMessage": "저는 Verdance로 성경을 공부하고 있어요 — 플래시카드, 퀴즈, 매일 연속 기록. 함께해요: https://getverdance.com"
   }
 }
