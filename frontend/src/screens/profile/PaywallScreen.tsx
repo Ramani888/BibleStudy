@@ -297,7 +297,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
               <Typography preset="label" color={colors.textSecondary}>{t('profile:subscription.manage', 'Manage Subscription')}</Typography>
             </Pressable>
           )}
-          <Pressable onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
+          <Pressable onPress={() => Linking.openURL('https://getverdance.com/terms.html')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.terms', 'Terms of Use')}</Typography>
           </Pressable>
           <Pressable onPress={() => Linking.openURL('https://getverdance.com/privacy.html')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
