@@ -11,9 +11,11 @@ interface SetCardProps {
   onPress: () => void;
   onLongPress?: () => void;
   onMenuPress?: () => void;
+  /** Optional right-side element (e.g. a DUE badge on Home). */
+  trailing?: React.ReactNode;
 }
 
-export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps) {
+export function SetCard({ set, onPress, onLongPress, onMenuPress, trailing }: SetCardProps) {
   const { t } = useTranslation(['library', 'common']);
   const { colors } = useTheme();
   const cardCount = set._count?.cards ?? 0;
@@ -31,6 +33,7 @@ export function SetCard({ set, onPress, onLongPress, onMenuPress }: SetCardProps
         ) : undefined
       }
       subtitle={subtitle}
+      trailing={trailing}
       onPress={onPress}
       onLongPress={onLongPress}
       onMenuPress={onMenuPress}

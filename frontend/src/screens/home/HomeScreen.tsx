@@ -381,7 +381,16 @@ export function HomeScreen() {
             <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
-                <SetCard key={s.id} set={s} onPress={() => nav.goContinue(s)} />
+                <SetCard
+                  key={s.id}
+                  set={s}
+                  onPress={() => nav.goContinue(s)}
+                  trailing={dueSummary?.topSet?.id === s.id ? (
+                    <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}>
+                      <Typography preset="caption" color={colors.success}>{t('home:featured.due', 'DUE')}</Typography>
+                    </View>
+                  ) : undefined}
+                />
               ))}
             </View>
           </>
@@ -487,6 +496,7 @@ const styles = StyleSheet.create({
 
   // Recent sets
   setsList: { gap: spacing.md },
+  dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
   cardShadow: { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 },
 
   // Summary stats
