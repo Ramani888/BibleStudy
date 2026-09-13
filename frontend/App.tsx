@@ -2,14 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import Toast from 'react-native-toast-message';
 import { enableScreens } from 'react-native-screens';
 import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 
 import './src/i18n';
 import { useLanguageStore } from './src/i18n';
-import { queryClient } from './src/lib/queryClient';
+import { queryClient, persistOptions } from './src/lib/queryClient';
+import { OfflineBanner } from './src/components/feedback';
 import { useAuthStore } from './src/store';
 import { useTheme, useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
@@ -42,6 +43,7 @@ function AppBootstrap() {
         backgroundColor={colors.background}
       />
       <RootNavigator />
+      <OfflineBanner />
       {showSplash && (
         <SplashScreen
           isReady={isInitialized}
@@ -56,12 +58,12 @@ export default function App() {
   return (
     <GestureHandlerRootView style={styles.root}>
       <SafeAreaProvider>
-        <QueryClientProvider client={queryClient}>
+        <PersistQueryClientProvider client={queryClient} persistOptions={persistOptions}>
           <BottomSheetModalProvider>
             <AppBootstrap />
             <Toast />
           </BottomSheetModalProvider>
-        </QueryClientProvider>
+        </PersistQueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
