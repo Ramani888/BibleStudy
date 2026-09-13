@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.lg,
   },
   dividerLine: { flex: 1 },
-  orText:      { lineHeight: 18, textTransform: 'uppercase' }, // ponytail: off-grid Figma value
+  orText:      { textTransform: 'uppercase', paddingHorizontal: spacing.s2 }, // uppercase caps need natural lineHeight + edge padding (no clip)
   logoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10, marginBottom: spacing.xxxl },
   logoIcon: {
     width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius,
