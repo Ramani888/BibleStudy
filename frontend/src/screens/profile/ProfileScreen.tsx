@@ -1,11 +1,11 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 
 import { MenuSection } from './components/MenuSection';
 import { MenuItem } from './components/MenuItem';
-import { ConfirmDialog } from '../../components/feedback';
+import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Avatar, Typography } from '../../components/ui';
 import {
   AlbumsIcon,
@@ -61,10 +61,11 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const handleNavPaywall      = useCallback(() => navigation.navigate('Paywall'), [navigation]);
   const handleNavChangePass   = useCallback(() => navigation.navigate('ChangePassword'), [navigation]);
   const handleNavSettings     = useCallback(() => navigation.navigate('Settings'), [navigation]);
-  const handleInviteFriends   = useCallback(async () => {
-    try {
-      await Share.share({ message: t('profile:share.inviteMessage', { defaultValue: "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com" }) });
-    } catch {}
+  const [inviteSheetOpen, setInviteSheetOpen] = useState(false);
+  const handleInviteFriends   = useCallback(() => setInviteSheetOpen(true), []);
+  const shareInvite = useCallback((key: 'inviteMessage' | 'invitePastor', fallback: string) => {
+    setInviteSheetOpen(false);
+    Share.share({ message: t(`profile:share.${key}`, { defaultValue: fallback }) }).catch(() => {});
   }, [t]);
   const handleSignOut         = useCallback(() =>
     showConfirm({
@@ -209,6 +210,23 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
         </Typography>
       </ScrollView>
 
+      <ActionSheet
+        visible={inviteSheetOpen}
+        title={t('profile:share.inviteTitle', 'Invite to Verdance')}
+        onClose={() => setInviteSheetOpen(false)}
+        actions={[
+          {
+            label: t('profile:share.inviteFriend', 'Invite a friend'),
+            icon: ShareIcon,
+            onPress: () => shareInvite('inviteMessage', "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com"),
+          },
+          {
+            label: t('profile:share.invitePastorLabel', 'Tell your pastor or group leader'),
+            icon: UsersIcon,
+            onPress: () => shareInvite('invitePastor', "I think our group would love Verdance for Bible study — AI answers with verse citations, shared flashcard sets, quizzes, and streaks to keep everyone going. Worth a look for the church: https://getverdance.com"),
+          },
+        ]}
+      />
       <ConfirmDialog {...dialogProps} />
     </View>
   );

@@ -15,6 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
+import { buildSetShareLink, shareToWhatsApp } from '../../utils';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
@@ -34,6 +35,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
   const [quizSheetOpen, setQuizSheetOpen] = useState(false);
+  const [shareSheetOpen, setShareSheetOpen] = useState(false);
   const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
   const [savingNote, setSavingNote] = useState(false);
@@ -61,18 +63,21 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     if (cachedTitle) navigation.setOptions({ title: cachedTitle });
   }, [cachedTitle, navigation]);
 
-  const handleShare = useCallback(async () => {
-    try {
-      const title = cachedTitle ?? setTitle;
-      const cardList = cards
-        .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
-        .join('\n\n');
-      const divider = '─'.repeat(Math.min(title.length, 40));
-      // Pull recipients back to the app — turns every shared set into a soft referral.
-      const footer = t('library:setDetail.shareFooter', { defaultValue: '📖 Studied with Verdance — grow in the Word: https://getverdance.com' });
-      await Share.share({ message: `${title}\n${divider}\n\n${cardList}\n\n${footer}` });
-    } catch {}
-  }, [cachedTitle, setTitle, cards]);
+  const setMeta = allSets.find(s => s.id === setId);
+
+  const buildShareMessage = useCallback(() => {
+    const title = cachedTitle ?? setTitle;
+    const cardList = cards
+      .map((c, i) => `${i + 1}. ${c.question}\n   ${c.answer}`)
+      .join('\n\n');
+    const divider = '─'.repeat(Math.min(title.length, 40));
+    // PUBLIC sets link to a live preview page; others fall back to the homepage.
+    const link = setMeta ? buildSetShareLink(setMeta) : 'https://getverdance.com';
+    const footer = t('library:setDetail.shareFooter', { link, defaultValue: '📖 Studied with Verdance — grow in the Word: {{link}}' });
+    return `${title}\n${divider}\n\n${cardList}\n\n${footer}`;
+  }, [cachedTitle, setTitle, cards, setMeta, t]);
+
+  const handleShare = useCallback(() => setShareSheetOpen(true), []);
 
   const filteredCards = useMemo(
     () => cardSearch.trim()
@@ -457,6 +462,25 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         setTitles={[cachedTitle ?? setTitle]}
         onClose={handleCloseQuizSheet}
         onStart={handleQuizStart}
+      />
+
+      {/* ── Share sheet: WhatsApp-direct or system share ── */}
+      <ActionSheet
+        visible={shareSheetOpen}
+        title={t('library:setDetail.shareTitle', 'Share this set')}
+        onClose={() => setShareSheetOpen(false)}
+        actions={[
+          {
+            label: t('library:setDetail.shareWhatsApp', 'Share to WhatsApp'),
+            icon: ShareIcon,
+            onPress: () => { setShareSheetOpen(false); shareToWhatsApp(buildShareMessage()); },
+          },
+          {
+            label: t('common:actions.more', 'More…'),
+            icon: MoreVerticalIcon,
+            onPress: () => { setShareSheetOpen(false); Share.share({ message: buildShareMessage() }).catch(() => {}); },
+          },
+        ]}
       />
 
       {/* ── Note popup ── */}
