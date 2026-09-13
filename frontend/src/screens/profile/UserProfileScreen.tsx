@@ -197,7 +197,6 @@ export function UserProfileScreen({ route, navigation }: Props) {
                 style={({ pressed }) => [
                   styles.setCard,
                   { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-                  !isDark && styles.cardShadow,
                   pressed && styles.setCardPressed,
                 ]}
                 onPress={() => openSet(set)}
@@ -263,12 +262,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   setInfo: { flex: 1, gap: spacing.s2 },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
   setCardPressed: { opacity: 0.7 },
 });

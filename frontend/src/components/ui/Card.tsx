@@ -1,22 +1,15 @@
 import React from 'react';
-import { Platform, Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
+import { Pressable, PressableProps, StyleSheet, View, ViewProps, ViewStyle } from 'react-native';
 import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
 type ShadowLevel = 'none' | 'sm' | 'md' | 'lg' | 'xl';
 
-const shadow = (elevation: number, opacity: number, radius: number, offsetY: number) =>
-  Platform.select({
-    ios:     { shadowColor: '#000', shadowOpacity: opacity, shadowRadius: radius, shadowOffset: { width: 0, height: offsetY } },
-    android: { elevation },
-    default: {},
-  });
-
 const shadows: Record<ShadowLevel, object> = {
   none: {},
-  sm:   shadow(2,  0.06, 4,  1),
-  md:   shadow(4,  0.08, 8,  2),
-  lg:   shadow(8,  0.10, 16, 4),
-  xl:   shadow(12, 0.12, 24, 6),
+  sm:   {},
+  md:   {},
+  lg:   {},
+  xl:   {},
 };
 
 interface CardProps extends ViewProps {

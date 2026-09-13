@@ -147,11 +147,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: spacing.xxxl,
-    shadowColor: palette.indigo500,
-    shadowOpacity: 0.2,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
   },
   btnGradient: { borderRadius: radius.lg },
   btnText: {

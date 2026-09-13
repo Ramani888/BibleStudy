@@ -257,7 +257,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     <View style={[
       styles.cardItem,
       { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
-      !isDark && styles.cardShadow,
       cardLayout === 'grid' && styles.cardItemGrid,
     ]}>
       {/* Question / Reference — label + icons on top row, text below */}
@@ -534,13 +533,6 @@ const styles = StyleSheet.create({
     borderRadius: layout.cardRadius,
     overflow: 'hidden',
     borderWidth: 1,
-  },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
   },
   cardItemActive: { opacity: 0.9 },
   cardPressed: { opacity: 0.7 },

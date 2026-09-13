@@ -44,7 +44,6 @@ function PreferenceCard({
     <View style={[
       styles.card,
       { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-      !isDark && styles.cardShadow,
     ]}>
       <View style={styles.cardText}>
         <Typography preset="label" color={colors.textPrimary}>{title}</Typography>
@@ -114,13 +113,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.s18,
     paddingVertical: spacing.lg,
     gap: spacing.md,
-  },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
   },
   cardText: { flex: 1 },
   cardSub: { marginTop: spacing.xs },

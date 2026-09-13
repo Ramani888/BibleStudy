@@ -35,14 +35,6 @@ const CATEGORY_ORDER: AchievementCategory[] = ['streak', 'study', 'quiz', 'ai', 
 const AMBER      = '#F79009';
 const AMBER_SOFT = 'rgba(247,144,9,0.15)';
 
-const CARD_SHADOW = {
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.04,
-  shadowRadius: 10,
-  elevation: 2,
-} as const;
-
 // ── Status badge ────────────────────────────────────────────────────────────
 
 function StatusBadge({ achievement: a }: { achievement: Achievement }) {
@@ -80,7 +72,7 @@ function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achi
   const isLocked = !a.unlocked && a.progress === 0;
 
   return (
-    <View style={[styles.card, !isDark && styles.cardShadow, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder }]}>
+    <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder }]}>
       <View style={isLocked ? styles.cardLocked : undefined}>
         <View style={styles.cardTop}>
           <View style={styles.emojiBadge}>
@@ -284,7 +276,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     marginBottom: spacing.md,
   },
-  cardShadow: CARD_SHADOW,
   cardLocked: { opacity: 0.6 },
   cardTop: {
     flexDirection: 'row',

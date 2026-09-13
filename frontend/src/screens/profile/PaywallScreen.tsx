@@ -80,7 +80,6 @@ function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () =>
       onPress={onPress}
       style={({ pressed }) => [
         styles.planCard,
-        !isDark && !selected && styles.cardShadow,
         pressed && styles.cardPressed,
         {
           backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
@@ -119,7 +118,6 @@ function PlanCard({ tier, period, selected, onPress }: {
       onPress={onPress}
       style={({ pressed }) => [
         styles.planCard,
-        !isDark && !selected && styles.cardShadow,
         pressed && styles.cardPressed,
         {
           backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
@@ -351,13 +349,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.s18,
     paddingVertical: spacing.s18,
     gap: spacing.s14,
-  },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
   },
   planText: { flex: 1, gap: spacing.xs },
   priceBlock: { alignItems: 'flex-end', gap: spacing.xs },

@@ -51,7 +51,6 @@ export function FriendsScreen({ navigation }: Props) {
         style={({ pressed }) => [
           styles.card,
           { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-          !isDark && styles.cardShadow,
           pressed && { opacity: 0.7 },
         ]}
         onPress={() => navigation.navigate('UserProfile', { userId: item.friendId })}
@@ -134,13 +133,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.lg,
     minHeight: 72,
     borderRadius: radius.md,
-  },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
   },
   cardInfo: { flex: 1, gap: spacing.s2 },
   removeBtn: { padding: spacing.xs },

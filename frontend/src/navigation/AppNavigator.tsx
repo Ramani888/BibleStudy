@@ -83,11 +83,6 @@ const makeStyles = (colors: ThemeColors, bottomInset: number) =>
       height: layout.tabBarHeight + bottomInset,
       paddingTop: spacing.xs,
       paddingBottom: bottomInset + spacing.xs,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: 0.06,
-      shadowRadius: 8,
-      elevation: 8,
     },
     tabLabel: {
       fontSize: fontSizes.xs,

@@ -47,7 +47,6 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
     <View style={[
       styles.row,
       { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-      !isDark && !item.isMe && styles.rowShadow,
       item.isMe && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
     ]}>
       <View style={styles.rank}>
@@ -125,13 +124,6 @@ const styles = StyleSheet.create({
   quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
   quoteTopLeft: { top: spacing.sm, left: spacing.lg },
   quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
-  rowShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',

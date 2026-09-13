@@ -180,8 +180,7 @@ const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { s
     <AnimatedPressable
       style={[
         styles.miniCard,
-        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border, shadowColor: colors.textPrimary },
-        !isDark && styles.cardShadow,
+        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
       ]}
       onPress={handlePress}
       accessibilityRole="button"
@@ -236,8 +235,7 @@ const SummaryCard = React.memo(function SummaryCard({ stats }: { stats: Array<{ 
           key={s.label}
           style={[
             styles.summaryStat,
-            { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, shadowColor: colors.textPrimary },
-            !isDark && styles.cardShadow,
+            { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
           ]}
         >
           <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
@@ -497,7 +495,6 @@ const styles = StyleSheet.create({
   // Recent sets
   setsList: { gap: spacing.md },
   dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
-  cardShadow: { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 },
 
   // Summary stats
   summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing.md },

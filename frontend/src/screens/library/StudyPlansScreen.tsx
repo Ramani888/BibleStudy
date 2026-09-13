@@ -40,7 +40,6 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
       <Pressable
         style={({ pressed }) => [
           styles.card,
-          !isDark && styles.cardShadow,
           { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder },
           pressed && styles.cardPressed,
         ]}
@@ -123,13 +122,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     padding: spacing.lg,
     gap: spacing.sm,
-  },
-  cardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
   },
   cardPressed: { opacity: 0.7 },
   iconPressed: { opacity: 0.85 },

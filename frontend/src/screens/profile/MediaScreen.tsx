@@ -4,7 +4,6 @@ import {
   Dimensions,
   FlatList,
   Image,
-  Platform,
   Pressable,
   RefreshControl,
   StyleSheet,
@@ -176,7 +175,6 @@ const utStyles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     borderWidth: 1, borderRadius: layout.cardRadius,
     paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
-    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 2 } }, android: { elevation: 4 }, default: {} }),
   },
   info:  { flex: 1, gap: spacing.xs },
   track: { height: 3, borderRadius: 2, overflow: 'hidden' },
@@ -253,7 +251,6 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         style={({ pressed }) => [
           styles.pdfCard,
           { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-          !isDark && !isSelected && styles.pdfCardShadow,
           pressed && styles.pdfCardPressed,
           isSelected && { borderColor: colors.accent, borderWidth: 1.5, backgroundColor: colors.accentSoft },
         ]}
@@ -491,10 +488,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row', alignItems: 'center', gap: spacing.md,
     borderRadius: layout.cardRadiusSm, padding: spacing.lg,
   },
-  pdfCardShadow: {
-    shadowColor: '#000', shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04, shadowRadius: 10, elevation: 2,
-  },
   pdfCardPressed:  { opacity: 0.7 },
   pdfIconBox: {
     width: 52, height: 52, borderRadius: layout.cardRadiusSm,
@@ -507,7 +500,6 @@ const styles = StyleSheet.create({
     position: 'absolute', bottom: spacing.xxxl, right: layout.screenPaddingH,
     width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,
     alignItems: 'center', justifyContent: 'center',
-    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
   },
   fabPressed:  { opacity: 0.85 },
   fabDisabled: { opacity: 0.5 },

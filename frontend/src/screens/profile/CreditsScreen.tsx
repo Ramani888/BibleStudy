@@ -5,8 +5,7 @@ import {
   Pressable,
   RefreshControl,
   StyleSheet,
-  View,
-Platform } from 'react-native';
+  View } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { Badge, Divider, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
@@ -201,7 +200,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     padding: spacing.xl,
     gap: spacing.lg,
-    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
   },
   balanceHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   balanceLabel: { letterSpacing: 1, fontSize: fontSizes.xs },

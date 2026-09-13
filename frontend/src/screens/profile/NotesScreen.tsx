@@ -5,8 +5,7 @@ import {
   RefreshControl,
   ScrollView,
   StyleSheet,
-  View,
-Platform } from 'react-native';
+  View } from 'react-native';
 import Toast from 'react-native-toast-message';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -117,7 +116,7 @@ export function NotesScreen({ navigation }: Props) {
       }}
     >
       <Pressable
-        style={({ pressed }) => [styles.noteCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, !isDark && styles.noteCardShadow, pressed && styles.noteCardPressed]}
+        style={({ pressed }) => [styles.noteCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.noteCardPressed]}
         onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
       >
         <View style={styles.noteHeader}>
@@ -260,13 +259,6 @@ const styles = StyleSheet.create({
     padding: spacing.lg,
     gap: spacing.xs,
   },
-  noteCardShadow: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.04,
-    shadowRadius: 10,
-    elevation: 2,
-  },
   noteCardPressed: { opacity: 0.7 },
   noteHeader: {
     flexDirection: 'row',
@@ -291,7 +283,6 @@ const styles = StyleSheet.create({
     borderRadius: FAB_SIZE / 2,
     alignItems: 'center',
     justifyContent: 'center',
-    ...Platform.select({ ios: { shadowColor: '#000', shadowOpacity: 0.10, shadowRadius: 16, shadowOffset: { width: 0, height: 4 } }, android: { elevation: 8 }, default: {} }),
   },
   fabPressed: { opacity: 0.85 },
   deleteAction: {
