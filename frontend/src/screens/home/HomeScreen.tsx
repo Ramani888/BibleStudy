@@ -6,6 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 
 import { Avatar, Button, Spacer, Typography, AnimatedPressable } from '../../components/ui';
+import { SetCard } from '../../components/domain';
 import {
   FlameIcon,
   BellIcon,
@@ -164,44 +165,6 @@ const QuickAction = React.memo(function QuickAction({ Icon, label, onPress }: { 
         <Icon size={22} color={colors.textPrimary} />
       </View>
       <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
-    </AnimatedPressable>
-  );
-});
-
-// ─── Recent set row ────────────────────────────────────────────────────────────
-const SetRow = React.memo(function SetRow({ set, due, onSelect }: { set: StudySet; due: boolean; onSelect: (s: StudySet) => void }) {
-  const { t } = useTranslation(['home', 'library', 'common']);
-  const { colors, name: themeName } = useTheme();
-  const isDark = themeName === 'dark';
-  const count = set._count?.cards ?? 0;
-  const handlePress = useCallback(() => onSelect(set), [onSelect, set]);
-  return (
-    <AnimatedPressable
-      style={[
-        styles.setRow,
-        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, shadowColor: colors.textPrimary },
-        !isDark && styles.cardShadow,
-      ]}
-      onPress={handlePress}
-      accessibilityRole="button"
-      accessibilityLabel={t('home:a11y.openSet', { title: set.title })}
-    >
-      <View style={[styles.setIcon, { borderColor: colors.border }]}>
-        <LibraryIcon size={18} color={colors.textPrimary} />
-      </View>
-      <View style={styles.flex1}>
-        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{set.title}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
-        </Typography>
-      </View>
-      {due ? (
-        <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}>
-          <Typography preset="caption" color={colors.success}>{t('home:featured.due', 'DUE')}</Typography>
-        </View>
-      ) : (
-        <ChevronRightIcon size={18} color={colors.textSecondary} />
-      )}
     </AnimatedPressable>
   );
 });
@@ -418,7 +381,7 @@ export function HomeScreen() {
             <Spacer size={spacing.md} />
             <View style={styles.setsList}>
               {recentSets.map(s => (
-                <SetRow key={s.id} set={s} due={dueSummary?.topSet?.id === s.id} onSelect={nav.goContinue} />
+                <SetCard key={s.id} set={s} onPress={() => nav.goContinue(s)} />
               ))}
             </View>
           </>
@@ -524,12 +487,6 @@ const styles = StyleSheet.create({
 
   // Recent sets
   setsList: { gap: spacing.md },
-  setRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    borderRadius: layout.cardRadiusSm, padding: spacing.lg,
-  },
-  setIcon: { width: spacing.huge, height: spacing.huge, borderRadius: layout.pillRadius, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
-  dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
   cardShadow: { shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.04, shadowRadius: 10, elevation: 2 },
 
   // Summary stats
