@@ -57,10 +57,10 @@ tie-broken by `longestStreak` then name. Each row: `streak`, `longestStreak`,
 
 ## Endpoints
 - `GET /api/v1/achievements` — full achievement list w/ progress (auth required).
-- `GET /api/v1/friends/leaderboard` — friends streak/achievement board (see [[Module - Social (Friends, Groups, Gatherings, Map)]]).
+- `GET /api/v1/friends/leaderboard` — friends streak/achievement board (see [[Module - Social (Friends, Activities, Notifications)]]).
 
 ## Client
 Hooks: `useAchievements`, leaderboard via `useFriends`; Home surfaces streak. See [[Hooks & API Layer]].
 
 ## See also
-[[Gamification]] · [[Module - AI & Credits]] · [[Module - Study Plans]] · [[Module - Social (Friends, Groups, Gatherings, Map)]] · [[Database Schema]]
+[[Gamification]] · [[Module - AI & Credits]] · [[Module - Study Plans]] · [[Module - Social (Friends, Activities, Notifications)]] · [[Database Schema]]

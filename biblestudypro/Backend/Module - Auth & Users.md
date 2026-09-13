@@ -48,5 +48,5 @@ Routes: `POST /api/v1/auth/google`, `POST /api/v1/auth/apple`
 
 ## Notes
 - `User` is the cascade root for the whole schema.
-- Blocking lives in the [[Module - Social (Friends, Groups, Gatherings, Map)|social module]],
+- Blocking lives in the [[Module - Social (Friends, Activities, Notifications)|social module]],
   but affects what a user profile exposes.

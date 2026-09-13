@@ -61,7 +61,7 @@ entitlements — [[Credits & Subscriptions]]), `achievements`
 
 Grouped in this brain as: [[Module - Auth & Users]],
 [[Module - Library (Folders, Sets, Cards)]], [[Module - AI & Credits]],
-[[Module - Social (Friends, Groups, Gatherings, Map)]], [[Module - Media & Notes]].
+[[Module - Social (Friends, Activities, Notifications)]], [[Module - Media & Notes]].
 
 ## Frontend surface
 

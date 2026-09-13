@@ -1,7 +1,7 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-09-10
+updated: 2026-09-13
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
@@ -9,7 +9,7 @@ updated: 2026-09-10
 Knowledge vault for **BibleStudyPro** — an AI-assisted Bible-study flashcard app
 with a monetization layer (credits + IAP subscriptions), gamification, study
 plans, and a social/community layer. Full-stack: **Node/Express/Prisma/PostgreSQL**
-backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
+backend (17 modules) + **React Native 0.84 / React 19** app (~49 screens).
 
 > This is a *code brain*, not a design vault — it documents how the system is
 > built, feature by feature, including edge cases. Notes are cross-linked; open
@@ -35,7 +35,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
   - [[Module - Auth & Users]]
   - [[Module - Library (Folders, Sets, Cards)]]
   - [[Module - AI & Credits]]
-  - [[Module - Social (Friends, Groups, Gatherings, Map)]]
+  - [[Module - Social (Friends, Activities, Notifications)]]
   - [[Module - Media & Notes]]
   - [[Module - Study Plans]]
   - [[Module - Gamification]]
@@ -56,7 +56,7 @@ backend (19 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Identity & Accounts]] — ⭐ authoritative app name, bundle IDs, Firebase/OAuth accounts
 - [[Store Launch (App Store + Play)]] — App Store + Play submission status, reviewer account, screenshots
 - [[Local Dev Setup]] — running locally (Postgres 5434)
-- [[Deployment (Hetzner)]] — the VPS setup (currently stopped)
+- [[Deployment (Hetzner)]] — the VPS setup (LIVE at 94.130.176.8; api.getverdance.com)
 - [[Migration History]] — Prisma migration timeline & the reconciliation
 
 ## Conventions for this vault

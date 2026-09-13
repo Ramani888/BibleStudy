@@ -52,4 +52,4 @@ sets they don't own **without cloning them**. Called from:
 Hooks: `usePlans`; screens under the Library/Profile stacks. See [[Hooks & API Layer]].
 
 ## See also
-[[Study Plans]] · [[Module - Gamification]] · [[Module - Social (Friends, Groups, Gatherings, Map)]] · [[Module - Library (Folders, Sets, Cards)]] · [[Database Schema]]
+[[Study Plans]] · [[Module - Gamification]] · [[Module - Social (Friends, Activities, Notifications)]] · [[Module - Library (Folders, Sets, Cards)]] · [[Database Schema]]

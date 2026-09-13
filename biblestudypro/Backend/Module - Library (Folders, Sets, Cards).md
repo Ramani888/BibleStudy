@@ -25,7 +25,7 @@ public discovery feeds the PublicSets & FriendsSets screens.
 
 ## cards
 CRUD for cards within a set; layout + difficulty metadata; per-card `note`.
-Creating a card can emit a `CREATED_CARD` [[Module - Social (Friends, Groups, Gatherings, Map)|Activity]].
+Creating a card can emit a `CREATED_CARD` [[Module - Social (Friends, Activities, Notifications)|Activity]].
 
 ## Client
 - Hooks: `useFolders`, `useSets`, `useCards`, `useSetStats` — see [[Hooks & API Layer]].
