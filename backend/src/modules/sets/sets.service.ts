@@ -67,6 +67,24 @@ export async function getSetById(userId: string, setId: string) {
   return set;
 }
 
+// Public, unauthenticated view of a PUBLIC set — backs getverdance.com/s/:id share links.
+// Only PUBLIC sets are resolvable; private/friends sets 404 so a leaked link exposes nothing.
+export async function getSharedSet(setId: string) {
+  const set = await prisma.set.findFirst({
+    where: { id: setId, visibility: 'PUBLIC' },
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      user: { select: { name: true } },
+      _count: { select: { cards: true } },
+      cards: { orderBy: { order: 'asc' }, take: 6, select: { question: true, answer: true } },
+    },
+  });
+  if (!set) throw new NotFoundError('Set not found');
+  return set;
+}
+
 export async function updateSet(userId: string, setId: string, dto: UpdateSetDtoType) {
   const set = await prisma.set.findFirst({ where: { id: setId, userId } });
   if (!set) {

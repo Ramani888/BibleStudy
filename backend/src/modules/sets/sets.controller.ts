@@ -24,6 +24,13 @@ export async function getSetById(req: Request, res: Response): Promise<void> {
   } catch (error) { handleControllerError(res, error, 'Failed to get set'); }
 }
 
+export async function getSharedSet(req: Request, res: Response): Promise<void> {
+  try {
+    const set = await setsService.getSharedSet(req.params.id);
+    sendSuccess(res, set, 'Shared set retrieved successfully');
+  } catch (error) { handleControllerError(res, error, 'Failed to get shared set'); }
+}
+
 export async function updateSet(req: Request, res: Response): Promise<void> {
   try {
     const set = await setsService.updateSet(req.user!.id, req.params.id, req.body);

@@ -6,6 +6,9 @@ import { CreateSetDto, UpdateSetDto } from './sets.dto';
 
 const router = Router();
 
+// Public — no auth. Resolves getverdance.com/s/:id share links (PUBLIC sets only).
+router.get('/shared/:id', setsController.getSharedSet);
+
 router.use(authMiddleware);
 
 router.get('/public', setsController.getPublicSets);
