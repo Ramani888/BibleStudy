@@ -40,6 +40,7 @@ backend (17 modules) + **React Native 0.84 / React 19** app (~49 screens).
   - [[Module - Study Plans]]
   - [[Module - Gamification]]
   - [[Module - Subscriptions]]
+  - [[Module - Waitlist]]
 
 ## 📱 Frontend
 - [[Frontend Architecture]] — directory map, conventions
