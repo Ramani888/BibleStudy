@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -57,9 +57,13 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
         <>
           <Button label={t('resetPassword')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending} style={({ pressed }) => pressed && styles.linkPressed}>
-            <Typography preset="bodySm" color={resending ? colors.textDisabled : colors.accent} align="center">
-              {resending ? t('common:status.sending', 'Sending…') : t('resendCode')}
-            </Typography>
+            {resending ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Typography preset="bodySm" color={colors.accent} align="center">
+                {t('resendCode')}
+              </Typography>
+            )}
           </Pressable>
         </>
       }

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, View } from 'react-native';
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
@@ -67,9 +67,13 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
         <>
           <Button label={t('verifyEmail')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
           <Pressable onPress={handleResend} disabled={resending || cooldown > 0} style={({ pressed }) => pressed && styles.linkPressed}>
-            <Typography preset="bodySm" color={resending || cooldown > 0 ? colors.textDisabled : colors.accent} align="center">
-              {resending ? t('common:status.sending', 'Sending…') : cooldown > 0 ? t('auth:resendCooldown', { seconds: cooldown, defaultValue: `Resend code in ${cooldown}s` }) : t('resendCode')}
-            </Typography>
+            {resending ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Typography preset="bodySm" color={cooldown > 0 ? colors.textDisabled : colors.accent} align="center">
+                {cooldown > 0 ? t('auth:resendCooldown', { seconds: cooldown, defaultValue: `Resend code in ${cooldown}s` }) : t('resendCode')}
+              </Typography>
+            )}
           </Pressable>
           <Pressable onPress={() => navigation.navigate('Login')} style={({ pressed }) => pressed && styles.linkPressed}>
             <Typography preset="bodySm" color={colors.textSecondary} align="center">

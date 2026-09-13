@@ -205,7 +205,7 @@ export function QuizSetupScreen() {
             <View style={styles.modeSection}>
               <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.quizTypeLabel', 'QUIZ TYPE')}</Typography>
               {cardsLoading ? (
-                <Typography preset="body" color={colors.textSecondary}>{t('common:status.loading', 'Loading modes…')}</Typography>
+                <ActivityIndicator color={colors.accent} />
               ) : (
                 <>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>

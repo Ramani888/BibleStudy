@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native'; // StatusBar used imperatively via useFocusEffect
+import { ActivityIndicator, BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native'; // StatusBar used imperatively via useFocusEffect
 import { useFocusEffect, useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -103,7 +103,7 @@ export function QuizScreen() {
   if (isLoading) return (
     <View style={[styles.fill, { backgroundColor: colors.background }]}>
       {safeHeader}
-      <View style={styles.center}><Typography preset="body" color={colors.textSecondary}>{t('common:status.loading', 'Loading…')}</Typography></View>
+      <View style={styles.center}><ActivityIndicator color={colors.accent} /></View>
     </View>
   );
 
