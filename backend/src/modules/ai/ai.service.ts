@@ -371,7 +371,8 @@ export async function generateQuizCards(
   // Need ≥4 so Multiple Choice always has enough distractors client-side.
   if (cards.length < 4) {
     await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
-    throw new AppError('Could not generate enough quiz questions for that topic. No credit was charged.', 502, 'AI_INSUFFICIENT_CARDS');
+    const source = material && material.length > 0 ? 'the selected sets (try adding more cards)' : 'that topic';
+    throw new AppError(`Could not generate enough quiz questions for ${source}. No credit was charged.`, 502, 'AI_INSUFFICIENT_CARDS');
   }
 
   // Balance already decremented by the atomic reserve above; log the ledger entry.

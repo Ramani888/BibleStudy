@@ -19,6 +19,9 @@ import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators'
 import { useTranslation } from 'react-i18next';
 type SortOrder = 'newest' | 'alpha' | 'cards';
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
+// Need ≥4 cards to reliably ground a 4-option MC quiz; fewer risks a "not enough
+// questions" failure after the credit is spent, so we gate the button instead.
+const MIN_SET_CARDS = 4;
 
 /**
  * Quiz setup — AI generation only. Make a quiz from a typed topic or grounded in
@@ -61,6 +64,13 @@ export function QuizSetupScreen() {
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const { data: sets = [], isLoading } = useSets();
+
+  // Total cards across the selected sets — gate generation below the MC threshold.
+  const selectedCardCount = useMemo(
+    () => sets.reduce((n, s) => (selectedSetIds.includes(s.id) ? n + (s._count?.cards ?? 0) : n), 0),
+    [sets, selectedSetIds],
+  );
+  const setsTooFew = aiSource === 'sets' && selectedSetIds.length > 0 && selectedCardCount < MIN_SET_CARDS;
 
   const cycleSortOrder = useCallback(() =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest'), []);
@@ -202,7 +212,7 @@ export function QuizSetupScreen() {
             label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
             loading={generate.isPending}
             onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
-            disabled={generate.isPending || (aiSource === 'sets' && selectedSetIds.length === 0)}
+            disabled={generate.isPending || (aiSource === 'sets' && (selectedSetIds.length === 0 || setsTooFew))}
             fullWidth
           />
         </View>
@@ -236,6 +246,14 @@ export function QuizSetupScreen() {
             <StarIcon size={12} color={colors.textSecondary} />
             <Typography preset="caption" color={colors.textSecondary}>{aiCostLabel}</Typography>
           </View>
+
+          {setsTooFew && (
+            <View style={styles.aiCostRow}>
+              <Typography preset="caption" color={colors.alert} align="center">
+                {t('quiz:setup.tooFewCards', { count: MIN_SET_CARDS, defaultValue: `Pick sets with at least ${MIN_SET_CARDS} cards total to generate a quiz.` })}
+              </Typography>
+            </View>
+          )}
         </View>
       </ScrollView>
 

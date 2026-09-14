@@ -63,13 +63,16 @@ function deriveScore(dto: RecordAttemptDtoType): { total: number; correct: numbe
 }
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
-  // AI quizzes (topic / generated) carry no setIds → recorded set-less (setId null).
-  // Real quizzes (review-due, retake) carry their sets and are ownership-checked.
-  const primarySetId = dto.setIds[0] ?? null;
-  if (dto.setIds.length > 0) {
-    const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } });
-    if (sets.length !== dto.setIds.length) throw new NotFoundError('One or more sets not found');
-  }
+  // Keep only sets the user still owns, rather than rejecting the whole attempt if
+  // one is missing. AI quizzes ground on sets but store ephemeral cards, so if a
+  // grounding set is deleted between generating and finishing the quiz, the finished
+  // quiz must still be recorded (just against the surviving sets / set-less) — not
+  // silently discarded. A crafted unowned setId is simply dropped, never recorded.
+  const owned = dto.setIds.length > 0
+    ? new Set((await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } })).map(s => s.id))
+    : new Set<string>();
+  const setIds = dto.setIds.filter(id => owned.has(id));
+  const primarySetId = setIds[0] ?? null;
 
   const { total, correct } = deriveScore(dto);
   const scorePct = Math.round((correct / total) * 100);
@@ -77,7 +80,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
     data: {
       userId,
       setId:   primarySetId,
-      setIds:  dto.setIds,
+      setIds,
       total,
       correct,
       scorePct,
@@ -94,7 +97,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   // inner transaction). A crash in the gap leaves the attempt recorded but the
   // cards not rescheduled — it self-corrects on the next quiz. Not worth threading
   // a tx through the shared applyReviews path pre-launch.
-  await applySpacedRepetition(userId, dto);
+  await applySpacedRepetition(userId, dto, setIds);
   // "Best" is per-set — only meaningful for real single-set quizzes, not set-less AI ones.
   const best = primarySetId ? await getBestForSet(userId, primarySetId) : null;
   return { attempt, best };
