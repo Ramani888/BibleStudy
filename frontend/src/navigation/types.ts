@@ -45,7 +45,7 @@ export type LibraryStackParamList = {
 export type QuizStackParamList = {
   QuizHub: undefined;
   QuizDetail: { id: string; setIds: string[]; setTitles: string[]; mode: string | null; scorePct: number; correct: number; total: number; createdAt: string; practicedAt?: string; quizName?: string; timeSecs?: number };
-  QuizSetup: { preSelectedSetIds?: string[]; preSelectedSetTitles?: string[]; retakeAttemptId?: string } | undefined;
+  QuizSetup: undefined;
   Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[] };
 };
 

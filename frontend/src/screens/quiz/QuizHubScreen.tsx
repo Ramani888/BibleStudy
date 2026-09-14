@@ -212,7 +212,7 @@ export function QuizHubScreen() {
         <View style={styles.flex}>
           <EmptyState
             title={search ? t('common:status.noResults', 'No results') : t('quiz:hub.emptyTitle', 'No quizzes yet')}
-            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No quizzes match "${search}"` }) : t('quiz:hub.emptySub', "Tap 'Start New Quiz' — pick your sets or generate one with AI")}
+            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No quizzes match "${search}"` }) : t('quiz:hub.emptySub', "Tap 'Start New Quiz' to generate one with AI")}
           />
         </View>
       ) : (

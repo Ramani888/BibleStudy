@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
-import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,56 +9,30 @@ import { AppModal, EmptyState } from '../../components/feedback';
 import { Button, FilterChip, Screen, SearchBar, Typography } from '../../components/ui';
 import { FormField } from '../../components/forms';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon, StarIcon } from '../../components/icons';
+import { CheckCircleIcon, ChevronRightIcon, SearchIcon, SortIcon, StarIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
 import { getErrorMessage } from '../../api';
 import { useCreditBalance, useGenerateQuiz, useSearchToggle, useSets } from '../../hooks';
-import { supportedModes } from '../../hooks/useQuizSession';
-import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
-import type { QuizSelectableMode } from '../../types';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
-import type { QuizStackParamList } from '../../navigation/types';
 
 import { useTranslation } from 'react-i18next';
-type Params = QuizStackParamList['QuizSetup'];
 type SortOrder = 'newest' | 'alpha' | 'cards';
-
-const ALL_SELECTABLE: QuizSelectableMode[] = ['mix', 'mc', 'story_mc', 'type_answer', 'type_verbatim', 'blanks', 'chunks', 'read'];
-const MODE_LABEL: Record<QuizSelectableMode, string> = {
-  mix: 'Mix', mc: 'Multiple Choice', story_mc: 'Story MC',
-  type_answer: 'Type Answer', type_verbatim: 'Type Verbatim',
-  blanks: 'Fill Blanks', chunks: 'Reorder', read: 'Read',
-};
-const modeDesc: Record<QuizSelectableMode, string> = {
-  mix: 'Random mix of all available types',
-  mc: 'Pick the correct answer from 4 options',
-  story_mc: 'Match reference to the correct passage',
-  type_answer: 'Type the answer from memory',
-  type_verbatim: 'Type the full passage verbatim',
-  blanks: 'Fill in the missing words',
-  chunks: 'Put the passage chunks in order',
-  read: 'Read & memorize — not scored',
-};
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
-// One form, two sources: practice existing cards, or generate with AI (topic / sets).
-type SetupMode = 'practice' | 'ai';
-const SETUP_MODES: SetupMode[] = ['practice', 'ai'];
-const SETUP_MODE_LABEL: Record<SetupMode, string> = { practice: 'Practice', ai: 'Quiz by AI' };
-
+/**
+ * Quiz setup — AI generation only. Make a quiz from a typed topic or grounded in
+ * the user's own sets. (The old manual "Practice" lane was removed; playing existing
+ * cards now happens via Review-due and retake, which go straight to the Quiz screen.)
+ */
 export function QuizSetupScreen() {
   const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const isDark = theme.name === 'dark';
   const navigation = useNavigation<any>();
-  const { params } = useRoute<RouteProp<{ QuizSetup: Params }, 'QuizSetup'>>();
 
-  const preIds = params?.preSelectedSetIds ?? [];
-  const preTitles = params?.preSelectedSetTitles ?? [];
-
-  const { control, handleSubmit, getValues } = useForm<QuizSetupFormData>({
+  const { control, handleSubmit } = useForm<QuizSetupFormData>({
     resolver: zodResolver(quizSetupSchema),
     defaultValues: { quizName: '', aiTopic: '' },
   });
@@ -78,18 +52,15 @@ export function QuizSetupScreen() {
     const id = setInterval(() => setGenMsgIdx(i => (i + 1) % genMessages.length), 1800);
     return () => clearInterval(id);
   }, [generate.isPending]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [selectedSetIds, setSelectedSetIds] = useState<string[]>(preIds);
-  const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>(preTitles);
-  const [selectedMode, setSelectedMode] = useState<QuizSelectableMode>('mix');
-  const [mode, setMode] = useState<SetupMode>('practice');
+
+  const [selectedSetIds, setSelectedSetIds] = useState<string[]>([]);
+  const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>([]);
   const [aiSource, setAiSource] = useState<'topic' | 'sets'>('topic');
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
   const { data: sets = [], isLoading } = useSets();
-  const { data: cards = [], isLoading: cardsLoading } = useCardsForSets(selectedSetIds);
-  const available = supportedModes(cards);
 
   const cycleSortOrder = useCallback(() =>
     setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest'), []);
@@ -106,18 +77,6 @@ export function QuizSetupScreen() {
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }, [sets, search, sortOrder]);
-
-  const chipModes = useMemo(() => {
-    if (selectedSetIds.length === 0 || cards.length === 0) return [] as QuizSelectableMode[];
-    return ALL_SELECTABLE.filter(m => m === 'mix' || available.includes(m as any));
-  }, [selectedSetIds.length, cards.length, available]);
-
-  // reset mode when selected sets change and mode is no longer available
-  useEffect(() => {
-    if (chipModes.length > 0 && !chipModes.includes(selectedMode)) {
-      setSelectedMode('mix');
-    }
-  }, [chipModes]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleToggle = useCallback((id: string, title: string) => {
     if (selectedSetIds.includes(id)) {
@@ -164,9 +123,7 @@ export function QuizSetupScreen() {
     ? selectedSetTitles[0]
     : t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` });
 
-  const canStart = selectedSetIds.length > 0 && cards.length > 0;
-
-  // Shared: fire a generate request → route into the ephemeral quiz on success.
+  // Fire a generate request → route into the ephemeral quiz on success.
   // AI quizzes default to Multiple Choice — cleanest UX for generated content.
   const runGenerate = useCallback((payload: { topic?: string; setIds?: string[] }, title: string) => {
     if (generate.isPending) return;
@@ -201,26 +158,10 @@ export function QuizSetupScreen() {
     runGenerate({ setIds: selectedSetIds }, title);
   }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
 
-  const startPractice = useCallback(() => navigation.navigate('Quiz', {
-    setIds: selectedSetIds,
-    setTitles: selectedSetTitles,
-    mode: selectedMode,
-    retakeAttemptId: params?.retakeAttemptId,
-    quizName: getValues('quizName').trim() || undefined,
-  }), [navigation, selectedSetIds, selectedSetTitles, selectedMode, params?.retakeAttemptId, getValues]);
-
-  // Cost hint for the AI lane.
   const aiCostLabel = creditBalance !== undefined
     ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
     : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` });
-  const costRow = (label: string) => (
-    <View style={styles.aiCostRow}>
-      <StarIcon size={12} color={colors.textSecondary} />
-      <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
-    </View>
-  );
 
-  // Choose-sets selector — shared by Practice and the AI "My sets" source.
   const chooseSetsBlock = (
     <View>
       <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
@@ -247,108 +188,44 @@ export function QuizSetupScreen() {
       header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
       footer={
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
-          {mode === 'practice' ? (
-            <Button
-              label={selectedSetIds.length > 0 && cards.length === 0 && !cardsLoading
-                ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
-                : t('quiz:setup.startQuiz', 'Start Quiz')}
-              loading={cardsLoading}
-              onPress={startPractice}
-              disabled={!canStart}
-              fullWidth
-            />
-          ) : (
-            <Button
-              label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
-              loading={generate.isPending}
-              onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
-              disabled={generate.isPending || (aiSource === 'sets' && selectedSetIds.length === 0)}
-              fullWidth
-            />
-          )}
+          <Button
+            label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
+            loading={generate.isPending}
+            onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
+            disabled={generate.isPending || (aiSource === 'sets' && selectedSetIds.length === 0)}
+            fullWidth
+          />
         </View>
       }
     >
       <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.section}>
-
-          {/* ── Mode chooser: practice existing cards, or generate with AI ── */}
-          <View style={styles.tabRow}>
-            {SETUP_MODES.map(m => (
-              <FilterChip
-                key={m}
-                label={t(`quiz:setup.tab.${m}`, SETUP_MODE_LABEL[m])}
-                active={m === mode}
-                onPress={() => setMode(m)}
-              />
-            ))}
+          <View style={styles.nameField}>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
+            <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="next" maxLength={80} />
           </View>
 
-          {/* ── PRACTICE: quiz existing cards ── */}
-          {mode === 'practice' && (
-            <>
-              <View style={styles.nameField}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
-                <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="done" maxLength={80} />
-              </View>
+          <View style={styles.nameField}>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiSourceLabel', 'GENERATE FROM')}</Typography>
+            <View style={styles.chipRow}>
+              <FilterChip label={t('quiz:setup.aiSource.topic', 'A topic')} active={aiSource === 'topic'} onPress={() => setAiSource('topic')} />
+              <FilterChip label={t('quiz:setup.aiSource.sets', 'My sets')} active={aiSource === 'sets'} onPress={() => setAiSource('sets')} />
+            </View>
+          </View>
 
-              {chooseSetsBlock}
-
-              {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
-                <View style={styles.modeSection}>
-                  <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.quizTypeLabel', 'QUIZ TYPE')}</Typography>
-                  {cardsLoading ? (
-                    <ActivityIndicator color={colors.accent} />
-                  ) : (
-                    <>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                        {chipModes.map(m => (
-                          <FilterChip
-                            key={m}
-                            label={t(`quiz:modes.${m}`, MODE_LABEL[m])}
-                            active={m === selectedMode}
-                            onPress={() => setSelectedMode(m)}
-                            icon={m === 'mix' ? ShuffleIcon : undefined}
-                          />
-                        ))}
-                      </ScrollView>
-                      <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
-                        {t(`quiz:setup.modeDesc.${selectedMode}`, modeDesc[selectedMode])}
-                      </Typography>
-                    </>
-                  )}
-                </View>
-              )}
-            </>
+          {aiSource === 'topic' ? (
+            <View>
+              <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
+              <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
+            </View>
+          ) : (
+            chooseSetsBlock
           )}
 
-          {/* ── QUIZ BY AI: generate from a topic OR the selected sets ── */}
-          {mode === 'ai' && (
-            <>
-              <View style={styles.nameField}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
-                <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="next" maxLength={80} />
-              </View>
-
-              <View style={styles.nameField}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiSourceLabel', 'GENERATE FROM')}</Typography>
-                <View style={styles.chipRow}>
-                  <FilterChip label={t('quiz:setup.aiSource.topic', 'A topic')} active={aiSource === 'topic'} onPress={() => setAiSource('topic')} />
-                  <FilterChip label={t('quiz:setup.aiSource.sets', 'My sets')} active={aiSource === 'sets'} onPress={() => setAiSource('sets')} />
-                </View>
-              </View>
-
-              {aiSource === 'topic' ? (
-                <View>
-                  <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
-                  <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
-                </View>
-              ) : (
-                chooseSetsBlock
-              )}
-              {costRow(aiCostLabel)}
-            </>
-          )}
+          <View style={styles.aiCostRow}>
+            <StarIcon size={12} color={colors.textSecondary} />
+            <Typography preset="caption" color={colors.textSecondary}>{aiCostLabel}</Typography>
+          </View>
         </View>
       </ScrollView>
 
@@ -433,7 +310,6 @@ const styles = StyleSheet.create({
   section: { padding: layout.screenPaddingH },
   sectionLabel: { marginBottom: spacing.md, marginTop: spacing.sm },
   nameField: { marginBottom: spacing.xl },
-  tabRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
   selectorRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -443,12 +319,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   selectorIcon: { width: spacing.s28, alignItems: 'center' },
-  modeSection: { marginTop: spacing.xxl },
   aiCostRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, marginTop: spacing.md },
   genModal: { alignItems: 'center' },
   genWrap: { alignItems: 'center', gap: spacing.lg, paddingVertical: spacing.xl },
   chipRow: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
-  modeDesc: { marginTop: spacing.md },
   rowPressed: { opacity: 0.7 },
   iconPressed: { opacity: 0.85 },
   footer: {
