@@ -127,14 +127,6 @@ ${CARD_DELIMITER}
 Q: [a clear question]
 A: [a concise answer]`;
 
-// Media-grounded variant: quiz the content of an attached PDF/image.
-const QUIZ_FROM_MEDIA_SYSTEM_PROMPT =
-  `You are a Bible-study quiz writer. Using ONLY the content of the attached file, write quiz questions that test understanding of that material. Do not introduce facts not present in the file. Keep each answer concise. Write in the language of the file.
-Output ONLY the cards — no introduction, no commentary, no follow-up questions. Format EACH card exactly as:
-${CARD_DELIMITER}
-Q: [a clear question]
-A: [a concise answer]`;
-
 const HARDCODED_VERSE = {
   reference: 'John 3:16',
   text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
@@ -338,30 +330,11 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
  */
 export async function generateQuizCards(
   userId: string,
-  opts: { topic?: string; cards?: { question: string; answer: string }[]; count: number; mediaIds?: string[] },
+  opts: { topic?: string; cards?: { question: string; answer: string }[]; count: number },
 ) {
   const { topic, cards: material, count } = opts;
 
-  // Resolve media (mirrors askQuestion): PDF/image force Claude + the media rate.
-  let mediaBlocks: MediaBlock[] | undefined;
-  let hasPdf = false, hasImage = false;
-  if (opts.mediaIds && opts.mediaIds.length > 0) {
-    const files = await prisma.mediaFile.findMany({
-      where: { id: { in: opts.mediaIds }, userId },
-      select: { url: true, type: true },
-    });
-    if (files.length !== opts.mediaIds.length) throw new AppError('One or more files not found', 400, 'INVALID_MEDIA');
-    mediaBlocks = files.map(f =>
-      f.type === 'PDF'
-        ? { type: 'document' as const, source: { type: 'url' as const, url: f.url } }
-        : { type: 'image' as const, source: { type: 'url' as const, url: f.url } },
-    );
-    hasPdf = files.some(f => f.type === 'PDF');
-    hasImage = files.some(f => f.type === 'IMAGE');
-  }
-
-  // Media dominates cost (paid Claude); reserved full-cost-upfront (G1).
-  const cost = hasPdf ? CREDIT_COST.pdf : hasImage ? CREDIT_COST.image : CREDIT_COST.cards;
+  const cost = CREDIT_COST.cards;
 
   // Atomic reserve (TOCTOU-safe): check AND decrement in one SQL statement.
   const reserved = await prisma.$queryRaw<{ creditBalance: number }[]>`
@@ -376,21 +349,17 @@ export async function generateQuizCards(
     throw new PaymentRequiredError(`This needs ${cost} credits. Earn more or upgrade to keep generating quizzes.`);
   }
 
-  // Prompt precedence: media > grounding cards > topic.
-  const system = mediaBlocks ? QUIZ_FROM_MEDIA_SYSTEM_PROMPT
-    : material && material.length > 0 ? QUIZ_FROM_CARDS_SYSTEM_PROMPT
-    : QUIZ_SYSTEM_PROMPT;
-  const userContent = mediaBlocks
-    ? `Generate ${count} Bible-study quiz flashcards based ONLY on the attached file.`
-    : material && material.length > 0
-      ? `Generate ${count} quiz questions based ONLY on these flashcards:\n` +
-        material.map((c, i) => `${i + 1}. Q: ${c.question.slice(0, 300)} | A: ${c.answer.slice(0, 300)}`).join('\n')
-      : `Generate ${count} Bible-study flashcards on the topic: "${topic}".`;
+  // Prompt precedence: grounding cards > topic.
+  const system = material && material.length > 0 ? QUIZ_FROM_CARDS_SYSTEM_PROMPT : QUIZ_SYSTEM_PROMPT;
+  const userContent = material && material.length > 0
+    ? `Generate ${count} quiz questions based ONLY on these flashcards:\n` +
+      material.map((c, i) => `${i + 1}. Q: ${c.question.slice(0, 300)} | A: ${c.answer.slice(0, 300)}`).join('\n')
+    : `Generate ${count} Bible-study flashcards on the topic: "${topic}".`;
   const messages: ChatMessage[] = [{ role: 'user', content: userContent }];
 
   let rawText: string;
   try {
-    rawText = await generateAnswer(system, messages, mediaBlocks);
+    rawText = await generateAnswer(system, messages);
   } catch (e) {
     await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
     throw e;

@@ -72,12 +72,6 @@
     "aiLabel": "OR GENERATE WITH AI",
     "aiTopicPlaceholder": "Enter a topic — e.g. Gospel of John",
     "generateAiQuiz": "✨ Generate AI Quiz",
-    "generateAiQuizFromSets": "✨ Generate AI Quiz from selected sets",
-    "generateFromFile": "📎 Quiz from a PDF or image",
-    "choosePdf": "Choose PDF",
-    "chooseImage": "Choose image",
-    "fileQuizTitle": "File quiz",
-    "uploadingFile": "Uploading file…",
     "aiCost": "Costs {{cost}} credits",
     "aiCostWithBalance": "Costs {{cost}} credits · {{balance}} left",
     "generatingTitle": "Building your quiz…",
@@ -91,24 +85,14 @@
     "couldNotGenerate": "Couldn't generate quiz",
     "tab": {
       "practice": "Practice",
-      "ai": "Quiz by AI",
-      "file": "PDF / Image"
+      "ai": "Quiz by AI"
     },
     "topicLabel": "TOPIC",
-    "fileSourceLabel": "SOURCE",
-    "fileKindPdf": "PDF",
-    "fileKindImage": "Image",
-    "fileHelp": "We’ll read your file and build a quiz from it.",
-    "fileCost": "Costs 3–5 credits · media",
-    "generateQuiz": "✨ Generate Quiz",
     "aiSourceLabel": "GENERATE FROM",
     "aiSource": {
       "topic": "A topic",
       "sets": "My sets"
-    },
-    "fileLabel": "FILE",
-    "tapToChoosePdf": "Tap to choose a PDF…",
-    "tapToChooseImage": "Tap to choose an image…"
+    }
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",

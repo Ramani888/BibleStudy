@@ -16,10 +16,6 @@ const MAX_GROUNDING_CARDS = 40;
  * persisted. Card loading is owner-scoped and happens BEFORE any credit charge.
  */
 export async function generateQuiz(userId: string, dto: GenerateQuizDtoType) {
-  if (dto.mediaIds && dto.mediaIds.length > 0) {
-    // Media wins: quiz the attached file (ai.service resolves it + charges media rate).
-    return generateQuizCards(userId, { mediaIds: dto.mediaIds, count: dto.count });
-  }
   if (dto.setIds && dto.setIds.length > 0) {
     const cards = await prisma.card.findMany({
       where: { setId: { in: dto.setIds }, set: { userId } }, // owner-scoped

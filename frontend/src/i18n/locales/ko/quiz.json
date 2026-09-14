@@ -98,12 +98,6 @@
     "aiLabel": "또는 AI로 생성",
     "aiTopicPlaceholder": "주제를 입력하세요 — 예: 요한복음",
     "generateAiQuiz": "✨ AI 퀴즈 생성",
-    "generateAiQuizFromSets": "✨ 선택한 세트로 AI 퀴즈 생성",
-    "generateFromFile": "📎 PDF 또는 이미지로 퀴즈",
-    "choosePdf": "PDF 선택",
-    "chooseImage": "이미지 선택",
-    "fileQuizTitle": "파일 퀴즈",
-    "uploadingFile": "파일 업로드 중…",
     "aiCost": "{{cost}} 크레딧 소모",
     "aiCostWithBalance": "{{cost}} 크레딧 소모 · {{balance}} 남음",
     "generatingTitle": "퀴즈를 만드는 중…",
@@ -117,24 +111,14 @@
     "couldNotGenerate": "퀴즈를 생성할 수 없습니다",
     "tab": {
       "practice": "연습",
-      "ai": "AI 퀴즈",
-      "file": "PDF / 이미지"
+      "ai": "AI 퀴즈"
     },
     "topicLabel": "주제",
-    "fileSourceLabel": "소스",
-    "fileKindPdf": "PDF",
-    "fileKindImage": "이미지",
-    "fileHelp": "파일을 읽고 그것으로 퀴즈를 만들어 드립니다.",
-    "fileCost": "3–5 크레딧 소요 · 미디어",
-    "generateQuiz": "✨ 퀴즈 생성",
     "aiSourceLabel": "생성 기준",
     "aiSource": {
       "topic": "주제",
       "sets": "내 세트"
-    },
-    "fileLabel": "파일",
-    "tapToChoosePdf": "PDF를 선택하려면 탭하세요…",
-    "tapToChooseImage": "이미지를 선택하려면 탭하세요…"
+    }
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",

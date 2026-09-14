@@ -98,12 +98,6 @@
     "aiLabel": "OU GERAR COM IA",
     "aiTopicPlaceholder": "Digite um tema — ex. Evangelho de João",
     "generateAiQuiz": "✨ Gerar quiz com IA",
-    "generateAiQuizFromSets": "✨ Gerar quiz com IA dos conjuntos selecionados",
-    "generateFromFile": "📎 Quiz a partir de um PDF ou imagem",
-    "choosePdf": "Escolher PDF",
-    "chooseImage": "Escolher imagem",
-    "fileQuizTitle": "Quiz de arquivo",
-    "uploadingFile": "Enviando arquivo…",
     "aiCost": "Custa {{cost}} créditos",
     "aiCostWithBalance": "Custa {{cost}} créditos · restam {{balance}}",
     "generatingTitle": "Montando seu quiz…",
@@ -117,24 +111,14 @@
     "couldNotGenerate": "Não foi possível gerar o quiz",
     "tab": {
       "practice": "Praticar",
-      "ai": "Quiz por IA",
-      "file": "PDF / Imagem"
+      "ai": "Quiz por IA"
     },
     "topicLabel": "TÓPICO",
-    "fileSourceLabel": "FONTE",
-    "fileKindPdf": "PDF",
-    "fileKindImage": "Imagem",
-    "fileHelp": "Vamos ler seu arquivo e criar um quiz a partir dele.",
-    "fileCost": "Custa 3–5 créditos · mídia",
-    "generateQuiz": "✨ Gerar quiz",
     "aiSourceLabel": "GERAR A PARTIR DE",
     "aiSource": {
       "topic": "Um tópico",
       "sets": "Meus conjuntos"
-    },
-    "fileLabel": "ARQUIVO",
-    "tapToChoosePdf": "Toque para escolher um PDF…",
-    "tapToChooseImage": "Toque para escolher uma imagem…"
+    }
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",

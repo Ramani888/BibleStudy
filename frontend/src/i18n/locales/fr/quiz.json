@@ -98,12 +98,6 @@
     "aiLabel": "OU GÉNÉRER AVEC L'IA",
     "aiTopicPlaceholder": "Entrez un sujet — p. ex. Évangile de Jean",
     "generateAiQuiz": "✨ Générer un quiz avec l'IA",
-    "generateAiQuizFromSets": "✨ Générer un quiz IA à partir des ensembles sélectionnés",
-    "generateFromFile": "📎 Quiz à partir d'un PDF ou d'une image",
-    "choosePdf": "Choisir un PDF",
-    "chooseImage": "Choisir une image",
-    "fileQuizTitle": "Quiz de fichier",
-    "uploadingFile": "Envoi du fichier…",
     "aiCost": "Coûte {{cost}} crédits",
     "aiCostWithBalance": "Coûte {{cost}} crédits · {{balance}} restants",
     "generatingTitle": "Création de votre quiz…",
@@ -117,24 +111,14 @@
     "couldNotGenerate": "Impossible de générer le quiz",
     "tab": {
       "practice": "Pratiquer",
-      "ai": "Quiz par IA",
-      "file": "PDF / Image"
+      "ai": "Quiz par IA"
     },
     "topicLabel": "SUJET",
-    "fileSourceLabel": "SOURCE",
-    "fileKindPdf": "PDF",
-    "fileKindImage": "Image",
-    "fileHelp": "Nous lirons votre fichier et créerons un quiz à partir de celui-ci.",
-    "fileCost": "Coûte 3–5 crédits · média",
-    "generateQuiz": "✨ Générer le quiz",
     "aiSourceLabel": "GÉNÉRER À PARTIR DE",
     "aiSource": {
       "topic": "Un sujet",
       "sets": "Mes ensembles"
-    },
-    "fileLabel": "FICHIER",
-    "tapToChoosePdf": "Touchez pour choisir un PDF…",
-    "tapToChooseImage": "Touchez pour choisir une image…"
+    }
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",

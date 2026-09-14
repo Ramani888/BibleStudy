@@ -114,7 +114,7 @@ Today: score + quote + review. Add, in priority order:
 **Phase 4 — later / opt-in ✅ DONE (except dashboard)**
 11. ✅ **FSRS** as an opt-in scheduler alongside SM-2 (via `ts-fsrs`; Settings → "Smart scheduling"). SM-2 stays default.
 12. ⏳ Mastery analytics **dashboard** (weakest concepts across sets) — per-set mastery shipped (#7); a dedicated cross-set dashboard deferred (low pre-launch value).
-13. ✅ **Media→quiz** — generate from an uploaded PDF/image (reuses media-chat seam, media credit rate 3–5).
+13. ❌ **Media→quiz** — REMOVED (2026-09-14, per product call). Was: generate a quiz from an uploaded PDF/image. Deleted end-to-end (QuizSetup file lane, `mediaIds` in quiz.dto/service, `generateQuizCards` media branch + `QUIZ_FROM_MEDIA_SYSTEM_PROMPT`). Media chat (feature F) is untouched — `ai.dto` mediaIds + `askQuestion` seam remain.
 
 **Remaining:** only #8 (copy polish), #10 (analytics — externally blocked), #12 (dashboard — optional). Everything engine/feature-level is shipped and verified.
 

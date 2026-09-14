@@ -12,11 +12,11 @@ import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon, StarIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
 import { getErrorMessage } from '../../api';
-import { useCreditBalance, useGenerateQuiz, usePickMedia, useSearchToggle, useSets } from '../../hooks';
+import { useCreditBalance, useGenerateQuiz, useSearchToggle, useSets } from '../../hooks';
 import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
-import type { MediaFile, QuizSelectableMode } from '../../types';
+import type { QuizSelectableMode } from '../../types';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 import type { QuizStackParamList } from '../../navigation/types';
 
@@ -42,10 +42,10 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 };
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
-// One form, three sources: practice existing cards, generate from a topic, or from a file.
-type SetupMode = 'practice' | 'ai' | 'file';
-const SETUP_MODES: SetupMode[] = ['practice', 'ai', 'file'];
-const SETUP_MODE_LABEL: Record<SetupMode, string> = { practice: 'Practice', ai: 'Quiz by AI', file: 'PDF / Image' };
+// One form, two sources: practice existing cards, or generate with AI (topic / sets).
+type SetupMode = 'practice' | 'ai';
+const SETUP_MODES: SetupMode[] = ['practice', 'ai'];
+const SETUP_MODE_LABEL: Record<SetupMode, string> = { practice: 'Practice', ai: 'Quiz by AI' };
 
 export function QuizSetupScreen() {
   const { t } = useTranslation(['quiz', 'common']);
@@ -64,7 +64,6 @@ export function QuizSetupScreen() {
   });
   const generate = useGenerateQuiz();
   const { data: creditBalance } = useCreditBalance();
-  const { pickPdf, pickImage, isUploading } = usePickMedia();
   const AI_QUIZ_COST = 2;
 
   // Rotating reassurance while the LLM works (the 5–15s where users bail).
@@ -84,8 +83,6 @@ export function QuizSetupScreen() {
   const [selectedMode, setSelectedMode] = useState<QuizSelectableMode>('mix');
   const [mode, setMode] = useState<SetupMode>('practice');
   const [aiSource, setAiSource] = useState<'topic' | 'sets'>('topic');
-  const [fileKind, setFileKind] = useState<'pdf' | 'image'>('pdf');
-  const [pickedFile, setPickedFile] = useState<MediaFile | null>(null);
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
@@ -171,7 +168,7 @@ export function QuizSetupScreen() {
 
   // Shared: fire a generate request → route into the ephemeral quiz on success.
   // AI quizzes default to Multiple Choice — cleanest UX for generated content.
-  const runGenerate = useCallback((payload: { topic?: string; setIds?: string[]; mediaIds?: string[] }, title: string) => {
+  const runGenerate = useCallback((payload: { topic?: string; setIds?: string[] }, title: string) => {
     if (generate.isPending) return;
     generate.mutate(payload, {
       onSuccess: ({ cards: generatedCards }) => {
@@ -204,21 +201,6 @@ export function QuizSetupScreen() {
     runGenerate({ setIds: selectedSetIds }, title);
   }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
 
-  // Quiz from an uploaded PDF/image (media rate: 3–5 credits). Pick first — the
-  // chosen file shows in a field — then generate as a separate step.
-  const changeFileKind = useCallback((kind: 'pdf' | 'image') => {
-    setFileKind(kind);
-    setPickedFile(null);
-  }, []);
-  const pickFile = useCallback(async () => {
-    const file = fileKind === 'pdf' ? await pickPdf() : await pickImage();
-    if (file) setPickedFile(file);
-  }, [fileKind, pickPdf, pickImage]);
-  const generateFromFile = useCallback(() => {
-    if (!pickedFile) return;
-    runGenerate({ mediaIds: [pickedFile.id] }, pickedFile.name);
-  }, [pickedFile, runGenerate]);
-
   const startPractice = useCallback(() => navigation.navigate('Quiz', {
     setIds: selectedSetIds,
     setTitles: selectedSetTitles,
@@ -227,7 +209,7 @@ export function QuizSetupScreen() {
     quizName: getValues('quizName').trim() || undefined,
   }), [navigation, selectedSetIds, selectedSetTitles, selectedMode, params?.retakeAttemptId, getValues]);
 
-  // Cost hint reused by the AI + file lanes (media is charged at a higher rate).
+  // Cost hint for the AI lane.
   const aiCostLabel = creditBalance !== undefined
     ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
     : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` });
@@ -275,20 +257,12 @@ export function QuizSetupScreen() {
               disabled={!canStart}
               fullWidth
             />
-          ) : mode === 'ai' ? (
+          ) : (
             <Button
               label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
               loading={generate.isPending}
               onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
               disabled={generate.isPending || (aiSource === 'sets' && selectedSetIds.length === 0)}
-              fullWidth
-            />
-          ) : (
-            <Button
-              label={t('quiz:setup.generateQuiz', '✨ Generate Quiz')}
-              loading={generate.isPending}
-              onPress={generateFromFile}
-              disabled={generate.isPending || isUploading || !pickedFile}
               fullWidth
             />
           )}
@@ -298,7 +272,7 @@ export function QuizSetupScreen() {
       <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.section}>
 
-          {/* ── Mode chooser: one form, three sources ── */}
+          {/* ── Mode chooser: practice existing cards, or generate with AI ── */}
           <View style={styles.tabRow}>
             {SETUP_MODES.map(m => (
               <FilterChip
@@ -375,49 +349,6 @@ export function QuizSetupScreen() {
               {costRow(aiCostLabel)}
             </>
           )}
-
-          {/* ── PDF / IMAGE: generate from an uploaded file ── */}
-          {mode === 'file' && (
-            <>
-              <View style={styles.nameField}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.fileSourceLabel', 'SOURCE')}</Typography>
-                <View style={styles.chipRow}>
-                  <FilterChip label={t('quiz:setup.fileKindPdf', 'PDF')} active={fileKind === 'pdf'} onPress={() => changeFileKind('pdf')} />
-                  <FilterChip label={t('quiz:setup.fileKindImage', 'Image')} active={fileKind === 'image'} onPress={() => changeFileKind('image')} />
-                </View>
-              </View>
-
-              <View>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.fileLabel', 'FILE')}</Typography>
-                <Pressable
-                  style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-                  onPress={pickFile}
-                  disabled={isUploading}
-                  accessibilityRole="button"
-                >
-                  <View style={styles.selectorIcon}>
-                    {isUploading
-                      ? <ActivityIndicator color={colors.accent} />
-                      : pickedFile
-                      ? <CheckCircleIcon size={20} color={colors.accent} />
-                      : <ChevronRightIcon size={20} color={colors.textDisabled} />}
-                  </View>
-                  <Typography preset="body" color={pickedFile ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
-                    {pickedFile
-                      ? pickedFile.name
-                      : fileKind === 'pdf'
-                      ? t('quiz:setup.tapToChoosePdf', 'Tap to choose a PDF…')
-                      : t('quiz:setup.tapToChooseImage', 'Tap to choose an image…')}
-                  </Typography>
-                  <ChevronRightIcon size={18} color={colors.textSecondary} />
-                </Pressable>
-                <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
-                  {t('quiz:setup.fileHelp', "We'll read your file and build a quiz from it.")}
-                </Typography>
-              </View>
-              {costRow(t('quiz:setup.fileCost', 'Costs 3–5 credits · media'))}
-            </>
-          )}
         </View>
       </ScrollView>
 
@@ -485,14 +416,12 @@ export function QuizSetupScreen() {
         />
       </AppModal>
 
-      {/* ── AI generation loading overlay (upload + the 5–15s wait) ── */}
-      <AppModal visible={generate.isPending || isUploading} contentStyle={styles.genModal}>
+      {/* ── AI generation loading overlay (the 5–15s wait) ── */}
+      <AppModal visible={generate.isPending} contentStyle={styles.genModal}>
         <View style={styles.genWrap}>
           <ActivityIndicator size="large" color={colors.accent} />
-          <Typography preset="h4" align="center">
-            {isUploading ? t('quiz:setup.uploadingFile', 'Uploading file…') : t('quiz:setup.generatingTitle', 'Building your quiz…')}
-          </Typography>
-          {!isUploading && <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>}
+          <Typography preset="h4" align="center">{t('quiz:setup.generatingTitle', 'Building your quiz…')}</Typography>
+          <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>
         </View>
       </AppModal>
     </Screen>
