@@ -183,7 +183,9 @@
     "noMatch": "일치하는 카드 없음 ",
     "qaCard": "질문 & 답 카드",
     "storyCard": "이야기 카드",
-    "noCards": "아직 카드가 없습니다"
+    "noCards": "아직 카드가 없습니다",
+    "mastery": "숙련도",
+    "masteryCount": "{{learned}}/{{total}} 학습됨"
   },
   "plans": {
     "title": "학습 계획",

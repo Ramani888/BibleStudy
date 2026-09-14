@@ -183,7 +183,9 @@
     "noMatch": "Walang cards na tumugma sa ",
     "qaCard": "Q&A Card",
     "storyCard": "Story Card",
-    "noCards": "Wala pang cards"
+    "noCards": "Wala pang cards",
+    "mastery": "Kahusayan",
+    "masteryCount": "{{learned}}/{{total}} natutunan"
   },
   "plans": {
     "title": "Mga Plano sa Pag-aaral",

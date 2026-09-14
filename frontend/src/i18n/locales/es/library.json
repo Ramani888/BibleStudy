@@ -183,7 +183,9 @@
     "noMatch": "Ninguna tarjeta coincide con ",
     "qaCard": "Tarjeta de P y R",
     "storyCard": "Tarjeta de historia",
-    "noCards": "Aún no hay tarjetas"
+    "noCards": "Aún no hay tarjetas",
+    "mastery": "Dominio",
+    "masteryCount": "{{learned}}/{{total}} aprendidas"
   },
   "plans": {
     "title": "Planes de Estudio",

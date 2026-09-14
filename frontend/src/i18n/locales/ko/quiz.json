@@ -27,7 +27,9 @@
     "startNewQuiz": "+ 새 퀴즈 시작",
     "emptyTitle": "아직 퀴즈가 없습니다",
     "emptySub": "탭하세요 ",
-    "details": "상세"
+    "details": "상세",
+    "reviewDue": "복습할 카드",
+    "dueCount": "복습할 카드 {{count}}개"
   },
   "setup": {
     "title": "퀴즈 설정",
@@ -92,7 +94,27 @@
     "nameLabel": "퀴즈 이름",
     "namePlaceholder": "예: 3주차 복습…",
     "quizTypeLabel": "퀴즈 유형",
-    "selectSetsToContinue": "계속하려면 세트를 선택하세요"
+    "selectSetsToContinue": "계속하려면 세트를 선택하세요",
+    "aiLabel": "또는 AI로 생성",
+    "aiTopicPlaceholder": "주제를 입력하세요 — 예: 요한복음",
+    "generateAiQuiz": "✨ AI 퀴즈 생성",
+    "generateAiQuizFromSets": "✨ 선택한 세트로 AI 퀴즈 생성",
+    "generateFromFile": "📎 PDF 또는 이미지로 퀴즈",
+    "choosePdf": "PDF 선택",
+    "chooseImage": "이미지 선택",
+    "fileQuizTitle": "파일 퀴즈",
+    "uploadingFile": "파일 업로드 중…",
+    "aiCost": "{{cost}} 크레딧 소모",
+    "aiCostWithBalance": "{{cost}} 크레딧 소모 · {{balance}} 남음",
+    "generatingTitle": "퀴즈를 만드는 중…",
+    "generating": {
+      "writing": "문제를 작성하는 중…",
+      "grounding": "성경에 근거하는 중…",
+      "almost": "거의 완료…"
+    },
+    "outOfCredits": "크레딧 부족",
+    "upgradeToGenerate": "AI 퀴즈를 생성하려면 업그레이드하세요.",
+    "couldNotGenerate": "퀴즈를 생성할 수 없습니다"
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",
@@ -222,7 +244,8 @@
     "correctAnswer": "정답",
     "quitDialogTitle": "퀴즈를 종료할까요?",
     "quitDialogMessage": "이 퀴즈의 진행 상황이 사라집니다.",
-    "emptyState": "퀴즈로 낼 항목이 없습니다"
+    "emptyState": "퀴즈로 낼 항목이 없습니다",
+    "practiceNotSaved": "연습 · 저장 안 됨"
   },
   "results": {
     "title": "퀴즈 완료!",
@@ -239,7 +262,10 @@
     "saveFailed": "저장 실패: {{message}}",
     "perfectScore": "훌륭해요! 만점입니다!",
     "goodJob": "잘했어요! 신실한 공부를 계속 이어가세요.",
-    "needsPractice": "좋은 노력이에요! 틀린 카드를 복습하여 완전히 익히세요."
+    "needsPractice": "좋은 노력이에요! 틀린 카드를 복습하여 완전히 익히세요.",
+    "streakDays": "🔥 {{count}}일 연속",
+    "practiceMissed": "틀린 문제 연습",
+    "practiceMissedCount": "틀린 {{count}}개 연습"
   },
   "item": {
     "typeAnswerPlaceholder": "답을 입력하세요…"
@@ -252,5 +278,10 @@
   },
   "play": {
     "tapToRevealProgress": "탭하여 공개 ({{revealed}}/{{total}})"
+  },
+  "difficulty": {
+    "easy": "쉬움",
+    "medium": "보통",
+    "hard": "어려움"
   }
 }

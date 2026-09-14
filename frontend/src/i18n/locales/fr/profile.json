@@ -116,7 +116,10 @@
     "versionLabel": "Version {{version}}",
     "madeWithLove": "Fait avec ♥",
     "aboutUs": "À Propos de Nous",
-    "privacyPolicy": "Politique de Confidentialité"
+    "privacyPolicy": "Politique de Confidentialité",
+    "study": "Étude",
+    "smartScheduling": "Planification intelligente (FSRS)",
+    "smartSchedulingHint": "Moins de révisions pour la même mémorisation. Désactivé = SM-2 classique."
   },
   "creditsScreen": {
     "title": "Crédits d'Étude",

@@ -27,7 +27,9 @@
     "startNewQuiz": "+ Démarrer un nouveau quiz",
     "emptyTitle": "Aucun quiz pour l'instant",
     "emptySub": "Touchez ",
-    "details": "Détails"
+    "details": "Détails",
+    "reviewDue": "Réviser les cartes dues",
+    "dueCount": "{{count}} cartes à réviser"
   },
   "setup": {
     "title": "Configuration du Quiz",
@@ -92,7 +94,27 @@
     "nameLabel": "NOM DU QUIZ",
     "namePlaceholder": "ex. Révision semaine 3…",
     "quizTypeLabel": "TYPE DE QUIZ",
-    "selectSetsToContinue": "Sélectionnez des ensembles pour continuer"
+    "selectSetsToContinue": "Sélectionnez des ensembles pour continuer",
+    "aiLabel": "OU GÉNÉRER AVEC L'IA",
+    "aiTopicPlaceholder": "Entrez un sujet — p. ex. Évangile de Jean",
+    "generateAiQuiz": "✨ Générer un quiz avec l'IA",
+    "generateAiQuizFromSets": "✨ Générer un quiz IA à partir des ensembles sélectionnés",
+    "generateFromFile": "📎 Quiz à partir d'un PDF ou d'une image",
+    "choosePdf": "Choisir un PDF",
+    "chooseImage": "Choisir une image",
+    "fileQuizTitle": "Quiz de fichier",
+    "uploadingFile": "Envoi du fichier…",
+    "aiCost": "Coûte {{cost}} crédits",
+    "aiCostWithBalance": "Coûte {{cost}} crédits · {{balance}} restants",
+    "generatingTitle": "Création de votre quiz…",
+    "generating": {
+      "writing": "Rédaction de vos questions…",
+      "grounding": "Ancrage dans les Écritures…",
+      "almost": "Presque prêt…"
+    },
+    "outOfCredits": "Plus de crédits",
+    "upgradeToGenerate": "Passez à la version supérieure pour générer des quiz IA.",
+    "couldNotGenerate": "Impossible de générer le quiz"
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",
@@ -222,7 +244,8 @@
     "correctAnswer": "Bonne réponse",
     "quitDialogTitle": "Quitter le quiz ?",
     "quitDialogMessage": "Votre progression dans ce quiz sera perdue.",
-    "emptyState": "Rien à réviser ici"
+    "emptyState": "Rien à réviser ici",
+    "practiceNotSaved": "Entraînement · non enregistré"
   },
   "results": {
     "title": "Quiz terminé !",
@@ -239,7 +262,10 @@
     "saveFailed": "Échec de l'enregistrement : {{message}}",
     "perfectScore": "Remarquable ! Score parfait !",
     "goodJob": "Bravo ! Poursuivez votre étude fidèle.",
-    "needsPractice": "Bel effort ! Révisez les cartes manquées pour les maîtriser."
+    "needsPractice": "Bel effort ! Révisez les cartes manquées pour les maîtriser.",
+    "streakDays": "🔥 série de {{count}} jours",
+    "practiceMissed": "Réviser les erreurs",
+    "practiceMissedCount": "Réviser les {{count}} manqués"
   },
   "item": {
     "typeAnswerPlaceholder": "Tapez votre réponse…"
@@ -252,5 +278,10 @@
   },
   "play": {
     "tapToRevealProgress": "Appuyez pour révéler ({{revealed}}/{{total}})"
+  },
+  "difficulty": {
+    "easy": "Facile",
+    "medium": "Moyen",
+    "hard": "Difficile"
   }
 }

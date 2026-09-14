@@ -183,7 +183,9 @@
     "noMatch": "Nenhum card corresponde a ",
     "qaCard": "Card de P&R",
     "storyCard": "Card de história",
-    "noCards": "Nenhum card ainda"
+    "noCards": "Nenhum card ainda",
+    "mastery": "Domínio",
+    "masteryCount": "{{learned}}/{{total}} aprendidos"
   },
   "plans": {
     "title": "Planos de Estudo",

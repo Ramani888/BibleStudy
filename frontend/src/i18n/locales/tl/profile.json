@@ -116,7 +116,10 @@
     "versionLabel": "Bersyon {{version}}",
     "madeWithLove": "Gawa nang may ♥",
     "aboutUs": "Tungkol sa Amin",
-    "privacyPolicy": "Patakaran sa Pagkapribado"
+    "privacyPolicy": "Patakaran sa Pagkapribado",
+    "study": "Pag-aaral",
+    "smartScheduling": "Smart scheduling (FSRS)",
+    "smartSchedulingHint": "Mas kaunting review para sa parehong recall. Naka-off = classic SM-2."
   },
   "creditsScreen": {
     "title": "Mga Kredito sa Pag-aaral",

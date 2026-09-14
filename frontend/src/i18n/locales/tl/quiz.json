@@ -27,7 +27,9 @@
     "startNewQuiz": "+ Magsimula ng Bagong Quiz",
     "emptyTitle": "Wala pang quiz",
     "emptySub": "I-tap ang ",
-    "details": "Mga Detalye"
+    "details": "Mga Detalye",
+    "reviewDue": "Balikan ang mga due na card",
+    "dueCount": "{{count}} card ang dapat balikan"
   },
   "setup": {
     "title": "Setup ng Pagsusulit",
@@ -92,7 +94,27 @@
     "nameLabel": "PANGALAN NG QUIZ",
     "namePlaceholder": "hal. Linggo 3 na Pagsusuri…",
     "quizTypeLabel": "URI NG QUIZ",
-    "selectSetsToContinue": "Pumili ng sets upang magpatuloy"
+    "selectSetsToContinue": "Pumili ng sets upang magpatuloy",
+    "aiLabel": "O GUMAWA GAMIT ANG AI",
+    "aiTopicPlaceholder": "Maglagay ng paksa — hal. Ebanghelyo ni Juan",
+    "generateAiQuiz": "✨ Gumawa ng AI Quiz",
+    "generateAiQuizFromSets": "✨ Gumawa ng AI Quiz mula sa napiling mga set",
+    "generateFromFile": "📎 Quiz mula sa PDF o larawan",
+    "choosePdf": "Pumili ng PDF",
+    "chooseImage": "Pumili ng larawan",
+    "fileQuizTitle": "Quiz mula sa file",
+    "uploadingFile": "Ina-upload ang file…",
+    "aiCost": "Nagkakahalaga ng {{cost}} credits",
+    "aiCostWithBalance": "Nagkakahalaga ng {{cost}} credits · {{balance}} natitira",
+    "generatingTitle": "Ginagawa ang iyong quiz…",
+    "generating": {
+      "writing": "Isinusulat ang mga tanong…",
+      "grounding": "Iniuugnay sa Kasulatan…",
+      "almost": "Malapit na…"
+    },
+    "outOfCredits": "Ubos na ang credits",
+    "upgradeToGenerate": "Mag-upgrade para makagawa ng AI quiz.",
+    "couldNotGenerate": "Hindi makagawa ng quiz"
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",
@@ -222,7 +244,8 @@
     "correctAnswer": "Tamang Sagot",
     "quitDialogTitle": "Ihinto ang Quiz?",
     "quitDialogMessage": "Mawawala ang iyong progreso sa quiz na ito.",
-    "emptyState": "Walang ma-quiz dito"
+    "emptyState": "Walang ma-quiz dito",
+    "practiceNotSaved": "Pagsasanay · hindi naka-save"
   },
   "results": {
     "title": "Tapos na ang Quiz!",
@@ -239,7 +262,10 @@
     "saveFailed": "Nabigo ang pag-save: {{message}}",
     "perfectScore": "Kahanga-hanga! Perfect Score!",
     "goodJob": "Magaling! Ipagpatuloy ang tapat na pag-aaral.",
-    "needsPractice": "Magandang pagsisikap! Balikan ang mga card na namali para masapatan mo ang mga ito."
+    "needsPractice": "Magandang pagsisikap! Balikan ang mga card na namali para masapatan mo ang mga ito.",
+    "streakDays": "🔥 {{count}}-araw na streak",
+    "practiceMissed": "Sanayin ang mga namali",
+    "practiceMissedCount": "Sanayin ang {{count}} na namali"
   },
   "item": {
     "typeAnswerPlaceholder": "I-type ang iyong sagot…"
@@ -252,5 +278,10 @@
   },
   "play": {
     "tapToRevealProgress": "I-tap para ipakita ({{revealed}}/{{total}})"
+  },
+  "difficulty": {
+    "easy": "Madali",
+    "medium": "Katamtaman",
+    "hard": "Mahirap"
   }
 }

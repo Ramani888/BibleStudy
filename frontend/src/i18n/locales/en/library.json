@@ -104,6 +104,8 @@
     "cards": "Cards",
     "cardCount": "{{count}} card",
     "cardCount_other": "{{count}} cards",
+    "mastery": "Mastery",
+    "masteryCount": "{{learned}}/{{total}} learned",
     "cardAdded": "Card added!",
     "cardUpdated": "Card updated!",
     "cardDeleted": "Card deleted",

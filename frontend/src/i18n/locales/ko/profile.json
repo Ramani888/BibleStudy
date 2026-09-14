@@ -116,7 +116,10 @@
     "versionLabel": "버전 {{version}}",
     "madeWithLove": "사랑으로 제작됨 ♥",
     "aboutUs": "앱 소개",
-    "privacyPolicy": "개인정보 처리방침"
+    "privacyPolicy": "개인정보 처리방침",
+    "study": "학습",
+    "smartScheduling": "스마트 스케줄링 (FSRS)",
+    "smartSchedulingHint": "같은 기억력으로 복습을 줄입니다. 끄면 기존 SM-2."
   },
   "creditsScreen": {
     "title": "학습 크레딧",

@@ -27,7 +27,9 @@
     "startNewQuiz": "+ Iniciar novo quiz",
     "emptyTitle": "Nenhum quiz ainda",
     "emptySub": "Toque em ",
-    "details": "Detalhes"
+    "details": "Detalhes",
+    "reviewDue": "Revisar cartões pendentes",
+    "dueCount": "{{count}} cartões para revisar"
   },
   "setup": {
     "title": "Configuração do Quiz",
@@ -92,7 +94,27 @@
     "nameLabel": "NOME DO QUIZ",
     "namePlaceholder": "ex. Revisão da semana 3…",
     "quizTypeLabel": "TIPO DE QUIZ",
-    "selectSetsToContinue": "Selecione conjuntos para continuar"
+    "selectSetsToContinue": "Selecione conjuntos para continuar",
+    "aiLabel": "OU GERAR COM IA",
+    "aiTopicPlaceholder": "Digite um tema — ex. Evangelho de João",
+    "generateAiQuiz": "✨ Gerar quiz com IA",
+    "generateAiQuizFromSets": "✨ Gerar quiz com IA dos conjuntos selecionados",
+    "generateFromFile": "📎 Quiz a partir de um PDF ou imagem",
+    "choosePdf": "Escolher PDF",
+    "chooseImage": "Escolher imagem",
+    "fileQuizTitle": "Quiz de arquivo",
+    "uploadingFile": "Enviando arquivo…",
+    "aiCost": "Custa {{cost}} créditos",
+    "aiCostWithBalance": "Custa {{cost}} créditos · restam {{balance}}",
+    "generatingTitle": "Montando seu quiz…",
+    "generating": {
+      "writing": "Escrevendo suas perguntas…",
+      "grounding": "Fundamentando nas Escrituras…",
+      "almost": "Quase pronto…"
+    },
+    "outOfCredits": "Sem créditos",
+    "upgradeToGenerate": "Faça upgrade para gerar quizzes com IA.",
+    "couldNotGenerate": "Não foi possível gerar o quiz"
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",
@@ -222,7 +244,8 @@
     "correctAnswer": "Resposta correta",
     "quitDialogTitle": "Sair do quiz?",
     "quitDialogMessage": "Seu progresso neste quiz será perdido.",
-    "emptyState": "Nada para o quiz aqui"
+    "emptyState": "Nada para o quiz aqui",
+    "practiceNotSaved": "Prática · não salva"
   },
   "results": {
     "title": "Quiz concluído!",
@@ -239,7 +262,10 @@
     "saveFailed": "Falha ao salvar: {{message}}",
     "perfectScore": "Excelente! Pontuação perfeita!",
     "goodJob": "Ótimo trabalho! Continue com o estudo fiel.",
-    "needsPractice": "Bom esforço! Revise os cartões que errou para dominá-los."
+    "needsPractice": "Bom esforço! Revise os cartões que errou para dominá-los.",
+    "streakDays": "🔥 sequência de {{count}} dias",
+    "practiceMissed": "Praticar os que errou",
+    "practiceMissedCount": "Praticar {{count}} que você errou"
   },
   "item": {
     "typeAnswerPlaceholder": "Digite sua resposta…"
@@ -252,5 +278,10 @@
   },
   "play": {
     "tapToRevealProgress": "Toque para revelar ({{revealed}}/{{total}})"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Média",
+    "hard": "Difícil"
   }
 }

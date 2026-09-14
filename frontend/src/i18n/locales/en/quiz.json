@@ -20,6 +20,8 @@
     "deleteAttempt": "Delete Attempt",
     "setsCount": "{{count}} Sets",
     "startNewQuiz": "+ Start New Quiz",
+    "reviewDue": "Review due cards",
+    "dueCount": "{{count}} cards due for review",
     "emptyTitle": "No quizzes yet",
     "emptySub": "Tap ",
     "details": "Details"
@@ -66,7 +68,27 @@
     "nameLabel": "QUIZ NAME",
     "namePlaceholder": "e.g. Week 3 Review…",
     "quizTypeLabel": "QUIZ TYPE",
-    "selectSetsToContinue": "Select sets to continue"
+    "selectSetsToContinue": "Select sets to continue",
+    "aiLabel": "OR GENERATE WITH AI",
+    "aiTopicPlaceholder": "Enter a topic — e.g. Gospel of John",
+    "generateAiQuiz": "✨ Generate AI Quiz",
+    "generateAiQuizFromSets": "✨ Generate AI Quiz from selected sets",
+    "generateFromFile": "📎 Quiz from a PDF or image",
+    "choosePdf": "Choose PDF",
+    "chooseImage": "Choose image",
+    "fileQuizTitle": "File quiz",
+    "uploadingFile": "Uploading file…",
+    "aiCost": "Costs {{cost}} credits",
+    "aiCostWithBalance": "Costs {{cost}} credits · {{balance}} left",
+    "generatingTitle": "Building your quiz…",
+    "generating": {
+      "writing": "Writing your questions…",
+      "grounding": "Grounding them in scripture…",
+      "almost": "Almost ready…"
+    },
+    "outOfCredits": "Out of credits",
+    "upgradeToGenerate": "Upgrade to generate AI quizzes.",
+    "couldNotGenerate": "Couldn't generate quiz"
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",
@@ -78,11 +100,20 @@
     "correctAnswer": "Correct Answer",
     "quitDialogTitle": "Quit Quiz?",
     "quitDialogMessage": "Your progress in this quiz will be lost.",
-    "emptyState": "Nothing to quiz here"
+    "emptyState": "Nothing to quiz here",
+    "practiceNotSaved": "Practice · not saved"
+  },
+  "difficulty": {
+    "easy": "Easy",
+    "medium": "Medium",
+    "hard": "Hard"
   },
   "results": {
     "title": "Quiz Complete!",
     "quizComplete": "Quiz Complete!",
+    "streakDays": "🔥 {{count}}-day streak",
+    "practiceMissed": "Practice missed",
+    "practiceMissedCount": "Practice {{count}} you missed",
     "score": "Score",
     "scoreFraction": "{{correct}} / {{total}} correct",
     "accuracy": "Accuracy",

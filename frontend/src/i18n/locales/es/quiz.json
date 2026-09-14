@@ -27,7 +27,9 @@
     "startNewQuiz": "+ Iniciar nuevo cuestionario",
     "emptyTitle": "Aún no hay cuestionarios",
     "emptySub": "Toca ",
-    "details": "Detalles"
+    "details": "Detalles",
+    "reviewDue": "Repasar tarjetas pendientes",
+    "dueCount": "{{count}} tarjetas para repasar"
   },
   "setup": {
     "title": "Configuración del Cuestionario",
@@ -92,7 +94,27 @@
     "nameLabel": "NOMBRE DEL CUESTIONARIO",
     "namePlaceholder": "p. ej. Repaso de la semana 3…",
     "quizTypeLabel": "TIPO DE CUESTIONARIO",
-    "selectSetsToContinue": "Selecciona conjuntos para continuar"
+    "selectSetsToContinue": "Selecciona conjuntos para continuar",
+    "aiLabel": "O GENERAR CON IA",
+    "aiTopicPlaceholder": "Escribe un tema — p. ej. Evangelio de Juan",
+    "generateAiQuiz": "✨ Generar cuestionario con IA",
+    "generateAiQuizFromSets": "✨ Generar cuestionario con IA de los conjuntos seleccionados",
+    "generateFromFile": "📎 Cuestionario desde un PDF o imagen",
+    "choosePdf": "Elegir PDF",
+    "chooseImage": "Elegir imagen",
+    "fileQuizTitle": "Cuestionario de archivo",
+    "uploadingFile": "Subiendo archivo…",
+    "aiCost": "Cuesta {{cost}} créditos",
+    "aiCostWithBalance": "Cuesta {{cost}} créditos · quedan {{balance}}",
+    "generatingTitle": "Creando tu cuestionario…",
+    "generating": {
+      "writing": "Escribiendo tus preguntas…",
+      "grounding": "Fundamentándolas en las Escrituras…",
+      "almost": "Casi listo…"
+    },
+    "outOfCredits": "Sin créditos",
+    "upgradeToGenerate": "Mejora tu plan para generar cuestionarios con IA.",
+    "couldNotGenerate": "No se pudo generar el cuestionario"
   },
   "hud": {
     "questionOf": "Pregunta {{current}} de {{total}}",
@@ -222,7 +244,8 @@
     "correctAnswer": "Respuesta correcta",
     "quitDialogTitle": "¿Salir del cuestionario?",
     "quitDialogMessage": "Perderás tu progreso en este cuestionario.",
-    "emptyState": "Nada que evaluar aquí"
+    "emptyState": "Nada que evaluar aquí",
+    "practiceNotSaved": "Práctica · no guardada"
   },
   "results": {
     "title": "¡Cuestionario completado!",
@@ -239,7 +262,10 @@
     "saveFailed": "Error al guardar: {{message}}",
     "perfectScore": "¡Impresionante! ¡Puntuación perfecta!",
     "goodJob": "¡Buen trabajo! Sigue con tu estudio fiel.",
-    "needsPractice": "¡Buen esfuerzo! Repasa las tarjetas que fallaste para dominarlas."
+    "needsPractice": "¡Buen esfuerzo! Repasa las tarjetas que fallaste para dominarlas.",
+    "streakDays": "🔥 racha de {{count}} días",
+    "practiceMissed": "Practicar los fallados",
+    "practiceMissedCount": "Practicar {{count}} que fallaste"
   },
   "item": {
     "typeAnswerPlaceholder": "Escribe tu respuesta…"
@@ -252,5 +278,10 @@
   },
   "play": {
     "tapToRevealProgress": "Toca para revelar ({{revealed}}/{{total}})"
+  },
+  "difficulty": {
+    "easy": "Fácil",
+    "medium": "Media",
+    "hard": "Difícil"
   }
 }

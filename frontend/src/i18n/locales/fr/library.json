@@ -183,7 +183,9 @@
     "noMatch": "Aucune carte ne correspond à ",
     "qaCard": "Carte Q&R",
     "storyCard": "Carte récit",
-    "noCards": "Aucune carte pour l'instant"
+    "noCards": "Aucune carte pour l'instant",
+    "mastery": "Maîtrise",
+    "masteryCount": "{{learned}}/{{total}} apprises"
   },
   "plans": {
     "title": "Plans d'Étude",
