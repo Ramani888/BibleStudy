@@ -15,7 +15,5 @@ router.put('/attempts/:id',    validate(RecordAttemptDto), quizController.update
 router.delete('/attempts/:id',                             quizController.deleteAttempt);
 router.get('/attempts/recent',                       quizController.getRecentAttempts);
 router.get('/attempts/:id/responses',                quizController.getAttemptResponses);
-router.get('/best',                                  quizController.getAllBest);
-router.get('/sets/:setId/best',                      quizController.getBest);
 
 export default router;

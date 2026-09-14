@@ -57,7 +57,6 @@
     "createSetFirst": "Crea un set con al menos 1 tarjeta primero.",
     "quizNamePlaceholder": "Nombre del cuestionario (opcional)",
     "selectSets": "Seleccionar sets",
-    "startQuiz": "Empezar cuestionario",
     "selectMode": "Seleccionar modo",
     "chooseSets": "Elegir sets",
     "chooseSetsLabel": "Toca para elegir sets",
@@ -66,16 +65,6 @@
     "noSetsSub": "Crea algunos sets de estudio antes de hacer un cuestionario.",
     "startQuizBtn": "Empezar cuestionario",
     "selectSetsCount": "Seleccionar sets ({{count}} seleccionados)",
-    "modeDesc": {
-      "mix": "Mezcla aleatoria de todos los tipos disponibles",
-      "mc": "Elige la respuesta correcta entre 4 opciones",
-      "story_mc": "Relaciona la referencia con el pasaje correcto",
-      "type_answer": "Escribe la respuesta de memoria",
-      "type_verbatim": "Escribe el pasaje completo, palabra por palabra",
-      "blanks": "Completa las palabras que faltan",
-      "chunks": "Ordena los fragmentos del pasaje",
-      "read": "Lee y memoriza — sin puntuación"
-    },
     "sort": {
       "newest": "Recientes",
       "cards": "Tarjetas"
@@ -90,12 +79,9 @@
     "cancelWarning": "Perderás tu progreso.",
     "tapToChooseSets": "Toca para elegir conjuntos…",
     "loadingCards": "Cargando tarjetas…",
-    "noCardsInSets": "No hay tarjetas en los conjuntos seleccionados",
     "nameLabel": "NOMBRE DEL CUESTIONARIO",
     "namePlaceholder": "p. ej. Repaso de la semana 3…",
-    "quizTypeLabel": "TIPO DE CUESTIONARIO",
     "selectSetsToContinue": "Selecciona conjuntos para continuar",
-    "aiLabel": "O GENERAR CON IA",
     "aiTopicPlaceholder": "Escribe un tema — p. ej. Evangelio de Juan",
     "generateAiQuiz": "✨ Generar cuestionario con IA",
     "aiCost": "Cuesta {{cost}} créditos",
@@ -109,10 +95,6 @@
     "outOfCredits": "Sin créditos",
     "upgradeToGenerate": "Mejora tu plan para generar cuestionarios con IA.",
     "couldNotGenerate": "No se pudo generar el cuestionario",
-    "tab": {
-      "practice": "Practicar",
-      "ai": "Quiz con IA"
-    },
     "topicLabel": "TEMA",
     "aiSourceLabel": "GENERAR DESDE",
     "aiSource": {

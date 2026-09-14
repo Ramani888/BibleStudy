@@ -57,7 +57,6 @@
     "createSetFirst": "최소 1개의 카드가 포함된 세트를 먼저 만드세요.",
     "quizNamePlaceholder": "퀴즈 이름 (선택)",
     "selectSets": "세트 선택",
-    "startQuiz": "퀴즈 시작",
     "selectMode": "모드 선택",
     "chooseSets": "세트 선택",
     "chooseSetsLabel": "탭하여 세트를 선택하세요",
@@ -66,16 +65,6 @@
     "noSetsSub": "퀴즈를 풀기 전에 먼저 학습 세트를 만드세요.",
     "startQuizBtn": "퀴즈 시작",
     "selectSetsCount": "세트 선택 ({{count}}개 선택됨)",
-    "modeDesc": {
-      "mix": "사용 가능한 모든 유형을 무작위로 조합",
-      "mc": "4개의 보기에서 정답을 고르세요",
-      "story_mc": "성경 구절을 알맞은 본문과 연결하세요",
-      "type_answer": "기억을 떠올려 답을 입력하세요",
-      "type_verbatim": "본문 전체를 그대로 입력하세요",
-      "blanks": "빈칸에 알맞은 단어를 채우세요",
-      "chunks": "본문 조각을 순서대로 배열하세요",
-      "read": "읽고 암기하기 — 채점 없음"
-    },
     "sort": {
       "newest": "최신순",
       "cards": "카드순"
@@ -90,12 +79,9 @@
     "cancelWarning": "진행 상황이 사라집니다.",
     "tapToChooseSets": "탭하여 세트 선택…",
     "loadingCards": "카드 불러오는 중…",
-    "noCardsInSets": "선택한 세트에 카드가 없습니다",
     "nameLabel": "퀴즈 이름",
     "namePlaceholder": "예: 3주차 복습…",
-    "quizTypeLabel": "퀴즈 유형",
     "selectSetsToContinue": "계속하려면 세트를 선택하세요",
-    "aiLabel": "또는 AI로 생성",
     "aiTopicPlaceholder": "주제를 입력하세요 — 예: 요한복음",
     "generateAiQuiz": "✨ AI 퀴즈 생성",
     "aiCost": "{{cost}} 크레딧 소모",
@@ -109,10 +95,6 @@
     "outOfCredits": "크레딧 부족",
     "upgradeToGenerate": "AI 퀴즈를 생성하려면 업그레이드하세요.",
     "couldNotGenerate": "퀴즈를 생성할 수 없습니다",
-    "tab": {
-      "practice": "연습",
-      "ai": "AI 퀴즈"
-    },
     "topicLabel": "주제",
     "aiSourceLabel": "생성 기준",
     "aiSource": {

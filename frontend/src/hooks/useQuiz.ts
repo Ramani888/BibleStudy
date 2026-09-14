@@ -40,23 +40,6 @@ export function useRecentQuizAttempts(limit = 20) {
   });
 }
 
-/** Best score + attempt count per set — powers Quiz hub badges. */
-export function useAllQuizBest() {
-  return useQuery({
-    queryKey: ['quiz', 'best'],
-    queryFn: quizApi.getAllBest,
-  });
-}
-
-/** Best score for a single set. */
-export function useQuizBest(setId: string) {
-  return useQuery({
-    queryKey: ['quiz', 'best', setId],
-    queryFn: () => quizApi.getBest(setId),
-    enabled: !!setId,
-  });
-}
-
 /**
  * Unified save hook for quiz completion.
  * - No retakeAttemptId → creates a new attempt (POST)

@@ -30,7 +30,6 @@
     "title": "Quiz Setup",
     "quizNamePlaceholder": "Quiz Name (optional)",
     "selectSets": "Select Sets",
-    "startQuiz": "Start Quiz",
     "selectMode": "Select Mode",
     "chooseSets": "Choose Sets",
     "chooseSetsLabel": "Tap to choose sets",
@@ -39,16 +38,6 @@
     "noSetsSub": "Create some study sets first before taking a quiz.",
     "startQuizBtn": "Start Quiz",
     "selectSetsCount": "Select Sets ({{count}} selected)",
-    "modeDesc": {
-      "mix": "Random mix of all available types",
-      "mc": "Pick the correct answer from 4 options",
-      "story_mc": "Match reference to the correct passage",
-      "type_answer": "Type the answer from memory",
-      "type_verbatim": "Type the full passage verbatim",
-      "blanks": "Fill in the missing words",
-      "chunks": "Put the passage chunks in order",
-      "read": "Read & memorize — not scored"
-    },
     "sort": {
       "newest": "Recent",
       "alpha": "A–Z",
@@ -64,12 +53,9 @@
     "cancelWarning": "Your progress will be lost.",
     "tapToChooseSets": "Tap to choose sets…",
     "loadingCards": "Loading cards…",
-    "noCardsInSets": "No cards in selected sets",
     "nameLabel": "QUIZ NAME",
     "namePlaceholder": "e.g. Week 3 Review…",
-    "quizTypeLabel": "QUIZ TYPE",
     "selectSetsToContinue": "Select sets to continue",
-    "aiLabel": "OR GENERATE WITH AI",
     "aiTopicPlaceholder": "Enter a topic — e.g. Gospel of John",
     "generateAiQuiz": "✨ Generate AI Quiz",
     "aiCost": "Costs {{cost}} credits",
@@ -83,10 +69,6 @@
     "outOfCredits": "Out of credits",
     "upgradeToGenerate": "Upgrade to generate AI quizzes.",
     "couldNotGenerate": "Couldn't generate quiz",
-    "tab": {
-      "practice": "Practice",
-      "ai": "Quiz by AI"
-    },
     "topicLabel": "TOPIC",
     "aiSourceLabel": "GENERATE FROM",
     "aiSource": {

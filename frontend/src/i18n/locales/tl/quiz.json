@@ -57,7 +57,6 @@
     "createSetFirst": "Gumawa muna ng set na may kahit 1 card.",
     "quizNamePlaceholder": "Pangalan ng Quiz (opsyonal)",
     "selectSets": "Pumili ng Sets",
-    "startQuiz": "Simulan ang Quiz",
     "selectMode": "Pumili ng Mode",
     "chooseSets": "Pumili ng Sets",
     "chooseSetsLabel": "I-tap para pumili ng sets",
@@ -66,16 +65,6 @@
     "noSetsSub": "Gumawa muna ng ilang study set bago kumuha ng quiz.",
     "startQuizBtn": "Simulan ang Quiz",
     "selectSetsCount": "Pumili ng Sets ({{count}} napili)",
-    "modeDesc": {
-      "mix": "Random na halo ng lahat ng available na uri",
-      "mc": "Piliin ang tamang sagot mula sa 4 na opsyon",
-      "story_mc": "Itugma ang reference sa tamang talata",
-      "type_answer": "I-type ang sagot mula sa memorya",
-      "type_verbatim": "I-type ang buong talata nang eksakto",
-      "blanks": "Punan ang mga nawawalang salita",
-      "chunks": "Isaayos ang mga bahagi ng talata",
-      "read": "Basahin at isaulo — hindi iniiskor"
-    },
     "sort": {
       "newest": "Kamakailan",
       "cards": "Cards"
@@ -90,12 +79,9 @@
     "cancelWarning": "Mawawala ang iyong progreso.",
     "tapToChooseSets": "I-tap upang pumili ng sets…",
     "loadingCards": "Nilo-load ang cards…",
-    "noCardsInSets": "Walang cards sa napiling sets",
     "nameLabel": "PANGALAN NG QUIZ",
     "namePlaceholder": "hal. Linggo 3 na Pagsusuri…",
-    "quizTypeLabel": "URI NG QUIZ",
     "selectSetsToContinue": "Pumili ng sets upang magpatuloy",
-    "aiLabel": "O GUMAWA GAMIT ANG AI",
     "aiTopicPlaceholder": "Maglagay ng paksa — hal. Ebanghelyo ni Juan",
     "generateAiQuiz": "✨ Gumawa ng AI Quiz",
     "aiCost": "Nagkakahalaga ng {{cost}} credits",
@@ -109,10 +95,6 @@
     "outOfCredits": "Ubos na ang credits",
     "upgradeToGenerate": "Mag-upgrade para makagawa ng AI quiz.",
     "couldNotGenerate": "Hindi makagawa ng quiz",
-    "tab": {
-      "practice": "Magsanay",
-      "ai": "Quiz sa AI"
-    },
     "topicLabel": "PAKSA",
     "aiSourceLabel": "GUMAWA MULA SA",
     "aiSource": {

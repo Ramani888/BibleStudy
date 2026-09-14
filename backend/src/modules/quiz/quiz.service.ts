@@ -167,21 +167,3 @@ export async function getAttemptResponses(userId: string, attemptId: string) {
   if (!row) throw new NotFoundError('Attempt not found');
   return { responses: row.responses ?? null };
 }
-
-export async function getAllBest(userId: string) {
-  // Single-set attempts only — mirrors getBestForSet (multi-set/review sessions
-  // don't credit any one set's best/attempt count).
-  const rows = await prisma.quizAttempt.findMany({
-    where: { userId },
-    select: { setId: true, scorePct: true, setIds: true },
-  });
-  const bySet = new Map<string, { best: number; attempts: number }>();
-  for (const r of rows) {
-    if (r.setIds.length > 1) continue;
-    const cur = bySet.get(r.setId) ?? { best: 0, attempts: 0 };
-    cur.best = Math.max(cur.best, r.scorePct);
-    cur.attempts += 1;
-    bySet.set(r.setId, cur);
-  }
-  return [...bySet].map(([setId, v]) => ({ setId, best: v.best, attempts: v.attempts }));
-}

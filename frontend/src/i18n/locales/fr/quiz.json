@@ -57,7 +57,6 @@
     "createSetFirst": "Créez d'abord une série avec au moins 1 carte.",
     "quizNamePlaceholder": "Nom du quiz (facultatif)",
     "selectSets": "Sélectionner des ensembles",
-    "startQuiz": "Démarrer le quiz",
     "selectMode": "Sélectionner un mode",
     "chooseSets": "Choisir des ensembles",
     "chooseSetsLabel": "Touchez pour choisir des ensembles",
@@ -66,16 +65,6 @@
     "noSetsSub": "Créez d'abord des ensembles d'étude avant de faire un quiz.",
     "startQuizBtn": "Démarrer le quiz",
     "selectSetsCount": "Sélectionner des ensembles ({{count}} sélectionnés)",
-    "modeDesc": {
-      "mix": "Mélange aléatoire de tous les types disponibles",
-      "mc": "Choisissez la bonne réponse parmi 4 options",
-      "story_mc": "Associez la référence au bon passage",
-      "type_answer": "Tapez la réponse de mémoire",
-      "type_verbatim": "Tapez le passage entier mot pour mot",
-      "blanks": "Remplissez les mots manquants",
-      "chunks": "Remettez les fragments du passage dans l'ordre",
-      "read": "Lire et mémoriser — sans score"
-    },
     "sort": {
       "newest": "Récent",
       "cards": "Cartes"
@@ -90,12 +79,9 @@
     "cancelWarning": "Votre progression sera perdue.",
     "tapToChooseSets": "Touchez pour choisir des ensembles…",
     "loadingCards": "Chargement des cartes…",
-    "noCardsInSets": "Aucune carte dans les ensembles sélectionnés",
     "nameLabel": "NOM DU QUIZ",
     "namePlaceholder": "ex. Révision semaine 3…",
-    "quizTypeLabel": "TYPE DE QUIZ",
     "selectSetsToContinue": "Sélectionnez des ensembles pour continuer",
-    "aiLabel": "OU GÉNÉRER AVEC L'IA",
     "aiTopicPlaceholder": "Entrez un sujet — p. ex. Évangile de Jean",
     "generateAiQuiz": "✨ Générer un quiz avec l'IA",
     "aiCost": "Coûte {{cost}} crédits",
@@ -109,10 +95,6 @@
     "outOfCredits": "Plus de crédits",
     "upgradeToGenerate": "Passez à la version supérieure pour générer des quiz IA.",
     "couldNotGenerate": "Impossible de générer le quiz",
-    "tab": {
-      "practice": "Pratiquer",
-      "ai": "Quiz par IA"
-    },
     "topicLabel": "SUJET",
     "aiSourceLabel": "GÉNÉRER À PARTIR DE",
     "aiSource": {

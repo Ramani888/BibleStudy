@@ -55,13 +55,6 @@ export interface QuizAttemptWithSet {
   createdAt: string;
 }
 
-// Best score + attempt count for a set (Quiz hub badges).
-export interface SetBestScore {
-  setId: string;
-  best: number;
-  attempts: number;
-}
-
 // The quiz modes. `mix` is a meta-mode (rotate all supported modes).
 export type QuizMode =
   | 'mc'            // Q&A: question -> pick answer

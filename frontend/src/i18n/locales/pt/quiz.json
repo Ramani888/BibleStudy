@@ -57,7 +57,6 @@
     "createSetFirst": "Crie um conjunto com pelo menos 1 cartão primeiro.",
     "quizNamePlaceholder": "Nome do quiz (opcional)",
     "selectSets": "Selecionar conjuntos",
-    "startQuiz": "Iniciar quiz",
     "selectMode": "Selecionar modo",
     "chooseSets": "Escolher conjuntos",
     "chooseSetsLabel": "Toque para escolher conjuntos",
@@ -66,16 +65,6 @@
     "noSetsSub": "Crie alguns conjuntos de estudo antes de fazer um quiz.",
     "startQuizBtn": "Iniciar quiz",
     "selectSetsCount": "Selecionar conjuntos ({{count}} selecionados)",
-    "modeDesc": {
-      "mix": "Mistura aleatória de todos os tipos disponíveis",
-      "mc": "Escolha a resposta correta entre 4 opções",
-      "story_mc": "Associe a referência à passagem correta",
-      "type_answer": "Digite a resposta de memória",
-      "type_verbatim": "Digite a passagem completa, palavra por palavra",
-      "blanks": "Preencha as palavras que faltam",
-      "chunks": "Coloque os trechos da passagem em ordem",
-      "read": "Leia e memorize — sem pontuação"
-    },
     "sort": {
       "newest": "Recentes",
       "cards": "Cartões"
@@ -90,12 +79,9 @@
     "cancelWarning": "Seu progresso será perdido.",
     "tapToChooseSets": "Toque para escolher conjuntos…",
     "loadingCards": "Carregando cards…",
-    "noCardsInSets": "Nenhum card nos conjuntos selecionados",
     "nameLabel": "NOME DO QUIZ",
     "namePlaceholder": "ex. Revisão da semana 3…",
-    "quizTypeLabel": "TIPO DE QUIZ",
     "selectSetsToContinue": "Selecione conjuntos para continuar",
-    "aiLabel": "OU GERAR COM IA",
     "aiTopicPlaceholder": "Digite um tema — ex. Evangelho de João",
     "generateAiQuiz": "✨ Gerar quiz com IA",
     "aiCost": "Custa {{cost}} créditos",
@@ -109,10 +95,6 @@
     "outOfCredits": "Sem créditos",
     "upgradeToGenerate": "Faça upgrade para gerar quizzes com IA.",
     "couldNotGenerate": "Não foi possível gerar o quiz",
-    "tab": {
-      "practice": "Praticar",
-      "ai": "Quiz por IA"
-    },
     "topicLabel": "TÓPICO",
     "aiSourceLabel": "GERAR A PARTIR DE",
     "aiSource": {
