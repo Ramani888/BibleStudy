@@ -126,7 +126,12 @@
     "fileKindImage": "이미지",
     "fileHelp": "파일을 읽고 그것으로 퀴즈를 만들어 드립니다.",
     "fileCost": "3–5 크레딧 소요 · 미디어",
-    "generateQuiz": "✨ 퀴즈 생성"
+    "generateQuiz": "✨ 퀴즈 생성",
+    "aiSourceLabel": "생성 기준",
+    "aiSource": {
+      "topic": "주제",
+      "sets": "내 세트"
+    }
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",

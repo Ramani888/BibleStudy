@@ -83,6 +83,7 @@ export function QuizSetupScreen() {
   const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>(preTitles);
   const [selectedMode, setSelectedMode] = useState<QuizSelectableMode>('mix');
   const [mode, setMode] = useState<SetupMode>('practice');
+  const [aiSource, setAiSource] = useState<'topic' | 'sets'>('topic');
   const [fileKind, setFileKind] = useState<'pdf' | 'image'>('pdf');
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
@@ -193,6 +194,15 @@ export function QuizSetupScreen() {
     runGenerate({ topic }, topic);
   });
 
+  // AI quiz grounded in the selected sets' cards.
+  const generateFromSets = useCallback(() => {
+    if (selectedSetIds.length === 0) return;
+    const title = selectedSetTitles.length === 1
+      ? selectedSetTitles[0]
+      : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` });
+    runGenerate({ setIds: selectedSetIds }, title);
+  }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
+
   // Quiz from an uploaded PDF/image (media rate: 3–5 credits).
   const handleGenerateFromFile = useCallback(async (kind: 'pdf' | 'image') => {
     const file = kind === 'pdf' ? await pickPdf() : await pickImage();
@@ -219,6 +229,28 @@ export function QuizSetupScreen() {
     </View>
   );
 
+  // Choose-sets selector — shared by Practice and the AI "My sets" source.
+  const chooseSetsBlock = (
+    <View>
+      <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
+      <Pressable
+        style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+        onPress={openSetPicker}
+        accessibilityRole="button"
+      >
+        <View style={styles.selectorIcon}>
+          {selectedSetIds.length > 0
+            ? <CheckCircleIcon size={20} color={colors.accent} />
+            : <ChevronRightIcon size={20} color={colors.textDisabled} />}
+        </View>
+        <Typography preset="body" color={selectedSetIds.length > 0 ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
+          {selectorLabel}
+        </Typography>
+        <ChevronRightIcon size={18} color={colors.textSecondary} />
+      </Pressable>
+    </View>
+  );
+
   return (
     <Screen
       header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
@@ -238,8 +270,8 @@ export function QuizSetupScreen() {
             <Button
               label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
               loading={generate.isPending}
-              onPress={generateFromTopic}
-              disabled={generate.isPending}
+              onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
+              disabled={generate.isPending || (aiSource === 'sets' && selectedSetIds.length === 0)}
               fullWidth
             />
           ) : (
@@ -277,24 +309,7 @@ export function QuizSetupScreen() {
                 <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="done" maxLength={80} />
               </View>
 
-              <View>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
-                <Pressable
-                  style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-                  onPress={openSetPicker}
-                  accessibilityRole="button"
-                >
-                  <View style={styles.selectorIcon}>
-                    {selectedSetIds.length > 0
-                      ? <CheckCircleIcon size={20} color={colors.accent} />
-                      : <ChevronRightIcon size={20} color={colors.textDisabled} />}
-                  </View>
-                  <Typography preset="body" color={selectedSetIds.length > 0 ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
-                    {selectorLabel}
-                  </Typography>
-                  <ChevronRightIcon size={18} color={colors.textSecondary} />
-                </Pressable>
-              </View>
+              {chooseSetsBlock}
 
               {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
                 <View style={styles.modeSection}>
@@ -324,17 +339,30 @@ export function QuizSetupScreen() {
             </>
           )}
 
-          {/* ── QUIZ BY AI: generate from a topic ── */}
+          {/* ── QUIZ BY AI: generate from a topic OR the selected sets ── */}
           {mode === 'ai' && (
             <>
               <View style={styles.nameField}>
                 <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
                 <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="next" maxLength={80} />
               </View>
-              <View>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
-                <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
+
+              <View style={styles.nameField}>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiSourceLabel', 'GENERATE FROM')}</Typography>
+                <View style={styles.chipRow}>
+                  <FilterChip label={t('quiz:setup.aiSource.topic', 'A topic')} active={aiSource === 'topic'} onPress={() => setAiSource('topic')} />
+                  <FilterChip label={t('quiz:setup.aiSource.sets', 'My sets')} active={aiSource === 'sets'} onPress={() => setAiSource('sets')} />
+                </View>
               </View>
+
+              {aiSource === 'topic' ? (
+                <View>
+                  <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
+                  <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
+                </View>
+              ) : (
+                chooseSetsBlock
+              )}
               {costRow(aiCostLabel)}
             </>
           )}

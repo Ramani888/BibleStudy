@@ -126,7 +126,12 @@
     "fileKindImage": "Larawan",
     "fileHelp": "Babasahin namin ang iyong file at gagawa ng quiz mula rito.",
     "fileCost": "Nagkakahalaga ng 3–5 credit · media",
-    "generateQuiz": "✨ Gumawa ng quiz"
+    "generateQuiz": "✨ Gumawa ng quiz",
+    "aiSourceLabel": "GUMAWA MULA SA",
+    "aiSource": {
+      "topic": "Isang paksa",
+      "sets": "Aking mga set"
+    }
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",

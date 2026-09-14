@@ -100,7 +100,12 @@
     "fileKindImage": "Image",
     "fileHelp": "We’ll read your file and build a quiz from it.",
     "fileCost": "Costs 3–5 credits · media",
-    "generateQuiz": "✨ Generate Quiz"
+    "generateQuiz": "✨ Generate Quiz",
+    "aiSourceLabel": "GENERATE FROM",
+    "aiSource": {
+      "topic": "A topic",
+      "sets": "My sets"
+    }
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",

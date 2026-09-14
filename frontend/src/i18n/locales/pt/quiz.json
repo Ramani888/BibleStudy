@@ -126,7 +126,12 @@
     "fileKindImage": "Imagem",
     "fileHelp": "Vamos ler seu arquivo e criar um quiz a partir dele.",
     "fileCost": "Custa 3–5 créditos · mídia",
-    "generateQuiz": "✨ Gerar quiz"
+    "generateQuiz": "✨ Gerar quiz",
+    "aiSourceLabel": "GERAR A PARTIR DE",
+    "aiSource": {
+      "topic": "Um tópico",
+      "sets": "Meus conjuntos"
+    }
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",
