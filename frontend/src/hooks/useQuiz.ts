@@ -21,6 +21,17 @@ export function useCardsForSets(setIds: string[]) {
   });
 }
 
+/**
+ * Generate an ephemeral AI quiz from a topic. Nothing is persisted — the
+ * returned cards are played once and discarded, so there is no cache to invalidate.
+ */
+export function useGenerateQuiz() {
+  return useMutation({
+    mutationFn: (body: { topic?: string; setIds?: string[]; count?: number }) =>
+      quizApi.generateQuiz(body),
+  });
+}
+
 /** Recent quiz attempts — powers the Quiz hub list. */
 export function useRecentQuizAttempts(limit = 20) {
   return useQuery({
@@ -59,6 +70,10 @@ export function useQuizAttemptSave(retakeAttemptId?: string) {
     // achievements are unlocked server-side on each quiz save; re-fetch so
     // useNewAchievements can detect the transition.
     qc.invalidateQueries({ queryKey: ['achievements'] });
+    // quizzes feed SM-2, changing which cards are due / mastered — refresh both.
+    qc.invalidateQueries({ queryKey: ['cards', 'due-summary'] });
+    qc.invalidateQueries({ queryKey: ['cards', 'due'] });
+    qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
   }, [qc]);
 
   const create = useMutation({

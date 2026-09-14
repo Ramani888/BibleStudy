@@ -6,8 +6,8 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
 import { Button, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
-import { useConfirmDialog, useDeleteQuizAttempt, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
+import { CheckCircleIcon, ChevronRightIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
+import { useConfirmDialog, useDeleteQuizAttempt, useDueCards, useDueSummary, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
 
 import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '../../api';
@@ -39,7 +39,20 @@ export function QuizHubScreen() {
   const navigation = useNavigation<Nav>();
 
   const { data: attempts = [], isLoading, isError, error, refetch } = useRecentQuizAttempts(20);
+  const { data: dueSummary } = useDueSummary();
+  const due = useDueCards();
+  const dueCount = dueSummary?.dueCount ?? 0;
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
+
+  // Review due cards → a real, tracked SR session (records + updates SM-2).
+  const handleReviewDue = useCallback(async () => {
+    const res = await due.refetch();
+    const cards = res.data ?? [];
+    if (cards.length === 0) return;
+    const setIds = [...new Set(cards.map(c => c.setId))];
+    const title = t('quiz:hub.reviewDue', 'Review due cards');
+    navigation.navigate('Quiz', { setIds, setTitles: [title], reviewCards: cards, mode: 'mix', quizName: title });
+  }, [due, navigation, t]);
   const { show, dialogProps } = useConfirmDialog();
   const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
@@ -169,6 +182,27 @@ export function QuizHubScreen() {
           <SearchBar value={search} onChangeText={setSearch} placeholder={t('quiz:hub.searchPlaceholder', 'Search quizzes…')} autoFocus />
         </View>
       )}
+
+      {dueCount > 0 && (
+        <Pressable
+          onPress={handleReviewDue}
+          disabled={due.isFetching}
+          style={({ pressed }) => [styles.dueBanner, { backgroundColor: colors.accent }, pressed && styles.rowPressed]}
+          accessibilityRole="button"
+        >
+          <RefreshIcon size={ICON_SIZE} color={colors.textOnAccent} />
+          <View style={styles.flex}>
+            <Typography preset="h4" color={colors.textOnAccent}>{t('quiz:hub.reviewDue', 'Review due cards')}</Typography>
+            <Typography preset="caption" color={colors.textOnPrimaryMuted}>
+              {t('quiz:hub.dueCount', { count: dueCount, defaultValue: `${dueCount} cards due for review` })}
+            </Typography>
+          </View>
+          {due.isFetching
+            ? <ActivityIndicator color={colors.textOnAccent} />
+            : <ChevronRightIcon size={ICON_SIZE} color={colors.textOnAccent} />}
+        </Pressable>
+      )}
+
       {isError ? (
         <ErrorState message={getErrorMessage(error)} onRetry={refetch} />
       ) : isLoading ? (
@@ -177,7 +211,7 @@ export function QuizHubScreen() {
         <View style={styles.flex}>
           <EmptyState
             title={search ? t('common:status.noResults', 'No results') : t('quiz:hub.emptyTitle', 'No quizzes yet')}
-            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No quizzes match "${search}"` }) : t('quiz:hub.emptySub', "Tap 'Start New Quiz' below to test yourself")}
+            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No quizzes match "${search}"` }) : t('quiz:hub.emptySub', "Tap 'Start New Quiz' — pick your sets or generate one with AI")}
           />
         </View>
       ) : (
@@ -250,6 +284,15 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
+  dueBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    padding: spacing.lg,
+    marginHorizontal: layout.screenPaddingH,
+    marginBottom: spacing.md,
+    borderRadius: layout.cardRadiusSm,
+  },
   list: { padding: layout.screenPaddingH, gap: spacing.sm, flexGrow: 1 },
   listHeader: { marginBottom: spacing.md },
   row: {

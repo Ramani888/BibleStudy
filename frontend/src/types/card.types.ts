@@ -1,4 +1,5 @@
 export type CardType = 'QA' | 'STORY';
+export type CardDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
 
 export interface Card {
   id: string;
@@ -11,6 +12,7 @@ export interface Card {
   imageId: string | null;
   order: number;
   isBlurred: boolean;
+  difficulty: CardDifficulty;
   lastStudiedAt: string | null;
   nextReviewAt: string | null;
   createdAt: string;
@@ -50,6 +52,14 @@ export interface DueSummary {
   dueCount: number;
   dueSets: number;
   topSet: { id: string; title: string } | null;
+}
+
+/** Per-set mastery — share of cards whose SM-2 interval has reached maturity. */
+export interface SetMastery {
+  setId: string;
+  total: number;
+  learned: number;
+  masteryPct: number;
 }
 
 export interface ReorderCardsPayload {

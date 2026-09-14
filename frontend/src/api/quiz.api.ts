@@ -1,7 +1,17 @@
 import { apiDelete, apiGet, apiPost, apiPut } from './client';
 import type { QuizAttemptWithSet, RecordAttemptPayload, RecordAttemptResult, SetBestScore, SummaryItem } from '../types';
+import type { GeneratedQuizCard } from '../navigation/types';
 
 export const quizApi = {
+  // AI quiz generation — ephemeral cards from a topic OR the user's sets (sets win).
+  // 60s timeout (free models cold-start slowly).
+  generateQuiz: (body: { topic?: string; setIds?: string[]; count?: number }) =>
+    apiPost<{ cards: GeneratedQuizCard[]; creditsUsed: number }>(
+      '/quiz/generate',
+      body,
+      { timeout: 60000 },
+    ),
+
   recordAttempt: (payload: RecordAttemptPayload) =>
     apiPost<RecordAttemptResult>('/quiz/attempts', payload),
 

@@ -12,7 +12,7 @@ import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { BookIcon, FileTextIcon, GlobeIcon, InfoIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
-import { useConfirmDialog } from '../../hooks';
+import { useConfirmDialog, useUpdateProfile } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { spacing, useTheme, useThemeStore } from '../../theme';
 import { useLanguageStore, SUPPORTED_LANGUAGES, type SupportedLanguage } from '../../i18n';
@@ -28,6 +28,9 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   const deleteAccount = useAuthStore(s => s.deleteAccount);
   const { show, dialogProps } = useConfirmDialog();
   const isDark = theme.name === 'dark';
+  const useFsrs = useAuthStore(s => s.user?.useFsrs ?? false);
+  const updateProfile = useUpdateProfile();
+  const handleFsrsToggle = useCallback((v: boolean) => updateProfile.mutate({ useFsrs: v }), [updateProfile]);
   const setMode = useThemeStore(s => s.setMode);
   const currentLang = useLanguageStore(s => s.language);
   const setLanguage = useLanguageStore(s => s.setLanguage);
@@ -103,6 +106,18 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
         </View>
 
         <View>
+          <MenuSection label={t('profile:settings.study', 'Study')}>
+            <View style={styles.themeRow}>
+              <View style={styles.fsrsLabel}>
+                <Typography preset="label" color={colors.textPrimary}>{t('profile:settings.smartScheduling', 'Smart scheduling (FSRS)')}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>{t('profile:settings.smartSchedulingHint', 'Fewer reviews for the same recall. Off = classic SM-2.')}</Typography>
+              </View>
+              <Switch value={useFsrs} onValueChange={handleFsrsToggle} />
+            </View>
+          </MenuSection>
+        </View>
+
+        <View>
           <MenuSection label={t('profile:settings.account')}>
             <MenuItem icon={LogOutIcon} label={t('profile:settings.signOut')} showChevron={false} onPress={handleSignOut} />
             <MenuItem icon={TrashIcon} label={t('profile:settings.deleteAccount')} destructive showChevron={false} onPress={handleDeleteAccount} />
@@ -142,4 +157,5 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.s17,
     paddingHorizontal: spacing.lg,
   },
+  fsrsLabel: { flex: 1, paddingRight: spacing.md, gap: spacing.xs },
 });

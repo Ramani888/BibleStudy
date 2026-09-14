@@ -6,12 +6,19 @@ import type {
   DueSummary,
   MoveCardPayload,
   ReorderCardsPayload,
+  SetMastery,
   UpdateCardPayload,
 } from '../types';
 
 export const cardsApi = {
   dueSummary: () =>
     apiGet<DueSummary>('/cards/due-summary'),
+
+  listDue: () =>
+    apiGet<Card[]>('/cards/due'),
+
+  mastery: () =>
+    apiGet<SetMastery[]>('/cards/mastery'),
 
   create: (payload: CreateCardPayload) =>
     apiPost<Card>('/cards', payload),

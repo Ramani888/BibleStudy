@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 import { Button, Typography } from '../../../components/ui';
 import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
-import { useQuizAttemptSave } from '../../../hooks';
+import { useQuizAttemptSave, useStreak } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import { requestReviewOnce } from '../../../utils/requestReview';
 import type { SummaryItem } from '../../../types';
@@ -36,6 +36,8 @@ interface Props {
   timeSecs?: number;
   summaryItems: SummaryItem[];
   retakeAttemptId?: string;
+  /** Ephemeral AI quiz — no real set/cards, so skip recording (SM-2/history). */
+  ephemeral?: boolean;
   isFocused: boolean;
   onExit: () => void;
 }
@@ -43,20 +45,33 @@ interface Props {
 export function QuizResultScreen({
   setIds, setTitle, mode, quizName,
   total, correct, scorePct, timeSecs,
-  summaryItems, retakeAttemptId, isFocused, onExit,
+  summaryItems, retakeAttemptId, ephemeral, isFocused, onExit,
 }: Props) {
   const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
   const { colors } = theme;
   const navigation = useNavigation();
   const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
+  const { data: streakData } = useStreak();
   const saved = useRef(false);
+
+  // Close the study loop: re-quiz just the missed items as an ephemeral quiz
+  // (works for both manual and AI quizzes — reconstructs QA cards from responses).
+  const missed = summaryItems.filter(i => !i.isCorrect);
+  const handlePracticeMissed = useCallback(() => {
+    const generatedCards = missed.map(i => ({ question: i.prompt, answer: i.correctAnswer }));
+    (navigation as any).push('Quiz', {
+      setIds: [], setTitles: [t('quiz:results.practiceMissed', 'Practice missed')],
+      mode: 'mc', quizName: t('quiz:results.practiceMissed', 'Practice missed'), generatedCards,
+    });
+  }, [missed, navigation, t]);
   const [best, setBest] = useState<number | null>(null);
   const [countdown, setCountdown] = useState(AUTO_EXIT_SECS);
 
-  // Save once on mount — unified hook handles create vs update
+  // Save once on mount — unified hook handles create vs update.
+  // Ephemeral AI quizzes have no real set/cards, so they are never recorded.
   useEffect(() => {
-    if (saved.current || total === 0) return;
+    if (saved.current || total === 0 || ephemeral) return;
     saved.current = true;
     save({ setIds, total, correct, mode, quizName, timeSecs, responses: summaryItems })
       .then(res => { setBest(res.best ?? null); if (scorePct >= 80) requestReviewOnce('quiz_high_score'); })
@@ -120,6 +135,16 @@ export function QuizResultScreen({
         <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
       </View>
 
+      {/* Streak — loss-aversion nudge to come back tomorrow (+ freeze count) */}
+      {!!streakData?.streak && streakData.streak > 0 && (
+        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+          <Typography preset="caption" color={colors.textPrimary}>
+            {t('quiz:results.streakDays', { count: streakData.streak, defaultValue: `🔥 ${streakData.streak}-day streak` })}
+            {!!streakData.freezes && streakData.freezes > 0 && `  🧊 ${streakData.freezes}`}
+          </Typography>
+        </View>
+      )}
+
       {/* Summary icon button */}
       <Pressable
         onPress={openSummary}
@@ -151,6 +176,15 @@ export function QuizResultScreen({
             {t('quiz:results.saveFailed', { message: (error as any)?.message ?? t('common:status.unknownError', 'Unknown error'), defaultValue: `Save failed: ${(error as any)?.message ?? 'Unknown error'}` })}
           </Typography>
         </View>
+      )}
+
+      {missed.length > 0 && (
+        <Button
+          label={t('quiz:results.practiceMissedCount', { count: missed.length, defaultValue: `Practice ${missed.length} you missed` })}
+          variant="secondary"
+          onPress={handlePracticeMissed}
+          fullWidth
+        />
       )}
 
       <Button

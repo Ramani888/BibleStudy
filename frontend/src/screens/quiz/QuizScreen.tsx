@@ -10,9 +10,20 @@ import { ConfirmDialog } from '../../components/feedback';
 import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
 import { layout, spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
-import type { QuizSelectableMode } from '../../types';
+import type { Card, QuizSelectableMode } from '../../types';
+import type { GeneratedQuizCard } from '../../navigation/types';
 
-type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string };
+type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[] };
+
+/** Wrap an LLM-generated {question,answer} as an in-memory QA Card (never persisted). */
+function toEphemeralCard(c: GeneratedQuizCard, i: number): Card {
+  return {
+    id: `gen-${i}`, setId: 'generated', userId: null, type: 'QA',
+    question: c.question, answer: c.answer, note: null, imageId: null,
+    order: i, isBlurred: false, difficulty: 'MEDIUM', lastStudiedAt: null, nextReviewAt: null,
+    createdAt: '', updatedAt: '',
+  };
+}
 
 function formatTime(s: number): string {
   return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
@@ -26,7 +37,7 @@ export function QuizScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
-  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId } = params;
+  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId, generatedCards, reviewCards } = params;
 
   const isFocused = useIsFocused();
 
@@ -34,7 +45,18 @@ export function QuizScreen() {
     StatusBar.setHidden(true, 'fade');
     return () => StatusBar.setHidden(false, 'fade');
   }, []));
-  const { data: cards = [], isLoading, isError } = useCardsForSets(setIds);
+
+  // Two "cards passed via params" cases:
+  //  • generatedCards → ephemeral AI quiz (real ids absent → NOT recorded)
+  //  • reviewCards    → real due cards (real ids → recorded + feeds SM-2)
+  // Either way we skip the per-set fetch.
+  const isGenerated = !!generatedCards && generatedCards.length > 0;
+  const isReview = !!reviewCards && reviewCards.length > 0;
+  const usePassed = isGenerated || isReview;
+  const fetched = useCardsForSets(usePassed ? [] : setIds);
+  const cards = isGenerated ? generatedCards!.map(toEphemeralCard) : isReview ? reviewCards! : fetched.data;
+  const isLoading = usePassed ? false : fetched.isLoading;
+  const isError = usePassed ? false : fetched.isError;
   const s = useQuizSession(cards, mode);
   const [responses, setResponses] = useState<Record<number, unknown>>({});
   const saveResponse = useCallback((idx: number, r: unknown) => setResponses(prev => ({ ...prev, [idx]: r })), []);
@@ -124,6 +146,7 @@ export function QuizScreen() {
           timeSecs={elapsed}
           summaryItems={summaryItems}
           retakeAttemptId={retakeAttemptId}
+          ephemeral={isGenerated}
           isFocused={isFocused}
           onExit={goBack}
         />
@@ -150,6 +173,14 @@ export function QuizScreen() {
       <View style={[styles.progressTrack, { backgroundColor: colors.surfaceMuted }]}>
         <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.accent }]} />
       </View>
+
+      {isGenerated && (
+        <View style={styles.ephemeralBadge}>
+          <Typography preset="caption" color={colors.textSecondary}>
+            {t('quiz:inQuiz.practiceNotSaved', 'Practice · not saved')}
+          </Typography>
+        </View>
+      )}
 
       {s.item && (
         <QuizItemView
@@ -184,4 +215,5 @@ const styles = StyleSheet.create({
   backPressed:   { opacity: 0.85 },
   progressTrack: { height: layout.progressBarHeight, width: '100%' },
   progressFill:  { height: layout.progressBarHeight },
+  ephemeralBadge:{ alignItems: 'center', paddingTop: spacing.sm },
 });

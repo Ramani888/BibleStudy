@@ -12,6 +12,7 @@ export interface User {
   plan: Plan;
   emailVerified: boolean;
   hasPassword: boolean;
+  useFsrs: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -21,6 +22,7 @@ export interface UpdateProfilePayload {
   bio?: string;
   church?: string;
   profileImage?: string;
+  useFsrs?: boolean;
 }
 
 export interface ChangePasswordPayload {

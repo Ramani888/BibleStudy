@@ -13,10 +13,6 @@ type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
 export function useHomeNavigation(navigation: HomeNav) {
   const { t } = useTranslation('home');
-  const goReview = useCallback((setId: string, setTitle: string) =>
-    navigation.navigate('QuizTab', { screen: 'QuizSetup', params: { preSelectedSetIds: [setId], preSelectedSetTitles: [setTitle] }, initial: false }),
-  [navigation]);
-
   const goContinue = useCallback((s: StudySet) =>
     navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title }, initial: false }),
   [navigation]);
@@ -63,7 +59,7 @@ export function useHomeNavigation(navigation: HomeNav) {
   ], [t, goCreate, goStudyPlans, goAchievements, goLeaderboard, goNotes, goMedia, goPublicSets, goFriends]);
 
   return {
-    goReview, goContinue, goCreate,
+    goContinue, goCreate,
     onAI, onBell, onAvatar,
     goLibrary, goPublicSets, goFriends, goFriendsSets, goViewSet,
     quickActions,

@@ -93,7 +93,17 @@ export function QuizItemView({
       >
         {/* Question card */}
         <View style={[styles.questionCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item, t)}</Typography>
+          <View style={styles.cardHeaderRow}>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item, t)}</Typography>
+            {!!item.difficulty && (
+              <View style={styles.diffPip}>
+                <View style={[styles.diffDot, { backgroundColor: item.difficulty === 'EASY' ? colors.success : item.difficulty === 'HARD' ? colors.alert : colors.warning }]} />
+                <Typography preset="caption" color={colors.textSecondary}>
+                  {t(`quiz:difficulty.${item.difficulty.toLowerCase()}`, item.difficulty.charAt(0) + item.difficulty.slice(1).toLowerCase())}
+                </Typography>
+              </View>
+            )}
+          </View>
           {!!promptText(item) && (
             <Typography preset="h3" color={colors.textPrimary}>{promptText(item)}</Typography>
           )}
@@ -464,6 +474,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   label:      { letterSpacing: 0.5 },
+  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs },
+  diffPip:    { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  diffDot:    { width: 8, height: 8, borderRadius: 4 },
   answerArea: { paddingHorizontal: layout.screenPaddingH },
   // Feedback
   feedbackBanner: {

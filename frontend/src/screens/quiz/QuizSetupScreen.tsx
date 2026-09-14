@@ -2,11 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
-import { AppModal, EmptyState } from '../../components/feedback';
+import { ActionSheet, AppModal, EmptyState } from '../../components/feedback';
 import { Button, FilterChip, Input, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon } from '../../components/icons';
-import { useSearchToggle, useSets } from '../../hooks';
+import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon, StarIcon } from '../../components/icons';
+import Toast from 'react-native-toast-message';
+import { getErrorMessage } from '../../api';
+import { useCreditBalance, useGenerateQuiz, usePickMedia, useSearchToggle, useSets } from '../../hooks';
 import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
@@ -47,6 +49,24 @@ export function QuizSetupScreen() {
   const preTitles = params?.preSelectedSetTitles ?? [];
 
   const [quizName, setQuizName] = useState('');
+  const [aiTopic, setAiTopic] = useState('');
+  const generate = useGenerateQuiz();
+  const { data: creditBalance } = useCreditBalance();
+  const { pickPdf, pickImage, isUploading } = usePickMedia();
+  const AI_QUIZ_COST = 2;
+
+  // Rotating reassurance while the LLM works (the 5–15s where users bail).
+  const [genMsgIdx, setGenMsgIdx] = useState(0);
+  const genMessages = [
+    t('quiz:setup.generating.writing', 'Writing your questions…'),
+    t('quiz:setup.generating.grounding', 'Grounding them in scripture…'),
+    t('quiz:setup.generating.almost', 'Almost ready…'),
+  ];
+  useEffect(() => {
+    if (!generate.isPending) { setGenMsgIdx(0); return; }
+    const id = setInterval(() => setGenMsgIdx(i => (i + 1) % genMessages.length), 1800);
+    return () => clearInterval(id);
+  }, [generate.isPending]); // eslint-disable-line react-hooks/exhaustive-deps
   const [selectedSetIds, setSelectedSetIds] = useState<string[]>(preIds);
   const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>(preTitles);
   const [selectedMode, setSelectedMode] = useState<QuizSelectableMode>('mix');
@@ -132,6 +152,46 @@ export function QuizSetupScreen() {
     : t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` });
 
   const canStart = selectedSetIds.length > 0 && cards.length > 0;
+
+  // Shared: fire a generate request → route into the ephemeral quiz on success.
+  // AI quizzes default to Multiple Choice — cleanest UX for generated content.
+  const runGenerate = useCallback((payload: { topic?: string; setIds?: string[]; mediaIds?: string[] }, title: string) => {
+    if (generate.isPending) return;
+    generate.mutate(payload, {
+      onSuccess: ({ cards: generatedCards }) => {
+        navigation.navigate('Quiz', { setIds: [], setTitles: [title], mode: 'mc', quizName: title, generatedCards });
+      },
+      onError: (err) => {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 402) {
+          Toast.show({ type: 'error', text1: t('quiz:setup.outOfCredits', 'Out of credits'), text2: t('quiz:setup.upgradeToGenerate', 'Upgrade to generate AI quizzes.') });
+          navigation.navigate('ProfileTab', { screen: 'Paywall' });
+          return;
+        }
+        Toast.show({ type: 'error', text1: t('quiz:setup.couldNotGenerate', "Couldn't generate quiz"), text2: getErrorMessage(err) });
+      },
+    });
+  }, [generate, navigation, t]);
+
+  // Sets win over topic: if the selected sets have cards, ground the AI quiz in
+  // them; otherwise fall back to the typed topic.
+  const handleGenerateAI = useCallback(() => {
+    const topic = aiTopic.trim();
+    if (!canStart && topic.length < 2) return;
+    const title = canStart
+      ? (selectedSetTitles.length === 1 ? selectedSetTitles[0] : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` }))
+      : topic;
+    runGenerate(canStart ? { setIds: selectedSetIds } : { topic }, title);
+  }, [canStart, aiTopic, selectedSetIds, selectedSetTitles, runGenerate, t]);
+
+  // Quiz from an uploaded PDF/image (media rate: 3–5 credits).
+  const [fileSheetOpen, setFileSheetOpen] = useState(false);
+  const handleGenerateFromFile = useCallback(async (kind: 'pdf' | 'image') => {
+    setFileSheetOpen(false);
+    const file = kind === 'pdf' ? await pickPdf() : await pickImage();
+    if (!file) return;
+    runGenerate({ mediaIds: [file.id] }, t('quiz:setup.fileQuizTitle', 'File quiz'));
+  }, [pickPdf, pickImage, runGenerate, t]);
 
   return (
     <Screen
@@ -226,6 +286,45 @@ export function QuizSetupScreen() {
               )}
             </View>
           )}
+
+          {/* ── Or generate with AI (grounded in selected sets, else a topic) ── */}
+          <View style={styles.modeSection}>
+            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiLabel', 'OR GENERATE WITH AI')}</Typography>
+            {!canStart && (
+              <Input
+                placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')}
+                value={aiTopic}
+                onChangeText={setAiTopic}
+                returnKeyType="done"
+                onSubmitEditing={handleGenerateAI}
+                containerStyle={{ marginBottom: spacing.md }}
+              />
+            )}
+            <Button
+              label={canStart
+                ? t('quiz:setup.generateAiQuizFromSets', '✨ Generate AI Quiz from selected sets')
+                : t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
+              loading={generate.isPending}
+              onPress={handleGenerateAI}
+              disabled={!canStart && aiTopic.trim().length < 2}
+              fullWidth
+            />
+            <View style={styles.aiCostRow}>
+              <StarIcon size={12} color={colors.textSecondary} />
+              <Typography preset="caption" color={colors.textSecondary}>
+                {creditBalance !== undefined
+                  ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
+                  : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` })}
+              </Typography>
+            </View>
+            <Button
+              label={t('quiz:setup.generateFromFile', '📎 Quiz from a PDF or image')}
+              variant="ghost"
+              onPress={() => setFileSheetOpen(true)}
+              disabled={generate.isPending || isUploading}
+              fullWidth
+            />
+          </View>
         </View>
       </ScrollView>
 
@@ -292,6 +391,28 @@ export function QuizSetupScreen() {
           style={styles.sheetDone}
         />
       </AppModal>
+
+      {/* ── AI generation loading overlay (upload + the 5–15s wait) ── */}
+      <AppModal visible={generate.isPending || isUploading} contentStyle={styles.genModal}>
+        <View style={styles.genWrap}>
+          <ActivityIndicator size="large" color={colors.accent} />
+          <Typography preset="h4" align="center">
+            {isUploading ? t('quiz:setup.uploadingFile', 'Uploading file…') : t('quiz:setup.generatingTitle', 'Building your quiz…')}
+          </Typography>
+          {!isUploading && <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>}
+        </View>
+      </AppModal>
+
+      {/* ── Quiz-from-file source picker ── */}
+      <ActionSheet
+        visible={fileSheetOpen}
+        title={t('quiz:setup.generateFromFile', '📎 Quiz from a PDF or image')}
+        onClose={() => setFileSheetOpen(false)}
+        actions={[
+          { label: t('quiz:setup.choosePdf', 'Choose PDF'), onPress: () => handleGenerateFromFile('pdf') },
+          { label: t('quiz:setup.chooseImage', 'Choose image'), onPress: () => handleGenerateFromFile('image') },
+        ]}
+      />
     </Screen>
   );
 }
@@ -310,6 +431,9 @@ const styles = StyleSheet.create({
   },
   selectorIcon: { width: spacing.s28, alignItems: 'center' },
   modeSection: { marginTop: spacing.xxl },
+  aiCostRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, marginTop: spacing.md },
+  genModal: { alignItems: 'center' },
+  genWrap: { alignItems: 'center', gap: spacing.lg, paddingVertical: spacing.xl },
   chipRow: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
   modeDesc: { marginTop: spacing.md },
   rowPressed: { opacity: 0.7 },

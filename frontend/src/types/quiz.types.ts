@@ -1,3 +1,5 @@
+import type { CardDifficulty } from './card.types';
+
 // A persisted quiz attempt (backend record).
 export interface QuizAttempt {
   id: string;
@@ -72,13 +74,14 @@ export type QuizMode =
 
 export type QuizSelectableMode = QuizMode | 'mix';
 
-// One built quiz item (a discriminated union by mode).
+// One built quiz item (a discriminated union by mode). `difficulty` is a
+// display-only hint carried from the source card (set in buildItems).
 export type QuizItem =
-  | { mode: 'mc' | 'story_mc'; cardId: string; prompt: string; options: string[]; answerIndex: number }
-  | { mode: 'type_answer' | 'type_verbatim'; cardId: string; prompt: string; answer: string }
-  | { mode: 'blanks'; cardId: string; prompt: string; tokens: string[]; blankAt: number[] }
-  | { mode: 'chunks'; cardId: string; prompt: string; chunks: string[]; correct: string[] }
-  | { mode: 'read'; cardId: string; prompt: string; text: string };
+  | { mode: 'mc' | 'story_mc'; cardId: string; prompt: string; options: string[]; answerIndex: number; difficulty?: CardDifficulty }
+  | { mode: 'type_answer' | 'type_verbatim'; cardId: string; prompt: string; answer: string; difficulty?: CardDifficulty }
+  | { mode: 'blanks'; cardId: string; prompt: string; tokens: string[]; blankAt: number[]; difficulty?: CardDifficulty }
+  | { mode: 'chunks'; cardId: string; prompt: string; chunks: string[]; correct: string[]; difficulty?: CardDifficulty }
+  | { mode: 'read'; cardId: string; prompt: string; text: string; difficulty?: CardDifficulty };
 
 // Kept for the original MC view's prop shape.
 export interface QuizQuestion {

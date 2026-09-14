@@ -33,6 +33,7 @@ import {
   useAutoDailyClaim,
   useStreak,
   useDueSummary,
+  useDueCards,
   useNotifications,
   useNotificationPrefs,
   TYPE_TO_PREF,
@@ -87,8 +88,8 @@ const StickyHeader = React.memo(function StickyHeader({ greeting, name, avatarUr
 });
 
 // ─── Featured card ─────────────────────────────────────────────────────────────
-const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak, onReview, onContinue, onCreate }: {
-  due?: DueSummary; continueSet: StudySet | null; streak: number;
+const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak, freezes, onReview, onContinue, onCreate }: {
+  due?: DueSummary; continueSet: StudySet | null; streak: number; freezes: number;
   onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
 }) {
   const { t } = useTranslation('home');
@@ -128,7 +129,10 @@ const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak
         </View>
         <View style={styles.featuredFooter}>
           <FlameIcon size={14} color={colors.warning} />
-          <Typography preset="caption" color={colors.textOnPrimaryMuted}>{t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}</Typography>
+          <Typography preset="caption" color={colors.textOnPrimaryMuted}>
+            {t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}
+            {freezes > 0 && `  🧊 ${freezes}`}
+          </Typography>
         </View>
       </AnimatedPressable>
     </View>
@@ -288,6 +292,17 @@ export function HomeScreen() {
   useAutoDailyClaim();
 
   const nav = useHomeNavigation(navigation);
+  const dueCards = useDueCards();
+
+  // TODAY card → the spaced-repetition review flow (real, tracked SM-2 session).
+  const handleReviewDue = useCallback(async () => {
+    const res = await dueCards.refetch();
+    const cards = res.data ?? [];
+    if (cards.length === 0) return;
+    const setIds = [...new Set(cards.map(c => c.setId))];
+    const title = t('quiz:hub.reviewDue', 'Review due cards');
+    (navigation as any).navigate('Quiz', { setIds, setTitles: [title], reviewCards: cards, mode: 'mix', quizName: title });
+  }, [dueCards, navigation, t]);
 
   const publicSets  = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
@@ -355,7 +370,8 @@ export function HomeScreen() {
           due={dueSummary}
           continueSet={continueSet}
           streak={streak}
-          onReview={nav.goReview}
+          freezes={streakData?.freezes ?? 0}
+          onReview={handleReviewDue}
           onContinue={nav.goContinue}
           onCreate={nav.goCreate}
         />

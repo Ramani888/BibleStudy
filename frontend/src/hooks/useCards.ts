@@ -24,6 +24,27 @@ export function useDueSummary() {
   });
 }
 
+/** Per-set mastery (% of cards learned via SM-2). Powers mastery bars. */
+export function useMastery() {
+  return useQuery({
+    queryKey: ['cards', 'mastery'],
+    queryFn: () => cardsApi.mastery(),
+  });
+}
+
+/**
+ * The actual cards due for review — fetched on demand (enabled:false) so the
+ * Review-due entry can grab a fresh list on tap, then quiz them.
+ */
+export function useDueCards() {
+  return useQuery({
+    queryKey: ['cards', 'due'],
+    queryFn: () => cardsApi.listDue(),
+    enabled: false,
+    gcTime: 0,
+  });
+}
+
 export function useCardById(cardId: string) {
   return useQuery({
     queryKey: ['card', cardId],

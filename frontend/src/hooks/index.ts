@@ -16,6 +16,8 @@ export { useFolders, useFolder, useCreateFolder, useUpdateFolder, useDeleteFolde
 export {
   useCards,
   useDueSummary,
+  useDueCards,
+  useMastery,
   useCardById,
   useCreateCard,
   useBulkCreateCards,
@@ -43,7 +45,7 @@ export { useManualRefresh } from './useManualRefresh';
 export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
-export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses } from './useQuiz';
+export { useAllQuizBest, useQuizBest, useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses, useGenerateQuiz } from './useQuiz';
 
 export {
   useFriends,

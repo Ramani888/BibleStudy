@@ -4,16 +4,15 @@ import DraggableFlatList, { ScaleDecorator, type RenderItemParams } from 'react-
 import Toast from 'react-native-toast-message';
 
 import { ActionSheet, AppModal, ConfirmDialog, EmptyState, ErrorState, SelectSheet } from '../../components/feedback';
-import { QuizModeSheet } from '../../components/domain';
 import { Button, Divider, Screen, ScreenHeader, SearchBar, Typography } from '../../components/ui';
 import {
   SearchIcon, ShareIcon, MoreVerticalIcon, InfoIcon, EyeIcon, EyeOffIcon,
-  BookIcon, CheckCircleIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
+  BookIcon, PlusCircleIcon, PencilIcon, CopyIcon, ArrowRightIcon, SparklesIcon, TrashIcon, ReorderIcon,
   ListIcon, GridIcon,
 } from '../../components/icons';
 
 import { useTranslation } from 'react-i18next';
-import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
+import { useCards, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMastery, useMoveCard, useReorderCards, useSearchToggle, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { buildSetShareLink, shareToWhatsApp } from '../../utils';
 import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, lineHeights, spacing, useTheme } from '../../theme';
@@ -34,7 +33,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [moveTargetCard, setMoveTargetCard] = useState<CardType | null>(null);
   const [noteCard, setNoteCard] = useState<CardType | null>(null);
   const [headerMenuOpen, setHeaderMenuOpen] = useState(false);
-  const [quizSheetOpen, setQuizSheetOpen] = useState(false);
   const [shareSheetOpen, setShareSheetOpen] = useState(false);
   const [cardLayout, setCardLayout] = useState<'list' | 'grid'>('list');
   const [noteText, setNoteText] = useState('');
@@ -46,6 +44,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
   const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { data: allSets = [] } = useSets();
+  const { data: masteryRows } = useMastery();
+  const setMastery = masteryRows?.find(m => m.setId === setId);
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
   const { mutate: copyCard }   = useCopyCard(setId);
@@ -192,11 +192,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const handleCloseHeaderMenu = useCallback(() => setHeaderMenuOpen(false), []);
   const handleCloseSelectedCard = useCallback(() => setSelectedCard(null), []);
   const handleCloseMovePicker   = useCallback(() => { setMovePickerOpen(false); setMoveTargetCard(null); }, []);
-  const handleCloseQuizSheet    = useCallback(() => setQuizSheetOpen(false), []);
   const handleCloseNoteModal    = useCallback(() => { setNoteCard(null); setNoteText(''); }, []);
   const handleDragEnd = useCallback(({ data }: { data: CardType[] }) => setOrderedCards(data), []);
-  const handleQuizStart = useCallback((mode: any, ids: string[], titles: string[]) =>
-    navigation.navigate('Quiz', { setIds: ids, setTitles: titles, mode }), [navigation]);
 
   // ── Header (normal vs reorder) ──
   const header = reorderMode ? (
@@ -364,6 +361,19 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   return (
     <Screen header={header}>
+      {!reorderMode && cards.length > 0 && setMastery && setMastery.total > 0 && (
+        <View style={styles.masteryWrap}>
+          <View style={styles.masteryHeader}>
+            <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.mastery', 'Mastery')}</Typography>
+            <Typography preset="caption" color={colors.textSecondary}>
+              {t('library:cards.masteryCount', { learned: setMastery.learned, total: setMastery.total, defaultValue: `${setMastery.learned}/${setMastery.total} learned` })}
+            </Typography>
+          </View>
+          <View style={[styles.masteryTrack, { backgroundColor: colors.surfaceMuted }]}>
+            <View style={[styles.masteryFill, { width: `${setMastery.masteryPct}%` as `${number}%`, backgroundColor: colors.accent }]} />
+          </View>
+        </View>
+      )}
       {reorderMode ? (
         <View style={styles.flex}>
         <DraggableFlatList
@@ -444,7 +454,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
         title={cachedTitle ?? setTitle}
         onClose={handleCloseHeaderMenu}
         actions={[
-          { label: t('navigation:tabs.study', 'Quiz'), icon: CheckCircleIcon, onPress: () => { setHeaderMenuOpen(false); setTimeout(() => setQuizSheetOpen(true), 350); } },
           ...(isOwner ? [
             { label: t('library:cards.createCard', 'Create Card'), icon: PlusCircleIcon, onPress: () => navigation.navigate('CreateCard', { setId }) },
             { label: t('library:sets.editSet', 'Edit Set'), icon: PencilIcon, onPress: () => navigation.navigate('EditSet', { setId }) },
@@ -453,14 +462,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           ] : []),
           { label: cardLayout === 'grid' ? t('library:cards.listView', 'List View') : t('library:cards.gridView', 'Grid View'), icon: cardLayout === 'grid' ? ListIcon : GridIcon, onPress: () => setCardLayout(l => l === 'list' ? 'grid' : 'list') },
         ]}
-      />
-
-      <QuizModeSheet
-        visible={quizSheetOpen}
-        setIds={[setId]}
-        setTitles={[cachedTitle ?? setTitle]}
-        onClose={handleCloseQuizSheet}
-        onStart={handleQuizStart}
       />
 
       {/* ── Share sheet: WhatsApp-direct or system share ── */}
@@ -509,6 +510,10 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 }
 
 const styles = StyleSheet.create({
+  masteryWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.sm, paddingBottom: spacing.md, gap: spacing.xs },
+  masteryHeader: { flexDirection: 'row', justifyContent: 'space-between' },
+  masteryTrack: { height: layout.progressBarHeight, borderRadius: layout.progressBarHeight / 2, overflow: 'hidden' },
+  masteryFill: { height: '100%', borderRadius: layout.progressBarHeight / 2 },
   reorderBar: {
     minHeight: layout.headerHeight,
     flexDirection: 'row',

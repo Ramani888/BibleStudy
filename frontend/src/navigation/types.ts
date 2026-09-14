@@ -1,12 +1,15 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
-import type { QuizSelectableMode } from '../types';
+import type { Card, QuizSelectableMode } from '../types';
+
+/** An LLM-generated, ephemeral quiz card (never persisted to the DB). */
+export type GeneratedQuizCard = { question: string; answer: string };
 
 // ─── Root Stack (above tabs — full-screen overlays) ───────────────────────────
 export type RootStackParamList = {
   App: undefined;
-  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[] };
   QuizSummary: { items: import('../types').SummaryItem[]; title: string; scorePct: number; total: number; correct: number; exitToHub?: boolean };
 };
 
@@ -43,7 +46,7 @@ export type QuizStackParamList = {
   QuizHub: undefined;
   QuizDetail: { id: string; setIds: string[]; setTitles: string[]; mode: string | null; scorePct: number; correct: number; total: number; createdAt: string; practicedAt?: string; quizName?: string; timeSecs?: number };
   QuizSetup: { preSelectedSetIds?: string[]; preSelectedSetTitles?: string[]; retakeAttemptId?: string } | undefined;
-  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string };
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[] };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────

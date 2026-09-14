@@ -118,7 +118,7 @@ function buildItems(cards: Card[], selected: QuizSelectableMode): QuizItem[] {
     const orderedModes = [preferred, ...modes.filter(m => m !== preferred)];
     for (const m of orderedModes) {
       const item = buildItem(card, m, cards);
-      if (item) { items.push(item); break; }
+      if (item) { item.difficulty = card.difficulty; items.push(item); break; }
     }
   }
   return items;
