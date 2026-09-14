@@ -19,6 +19,9 @@ model User {
   bio             String?
   church          String?
   creditBalance   Int             @default(3)
+  streakFreezes         Int       @default(0)  // available streak freezes (auto-applied on a missed day)
+  streakFreezeMilestone Int       @default(0)  // highest 7-day streak already rewarded a freeze
+  useFsrs         Boolean         @default(false) // opt into FSRS scheduling (SM-2 is the default)
   storageUsed     BigInt          @default(0)
   storageLimit    BigInt          @default(262144000)
   plan            Plan            @default(FREE)
@@ -50,6 +53,20 @@ model User {
   studyPlans              StudyPlan[]
   planProgress            StudyPlanProgress[]
   subscription            Subscription?
+  streakFreezeLogs        StreakFreezeLog[]
+}
+
+// One row per day a streak freeze bridged a missed login. `date` is the local
+// date string (YYYY-MM-DD) it covered, matching the streak computation's day keys.
+model StreakFreezeLog {
+  id        String   @id @default(uuid())
+  userId    String
+  date      String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
 }
 
 model RefreshToken {
@@ -127,8 +144,15 @@ model Card {
   difficulty    Difficulty @default(MEDIUM)
   lastStudiedAt DateTime?
   nextReviewAt  DateTime?
-  interval      Int        @default(0)   // spaced-rep: days until next review
+  interval      Int        @default(0)   // spaced-rep: days until next review (also FSRS scheduled_days)
   ease          Float      @default(2.5) // spaced-rep: SM-2 ease factor
+  // FSRS state (used only when the owner opts into FSRS; SM-2 fields stay authoritative otherwise)
+  fsrsStability     Float?
+  fsrsDifficulty    Float?
+  fsrsReps          Int    @default(0)
+  fsrsLapses        Int    @default(0)
+  fsrsState         Int    @default(0)   // 0 New · 1 Learning · 2 Review · 3 Relearning
+  fsrsLearningSteps Int    @default(0)
   createdAt     DateTime   @default(now())
   updatedAt     DateTime   @updatedAt
   set           Set        @relation(fields: [setId], references: [id], onDelete: Cascade)

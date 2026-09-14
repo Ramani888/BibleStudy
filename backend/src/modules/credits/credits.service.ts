@@ -164,16 +164,21 @@ function toLocalDateStr(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 }
 
-export async function getStreak(userId: string): Promise<{ streak: number; longestStreak: number }> {
-  const rewards = await prisma.creditTransaction.findMany({
-    where: { userId, type: 'REWARD' },
-    select: { createdAt: true },
-    orderBy: { createdAt: 'asc' },
-  });
+const MAX_STREAK_FREEZES = 2;
 
-  if (rewards.length === 0) return { streak: 0, longestStreak: 0 };
+export async function getStreak(userId: string): Promise<{ streak: number; longestStreak: number; freezes: number }> {
+  const [rewards, freezeLogs, user] = await Promise.all([
+    prisma.creditTransaction.findMany({ where: { userId, type: 'REWARD' }, select: { createdAt: true }, orderBy: { createdAt: 'asc' } }),
+    prisma.streakFreezeLog.findMany({ where: { userId }, select: { date: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { streakFreezes: true } }),
+  ]);
+  const freezes = user?.streakFreezes ?? 0;
 
+  if (rewards.length === 0 && freezeLogs.length === 0) return { streak: 0, longestStreak: 0, freezes };
+
+  // Freeze-covered days count as present, so a bridged miss doesn't break the run.
   const days = new Set<string>(rewards.map(r => toLocalDateStr(r.createdAt)));
+  for (const f of freezeLogs) days.add(f.date);
 
   // Current streak: count consecutive days from today backwards
   let streak = 0;
@@ -198,7 +203,62 @@ export async function getStreak(userId: string): Promise<{ streak: number; longe
     }
   }
 
-  return { streak, longestStreak: Math.max(streak, longest) };
+  return { streak, longestStreak: Math.max(streak, longest), freezes };
+}
+
+/**
+ * Streak-freeze maintenance, run once per day after the daily claim:
+ *  1) bridge the gap between today and the last present day (if coverable by
+ *     available freezes) so a missed login doesn't break the streak,
+ *  2) grant 1 freeze per new 7-day milestone (capped at MAX),
+ *  3) premium users are auto-refilled to MAX.
+ * Idempotent within a day: freeze logs are unique per (user, date).
+ */
+export async function maintainStreakFreezes(userId: string): Promise<void> {
+  const [user, rewards, freezeLogs] = await Promise.all([
+    prisma.user.findUnique({ where: { id: userId }, select: { streakFreezes: true, streakFreezeMilestone: true, plan: true } }),
+    prisma.creditTransaction.findMany({ where: { userId, type: 'REWARD' }, select: { createdAt: true } }),
+    prisma.streakFreezeLog.findMany({ where: { userId }, select: { date: true } }),
+  ]);
+  if (!user) return;
+
+  const days = new Set<string>(rewards.map(r => toLocalDateStr(r.createdAt)));
+  const freezeDates = new Set<string>(freezeLogs.map(f => f.date));
+  const present = (d: Date) => { const s = toLocalDateStr(d); return days.has(s) || freezeDates.has(s); };
+
+  let freezes = user.streakFreezes;
+  let milestone = user.streakFreezeMilestone;
+  const today = new Date(); today.setHours(0, 0, 0, 0);
+
+  // 1) Bridge consecutive missed days between today and the previous present day.
+  const missed: Date[] = [];
+  const c = new Date(today); c.setDate(c.getDate() - 1);
+  while (!present(c) && missed.length <= MAX_STREAK_FREEZES) { missed.push(new Date(c)); c.setDate(c.getDate() - 1); }
+  const priorPresent = present(c); // the day just before the missed run
+  if (missed.length > 0 && priorPresent && missed.length <= freezes) {
+    for (const d of missed) {
+      const s = toLocalDateStr(d);
+      await prisma.streakFreezeLog.create({ data: { userId, date: s } }).catch(() => {}); // unique guard
+      freezeDates.add(s);
+    }
+    freezes -= missed.length;
+  }
+
+  // 2) Recompute streak (freeze days count) and grant milestone freezes.
+  let streak = 0; const cur = new Date(today);
+  while (present(cur)) { streak++; cur.setDate(cur.getDate() - 1); }
+  if (streak >= milestone + 7) {
+    const newMilestone = Math.floor(streak / 7) * 7;
+    freezes = Math.min(MAX_STREAK_FREEZES, freezes + Math.floor((newMilestone - milestone) / 7));
+    milestone = newMilestone;
+  }
+
+  // 3) Premium auto-refill.
+  if (user.plan !== 'FREE') freezes = Math.max(freezes, MAX_STREAK_FREEZES);
+
+  if (freezes !== user.streakFreezes || milestone !== user.streakFreezeMilestone) {
+    await prisma.user.update({ where: { id: userId }, data: { streakFreezes: freezes, streakFreezeMilestone: milestone } });
+  }
 }
 
 export async function getBalance(userId: string) {
@@ -282,6 +342,7 @@ export async function claimDailyLogin(userId: string) {
   }
 
   triggerAchievementCheck(userId); // streak milestones
+  await maintainStreakFreezes(userId).catch(() => {}); // bridge misses + grant/refill freezes
 
   return {
     balance: updatedUser.creditBalance,

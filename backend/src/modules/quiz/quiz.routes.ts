@@ -2,12 +2,14 @@ import { Router } from 'express';
 import * as quizController from './quiz.controller';
 import { validate } from '../../middlewares/validate.middleware';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { RecordAttemptDto } from './quiz.dto';
+import { aiRateLimit } from '../../middlewares/rateLimit.middleware';
+import { RecordAttemptDto, GenerateQuizDto } from './quiz.dto';
 
 const router = Router();
 
 router.use(authMiddleware);
 
+router.post('/generate',        aiRateLimit, validate(GenerateQuizDto), quizController.generateQuiz);
 router.post('/attempts',        validate(RecordAttemptDto), quizController.recordAttempt);
 router.put('/attempts/:id',    validate(RecordAttemptDto), quizController.updateAttempt);
 router.delete('/attempts/:id',                             quizController.deleteAttempt);

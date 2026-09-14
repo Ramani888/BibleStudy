@@ -1,8 +1,40 @@
 import { prisma } from '../../config/db';
-import { RecordAttemptDtoType } from './quiz.dto';
-import { NotFoundError } from '../../utils/errors';
+import { RecordAttemptDtoType, GenerateQuizDtoType } from './quiz.dto';
+import { NotFoundError, ValidationError } from '../../utils/errors';
 import { applyReviews } from '../cards/cards.service';
+import { generateQuizCards } from '../ai/ai.service';
 import { logActivity } from '../../utils/activity';
+
+// Cap cards sent to the LLM to protect the token budget. ponytail: naive cap
+// (first N by order); smarter selection (due/least-reviewed) later if needed.
+const MAX_GROUNDING_CARDS = 40;
+
+/**
+ * Generate an ephemeral AI quiz (delegates to ai.service — it owns the LLM +
+ * credit seam). Sets win over topic: if setIds are given, quiz is grounded in
+ * the user's own cards; otherwise it's generated from the topic. Nothing is
+ * persisted. Card loading is owner-scoped and happens BEFORE any credit charge.
+ */
+export async function generateQuiz(userId: string, dto: GenerateQuizDtoType) {
+  if (dto.mediaIds && dto.mediaIds.length > 0) {
+    // Media wins: quiz the attached file (ai.service resolves it + charges media rate).
+    return generateQuizCards(userId, { mediaIds: dto.mediaIds, count: dto.count });
+  }
+  if (dto.setIds && dto.setIds.length > 0) {
+    const cards = await prisma.card.findMany({
+      where: { setId: { in: dto.setIds }, set: { userId } }, // owner-scoped
+      select: { question: true, answer: true },
+      orderBy: { order: 'asc' },
+      take: MAX_GROUNDING_CARDS,
+    });
+    if (cards.length === 0) throw new ValidationError('No cards found in the selected sets');
+    return generateQuizCards(userId, { cards, count: dto.count });
+  }
+  if (dto.topic) {
+    return generateQuizCards(userId, { topic: dto.topic, count: dto.count });
+  }
+  throw new ValidationError('Provide a topic or select sets');
+}
 
 /**
  * Feed a quiz's per-card results into spaced repetition. Skips unscored

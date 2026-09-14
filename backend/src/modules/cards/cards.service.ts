@@ -8,12 +8,49 @@ import {
   ReorderCardsDtoType,
 } from './cards.dto';
 import { NotFoundError, ValidationError } from '../../utils/errors';
+import { fsrs, createEmptyCard, Rating } from 'ts-fsrs';
+
+const fsrsScheduler = fsrs();
 
 /**
  * Spaced-repetition summary for the Home "TODAY" card: how many of the user's
  * cards are due for review now, across how many sets, and the set with the most
  * due cards (so Home can deep-link straight into the set that needs review).
  */
+/**
+ * The user's cards due for spaced-repetition review (nextReviewAt <= now),
+ * most-overdue first. Owner-scoped. Powers the "Review due cards" quiz — a real,
+ * tracked session (records + updates SM-2), unlike ephemeral AI quizzes.
+ */
+export async function getDueCards(userId: string, limit = 50) {
+  return prisma.card.findMany({
+    where: { set: { userId }, nextReviewAt: { lte: new Date() } },
+    orderBy: { nextReviewAt: 'asc' },
+    take: limit,
+  });
+}
+
+// A card is "learned" once its SM-2 interval reaches maturity (Anki's convention
+// is 21 days). Mastery% per set = learned / total.
+const MATURE_INTERVAL_DAYS = 21;
+
+/**
+ * Per-set mastery: share of cards whose SM-2 interval has reached maturity.
+ * Owner-scoped. Returns one row per set that has cards.
+ */
+export async function getMasteryBySet(userId: string): Promise<{ setId: string; total: number; learned: number; masteryPct: number }[]> {
+  const [totals, learned] = await Promise.all([
+    prisma.card.groupBy({ by: ['setId'], where: { set: { userId } }, _count: { _all: true } }),
+    prisma.card.groupBy({ by: ['setId'], where: { set: { userId }, interval: { gte: MATURE_INTERVAL_DAYS } }, _count: { _all: true } }),
+  ]);
+  const learnedMap = new Map(learned.map(l => [l.setId, l._count._all]));
+  return totals.map(t => {
+    const total = t._count._all;
+    const learnedCount = learnedMap.get(t.setId) ?? 0;
+    return { setId: t.setId, total, learned: learnedCount, masteryPct: total > 0 ? Math.round((learnedCount / total) * 100) : 0 };
+  });
+}
+
 export async function getDueSummary(userId: string) {
   const grouped = await prisma.card.groupBy({
     by: ['setId'],
@@ -47,14 +84,62 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * ponytail: no sub-day learning steps — a wrong card reschedules +1 day, not
  * "+10 min". Add Anki-style learning steps only if users start cramming.
  */
+type ReviewCard = {
+  interval: number; ease: number; nextReviewAt: Date | null; lastStudiedAt: Date | null;
+  fsrsStability: number | null; fsrsDifficulty: number | null; fsrsReps: number; fsrsLapses: number; fsrsState: number; fsrsLearningSteps: number;
+};
+
+// Classic SM-2 (default). Binary grade → quality 5 (correct) / 2 (wrong).
+function sm2Update(card: ReviewCard, correct: boolean, now: Date) {
+  const q = correct ? 5 : 2;
+  const ease = Math.max(1.3, card.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
+  const interval = !correct ? 0 : card.interval === 0 ? 1 : card.interval === 1 ? 6 : Math.round(card.interval * ease);
+  return { interval, ease, nextReviewAt: new Date(now.getTime() + Math.max(1, interval) * DAY_MS), lastStudiedAt: now };
+}
+
+// FSRS via ts-fsrs (opt-in). Binary grade → Good (correct) / Again (wrong).
+// Reconstructs the FSRS card from stored state, or starts fresh on first FSRS review.
+function fsrsUpdate(card: ReviewCard, correct: boolean, now: Date) {
+  const fcard = card.fsrsStability == null
+    ? createEmptyCard(now)
+    : {
+        due: card.nextReviewAt ?? now,
+        stability: card.fsrsStability,
+        difficulty: card.fsrsDifficulty ?? 0,
+        elapsed_days: 0,
+        scheduled_days: card.interval,
+        reps: card.fsrsReps,
+        lapses: card.fsrsLapses,
+        learning_steps: card.fsrsLearningSteps,
+        state: card.fsrsState,
+        last_review: card.lastStudiedAt ?? undefined,
+      };
+  const { card: n } = fsrsScheduler.next(fcard, now, correct ? Rating.Good : Rating.Again);
+  return {
+    interval: n.scheduled_days,
+    nextReviewAt: n.due,
+    lastStudiedAt: now,
+    fsrsStability: n.stability,
+    fsrsDifficulty: n.difficulty,
+    fsrsReps: n.reps,
+    fsrsLapses: n.lapses,
+    fsrsState: n.state as number,
+    fsrsLearningSteps: n.learning_steps ?? 0,
+  };
+}
+
 export async function applyReviews(
   userId: string,
   results: { cardId: string; correct: boolean }[],
 ) {
   if (results.length === 0) return;
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { useFsrs: true } });
   const cards = await prisma.card.findMany({
     where: { id: { in: results.map(r => r.cardId) }, set: { userId } },
-    select: { id: true, interval: true, ease: true },
+    select: {
+      id: true, interval: true, ease: true, nextReviewAt: true, lastStudiedAt: true,
+      fsrsStability: true, fsrsDifficulty: true, fsrsReps: true, fsrsLapses: true, fsrsState: true, fsrsLearningSteps: true,
+    },
   });
   const byId = new Map(cards.map(c => [c.id, c]));
   const now = new Date();
@@ -62,22 +147,8 @@ export async function applyReviews(
   const updates = results.flatMap(({ cardId, correct }) => {
     const card = byId.get(cardId);
     if (!card) return [];
-    const q = correct ? 5 : 2;
-    const ease = Math.max(1.3, card.ease + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02)));
-    const interval = !correct
-      ? 0
-      : card.interval === 0
-        ? 1
-        : card.interval === 1
-          ? 6
-          : Math.round(card.interval * ease);
-    const nextReviewAt = new Date(now.getTime() + Math.max(1, interval) * DAY_MS);
-    return [
-      prisma.card.update({
-        where: { id: cardId },
-        data: { interval, ease, nextReviewAt, lastStudiedAt: now },
-      }),
-    ];
+    const data = user?.useFsrs ? fsrsUpdate(card, correct, now) : sm2Update(card, correct, now);
+    return [prisma.card.update({ where: { id: cardId }, data })];
   });
 
   if (updates.length > 0) await prisma.$transaction(updates);

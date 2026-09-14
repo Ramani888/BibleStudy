@@ -7,7 +7,7 @@ import { deleteUserFilesFromDisk } from '../media/media.service';
 const PROFILE_SELECT = {
   id: true, name: true, email: true, password: true, profileImage: true,
   bio: true, church: true, creditBalance: true, storageUsed: true,
-  storageLimit: true, plan: true, emailVerified: true, createdAt: true, updatedAt: true,
+  storageLimit: true, plan: true, emailVerified: true, useFsrs: true, createdAt: true, updatedAt: true,
 } as const;
 
 function toProfileOut<T extends { password: string | null }>(user: T) {
@@ -29,6 +29,7 @@ export async function updateProfile(userId: string, dto: UpdateProfileDtoType) {
       ...(dto.bio !== undefined && { bio: dto.bio }),
       ...(dto.church !== undefined && { church: dto.church }),
       ...(dto.profileImage !== undefined && { profileImage: dto.profileImage }),
+      ...(dto.useFsrs !== undefined && { useFsrs: dto.useFsrs }),
     },
     select: PROFILE_SELECT,
   });

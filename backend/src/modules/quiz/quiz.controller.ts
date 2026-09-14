@@ -9,6 +9,13 @@ export async function recordAttempt(req: Request, res: Response): Promise<void> 
   } catch (error) { handleControllerError(res, error, 'Failed to record quiz attempt'); }
 }
 
+export async function generateQuiz(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await quizService.generateQuiz(req.user!.id, req.body);
+    sendSuccess(res, result, 'Quiz generated', 201);
+  } catch (error) { handleControllerError(res, error, 'Failed to generate quiz'); }
+}
+
 export async function deleteAttempt(req: Request, res: Response): Promise<void> {
   try {
     await quizService.deleteAttempt(req.user!.id, req.params.id);

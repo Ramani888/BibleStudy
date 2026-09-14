@@ -5,6 +5,7 @@ export const UpdateProfileDto = z.object({
   bio: z.string().max(500).optional(),
   church: z.string().max(200).optional(),
   profileImage: z.string().url().optional(),
+  useFsrs: z.boolean().optional(),
 });
 
 const newPasswordSchema = z

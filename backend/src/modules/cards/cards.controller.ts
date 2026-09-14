@@ -9,6 +9,21 @@ export async function getDueSummary(req: Request, res: Response): Promise<void> 
   } catch (error) { handleControllerError(res, error, 'Failed to get due summary'); }
 }
 
+export async function getDueCards(req: Request, res: Response): Promise<void> {
+  try {
+    const limit = Math.min(Number(req.query.limit) || 50, 100);
+    const cards = await cardsService.getDueCards(req.user!.id, limit);
+    sendSuccess(res, cards, 'Due cards retrieved');
+  } catch (error) { handleControllerError(res, error, 'Failed to get due cards'); }
+}
+
+export async function getMastery(req: Request, res: Response): Promise<void> {
+  try {
+    const rows = await cardsService.getMasteryBySet(req.user!.id);
+    sendSuccess(res, rows, 'Mastery retrieved');
+  } catch (error) { handleControllerError(res, error, 'Failed to get mastery'); }
+}
+
 export async function createCard(req: Request, res: Response): Promise<void> {
   try {
     const card = await cardsService.createCard(req.user!.id, req.body);

@@ -109,6 +109,32 @@ ${FOLLOWUP_DELIMITER}What does this passage mean for daily life?
 ${FOLLOWUP_DELIMITER}Are there related verses elsewhere in the Bible?
 ${FOLLOWUP_DELIMITER}How do different denominations interpret this?`;
 
+// AI Quiz Generation: a focused prompt that returns ONLY cards (no intro/follow-ups),
+// reusing the same ---CARD--- Q:/A: format parseAIResponse already understands.
+const QUIZ_SYSTEM_PROMPT =
+  `You are a Bible-study quiz writer. Generate study flashcards on the topic the user requests. Only use well-established scripture; each answer must include the supporting verse reference (e.g. John 3:16). Write in the same language as the topic.
+Output ONLY the cards — no introduction, no commentary, no follow-up questions. Format EACH card exactly as:
+${CARD_DELIMITER}
+Q: [a clear question]
+A: [a concise answer that includes the verse reference]`;
+
+// Card-grounded variant: write NEW questions about the user's OWN cards (no
+// hallucination — stay within the supplied material), not copies of them.
+const QUIZ_FROM_CARDS_SYSTEM_PROMPT =
+  `You are a Bible-study quiz writer. Using ONLY the flashcards the user provides, write NEW quiz questions that test understanding of the SAME material — reword them, vary the angle, and do NOT copy the cards verbatim. Do not introduce any facts not present in the cards. Keep each answer concise and include the verse reference when the source card has one. Write in the same language as the cards.
+Output ONLY the cards — no introduction, no commentary, no follow-up questions. Format EACH card exactly as:
+${CARD_DELIMITER}
+Q: [a clear question]
+A: [a concise answer]`;
+
+// Media-grounded variant: quiz the content of an attached PDF/image.
+const QUIZ_FROM_MEDIA_SYSTEM_PROMPT =
+  `You are a Bible-study quiz writer. Using ONLY the content of the attached file, write quiz questions that test understanding of that material. Do not introduce facts not present in the file. Keep each answer concise. Write in the language of the file.
+Output ONLY the cards — no introduction, no commentary, no follow-up questions. Format EACH card exactly as:
+${CARD_DELIMITER}
+Q: [a clear question]
+A: [a concise answer]`;
+
 const HARDCODED_VERSE = {
   reference: 'John 3:16',
   text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
@@ -301,6 +327,90 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     creditsUsed: charge,
     createdAt: aiChat.createdAt,
   };
+}
+
+/**
+ * Generate an EPHEMERAL quiz: N Bible-study flashcards, either from a topic
+ * (open-ended) or grounded in the user's own cards (opts.cards). Nothing is
+ * persisted (no Card/Set/AIChat rows) — the cards are returned to the client,
+ * played once via the existing quiz engine, then discarded. Charges cards:2
+ * on success; refunds atomically on any failure (charge-on-success invariant).
+ */
+export async function generateQuizCards(
+  userId: string,
+  opts: { topic?: string; cards?: { question: string; answer: string }[]; count: number; mediaIds?: string[] },
+) {
+  const { topic, cards: material, count } = opts;
+
+  // Resolve media (mirrors askQuestion): PDF/image force Claude + the media rate.
+  let mediaBlocks: MediaBlock[] | undefined;
+  let hasPdf = false, hasImage = false;
+  if (opts.mediaIds && opts.mediaIds.length > 0) {
+    const files = await prisma.mediaFile.findMany({
+      where: { id: { in: opts.mediaIds }, userId },
+      select: { url: true, type: true },
+    });
+    if (files.length !== opts.mediaIds.length) throw new AppError('One or more files not found', 400, 'INVALID_MEDIA');
+    mediaBlocks = files.map(f =>
+      f.type === 'PDF'
+        ? { type: 'document' as const, source: { type: 'url' as const, url: f.url } }
+        : { type: 'image' as const, source: { type: 'url' as const, url: f.url } },
+    );
+    hasPdf = files.some(f => f.type === 'PDF');
+    hasImage = files.some(f => f.type === 'IMAGE');
+  }
+
+  // Media dominates cost (paid Claude); reserved full-cost-upfront (G1).
+  const cost = hasPdf ? CREDIT_COST.pdf : hasImage ? CREDIT_COST.image : CREDIT_COST.cards;
+
+  // Atomic reserve (TOCTOU-safe): check AND decrement in one SQL statement.
+  const reserved = await prisma.$queryRaw<{ creditBalance: number }[]>`
+    UPDATE "User"
+    SET "creditBalance" = "creditBalance" - ${cost}
+    WHERE id = ${userId} AND "creditBalance" >= ${cost}
+    RETURNING "creditBalance"
+  `;
+  if (reserved.length === 0) {
+    const exists = await prisma.user.count({ where: { id: userId } });
+    if (!exists) throw new NotFoundError('User not found');
+    throw new PaymentRequiredError(`This needs ${cost} credits. Earn more or upgrade to keep generating quizzes.`);
+  }
+
+  // Prompt precedence: media > grounding cards > topic.
+  const system = mediaBlocks ? QUIZ_FROM_MEDIA_SYSTEM_PROMPT
+    : material && material.length > 0 ? QUIZ_FROM_CARDS_SYSTEM_PROMPT
+    : QUIZ_SYSTEM_PROMPT;
+  const userContent = mediaBlocks
+    ? `Generate ${count} Bible-study quiz flashcards based ONLY on the attached file.`
+    : material && material.length > 0
+      ? `Generate ${count} quiz questions based ONLY on these flashcards:\n` +
+        material.map((c, i) => `${i + 1}. Q: ${c.question.slice(0, 300)} | A: ${c.answer.slice(0, 300)}`).join('\n')
+      : `Generate ${count} Bible-study flashcards on the topic: "${topic}".`;
+  const messages: ChatMessage[] = [{ role: 'user', content: userContent }];
+
+  let rawText: string;
+  try {
+    rawText = await generateAnswer(system, messages, mediaBlocks);
+  } catch (e) {
+    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
+    throw e;
+  }
+
+  const { suggestedCards } = parseAIResponse(rawText);
+  const cards = suggestedCards.slice(0, count);
+
+  // Need ≥4 so Multiple Choice always has enough distractors client-side.
+  if (cards.length < 4) {
+    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
+    throw new AppError('Could not generate enough quiz questions for that topic. No credit was charged.', 502, 'AI_INSUFFICIENT_CARDS');
+  }
+
+  // Balance already decremented by the atomic reserve above; log the ledger entry.
+  await prisma.creditTransaction.create({
+    data: { userId, type: 'USAGE', amount: -cost, description: 'AI quiz generation' },
+  });
+
+  return { cards, creditsUsed: cost };
 }
 
 export async function markCardsSaved(userId: string, chatId: string) {

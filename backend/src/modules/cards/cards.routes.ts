@@ -18,6 +18,8 @@ router.post('/', validate(CreateCardDto), cardsController.createCard);
 router.post('/bulk', validate(BulkCreateCardsDto), cardsController.bulkCreateCards);
 router.post('/reorder', validate(ReorderCardsDto), cardsController.reorderCards);
 router.get('/due-summary', cardsController.getDueSummary);
+router.get('/due', cardsController.getDueCards);
+router.get('/mastery', cardsController.getMastery);
 router.get('/set/:setId', cardsController.listCardsBySet);
 router.get('/:id', cardsController.getCardById);
 router.put('/:id', validate(UpdateCardDto), cardsController.updateCard);
