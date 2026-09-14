@@ -118,6 +118,15 @@ Today: score + quote + review. Add, in priority order:
 
 **Remaining:** only #8 (copy polish), #10 (analytics — externally blocked), #12 (dashboard — optional). Everything engine/feature-level is shipped and verified.
 
+## 5b. Post-audit hardening (2026-09-14)
+Three-agent review of the quiz feature (frontend / backend / SR data-flow), findings verified against source before acting. Fixed:
+- **Best % now single-set only** — multi-set/review sessions no longer credit a blended score to `setIds[0]` (`getBestForSet`/`getAllBest`).
+- **FSRS seeded from SM-2 maturity** on first opt-in (mature card no longer resets to New); real `elapsed_days` passed so late reviews score correctly (verified via ts-fsrs: seeded interval 30→85d, fresh→0).
+- **Credit-ledger write guarded** — a failed `creditTransaction` write now refunds (charge-on-success invariant).
+- **Defensive:** dedupe duplicate cardId in `applyReviews`; review double-tap guard; retake keeps `quizName`; dev-only guard on the ephemeral-vs-review param invariant.
+
+Documented limitations (deliberate, `ponytail:` in code): "due" uses UTC not local midnight (no tz stored → near-midnight off-by-one); FSRS→SM-2 (disabling FSRS) mid-history unsupported; `recordAttempt` commits before SR (self-corrects next quiz); wrong answer resets SM-2 interval to 0 (intentional, no sub-day steps). Confirmed robust: ephemeral quizzes can't touch SM-2 (3 guards), never-quizzed `nextReviewAt=null` excluded, ease floor 1.3, ownership scoping.
+
 ## 6. The one-line strategy
 **Free unlimited practice is the retention engine; AI generation is the monetization wedge; streaks are the conversion lever** — Knowt's free tier + StudyX's credits + Duolingo's gamification, all from primitives we already have.
 

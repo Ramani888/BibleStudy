@@ -375,9 +375,16 @@ export async function generateQuizCards(
   }
 
   // Balance already decremented by the atomic reserve above; log the ledger entry.
-  await prisma.creditTransaction.create({
-    data: { userId, type: 'USAGE', amount: -cost, description: 'AI quiz generation' },
-  });
+  // If the ledger write fails, refund so we never charge without a matching record
+  // (charge-on-success invariant) — the user retries rather than losing credits.
+  try {
+    await prisma.creditTransaction.create({
+      data: { userId, type: 'USAGE', amount: -cost, description: 'AI quiz generation' },
+    });
+  } catch (e) {
+    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
+    throw new AppError('Could not complete quiz generation. No credit was charged — please retry.', 500, 'LEDGER_WRITE_FAILED');
+  }
 
   return { cards, creditsUsed: cost };
 }

@@ -46,6 +46,7 @@ export function QuizHubScreen() {
 
   // Review due cards → a real, tracked SR session (records + updates SM-2).
   const handleReviewDue = useCallback(async () => {
+    if (due.isFetching) return; // guard double-tap → avoid two refetches + double navigate
     const res = await due.refetch();
     const cards = res.data ?? [];
     if (cards.length === 0) return;
@@ -265,6 +266,7 @@ export function QuizHubScreen() {
               setTitles: activeItem.setTitles,
               mode: (activeItem.mode ?? 'mix') as any,
               retakeAttemptId: activeItem.id,
+              quizName: activeItem.quizName, // keep the quiz's name on retake
             }),
           },
           {

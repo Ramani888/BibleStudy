@@ -52,6 +52,9 @@ export function QuizScreen() {
   // Either way we skip the per-set fetch.
   const isGenerated = !!generatedCards && generatedCards.length > 0;
   const isReview = !!reviewCards && reviewCards.length > 0;
+  if (__DEV__ && isGenerated && isReview) {
+    console.warn('QuizScreen: generatedCards + reviewCards both passed — using generatedCards (ephemeral). Callers should pass exactly one.');
+  }
   const usePassed = isGenerated || isReview;
   const fetched = useCardsForSets(usePassed ? [] : setIds);
   const cards = isGenerated ? generatedCards!.map(toEphemeralCard) : isReview ? reviewCards! : fetched.data;

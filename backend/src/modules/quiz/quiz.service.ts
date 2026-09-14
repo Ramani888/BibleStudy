@@ -66,6 +66,10 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   });
 
   logActivity(userId, 'STUDIED_CARDS', attempt.id);
+  // ponytail: the attempt row commits before SR runs (applyReviews has its own
+  // inner transaction). A crash in the gap leaves the attempt recorded but the
+  // cards not rescheduled — it self-corrects on the next quiz. Not worth threading
+  // a tx through the shared applyReviews path pre-launch.
   await applySpacedRepetition(userId, dto);
   const best = await getBestForSet(userId, primarySetId);
   return { attempt, best };
@@ -88,12 +92,17 @@ export async function deleteAttempt(userId: string, attemptId: string) {
   if (deleted.count === 0) throw new NotFoundError('Attempt not found');
 }
 
+// "Best" reflects single-set quizzes only. A multi-set/review session stores a
+// blended score under setIds[0]; crediting that to one set would mislead, so any
+// attempt spanning >1 set is excluded. ponytail: O(attempts-for-set) scan — fine
+// at per-user attempt volumes; revisit if a user ever accrues thousands.
 export async function getBestForSet(userId: string, setId: string): Promise<number | null> {
-  const agg = await prisma.quizAttempt.aggregate({
+  const rows = await prisma.quizAttempt.findMany({
     where: { userId, setId },
-    _max: { scorePct: true },
+    select: { scorePct: true, setIds: true },
   });
-  return agg._max.scorePct ?? null;
+  const single = rows.filter(r => r.setIds.length <= 1);
+  return single.length ? Math.max(...single.map(r => r.scorePct)) : null;
 }
 
 export async function getRecentAttempts(userId: string, limit = 20) {
@@ -141,15 +150,19 @@ export async function getAttemptResponses(userId: string, attemptId: string) {
 }
 
 export async function getAllBest(userId: string) {
-  const rows = await prisma.quizAttempt.groupBy({
-    by: ['setId'],
+  // Single-set attempts only — mirrors getBestForSet (multi-set/review sessions
+  // don't credit any one set's best/attempt count).
+  const rows = await prisma.quizAttempt.findMany({
     where: { userId },
-    _max: { scorePct: true },
-    _count: { _all: true },
+    select: { setId: true, scorePct: true, setIds: true },
   });
-  return rows.map(r => ({
-    setId:    r.setId,
-    best:     r._max.scorePct ?? 0,
-    attempts: r._count._all,
-  }));
+  const bySet = new Map<string, { best: number; attempts: number }>();
+  for (const r of rows) {
+    if (r.setIds.length > 1) continue;
+    const cur = bySet.get(r.setId) ?? { best: 0, attempts: 0 };
+    cur.best = Math.max(cur.best, r.scorePct);
+    cur.attempts += 1;
+    bySet.set(r.setId, cur);
+  }
+  return [...bySet].map(([setId, v]) => ({ setId, best: v.best, attempts: v.attempts }));
 }

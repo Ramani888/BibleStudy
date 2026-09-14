@@ -8,7 +8,7 @@ import {
   ReorderCardsDtoType,
 } from './cards.dto';
 import { NotFoundError, ValidationError } from '../../utils/errors';
-import { fsrs, createEmptyCard, Rating } from 'ts-fsrs';
+import { fsrs, createEmptyCard, Rating, State } from 'ts-fsrs';
 
 const fsrsScheduler = fsrs();
 
@@ -22,6 +22,9 @@ const fsrsScheduler = fsrs();
  * most-overdue first. Owner-scoped. Powers the "Review due cards" quiz — a real,
  * tracked session (records + updates SM-2), unlike ephemeral AI quizzes.
  */
+// ponytail: "due" uses a raw UTC instant (nextReviewAt <= now), not the user's
+// local midnight — we store no timezone. Near a user's day boundary the due count
+// can be off by one. Add a client tz-offset param if this becomes a real complaint.
 export async function getDueCards(userId: string, limit = 50) {
   return prisma.card.findMany({
     where: { set: { userId }, nextReviewAt: { lte: new Date() } },
@@ -98,22 +101,50 @@ function sm2Update(card: ReviewCard, correct: boolean, now: Date) {
 }
 
 // FSRS via ts-fsrs (opt-in). Binary grade → Good (correct) / Again (wrong).
-// Reconstructs the FSRS card from stored state, or starts fresh on first FSRS review.
+// Reconstructs the FSRS card from stored state; seeds from SM-2 maturity when a
+// user first enables FSRS (so a mature card isn't reset to New); else starts fresh.
 function fsrsUpdate(card: ReviewCard, correct: boolean, now: Date) {
-  const fcard = card.fsrsStability == null
-    ? createEmptyCard(now)
-    : {
-        due: card.nextReviewAt ?? now,
-        stability: card.fsrsStability,
-        difficulty: card.fsrsDifficulty ?? 0,
-        elapsed_days: 0,
-        scheduled_days: card.interval,
-        reps: card.fsrsReps,
-        lapses: card.fsrsLapses,
-        learning_steps: card.fsrsLearningSteps,
-        state: card.fsrsState,
-        last_review: card.lastStudiedAt ?? undefined,
-      };
+  // ts-fsrs derives retrievability from now − last_review; pass the real elapsed
+  // days so a card reviewed late isn't treated as reviewed immediately.
+  const elapsed = card.lastStudiedAt
+    ? Math.max(0, Math.round((now.getTime() - card.lastStudiedAt.getTime()) / DAY_MS))
+    : 0;
+  let fcard: Parameters<typeof fsrsScheduler.next>[0];
+  if (card.fsrsStability != null) {
+    // Existing FSRS state.
+    fcard = {
+      due: card.nextReviewAt ?? now,
+      stability: card.fsrsStability,
+      difficulty: card.fsrsDifficulty ?? 0,
+      elapsed_days: elapsed,
+      scheduled_days: card.interval,
+      reps: card.fsrsReps,
+      lapses: card.fsrsLapses,
+      learning_steps: card.fsrsLearningSteps,
+      state: card.fsrsState,
+      last_review: card.lastStudiedAt ?? undefined,
+    };
+  } else if (card.interval > 0) {
+    // Migrating SM-2 → FSRS: seed from accumulated maturity. SM-2 interval (days)
+    // ≈ FSRS stability at 90% recall; difficulty seeds neutral and self-tunes.
+    // ponytail: one-way seed. FSRS → SM-2 (disabling FSRS) still reads card.ease,
+    // which FSRS never maintains — switching back mid-history is not supported.
+    fcard = {
+      due: card.nextReviewAt ?? now,
+      stability: Math.max(1, card.interval),
+      difficulty: 5,
+      elapsed_days: elapsed,
+      scheduled_days: card.interval,
+      reps: card.fsrsReps,
+      lapses: card.fsrsLapses,
+      learning_steps: card.fsrsLearningSteps,
+      state: State.Review,
+      last_review: card.lastStudiedAt ?? undefined,
+    };
+  } else {
+    // Never studied under either scheduler.
+    fcard = createEmptyCard(now);
+  }
   const { card: n } = fsrsScheduler.next(fcard, now, correct ? Rating.Good : Rating.Again);
   return {
     interval: n.scheduled_days,
@@ -133,9 +164,13 @@ export async function applyReviews(
   results: { cardId: string; correct: boolean }[],
 ) {
   if (results.length === 0) return;
+  // Dedupe by cardId (keep the last grade) — two updates for the same card in one
+  // $transaction would both compute from the pre-review snapshot and the first
+  // would be lost. Normal flow yields one item per card; this is defensive.
+  const reviews = [...new Map(results.map(r => [r.cardId, r])).values()];
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { useFsrs: true } });
   const cards = await prisma.card.findMany({
-    where: { id: { in: results.map(r => r.cardId) }, set: { userId } },
+    where: { id: { in: reviews.map(r => r.cardId) }, set: { userId } },
     select: {
       id: true, interval: true, ease: true, nextReviewAt: true, lastStudiedAt: true,
       fsrsStability: true, fsrsDifficulty: true, fsrsReps: true, fsrsLapses: true, fsrsState: true, fsrsLearningSteps: true,
@@ -144,7 +179,7 @@ export async function applyReviews(
   const byId = new Map(cards.map(c => [c.id, c]));
   const now = new Date();
 
-  const updates = results.flatMap(({ cardId, correct }) => {
+  const updates = reviews.flatMap(({ cardId, correct }) => {
     const card = byId.get(cardId);
     if (!card) return [];
     const data = user?.useFsrs ? fsrsUpdate(card, correct, now) : sm2Update(card, correct, now);
