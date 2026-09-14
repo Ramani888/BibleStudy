@@ -283,5 +283,10 @@
     "easy": "Madali",
     "medium": "Katamtaman",
     "hard": "Mahirap"
+  },
+  "validation": {
+    "nameMax": "Hanggang 80 karakter",
+    "topicMin": "Maglagay ng hindi bababa sa 2 karakter",
+    "topicMax": "Hanggang 100 karakter"
   }
 }

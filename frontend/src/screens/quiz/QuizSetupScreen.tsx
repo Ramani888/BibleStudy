@@ -2,8 +2,12 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+
 import { ActionSheet, AppModal, EmptyState } from '../../components/feedback';
-import { Button, FilterChip, Input, Screen, SearchBar, Typography } from '../../components/ui';
+import { Button, FilterChip, Screen, SearchBar, Typography } from '../../components/ui';
+import { FormField } from '../../components/forms';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ChevronRightIcon, SearchIcon, ShuffleIcon, SortIcon, StarIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
@@ -13,6 +17,7 @@ import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import type { QuizSelectableMode } from '../../types';
+import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 import type { QuizStackParamList } from '../../navigation/types';
 
 import { useTranslation } from 'react-i18next';
@@ -48,8 +53,10 @@ export function QuizSetupScreen() {
   const preIds = params?.preSelectedSetIds ?? [];
   const preTitles = params?.preSelectedSetTitles ?? [];
 
-  const [quizName, setQuizName] = useState('');
-  const [aiTopic, setAiTopic] = useState('');
+  const { control, handleSubmit, getValues } = useForm<QuizSetupFormData>({
+    resolver: zodResolver(quizSetupSchema),
+    defaultValues: { quizName: '', aiTopic: '' },
+  });
   const generate = useGenerateQuiz();
   const { data: creditBalance } = useCreditBalance();
   const { pickPdf, pickImage, isUploading } = usePickMedia();
@@ -173,16 +180,21 @@ export function QuizSetupScreen() {
     });
   }, [generate, navigation, t]);
 
-  // Sets win over topic: if the selected sets have cards, ground the AI quiz in
-  // them; otherwise fall back to the typed topic.
-  const handleGenerateAI = useCallback(() => {
+  // Sets win over topic: with sets selected, ground the AI quiz in them (skips
+  // topic validation); otherwise validate + use the typed topic via handleSubmit.
+  const generateFromSets = useCallback(() => {
+    const title = selectedSetTitles.length === 1
+      ? selectedSetTitles[0]
+      : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` });
+    runGenerate({ setIds: selectedSetIds }, title);
+  }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
+
+  const generateFromTopic = handleSubmit(({ aiTopic }) => {
     const topic = aiTopic.trim();
-    if (!canStart && topic.length < 2) return;
-    const title = canStart
-      ? (selectedSetTitles.length === 1 ? selectedSetTitles[0] : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` }))
-      : topic;
-    runGenerate(canStart ? { setIds: selectedSetIds } : { topic }, title);
-  }, [canStart, aiTopic, selectedSetIds, selectedSetTitles, runGenerate, t]);
+    runGenerate({ topic }, topic);
+  });
+
+  const onGenerateAI = canStart ? generateFromSets : generateFromTopic;
 
   // Quiz from an uploaded PDF/image (media rate: 3–5 credits).
   const [fileSheetOpen, setFileSheetOpen] = useState(false);
@@ -209,7 +221,7 @@ export function QuizSetupScreen() {
               setTitles: selectedSetTitles,
               mode: selectedMode,
               retakeAttemptId: params?.retakeAttemptId,
-              quizName: quizName.trim() || undefined,
+              quizName: getValues('quizName').trim() || undefined,
             })}
             disabled={!canStart}
             fullWidth
@@ -221,16 +233,16 @@ export function QuizSetupScreen() {
         <View style={styles.section}>
 
           {/* ── Quiz Name ── */}
-          <View>
+          <View style={styles.nameField}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
-          <Input
+          <FormField
+            name="quizName"
+            control={control}
             placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')}
-            value={quizName}
-            onChangeText={setQuizName}
+            autoCapitalize="sentences"
             returnKeyType="done"
-            containerStyle={{ marginBottom: spacing.xl }}
+            maxLength={80}
           />
-
           </View>
 
           {/* ── Choose Sets row ── */}
@@ -291,22 +303,25 @@ export function QuizSetupScreen() {
           <View style={styles.modeSection}>
             <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiLabel', 'OR GENERATE WITH AI')}</Typography>
             {!canStart && (
-              <Input
-                placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')}
-                value={aiTopic}
-                onChangeText={setAiTopic}
-                returnKeyType="done"
-                onSubmitEditing={handleGenerateAI}
-                containerStyle={{ marginBottom: spacing.md }}
-              />
+              <View style={styles.topicField}>
+                <FormField
+                  name="aiTopic"
+                  control={control}
+                  placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')}
+                  autoCapitalize="sentences"
+                  returnKeyType="done"
+                  onSubmitEditing={generateFromTopic}
+                  maxLength={100}
+                />
+              </View>
             )}
             <Button
               label={canStart
                 ? t('quiz:setup.generateAiQuizFromSets', '✨ Generate AI Quiz from selected sets')
                 : t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
               loading={generate.isPending}
-              onPress={handleGenerateAI}
-              disabled={!canStart && aiTopic.trim().length < 2}
+              onPress={onGenerateAI}
+              disabled={generate.isPending}
               fullWidth
             />
             <View style={styles.aiCostRow}>
@@ -421,6 +436,8 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   section: { padding: layout.screenPaddingH },
   sectionLabel: { marginBottom: spacing.md, marginTop: spacing.sm },
+  nameField: { marginBottom: spacing.xl },
+  topicField: { marginBottom: spacing.md },
   selectorRow: {
     flexDirection: 'row',
     alignItems: 'center',

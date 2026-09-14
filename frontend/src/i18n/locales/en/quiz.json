@@ -213,5 +213,10 @@
         "sub": "Every attempt makes you stronger."
       }
     }
+  },
+  "validation": {
+    "nameMax": "Max 80 characters",
+    "topicMin": "Enter at least 2 characters",
+    "topicMax": "Max 100 characters"
   }
 }

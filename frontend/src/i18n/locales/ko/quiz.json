@@ -283,5 +283,10 @@
     "easy": "쉬움",
     "medium": "보통",
     "hard": "어려움"
+  },
+  "validation": {
+    "nameMax": "최대 80자",
+    "topicMin": "2자 이상 입력하세요",
+    "topicMax": "최대 100자"
   }
 }

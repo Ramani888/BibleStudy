@@ -61,3 +61,18 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;
 export type ChangePasswordFormData = z.infer<ReturnType<typeof makeChangePasswordSchema>>;
 export type CreateSetFormData = z.infer<typeof createSetSchema>;
+
+/**
+ * Quiz setup form. `quizName` is optional (blank = auto-named); `aiTopic` is only
+ * validated on the AI-from-topic path (the sets path bypasses handleSubmit), so its
+ * min-2 rule never blocks a sets-grounded quiz.
+ */
+export const quizSetupSchema = z.object({
+  quizName: z.string().trim().max(80, i18n.t('quiz:validation.nameMax', 'Max 80 characters')),
+  aiTopic: z
+    .string()
+    .trim()
+    .min(2, i18n.t('quiz:validation.topicMin', 'Enter at least 2 characters'))
+    .max(100, i18n.t('quiz:validation.topicMax', 'Max 100 characters')),
+});
+export type QuizSetupFormData = z.infer<typeof quizSetupSchema>;

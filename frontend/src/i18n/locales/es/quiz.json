@@ -283,5 +283,10 @@
     "easy": "Fácil",
     "medium": "Media",
     "hard": "Difícil"
+  },
+  "validation": {
+    "nameMax": "Máximo 80 caracteres",
+    "topicMin": "Introduce al menos 2 caracteres",
+    "topicMax": "Máximo 100 caracteres"
   }
 }
