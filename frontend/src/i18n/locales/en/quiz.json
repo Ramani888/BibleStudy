@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "New questions?",
+    "confirmMessage": "Re-quiz makes new questions from the same source and uses {{cost}} credits.",
+    "confirmCta": "Use {{cost}} credits"
+  },
   "hub": {
     "fromTopic": "Topic · {{topic}}",
     "aiQuiz": "AI quiz",
@@ -29,6 +34,7 @@
     "details": "Details"
   },
   "setup": {
+    "tooFewCards": "Pick sets with at least {{count}} cards total to generate a quiz.",
     "title": "Quiz Setup",
     "quizNamePlaceholder": "Quiz Name (optional)",
     "selectSets": "Select Sets",

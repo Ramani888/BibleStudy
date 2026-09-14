@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "¿Nuevas preguntas?",
+    "confirmMessage": "Rehacer crea preguntas nuevas de la misma fuente y usa {{cost}} créditos.",
+    "confirmCta": "Usar {{cost}} créditos"
+  },
   "hub": {
     "fromTopic": "Tema · {{topic}}",
     "aiQuiz": "Cuestionario IA",
@@ -34,6 +39,7 @@
     "dueCount": "{{count}} tarjetas para repasar"
   },
   "setup": {
+    "tooFewCards": "Elige sets con al menos {{count}} tarjetas en total para generar un cuestionario.",
     "title": "Configuración del Cuestionario",
     "mode": "Modo de Cuestionario",
     "modes": {

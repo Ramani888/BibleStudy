@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "Bagong tanong?",
+    "confirmMessage": "Ang muling pagsusulit ay gumagawa ng bagong mga tanong mula sa parehong pinagmulan at gumagamit ng {{cost}} credits.",
+    "confirmCta": "Gumamit ng {{cost}} credits"
+  },
   "hub": {
     "fromTopic": "Paksa · {{topic}}",
     "aiQuiz": "AI Quiz",
@@ -34,6 +39,7 @@
     "dueCount": "{{count}} card ang dapat balikan"
   },
   "setup": {
+    "tooFewCards": "Pumili ng mga set na may hindi bababa sa {{count}} kard sa kabuuan para makabuo ng pagsusulit.",
     "title": "Setup ng Pagsusulit",
     "mode": "Mode ng Pagsusulit",
     "modes": {

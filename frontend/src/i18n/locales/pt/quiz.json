@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "Novas perguntas?",
+    "confirmMessage": "Refazer cria novas perguntas da mesma fonte e usa {{cost}} créditos.",
+    "confirmCta": "Usar {{cost}} créditos"
+  },
   "hub": {
     "fromTopic": "Tópico · {{topic}}",
     "aiQuiz": "Quiz IA",
@@ -34,6 +39,7 @@
     "dueCount": "{{count}} cartões para revisar"
   },
   "setup": {
+    "tooFewCards": "Escolha conjuntos com pelo menos {{count}} cartões no total para gerar um quiz.",
     "title": "Configuração do Quiz",
     "mode": "Modo de Quiz",
     "modes": {

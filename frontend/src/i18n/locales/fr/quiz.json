@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "Nouvelles questions ?",
+    "confirmMessage": "Rejouer crée de nouvelles questions à partir de la même source et utilise {{cost}} crédits.",
+    "confirmCta": "Utiliser {{cost}} crédits"
+  },
   "hub": {
     "fromTopic": "Thème · {{topic}}",
     "aiQuiz": "Quiz IA",
@@ -34,6 +39,7 @@
     "dueCount": "{{count}} cartes à réviser"
   },
   "setup": {
+    "tooFewCards": "Choisissez des ensembles avec au moins {{count}} cartes au total pour générer un quiz.",
     "title": "Configuration du Quiz",
     "mode": "Mode de Quiz",
     "modes": {

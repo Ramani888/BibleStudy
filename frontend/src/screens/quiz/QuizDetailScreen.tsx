@@ -4,13 +4,14 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { Button, Screen, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, TimerIcon, TrashIcon, TrophyIcon } from '../../components/icons';
-import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useRecentQuizAttempts } from '../../hooks';
+import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useReQuiz, useRecentQuizAttempts } from '../../hooks';
 import { ConfirmDialog } from '../../components/feedback';
+import { GeneratingQuizModal } from './components';
 import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
-import { MODE_NAMES, reQuizParams, scoreColor } from './quizUi';
+import { MODE_NAMES, scoreColor } from './quizUi';
 
 import { useTranslation } from 'react-i18next';
 type Params = QuizStackParamList['QuizDetail'];
@@ -60,11 +61,12 @@ export function QuizDetailScreen() {
   const { data: responsesData } = useQuizAttemptResponses(params.id);
   const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
 
-  // Set-less AI quizzes reconstruct their questions from stored responses; real
-  // quizzes replay from their sets. reQuizParams handles both.
+  // AI quizzes regenerate fresh questions from their topic/sets (charges credits);
+  // old/real quizzes replay. useReQuiz handles the confirm + generate + fallback.
+  const { reQuiz, dialogProps: reQuizDialog, isGenerating } = useReQuiz();
   const handleReQuiz = useCallback(
-    () => navigation.navigate('Quiz', reQuizParams({ id, setIds, setTitles, mode, quizName }, storedResponses)),
-    [navigation, id, setIds, setTitles, mode, quizName, storedResponses],
+    () => reQuiz({ id, setIds, setTitles, mode, quizName, topic }, storedResponses),
+    [reQuiz, id, setIds, setTitles, mode, quizName, topic, storedResponses],
   );
 
   const footer = (
@@ -202,6 +204,8 @@ export function QuizDetailScreen() {
         </View>
       </ScrollView>
       <ConfirmDialog {...dialogProps} />
+      <ConfirmDialog {...reQuizDialog} />
+      <GeneratingQuizModal visible={isGenerating} />
     </Screen>
   );
 }

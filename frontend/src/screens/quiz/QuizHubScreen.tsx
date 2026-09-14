@@ -7,7 +7,8 @@ import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../compon
 import { Button, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, ChevronRightIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
-import { useConfirmDialog, useDeleteQuizAttempt, useDueCards, useDueSummary, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
+import { useConfirmDialog, useDeleteQuizAttempt, useDueCards, useDueSummary, useReQuiz, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
+import { GeneratingQuizModal } from './components';
 
 import { useTranslation } from 'react-i18next';
 import { getErrorMessage } from '../../api';
@@ -15,7 +16,7 @@ import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } fr
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
-import { MODE_NAMES, reQuizParams, scoreColor } from './quizUi';
+import { MODE_NAMES, scoreColor } from './quizUi';
 
 const ICON_SIZE = 20;
 
@@ -33,6 +34,7 @@ export function QuizHubScreen() {
   const due = useDueCards();
   const dueCount = dueSummary?.dueCount ?? 0;
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
+  const { reQuiz, dialogProps: reQuizDialog, isGenerating } = useReQuiz();
 
   // Review due cards → a real, tracked SR session (records + updates SM-2).
   const handleReviewDue = useCallback(async () => {
@@ -258,7 +260,7 @@ export function QuizHubScreen() {
           {
             label: t('quiz:summary.reQuiz', 'Re-Quiz'),
             icon: RefreshIcon,
-            onPress: () => activeItem && navigation.navigate('Quiz', reQuizParams(activeItem, activeItem.responses)),
+            onPress: () => { if (!activeItem) return; const item = activeItem; closeSheet(); reQuiz(item, item.responses); },
           },
           {
             label: t('common:actions.delete', 'Delete'),
@@ -269,6 +271,8 @@ export function QuizHubScreen() {
         ]}
       />
       <ConfirmDialog {...dialogProps} />
+      <ConfirmDialog {...reQuizDialog} />
+      <GeneratingQuizModal visible={isGenerating} />
     </Screen>
   );
 }

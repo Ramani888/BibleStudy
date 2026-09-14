@@ -46,6 +46,7 @@ export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
 export { useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses, useGenerateQuiz } from './useQuiz';
+export { useReQuiz } from './useReQuiz';
 
 export {
   useFriends,

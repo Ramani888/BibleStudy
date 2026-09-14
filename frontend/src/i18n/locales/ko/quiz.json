@@ -1,4 +1,9 @@
 {
+  "reQuiz": {
+    "confirmTitle": "새로운 문제로?",
+    "confirmMessage": "다시 풀기는 같은 출처에서 새 문제를 만들고 크레딧 {{cost}}개를 사용합니다.",
+    "confirmCta": "크레딧 {{cost}}개 사용"
+  },
   "hub": {
     "fromTopic": "주제 · {{topic}}",
     "aiQuiz": "AI 퀴즈",
@@ -34,6 +39,7 @@
     "dueCount": "복습할 카드 {{count}}개"
   },
   "setup": {
+    "tooFewCards": "퀴즈를 생성하려면 총 {{count}}개 이상의 카드가 있는 세트를 선택하세요.",
     "title": "퀴즈 설정",
     "mode": "퀴즈 모드",
     "modes": {
