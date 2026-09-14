@@ -88,7 +88,19 @@
     },
     "outOfCredits": "Out of credits",
     "upgradeToGenerate": "Upgrade to generate AI quizzes.",
-    "couldNotGenerate": "Couldn't generate quiz"
+    "couldNotGenerate": "Couldn't generate quiz",
+    "tab": {
+      "practice": "Practice",
+      "ai": "Quiz by AI",
+      "file": "PDF / Image"
+    },
+    "topicLabel": "TOPIC",
+    "fileSourceLabel": "SOURCE",
+    "fileKindPdf": "PDF",
+    "fileKindImage": "Image",
+    "fileHelp": "We’ll read your file and build a quiz from it.",
+    "fileCost": "Costs 3–5 credits · media",
+    "generateQuiz": "✨ Generate Quiz"
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",

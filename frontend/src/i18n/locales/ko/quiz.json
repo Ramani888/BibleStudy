@@ -114,7 +114,19 @@
     },
     "outOfCredits": "크레딧 부족",
     "upgradeToGenerate": "AI 퀴즈를 생성하려면 업그레이드하세요.",
-    "couldNotGenerate": "퀴즈를 생성할 수 없습니다"
+    "couldNotGenerate": "퀴즈를 생성할 수 없습니다",
+    "tab": {
+      "practice": "연습",
+      "ai": "AI 퀴즈",
+      "file": "PDF / 이미지"
+    },
+    "topicLabel": "주제",
+    "fileSourceLabel": "소스",
+    "fileKindPdf": "PDF",
+    "fileKindImage": "이미지",
+    "fileHelp": "파일을 읽고 그것으로 퀴즈를 만들어 드립니다.",
+    "fileCost": "3–5 크레딧 소요 · 미디어",
+    "generateQuiz": "✨ 퀴즈 생성"
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",

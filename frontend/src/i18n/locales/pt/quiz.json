@@ -114,7 +114,19 @@
     },
     "outOfCredits": "Sem créditos",
     "upgradeToGenerate": "Faça upgrade para gerar quizzes com IA.",
-    "couldNotGenerate": "Não foi possível gerar o quiz"
+    "couldNotGenerate": "Não foi possível gerar o quiz",
+    "tab": {
+      "practice": "Praticar",
+      "ai": "Quiz por IA",
+      "file": "PDF / Imagem"
+    },
+    "topicLabel": "TÓPICO",
+    "fileSourceLabel": "FONTE",
+    "fileKindPdf": "PDF",
+    "fileKindImage": "Imagem",
+    "fileHelp": "Vamos ler seu arquivo e criar um quiz a partir dele.",
+    "fileCost": "Custa 3–5 créditos · mídia",
+    "generateQuiz": "✨ Gerar quiz"
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",

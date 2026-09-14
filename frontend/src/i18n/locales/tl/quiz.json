@@ -114,7 +114,19 @@
     },
     "outOfCredits": "Ubos na ang credits",
     "upgradeToGenerate": "Mag-upgrade para makagawa ng AI quiz.",
-    "couldNotGenerate": "Hindi makagawa ng quiz"
+    "couldNotGenerate": "Hindi makagawa ng quiz",
+    "tab": {
+      "practice": "Magsanay",
+      "ai": "Quiz sa AI",
+      "file": "PDF / Larawan"
+    },
+    "topicLabel": "PAKSA",
+    "fileSourceLabel": "PINAGMULAN",
+    "fileKindPdf": "PDF",
+    "fileKindImage": "Larawan",
+    "fileHelp": "Babasahin namin ang iyong file at gagawa ng quiz mula rito.",
+    "fileCost": "Nagkakahalaga ng 3–5 credit · media",
+    "generateQuiz": "✨ Gumawa ng quiz"
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",

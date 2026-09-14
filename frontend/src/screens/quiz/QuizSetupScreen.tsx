@@ -5,7 +5,7 @@ import { useNavigation, useRoute, type RouteProp } from '@react-navigation/nativ
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { ActionSheet, AppModal, EmptyState } from '../../components/feedback';
+import { AppModal, EmptyState } from '../../components/feedback';
 import { Button, FilterChip, Screen, SearchBar, Typography } from '../../components/ui';
 import { FormField } from '../../components/forms';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -42,6 +42,11 @@ const modeDesc: Record<QuizSelectableMode, string> = {
 };
 const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
 
+// One form, three sources: practice existing cards, generate from a topic, or from a file.
+type SetupMode = 'practice' | 'ai' | 'file';
+const SETUP_MODES: SetupMode[] = ['practice', 'ai', 'file'];
+const SETUP_MODE_LABEL: Record<SetupMode, string> = { practice: 'Practice', ai: 'Quiz by AI', file: 'PDF / Image' };
+
 export function QuizSetupScreen() {
   const { t } = useTranslation(['quiz', 'common']);
   const theme = useTheme();
@@ -77,6 +82,8 @@ export function QuizSetupScreen() {
   const [selectedSetIds, setSelectedSetIds] = useState<string[]>(preIds);
   const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>(preTitles);
   const [selectedMode, setSelectedMode] = useState<QuizSelectableMode>('mix');
+  const [mode, setMode] = useState<SetupMode>('practice');
+  const [fileKind, setFileKind] = useState<'pdf' | 'image'>('pdf');
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
@@ -180,166 +187,174 @@ export function QuizSetupScreen() {
     });
   }, [generate, navigation, t]);
 
-  // Sets win over topic: with sets selected, ground the AI quiz in them (skips
-  // topic validation); otherwise validate + use the typed topic via handleSubmit.
-  const generateFromSets = useCallback(() => {
-    const title = selectedSetTitles.length === 1
-      ? selectedSetTitles[0]
-      : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` });
-    runGenerate({ setIds: selectedSetIds }, title);
-  }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
-
+  // AI quiz from a typed topic (validated via zod + handleSubmit).
   const generateFromTopic = handleSubmit(({ aiTopic }) => {
     const topic = aiTopic.trim();
     runGenerate({ topic }, topic);
   });
 
-  const onGenerateAI = canStart ? generateFromSets : generateFromTopic;
-
   // Quiz from an uploaded PDF/image (media rate: 3–5 credits).
-  const [fileSheetOpen, setFileSheetOpen] = useState(false);
   const handleGenerateFromFile = useCallback(async (kind: 'pdf' | 'image') => {
-    setFileSheetOpen(false);
     const file = kind === 'pdf' ? await pickPdf() : await pickImage();
     if (!file) return;
     runGenerate({ mediaIds: [file.id] }, t('quiz:setup.fileQuizTitle', 'File quiz'));
   }, [pickPdf, pickImage, runGenerate, t]);
+
+  const startPractice = useCallback(() => navigation.navigate('Quiz', {
+    setIds: selectedSetIds,
+    setTitles: selectedSetTitles,
+    mode: selectedMode,
+    retakeAttemptId: params?.retakeAttemptId,
+    quizName: getValues('quizName').trim() || undefined,
+  }), [navigation, selectedSetIds, selectedSetTitles, selectedMode, params?.retakeAttemptId, getValues]);
+
+  // Cost hint reused by the AI + file lanes (media is charged at a higher rate).
+  const aiCostLabel = creditBalance !== undefined
+    ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
+    : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` });
+  const costRow = (label: string) => (
+    <View style={styles.aiCostRow}>
+      <StarIcon size={12} color={colors.textSecondary} />
+      <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
+    </View>
+  );
 
   return (
     <Screen
       header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
       footer={
         <View style={[styles.footer, { borderTopColor: colors.border }]}>
-          <Button
-            label={
-              selectedSetIds.length > 0 && cards.length === 0 && !cardsLoading ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
-              : t('quiz:setup.startQuiz', 'Start Quiz')
-            }
-            loading={cardsLoading}
-            onPress={() => navigation.navigate('Quiz', {
-              setIds: selectedSetIds,
-              setTitles: selectedSetTitles,
-              mode: selectedMode,
-              retakeAttemptId: params?.retakeAttemptId,
-              quizName: getValues('quizName').trim() || undefined,
-            })}
-            disabled={!canStart}
-            fullWidth
-          />
+          {mode === 'practice' ? (
+            <Button
+              label={selectedSetIds.length > 0 && cards.length === 0 && !cardsLoading
+                ? t('quiz:setup.noCardsInSets', 'No cards in selected sets')
+                : t('quiz:setup.startQuiz', 'Start Quiz')}
+              loading={cardsLoading}
+              onPress={startPractice}
+              disabled={!canStart}
+              fullWidth
+            />
+          ) : mode === 'ai' ? (
+            <Button
+              label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
+              loading={generate.isPending}
+              onPress={generateFromTopic}
+              disabled={generate.isPending}
+              fullWidth
+            />
+          ) : (
+            <Button
+              label={t('quiz:setup.generateQuiz', '✨ Generate Quiz')}
+              loading={generate.isPending || isUploading}
+              onPress={() => handleGenerateFromFile(fileKind)}
+              disabled={generate.isPending || isUploading}
+              fullWidth
+            />
+          )}
         </View>
       }
     >
       <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
         <View style={styles.section}>
 
-          {/* ── Quiz Name ── */}
-          <View style={styles.nameField}>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
-          <FormField
-            name="quizName"
-            control={control}
-            placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')}
-            autoCapitalize="sentences"
-            returnKeyType="done"
-            maxLength={80}
-          />
+          {/* ── Mode chooser: one form, three sources ── */}
+          <View style={styles.tabRow}>
+            {SETUP_MODES.map(m => (
+              <FilterChip
+                key={m}
+                label={t(`quiz:setup.tab.${m}`, SETUP_MODE_LABEL[m])}
+                active={m === mode}
+                onPress={() => setMode(m)}
+              />
+            ))}
           </View>
 
-          {/* ── Choose Sets row ── */}
-          <View>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
-          <Pressable
-            style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-            onPress={openSetPicker}
-            accessibilityRole="button"
-          >
-            <View style={styles.selectorIcon}>
-              {selectedSetIds.length > 0
-                ? <CheckCircleIcon size={20} color={colors.accent} />
-                : <ChevronRightIcon size={20} color={colors.textDisabled} />
-              }
-            </View>
-            <Typography
-              preset="body"
-              color={selectedSetIds.length > 0 ? colors.textPrimary : colors.textSecondary}
-              style={styles.flex}
-              numberOfLines={1}
-            >
-              {selectorLabel}
-            </Typography>
-            <ChevronRightIcon size={18} color={colors.textSecondary} />
-          </Pressable>
+          {/* ── PRACTICE: quiz existing cards ── */}
+          {mode === 'practice' && (
+            <>
+              <View style={styles.nameField}>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
+                <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="done" maxLength={80} />
+              </View>
 
-          </View>
-
-          {/* ── Quiz Type chips ── */}
-          {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
-            <View style={styles.modeSection}>
-              <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.quizTypeLabel', 'QUIZ TYPE')}</Typography>
-              {cardsLoading ? (
-                <ActivityIndicator color={colors.accent} />
-              ) : (
-                <>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
-                    {chipModes.map(m => (
-                      <FilterChip
-                        key={m}
-                        label={t(`quiz:modes.${m}`, MODE_LABEL[m])}
-                        active={m === selectedMode}
-                        onPress={() => setSelectedMode(m)}
-                        icon={m === 'mix' ? ShuffleIcon : undefined}
-                      />
-                    ))}
-                  </ScrollView>
-                  <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
-                    {t(`quiz:setup.modeDesc.${selectedMode}`, modeDesc[selectedMode])}
+              <View>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
+                <Pressable
+                  style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+                  onPress={openSetPicker}
+                  accessibilityRole="button"
+                >
+                  <View style={styles.selectorIcon}>
+                    {selectedSetIds.length > 0
+                      ? <CheckCircleIcon size={20} color={colors.accent} />
+                      : <ChevronRightIcon size={20} color={colors.textDisabled} />}
+                  </View>
+                  <Typography preset="body" color={selectedSetIds.length > 0 ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
+                    {selectorLabel}
                   </Typography>
-                </>
+                  <ChevronRightIcon size={18} color={colors.textSecondary} />
+                </Pressable>
+              </View>
+
+              {selectedSetIds.length > 0 && (cardsLoading || cards.length > 0) && (
+                <View style={styles.modeSection}>
+                  <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.quizTypeLabel', 'QUIZ TYPE')}</Typography>
+                  {cardsLoading ? (
+                    <ActivityIndicator color={colors.accent} />
+                  ) : (
+                    <>
+                      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipRow}>
+                        {chipModes.map(m => (
+                          <FilterChip
+                            key={m}
+                            label={t(`quiz:modes.${m}`, MODE_LABEL[m])}
+                            active={m === selectedMode}
+                            onPress={() => setSelectedMode(m)}
+                            icon={m === 'mix' ? ShuffleIcon : undefined}
+                          />
+                        ))}
+                      </ScrollView>
+                      <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
+                        {t(`quiz:setup.modeDesc.${selectedMode}`, modeDesc[selectedMode])}
+                      </Typography>
+                    </>
+                  )}
+                </View>
               )}
-            </View>
+            </>
           )}
 
-          {/* ── Or generate with AI (grounded in selected sets, else a topic) ── */}
-          <View style={styles.modeSection}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiLabel', 'OR GENERATE WITH AI')}</Typography>
-            {!canStart && (
-              <View style={styles.topicField}>
-                <FormField
-                  name="aiTopic"
-                  control={control}
-                  placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')}
-                  autoCapitalize="sentences"
-                  returnKeyType="done"
-                  onSubmitEditing={generateFromTopic}
-                  maxLength={100}
-                />
+          {/* ── QUIZ BY AI: generate from a topic ── */}
+          {mode === 'ai' && (
+            <>
+              <View style={styles.nameField}>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
+                <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="next" maxLength={80} />
               </View>
-            )}
-            <Button
-              label={canStart
-                ? t('quiz:setup.generateAiQuizFromSets', '✨ Generate AI Quiz from selected sets')
-                : t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
-              loading={generate.isPending}
-              onPress={onGenerateAI}
-              disabled={generate.isPending}
-              fullWidth
-            />
-            <View style={styles.aiCostRow}>
-              <StarIcon size={12} color={colors.textSecondary} />
-              <Typography preset="caption" color={colors.textSecondary}>
-                {creditBalance !== undefined
-                  ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
-                  : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` })}
-              </Typography>
-            </View>
-            <Button
-              label={t('quiz:setup.generateFromFile', '📎 Quiz from a PDF or image')}
-              variant="ghost"
-              onPress={() => setFileSheetOpen(true)}
-              disabled={generate.isPending || isUploading}
-              fullWidth
-            />
-          </View>
+              <View>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
+                <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
+              </View>
+              {costRow(aiCostLabel)}
+            </>
+          )}
+
+          {/* ── PDF / IMAGE: generate from an uploaded file ── */}
+          {mode === 'file' && (
+            <>
+              <View>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.fileSourceLabel', 'SOURCE')}</Typography>
+                <View style={styles.chipRow}>
+                  <FilterChip label={t('quiz:setup.fileKindPdf', 'PDF')} active={fileKind === 'pdf'} onPress={() => setFileKind('pdf')} />
+                  <FilterChip label={t('quiz:setup.fileKindImage', 'Image')} active={fileKind === 'image'} onPress={() => setFileKind('image')} />
+                </View>
+                <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
+                  {t('quiz:setup.fileHelp', "We'll read your file and build a quiz from it.")}
+                </Typography>
+              </View>
+              {costRow(t('quiz:setup.fileCost', 'Costs 3–5 credits · media'))}
+            </>
+          )}
         </View>
       </ScrollView>
 
@@ -417,17 +432,6 @@ export function QuizSetupScreen() {
           {!isUploading && <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>}
         </View>
       </AppModal>
-
-      {/* ── Quiz-from-file source picker ── */}
-      <ActionSheet
-        visible={fileSheetOpen}
-        title={t('quiz:setup.generateFromFile', '📎 Quiz from a PDF or image')}
-        onClose={() => setFileSheetOpen(false)}
-        actions={[
-          { label: t('quiz:setup.choosePdf', 'Choose PDF'), onPress: () => handleGenerateFromFile('pdf') },
-          { label: t('quiz:setup.chooseImage', 'Choose image'), onPress: () => handleGenerateFromFile('image') },
-        ]}
-      />
     </Screen>
   );
 }
@@ -437,7 +441,7 @@ const styles = StyleSheet.create({
   section: { padding: layout.screenPaddingH },
   sectionLabel: { marginBottom: spacing.md, marginTop: spacing.sm },
   nameField: { marginBottom: spacing.xl },
-  topicField: { marginBottom: spacing.md },
+  tabRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginBottom: spacing.xl },
   selectorRow: {
     flexDirection: 'row',
     alignItems: 'center',
