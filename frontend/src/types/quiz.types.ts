@@ -4,7 +4,7 @@ import type { CardDifficulty } from './card.types';
 export interface QuizAttempt {
   id: string;
   userId: string;
-  setId: string;
+  setId: string | null; // null for AI quizzes (topic / generated) with no source set
   total: number;
   correct: number;
   scorePct: number;
@@ -28,6 +28,7 @@ export interface RecordAttemptPayload {
   correct: number;
   mode?: string;
   quizName?: string;
+  topic?: string;
   timeSecs?: number;
   responses?: SummaryItem[];
 }
@@ -40,12 +41,13 @@ export interface RecordAttemptResult {
 // A quiz attempt joined with its set title (for the history list).
 export interface QuizAttemptWithSet {
   id: string;
-  setId: string;
+  setId: string | null;
   setIds: string[];
   setTitle: string;
   setTitles: string[];
   mode: string | null;
   quizName?: string;
+  topic?: string;
   practicedAt?: string;
   timeSecs?: number;
   responses?: SummaryItem[];

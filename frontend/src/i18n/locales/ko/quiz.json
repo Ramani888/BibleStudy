@@ -1,5 +1,7 @@
 {
   "hub": {
+    "fromTopic": "주제 · {{topic}}",
+    "aiQuiz": "AI 퀴즈",
     "title": "퀴즈 허브",
     "subtitle": "성경 말씀 지식을 테스트해 보세요",
     "startQuiz": "새 퀴즈 시작",
@@ -173,6 +175,7 @@
     "reQuiz": "다시 풀기"
   },
   "detail": {
+    "fromTopic": "주제 · {{topic}}",
     "headerTitle": "퀴즈 기록",
     "firstAttempt": "첫 번째 시도",
     "practiced": "{{count}}회 연습함",

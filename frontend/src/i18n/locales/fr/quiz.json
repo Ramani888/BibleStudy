@@ -1,5 +1,7 @@
 {
   "hub": {
+    "fromTopic": "Thème · {{topic}}",
+    "aiQuiz": "Quiz IA",
     "title": "Centre de Quiz",
     "subtitle": "Testez vos connaissances bibliques",
     "startQuiz": "Commencer un Nouveau Quiz",
@@ -173,6 +175,7 @@
     "reQuiz": "Refaire le quiz"
   },
   "detail": {
+    "fromTopic": "Thème · {{topic}}",
     "headerTitle": "Historique du Quiz",
     "firstAttempt": "Première Tentative",
     "practiced": "Pratiqué {{count}} fois",

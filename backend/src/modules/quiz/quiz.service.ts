@@ -83,6 +83,7 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
       scorePct,
       mode:      dto.mode ?? null,
       quizName:  dto.quizName ?? null,
+      topic:     dto.topic ?? null,
       timeSecs:  dto.timeSecs ?? null,
       ...(dto.responses ? { responses: dto.responses } : {}),
     },
@@ -168,6 +169,7 @@ export async function getRecentAttempts(userId: string, limit = 20) {
       total:     r.total,
       correct:   r.correct,
       quizName:    r.quizName ?? undefined,
+      topic:       r.topic ?? undefined,
       timeSecs:    r.timeSecs ?? undefined,
       // Included so the hub can offer "Summary" and reconstruct a retake for
       // set-less AI quizzes (whose questions aren't otherwise persisted).

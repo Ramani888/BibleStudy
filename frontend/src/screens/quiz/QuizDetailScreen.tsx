@@ -37,6 +37,7 @@ export function QuizDetailScreen() {
   const createdAt   = live?.createdAt   ?? params.createdAt;
   const practicedAt = live?.practicedAt ?? params.practicedAt ?? createdAt;
   const quizName    = live?.quizName    ?? params.quizName;
+  const topic       = live?.topic       ?? params.topic;
   const timeSecs    = live?.timeSecs    ?? params.timeSecs;
 
   const scored = total > 0;
@@ -139,11 +140,20 @@ export function QuizDetailScreen() {
           <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
             <Typography preset="caption" color={colors.textSecondary}>{modeLabel}</Typography>
           </View>
-          {setIds.length > 1 && (
+          {/* Source: topic, multiple sets, or a single set. */}
+          {topic ? (
+            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.fromTopic', { topic, defaultValue: `Topic · ${topic}` })}</Typography>
+            </View>
+          ) : setIds.length > 1 ? (
             <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
               <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.setsCount', { count: setIds.length })}</Typography>
             </View>
-          )}
+          ) : setTitles.length === 1 && !!setTitles[0] ? (
+            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
+              <Typography preset="caption" color={colors.textSecondary}>{setTitles[0]}</Typography>
+            </View>
+          ) : null}
         </View>
 
         {/* ── Date info card ── */}

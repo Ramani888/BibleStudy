@@ -94,6 +94,7 @@ export function QuizHubScreen() {
       createdAt: item.createdAt,
       practicedAt: item.practicedAt,
       quizName: item.quizName,
+      topic: item.topic,
       timeSecs: item.timeSecs,
     });
   }, [closeSheet, navigation]);
@@ -101,6 +102,12 @@ export function QuizHubScreen() {
   const renderItem = useCallback(({ item }: { item: QuizAttemptWithSet }) => {
     const scored = item.total > 0;
     const scoreCol = scoreColor(item.scorePct, colors);
+    // Where the quiz came from — a topic, some sets, or an AI quiz with neither.
+    const sourceLabel = item.topic
+      ? t('quiz:hub.fromTopic', { topic: item.topic, defaultValue: `Topic · ${item.topic}` })
+      : item.setIds.length > 1
+        ? t('quiz:hub.setsCount', { count: item.setIds.length })
+        : item.setTitle || t('quiz:hub.aiQuiz', 'AI quiz');
 
     return (
       <Pressable
@@ -117,11 +124,11 @@ export function QuizHubScreen() {
 
         <View style={styles.rowText}>
           <Typography preset="h4" color={colors.textPrimary} numberOfLines={1}>
-            {item.quizName ?? (item.setIds.length > 1 ? t('quiz:hub.setsCount', { count: item.setIds.length }) : item.setTitle)}
+            {item.quizName ?? sourceLabel}
           </Typography>
-          {!!item.quizName && (
+          {!!item.quizName && item.quizName !== sourceLabel && (
             <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
-              {item.setIds.length > 1 ? t('quiz:hub.setsCount', { count: item.setIds.length }) : item.setTitle}
+              {sourceLabel}
             </Typography>
           )}
           <Typography preset="caption" color={colors.textSecondary}>

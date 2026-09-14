@@ -1,5 +1,7 @@
 {
   "hub": {
+    "fromTopic": "Topic · {{topic}}",
+    "aiQuiz": "AI quiz",
     "title": "Quiz Hub",
     "subtitle": "Test your knowledge and memorize scripture",
     "practiceMode": "Practice Mode",
@@ -115,6 +117,7 @@
     "needsPractice": "Good effort! Review the cards you missed to master them."
   },
   "detail": {
+    "fromTopic": "Topic · {{topic}}",
     "title": "Quiz Attempt",
     "deleteTitle": "Delete Quiz",
     "deleteMessage": "Remove this attempt from your history?",

@@ -417,6 +417,7 @@ model QuizAttempt {
   scorePct  Int
   mode      String?
   quizName   String?
+  topic      String?  // AI topic this quiz was generated from (null for set-grounded / review quizzes)
   timeSecs   Int?
   responses  Json?
   createdAt  DateTime @default(now())

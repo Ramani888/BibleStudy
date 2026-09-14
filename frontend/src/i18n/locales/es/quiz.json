@@ -1,5 +1,7 @@
 {
   "hub": {
+    "fromTopic": "Tema · {{topic}}",
+    "aiQuiz": "Cuestionario IA",
     "title": "Centro de Cuestionarios",
     "subtitle": "Pon a prueba tu conocimiento de las Escrituras",
     "startQuiz": "Comenzar Nuevo Cuestionario",
@@ -173,6 +175,7 @@
     "reQuiz": "Repetir cuestionario"
   },
   "detail": {
+    "fromTopic": "Tema · {{topic}}",
     "headerTitle": "Historial del Cuestionario",
     "firstAttempt": "Primer Intento",
     "practiced": "Practicado {{count}} vez",

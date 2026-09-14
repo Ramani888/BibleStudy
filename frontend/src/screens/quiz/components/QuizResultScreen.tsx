@@ -31,6 +31,7 @@ interface Props {
   setTitle: string;
   mode?: string;
   quizName?: string;
+  topic?: string;
   total: number;
   correct: number;
   scorePct: number;
@@ -44,7 +45,7 @@ interface Props {
 }
 
 export function QuizResultScreen({
-  setIds, setTitle, mode, quizName,
+  setIds, setTitle, mode, quizName, topic,
   total, correct, scorePct, timeSecs,
   summaryItems, retakeAttemptId, ephemeral, isFocused, onExit,
 }: Props) {
@@ -75,7 +76,7 @@ export function QuizResultScreen({
   useEffect(() => {
     if (saved.current || total === 0 || ephemeral) return;
     saved.current = true;
-    save({ setIds, total, correct, mode, quizName, timeSecs, responses: summaryItems })
+    save({ setIds, total, correct, mode, quizName, topic, timeSecs, responses: summaryItems })
       .then(res => { setBest(res.best ?? null); if (scorePct >= 80) requestReviewOnce('quiz_high_score'); })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps

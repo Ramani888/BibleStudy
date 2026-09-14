@@ -19,6 +19,7 @@ export const RecordAttemptDto = z
     correct:   z.number().int().min(0, 'correct cannot be negative'),
     mode:      z.string().max(30).optional(),
     quizName:  z.string().max(100).optional(),
+    topic:     z.string().max(80).optional(), // AI topic source (set-less topic quizzes)
     timeSecs:  z.number().int().min(0).optional(),
     responses: z.array(SummaryItemDto).optional(),
   })

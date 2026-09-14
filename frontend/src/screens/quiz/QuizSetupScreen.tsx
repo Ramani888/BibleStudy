@@ -32,7 +32,7 @@ export function QuizSetupScreen() {
   const isDark = theme.name === 'dark';
   const navigation = useNavigation<any>();
 
-  const { control, handleSubmit } = useForm<QuizSetupFormData>({
+  const { control, handleSubmit, getValues } = useForm<QuizSetupFormData>({
     resolver: zodResolver(quizSetupSchema),
     defaultValues: { quizName: '', aiTopic: '' },
   });
@@ -123,16 +123,20 @@ export function QuizSetupScreen() {
     ? selectedSetTitles[0]
     : t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` });
 
-  // Fire a generate request → route into the ephemeral quiz on success.
+  // Fire a generate request → route into the quiz on success. `save` carries the
+  // name + source (topic OR sets) so the completed quiz is recorded with them.
   // AI quizzes default to Multiple Choice — cleanest UX for generated content.
-  const runGenerate = useCallback((payload: { topic?: string; setIds?: string[] }, title: string) => {
+  const runGenerate = useCallback((
+    payload: { topic?: string; setIds?: string[] },
+    save: { quizName: string; topic?: string; setIds: string[]; setTitles: string[] },
+  ) => {
     if (generate.isPending) return;
     generate.mutate(payload, {
       onSuccess: ({ cards: generatedCards }) => {
         // Pop Setup off the tab stack first so finishing the quiz (Done / auto-exit /
         // Summary exit) lands on QuizHub, never back on this generate form.
         navigation.goBack();
-        navigation.navigate('Quiz', { setIds: [], setTitles: [title], mode: 'mc', quizName: title, generatedCards });
+        navigation.navigate('Quiz', { ...save, mode: 'mc', generatedCards });
       },
       onError: (err) => {
         const status = (err as { response?: { status?: number } })?.response?.status;
@@ -146,20 +150,23 @@ export function QuizSetupScreen() {
     });
   }, [generate, navigation, t]);
 
-  // AI quiz from a typed topic (validated via zod + handleSubmit).
-  const generateFromTopic = handleSubmit(({ aiTopic }) => {
+  // AI quiz from a typed topic (validated via zod + handleSubmit). Name falls back
+  // to the topic when the user leaves the name field blank.
+  const generateFromTopic = handleSubmit(({ aiTopic, quizName }) => {
     const topic = aiTopic.trim();
-    runGenerate({ topic }, topic);
+    const name = quizName.trim() || topic;
+    runGenerate({ topic }, { quizName: name, topic, setIds: [], setTitles: [name] });
   });
 
-  // AI quiz grounded in the selected sets' cards.
+  // AI quiz grounded in the selected sets' cards. Name falls back to the set names.
   const generateFromSets = useCallback(() => {
     if (selectedSetIds.length === 0) return;
-    const title = selectedSetTitles.length === 1
+    const autoTitle = selectedSetTitles.length === 1
       ? selectedSetTitles[0]
       : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` });
-    runGenerate({ setIds: selectedSetIds }, title);
-  }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
+    const name = (getValues('quizName') || '').trim() || autoTitle;
+    runGenerate({ setIds: selectedSetIds }, { quizName: name, setIds: selectedSetIds, setTitles: selectedSetTitles });
+  }, [selectedSetIds, selectedSetTitles, runGenerate, getValues, t]);
 
   const aiCostLabel = creditBalance !== undefined
     ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })

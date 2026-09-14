@@ -1,5 +1,7 @@
 {
   "hub": {
+    "fromTopic": "Paksa · {{topic}}",
+    "aiQuiz": "AI Quiz",
     "title": "Quiz Hub",
     "subtitle": "Subukan ang iyong kaalaman sa Banal na Kasulatan",
     "startQuiz": "Magsimula ng Bagong Pagsusulit",
@@ -173,6 +175,7 @@
     "reQuiz": "Ulitin ang Quiz"
   },
   "detail": {
+    "fromTopic": "Paksa · {{topic}}",
     "headerTitle": "Kasaysayan ng Pagsusulit",
     "firstAttempt": "Unang Pagsubok",
     "practiced": "Nasanay nang {{count}} beses",

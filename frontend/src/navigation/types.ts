@@ -9,7 +9,7 @@ export type GeneratedQuizCard = { question: string; answer: string };
 // ─── Root Stack (above tabs — full-screen overlays) ───────────────────────────
 export type RootStackParamList = {
   App: undefined;
-  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; topic?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
   QuizSummary: { items: import('../types').SummaryItem[]; title: string; scorePct: number; total: number; correct: number; exitToHub?: boolean };
 };
 
@@ -44,9 +44,9 @@ export type LibraryStackParamList = {
 // ─── Quiz Stack (nested inside Quiz tab) ──────────────────────────────────────
 export type QuizStackParamList = {
   QuizHub: undefined;
-  QuizDetail: { id: string; setIds: string[]; setTitles: string[]; mode: string | null; scorePct: number; correct: number; total: number; createdAt: string; practicedAt?: string; quizName?: string; timeSecs?: number };
+  QuizDetail: { id: string; setIds: string[]; setTitles: string[]; mode: string | null; scorePct: number; correct: number; total: number; createdAt: string; practicedAt?: string; quizName?: string; topic?: string; timeSecs?: number };
   QuizSetup: undefined;
-  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
+  Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; retakeAttemptId?: string; quizName?: string; topic?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
 };
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────

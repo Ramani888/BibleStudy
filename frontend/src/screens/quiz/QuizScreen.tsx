@@ -13,7 +13,7 @@ import { QuizItemView, QuizResultScreen } from './components';
 import type { Card, QuizSelectableMode } from '../../types';
 import type { GeneratedQuizCard } from '../../navigation/types';
 
-type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
+type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; topic?: string; retakeAttemptId?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
 
 /** Wrap an LLM-generated {question,answer} as an in-memory QA Card (never persisted). */
 function toEphemeralCard(c: GeneratedQuizCard, i: number): Card {
@@ -37,7 +37,7 @@ export function QuizScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
-  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId, generatedCards, reviewCards, ephemeral = false } = params;
+  const { setIds, setTitles, mode = 'mix', quizName, topic, retakeAttemptId, generatedCards, reviewCards, ephemeral = false } = params;
 
   const isFocused = useIsFocused();
 
@@ -149,7 +149,7 @@ export function QuizScreen() {
     return (
       <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <QuizResultScreen
-          setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName}
+          setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName} topic={topic}
           total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
           timeSecs={elapsed}
           summaryItems={summaryItems}
