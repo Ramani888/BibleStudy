@@ -105,7 +105,10 @@
     "aiSource": {
       "topic": "A topic",
       "sets": "My sets"
-    }
+    },
+    "fileLabel": "FILE",
+    "tapToChoosePdf": "Tap to choose a PDF…",
+    "tapToChooseImage": "Tap to choose an image…"
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",

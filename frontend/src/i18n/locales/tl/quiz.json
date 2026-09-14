@@ -131,7 +131,10 @@
     "aiSource": {
       "topic": "Isang paksa",
       "sets": "Aking mga set"
-    }
+    },
+    "fileLabel": "FILE",
+    "tapToChoosePdf": "I-tap para pumili ng PDF…",
+    "tapToChooseImage": "I-tap para pumili ng larawan…"
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",

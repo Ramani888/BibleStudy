@@ -131,7 +131,10 @@
     "aiSource": {
       "topic": "Un sujet",
       "sets": "Mes ensembles"
-    }
+    },
+    "fileLabel": "FICHIER",
+    "tapToChoosePdf": "Touchez pour choisir un PDF…",
+    "tapToChooseImage": "Touchez pour choisir une image…"
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",

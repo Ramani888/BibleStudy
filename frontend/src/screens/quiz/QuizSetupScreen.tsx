@@ -16,7 +16,7 @@ import { useCreditBalance, useGenerateQuiz, usePickMedia, useSearchToggle, useSe
 import { supportedModes } from '../../hooks/useQuizSession';
 import { useCardsForSets } from '../../hooks';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
-import type { QuizSelectableMode } from '../../types';
+import type { MediaFile, QuizSelectableMode } from '../../types';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 import type { QuizStackParamList } from '../../navigation/types';
 
@@ -85,6 +85,7 @@ export function QuizSetupScreen() {
   const [mode, setMode] = useState<SetupMode>('practice');
   const [aiSource, setAiSource] = useState<'topic' | 'sets'>('topic');
   const [fileKind, setFileKind] = useState<'pdf' | 'image'>('pdf');
+  const [pickedFile, setPickedFile] = useState<MediaFile | null>(null);
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
@@ -203,12 +204,20 @@ export function QuizSetupScreen() {
     runGenerate({ setIds: selectedSetIds }, title);
   }, [selectedSetIds, selectedSetTitles, runGenerate, t]);
 
-  // Quiz from an uploaded PDF/image (media rate: 3–5 credits).
-  const handleGenerateFromFile = useCallback(async (kind: 'pdf' | 'image') => {
-    const file = kind === 'pdf' ? await pickPdf() : await pickImage();
-    if (!file) return;
-    runGenerate({ mediaIds: [file.id] }, t('quiz:setup.fileQuizTitle', 'File quiz'));
-  }, [pickPdf, pickImage, runGenerate, t]);
+  // Quiz from an uploaded PDF/image (media rate: 3–5 credits). Pick first — the
+  // chosen file shows in a field — then generate as a separate step.
+  const changeFileKind = useCallback((kind: 'pdf' | 'image') => {
+    setFileKind(kind);
+    setPickedFile(null);
+  }, []);
+  const pickFile = useCallback(async () => {
+    const file = fileKind === 'pdf' ? await pickPdf() : await pickImage();
+    if (file) setPickedFile(file);
+  }, [fileKind, pickPdf, pickImage]);
+  const generateFromFile = useCallback(() => {
+    if (!pickedFile) return;
+    runGenerate({ mediaIds: [pickedFile.id] }, pickedFile.name);
+  }, [pickedFile, runGenerate]);
 
   const startPractice = useCallback(() => navigation.navigate('Quiz', {
     setIds: selectedSetIds,
@@ -277,9 +286,9 @@ export function QuizSetupScreen() {
           ) : (
             <Button
               label={t('quiz:setup.generateQuiz', '✨ Generate Quiz')}
-              loading={generate.isPending || isUploading}
-              onPress={() => handleGenerateFromFile(fileKind)}
-              disabled={generate.isPending || isUploading}
+              loading={generate.isPending}
+              onPress={generateFromFile}
+              disabled={generate.isPending || isUploading || !pickedFile}
               fullWidth
             />
           )}
@@ -370,12 +379,38 @@ export function QuizSetupScreen() {
           {/* ── PDF / IMAGE: generate from an uploaded file ── */}
           {mode === 'file' && (
             <>
-              <View>
+              <View style={styles.nameField}>
                 <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.fileSourceLabel', 'SOURCE')}</Typography>
                 <View style={styles.chipRow}>
-                  <FilterChip label={t('quiz:setup.fileKindPdf', 'PDF')} active={fileKind === 'pdf'} onPress={() => setFileKind('pdf')} />
-                  <FilterChip label={t('quiz:setup.fileKindImage', 'Image')} active={fileKind === 'image'} onPress={() => setFileKind('image')} />
+                  <FilterChip label={t('quiz:setup.fileKindPdf', 'PDF')} active={fileKind === 'pdf'} onPress={() => changeFileKind('pdf')} />
+                  <FilterChip label={t('quiz:setup.fileKindImage', 'Image')} active={fileKind === 'image'} onPress={() => changeFileKind('image')} />
                 </View>
+              </View>
+
+              <View>
+                <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.fileLabel', 'FILE')}</Typography>
+                <Pressable
+                  style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+                  onPress={pickFile}
+                  disabled={isUploading}
+                  accessibilityRole="button"
+                >
+                  <View style={styles.selectorIcon}>
+                    {isUploading
+                      ? <ActivityIndicator color={colors.accent} />
+                      : pickedFile
+                      ? <CheckCircleIcon size={20} color={colors.accent} />
+                      : <ChevronRightIcon size={20} color={colors.textDisabled} />}
+                  </View>
+                  <Typography preset="body" color={pickedFile ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
+                    {pickedFile
+                      ? pickedFile.name
+                      : fileKind === 'pdf'
+                      ? t('quiz:setup.tapToChoosePdf', 'Tap to choose a PDF…')
+                      : t('quiz:setup.tapToChooseImage', 'Tap to choose an image…')}
+                  </Typography>
+                  <ChevronRightIcon size={18} color={colors.textSecondary} />
+                </Pressable>
                 <Typography preset="body" color={colors.textSecondary} style={styles.modeDesc}>
                   {t('quiz:setup.fileHelp', "We'll read your file and build a quiz from it.")}
                 </Typography>

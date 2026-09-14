@@ -131,7 +131,10 @@
     "aiSource": {
       "topic": "주제",
       "sets": "내 세트"
-    }
+    },
+    "fileLabel": "파일",
+    "tapToChoosePdf": "PDF를 선택하려면 탭하세요…",
+    "tapToChooseImage": "이미지를 선택하려면 탭하세요…"
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",

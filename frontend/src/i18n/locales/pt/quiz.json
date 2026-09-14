@@ -131,7 +131,10 @@
     "aiSource": {
       "topic": "Um tópico",
       "sets": "Meus conjuntos"
-    }
+    },
+    "fileLabel": "ARQUIVO",
+    "tapToChoosePdf": "Toque para escolher um PDF…",
+    "tapToChooseImage": "Toque para escolher uma imagem…"
   },
   "hud": {
     "questionOf": "Pergunta {{current}} de {{total}}",
