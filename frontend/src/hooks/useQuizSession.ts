@@ -26,10 +26,21 @@ function shuffle<T>(a: T[]): T[] {
   }
   return r;
 }
+// Unicode-aware: fold diacritics (NFKD + strip combining marks) so "resurrección"
+// matches "resurreccion", and KEEP letters of every script (\p{L}) so non-Latin
+// answers (ko/Greek/Hebrew) survive instead of collapsing to '' — which used to
+// make every typed answer compare equal. Non-letters/numbers → separator.
 export function normalize(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return s
+    .normalize('NFKD')
+    .replace(/\p{M}+/gu, '')
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
 }
-const core = (w: string) => w.replace(/[^A-Za-z0-9']/g, '');
+// Strip surrounding punctuation but keep any-script letters/numbers + apostrophe.
+// MUST stay byte-identical to coreWord() in QuizItemView (blank tiles vs grading).
+const core = (w: string) => w.replace(/[^\p{L}\p{N}']/gu, '');
 
 /** Which modes a set's cards can produce (drives the mode picker). */
 export function supportedModes(cards: Card[]): QuizMode[] {

@@ -41,7 +41,24 @@ async function applySpacedRepetition(userId: string, dto: RecordAttemptDtoType) 
   const reviews = dto.responses
     .filter(r => r.mode !== 'read' && r.cardId)
     .map(r => ({ cardId: r.cardId as string, correct: r.isCorrect }));
-  await applyReviews(userId, reviews);
+  // Scope SR to cards in the attempt's own sets — a crafted request can't move the
+  // schedule of unrelated cards it slipped into `responses`.
+  await applyReviews(userId, reviews, dto.setIds);
+}
+
+// Trust the graded responses, not the client's claimed total/correct: derive the
+// score from the scored (non-'read') responses so a tampered total/correct can't
+// forge a %. Falls back to the client numbers only when responses are absent.
+// ponytail: grading is client-side, so this bounds casual tampering, not a
+// determined cheat — but best% is self-only anyway (leaderboard is streak-based).
+function deriveScore(dto: RecordAttemptDtoType): { total: number; correct: number } {
+  if (dto.responses && dto.responses.length > 0) {
+    const scored = dto.responses.filter(r => r.mode !== 'read');
+    if (scored.length > 0) {
+      return { total: scored.length, correct: scored.filter(r => r.isCorrect).length };
+    }
+  }
+  return { total: dto.total, correct: dto.correct };
 }
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
@@ -49,14 +66,15 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } });
   if (sets.length !== dto.setIds.length) throw new NotFoundError('One or more sets not found');
 
-  const scorePct = Math.round((dto.correct / dto.total) * 100);
+  const { total, correct } = deriveScore(dto);
+  const scorePct = Math.round((correct / total) * 100);
   const attempt = await prisma.quizAttempt.create({
     data: {
       userId,
       setId:   primarySetId,
       setIds:  dto.setIds,
-      total:   dto.total,
-      correct: dto.correct,
+      total,
+      correct,
       scorePct,
       mode:      dto.mode ?? null,
       quizName:  dto.quizName ?? null,
@@ -76,10 +94,11 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
 }
 
 export async function updateAttempt(userId: string, attemptId: string, dto: RecordAttemptDtoType) {
-  const scorePct = Math.round((dto.correct / dto.total) * 100);
+  const { total, correct } = deriveScore(dto);
+  const scorePct = Math.round((correct / total) * 100);
   const updated = await prisma.quizAttempt.updateMany({
     where: { id: attemptId, userId },
-    data: { total: dto.total, correct: dto.correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
+    data: { total, correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
   });
   if (updated.count === 0) throw new NotFoundError('Attempt not found');
   await applySpacedRepetition(userId, dto);

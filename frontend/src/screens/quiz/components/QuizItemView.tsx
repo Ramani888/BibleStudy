@@ -8,7 +8,9 @@ import type { QuizItem } from '../../../types';
 const LETTERS = ['A', 'B', 'C', 'D'];
 
 // mirrors the private helpers in useQuizSession — not worth exporting for two callers
-const coreWord = (w: string) => w.replace(/[^A-Za-z0-9']/g, '');
+// MUST stay byte-identical to core() in useQuizSession (blank tiles vs grading).
+// Keep any-script letters/numbers + apostrophe so non-Latin blanks aren't emptied.
+const coreWord = (w: string) => w.replace(/[^\p{L}\p{N}']/gu, '');
 function shuffled<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {

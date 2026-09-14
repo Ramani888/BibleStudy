@@ -162,6 +162,7 @@ function fsrsUpdate(card: ReviewCard, correct: boolean, now: Date) {
 export async function applyReviews(
   userId: string,
   results: { cardId: string; correct: boolean }[],
+  setIds?: string[],
 ) {
   if (results.length === 0) return;
   // Dedupe by cardId (keep the last grade) — two updates for the same card in one
@@ -170,7 +171,9 @@ export async function applyReviews(
   const reviews = [...new Map(results.map(r => [r.cardId, r])).values()];
   const user = await prisma.user.findUnique({ where: { id: userId }, select: { useFsrs: true } });
   const cards = await prisma.card.findMany({
-    where: { id: { in: reviews.map(r => r.cardId) }, set: { userId } },
+    // Owner-scoped, and optionally constrained to the attempt's own sets so an
+    // injected cardId from an unrelated set can't be rescheduled.
+    where: { id: { in: reviews.map(r => r.cardId) }, set: { userId }, ...(setIds && setIds.length ? { setId: { in: setIds } } : {}) },
     select: {
       id: true, interval: true, ease: true, nextReviewAt: true, lastStudiedAt: true,
       fsrsStability: true, fsrsDifficulty: true, fsrsReps: true, fsrsLapses: true, fsrsState: true, fsrsLearningSteps: true,
