@@ -8,7 +8,7 @@ import { fontSizes, fontWeights, layout, spacing, useTheme, type ThemeColors } f
 import {
   HomeIcon,
   LibraryIcon,
-  CheckCircleIcon,
+  QuizIcon,
   SparklesIcon,
   UserIcon,
   type IconComponent,
@@ -27,7 +27,7 @@ const Tab = createBottomTabNavigator<AppTabParamList>();
 const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
   HomeTab: HomeIcon,
   LibraryTab: LibraryIcon,
-  QuizTab: CheckCircleIcon,
+  QuizTab: QuizIcon,
   AITab: SparklesIcon,
   ProfileTab: UserIcon,
 };

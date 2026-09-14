@@ -219,6 +219,17 @@ export const HelpCircleIcon: IconComponent = ({ size, color = DEFAULT_COLOR, str
   </Outline>
 );
 
+// Quiz: a multiple-choice card — two options, the second one selected (filled).
+export const QuizIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8, filled }) => (
+  <Outline size={size}>
+    <Path d="M5 4h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z" {...stroke(color, filled ? 2.6 : strokeWidth)} />
+    <Circle cx={7.5} cy={9.5} r={1.4} {...stroke(color, strokeWidth)} />
+    <Path d="M11 9.5h6" {...stroke(color, filled ? 2.6 : strokeWidth)} />
+    <Circle cx={7.5} cy={14.5} r={1.4} fill={color} />
+    <Path d="M11 14.5h6" {...stroke(color, filled ? 2.6 : strokeWidth)} />
+  </Outline>
+);
+
 export const PencilIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
   <Outline size={size}>
     <Path d="M12 20h9" {...stroke(color, strokeWidth)} />
