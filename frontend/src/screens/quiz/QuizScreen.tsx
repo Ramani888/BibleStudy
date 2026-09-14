@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native'; // StatusBar used imperatively via useFocusEffect
 import { useFocusEffect, useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -57,7 +57,12 @@ export function QuizScreen() {
   }
   const usePassed = isGenerated || isReview;
   const fetched = useCardsForSets(usePassed ? [] : setIds);
-  const cards = isGenerated ? generatedCards!.map(toEphemeralCard) : isReview ? reviewCards! : fetched.data;
+  // Memoise so the reference is stable across renders — otherwise the 1s elapsed
+  // timer re-renders → new array → useQuizSession rebuilds+reshuffles every second.
+  const cards = useMemo(
+    () => (isGenerated ? generatedCards!.map(toEphemeralCard) : isReview ? reviewCards! : fetched.data),
+    [isGenerated, isReview, generatedCards, reviewCards, fetched.data],
+  );
   const isLoading = usePassed ? false : fetched.isLoading;
   const isError = usePassed ? false : fetched.isError;
   const s = useQuizSession(cards, mode);
