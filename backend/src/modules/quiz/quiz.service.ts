@@ -36,14 +36,15 @@ export async function generateQuiz(userId: string, dto: GenerateQuizDtoType) {
  * Feed a quiz's per-card results into spaced repetition. Skips unscored
  * 'read' items (their isCorrect is always true) and items without a cardId.
  */
-async function applySpacedRepetition(userId: string, dto: RecordAttemptDtoType) {
+async function applySpacedRepetition(userId: string, dto: RecordAttemptDtoType, setIds: string[] = dto.setIds) {
   if (!dto.responses) return;
   const reviews = dto.responses
     .filter(r => r.mode !== 'read' && r.cardId)
     .map(r => ({ cardId: r.cardId as string, correct: r.isCorrect }));
   // Scope SR to cards in the attempt's own sets — a crafted request can't move the
-  // schedule of unrelated cards it slipped into `responses`.
-  await applyReviews(userId, reviews, dto.setIds);
+  // schedule of unrelated cards it slipped into `responses`. Retakes pass the
+  // stored row's sets so the PUT payload can't redirect the scope.
+  await applyReviews(userId, reviews, setIds);
 }
 
 // Trust the graded responses, not the client's claimed total/correct: derive the
@@ -62,9 +63,13 @@ function deriveScore(dto: RecordAttemptDtoType): { total: number; correct: numbe
 }
 
 export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
-  const primarySetId = dto.setIds[0];
-  const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } });
-  if (sets.length !== dto.setIds.length) throw new NotFoundError('One or more sets not found');
+  // AI quizzes (topic / generated) carry no setIds → recorded set-less (setId null).
+  // Real quizzes (review-due, retake) carry their sets and are ownership-checked.
+  const primarySetId = dto.setIds[0] ?? null;
+  if (dto.setIds.length > 0) {
+    const sets = await prisma.set.findMany({ where: { id: { in: dto.setIds }, userId }, select: { id: true } });
+    if (sets.length !== dto.setIds.length) throw new NotFoundError('One or more sets not found');
+  }
 
   const { total, correct } = deriveScore(dto);
   const scorePct = Math.round((correct / total) * 100);
@@ -89,20 +94,30 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   // cards not rescheduled — it self-corrects on the next quiz. Not worth threading
   // a tx through the shared applyReviews path pre-launch.
   await applySpacedRepetition(userId, dto);
-  const best = await getBestForSet(userId, primarySetId);
+  // "Best" is per-set — only meaningful for real single-set quizzes, not set-less AI ones.
+  const best = primarySetId ? await getBestForSet(userId, primarySetId) : null;
   return { attempt, best };
 }
 
 export async function updateAttempt(userId: string, attemptId: string, dto: RecordAttemptDtoType) {
+  // A retake keeps the original quiz's identity: load the owned row and scope
+  // scoring + SR to ITS sets, never the client-supplied setIds (which could point
+  // at unrelated sets). Only the score/time/responses are overwritten.
+  const existing = await prisma.quizAttempt.findFirst({
+    where: { id: attemptId, userId },
+    select: { setId: true, setIds: true },
+  });
+  if (!existing) throw new NotFoundError('Attempt not found');
+  const setIds = existing.setIds.length > 0 ? existing.setIds : (existing.setId ? [existing.setId] : []);
+
   const { total, correct } = deriveScore(dto);
   const scorePct = Math.round((correct / total) * 100);
-  const updated = await prisma.quizAttempt.updateMany({
-    where: { id: attemptId, userId },
+  await prisma.quizAttempt.update({
+    where: { id: attemptId },
     data: { total, correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
   });
-  if (updated.count === 0) throw new NotFoundError('Attempt not found');
-  await applySpacedRepetition(userId, dto);
-  const best = await getBestForSet(userId, dto.setIds[0]);
+  await applySpacedRepetition(userId, dto, setIds);
+  const best = setIds[0] ? await getBestForSet(userId, setIds[0]) : null;
   return { best };
 }
 
@@ -132,27 +147,31 @@ export async function getRecentAttempts(userId: string, limit = 20) {
     include: { set: { select: { title: true } } },
   });
 
-  const allSetIds = [...new Set(rows.flatMap(r => r.setIds.length > 0 ? r.setIds : [r.setId]))];
+  // Set-less AI attempts (setId null, setIds []) contribute no ids here.
+  const allSetIds = [...new Set(rows.flatMap(r => r.setIds.length > 0 ? r.setIds : (r.setId ? [r.setId] : [])))];
   const setMap = allSetIds.length > 0
     ? await prisma.set.findMany({ where: { id: { in: allSetIds } }, select: { id: true, title: true } })
         .then(sets => Object.fromEntries(sets.map(s => [s.id, s.title])))
     : {} as Record<string, string>;
 
   return rows.map(r => {
-    const effectiveSetIds = r.setIds.length > 0 ? r.setIds : [r.setId];
-    const setTitles = effectiveSetIds.map(id => setMap[id] ?? r.set.title);
+    const effectiveSetIds = r.setIds.length > 0 ? r.setIds : (r.setId ? [r.setId] : []);
+    const setTitles = effectiveSetIds.map(id => setMap[id] ?? r.set?.title ?? '');
     return {
       id:        r.id,
       setId:     r.setId,
       setIds:    effectiveSetIds,
       setTitles,
-      setTitle:  r.set.title,
+      setTitle:  r.set?.title ?? '',
       mode:      r.mode,
       scorePct:  r.scorePct,
       total:     r.total,
       correct:   r.correct,
       quizName:    r.quizName ?? undefined,
       timeSecs:    r.timeSecs ?? undefined,
+      // Included so the hub can offer "Summary" and reconstruct a retake for
+      // set-less AI quizzes (whose questions aren't otherwise persisted).
+      responses:   r.responses ?? undefined,
       createdAt:   r.createdAt.toISOString(),
       practicedAt: (r.practicedAt ?? r.createdAt).toISOString(),
     };

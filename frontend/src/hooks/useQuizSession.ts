@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import i18n from '../i18n';
 import type { Card, QuizItem, QuizMode, QuizSelectableMode, SummaryItem } from '../types';
 
@@ -148,8 +148,13 @@ export function gradeItem(item: QuizItem, response: unknown): boolean {
       const r = (response as string[]) ?? [];
       return item.blankAt.every((tokenIdx, k) => normalize(r[k] ?? '') === normalize(core(item.tokens[tokenIdx])));
     }
-    case 'chunks':
-      return JSON.stringify(response) === JSON.stringify(item.correct);
+    case 'chunks': {
+      // response holds "i::chunkText" keys (see Chunks in QuizItemView) — strip the
+      // index prefix before comparing to the plain-text correct order, else a
+      // perfect answer never matches. Mirrors the unkey() used for display.
+      const r = (response as string[] | undefined)?.map(k => k.slice(k.indexOf('::') + 2)) ?? [];
+      return JSON.stringify(r) === JSON.stringify(item.correct);
+    }
     case 'read':
       return true; // unscored
   }
@@ -217,10 +222,18 @@ export function buildSummaryItems(items: QuizItem[], responses: Record<number, u
 // ─── hook ───────────────────────────────────────────────────────────────────
 export function useQuizSession(cards: Card[], selected: QuizSelectableMode) {
   const [seed, setSeed] = useState(0);
+  // Freeze the card list the first time it arrives non-empty. A background React
+  // Query refetch (e.g. on the setIds/retake path) must NOT hand us a new array
+  // ref mid-quiz — that would rebuild+reshuffle `items` while index/responses stay
+  // put, mismatching answers to prompts. The hook remounts per quiz, so this ref
+  // is naturally per-session; restart reshuffles via `seed`, not new cards.
+  const frozen = useRef<Card[] | null>(null);
+  if (frozen.current === null && cards.length > 0) frozen.current = cards;
+  const activeCards = frozen.current ?? cards;
   const items = useMemo(
-    () => buildItems(cards, selected),
+    () => buildItems(activeCards, selected),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [cards, selected, seed],
+    [activeCards, selected, seed],
   );
 
   const [index, setIndex] = useState(0);

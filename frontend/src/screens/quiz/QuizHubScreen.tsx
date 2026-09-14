@@ -15,21 +15,11 @@ import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } fr
 import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
+import { MODE_NAMES, reQuizParams, scoreColor } from './quizUi';
 
 const ICON_SIZE = 20;
 
 type Nav = NativeStackNavigationProp<QuizStackParamList>;
-
-const MODE_DISPLAY: Record<string, string> = {
-  mix: 'Mix',
-  mc: 'Multiple Choice',
-  story_mc: 'Story MC',
-  type_answer: 'Type Answer',
-  type_verbatim: 'Type Verbatim',
-  blanks: 'Fill Blanks',
-  chunks: 'Reorder',
-  read: 'Read',
-};
 
 export function QuizHubScreen() {
   const { t } = useTranslation(['quiz', 'common']);
@@ -110,7 +100,7 @@ export function QuizHubScreen() {
 
   const renderItem = useCallback(({ item }: { item: QuizAttemptWithSet }) => {
     const scored = item.total > 0;
-    const scoreColor = item.scorePct >= 80 ? colors.success : item.scorePct >= 50 ? colors.warning : colors.alert;
+    const scoreCol = scoreColor(item.scorePct, colors);
 
     return (
       <Pressable
@@ -118,9 +108,9 @@ export function QuizHubScreen() {
         onPress={() => handleDetails(item)}
         accessibilityRole="button"
       >
-        <View style={[styles.scoreCircle, { borderColor: scored ? scoreColor : colors.border }]}>
+        <View style={[styles.scoreCircle, { borderColor: scored ? scoreCol : colors.border }]}>
           {scored
-            ? <Typography style={[styles.scoreText, { color: scoreColor }]}>{item.scorePct}%</Typography>
+            ? <Typography style={[styles.scoreText, { color: scoreCol }]}>{item.scorePct}%</Typography>
             : <Typography preset="caption" color={colors.textSecondary}>—</Typography>
           }
         </View>
@@ -135,7 +125,7 @@ export function QuizHubScreen() {
             </Typography>
           )}
           <Typography preset="caption" color={colors.textSecondary}>
-            {t(`quiz:modeNames.${item.mode ?? 'mix'}`, MODE_DISPLAY[item.mode ?? 'mix'] ?? item.mode)} · {formatDateWithTime(item.practicedAt ?? item.createdAt)}
+            {t(`quiz:modeNames.${item.mode ?? 'mix'}`, MODE_NAMES[item.mode ?? 'mix'] ?? item.mode)} · {formatDateWithTime(item.practicedAt ?? item.createdAt)}
           </Typography>
         </View>
 
@@ -261,13 +251,7 @@ export function QuizHubScreen() {
           {
             label: t('quiz:summary.reQuiz', 'Re-Quiz'),
             icon: RefreshIcon,
-            onPress: () => activeItem && navigation.navigate('Quiz', {
-              setIds: activeItem.setIds,
-              setTitles: activeItem.setTitles,
-              mode: (activeItem.mode ?? 'mix') as any,
-              retakeAttemptId: activeItem.id,
-              quizName: activeItem.quizName, // keep the quiz's name on retake
-            }),
+            onPress: () => activeItem && navigation.navigate('Quiz', reQuizParams(activeItem, activeItem.responses)),
           },
           {
             label: t('common:actions.delete', 'Delete'),

@@ -10,6 +10,7 @@ import { useQuizAttemptSave, useStreak } from '../../../hooks';
 import { fontWeights, layout, spacing, useTheme } from '../../../theme';
 import { requestReviewOnce } from '../../../utils/requestReview';
 import type { SummaryItem } from '../../../types';
+import { scoreColor } from '../quizUi';
 
 const QUOTE_TIERS: { minScore: number; key: string }[] = [
   { minScore: 90, key: 'excellent' },
@@ -63,6 +64,7 @@ export function QuizResultScreen({
     (navigation as any).push('Quiz', {
       setIds: [], setTitles: [t('quiz:results.practiceMissed', 'Practice missed')],
       mode: 'mc', quizName: t('quiz:results.practiceMissed', 'Practice missed'), generatedCards,
+      ephemeral: true, // a quick re-drill of missed items — not a new history entry
     });
   }, [missed, navigation, t]);
   const [best, setBest] = useState<number | null>(null);
@@ -93,7 +95,7 @@ export function QuizResultScreen({
     return () => clearInterval(id);
   }, [isPending, isFocused, onExit]);
 
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
+  const scoreCol = scoreColor(scorePct, colors);
   const isNewBest = best !== null && scorePct >= best;
   const qk = getQuoteKey(scorePct);
   const quote = {
@@ -121,7 +123,7 @@ export function QuizResultScreen({
       </Typography>
 
       <View style={styles.scoreWrap}>
-        <Typography style={[styles.scoreNumber, { color: scoreColor }]}>{scorePct}%</Typography>
+        <Typography style={[styles.scoreNumber, { color: scoreCol }]}>{scorePct}%</Typography>
         <Typography preset="caption" color={colors.textSecondary}>
           {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct} / ${total} correct` })}
         </Typography>

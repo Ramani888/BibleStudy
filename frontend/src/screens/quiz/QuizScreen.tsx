@@ -13,7 +13,7 @@ import { QuizItemView, QuizResultScreen } from './components';
 import type { Card, QuizSelectableMode } from '../../types';
 import type { GeneratedQuizCard } from '../../navigation/types';
 
-type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[] };
+type Params = { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode; quizName?: string; retakeAttemptId?: string; generatedCards?: GeneratedQuizCard[]; reviewCards?: Card[]; ephemeral?: boolean };
 
 /** Wrap an LLM-generated {question,answer} as an in-memory QA Card (never persisted). */
 function toEphemeralCard(c: GeneratedQuizCard, i: number): Card {
@@ -37,7 +37,7 @@ export function QuizScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
-  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId, generatedCards, reviewCards } = params;
+  const { setIds, setTitles, mode = 'mix', quizName, retakeAttemptId, generatedCards, reviewCards, ephemeral = false } = params;
 
   const isFocused = useIsFocused();
 
@@ -46,10 +46,10 @@ export function QuizScreen() {
     return () => StatusBar.setHidden(false, 'fade');
   }, []));
 
-  // Two "cards passed via params" cases:
-  //  • generatedCards → ephemeral AI quiz (real ids absent → NOT recorded)
+  // Two "cards passed via params" cases (both skip the per-set fetch):
+  //  • generatedCards → AI quiz (real card ids absent → SM-2 not fed, but the
+  //    attempt IS recorded set-less unless `ephemeral` is set, e.g. practice-missed)
   //  • reviewCards    → real due cards (real ids → recorded + feeds SM-2)
-  // Either way we skip the per-set fetch.
   const isGenerated = !!generatedCards && generatedCards.length > 0;
   const isReview = !!reviewCards && reviewCards.length > 0;
   if (__DEV__ && isGenerated && isReview) {
@@ -154,7 +154,7 @@ export function QuizScreen() {
           timeSecs={elapsed}
           summaryItems={summaryItems}
           retakeAttemptId={retakeAttemptId}
-          ephemeral={isGenerated}
+          ephemeral={ephemeral}
           isFocused={isFocused}
           onExit={goBack}
         />
@@ -182,7 +182,7 @@ export function QuizScreen() {
         <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.accent }]} />
       </View>
 
-      {isGenerated && (
+      {ephemeral && (
         <View style={styles.ephemeralBadge}>
           <Typography preset="caption" color={colors.textSecondary}>
             {t('quiz:inQuiz.practiceNotSaved', 'Practice · not saved')}

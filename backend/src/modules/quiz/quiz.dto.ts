@@ -12,7 +12,9 @@ const SummaryItemDto = z.object({
 
 export const RecordAttemptDto = z
   .object({
-    setIds:    z.array(z.string().min(1)).min(1, 'at least one setId required'),
+    // Empty for AI quizzes (topic / generated) — they have no source set and are
+    // recorded set-less. When present, every id is validated for ownership in the service.
+    setIds:    z.array(z.string().min(1)).default([]),
     total:     z.number().int().positive('total must be a positive integer'),
     correct:   z.number().int().min(0, 'correct cannot be negative'),
     mode:      z.string().max(30).optional(),

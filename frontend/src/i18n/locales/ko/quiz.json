@@ -67,6 +67,7 @@
     "selectSetsCount": "세트 선택 ({{count}}개 선택됨)",
     "sort": {
       "newest": "최신순",
+      "alpha": "가나다순",
       "cards": "카드순"
     },
     "chooseType": "퀴즈 유형 선택",

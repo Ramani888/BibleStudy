@@ -10,16 +10,11 @@ import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
+import { MODE_NAMES, scoreColor } from './quizUi';
 
 import { useTranslation } from 'react-i18next';
 type Params = RootStackParamList['QuizSummary'];
 type Filter = 'all' | 'correct' | 'wrong';
-
-const MODE_LABEL: Record<string, string> = {
-  mc: 'Multiple Choice', story_mc: 'Story MC',
-  type_answer: 'Type Answer', type_verbatim: 'Type Verbatim',
-  blanks: 'Fill Blanks', chunks: 'Reorder', read: 'Read',
-};
 
 export function QuizSummaryScreen() {
   const { t } = useTranslation(['quiz', 'common']);
@@ -48,7 +43,7 @@ export function QuizSummaryScreen() {
     [filter, items],
   );
 
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
+  const scoreCol = scoreColor(scorePct, colors);
 
   const renderItem = useCallback(({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
@@ -56,7 +51,7 @@ export function QuizSummaryScreen() {
       <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
         <View style={styles.cardHeader}>
           <Typography preset="caption" color={colors.textSecondary} style={styles.cardIndex}>
-            Q{item.index + 1} · {t(`quiz:modes.${item.mode}`, MODE_LABEL[item.mode] ?? item.mode)}
+            Q{item.index + 1} · {t(`quiz:modes.${item.mode}`, MODE_NAMES[item.mode] ?? item.mode)}
           </Typography>
           {isRead
             ? null
@@ -103,7 +98,7 @@ export function QuizSummaryScreen() {
 
       {/* Score strip */}
       <View style={[styles.scoreStrip, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.divider }]}>
-        <Typography preset="h3" style={{ color: scoreColor }}>{scorePct}%</Typography>
+        <Typography preset="h3" style={{ color: scoreCol }}>{scorePct}%</Typography>
         <Typography preset="caption" color={colors.textSecondary}>
           {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct}/${total} correct` })} · {title}
         </Typography>

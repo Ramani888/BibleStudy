@@ -67,6 +67,7 @@
     "selectSetsCount": "Seleccionar sets ({{count}} seleccionados)",
     "sort": {
       "newest": "Recientes",
+      "alpha": "A–Z",
       "cards": "Tarjetas"
     },
     "chooseType": "ELIGE UN TIPO DE CUESTIONARIO",

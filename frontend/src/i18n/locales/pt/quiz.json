@@ -67,6 +67,7 @@
     "selectSetsCount": "Selecionar conjuntos ({{count}} selecionados)",
     "sort": {
       "newest": "Recentes",
+      "alpha": "A–Z",
       "cards": "Cartões"
     },
     "chooseType": "ESCOLHA UM TIPO DE QUIZ",

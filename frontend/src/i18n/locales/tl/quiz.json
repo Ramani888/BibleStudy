@@ -67,6 +67,7 @@
     "selectSetsCount": "Pumili ng Sets ({{count}} napili)",
     "sort": {
       "newest": "Kamakailan",
+      "alpha": "A–Z",
       "cards": "Cards"
     },
     "chooseType": "PUMILI NG URI NG QUIZ",

@@ -129,6 +129,9 @@ export function QuizSetupScreen() {
     if (generate.isPending) return;
     generate.mutate(payload, {
       onSuccess: ({ cards: generatedCards }) => {
+        // Pop Setup off the tab stack first so finishing the quiz (Done / auto-exit /
+        // Summary exit) lands on QuizHub, never back on this generate form.
+        navigation.goBack();
         navigation.navigate('Quiz', { setIds: [], setTitles: [title], mode: 'mc', quizName: title, generatedCards });
       },
       onError: (err) => {

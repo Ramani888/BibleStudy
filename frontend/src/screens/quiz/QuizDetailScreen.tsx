@@ -10,15 +10,10 @@ import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../t
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
+import { MODE_NAMES, reQuizParams, scoreColor } from './quizUi';
 
 import { useTranslation } from 'react-i18next';
 type Params = QuizStackParamList['QuizDetail'];
-
-const MODE_LABEL: Record<string, string> = {
-  mix: 'Mix', mc: 'Multiple Choice', story_mc: 'Story MC',
-  type_answer: 'Type Answer', type_verbatim: 'Type Verbatim',
-  blanks: 'Fill Blanks', chunks: 'Reorder', read: 'Read',
-};
 
 export function QuizDetailScreen() {
   const { t } = useTranslation(['quiz', 'common']);
@@ -45,8 +40,8 @@ export function QuizDetailScreen() {
   const timeSecs    = live?.timeSecs    ?? params.timeSecs;
 
   const scored = total > 0;
-  const scoreColor = scorePct >= 80 ? colors.success : scorePct >= 50 ? colors.warning : colors.alert;
-  const modeLabel = mode ? t(`quiz:modeNames.${mode}`, MODE_LABEL[mode] ?? mode) : '—';
+  const scoreCol = scoreColor(scorePct, colors);
+  const modeLabel = mode ? t(`quiz:modeNames.${mode}`, MODE_NAMES[mode] ?? mode) : '—';
   const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(' · ');
   const isPerfect = scored && scorePct === 100;
   const isRetaken = practicedAt !== createdAt;
@@ -61,15 +56,15 @@ export function QuizDetailScreen() {
     });
   }, [show, deleteAttempt, id, navigation, t]);
 
-  const handleReQuiz = useCallback(() => navigation.navigate('Quiz', {
-    setIds,
-    setTitles,
-    mode: mode ?? 'mix',
-    retakeAttemptId: id,
-  }), [navigation, setIds, setTitles, mode, id]);
-
   const { data: responsesData } = useQuizAttemptResponses(params.id);
   const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
+
+  // Set-less AI quizzes reconstruct their questions from stored responses; real
+  // quizzes replay from their sets. reQuizParams handles both.
+  const handleReQuiz = useCallback(
+    () => navigation.navigate('Quiz', reQuizParams({ id, setIds, setTitles, mode, quizName }, storedResponses)),
+    [navigation, id, setIds, setTitles, mode, quizName, storedResponses],
+  );
 
   const footer = (
     <View style={[styles.footer, { borderTopColor: colors.border }]}>
@@ -123,7 +118,7 @@ export function QuizDetailScreen() {
         <View style={styles.hero}>
           {isPerfect && <TrophyIcon size={32} color={colors.warning} />}
           {scored ? (
-            <Typography style={[styles.scoreNumber, { color: scoreColor }]}>
+            <Typography style={[styles.scoreNumber, { color: scoreCol }]}>
               {scorePct}%
             </Typography>
           ) : (
