@@ -1,5 +1,5 @@
 import { prisma } from '../../config/db';
-import { NotFoundError, ConflictError } from '../../utils/errors';
+import { NotFoundError, ConflictError, ValidationError } from '../../utils/errors';
 import { triggerAchievementCheck } from '../../utils/achievementCheck';
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
@@ -349,4 +349,124 @@ export async function claimDailyLogin(userId: string) {
     transaction,
     message: 'Daily login reward claimed! +1 credit',
   };
+}
+
+// ─── Referrals ──────────────────────────────────────────────────────────────
+// Redeem-a-code model (no deferred deep-link infra): a new user enters a friend's
+// code once; both sides get credits. Change the reward numbers here — single source.
+export const REFERRER_REWARD = 5;  // credits the inviter earns per successful referral
+export const NEW_USER_REWARD = 5;  // credits the redeemer earns for using a code
+export const REFERRER_CAP    = 25; // max rewarded referrals per inviter (anti-farming)
+
+// Unambiguous alphabet (no 0/O/1/I) for codes people type from a WhatsApp message.
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function randomCode(len = 6): string {
+  let out = '';
+  for (let i = 0; i < len; i++) out += CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)];
+  return out;
+}
+
+/** Return the user's own invite code (lazy-generating + persisting one on first request). */
+export async function getReferralInfo(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { referralCode: true, referredById: true },
+  });
+  if (!user) throw new NotFoundError('User not found');
+
+  let code = user.referralCode;
+  if (!code) {
+    // Assign a unique code; retry on the rare collision.
+    for (let attempt = 0; attempt < 5 && !code; attempt++) {
+      const candidate = randomCode();
+      try {
+        await prisma.user.update({ where: { id: userId }, data: { referralCode: candidate } });
+        code = candidate;
+      } catch (e) {
+        if ((e as { code?: string }).code !== 'P2002') throw e; // P2002 = unique clash → retry
+      }
+    }
+    if (!code) throw new ConflictError('Could not generate a referral code, please try again');
+  }
+
+  const referredCount = await prisma.creditTransaction.count({
+    where: { userId, type: 'REWARD', description: 'Referral reward (friend joined)' },
+  });
+
+  return {
+    code,
+    referredCount,
+    rewardPerReferral: REFERRER_REWARD,
+    newUserReward: NEW_USER_REWARD,
+    alreadyRedeemed: user.referredById !== null,
+  };
+}
+
+/** Redeem a friend's code once. Grants both sides atomically. */
+export async function redeemReferral(userId: string, rawCode: string) {
+  const code = rawCode.trim().toUpperCase();
+  if (!code) throw new ValidationError('Enter a referral code');
+
+  const referrer = await prisma.user.findUnique({
+    where: { referralCode: code },
+    select: { id: true },
+  });
+  if (!referrer) throw new NotFoundError('That referral code is invalid');
+  if (referrer.id === userId) throw new ValidationError('You cannot use your own referral code');
+
+  const me = await prisma.user.findUnique({ where: { id: userId }, select: { referredById: true } });
+  if (!me) throw new NotFoundError('User not found');
+  if (me.referredById) throw new ConflictError('You have already redeemed a referral code');
+
+  // Serializable so two concurrent redeems can't both pass the referredById check.
+  let balance: number;
+  try {
+    balance = await prisma.$transaction(async (tx) => {
+      const fresh = await tx.user.findUnique({ where: { id: userId }, select: { referredById: true } });
+      if (fresh?.referredById) throw new ConflictError('You have already redeemed a referral code');
+
+      // Grant the new user their bonus + record who referred them.
+      const updated = await tx.user.update({
+        where: { id: userId },
+        data: { referredById: referrer.id, creditBalance: { increment: NEW_USER_REWARD } },
+        select: { creditBalance: true },
+      });
+      await tx.creditTransaction.create({
+        data: { userId, type: 'REWARD', amount: NEW_USER_REWARD, description: 'Referral reward (used a code)' },
+      });
+
+      // Reward the inviter, unless they've hit the cap. Guard against the
+      // referrer being deleted between the outer lookup and here (P2025) —
+      // the new user still keeps their bonus; we just skip the inviter reward.
+      const inviterRewards = await tx.creditTransaction.count({
+        where: { userId: referrer.id, type: 'REWARD', description: 'Referral reward (friend joined)' },
+      });
+      if (inviterRewards < REFERRER_CAP) {
+        try {
+          await tx.user.update({
+            where: { id: referrer.id },
+            data: { creditBalance: { increment: REFERRER_REWARD } },
+          });
+          await tx.creditTransaction.create({
+            data: { userId: referrer.id, type: 'REWARD', amount: REFERRER_REWARD, description: 'Referral reward (friend joined)' },
+          });
+        } catch (e) {
+          if ((e as { code?: string }).code !== 'P2025') throw e; // referrer gone → skip reward
+        }
+      }
+
+      return updated.creditBalance;
+    }, { isolationLevel: 'Serializable' });
+  } catch (e) {
+    // P2034 = serialization failure. This fires both for a genuine same-user
+    // double-redeem AND for two different users redeeming the same referrer at
+    // once — so a generic retry message is the only correct wording. A real
+    // repeat redeem is caught by the referredById checks with a clear message.
+    if ((e as { code?: string }).code === 'P2034') {
+      throw new ConflictError('Could not apply the referral code, please try again');
+    }
+    throw e;
+  }
+
+  return { balance, granted: NEW_USER_REWARD };
 }

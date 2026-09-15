@@ -26,6 +26,8 @@ model User {
   storageLimit    BigInt          @default(262144000)
   plan            Plan            @default(FREE)
   emailVerified   Boolean         @default(false)
+  referralCode    String?         @unique  // this user's own invite code (lazy-generated)
+  referredById    String?                  // who invited this user (set once on redeem)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
@@ -54,6 +56,8 @@ model User {
   planProgress            StudyPlanProgress[]
   subscription            Subscription?
   streakFreezeLogs        StreakFreezeLog[]
+  referredBy              User?                 @relation("Referrals", fields: [referredById], references: [id], onDelete: SetNull)
+  referrals               User[]                @relation("Referrals")
 }
 
 // One row per day a streak freeze bridged a missed login. `date` is the local

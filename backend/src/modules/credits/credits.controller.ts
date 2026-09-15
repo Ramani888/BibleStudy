@@ -31,6 +31,20 @@ export async function claimDailyLogin(req: Request, res: Response): Promise<void
   } catch (error) { handleControllerError(res, error, 'Failed to claim daily reward'); }
 }
 
+export async function getReferral(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await creditsService.getReferralInfo(req.user!.id);
+    sendSuccess(res, result, 'Referral info retrieved successfully');
+  } catch (error) { handleControllerError(res, error, 'Failed to get referral info'); }
+}
+
+export async function redeemReferral(req: Request, res: Response): Promise<void> {
+  try {
+    const result = await creditsService.redeemReferral(req.user!.id, req.body.code);
+    sendSuccess(res, result, `Referral applied! +${result.granted} credits`);
+  } catch (error) { handleControllerError(res, error, 'Failed to redeem referral code'); }
+}
+
 export async function getStreak(req: Request, res: Response): Promise<void> {
   try {
     const result = await creditsService.getStreak(req.user!.id);
