@@ -14,7 +14,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import { ActionSheet, ConfirmDialog } from '../../components/feedback';
 import { Typography } from '../../components/ui';
-import { BookmarkIcon, ClockIcon, CopyIcon, FileTextIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
+import { BookmarkIcon, ClockIcon, CopyIcon, FileTextIcon, MoreVerticalIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
 import { ChatInput } from './components/ChatInput';
 import { CardProposalSheet } from './components/CardProposalSheet';
 import { ChatMessageItem } from './components/ChatMessageItem';
@@ -61,6 +61,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const [sheet, setSheet] = useState<{ visible: boolean; message: ChatUIMessage | null }>({
     visible: false, message: null,
   });
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const { mutate: sendMessage, isPending }       = useAIChat();
   const { mutateAsync: bulkCreateCards }         = useBulkCreateCards();
@@ -344,14 +345,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
           </View>
         </View>
         <View style={styles.headerRight}>
-          <Pressable onPress={handleExport} hitSlop={8} disabled={!hasExportableMessages} style={({ pressed }) => ({ opacity: hasExportableMessages ? (pressed ? 0.7 : 1) : 0 })}>
-            <FileTextIcon size={ICON_SIZE} color={colors.textSecondary} />
-          </Pressable>
           <Pressable onPress={handleClearChat} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
             <PlusIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
-          <Pressable onPress={() => navigation.navigate('ChatHistory')} hitSlop={8} style={({ pressed }) => [styles.historyBtn, { opacity: pressed ? 0.7 : 1 }]}>
-            <ClockIcon size={ICON_SIZE} color={colors.accent} />
+          <Pressable onPress={() => setMenuVisible(true)} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+            <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
           </Pressable>
         </View>
       </View>
@@ -408,6 +406,15 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('ai:chat.attachFile', 'Attach a file')} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
       <ActionSheet visible={att.pickerVisible} title={t('ai:chat.chooseMedia', 'Choose from My Media')} actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
       <ActionSheet visible={sheet.visible} title={sheet.message?.role === 'user' ? t('ai:chat.yourMessage', 'Your message') : t('ai:chat.aiResponse', 'AI response')} actions={sheetActions} onClose={() => setSheet({ visible: false, message: null })} />
+      <ActionSheet
+        visible={menuVisible}
+        title={t('ai:title')}
+        onClose={() => setMenuVisible(false)}
+        actions={[
+          { label: t('ai:chat.exportChat', 'Export chat'), icon: FileTextIcon, disabled: !hasExportableMessages, onPress: handleExport },
+          { label: t('ai:chat.history', 'Chat history'), icon: ClockIcon, onPress: () => navigation.navigate('ChatHistory') },
+        ]}
+      />
 
       <CardProposalSheet visible={saveModal.visible} cards={saveModal.cards} onSave={handleSaveCards} onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })} />
 
@@ -442,7 +449,6 @@ const styles = StyleSheet.create({
     width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius,
     alignItems: 'center', justifyContent: 'center',
   },
-  historyBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   list: { padding: layout.screenPaddingH, paddingTop: spacing.lg, flexGrow: 1 },
   emptyWrap: { flex: 1, alignItems: 'center', paddingTop: spacing.xxxl, gap: spacing.md },
   emptySub:  { paddingHorizontal: spacing.lg },

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import {
   BottomSheetModal,
@@ -51,6 +51,7 @@ export function ActionSheet({ visible, title, actions, onClose }: ActionSheetPro
   useEffect(() => {
     if (visible && !isOpenRef.current) {
       isOpenRef.current = true;
+      Keyboard.dismiss(); // else the sheet presents behind an open keyboard and is hidden
       ref.current?.present();
     } else if (!visible && isOpenRef.current) {
       ref.current?.dismiss();
