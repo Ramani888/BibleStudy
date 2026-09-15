@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
+import { getFileUrl } from '../../config/storage';
 import { AskQuestionDtoType } from './ai.dto';
 import { AppError, NotFoundError, PaymentRequiredError } from '../../utils/errors';
 import { triggerAchievementCheck } from '../../utils/achievementCheck';
@@ -200,14 +201,17 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
   if (dto.mediaIds && dto.mediaIds.length > 0) {
     const files = await prisma.mediaFile.findMany({
       where: { id: { in: dto.mediaIds }, userId },
-      select: { url: true, type: true },
+      select: { key: true, type: true },
     });
     if (files.length !== dto.mediaIds.length) throw new AppError('One or more files not found', 400, 'INVALID_MEDIA');
-    mediaBlocks = files.map(f =>
-      f.type === 'PDF'
-        ? { type: 'document' as const, source: { type: 'url' as const, url: f.url } }
-        : { type: 'image' as const, source: { type: 'url' as const, url: f.url } },
-    );
+    // Derive a fresh servable URL per file (presigned + short-lived in s3 mode) so
+    // Claude can fetch the attachment; never rely on a stored/expired URL here.
+    mediaBlocks = await Promise.all(files.map(async f => {
+      const url = await getFileUrl(f.key);
+      return f.type === 'PDF'
+        ? { type: 'document' as const, source: { type: 'url' as const, url } }
+        : { type: 'image' as const, source: { type: 'url' as const, url } };
+    }));
     hasPdf = files.some(f => f.type === 'PDF');
     hasImage = files.some(f => f.type === 'IMAGE');
   }

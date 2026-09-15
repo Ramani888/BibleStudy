@@ -42,8 +42,24 @@ const envSchema = z.object({
   FIREBASE_PRIVATE_KEY: z.string().optional().default(''),
   FIREBASE_CLIENT_EMAIL: z.string().optional().default(''),
 
-  // Public base URL of this server — used to build media file URLs
+  // Public base URL of this server — used to build media file URLs (local mode)
   APP_URL: z.string().min(1, 'APP_URL is required'),
+
+  // Media storage backend: 'local' (disk, served via /uploads) or 's3' (Hetzner/AWS
+  // object storage w/ presigned URLs). Local dev defaults to disk; prod flips to s3.
+  MEDIA_STORAGE: z.enum(['local', 's3']).default('local'),
+  HETZNER_S3_ENDPOINT:   z.string().optional().default(''), // e.g. https://nbg1.your-objectstorage.com
+  HETZNER_S3_REGION:     z.string().optional().default('nbg1'),
+  HETZNER_S3_BUCKET:     z.string().optional().default(''),
+  HETZNER_S3_ACCESS_KEY: z.string().optional().default(''),
+  HETZNER_S3_SECRET_KEY: z.string().optional().default(''),
+  HETZNER_S3_PUBLIC_URL: z.string().optional().default(''), // optional CDN/base for the stored canonical url
+}).superRefine((val, ctx) => {
+  if (val.MEDIA_STORAGE === 's3') {
+    for (const k of ['HETZNER_S3_BUCKET', 'HETZNER_S3_ACCESS_KEY', 'HETZNER_S3_SECRET_KEY'] as const) {
+      if (!val[k]) ctx.addIssue({ code: z.ZodIssueCode.custom, path: [k], message: `${k} is required when MEDIA_STORAGE=s3` });
+    }
+  }
 });
 
 const parsed = envSchema.safeParse(process.env);

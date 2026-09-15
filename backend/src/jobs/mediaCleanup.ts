@@ -1,9 +1,6 @@
 import cron from 'node-cron';
-import fs from 'fs/promises';
-import path from 'path';
 import { prisma } from '../config/db';
-
-const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+import { deleteObject } from '../config/storage';
 
 async function deleteExpiredMedia() {
   const expired = await prisma.mediaFile.findMany({
@@ -22,8 +19,8 @@ async function deleteExpiredMedia() {
           data:  { storageUsed: { decrement: file.sizeBytes } },
         }),
       ]);
-      await fs.unlink(path.join(UPLOADS_DIR, file.key)).catch(err =>
-        console.error(`[mediaCleanup] disk delete failed for ${file.key}:`, err),
+      await deleteObject(file.key).catch(err =>
+        console.error(`[mediaCleanup] storage delete failed for ${file.key}:`, err),
       );
     } catch (err) {
       console.error(`[mediaCleanup] failed to delete file ${file.id}:`, err);
