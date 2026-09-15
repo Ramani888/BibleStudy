@@ -166,7 +166,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
       <SetCard
         set={item}
         onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title })}
-        onLongPress={() => setSelectedSet(item)}
+        onMenuPress={() => setSelectedSet(item)}
       />
     ),
     [navigation],
@@ -178,7 +178,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         folder={item}
         setCount={folderSetCounts[item.id] ?? 0}
         onPress={() => navigation.navigate('FolderDetail', { folderId: item.id, folderName: item.name })}
-        onLongPress={() => setSelectedFolder(item)}
+        onMenuPress={() => setSelectedFolder(item)}
       />
     ),
     [navigation, folderSetCounts],
