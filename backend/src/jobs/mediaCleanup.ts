@@ -15,16 +15,24 @@ async function deleteExpiredMedia() {
 
   for (const file of expired) {
     try {
+      // Disk first (tolerate ENOENT). On any other disk error, skip this file so its
+      // row survives and next run retries — never leave an orphan with no DB row.
+      try {
+        await fs.unlink(path.join(UPLOADS_DIR, file.key));
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+          console.error(`[mediaCleanup] disk delete failed for ${file.key}, will retry next run:`, err);
+          continue;
+        }
+      }
       await prisma.$transaction([
         prisma.mediaFile.delete({ where: { id: file.id } }),
-        prisma.user.update({
-          where: { id: file.userId },
-          data:  { storageUsed: { decrement: file.sizeBytes } },
-        }),
+        prisma.$executeRaw`
+          UPDATE "User"
+          SET    "storageUsed" = GREATEST(0::bigint, "storageUsed" - ${file.sizeBytes}::bigint)
+          WHERE  id = ${file.userId}
+        `,
       ]);
-      await fs.unlink(path.join(UPLOADS_DIR, file.key)).catch(err =>
-        console.error(`[mediaCleanup] disk delete failed for ${file.key}:`, err),
-      );
     } catch (err) {
       console.error(`[mediaCleanup] failed to delete file ${file.id}:`, err);
     }

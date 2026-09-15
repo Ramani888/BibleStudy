@@ -137,20 +137,28 @@ export async function deleteFile(userId: string, fileId: string) {
   const file = await prisma.mediaFile.findFirst({ where: { id: fileId, userId } });
   if (!file) throw new NotFoundError('Media file not found');
 
-  // DB first — if this fails the file on disk is untouched (consistent state).
+  // Disk first, so we never leave an orphaned file with no DB row. Tolerate ENOENT
+  // (already gone); on any other error abort so the row stays and the delete is
+  // retryable (consistent state, no silent orphan).
+  const filePath = path.join(UPLOADS_DIR, file.key);
+  try {
+    await fs.unlink(filePath);
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+      console.error(`[media] disk delete failed for key ${file.key}:`, err);
+      throw new AppError('Could not delete the file from storage. Please try again.', 500, 'STORAGE_DELETE_FAILED');
+    }
+  }
+
+  // Row + quota refund, clamped at 0 so storageUsed can never go negative.
   await prisma.$transaction([
     prisma.mediaFile.delete({ where: { id: fileId } }),
-    prisma.user.update({
-      where: { id: userId },
-      data:  { storageUsed: { decrement: file.sizeBytes } },
-    }),
+    prisma.$executeRaw`
+      UPDATE "User"
+      SET    "storageUsed" = GREATEST(0::bigint, "storageUsed" - ${file.sizeBytes}::bigint)
+      WHERE  id = ${userId}
+    `,
   ]);
-
-  // Disk delete after DB — if it fails the file is orphaned but removed from listing.
-  const filePath = path.join(UPLOADS_DIR, file.key);
-  await fs.unlink(filePath).catch(err => {
-    console.error(`[media] disk delete failed for key ${file.key}:`, err);
-  });
 
   return { message: 'File deleted successfully' };
 }
