@@ -19,7 +19,7 @@ const CREDIT_COST = { text: 1, cards: 2, image: 3, pdf: 5 } as const;
 type ChatMessage = { role: 'user' | 'assistant'; content: string };
 
 // A media attachment for the latest user turn (Phase F). PDF now; image later.
-// Files are public-read on S3, so Claude ingests them by URL (no base64).
+// Files are served from local disk under /uploads, so Claude ingests them by URL (no base64).
 type MediaBlock = Anthropic.DocumentBlockParam | Anthropic.ImageBlockParam;
 
 // Provider seam: text chat routes to AI_PROVIDER (anthropic | openrouter).
