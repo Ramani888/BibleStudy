@@ -133,6 +133,7 @@
     "lastPracticed": "Last practiced",
     "firstAttempt": "First attempt",
     "correctCount": "{{correct}} / {{total}} correct",
+    "correctLabel": "Correct",
     "setsCount": "{{count}} sets",
     "viewSummary": "View summary"
   },

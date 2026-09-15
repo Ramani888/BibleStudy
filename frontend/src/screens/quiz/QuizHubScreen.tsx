@@ -4,9 +4,9 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 import { ActionSheet, ConfirmDialog, EmptyState, ErrorState } from '../../components/feedback';
-import { Button, Screen, SearchBar, Typography } from '../../components/ui';
+import { AnimatedPressable, Button, Screen, SearchBar, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ChevronRightIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
+import { ChevronRightIcon, EyeIcon, ListIcon, MoreVerticalIcon, RefreshIcon, SearchIcon, TrashIcon } from '../../components/icons';
 import { useConfirmDialog, useDeleteQuizAttempt, useDueCards, useDueSummary, useReQuiz, useRecentQuizAttempts, useSearchToggle } from '../../hooks';
 import { GeneratingQuizModal } from './components';
 
@@ -112,18 +112,11 @@ export function QuizHubScreen() {
         : item.setTitle || t('quiz:hub.aiQuiz', 'AI quiz');
 
     return (
-      <Pressable
-        style={({ pressed }) => [styles.row, { borderColor: colors.cardBorder, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+      <AnimatedPressable
+        style={[styles.row, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }]}
         onPress={() => handleDetails(item)}
         accessibilityRole="button"
       >
-        <View style={[styles.scoreCircle, { borderColor: scored ? scoreCol : colors.border }]}>
-          {scored
-            ? <Typography style={[styles.scoreText, { color: scoreCol }]}>{item.scorePct}%</Typography>
-            : <Typography preset="caption" color={colors.textSecondary}>—</Typography>
-          }
-        </View>
-
         <View style={styles.rowText}>
           <Typography preset="h4" color={colors.textPrimary} numberOfLines={1}>
             {item.quizName ?? sourceLabel}
@@ -138,7 +131,9 @@ export function QuizHubScreen() {
           </Typography>
         </View>
 
-        {scored && item.scorePct >= 80 && <CheckCircleIcon size={18} color={colors.success} />}
+        {scored
+          ? <Typography style={[styles.scorePct, { color: scoreCol }]}>{item.scorePct}%</Typography>
+          : <Typography preset="caption" color={colors.textSecondary}>—</Typography>}
 
         <Pressable
           hitSlop={12}
@@ -149,7 +144,7 @@ export function QuizHubScreen() {
         >
           <MoreVerticalIcon size={20} color={colors.textSecondary} />
         </Pressable>
-      </Pressable>
+      </AnimatedPressable>
     );
   }, [handleDetails, openSheet, colors, isDark, t]);
 
@@ -298,18 +293,9 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     padding: spacing.lg,
     borderRadius: layout.cardRadiusSm,
-    borderWidth: 1,
   },
-  scoreCircle: {
-    width: layout.iconCircleLg,
-    height: layout.iconCircleLg,
-    borderRadius: layout.iconCircleLg / 2,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreText: {
-    fontSize: fontSizes.sm,
+  scorePct: {
+    fontSize: fontSizes.md,
     fontWeight: fontWeights.bold,
   },
   rowPressed: { opacity: 0.7 },

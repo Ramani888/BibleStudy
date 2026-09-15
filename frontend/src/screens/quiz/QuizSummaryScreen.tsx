@@ -1,16 +1,15 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, Pressable, StyleSheet, View } from 'react-native';
-import { CelebrationBurst } from '../../components/ui/CelebrationBurst';
+import { FlatList, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Typography } from '../../components/ui';
+import { FilterChip, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
-import { MODE_NAMES, scoreColor } from './quizUi';
+import { MODE_NAMES } from './quizUi';
 
 import { useTranslation } from 'react-i18next';
 type Params = RootStackParamList['QuizSummary'];
@@ -24,7 +23,7 @@ export function QuizSummaryScreen() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
   const { params } = useRoute<RouteProp<{ QuizSummary: Params }, 'QuizSummary'>>();
-  const { items, title, scorePct, total, correct, exitToHub } = params;
+  const { items, exitToHub } = params;
 
   const handleBack = useCallback(() => {
     if (exitToHub) {
@@ -43,44 +42,48 @@ export function QuizSummaryScreen() {
     [filter, items],
   );
 
-  const scoreCol = scoreColor(scorePct, colors);
+  const correctCount = useMemo(() => items.filter(i => i.isCorrect).length, [items]);
+  const wrongCount = items.length - correctCount;
 
   const renderItem = useCallback(({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
+    const ok = item.isCorrect;
     return (
-      <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: item.isCorrect ? colors.success : isRead ? colors.border : colors.alert }]}>
+      <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
         <View style={styles.cardHeader}>
-          <Typography preset="caption" color={colors.textSecondary} style={styles.cardIndex}>
+          <Typography preset="caption" color={colors.textSecondary}>
             Q{item.index + 1} · {t(`quiz:modes.${item.mode}`, MODE_NAMES[item.mode] ?? item.mode)}
           </Typography>
-          {isRead
-            ? null
-            : item.isCorrect
-              ? <CheckCircleIcon size={16} color={colors.success} />
-              : <CloseCircleIcon size={16} color={colors.alert} />
-          }
+          {!isRead && (
+            <View style={[styles.badge, { backgroundColor: ok ? colors.successSoft : colors.errorSurface }]}>
+              {ok
+                ? <CheckCircleIcon size={14} color={colors.success} />
+                : <CloseCircleIcon size={14} color={colors.alert} />}
+              <Typography preset="caption" color={ok ? colors.success : colors.alert}>
+                {ok ? t('quiz:summary.correct', 'Correct') : t('quiz:summary.incorrect', 'Incorrect')}
+              </Typography>
+            </View>
+          )}
         </View>
 
-        <Typography preset="body" color={colors.textPrimary} style={styles.prompt}>
+        <Typography preset="label" color={colors.textPrimary} style={styles.prompt}>
           {item.prompt}
         </Typography>
 
         {isRead ? (
-          <Typography preset="caption" color={colors.textSecondary}>{item.correctAnswer}</Typography>
+          <View style={[styles.answerBox, { backgroundColor: colors.surfaceMuted }]}>
+            <Typography preset="body" color={colors.textPrimary}>{item.correctAnswer}</Typography>
+          </View>
         ) : (
           <>
-            <View style={styles.answerRow}>
-              <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>{t('quiz:summary.yourAnswer', 'Your answer')}</Typography>
-              <Typography preset="caption" color={item.isCorrect ? colors.success : colors.alert} style={styles.answerValue}>
-                {item.userAnswer}
-              </Typography>
+            <View style={[styles.answerBox, { backgroundColor: ok ? colors.successSoft : colors.errorSurface }]}>
+              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:summary.yourAnswer', 'Your answer')}</Typography>
+              <Typography preset="body" color={ok ? colors.success : colors.alert}>{item.userAnswer}</Typography>
             </View>
-            {!item.isCorrect && (
-              <View style={styles.answerRow}>
-                <Typography preset="caption" color={colors.textSecondary} style={styles.answerLabel}>{t('quiz:summary.correctAnswer', 'Correct')}</Typography>
-                <Typography preset="caption" color={colors.success} style={styles.answerValue}>
-                  {item.correctAnswer}
-                </Typography>
+            {!ok && (
+              <View style={[styles.answerBox, { backgroundColor: colors.successSoft }]}>
+                <Typography preset="caption" color={colors.textSecondary}>{t('quiz:summary.correctAnswer', 'Correct')}</Typography>
+                <Typography preset="body" color={colors.success}>{item.correctAnswer}</Typography>
               </View>
             )}
           </>
@@ -91,39 +94,15 @@ export function QuizSummaryScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
-      {scorePct >= 80 && <CelebrationBurst trigger={scorePct} originYFraction={0.25} />}
       <View style={{ paddingTop: insets.top }}>
         <ScreenHeader title={t('quiz:summary.title')} onBack={handleBack} />
       </View>
 
-      {/* Score strip */}
-      <View style={[styles.scoreStrip, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderBottomColor: colors.divider }]}>
-        <Typography preset="h3" style={{ color: scoreCol }}>{scorePct}%</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct}/${total} correct` })} · {title}
-        </Typography>
-      </View>
-
-      {/* Filter tabs */}
-      <View style={[styles.tabs, { borderBottomColor: colors.divider }]}>
-        {[
-          { key: 'all', label: t('common:filter.all', 'All') },
-          { key: 'correct', label: t('quiz:summary.correct', 'Correct') },
-          { key: 'wrong', label: t('quiz:summary.incorrect', 'Incorrect') },
-        ].map(({ key, label }) => (
-          <Pressable
-            key={key}
-            style={({ pressed }) => [styles.tab, filter === key && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, pressed && styles.tabPressed]}
-            onPress={() => setFilter(key as any)}
-          >
-            <Typography
-              preset="label"
-              color={filter === key ? colors.accent : colors.textSecondary}
-            >
-              {label}
-            </Typography>
-          </Pressable>
-        ))}
+      {/* Filter chips */}
+      <View style={styles.filters}>
+        <FilterChip label={`${t('common:filter.all', 'All')} ${items.length}`} active={filter === 'all'} onPress={() => setFilter('all')} />
+        <FilterChip label={`${t('quiz:summary.correct', 'Correct')} ${correctCount}`} active={filter === 'correct'} onPress={() => setFilter('correct')} />
+        <FilterChip label={`${t('quiz:summary.incorrect', 'Incorrect')} ${wrongCount}`} active={filter === 'wrong'} onPress={() => setFilter('wrong')} />
       </View>
 
       <View style={styles.flex}>
@@ -147,22 +126,29 @@ export function QuizSummaryScreen() {
 const styles = StyleSheet.create({
   root:        { flex: 1 },
   flex:        { flex: 1 },
-  scoreStrip:  { alignItems: 'center', paddingVertical: spacing.md, gap: spacing.xs, borderBottomWidth: StyleSheet.hairlineWidth },
-  tabs:        { flexDirection: 'row', borderBottomWidth: StyleSheet.hairlineWidth },
-  tab:         { flex: 1, alignItems: 'center', paddingVertical: spacing.md },
-  tabPressed:  { opacity: 0.7 },
+  filters:     { flexDirection: 'row', gap: spacing.sm, paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md },
   list:        { padding: layout.screenPaddingH, gap: spacing.md },
   empty:       { paddingTop: spacing.s48 },
   card: {
     borderRadius: layout.cardRadius,
     borderWidth: 1,
     padding: spacing.lg,
-    gap: spacing.sm,
+    gap: spacing.md,
   },
-  cardHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  cardIndex:   { flex: 1 },
+  cardHeader:  { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: spacing.sm },
+  badge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.s2,
+    borderRadius: layout.pillRadius,
+  },
   prompt:      { lineHeight: fontSizes.md * lineHeights.normal },
-  answerRow:   { flexDirection: 'row', gap: spacing.sm },
-  answerLabel: { width: spacing.s80 },
-  answerValue: { flex: 1 },
+  answerBox: {
+    borderRadius: layout.cardRadiusSm,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.s2,
+  },
 });

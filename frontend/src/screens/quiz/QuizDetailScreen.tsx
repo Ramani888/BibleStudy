@@ -1,13 +1,13 @@
 import React, { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import { Button, Screen, Typography } from '../../components/ui';
+import { Button, Screen, ScoreRing, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, TimerIcon, TrashIcon, TrophyIcon } from '../../components/icons';
 import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useReQuiz, useRecentQuizAttempts } from '../../hooks';
 import { ConfirmDialog } from '../../components/feedback';
 import { GeneratingQuizModal } from './components';
-import { fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
+import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
@@ -120,21 +120,7 @@ export function QuizDetailScreen() {
         {/* ── Hero ── */}
         <View style={styles.hero}>
           {isPerfect && <TrophyIcon size={32} color={colors.warning} />}
-          {scored ? (
-            <Typography style={[styles.scoreNumber, { color: scoreCol }]}>
-              {scorePct}%
-            </Typography>
-          ) : (
-            <Typography style={[styles.scoreNumber, { color: colors.textSecondary }]}>—</Typography>
-          )}
-          {scored && (
-            <View style={styles.correctRow}>
-              <CheckCircleIcon size={14} color={colors.textSecondary} />
-              <Typography preset="caption" color={colors.textSecondary}>
-                {t('quiz:detail.correctCount', { correct, total })}
-              </Typography>
-            </View>
-          )}
+          <ScoreRing pct={scored ? scorePct : null} color={scoreCol} />
         </View>
 
         {/* ── Mode + sets chips ── */}
@@ -158,6 +144,24 @@ export function QuizDetailScreen() {
           ) : null}
         </View>
 
+        {/* ── Stat tiles ── */}
+        {scored && (
+          <View style={styles.statsRow}>
+            <View style={[styles.statTile, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
+              <CheckCircleIcon size={18} color={colors.success} />
+              <Typography style={[styles.statValue, { color: colors.textPrimary }]}>{correct}/{total}</Typography>
+              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.correctLabel', 'Correct')}</Typography>
+            </View>
+            {timeSecs != null && (
+              <View style={[styles.statTile, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
+                <TimerIcon size={18} color={colors.textSecondary} />
+                <Typography style={[styles.statValue, { color: colors.textPrimary }]}>{formatDuration(timeSecs)}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.timeSpent', 'Time spent')}</Typography>
+              </View>
+            )}
+          </View>
+        )}
+
         {/* ── Date info card ── */}
         <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
           <View style={styles.cardRow}>
@@ -171,21 +175,6 @@ export function QuizDetailScreen() {
               {formatDateWithTime(practicedAt)}
             </Typography>
           </View>
-
-          {timeSecs != null && (
-            <>
-              <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-              <View style={styles.cardRow}>
-                <View style={styles.cardRowLeft}>
-                  <TimerIcon size={16} color={colors.textSecondary} />
-                  <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.timeSpent', 'Time spent')}</Typography>
-                </View>
-                <Typography preset="body" color={colors.textPrimary}>
-                  {formatDuration(timeSecs)}
-                </Typography>
-              </View>
-            </>
-          )}
 
           {isRetaken && (
             <>
@@ -221,10 +210,19 @@ const styles = StyleSheet.create({
 
   // Hero
   hero: { alignItems: 'center', gap: spacing.sm },
-  // ponytail: fontSize 72 and lineHeight 80 are off-grid hero display values — no matching tokens
-  scoreNumber: { fontSize: 72, fontWeight: fontWeights.bold, lineHeight: 80, includeFontPadding: false },
   iconPressed: { opacity: 0.85 },
-  correctRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+
+  // Stat tiles
+  statsRow: { flexDirection: 'row', gap: spacing.md, width: '100%' },
+  statTile: {
+    flex: 1,
+    alignItems: 'center',
+    gap: spacing.xs,
+    paddingVertical: spacing.lg,
+    borderRadius: layout.cardRadiusLg,
+    borderWidth: 1,
+  },
+  statValue: { fontSize: fontSizes.lg, fontWeight: fontWeights.bold },
 
   // Chips
   headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
