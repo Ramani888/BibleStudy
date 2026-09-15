@@ -8,6 +8,7 @@ import { CreditsScreen } from '../screens/profile/CreditsScreen';
 import { PaywallScreen } from '../screens/profile/PaywallScreen';
 import { AchievementsScreen } from '../screens/profile/AchievementsScreen';
 import { SettingsScreen } from '../screens/profile/SettingsScreen';
+import { InviteFriendsScreen } from '../screens/profile/InviteFriendsScreen';
 import { FriendsScreen } from '../screens/profile/FriendsScreen';
 import { LeaderboardScreen } from '../screens/profile/LeaderboardScreen';
 import { FriendRequestsScreen } from '../screens/profile/FriendRequestsScreen';
@@ -35,6 +36,7 @@ export function ProfileNavigator() {
       <Stack.Screen name="Paywall"         component={PaywallScreen}         />
       <Stack.Screen name="Achievements"    component={AchievementsScreen}    />
       <Stack.Screen name="Settings"        component={SettingsScreen}        />
+      <Stack.Screen name="InviteFriends"   component={InviteFriendsScreen}   />
       <Stack.Screen name="Friends"         component={FriendsScreen}         />
       <Stack.Screen name="Leaderboard"     component={LeaderboardScreen}     />
       <Stack.Screen name="FriendRequests"  component={FriendRequestsScreen}  />

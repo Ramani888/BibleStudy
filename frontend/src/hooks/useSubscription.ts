@@ -11,6 +11,7 @@ import {
   restore as rcRestore,
   PurchaseCancelled,
 } from '../lib/purchases';
+import { track } from '../lib/analytics';
 import type { SubscriptionStatus } from '../types';
 
 /** Backend-recorded status (cheap; recomputes expiry, downgrades a lapsed record to FREE). */
@@ -68,6 +69,7 @@ export function useIapSubscriptions() {
     setProcessing(true);
     try {
       await purchaseByProductId(productId);
+      track('subscribed', { productId });
       await refreshUser();
     } catch (e) {
       if (!(e instanceof PurchaseCancelled)) setError(getErrorMessage(e));

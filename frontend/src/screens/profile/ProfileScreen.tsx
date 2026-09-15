@@ -1,5 +1,5 @@
 import React, { useCallback } from 'react';
-import { Pressable, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -61,9 +61,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const handleNavPaywall      = useCallback(() => navigation.navigate('Paywall'), [navigation]);
   const handleNavChangePass   = useCallback(() => navigation.navigate('ChangePassword'), [navigation]);
   const handleNavSettings     = useCallback(() => navigation.navigate('Settings'), [navigation]);
-  const handleInviteFriends   = useCallback(() => {
-    Share.share({ message: t('profile:share.inviteMessage', { defaultValue: "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com" }) }).catch(() => {});
-  }, [t]);
+  const handleInviteFriends   = useCallback(() => navigation.navigate('InviteFriends'), [navigation]);
   const handleSignOut         = useCallback(() =>
     showConfirm({
       title: t('profile:settings.signOut'),

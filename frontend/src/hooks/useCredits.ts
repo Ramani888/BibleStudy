@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { creditsApi } from '../api';
+import { track } from '../lib/analytics';
 
 export type CreditStatsPeriod = 'today' | 'week' | 'month' | 'year' | 'custom';
 export type CreditInterval    = '1h' | '2h' | '6h' | 'day' | 'week' | 'month' | 'quarter';
@@ -29,6 +30,25 @@ export function useClaimDailyLogin() {
   return useMutation({
     mutationFn: creditsApi.claimDailyLogin,
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['credits'] });
+    },
+  });
+}
+
+export function useReferral() {
+  return useQuery({
+    queryKey: ['credits', 'referral'],
+    queryFn: creditsApi.getReferral,
+    staleTime: 60_000,
+  });
+}
+
+export function useRedeemReferral() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (code: string) => creditsApi.redeemReferral(code),
+    onSuccess: () => {
+      track('referral_signup');
       qc.invalidateQueries({ queryKey: ['credits'] });
     },
   });

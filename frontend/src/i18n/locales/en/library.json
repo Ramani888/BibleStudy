@@ -192,6 +192,7 @@
   },
   "plans": {
     "title": "Study Plans",
+    "shareMessage": "Studying \"{{title}}\" on Verdance 📖 Want to join me? {{url}}",
     "newPlan": "New Plan",
     "createPlan": "Create Study Plan",
     "planCreated": "Plan created",

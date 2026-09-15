@@ -31,6 +31,7 @@
     "axios": "^1.13.6",
     "i18next": "^26.4.0",
     "lottie-react-native": "^7.3.8",
+    "posthog-react-native": "^4.73.1",
     "react": "19.2.3",
     "react-hook-form": "^7.71.2",
     "react-i18next": "^17.0.12",

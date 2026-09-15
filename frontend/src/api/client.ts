@@ -4,9 +4,13 @@ import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
 import { useAuthStore } from '../store/auth.store';
 
-// Config.API_BASE_URL is bundled from .env at build time. The fallbacks only fire on a
-// misconfigured build — dev → local server, release → prod host (never localhost).
-const BASE_URL = Config.API_BASE_URL ?? (__DEV__ ? 'http://localhost:3010/api/v1' : 'https://api.getverdance.com/api/v1');
+// Config.API_BASE_URL is bundled from .env at NATIVE BUILD time — so .env edits don't take
+// effect on device without a rebuild. In DEV we therefore hardcode the local backend so a
+// Metro reload can switch it instantly (update the IP to your Mac's LAN address). Release
+// builds still use the baked prod URL. Revert this to Config-first before shipping if needed.
+const BASE_URL = __DEV__
+  ? 'http://192.168.1.4:3010/api/v1'
+  : (Config.API_BASE_URL ?? 'https://api.getverdance.com/api/v1');
 
 export const apiClient = axios.create({
   baseURL: BASE_URL,

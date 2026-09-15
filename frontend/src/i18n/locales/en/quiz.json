@@ -146,7 +146,8 @@
     "readMode": "(read)",
     "reQuiz": "Re-Quiz",
     "yourAnswer": "Your answer…",
-    "correctAnswer": "Correct"
+    "correctAnswer": "Correct",
+    "shareMessage": "I scored {{correct}}/{{total}} on a Bible quiz in Verdance! 📖 Can you beat me? {{url}}"
   },
   "item": {
     "typeAnswerPlaceholder": "Type your answer…"

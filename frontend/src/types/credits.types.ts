@@ -12,3 +12,11 @@ export interface CreditTransaction {
 export interface CreditBalance {
   balance: number;
 }
+
+export interface ReferralInfo {
+  code: string;
+  referredCount: number;
+  rewardPerReferral: number;
+  newUserReward: number;
+  alreadyRedeemed: boolean;
+}

@@ -5,15 +5,16 @@ import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanStep } from '../../types';
-import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog } from '../../hooks';
+import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog, useReferral } from '../../hooks';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
 import { ProgressBar } from '../../components/ui/ProgressBar';
 import { ErrorState } from '../../components/feedback/ErrorState';
 import { ConfirmDialog } from '../../components/feedback';
-import { CheckCircleIcon, TrashIcon } from '../../components/icons';
+import { CheckCircleIcon, ShareIcon, TrashIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api';
+import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import { layout, radius, spacing, useTheme } from '../../theme';
 
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
@@ -24,6 +25,19 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
   const toggleStep = useToggleStep(planId);
   const deletePlan = useDeletePlan();
   const { show, dialogProps } = useConfirmDialog();
+  const { data: referral } = useReferral();
+
+  const handleShare = useCallback(() => {
+    if (!plan) return;
+    shareToWhatsApp(
+      t('library:plans.shareMessage', {
+        title: plan.title,
+        url: buildReferralLink(referral?.code),
+        defaultValue: 'Studying "{{title}}" on Verdance 📖 Want to join me? {{url}}',
+      }),
+      'plan',
+    );
+  }, [plan, referral?.code, t]);
 
   const handleDelete = useCallback(() => {
     show({
@@ -77,9 +91,14 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
           title={plan?.title ?? t('library:plans.plan', 'Plan')}
           onBack={navigation.goBack}
           right={
-            <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-              <TrashIcon size={20} color={colors.textSecondary} />
-            </Pressable>
+            <View style={styles.headerActions}>
+              <Pressable onPress={handleShare} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                <ShareIcon size={20} color={colors.textSecondary} />
+              </Pressable>
+              <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                <TrashIcon size={20} color={colors.textSecondary} />
+              </Pressable>
+            </View>
           }
         />
       }
@@ -124,5 +143,6 @@ const styles = StyleSheet.create({
   stepBody: { flex: 1, gap: spacing.s2 },
   emptyCircle: { width: spacing.xxl, height: spacing.xxl, borderRadius: radius.r12, borderWidth: 2 },
   iconPressed: { opacity: 0.85 },
+  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   rowPressed: { opacity: 0.7 },
 });

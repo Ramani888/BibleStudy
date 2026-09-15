@@ -1,14 +1,18 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { aiApi } from '../api';
+import { track } from '../lib/analytics';
 import type { AIChatPayload } from '../types';
 
 export function useAIChat() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: AIChatPayload) => aiApi.chat(payload),
-    onSuccess: () => {
+    onSuccess: data => {
       qc.invalidateQueries({ queryKey: ['ai-history'] });
       qc.invalidateQueries({ queryKey: ['credits'] });
+      if (data.suggestedCards?.length) {
+        track('cards_generated', { count: data.suggestedCards.length });
+      }
     },
   });
 }

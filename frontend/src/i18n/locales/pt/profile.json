@@ -80,6 +80,7 @@
     "unlocked": "{{count}} desbloqueados",
     "locked": "Bloqueada",
     "remaining": "{{count}} restantes",
+    "shareMessage": "Acabei de desbloquear \"{{title}}\" no Verdance 📖✨ Junte-se a mim: {{url}}",
     "categories": {
       "study": "Estudo",
       "quiz": "Quiz",
@@ -428,7 +429,7 @@
     "billedAnnually": "Cobrado anualmente",
     "billedMonthly": "Cobrado mensalmente",
     "premium": "Premium",
-    "tagline": "O estudo bíblico é grátis. Os créditos liberam a assistência da AI.",
+    "tagline": "Transforme qualquer versículo, tema ou PDF em cartões e quizzes. Os créditos alimentam a IA que os cria.",
     "freePlan": "Plano grátis",
     "currentPlan": "Plano atual",
     "restore": "Restaurar compras",
@@ -442,5 +443,21 @@
   },
   "share": {
     "inviteMessage": "Estou usando o Verdance para estudar a Bíblia — cartões, quizzes e sequências diárias. Junte-se a mim: https://getverdance.com"
+  },
+  "invite": {
+    "title": "Convidar amigos",
+    "headline": "Dê {{n}}, ganhe {{n}} créditos",
+    "subtitle": "Compartilhe seu código. Quando um amigo se cadastrar com ele, vocês dois ganham créditos grátis.",
+    "yourCode": "Seu código",
+    "loadError": "Não foi possível carregar — toque para tentar de novo",
+    "shareWhatsApp": "Compartilhar",
+    "copied": "Código copiado",
+    "redeemed": "+{{n}} créditos adicionados!",
+    "joinedCount": "{{count}} amigos já entraram 🎉",
+    "gotCode": "Recebeu um código de um amigo?",
+    "gotCodeHint": "Digite para ganhar {{n}} créditos grátis.",
+    "enterCode": "Digite o código",
+    "applyCode": "Aplicar código",
+    "shareMessage": "Junte-se a mim no Verdance — cartões e quizzes de estudo bíblico com IA 📖✨ Use meu código {{code}} ao se cadastrar e nós dois ganhamos créditos grátis! {{url}}"
   }
 }

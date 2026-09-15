@@ -107,6 +107,6 @@
     "title": "Compartilhe seu progresso 🙌",
     "subtitle": "Envie seu conjunto ou sequência para o seu grupo — cresçam juntos na Palavra.",
     "cta": "Compartilhar agora",
-    "message": "🔥 Sequência de {{streak}} dias no Verdance! Junte-se a mim e cresça na Palavra: https://getverdance.com"
+    "message": "🔥 Sequência de {{streak}} dias no Verdance! Junte-se a mim e cresça na Palavra: {{url}}"
   }
 }

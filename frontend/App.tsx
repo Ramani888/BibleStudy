@@ -16,17 +16,23 @@ import { useTheme, useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 import { configureGoogleSignIn } from './src/utils/socialAuth';
 import { configureRevenueCat } from './src/lib/purchases';
+import { identify, resetAnalytics } from './src/lib/analytics';
+import { useAnalyticsStore } from './src/store';
 import { SplashScreen } from './src/screens/SplashScreen';
 // Enable native screens for better performance
 enableScreens(true);
 configureGoogleSignIn();
 configureRevenueCat();
+// Analytics is configured inside useAnalyticsStore.hydrate() (below), AFTER the
+// opt-out preference is read — see analytics.store for why.
 
 function AppBootstrap() {
   const initialize = useAuthStore(s => s.initialize);
   const isInitialized = useAuthStore(s => s.isInitialized);
+  const userId = useAuthStore(s => s.user?.id);
   const hydrateTheme = useThemeStore(s => s.hydrate);
   const hydrateLanguage = useLanguageStore(s => s.hydrate);
+  const hydrateAnalytics = useAnalyticsStore(s => s.hydrate);
   const { colors } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
 
@@ -34,7 +40,14 @@ function AppBootstrap() {
     initialize();
     hydrateTheme();
     hydrateLanguage();
-  }, [initialize, hydrateTheme, hydrateLanguage]);
+    hydrateAnalytics();
+  }, [initialize, hydrateTheme, hydrateLanguage, hydrateAnalytics]);
+
+  // Link analytics to the signed-in user; reset to anonymous on logout.
+  useEffect(() => {
+    if (userId) identify(userId);
+    else resetAnalytics();
+  }, [userId]);
 
   return (
     <View style={styles.root}>

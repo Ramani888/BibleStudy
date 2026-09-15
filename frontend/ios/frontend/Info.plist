@@ -61,6 +61,20 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<!-- DEV ONLY: allow plain-HTTP to the local backend on the Mac's LAN IP.
+		     Scoped to a private IP — prod (api.getverdance.com) is HTTPS and unaffected.
+		     Update this IP if your Mac's LAN address changes. -->
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>192.168.1.4</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+			</dict>
+		</dict>
+	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>BibleStudyPro needs access to your photo library to upload images to your media gallery.</string>
 	<key>NSCameraUsageDescription</key>

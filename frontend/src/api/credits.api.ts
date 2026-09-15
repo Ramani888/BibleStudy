@@ -1,5 +1,5 @@
 import { apiGet, apiPost } from './client';
-import type { CreditBalance, CreditTransaction, Pagination, TransactionType } from '../types';
+import type { CreditBalance, CreditTransaction, Pagination, TransactionType, ReferralInfo } from '../types';
 
 interface TransactionParams {
   page?: number;
@@ -32,6 +32,12 @@ export const creditsApi = {
 
   getStreak: () =>
     apiGet<{ streak: number; longestStreak: number; freezes: number }>('/credits/streak'),
+
+  getReferral: () =>
+    apiGet<ReferralInfo>('/credits/referral'),
+
+  redeemReferral: (code: string) =>
+    apiPost<{ balance: number; granted: number }>('/credits/referral/redeem', { code }),
 
   getStats: (period: string, from?: Date, to?: Date, interval?: string) =>
     apiGet<StatPoint[]>('/credits/stats', {

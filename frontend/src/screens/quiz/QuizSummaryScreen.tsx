@@ -1,14 +1,16 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { FilterChip, Typography } from '../../components/ui';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
+import { CheckCircleIcon, CloseCircleIcon, ShareIcon } from '../../components/icons';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT, fontSizes, lineHeights } from '../../theme';
 import type { RootStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
+import { useReferral } from '../../hooks';
+import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import { MODE_NAMES } from './quizUi';
 
 import { useTranslation } from 'react-i18next';
@@ -44,6 +46,20 @@ export function QuizSummaryScreen() {
 
   const correctCount = useMemo(() => items.filter(i => i.isCorrect).length, [items]);
   const wrongCount = items.length - correctCount;
+
+  const { data: referral } = useReferral();
+  const handleShare = useCallback(() => {
+    const link = buildReferralLink(referral?.code);
+    shareToWhatsApp(
+      t('quiz:summary.shareMessage', {
+        correct: correctCount,
+        total: items.length,
+        url: link,
+        defaultValue: 'I scored {{correct}}/{{total}} on a Bible quiz in Verdance! 📖 Can you beat me? {{url}}',
+      }),
+      'quiz_result',
+    );
+  }, [referral?.code, correctCount, items.length, t]);
 
   const renderItem = useCallback(({ item }: { item: SummaryItem }) => {
     const isRead = item.mode === 'read';
@@ -95,7 +111,15 @@ export function QuizSummaryScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <View style={{ paddingTop: insets.top }}>
-        <ScreenHeader title={t('quiz:summary.title')} onBack={handleBack} />
+        <ScreenHeader
+          title={t('quiz:summary.title')}
+          onBack={handleBack}
+          right={
+            <Pressable onPress={handleShare} hitSlop={8} accessibilityRole="button" accessibilityLabel={t('common:actions.share', 'Share')}>
+              <ShareIcon size={22} color={colors.textPrimary} />
+            </Pressable>
+          }
+        />
       </View>
 
       {/* Filter chips */}

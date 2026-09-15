@@ -170,6 +170,7 @@
     "incorrectTab": "Incorretas ({{count}})",
     "yourAnswer": "Sua Resposta:",
     "correctAnswer": "Resposta Correta:",
+    "shareMessage": "Acertei {{correct}}/{{total}} em um quiz bíblico no Verdance! 📖 Consegue me superar? {{url}}",
     "noIncorrect": "Nenhuma resposta incorreta! Trabalho perfeito!",
     "noCorrect": "Nenhuma resposta correta ainda.",
     "done": "Concluído",

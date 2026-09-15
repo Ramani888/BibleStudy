@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { Pressable, Share, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
@@ -32,6 +32,7 @@ import {
   useCreditBalance,
   useAutoDailyClaim,
   useStreak,
+  useReferral,
   useDueSummary,
   useDueCards,
   useNotifications,
@@ -41,6 +42,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 import { formatDate } from '../../utils/formatters';
+import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import type { AppTabParamList } from '../../navigation/types';
 import type { DueSummary, StudySet } from '../../types';
 import type { Activity } from '../../types/activities.types';
@@ -144,13 +146,15 @@ const ShareEventCard = React.memo(function ShareEventCard({ streak, onDismiss }:
   const { t } = useTranslation(['home', 'library', 'common']);
   const { colors } = useTheme();
 
+  const { data: referral } = useReferral();
   const onShare = useCallback(() => {
     const message = t('home:shareEvent.message', {
       streak,
-      defaultValue: '🔥 {{streak}}-day streak on Verdance! Join me and grow in the Word: https://getverdance.com',
+      url: buildReferralLink(referral?.code),
+      defaultValue: '🔥 {{streak}}-day streak on Verdance! Join me and grow in the Word: {{url}}',
     });
-    Share.share({ message }).catch(() => {});
-  }, [t, streak]);
+    shareToWhatsApp(message, 'streak');
+  }, [t, streak, referral?.code]);
 
   return (
     <View style={[styles.shareEvent, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>

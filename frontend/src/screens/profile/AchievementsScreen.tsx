@@ -11,13 +11,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Achievement, AchievementCategory } from '../../types';
-import { useAchievements } from '../../hooks';
+import { useAchievements, useReferral } from '../../hooks';
 import { Typography } from '../../components/ui/Typography';
 import { ErrorState } from '../../components/feedback/ErrorState';
+import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import {
   AlbumsIcon, BackIcon, BookIcon, BookmarkIcon, BuildingIcon,
   CheckCircleIcon, CompassIcon, FlameIcon, FolderIcon, LockIcon,
-  SparklesIcon, StarIcon, TrophyIcon, UsersIcon,
+  ShareIcon, SparklesIcon, StarIcon, TrophyIcon, UsersIcon,
 } from '../../components/icons';
 import { useTheme, palette, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
 
@@ -67,7 +68,7 @@ function StatusBadge({ achievement: a }: { achievement: Achievement }) {
 
 // ── Achievement card ─────────────────────────────────────────────────────────
 
-function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achievement; colors: ReturnType<typeof useTheme>['colors']; isDark: boolean }) {
+function AchievementCard({ achievement: a, colors, isDark, onShare }: { achievement: Achievement; colors: ReturnType<typeof useTheme>['colors']; isDark: boolean; onShare?: () => void }) {
   const Icon = ICON_BY_KEY[a.icon] ?? TrophyIcon;
   const isLocked = !a.unlocked && a.progress === 0;
 
@@ -82,6 +83,11 @@ function AchievementCard({ achievement: a, colors, isDark }: { achievement: Achi
             {a.title}
           </Typography>
           <StatusBadge achievement={a} />
+          {a.unlocked && onShare && (
+            <Pressable onPress={onShare} hitSlop={8} style={styles.shareBtn} accessibilityRole="button">
+              <ShareIcon size={18} color={colors.textSecondary} />
+            </Pressable>
+          )}
         </View>
 
         <Typography preset="caption" color={colors.textSecondary} style={styles.cardDesc}>
@@ -120,6 +126,18 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   const isDark = theme.name === 'dark';
   const insets = useSafeAreaInsets();
   const { data: achievements = [], isLoading, error, refetch } = useAchievements();
+  const { data: referral } = useReferral();
+
+  const shareAchievement = (a: Achievement) => {
+    shareToWhatsApp(
+      t('profile:achievements.shareMessage', {
+        title: a.title,
+        url: buildReferralLink(referral?.code),
+        defaultValue: 'I just unlocked "{{title}}" on Verdance 📖✨ Join me: {{url}}',
+      }),
+      'achievement',
+    );
+  };
 
   const unlockedCount = useMemo(() => achievements.filter(a => a.unlocked).length, [achievements]);
   const remaining = achievements.length - unlockedCount;
@@ -195,7 +213,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
                 {t(`profile:achievements.categories.${category}`, CATEGORY_LABELS[category])}
               </Typography>
               {items.map(a => (
-                <AchievementCard key={a.key} achievement={a} colors={colors} isDark={isDark} />
+                <AchievementCard key={a.key} achievement={a} colors={colors} isDark={isDark} onShare={() => shareAchievement(a)} />
               ))}
             </View>
           ))}
@@ -292,6 +310,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cardTitle: { flex: 1 },
+  shareBtn: { padding: spacing.xs },
   cardDesc: {
     marginTop: spacing.sm,
     lineHeight: 18,

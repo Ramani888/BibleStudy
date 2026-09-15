@@ -36,6 +36,9 @@
     "study": "Study",
     "smartScheduling": "Smart scheduling (FSRS)",
     "smartSchedulingHint": "Fewer reviews for the same recall. Off = classic SM-2.",
+    "privacy": "Privacy",
+    "shareAnalytics": "Share usage data",
+    "shareAnalyticsHint": "Anonymous app-usage stats that help us improve Verdance. No ads, never shared.",
     "account": "Account",
     "signOut": "Sign Out",
     "deleteAccount": "Delete Account",
@@ -334,6 +337,7 @@
     "unlocked": "{{count}} unlocked",
     "locked": "Locked",
     "remaining": "{{count}} remaining",
+    "shareMessage": "I just unlocked \"{{title}}\" on Verdance 📖✨ Join me: {{url}}",
     "categories": {
       "study": "Study",
       "quiz": "Quiz",
@@ -357,7 +361,7 @@
     "billedAnnually": "Billed annually",
     "billedMonthly": "Billed monthly",
     "premium": "Premium",
-    "tagline": "Bible study is free. Credits unlock AI assistance.",
+    "tagline": "Turn any verse, topic, or PDF into flashcards & quizzes. Credits power the AI that builds them.",
     "freePlan": "Free Plan",
     "currentPlan": "Current Plan",
     "restore": "Restore Purchases",
@@ -371,5 +375,21 @@
   },
   "share": {
     "inviteMessage": "I'm using Verdance to study the Bible — flashcards, quizzes, and daily streaks. Join me: https://getverdance.com"
+  },
+  "invite": {
+    "title": "Invite friends",
+    "headline": "Give {{n}}, get {{n}} credits",
+    "subtitle": "Share your code. When a friend signs up with it, you both get free credits.",
+    "yourCode": "Your code",
+    "loadError": "Couldn’t load — tap to retry",
+    "shareWhatsApp": "Share",
+    "copied": "Code copied",
+    "redeemed": "+{{n}} credits added!",
+    "joinedCount": "{{count}} friends joined so far 🎉",
+    "gotCode": "Got a code from a friend?",
+    "gotCodeHint": "Enter it to get {{n}} free credits.",
+    "enterCode": "Enter code",
+    "applyCode": "Apply code",
+    "shareMessage": "Join me on Verdance — AI Bible-study flashcards & quizzes 📖✨ Use my code {{code}} when you sign up and we both get free credits! {{url}}"
   }
 }

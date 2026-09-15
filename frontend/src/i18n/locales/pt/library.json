@@ -191,6 +191,7 @@
   },
   "plans": {
     "title": "Planos de Estudo",
+    "shareMessage": "Estudando \"{{title}}\" no Verdance 📖 Quer participar comigo? {{url}}",
     "newPlan": "Novo Plano",
     "createPlan": "Criar Plano de Estudo",
     "planCreated": "Plano criado",

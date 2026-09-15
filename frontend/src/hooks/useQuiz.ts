@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
 import { quizApi } from '../api';
 import { cardsApi } from '../api';
+import { track } from '../lib/analytics';
 import type { RecordAttemptPayload } from '../types';
 import type { Card } from '../types/card.types';
 
@@ -61,7 +62,10 @@ export function useQuizAttemptSave(retakeAttemptId?: string) {
 
   const create = useMutation({
     mutationFn: (payload: RecordAttemptPayload) => quizApi.recordAttempt(payload),
-    onSuccess: invalidate,
+    onSuccess: (_, payload) => {
+      invalidate();
+      track('quiz_completed', { total: payload.total, correct: payload.correct, mode: payload.mode ?? null });
+    },
   });
 
   const update = useMutation({

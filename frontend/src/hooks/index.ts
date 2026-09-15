@@ -27,7 +27,7 @@ export {
   useMoveCard,
   useReorderCards,
 } from './useCards';
-export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak } from './useCredits';
+export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak, useReferral, useRedeemReferral } from './useCredits';
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useWeeklyChart } from './useWeeklyChart';

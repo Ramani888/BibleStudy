@@ -11,7 +11,7 @@ import { Switch, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { BookIcon, FileTextIcon, GlobeIcon, InfoIcon, LogOutIcon, StarOutlineIcon, TrashIcon } from '../../components/icons';
-import { useAuthStore } from '../../store';
+import { useAuthStore, useAnalyticsStore } from '../../store';
 import { useConfirmDialog, useUpdateProfile } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { spacing, useTheme, useThemeStore } from '../../theme';
@@ -31,6 +31,8 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   const useFsrs = useAuthStore(s => s.user?.useFsrs ?? false);
   const updateProfile = useUpdateProfile();
   const handleFsrsToggle = useCallback((v: boolean) => updateProfile.mutate({ useFsrs: v }), [updateProfile]);
+  const analyticsEnabled = useAnalyticsStore(s => s.enabled);
+  const setAnalyticsEnabled = useAnalyticsStore(s => s.setEnabled);
   const setMode = useThemeStore(s => s.setMode);
   const currentLang = useLanguageStore(s => s.language);
   const setLanguage = useLanguageStore(s => s.setLanguage);
@@ -113,6 +115,18 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
                 <Typography preset="caption" color={colors.textSecondary}>{t('profile:settings.smartSchedulingHint', 'Fewer reviews for the same recall. Off = classic SM-2.')}</Typography>
               </View>
               <Switch value={useFsrs} onValueChange={handleFsrsToggle} />
+            </View>
+          </MenuSection>
+        </View>
+
+        <View>
+          <MenuSection label={t('profile:settings.privacy', 'Privacy')}>
+            <View style={styles.themeRow}>
+              <View style={styles.fsrsLabel}>
+                <Typography preset="label" color={colors.textPrimary}>{t('profile:settings.shareAnalytics', 'Share usage data')}</Typography>
+                <Typography preset="caption" color={colors.textSecondary}>{t('profile:settings.shareAnalyticsHint', 'Anonymous app-usage stats that help us improve Verdance. No ads, never shared.')}</Typography>
+              </View>
+              <Switch value={analyticsEnabled} onValueChange={setAnalyticsEnabled} />
             </View>
           </MenuSection>
         </View>

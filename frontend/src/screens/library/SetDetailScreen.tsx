@@ -479,7 +479,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           {
             label: t('library:setDetail.shareWhatsApp', 'Share to WhatsApp'),
             icon: ShareIcon,
-            onPress: () => { setShareSheetOpen(false); shareToWhatsApp(buildShareMessage()); },
+            onPress: () => { setShareSheetOpen(false); shareToWhatsApp(buildShareMessage(), 'set'); },
           },
           {
             label: t('common:actions.more', 'More…'),

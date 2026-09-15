@@ -67,6 +67,7 @@ export type ProfileStackParamList = {
   Paywall: undefined;
   Achievements: undefined;
   Settings: undefined;
+  InviteFriends: undefined;
   // Friends
   Friends: undefined;
   Leaderboard: undefined;
