@@ -56,9 +56,16 @@ The credit economy that gates AI usage.
 - Model: `User` holds the plan + `creditBalance`; transactions form the ledger.
 - Purchased/subscription credits are granted by [[Module - Subscriptions]].
 
+### Referrals (growth, 2026-09-15)
+- `User.referralCode` (unique, lazy-generated 6-char) + `referredById` (self-relation, FK ON DELETE SET NULL).
+- `GET /credits/referral` → own code + `referredCount` (lazy-gens the code on first call).
+- `POST /credits/referral/redeem` → redeem-a-code, **once per account** (`referredById` fence, Serializable txn). Grants `NEW_USER_REWARD`(5) to redeemer + `REFERRER_REWARD`(5) to inviter up to `REFERRER_CAP`(25). Blocks self/invalid/double-redeem. Reward constants live in `credits.service.ts`.
+- No deferred-deep-link infra — friend enters the code manually (share link carries `?ref=CODE` for later). Shipped + prod-migrated.
+
 ## Client
-- Hooks: `useAI`, `useCredits`, `useAutoDailyClaim` — see [[Hooks & API Layer]].
-- Screens: AIChat, ChatHistory (sessions + bookmarks), Credits — see [[Screen Map]].
+- Hooks: `useAI`, `useCredits` (incl. `useReferral`/`useRedeemReferral`), `useAutoDailyClaim` — see [[Hooks & API Layer]].
+- Screens: AIChat, ChatHistory (sessions + bookmarks), Credits, **InviteFriends** (referral code + WhatsApp share + redeem) — see [[Screen Map]].
+- **Analytics:** PostHog (`lib/analytics.ts`, US cloud) fires `referral_signup` on redeem, `share_tapped` on WhatsApp shares — see [[growth_features_impl]] in memory.
 
 ## Notes
 - `AIChatSession` + `Bookmark` + `AIChat.sessionId`/`suggestedCards` were added
