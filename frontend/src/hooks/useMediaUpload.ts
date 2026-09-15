@@ -5,6 +5,7 @@ import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import DocumentPicker from 'react-native-document-picker';
 import { useUploadMedia } from './index';
 import { getErrorMessage } from '../api/client';
+import { ensureCameraPermission } from '../utils/permissions';
 
 export function useMediaUpload() {
   const { t } = useTranslation(['common', 'profile']);
@@ -25,7 +26,7 @@ export function useMediaUpload() {
   }, [uploadMedia, t]);
 
   const handlePickImage = useCallback(async () => {
-    const result = await launchImageLibrary({ mediaType: 'photo', quality: 1 });
+    const result = await launchImageLibrary({ mediaType: 'photo', quality: 0.8, maxWidth: 2048, maxHeight: 2048 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
       Toast.show({ type: 'error', text1: t('profile:media.photoPermissionDenied', 'Photo library permission denied. Enable it in Settings.') });
@@ -42,7 +43,11 @@ export function useMediaUpload() {
   }, [doUpload, t]);
 
   const handlePickFromCamera = useCallback(async () => {
-    const result = await launchCamera({ mediaType: 'photo', quality: 1 });
+    if (!(await ensureCameraPermission())) {
+      Toast.show({ type: 'error', text1: t('profile:media.cameraPermissionDenied', 'Camera permission denied. Enable it in Settings.') });
+      return;
+    }
+    const result = await launchCamera({ mediaType: 'photo', quality: 0.8, maxWidth: 2048, maxHeight: 2048 });
     if (result.didCancel) return;
     if (result.errorCode === 'permission') {
       Toast.show({ type: 'error', text1: t('profile:media.cameraPermissionDenied', 'Camera permission denied. Enable it in Settings.') });

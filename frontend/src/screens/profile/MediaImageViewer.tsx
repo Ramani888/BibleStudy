@@ -98,6 +98,14 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
           initialScrollIndex={initialIndex}
           getItemLayout={(_, i) => ({ length: W, offset: W * i, index: i })}
           onMomentumScrollEnd={onMomentumEnd}
+          onScrollToIndexFailed={({ index }) => {
+            // getItemLayout normally makes this unreachable; recover if layout races.
+            requestAnimationFrame(() => flatRef.current?.scrollToIndex({ index, animated: false }));
+          }}
+          windowSize={3}
+          maxToRenderPerBatch={2}
+          initialNumToRender={1}
+          removeClippedSubviews
         />
 
         {/* Counter */}
