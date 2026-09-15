@@ -46,6 +46,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { data: allSets = [] } = useSets();
   const { data: masteryRows } = useMastery();
   const setMastery = masteryRows?.find(m => m.setId === setId);
+  const [masteryInfo, setMasteryInfo] = useState(false);
   const { mutateAsync: deleteCardAsync } = useDeleteCard(setId);
   const { show, dialogProps } = useConfirmDialog();
   const { mutate: copyCard }   = useCopyCard(setId);
@@ -260,11 +261,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       {(!isStory || item.question) ? (
       <View style={[styles.questionSection, { borderBottomColor: colors.border }, cardLayout === 'grid' && styles.questionSectionGrid]}>
         <View style={styles.questionHeader}>
-          <Typography preset="caption" color={colors.textDisabled}>{isStory ? t('library:cards.reference', 'Reference') : t('library:cards.question', 'Question')}</Typography>
+          <Typography preset="caption" color={colors.textDisabled} numberOfLines={1} style={styles.questionLabel}>{isStory ? t('library:cards.reference', 'Reference') : t('library:cards.question', 'Question')}</Typography>
           {isOwner ? (
             <View style={styles.cardActions}>
               <Pressable onPress={() => { setNoteCard(item); setNoteText(item.note ?? ''); }} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
-                <InfoIcon size={ICON_SIZE} color={colors.textSecondary} />
+                <InfoIcon size={ICON_SIZE} color={item.note ? colors.accent : colors.textSecondary} />
               </Pressable>
               <Pressable onPress={() => handleBlurToggle(item)} hitSlop={6} style={({ pressed }) => [styles.iconBtn, pressed && styles.iconPressed]}>
                 {item.isBlurred ? <EyeOffIcon size={ICON_SIZE} color={colors.textSecondary} /> : <EyeIcon size={ICON_SIZE} color={colors.textSecondary} />}
@@ -297,15 +298,6 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
             <Typography preset="body" color={colors.textSecondary} style={styles.answer} numberOfLines={cardLayout === 'grid' ? 2 : undefined}>
               {item.answer}
             </Typography>
-            {item.note && cardLayout === 'list' ? (
-              <>
-                <Divider marginV={spacing.sm} />
-                <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.note', 'Note')}</Typography>
-                <Typography preset="bodySm" color={colors.textSecondary} style={styles.note}>
-                  {item.note}
-                </Typography>
-              </>
-            ) : null}
           </>
         )}
       </View>
@@ -364,7 +356,16 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       {!reorderMode && cards.length > 0 && setMastery && setMastery.total > 0 && (
         <View style={styles.masteryWrap}>
           <View style={styles.masteryHeader}>
-            <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.mastery', 'Mastery')}</Typography>
+            <Pressable
+              onPress={() => setMasteryInfo(v => !v)}
+              hitSlop={8}
+              style={styles.masteryLabel}
+              accessibilityRole="button"
+              accessibilityLabel={t('library:cards.masteryInfoA11y', 'What is mastery?')}
+            >
+              <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.mastery', 'Mastery')}</Typography>
+              <InfoIcon size={14} color={masteryInfo ? colors.accent : colors.textSecondary} />
+            </Pressable>
             <Typography preset="caption" color={colors.textSecondary}>
               {t('library:cards.masteryCount', { learned: setMastery.learned, total: setMastery.total, defaultValue: `${setMastery.learned}/${setMastery.total} learned` })}
             </Typography>
@@ -372,6 +373,11 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           <View style={[styles.masteryTrack, { backgroundColor: colors.surfaceMuted }]}>
             <View style={[styles.masteryFill, { width: `${setMastery.masteryPct}%` as `${number}%`, backgroundColor: colors.accent }]} />
           </View>
+          {masteryInfo && (
+            <Typography preset="caption" color={colors.textSecondary}>
+              {t('library:cards.masteryInfo', 'A card is “learned” once you’ve quizzed it enough that it’s not due again for 21+ days. This bar tracks your long-term retention for this set.')}
+            </Typography>
+          )}
         </View>
       )}
       {reorderMode ? (
@@ -511,7 +517,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
 const styles = StyleSheet.create({
   masteryWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.sm, paddingBottom: spacing.md, gap: spacing.xs },
-  masteryHeader: { flexDirection: 'row', justifyContent: 'space-between' },
+  masteryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  masteryLabel: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
   masteryTrack: { height: layout.progressBarHeight, borderRadius: layout.progressBarHeight / 2, overflow: 'hidden' },
   masteryFill: { height: '100%', borderRadius: layout.progressBarHeight / 2 },
   reorderBar: {
@@ -553,14 +560,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   question: { fontWeight: fontWeights.medium, lineHeight: fontSizes.md * lineHeights.normal },
-  cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  questionLabel: { flex: 1, marginRight: spacing.xs },
+  cardActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, flexShrink: 0 },
   iconBtn: { padding: spacing.xs },
   answerSection: {
     padding: spacing.lg,
     gap: spacing.sm,
   },
   answer: { lineHeight: fontSizes.md * lineHeights.normal },
-  note: { lineHeight: 20 }, // ponytail: off-grid Figma value
   blurOverlay: { alignItems: 'center', paddingVertical: spacing.sm },
   // space-between + fixed half-width so an odd last card stays half-width
   // (left column) instead of stretching to fill the row. flex-start keeps each

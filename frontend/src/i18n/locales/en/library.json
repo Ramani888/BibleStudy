@@ -106,6 +106,8 @@
     "cardCount_other": "{{count}} cards",
     "mastery": "Mastery",
     "masteryCount": "{{learned}}/{{total}} learned",
+    "masteryInfo": "A card is “learned” once you’ve quizzed it enough that it’s not due again for 21+ days. This bar tracks your long-term retention for this set.",
+    "masteryInfoA11y": "What is mastery?",
     "cardAdded": "Card added!",
     "cardUpdated": "Card updated!",
     "cardDeleted": "Card deleted",

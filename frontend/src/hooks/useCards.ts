@@ -59,6 +59,7 @@ export function useCreateCard() {
     mutationFn: (payload: CreateCardPayload) => cardsApi.create(payload),
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['cards', vars.setId] });
+      qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
       qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
@@ -70,6 +71,7 @@ export function useBulkCreateCards() {
     mutationFn: (payload: BulkCreateCardPayload) => cardsApi.bulkCreate(payload),
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['cards', vars.setId] });
+      qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
       qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
@@ -93,6 +95,7 @@ export function useDeleteCard(setId: string) {
     mutationFn: (id: string) => cardsApi.delete(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
       qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
@@ -104,6 +107,7 @@ export function useCopyCard(setId: string) {
     mutationFn: (id: string) => cardsApi.copy(id),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['cards', setId] });
+      qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
       qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
@@ -117,6 +121,7 @@ export function useMoveCard(setId: string) {
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ['cards', setId] });
       qc.invalidateQueries({ queryKey: ['cards', vars.payload.targetSetId] });
+      qc.invalidateQueries({ queryKey: ['cards', 'mastery'] });
       qc.invalidateQueries({ queryKey: ['sets'] });
     },
   });
