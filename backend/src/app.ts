@@ -59,11 +59,8 @@ app.use(
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Serve uploaded media files — only in local storage mode. In s3 mode media is
-// served via presigned URLs, so this public static route is not mounted.
-if (env.MEDIA_STORAGE === 'local') {
-  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
-}
+// Serve uploaded media files
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // Global rate limit
 app.use(generalRateLimit);

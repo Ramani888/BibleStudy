@@ -1,12 +1,15 @@
 import { randomUUID } from 'crypto';
+import fs from 'fs/promises';
+import path from 'path';
 import { Prisma } from '@prisma/client';
 import sharp from 'sharp';
 import { prisma } from '../../config/db';
-import { canonicalUrl, deleteObject, getFileUrl, putObject } from '../../config/storage';
+import { env } from '../../config/env';
 import { AppError, NotFoundError } from '../../utils/errors';
 import type { ListMediaDtoType } from './media.dto';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
+const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -67,17 +70,19 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
   const displayName = `${baseName}.${ext}`;
   const subDir      = isPdf ? 'pdfs' : 'images';
   const key         = `users/${userId}/${subDir}/${uuid}.${ext}`;
-  const url         = canonicalUrl(key);
+  const filePath    = path.join(UPLOADS_DIR, key);
+  const url         = `${env.APP_URL}/uploads/${key}`;
 
-  // Write to storage (disk or object storage, per MEDIA_STORAGE).
-  await putObject(key, buffer, mimeType);
+  // Write to disk
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, buffer);
 
   // Persist record + update quota atomically.
   // The conditional UPDATE is the real quota enforcement — closes the race window where
   // two concurrent uploads both pass the pre-check before either has incremented.
-  // If the DB step fails after storing the object, clean up the orphan.
+  // If the DB step fails after writing to disk, clean up the orphaned file.
   try {
-    const created = await prisma.$transaction(async (tx) => {
+    return await prisma.$transaction(async (tx) => {
       const affected = await tx.$executeRaw`
         UPDATE "User"
         SET    "storageUsed" = "storageUsed" + ${finalSize}::bigint
@@ -115,28 +120,24 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
         },
       });
     });
-    // Return a fresh servable url (presigned in s3 mode) rather than the stored canonical.
-    return { ...created, url: await getFileUrl(key) };
   } catch (dbError) {
-    await deleteObject(key).catch(() => {});
+    await fs.unlink(filePath).catch(() => {});
     throw dbError;
   }
 }
 
 export async function listFiles(userId: string, dto: ListMediaDtoType) {
-  const files = await prisma.mediaFile.findMany({
+  return prisma.mediaFile.findMany({
     where: { userId, ...(dto.type && { type: dto.type }) },
     orderBy: { createdAt: 'desc' },
   });
-  // Derive a fresh servable url per file (presigned + expiring in s3 mode).
-  return Promise.all(files.map(async f => ({ ...f, url: await getFileUrl(f.key) })));
 }
 
 export async function deleteFile(userId: string, fileId: string) {
   const file = await prisma.mediaFile.findFirst({ where: { id: fileId, userId } });
   if (!file) throw new NotFoundError('Media file not found');
 
-  // DB first — if this fails the object in storage is untouched (consistent state).
+  // DB first — if this fails the file on disk is untouched (consistent state).
   await prisma.$transaction([
     prisma.mediaFile.delete({ where: { id: fileId } }),
     prisma.user.update({
@@ -145,9 +146,10 @@ export async function deleteFile(userId: string, fileId: string) {
     }),
   ]);
 
-  // Object delete after DB — if it fails the object is orphaned but removed from listing.
-  await deleteObject(file.key).catch(err => {
-    console.error(`[media] storage delete failed for key ${file.key}:`, err);
+  // Disk delete after DB — if it fails the file is orphaned but removed from listing.
+  const filePath = path.join(UPLOADS_DIR, file.key);
+  await fs.unlink(filePath).catch(err => {
+    console.error(`[media] disk delete failed for key ${file.key}:`, err);
   });
 
   return { message: 'File deleted successfully' };
@@ -157,8 +159,7 @@ export async function renameFile(userId: string, fileId: string, name: string) {
   const file = await prisma.mediaFile.findFirst({ where: { id: fileId, userId } });
   if (!file) throw new NotFoundError('Media file not found');
   try {
-    const updated = await prisma.mediaFile.update({ where: { id: fileId }, data: { name } });
-    return { ...updated, url: await getFileUrl(updated.key) };
+    return await prisma.mediaFile.update({ where: { id: fileId }, data: { name } });
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2025') {
       throw new NotFoundError('Media file not found');
@@ -167,11 +168,13 @@ export async function renameFile(userId: string, fileId: string, name: string) {
   }
 }
 
-/** Best-effort storage cleanup of every file a user owns. Call BEFORE the DB rows are
+/** Best-effort disk cleanup of every file a user owns. Call BEFORE the DB rows are
  *  removed (e.g. account deletion) — the cascade only frees DB rows, not the bytes. */
 export async function deleteUserFilesFromDisk(userId: string) {
   const files = await prisma.mediaFile.findMany({ where: { userId }, select: { key: true } });
-  await Promise.all(files.map(f => deleteObject(f.key).catch(() => {})));
+  await Promise.all(files.map(f =>
+    fs.unlink(path.join(UPLOADS_DIR, f.key)).catch(() => {}),
+  ));
 }
 
 export async function getStorageUsage(userId: string) {
