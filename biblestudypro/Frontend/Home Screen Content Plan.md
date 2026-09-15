@@ -42,7 +42,7 @@ Get the user straight into today's study, show momentum, and surface community �
 - Get Started 3-card block — removed in favour of hero empty state
 
 ## Excluded (and why)
-- **Map / gatherings** — feature unreachable (no FE screens mounted)
+- **Groups / Gatherings / Map** — fully removed (deferred post-launch); no backend, hooks, or screens
 - **Notes / Media shortcuts** — personal utilities, belong in Profile
 - **Study Plan progress** — not yet surfaced on Home (future addition)
 

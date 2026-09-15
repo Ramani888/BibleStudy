@@ -25,10 +25,10 @@ This repo has two knowledge graphs — prefer them for exploration; they're chea
 | IAP | react-native-iap v16 (+ react-native-nitro-modules) |
 
 ## Backend
-Base URL `/api/v1`. **16 modules**, each `backend/src/modules/<m>/` with the same 4 files:
+Base URL `/api/v1`. **17 modules**, each `backend/src/modules/<m>/` with the same 4 files:
 `<m>.routes.ts` · `<m>.controller.ts` · `<m>.service.ts` (owns ALL Prisma) · `<m>.dto.ts` (zod):
 `auth`, `users`, `folders`, `sets`, `cards`, `ai`, `credits`, `friends`, `activities`,
-`notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`.
+`notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`, `waitlist`.
 
 - Prisma access lives ONLY in `*.service.ts` — controllers/routes never call Prisma directly.
 - Every new module must be mounted in `backend/src/app.ts` and get a migration via `prisma migrate dev`.
@@ -42,13 +42,13 @@ frontend/src/
   components/  # ui/ feedback/ forms/ domain/  (custom lib — no 3rd-party UI kit)
   hooks/       # use<Feature>.ts — React Query wrappers (one per module + usePickMedia, useSubscription…)
   navigation/  # RootNavigator → AuthNavigator | AppNavigator (5 tabs)
-  screens/     # auth/ onboarding/ home/ library/ ai/ profile/ quiz/  (~49 screens)
+  screens/     # auth/ onboarding/ home/ library/ ai/ profile/ quiz/  (~67 screens)
   store/       # auth.store.ts, aiChat.store.ts (Zustand)
   theme/ types/ utils/
 ```
 Tabs: **Home**, **Library** (sets/cards/study/quiz + study plans), **Quiz**, **AI**, **Profile**
 (hosts social + credits/subscriptions + gamification). Studying/review = **Quiz** (`SetDetail` is a card
-manager; there is **no** StudyScreen and `FlashCard.tsx` is dead code). Group plan detail + Paywall + Leaderboard + Achievements live
+manager; there is **no** StudyScreen and no flip-card review screen — `FlashCard.tsx` was removed). Paywall + Leaderboard + Achievements live
 under the Profile stack.
 
 **Safe-area:** stack navigators use `headerShown:false` + custom in-screen header. Tab-hosted screens
@@ -98,7 +98,7 @@ use `edges={['bottom']}`/all-edges on a tab-hosted screen.
   responses into `cards.service.applyReviews` (correct→q5, wrong→q2), which writes `Card.interval`/`ease`/
   `nextReviewAt`/`lastStudiedAt`. `getDueSummary` reads it, so Home's "due" count works. Ceilings: cards that
   were never quizzed have `nextReviewAt=null` (not counted as due); a wrong card reschedules +1 day (no sub-day
-  learning steps yet). `FlashCard.tsx` is dead code — review happens in Quiz, not a flip screen.
+  learning steps yet). `FlashCard.tsx` was removed — review happens in Quiz, not a flip screen.
 - **Map + Gatherings + Groups**: not implemented — no backend modules, no frontend hooks, no screens, no nav routes. Deferred to post-launch.
 - **Media chat needs a funded Anthropic account** (media routes to paid Claude); errors cleanly, charges nothing, when unfunded.
 - **IAP purchases** need App Store Connect products + `APPLE_IAP_SHARED_SECRET` before they work (see `IAP_SETUP.md`). Google verify is a stub.

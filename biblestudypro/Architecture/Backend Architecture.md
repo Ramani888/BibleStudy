@@ -15,12 +15,11 @@ app.ts             → express app: CORS, json(10mb), rate limit, /health, route
 config/
   db.ts            → PrismaClient singleton (+ connectDB/disconnectDB)
   env.ts           → validated environment config
-  s3.client.ts     → Hetzner S3-compatible client for media
 middlewares/
   auth.middleware.ts      → verifies JWT access token, attaches req.user
   rateLimit.middleware.ts → generalRateLimit (global) + per-route limits
   validate.middleware.ts  → runs a zod DTO against req, 422 on failure
-modules/<feature>/ → the 15 feature modules (see below)
+modules/<feature>/ → the 17 feature modules (see below)
 utils/
   jwt.ts           → sign/verify access & refresh tokens
   email.ts         → OTP / transactional email (Gmail SMTP)

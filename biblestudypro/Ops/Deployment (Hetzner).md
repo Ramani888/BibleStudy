@@ -13,7 +13,7 @@ tags: [ops, deployment]
 - **Server ID:** 161773426
 - **Stack:** Node.js 22, PM2, PostgreSQL 16, Caddy 2.x
 - **Firewall:** ports 22, 80, 443, ICMP
-- **Media storage:** Server local disk (40 GB SSD) — no Object Storage on new account
+- **Media storage:** Server local disk under `/uploads` (40 GB SSD), proxied by Caddy to Express static — no Object Storage / S3
 
 ## Deploy loop
 SSH as `root@94.130.176.8` → pull → rebuild → `pm2 reload`

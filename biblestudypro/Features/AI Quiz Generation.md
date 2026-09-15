@@ -173,4 +173,4 @@ Type-check both ends: `cd backend && npx tsc --noEmit` && `cd frontend && npx ts
 3. Type-check → commit. Update `APP_SCOPE.md`, [[Quiz]], this note, memory.
 
 ## Related
-[[Quiz]] · [[AI Chat]] · [[Credits & Subscriptions]] · [[Study Core]]
+[[Quiz]] · [[AI Chat]] · [[Credits & Subscriptions]]

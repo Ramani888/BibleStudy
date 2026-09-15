@@ -125,4 +125,4 @@ half of the weekly growth loop; the push half is [[Push Notifications]] `jobs/sh
 - Meditation-parity audit passed (Check 12 was the only violation — now fixed)
 
 ## Related
-[[AI Chat]] · [[Study Core]] · [[Gamification]] · [[Navigation & Architecture]] · [[Social]] · [[Architecture Overview]] · [[Database Schema]]
+[[AI Chat]] · [[Quiz]] · [[Gamification]] · [[Navigation & Architecture]] · [[Social]] · [[Architecture Overview]] · [[Database Schema]]

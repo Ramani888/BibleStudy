@@ -9,7 +9,7 @@ updated: 2026-09-13
 Knowledge vault for **BibleStudyPro** — an AI-assisted Bible-study flashcard app
 with a monetization layer (credits + IAP subscriptions), gamification, study
 plans, and a social/community layer. Full-stack: **Node/Express/Prisma/PostgreSQL**
-backend (17 modules) + **React Native 0.84 / React 19** app (~49 screens).
+backend (17 modules) + **React Native 0.84 / React 19** app (~67 screens).
 
 > This is a *code brain*, not a design vault — it documents how the system is
 > built, feature by feature, including edge cases. Notes are cross-linked; open
@@ -19,7 +19,7 @@ backend (17 modules) + **React Native 0.84 / React 19** app (~49 screens).
 - [[Rules]] — project conventions + process (source of truth: repo `CLAUDE.md`)
 
 ## ⭐ Features (screens · functionality · edge cases)
-- [[Auth & Account]] · [[Home Dashboard]] · [[Study Core]] · [[Quiz]]
+- [[Auth & Account]] · [[Home Dashboard]] · [[Quiz]]
 - [[AI Chat]] · [[Credits & Subscriptions]] · [[Gamification]] · [[Study Plans]]
 - [[Social]] · [[Notes & Media]]
 

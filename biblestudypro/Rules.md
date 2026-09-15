@@ -11,7 +11,7 @@ updated: 2026-08-08
 > update it first, then sync this note.
 
 ## Architecture invariants
-- Backend: 16 modules, each `modules/<m>/` with `routes`/`controller`/`service`/`dto`. **Prisma lives only in `service.ts`.** (`groups`, `gatherings`, `map` are deferred — not implemented.)
+- Backend: 17 modules, each `modules/<m>/` with `routes`/`controller`/`service`/`dto`. **Prisma lives only in `service.ts`.** (`groups`, `gatherings`, `map` were removed — deferred post-launch.)
 - New module ⇒ mount in `app.ts` + a Prisma migration.
 - Achievements are **code-defined** (`achievements.defs.ts` + `computeMetrics`); only unlocks persist (`UserAchievement`).
 - Studying/review = **Quiz** (Home "DUE" → `QuizSetup` preselected). `SetDetail` is a card *manager*; there is no StudyScreen and `FlashCard.tsx` is dead code.

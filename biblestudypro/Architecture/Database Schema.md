@@ -29,7 +29,7 @@ timeline & the 2026-08-04 reconciliation: [[Migration History]].
 - **MediaFile** — uploaded media (image/PDF) in S3: `key` (unique), `url`,
   `mimeType`, `sizeBytes`, `type` (MediaType). Replaced the old `File` table.
 - **QuizAttempt** — a finished quiz's result: `userId`, `setId`, `total`,
-  `correct`, `scorePct`. One row per completed quiz. See [[Quiz Feature]].
+  `correct`, `scorePct`. One row per completed quiz. See [[Quiz]].
 
 ### Study plans (see [[Study Plans]])
 - **StudyPlan** — an ordered plan owned by a User: `title`, `description`,
@@ -62,9 +62,6 @@ timeline & the 2026-08-04 reconciliation: [[Migration History]].
 - **FriendRequest** — pending/accepted/declined (`FriendRequestStatus`).
 - **Friendship** — established mutual friendship.
 - **Block** — user blocks (indexed by `blockedId`).
-- **Group** — a study group; **GroupMember** join table with `GroupRole`.
-- **Gathering** — an in-person event with location; **GatheringParticipant**
-  join with `ParticipantStatus`; `LocationPrivacy` controls map exposure.
 - **Activity** — activity-feed entries (`ActivityType`, incl. `CREATED_CARD`).
 - **Notification** — in-app notifications.
 
@@ -72,8 +69,11 @@ timeline & the 2026-08-04 reconciliation: [[Migration History]].
 
 `CardType` · `Plan` (FREE|STARTER|PRO) · `Store` (APPLE|GOOGLE) · `Platform` ·
 `Visibility` · `CardLayout` · `Difficulty` · `TransactionType` ·
-`MediaType` (IMAGE|PDF) · `FriendRequestStatus` · `GroupRole` ·
-`ParticipantStatus` · `LocationPrivacy` · `ActivityType`
+`MediaType` (IMAGE|PDF) · `FriendRequestStatus` · `ActivityType`
+
+> `Group`/`GroupMember`/`Gathering`/`GatheringParticipant` models and the
+> `GroupRole`/`ParticipantStatus`/`LocationPrivacy` enums were removed
+> (Groups/Gatherings/Map deferred post-launch).
 
 ## Key relational facts
 

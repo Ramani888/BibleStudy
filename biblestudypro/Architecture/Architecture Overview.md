@@ -12,9 +12,8 @@ client (no Expo) talking to a **Node.js + Express 4 + TypeScript** API backed by
 It is three products in one codebase:
 1. **Study core** — flashcard sets/cards organised in folders, an AI Bible
    assistant, a credit economy, quiz, study plans, notes, and media uploads.
-2. **Social layer** — friends, groups, an activity feed, and push notifications.
-   (An in-person "gatherings on a map" feature exists in the backend but its
-   frontend was deleted — see below.)
+2. **Social layer** — friends, an activity feed, and push notifications.
+   (Groups/Gatherings/Map were fully removed — deferred post-launch.)
 3. **Monetization arc** — a free-tier credit economy that graduates into IAP
    subscriptions (`STARTER`/`PRO`), plus gamification (achievements, streaks,
    leaderboard) and study plans to drive retention and church/group revenue.
@@ -30,7 +29,7 @@ It is three products in one codebase:
 | API | Express 4 + `express-async-errors`, modular routers — see [[Backend Architecture]] |
 | ORM | Prisma 5 / PostgreSQL 16 — see [[Database Schema]] |
 | Auth | JWT access + refresh, OTP email verify — see [[Auth & Token Flow]] |
-| Media | S3-compatible (Hetzner Object Storage) via `s3.client.ts` |
+| Media | local disk `/uploads`, served by `express.static` |
 | Hosting | Hetzner CX23 VPS + Caddy + PM2 (currently stopped) — see [[Deployment (Hetzner)]] |
 
 ## Request flow (end to end)
@@ -47,17 +46,17 @@ Return path is the reverse; services return raw data, controllers wrap it via
 
 ## Backend module inventory
 
-**19** feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
+**17** feature modules under `backend/src/modules/`, each mounted under `/api/v1/*`:
 
 `auth` · `users` · `folders` · `sets` · `cards` · `ai` · `credits` ·
-`subscriptions` · `achievements` · `plans` · `friends` · `groups` ·
-`gatherings` · `map` · `activities` · `notifications` · `notes` · `media` ·
-`quiz`
+`subscriptions` · `achievements` · `plans` · `friends` · `activities` ·
+`notifications` · `notes` · `media` · `quiz` · `waitlist`
 
-The three additions since the 16-module baseline are `subscriptions` (IAP
+The additions since the 16-module baseline are `subscriptions` (IAP
 entitlements — [[Credits & Subscriptions]]), `achievements`
-([[Gamification]]), and `plans` (personal & group study plans —
-[[Study Plans]]). `map` + `gatherings` remain backend-only (no frontend).
+([[Gamification]]), `plans` (personal & group study plans —
+[[Study Plans]]), and `waitlist`. `groups`/`gatherings`/`map` were fully
+removed (deferred post-launch).
 
 Grouped in this brain as: [[Module - Auth & Users]],
 [[Module - Library (Folders, Sets, Cards)]], [[Module - AI & Credits]],
@@ -65,17 +64,17 @@ Grouped in this brain as: [[Module - Auth & Users]],
 
 ## Frontend surface
 
-5-tab shell (Home · Library · Quiz · AI · Profile), **~49 screens**, plus a
+5-tab shell (Home · Library · Quiz · AI · Profile), **~67 screens**, plus a
 large Profile stack that hosts social, monetization (Paywall), and gamification
 (Achievements, Leaderboard) features. Study Plans live under LibraryTab; the
-Quiz runner is a root-level screen above the tabs. Map feature deleted
-(2026-08-06) — backend-only now. Full list in [[Screen Map]] · [[Navigation]].
+Quiz runner is a root-level screen above the tabs. Groups/Gatherings/Map fully
+removed (deferred post-launch). Full list in [[Screen Map]] · [[Navigation]].
 
 ## Notable facts / gotchas
 
-- **CLAUDE.md is out of date** on module count — it still lists 16 modules; the
-  actual backend has 19 (adds `subscriptions`, `achievements`, `plans`) and
-  `map`/`gatherings` are backend-only (frontend deleted 2026-08-06).
+- **Module count:** the actual backend has 17 (adds `subscriptions`,
+  `achievements`, `plans`, `waitlist` over the 16-module baseline).
+  `groups`/`gatherings`/`map` were fully removed (deferred post-launch).
 - The client is **mobile-only** — Express CORS allows requests with no `Origin`
   header unconditionally (RN isn't a browser). See `backend/src/app.ts`.
 - Body limit is **10mb** (media metadata + base64 edge cases).

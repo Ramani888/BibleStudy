@@ -127,7 +127,7 @@ Library Create/Edit screens (`CreateCard`, `CreateSet`, `EditCard`, `EditSet`, `
 
 ## Screen count
 
-~49 screens total (2026-08-14):
+~67 screens total:
 - Auth: Login, Register, VerifyEmail, ForgotPassword, ResetPassword (5)
 - Onboarding: OnboardingScreen (1)
 - Home: HomeScreen (1)
@@ -152,4 +152,4 @@ export type LibraryScreenProps<T extends keyof LibraryStackParamList> =
 `HomeTab` uses a raw `BottomTabNavigationProp<AppTabParamList>` since it has no inner stack.
 
 ## Related
-[[Home Dashboard]] · [[Study Core]] · [[Auth & Account]] · [[AI Chat]] · [[Quiz]]
+[[Home Dashboard]] · [[Auth & Account]] · [[AI Chat]] · [[Quiz]]

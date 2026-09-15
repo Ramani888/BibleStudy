@@ -32,9 +32,9 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 - **Study Plans** (see [[Study Plans]]):
   - StudyPlansScreen → `usePlans` (list of personal plans)
   - PlanDetailScreen → `usePlan` (ordered steps + per-step progress)
-  - CreatePlanScreen → `usePlans` (create/edit; also reused as `CreateGroupPlan`)
+  - CreatePlanScreen → `usePlans` (create/edit)
 
-## quiz/  (see [[Quiz Feature v2 Plan]])
+## quiz/  (see [[Quiz]])
 - QuizHubScreen → `useRecentQuizAttempts` (history list of recent attempts + "Start New Quiz" footer CTA)
 - QuizSetupScreen → `useSets`, `useQuizSession` (set picker with search, mode chips, start CTA)
 - QuizScreen → `useQuizSession` (full-screen, timer, header w/ exit+counter, 4px progress bar)
@@ -47,9 +47,9 @@ data hook (see [[Hooks & API Layer]]). Navigator tree: [[Navigation]].
 - AIChatScreen → `useAI` (chat, credits spent)
 - ChatHistoryScreen → `useAI` sessions + bookmarks
 
-## map/  ~~(gatherings)~~ — ❌ DELETED (2026-08-06)
-Frontend screens (`screens/map/`) and `MapNavigator.tsx` removed. Backend `map` +
-`gatherings` modules still exist. Resurrect from git history if needed.
+## map / gatherings — ❌ REMOVED
+Frontend screens (`screens/map/`), `MapNavigator.tsx`, **and** the backend `map`/`gatherings`
+modules were all removed. Deferred to post-launch (rebuild from git history if needed).
 
 ## profile/  (also hosts social, monetization & gamification)
 - ProfileScreen · EditProfileScreen · ChangePasswordScreen · SettingsScreen → `useProfile` / `useUser`
@@ -63,13 +63,10 @@ Frontend screens (`screens/map/`) and `MapNavigator.tsx` removed. Backend `map` 
 - NotificationsScreen → `useNotifications`
 - **Friends:** FriendsScreen · FriendRequestsScreen · SearchUsersScreen ·
   UserProfileScreen · BlockedUsersScreen → `useFriends`
-- **Groups:** GroupsScreen · GroupDetailScreen · CreateGroupScreen ·
-  EditGroupScreen · JoinGroupScreen · PublicGroupsScreen → `useGroups`
-- **Group study plans:** GroupPlanDetailScreen → `usePlan` / `useGroups`;
-  `CreateGroupPlan` route reuses CreatePlanScreen. See [[Study Plans]].
+- **Groups / group study plans:** ❌ REMOVED — no group screens or `useGroups` in current code.
 
 ## Notes
 - Study feature fully removed (front + back) — replaced by Quiz with 7 modes.
-- The Profile stack is the largest — it carries friends, groups, notes, media,
+- The Profile stack is the largest — it carries friends, notes, media,
   and notifications, not just account settings.
 - Tab stacks reset to root on tab switch (commit `0f2c365`).

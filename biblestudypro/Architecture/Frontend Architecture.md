@@ -18,7 +18,7 @@ frontend/src/
     feedback/   → ActionSheet, ConfirmDialog, EmptyState, ErrorState, LoadingOverlay, Modal,
                   SelectSheet, SkeletonLoader
     forms/      → FormField, OTPInput
-    domain/     → ChatBubble, CreditBadge, DailyVerseCard, FlashCard, FolderCard,
+    domain/     → ChatBubble, CreditBadge, DailyVerseCard, FolderCard,
                   QuizModeSheet, SetActionSheet, SetCard
     icons/      → SVG icon components (no vector-icon lib)
   hooks/        → 26 hooks (use<Feature>.ts) — see [[Hooks & API Layer]]
@@ -65,6 +65,6 @@ All screens use `<Screen>` + `<ScreenHeader>` + body + optional `<Screen footer>
 
 ## Scale
 
-~39 screens across auth, home, onboarding, library (9), quiz (5), ai (2),
+~67 screens across auth, home, onboarding, library (9), quiz (5), ai (2),
 profile (20, hosts the whole social layer). Study and Map features removed.
 Full inventory: [[Screen Map]].

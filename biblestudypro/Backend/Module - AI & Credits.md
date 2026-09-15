@@ -34,7 +34,7 @@ The Bible-study AI assistant. Text chat routes through a **provider seam**; medi
 ### Media in chat (Phase F)
 - `dto.mediaIds[]` reference the caller's **MediaFile** rows (see [[Module - Media & Notes]]).
   PDFs → `document` blocks, images → `image` blocks, attached to the latest user turn
-  by **public S3 URL** (no base64). Unknown ids → `INVALID_MEDIA` 400.
+  by public `/uploads` static URL (no base64). Unknown ids → `INVALID_MEDIA` 400.
 - Presence of media forces the Claude path (OpenRouter can't do vision/docs here).
 
 ### Variable credit cost

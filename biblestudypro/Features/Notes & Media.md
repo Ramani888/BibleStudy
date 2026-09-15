@@ -7,7 +7,8 @@ updated: 2026-08-10
 # Notes & Media
 
 > Personal study notes (title/body/tags CRUD) plus a per-user media library
-> (images + PDFs) backed by Hetzner Object Storage, with a race-safe storage
+> (images + PDFs) stored on the server's local disk under `/uploads` (served as
+> public static files by `express.static`), with a race-safe storage
 > quota. Media files are also consumed by [[AI Chat]] as attachments.
 
 ## Screens
@@ -65,7 +66,7 @@ Profile storage bar (taps to `Media`, or `Paywall` when over quota — see G2).
 - **UploadToast**: slides up from bottom (reanimated `withTiming`) when `uploadMedia.isPending`; shows real upload % progress bar via `onProgress` callback; slides away on complete. Replaces the old blocking overlay.
 - **Delete**: long-press any item → `ActionSheet` → Delete → confirm dialog → `deleteMedia`. Or enter selection mode (☑ icon) → multi-select → trash icon → `useBulkDeleteMedia`.
 - **Rename**: long-press → Rename → `AppModal`; edits name stem only, re-appends original ext, `maxLength` reduced by ext length.
-- **Share**: `Share.share({ message: file.url })` — shares the public S3 URL.
+- **Share**: `Share.share({ message: file.url })` — shares the public `/uploads` static URL.
 - Pull-to-refresh; `EmptyState`; `ErrorState` + retry.
 
 ### MediaImageViewer (modal component, `frontend/src/screens/profile/MediaImageViewer.tsx`)
@@ -134,15 +135,15 @@ AIChat / picker  → usePickMedia() → useUploadMedia()     → mediaApi.upload
   - `PATCH  /api/v1/media/:id` — `renameFile` (body `{ name }`).
   - `DELETE /api/v1/media/:id` — `deleteFile`.
 - **Service fns**:
-  - `uploadFile(userId, file)` — the heart of the feature; validates type, transforms, enforces quota, uploads to S3, persists. Detailed in Edge cases.
+  - `uploadFile(userId, file)` — the heart of the feature; validates type, transforms, enforces quota, writes the file to local disk under `/uploads`, persists. Detailed in Edge cases.
   - `listFiles(userId, dto)` — `findMany({ userId, ...type })` ordered `createdAt desc`.
-  - `deleteFile(userId, fileId)` — owner check → DB txn (delete row + decrement `storageUsed`) → then S3 delete (best-effort).
+  - `deleteFile(userId, fileId)` — owner check → DB txn (delete row + decrement `storageUsed`) → then local file delete (best-effort).
   - `renameFile(userId, fileId, name)` — owner check → update `name`; maps Prisma `P2025` → `NotFoundError`.
   - `getStorageUsage(userId)` — returns `{ used, limit, percent }` (percent clamped 0–100; 0 if limit is 0).
-- **s3.client** (`backend/src/config/s3.client.ts`): AWS SDK v3 `S3Client` pointed at
-  `HETZNER_S3_ENDPOINT`, `forcePathStyle: false`. `S3_BASE_URL` is derived as
-  `https://<bucket>.<location>.your-objectstorage.com` (location parsed from endpoint host);
-  **process exits at boot** if the endpoint is misconfigured (`your-objectstorage` placeholder). Objects are `public-read`, so `MediaFile.url` is directly loadable in `<Image>` / PDF viewers with no signing.
+- **Local disk storage**: files are written via `fs` under the server's `/uploads` directory and
+  served as public static files by `express.static`, so `MediaFile.url` is directly loadable in
+  `<Image>` / PDF viewers with no signing. There is no S3, no Hetzner Object Storage, no bucket, and
+  no `MEDIA_STORAGE` flag. Free-tier files expire +30d via the `mediaCleanup` cron.
 
 ### DTOs (zod)
 - `CreateNoteDto`: `title` 1–500 required, `body` ≥1 required, `tags` string[] optional.
@@ -168,7 +169,7 @@ model Note {
 model MediaFile {
   id        String    @id @default(uuid())
   userId    String
-  key       String    @unique      // S3 object key
+  key       String    @unique      // local file path/key under /uploads
   url       String                 // public https URL
   name      String                 // display name (with real ext)
   mimeType  String
@@ -188,7 +189,7 @@ notes         Note[]
 mediaFiles    MediaFile[]
 ```
 - Both models cascade-delete with the `User`. Deleting a user drops rows but **not** the
-  S3 objects (no cascade to storage — orphaned objects remain in the bucket).
+  files on disk (no cascade to storage — orphaned files remain under `/uploads`).
 - `storageUsed`/`storageLimit` are `BigInt` — service converts with `Number()`/`BigInt()`.
 
 ## Edge cases, rules & gotchas
@@ -196,19 +197,19 @@ mediaFiles    MediaFile[]
 **Storage quota (the critical path).** `uploadFile` enforces quota in two layers:
 1. **Fast pre-check** (non-atomic): `findUniqueOrThrow` the user; if
    `storageUsed + finalSize > storageLimit` → throw `413 QUOTA_EXCEEDED` with a
-   human message ("You have X remaining") **before** paying for the S3 upload.
+   human message ("You have X remaining") **before** writing the file to disk.
 2. **Race-safe conditional UPDATE** (the real enforcement) inside a `$transaction`
-   *after* the S3 upload:
+   *after* the file is written to disk:
    ```sql
    UPDATE "User" SET "storageUsed" = "storageUsed" + $size
    WHERE id = $userId AND "storageUsed" + $size <= "storageLimit"
    ```
    If `affected === 0`, two concurrent uploads both passed the pre-check but only one
    fits — the loser re-reads fresh usage, throws `413 QUOTA_EXCEEDED`, and the
-   `catch` block **deletes the just-uploaded S3 object** (orphan cleanup). Only on a
+   `catch` block **deletes the just-written file from disk** (orphan cleanup). Only on a
    successful increment is the `MediaFile` row created. This closes the double-spend race.
-- **Any DB failure after a successful S3 PutObject** → the outer `try/catch` issues a
-  best-effort `DeleteObjectCommand` so no orphan is left. S3-delete failures there are swallowed.
+- **Any DB failure after the file is written to disk** → the outer `try/catch` issues a
+  best-effort `fs` unlink so no orphan is left. Local-delete failures there are swallowed.
 - **413 code** flows to the client; `getErrorMessage` surfaces the "X remaining" text as a toast.
 
 **Over-quota after downgrade (#7 / G2).** Nothing is ever auto-deleted when a user drops
@@ -230,12 +231,12 @@ until they delete files or upgrade. Existing files stay viewable.
   `400 INVALID_FILE` ("could be corrupted…").
 - **PDFs are stored as-is** but sniff-validated: `%PDF` marker must appear within the first
   1024 bytes → else `400 INVALID_FILE`. `finalSize` = original `file.size`.
-- Object key: `users/<userId>/images|pdfs/<uuid>.<ext>`; UUID prevents collisions/enumeration.
+- File key (path under `/uploads`): `users/<userId>/images|pdfs/<uuid>.<ext>`; UUID prevents collisions/enumeration.
 
 **Delete ordering:** `deleteFile` does the **DB transaction first** (row delete +
-`storageUsed` decrement), then S3 delete. If S3 delete fails, the object is orphaned in
-the bucket but gone from the user's listing and quota — DB is the source of truth, error is
-logged not surfaced. (Inverse of upload, where S3 happens first.)
+`storageUsed` decrement), then the local file delete. If the file delete fails, the file is
+orphaned under `/uploads` but gone from the user's listing and quota — DB is the source of truth,
+error is logged not surfaced. (Inverse of upload, where the disk write happens first.)
 
 **Rename:** frontend only edits the name stem and re-appends the original extension, so the
 stored `mimeType`/`ext` never drift from `name`. Backend maps Prisma `P2025` (row vanished)
@@ -261,7 +262,7 @@ and `ErrorState` + retry. Notes list uses full-screen `ErrorState`; Media uses i
 **Known limitations / TODOs:**
 - No pagination on notes or media lists — full lists fetched each time.
 - No server-side note search/tag filter — all client-side over the full list.
-- Orphaned S3 objects (failed cleanup, or user deletion cascade) are never reaped — no GC job.
+- Orphaned files under `/uploads` (failed cleanup, or user deletion cascade) are never reaped — no GC job.
 - Note tags are free-form `String[]` in the DB but the UI only offers the 7 predefined tags.
 - Android PDF preview depends on Google Docs viewer (external, requires public URL + network).
 

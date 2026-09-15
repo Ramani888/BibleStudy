@@ -27,7 +27,7 @@ RootNavigator                         ← gated by auth.store (see [[Auth & Toke
                              → PublicSets
                              → FriendsSets
                              → StudyPlans → PlanDetail → CreatePlan   ← see [[Study Plans]]
-      QuizTab     → QuizNavigator (stack)     ← see [[Quiz Feature]]
+      QuizTab     → QuizNavigator (stack)     ← see [[Quiz]]
                       QuizHub → QuizDetail → QuizSetup
                       (the runner itself — Quiz / QuizSummary — is a root screen)
       AITab       → AINavigator (stack)
@@ -39,21 +39,18 @@ RootNavigator                         ← gated by auth.store (see [[Auth & Toke
                               → Media → MediaPDFViewer
                               → Notifications
                               → Friends → FriendRequests / SearchUsers / UserProfile / BlockedUsers
-                              → Groups → GroupDetail / CreateGroup / EditGroup / JoinGroup / PublicGroups
-                                       → GroupPlanDetail → CreateGroupPlan   ← group study plans
 ```
 
-> **Map / Gatherings is backend-only.** There is **no** `screens/map/` directory
-> and **no** `MapNavigator` on the frontend — both were deleted (2026-08-06). The
-> backend `map` + `gatherings` modules still exist, and a few unused
-> `useMap`/`useGatherings` hooks remain, but nothing is reachable from the UI.
+> **Map / Gatherings / Groups fully removed (deferred post-launch).** No backend
+> `map`/`gatherings`/`groups` modules, no `useMap`/`useGatherings`/`useGroups`
+> hooks, no `screens/map/` directory, no `MapNavigator`, and no routes.
+> The **group study plans** (D2: `GroupPlanDetail`/`CreateGroupPlan`) were removed
+> with the groups feature — only **personal** study plans remain (LibraryTab).
 > There is also **no** StudyTab/MapTab and **no** standalone Study screen — the
 > old Study feature was removed; studying now flows through **Study Plans**
 > (LibraryTab) and **Quiz**.
 >
-> `CreateGroupPlan` reuses `CreatePlanScreen` (no separate file); both
-> `CreatePlan` and `CreateGroupPlan` present modally.
-> Verify against `frontend/src/navigation/*.tsx`.
+> `CreatePlan` presents modally. Verify against `frontend/src/navigation/*.tsx`.
 
 ## Safe-area convention
 

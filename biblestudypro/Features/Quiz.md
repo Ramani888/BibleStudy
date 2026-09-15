@@ -163,7 +163,7 @@ All mutations invalidate the whole `['quiz']` query key on success.
     Does **not** re-trigger achievements.
   - **SR link**: `SummaryItem` now carries `cardId` (frontend `buildSummaryItems`
     + backend `SummaryItemDto`), so a quiz doubles as a review session — see the
-    SR section of [[Study Core]] for the SM-2 algorithm.
+    SR section of [[Quiz]] for the SM-2 algorithm.
   - `deleteAttempt(userId, id)` — `deleteMany` scoped to `{ id, userId }`; throws if none deleted.
   - `getBestForSet(userId, setId)` — `_max scorePct` (null if none).
   - `getRecentAttempts(userId, limit=20)` — recent attempts joined with set titles;

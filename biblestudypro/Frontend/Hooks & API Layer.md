@@ -22,8 +22,9 @@ One file per backend module, all importing `./client`. Each function returns raw
 response data (React Query handles the rest):
 
 `auth` · `users` · `folders` · `sets` · `cards` · `ai` · `credits` ·
-`friends` · `groups` · `gatherings` · `map` · `activities` · `notifications` ·
+`friends` · `activities` · `notifications` ·
 `notes` · `media` — 1:1 with the [[Backend Architecture|backend modules]].
+(`groups`/`gatherings`/`map` removed — deferred post-launch.)
 
 ## `hooks/use<Feature>.ts` — React Query wrappers
 
@@ -38,7 +39,7 @@ Present hooks:
 | `useDailyVerse` | home daily verse |
 | `useNotes` | notes |
 | `useMedia` | media uploads |
-| `useFriends` / `useGroups` / `useGatherings` / `useMap` | social layer |
+| `useFriends` | social layer (`useGroups` / `useGatherings` / `useMap` removed — deferred post-launch) |
 | `useActivities` / `useNotifications` | feed + notifications |
 | `useProfile` / `useUser` | profile |
 | `useStudySession` | study flow |

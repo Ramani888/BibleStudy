@@ -17,7 +17,7 @@
 - [ ] **Lock wedge messaging** — "Cancel anytime, no surprise charges" (vs Hallow) + "modern Bible flashcards" (vs Anki's dated/paid app). `P1` `🟢`
 - [ ] **Localize store listing + screenshots** in **pt-BR and es** (Brazil = YouVersion's #2 country; you already ship the locales). `P1` `🔴`
 - [ ] **Set regional price tiers** ~60–80% off US defaults for LatAm / SE Asia / E. Europe (App Store Connect + Play Console). Treat 60–80% as a starting point to A/B. `P2` `🟡`
-- [x] **Offline audit** — DONE 2026-09-13 (`28b4c1d`): persisted RQ cache (sets/cards/folders) + NetInfo onlineManager + offline banner; reads degrade gracefully, writes still need connection. See [[Study Core]]. `P2` `🟡`
+- [x] **Offline audit** — DONE 2026-09-13 (`28b4c1d`): persisted RQ cache (sets/cards/folders) + NetInfo onlineManager + offline banner; reads degrade gracefully, writes still need connection. See [[Quiz]]. `P2` `🟡`
 
 ## At launch
 

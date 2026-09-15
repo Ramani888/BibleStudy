@@ -12,7 +12,7 @@
 | Credit earning (daily login +1, streaks) | ✅ live | `credits.service.ts` |
 | `Plan` enum: FREE / STARTER / PRO | ✅ defined, **unused** | `schema.prisma` |
 | Per-user storage quota (default 250 MB) | ✅ live | `User.storageLimit` |
-| Media upload (images + PDF, S3, 20 MB) | ✅ live | `media` module |
+| Media upload (images + PDF, local disk `/uploads`, 20 MB) | ✅ live | `media` module |
 | Per-user AI rate limit (30/hr) | ✅ live | `aiRateLimit` |
 
 **Conclusion:** monetization is ~40% plumbed already. This is an *activation* project, not a greenfield build.
@@ -22,19 +22,19 @@
 | Feature | State | Scope today |
 |---|---|---|
 | **Friends** | ✅ ~90% done | Connection graph (search, request/accept/reject/cancel, block/unblock, remove) **+ shared study sets** (view/clone friends' FRIENDS-visibility sets, `/sets/friends`) **+ friends activity feed** (`/activities/friends`). Only gamification compare (leaderboard) left. |
-| **Groups** | ⚠️ ~40% done | **Membership only:** create/join (invite code), roles (OWNER/ADMIN/MEMBER), members, public discovery. **No shared study content** — members can't *do* anything together. |
-| **Gatherings** | ⛔ parked | Backend built; `map/` UI screens exist but `MapNavigator` is **mounted nowhere → unreachable**. Not needed for revenue; leave dormant, wire later only if in-person community becomes core. |
+| **Groups** | ⛔ REMOVED (deferred post-launch) | Was built (membership: create/join, roles, discovery) then **cut** — no Prisma model, no `groupId` in backend, no group screens/nav in current code. Rebuilding is a post-launch prerequisite for church revenue. |
+| **Gatherings / Map** | ⛔ REMOVED (deferred post-launch) | Was built (backend + `map/` screens) then **cut** — no backend module, no screens, no nav routes in current code. |
 
-**The Groups gap:** a group today = a **roster**. No shared sets, no group study plan, no group
-progress, no group leaderboard, no discussion.
+**The Groups reality:** Groups were **removed** from the current code. Church revenue reasoning
+below is therefore **aspirational** — it presumes groups get rebuilt first.
 
-**Why it blocks money:** nobody pays for a roster. The "Church/group plan = the real money" idea
-(§5.5) only works once a group *does something together* — studies the same material, tracks
-progress, competes/encourages. **Group shared-content is a prerequisite for church revenue, not a
-polish item.** This is exactly Phase D2's job (group study plans + progress).
+**Why groups matter for money (future):** nobody pays for a roster. The "Church/group plan = the
+real money" idea (§5.5) only works once a group *does something together* — studies the same
+material, tracks progress, competes/encourages. **Rebuilding groups + group shared-content is a
+prerequisite for church revenue.** Deferred to post-launch.
 
-**Decision (2026-08-08):** keep & invest in **Groups** (core to revenue); **park Gatherings**
-(don't delete — dormant backend is free to keep).
+**Decision (2026-08-08, superseded):** originally kept & invested in Groups; groups/gatherings/map
+have since been **removed** and deferred to post-launch. Rebuild before pursuing church revenue.
 
 ---
 
@@ -110,12 +110,14 @@ Keep credits as the universal meter. Different actions cost different credits:
 Notes: annual ≈ 2 months free (retention lever). Same Claude model for all tiers — differentiate on
 *volume* (credits/storage/rate), not model quality; simpler and avoids "why is my paid answer worse."
 
-✅ **LOCKED (Decision 5 — social gating):** **Never gate the social layer.** Friends, groups, and
-gatherings stay free on all tiers. Monetize AI usage + storage + (later) group study plans, not
-basic connection. Gating social kills the network effect that grows the app.
+✅ **LOCKED (Decision 5 — social gating):** **Never gate the social layer.** Friends stay free on
+all tiers (groups/gatherings were removed — deferred post-launch; if rebuilt, they'd stay free too).
+Monetize AI usage + storage, not basic connection. Gating social kills the network effect that
+grows the app.
 
-> **Church/group plan** (B2B, per-seat) pricing is **deferred** — it depends on Phase D2 (group
-> study plans) existing. Placeholder: ~$2/seat/mo or a flat per-group tier. Decide when D2 lands.
+> **Church/group plan** (B2B, per-seat) pricing is **deferred** — it depends on **rebuilding groups
+> + group study plans**, both of which were removed. Placeholder: ~$2/seat/mo or a flat per-group
+> tier. Decide only after groups are rebuilt post-launch.
 
 ### Billing — the critical constraint
 This is a **mobile app**. Apple & Google **require** digital subscriptions to use **In-App Purchase / Play Billing** — Stripe/web checkout is **not allowed** for in-app digital goods and will get you rejected.
@@ -157,7 +159,7 @@ the moat — none are replicable in ChatGPT:
 |---|---|
 | Flashcards + study sets | ❌ |
 | Quiz (7 modes) | ❌ |
-| Friends, groups, in-person gatherings on a map | ❌ |
+| Friends (groups + in-person gatherings on a map were removed — deferred post-launch) | ❌ |
 | Activity feed + notifications (accountability) | ❌ |
 | Personal media library (their PDFs/notes) | ❌ |
 | Notes | ❌ |
@@ -174,10 +176,11 @@ remember scripture, with their group, tracked over time.**
 None win on cheap AI. All win on **content + community + habit**.
 
 ### Revenue paths (priority order)
-1. **Church / small-group plans (B2B2C)** — 🎯 *the real money.* Sell seats to a group leader or
-   church. Groups/gatherings are deferred post-launch — group study plans (D2) are the prerequisite. One church = 30–200 seats at once.
+1. **Church / small-group plans (B2B2C)** — 🎯 *the real money (future).* Sell seats to a group
+   leader or church. **Blocked: groups/gatherings/group-plans were removed** — rebuilding groups +
+   group study plans is the prerequisite. One church = 30–200 seats at once. Post-launch.
 2. **Consumer Premium subscription** — freemium; Premium unlocks advanced AI, more storage,
-   premium study plans, group features. (Hallow's model.)
+   premium study plans (group features would return only if Groups is rebuilt post-launch). (Hallow's model.)
 3. **Premium content** — curated reading/study plans, devotionals (AI-assisted to produce cheaply).
 - **Avoid ads** — cheapens a faith app, pays poorly. Subscription + church plans instead.
 
@@ -186,7 +189,8 @@ Foundation already exists: **streaks are live** (`credits.service.ts`, current +
 People pay to protect a habit/identity, not to buy tokens. Build:
 - **Streaks** (have it) → "don't break your study streak"
 - **Milestones / achievements** → "Memorized 100 verses", "Completed Romans", "30-day reader"
-- **Group leaderboards** → friendly competition on the existing social layer
+- **Friends leaderboard** → friendly competition on the existing social layer (group leaderboards
+  removed with Groups — deferred post-launch)
 - **Reading/study plans with progress** → completion = achievement, reason to open daily
 
 ### Mindset shift on AI cost
@@ -194,8 +198,8 @@ AI cost is **our internal cost to manage** (free OpenRouter for text, Claude for
 invisible to the user. Cheap AI on our side = **higher margin**, not a selling point.
 
 ### Recommended focus order
-1. **Gamification layer** (milestones/achievements/group leaderboards) — deepens the moat, drives
-   daily habit. Do early.
+1. **Gamification layer** (milestones/achievements/friends leaderboard; group leaderboards deferred
+   post-launch with Groups) — deepens the moat, drives daily habit. Do early.
 2. **Reading/study plans** with progress tracking.
 3. **Subscriptions** (Premium + Church plans) once the habit loop is sticky.
 4. AI provider routing runs quietly as cost control throughout.
@@ -214,14 +218,15 @@ comes before media and subscriptions, not after.
 | **A. Provider swap** ✅ DONE | Text chat → free OpenRouter via `generateAnswer` seam; Claude stays. Model `google/gemma-4-26b-a4b-it:free` (non-reasoning, fast). Verified answers/follow-ups/flashcards. | Stops the Claude bill immediately; tiny; unblocks everything else. | S |
 | **B. Variable credits** ✅ DONE | Per-action credit cost (text 1 / flashcards 2). `CREDIT_COST` constant in `ai.service.ts`; charge floored at balance (never negative); labeled transactions. Media costs slot in at F. | Trivial follow-on to A; sets the metering that plans will sell. | S |
 | **C. Gamification** ✅ C1+C2+C3 DONE | C1 achievements (17 defs, `UserAchievement` table, +5 credits + notification on unlock, real-time triggers, Profile screen). C2 streak surfaced (Home + Profile). C3 friends leaderboard (`GET /friends/leaderboard`, ranked by current streak + longest/achievements, LeaderboardScreen via Friends trophy button). | **The moat + retention engine.** Drives daily habit → willingness to pay. Do before monetizing. | M |
-| **D. Study plans (personal → group → church)** — ✅ D1+D2 DONE | *One feature at three levels, in order:* **(D1) Personal plans** — ordered daily content (reuses sets/cards/quiz) + per-user progress; **(D2) Group plans** ✅ — a group does one plan together + group progress/leaderboard (fills the group shared-content gap from §0); **(D3)** groups are now sellable → church plans become real. | Reason to open daily; feeds achievements; **and it's the prerequisite that makes church revenue possible** — a group must *do something together* before anyone pays for it. | M–L |
-| **E. Subscriptions** | `react-native-iap`, receipt verification, plan→benefit mapping, monthly credit grants, Premium + **Church/group plans**, paywall UX. | The money. Only converts once C+D make the app sticky. | L |
+| **D. Study plans (personal → group → church)** — ✅ D1 DONE · ⛔ D2 REMOVED | **(D1) Personal plans** ✅ — ordered daily content (reuses sets/cards/quiz) + per-user progress. **(D2) Group plans** ⛔ **REMOVED** (feature cut with groups; deferred post-launch — would need groups rebuilt first). **(D3)** church plans stay blocked until groups + group plans are rebuilt. | D1 gives a reason to open daily + feeds achievements. Church revenue (via D2/groups) is deferred post-launch. | M–L |
+| **E. Subscriptions** | `react-native-iap`, receipt verification, plan→benefit mapping, monthly credit grants, consumer Premium, paywall UX. (**Church/group plans deferred post-launch — depend on groups being rebuilt.**) | The money. Only converts once C+D make the app sticky. | L |
 | **F. Media in chat** | **F.1 PDF first** then **F.2 images**: `mediaIds` on `/ai/chat`, Claude PDF/vision path, media picker in `AIChatScreen`. | Premium AI upsell — lands better as a paid perk once subscriptions exist. | M |
 | **G. Enforcement & polish** ✅ G1–G3 DONE | Per-tier rate limits + storage bumps landed in E-a. G1 media full-cost-upfront (reject before Claude, no floor), G2 over-quota banner→Paywall on Profile, G3 out-of-credits Upgrade CTA in AI chat. G4 S2S renewal webhooks deferred. | Hardens the paid tiers after they exist. | M |
 
 **Sequencing logic:** A→B are same-week cost wins. C→D build the habit loop ChatGPT can't
-copy. E monetizes that stickiness — but note **E's church plans depend on D2 (group plans)**:
-consumer Premium can ship after D1, church plans only after D2 gives groups shared content.
+copy. E monetizes that stickiness — but note **E's church plans depend on groups + D2 (group
+plans), which were removed**: consumer Premium ships after D1; church plans are deferred
+post-launch until groups + group plans are rebuilt.
 F is a premium AI perk that sells better *inside* a paid tier than as a free feature. G hardens
 everything.
 
@@ -248,18 +253,11 @@ everything.
   complete/uncomplete; nullable `groupId` for D2). Frontend: StudyPlans/PlanDetail/CreatePlan screens
   under Library (📖 header entry). "Plan Finisher" achievement (metric `plans_completed`) added,
   unlocks via the existing step-complete trigger.
-- **Phase D2 shipped** — group study plans. Backend (D2a): `groupId` on `createPlan` (OWNER/ADMIN
-  only via `assertGroupAdmin`); `GET /plans/group/:groupId` (member's own progress per plan);
-  `GET /plans/:id/members-progress` (leaderboard, sorted desc); `getPlan`/`completeStep` allow
-  group members; members can read PRIVATE/FRIENDS sets used by a group plan via
-  `memberHasGroupPlanAccess` (`utils/planAccess.ts`, wired into sets/cards fetch — no cloning).
-  Frontend (D2b): GroupDetail → **Study Plans** section (list + your progress bar, admin **New**
-  button); new `GroupPlanDetailScreen` (steps + check-off + your progress + members leaderboard;
-  step tap cross-navigates to LibraryTab→SetDetail so members study non-owned sets); `CreatePlanScreen`
-  reused for both stacks via optional `groupId` route param; `useGroupPlans`/`useMembersProgress`
-  hooks; registered `GroupPlanDetail` + `CreateGroupPlan` in `ProfileNavigator`.
-  **This unblocks E's church/group plans** (groups now do something together → sellable). Next: E
-  (subscriptions/IAP) or C3 (leaderboards) / F (media in chat).
+- **Phase D2 shipped, then REMOVED** — group study plans were built (backend `groupId` on plans,
+  group members-progress leaderboard, GroupDetail Study Plans section, GroupPlanDetailScreen) but
+  have since been **cut along with the entire Groups feature**. No `groupId` in the current backend,
+  no group/group-plan Prisma models, no group screens/nav. Deferred to post-launch — rebuilding
+  groups is a prerequisite to re-adding group study plans and unblocking church revenue (Phase E).
 - **AI chat UX fixes** (side quest, not a roadmap phase):
   - Empty-answer parser fallback (cards-with-no-intro no longer blank).
   - Inline "Create new set" in save-cards sheet — shown only when the user has zero sets.
@@ -279,8 +277,8 @@ everything.
 built on the streak foundation that already exists.
 
 ### Data foundation (all already recorded)
-- `Activity` events (via `logActivity`): CREATED_CARD, CREATED_SET, JOINED_GROUP, ADDED_FRIEND
-  *(note: STUDIED_CARDS & CREATED_NOTE enum values exist but are never logged — not used in v1)*
+- `Activity` events (via `logActivity`): CREATED_CARD, CREATED_SET, ADDED_FRIEND
+  *(JOINED_GROUP is moot — Groups feature removed; STUDIED_CARDS & CREATED_NOTE exist but are never logged)*
 - `QuizAttempt`: count, scores, perfect scores, modes
 - Streak (current + longest) from daily-login `REWARD` txns
 - `AIChat` rows (AI questions countable) · `notifications` module (unlock alerts) · credits
@@ -294,15 +292,16 @@ built on the streak foundation that already exists.
   + summary badge.
 - **C2 — Streak surfacing + milestones.** Streak achievements (3/7/30/100-day); make streak
   prominent. Folds into C1's list.
-- **C3 — Group + friend leaderboards.** Deferred — needs a scoring metric decision (see locked #11).
+- **C3 — Friends leaderboard.** ✅ Shipped (`GET /friends/leaderboard`). Group leaderboards removed
+  with the Groups feature — deferred post-launch.
 
 ### Starter achievement list (~15, all from existing data)
 Study: First Card · 10 Cards · 50 Cards · First Set · 5 Sets ·
 Quiz: First Quiz · 10 Quizzes · Perfect Score · Quiz Master (all modes) ·
 Streak: 3-day · 7-day · 30-day · 100-day ·
-Social: First Friend · Joined a Group ·
+Social: First Friend · ~~Joined a Group~~ (moot — Groups feature removed) ·
 AI: Curious Mind (first AI question) · 50 AI Questions
-*(Dropped "Joined a Gathering" — gatherings parked/unreachable.)*
+*(Dropped "Joined a Gathering" and "Joined a Group" — gatherings + groups removed/deferred post-launch.)*
 
 ### Locked Phase C decisions
 | # | Decision | Value |
@@ -312,7 +311,7 @@ AI: Curious Mind (first AI question) · 50 AI Questions
 | C-3 | When to check unlocks | After key write events **+** on achievements-screen open (safety net) |
 | C-4 | Leaderboards | **Defer to C3** — ship C1+C2 first |
 | C-5 | STUDIED_CARDS/notes logging | **Skip for v1** (quiz already proves engagement) |
-| C-6 | Gathering achievement | **Dropped** (feature parked) |
+| C-6 | Gathering + Group achievements | **Dropped** (gatherings + groups removed, deferred post-launch) |
 
 **Build order:** C1 (achievements + unlock + bonus credits + screen) → C2 (streak milestones) →
 [later] C3 (leaderboards). Start with C1.
@@ -344,7 +343,11 @@ D1c achievement hook.
 
 ---
 
-## Phase D2 — Group study plans ✅ SHIPPED 2026-08-08 (scope, finalized 2026-08-08)
+## Phase D2 — Group study plans ⛔ REMOVED (built 2026-08-08, later cut — deferred post-launch)
+
+> **STATUS: REMOVED.** This feature was built then cut together with the entire Groups feature.
+> Nothing below exists in the current code (no `groupId`, no group Prisma models, no group screens
+> or nav). Scope preserved for reference only — it may be rebuilt post-launch once Groups return.
 
 Group OWNER/ADMIN creates a plan attached to the group (`StudyPlan.groupId`); all members do the
 same steps, each with own progress; group sees a per-member leaderboard. No new tables (reuses
@@ -368,13 +371,13 @@ w/ leaderboard. Build: D2a backend → D2b frontend. **Unlocks church/group reve
 Attach a file from "My Media" into an AI chat; Claude reads it. Premium AI perk that
 gives a concrete reason to subscribe. **F.1 = PDF first** (locked #1), **F.2 = images** later.
 
-**Ground truth:** MediaFile is stored `public-read` on Hetzner S3 with a public `url` →
-Claude ingests **by URL** (no server download/base64). `generateAnswer` seam already exists;
+**Ground truth:** MediaFile is stored on local disk under `/uploads` with a public static `url` →
+Claude ingests **by that URL** (no server download/base64). `generateAnswer` seam already exists;
 media **forces the Claude path** regardless of `AI_PROVIDER`. Model `claude-haiku-4-5` supports
 PDF documents + vision. Costs locked #3: PDF 5, image 3. Routing locked #2: Claude native.
 
 **Locked F decisions:**
-1. Delivery = **URL source** (files are public-read; pass `url` to Claude, no base64).
+1. Delivery = **URL source** (files served from local disk `/uploads`; pass the static `url` to Claude, no base64).
 2. **One PDF per message** for F.1 (multi-file later).
 3. Cost = **media dominates → PDF chat = 5 flat** (even if cards are also returned).
 4. Gating = **credit-metered only** now; subscription-gating deferred to Phase G.
@@ -406,7 +409,8 @@ PDF chat only works once Claude is funded (by design — media is the paid perk)
 ## Phase E — Subscriptions (scope, finalized 2026-08-08)
 
 Turn the unused `Plan` enum (FREE/STARTER/PRO) into real IAP subscriptions mapped to benefits.
-Consumer Premium first; church/group per-seat pricing still deferred (needs its own B2B flow).
+Consumer Premium only. Church/group per-seat pricing is **deferred post-launch** — it needs its own
+B2B flow **and** the Groups + group-plans features, which were removed.
 
 **Tiers (locked #4):** STARTER $4.99/mo·$39.99/yr → 100 credits / 2 GB / 60 AI-req/hr ·
 PRO $9.99/mo·$79.99/yr → 500 credits / 10 GB / 120 AI-req/hr. Same AI model all tiers.
@@ -453,9 +457,10 @@ sandbox testers, real device / TestFlight. Purchases stay inert until this exist
 | 2 | Media routing | **Claude native** (no PDF-text extraction for free model) |
 | 3 | Credit costs | text 1 · card-batch 2 · image 3 · PDF 5 |
 | 4 | Plan numbers | STARTER $4.99/mo·$39.99/yr / 100cr / 2GB / 60/hr · PRO $9.99/mo·$79.99/yr / 500cr / 10GB / 120/hr |
-| 5 | Social gating | **Never** — friends/groups/gatherings free on all tiers |
+| 5 | Social gating | **Never** — friends free on all tiers (groups/gatherings removed, deferred post-launch; free too if rebuilt) |
 | 6 | Billing cadence | **Monthly + annual** from launch (IAP only) |
 | 7 | Downgrade over quota | **Block new uploads, never delete** |
 
-Deferred (not one of the 7): **church/group plan pricing** — decide when Phase D2 lands.
+Deferred (not one of the 7): **church/group plan pricing** — blocked; groups + group plans (D2) were
+removed. Decide only after they're rebuilt post-launch.
 All numbers are launch defaults; tune with real usage data.
