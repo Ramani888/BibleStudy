@@ -61,10 +61,16 @@
     "questions": "mga tanong",
     "continueConversation": "Ipagpatuloy ang usapan",
     "bookmarkedAt": "Na-bookmark {{date}}",
-    "saveToSet": "I-save sa Set"
+    "saveToSet": "I-save sa Set",
+    "exportChat": "I-export ang chat",
+    "history": "Kasaysayan ng chat"
   },
   "consent": {
-    "title": "Paunawa sa AI Assistant",
+    "title": "AI Chat",
+    "blurb": "Magtanong at kumuha ng agarang sagot na may mga talata sa Bibliya upang gabayan ang iyong pag-aaral.",
+    "accuracy": "Ang mga sagot ay binubuo ng AI at maaaring hindi palaging tama. I-verify ang mahahalagang interpretasyon sa iyong pastor o mapagkakatiwalaang komentaryo.",
+    "dataNote": "Ang iyong mga mensahe ay pinoproseso ng mga third-party na AI service upang makabuo ng mga sagot. Huwag magbahagi ng sensitibong personal na impormasyon.",
+    "agreement": "Sa pagpapatuloy, sumasang-ayon ka sa aming",
     "headline": "Pag-aaral ng Bibliya Gamit ang AI",
     "lead": "Gumagamit ang Verdance ng advanced na artificial intelligence (Claude ng Anthropic) upang magbigay ng teolohikong pananaw, buod ng kabanata, at paglikha ng flashcard.",
     "providerSummary": "Ligtas na pinoproseso ang iyong mga tanong at dokumento sa pamamagitan ng Anthropic API.",

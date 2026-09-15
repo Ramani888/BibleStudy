@@ -194,7 +194,8 @@
     "deleteTitle": "Excluir quiz",
     "deleteMessage": "Remover esta tentativa do seu histórico?",
     "retake": "Refazer quiz",
-    "timeSpent": "Tempo gasto"
+    "timeSpent": "Tempo gasto",
+    "correctLabel": "Corretas"
   },
   "modesSheet": {
     "chooseMode": "Escolher Modo de Estudo",

@@ -185,7 +185,9 @@
     "storyCard": "Story Card",
     "noCards": "Wala pang cards",
     "mastery": "Kahusayan",
-    "masteryCount": "{{learned}}/{{total}} natutunan"
+    "masteryCount": "{{learned}}/{{total}} natutunan",
+    "masteryInfo": "Ang isang card ay “natutunan” kapag na-quiz mo na ito nang sapat upang hindi na ito madue muli sa loob ng 21+ araw. Sinusubaybayan ng bar na ito ang iyong pangmatagalang retention para sa set na ito.",
+    "masteryInfoA11y": "Ano ang kahusayan?"
   },
   "plans": {
     "title": "Mga Plano sa Pag-aaral",

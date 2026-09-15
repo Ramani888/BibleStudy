@@ -185,7 +185,9 @@
     "storyCard": "Tarjeta de historia",
     "noCards": "Aún no hay tarjetas",
     "mastery": "Dominio",
-    "masteryCount": "{{learned}}/{{total}} aprendidas"
+    "masteryCount": "{{learned}}/{{total}} aprendidas",
+    "masteryInfo": "Una tarjeta se considera “aprendida” cuando la has puesto a prueba lo suficiente como para que no vuelva a estar pendiente hasta dentro de 21 días o más. Esta barra mide tu retención a largo plazo de este conjunto.",
+    "masteryInfoA11y": "¿Qué es el dominio?"
   },
   "plans": {
     "title": "Planes de Estudio",

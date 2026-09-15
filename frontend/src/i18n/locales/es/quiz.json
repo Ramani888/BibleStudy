@@ -188,6 +188,7 @@
     "practiced_other": "Practicado {{count}} veces",
     "lastPracticed": "Última práctica {{date}}",
     "correctCount": "{{correct}} / {{total}} correctas",
+    "correctLabel": "Correcta",
     "setsCount": "{{count}} conjuntos",
     "viewSummary": "Ver resumen",
     "title": "Intento de cuestionario",

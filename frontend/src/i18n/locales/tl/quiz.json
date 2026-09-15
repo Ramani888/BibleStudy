@@ -188,6 +188,7 @@
     "practiced_other": "Nasanay nang {{count}} beses",
     "lastPracticed": "Huling nasanay noong {{date}}",
     "correctCount": "{{correct}} / {{total}} tama",
+    "correctLabel": "Tama",
     "setsCount": "{{count}} sets",
     "viewSummary": "Tingnan ang summary",
     "title": "Pagtatangka sa Quiz",

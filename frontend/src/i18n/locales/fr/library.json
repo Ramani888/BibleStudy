@@ -185,7 +185,9 @@
     "storyCard": "Carte récit",
     "noCards": "Aucune carte pour l'instant",
     "mastery": "Maîtrise",
-    "masteryCount": "{{learned}}/{{total}} apprises"
+    "masteryCount": "{{learned}}/{{total}} apprises",
+    "masteryInfo": "Une carte est « apprise » lorsque vous l'avez suffisamment testée pour qu'elle ne soit plus à réviser avant 21 jours ou plus. Cette barre suit votre rétention à long terme pour cet ensemble.",
+    "masteryInfoA11y": "Qu'est-ce que la maîtrise ?"
   },
   "plans": {
     "title": "Plans d'Étude",

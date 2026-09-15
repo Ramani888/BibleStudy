@@ -61,10 +61,16 @@
     "questions": "questions",
     "continueConversation": "Continuer la conversation",
     "bookmarkedAt": "Enregistré {{date}}",
-    "saveToSet": "Enregistrer dans un ensemble"
+    "saveToSet": "Enregistrer dans un ensemble",
+    "exportChat": "Exporter la conversation",
+    "history": "Historique du chat"
   },
   "consent": {
-    "title": "Avis sur l'Assistant IA",
+    "title": "Chat IA",
+    "blurb": "Posez vos questions et obtenez des réponses instantanées avec des versets bibliques pour guider votre étude.",
+    "accuracy": "Les réponses sont générées par IA et peuvent ne pas toujours être exactes. Vérifiez les interprétations importantes avec votre pasteur ou un commentaire de confiance.",
+    "dataNote": "Vos messages sont traités par des services d'IA tiers pour créer les réponses. Veuillez ne pas partager d'informations personnelles sensibles.",
+    "agreement": "En continuant, vous acceptez nos",
     "headline": "Étude Biblique Assistée par IA",
     "lead": "Verdance utilise une intelligence artificielle avancée (Claude d'Anthropic) pour fournir des analyses théologiques instantanées, des résumés de chapitres et des flashcards.",
     "providerSummary": "Vos questions et documents téléversés sont traités en toute sécurité via l'API d'Anthropic.",

@@ -185,7 +185,9 @@
     "storyCard": "이야기 카드",
     "noCards": "아직 카드가 없습니다",
     "mastery": "숙련도",
-    "masteryCount": "{{learned}}/{{total}} 학습됨"
+    "masteryCount": "{{learned}}/{{total}} 학습됨",
+    "masteryInfo": "카드는 충분히 퀴즈를 풀어 21일 이상 다시 복습할 필요가 없어지면 “학습됨”으로 표시됩니다. 이 막대는 이 세트에 대한 장기 기억 유지율을 나타냅니다.",
+    "masteryInfoA11y": "숙련도란 무엇인가요?"
   },
   "plans": {
     "title": "학습 계획",

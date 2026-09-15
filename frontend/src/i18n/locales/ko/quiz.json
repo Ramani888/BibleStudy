@@ -194,7 +194,8 @@
     "deleteTitle": "퀴즈 삭제",
     "deleteMessage": "이 기록을 내역에서 삭제할까요?",
     "retake": "퀴즈 다시 풀기",
-    "timeSpent": "소요 시간"
+    "timeSpent": "소요 시간",
+    "correctLabel": "정답"
   },
   "modesSheet": {
     "chooseMode": "학습 모드 선택",
