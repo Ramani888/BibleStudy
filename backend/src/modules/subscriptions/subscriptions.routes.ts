@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import * as subscriptionsController from './subscriptions.controller';
-import { validate } from '../../middlewares/validate.middleware';
 import { authMiddleware } from '../../middlewares/auth.middleware';
-import { VerifyPurchaseDto } from './subscriptions.dto';
 
 const router = Router();
 
@@ -11,7 +9,7 @@ router.post('/rc-webhook', subscriptionsController.rcWebhook);
 
 router.use(authMiddleware);
 
-router.post('/verify', validate(VerifyPurchaseDto), subscriptionsController.verifyPurchase);
+// Legacy POST /verify removed — RevenueCat is the sole entitlement source (see PLAN.md #20).
 router.get('/status', subscriptionsController.getStatus);
 
 export default router;

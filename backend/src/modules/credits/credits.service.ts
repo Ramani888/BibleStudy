@@ -1,6 +1,7 @@
 import { prisma } from '../../config/db';
 import { NotFoundError, ConflictError, ValidationError } from '../../utils/errors';
 import { triggerAchievementCheck } from '../../utils/achievementCheck';
+import { getEffectivePlan } from '../subscriptions/subscriptions.service';
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 
@@ -216,7 +217,7 @@ export async function getStreak(userId: string): Promise<{ streak: number; longe
  */
 export async function maintainStreakFreezes(userId: string): Promise<void> {
   const [user, rewards, freezeLogs] = await Promise.all([
-    prisma.user.findUnique({ where: { id: userId }, select: { streakFreezes: true, streakFreezeMilestone: true, plan: true } }),
+    prisma.user.findUnique({ where: { id: userId }, select: { streakFreezes: true, streakFreezeMilestone: true } }),
     prisma.creditTransaction.findMany({ where: { userId, type: 'REWARD' }, select: { createdAt: true } }),
     prisma.streakFreezeLog.findMany({ where: { userId }, select: { date: true } }),
   ]);
@@ -253,8 +254,8 @@ export async function maintainStreakFreezes(userId: string): Promise<void> {
     milestone = newMilestone;
   }
 
-  // 3) Premium auto-refill.
-  if (user.plan !== 'FREE') freezes = Math.max(freezes, MAX_STREAK_FREEZES);
+  // 3) Premium auto-refill (SUB-5: expiry-aware — a naturally-lapsed sub reads as FREE).
+  if ((await getEffectivePlan(userId)) !== 'FREE') freezes = Math.max(freezes, MAX_STREAK_FREEZES);
 
   if (freezes !== user.streakFreezes || milestone !== user.streakFreezeMilestone) {
     await prisma.user.update({ where: { id: userId }, data: { streakFreezes: freezes, streakFreezeMilestone: milestone } });

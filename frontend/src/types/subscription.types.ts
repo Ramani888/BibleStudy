@@ -6,19 +6,6 @@ export interface SubscriptionStatus {
   expiresAt: string | null;
 }
 
-export interface VerifyPurchasePayload {
-  platform: 'APPLE' | 'GOOGLE';
-  productId: string;
-  receipt: string;
-}
-
-export interface VerifyPurchaseResult {
-  plan: Plan;
-  active: boolean;
-  expiresAt: string;
-  granted: boolean;
-}
-
 export type BillingPeriod = 'monthly' | 'annual';
 
 export interface FreeTierDef {

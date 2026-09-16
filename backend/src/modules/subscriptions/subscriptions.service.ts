@@ -1,147 +1,72 @@
-import type { Plan, Store } from '@prisma/client';
+import { randomUUID } from 'crypto';
+import type { Plan, Store, Prisma as PrismaNS } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
-import { AppError } from '../../utils/errors';
-import { PLAN_BENEFITS, getProduct, creditsForPurchase, type ProductDef } from '../../config/plans';
-import type { VerifyPurchaseDtoType } from './subscriptions.dto';
+import { PLAN_BENEFITS, getProduct, creditsForPurchase } from '../../config/plans';
 
-interface Verification {
-  expiresAt: Date;
-  originalTransactionId: string;
-  latestTransactionId: string;
-}
+// RevenueCat is the sole entitlement source (the legacy Apple-receipt /verify path was removed — the
+// app purchases via the RC SDK and grants come from the webhook). See PLAN.md #20.
 
-const APPLE_PROD = 'https://buy.itunes.apple.com/verifyReceipt';
-const APPLE_SANDBOX = 'https://sandbox.itunes.apple.com/verifyReceipt';
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
 
-// ── Apple receipt verification (legacy verifyReceipt; simplest, no dep) ─────────
-async function verifyApple(receipt: string, productId: string): Promise<Verification> {
-  if (!env.APPLE_IAP_SHARED_SECRET) throw new AppError('Apple IAP not configured', 503, 'IAP_NOT_CONFIGURED');
+// ── Effective entitlement (dual per-environment snapshot, production precedence) ──
+type SubSnapshot = {
+  plan: Plan | null; expiresAt: Date | null;
+  sandboxPlan: Plan | null; sandboxExpiresAt: Date | null;
+} | null;
 
-  const call = async (url: string) => {
-    const res = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        'receipt-data': receipt,
-        password: env.APPLE_IAP_SHARED_SECRET,
-        'exclude-old-transactions': true,
-      }),
-    });
-    return res.json() as Promise<any>;
-  };
-
-  // Prod first; 21007 means the receipt is from the sandbox → retry there.
-  let body = await call(APPLE_PROD);
-  if (body.status === 21007) body = await call(APPLE_SANDBOX);
-  if (body.status !== 0) throw new AppError(`Apple receipt invalid (status ${body.status})`, 400, 'RECEIPT_INVALID');
-
-  const infos: any[] = body.latest_receipt_info ?? [];
-  // Latest renewal for this product = highest expires_date_ms.
-  const latest = infos
-    .filter(i => i.product_id === productId)
-    .sort((a, b) => Number(b.expires_date_ms) - Number(a.expires_date_ms))[0];
-  if (!latest) throw new AppError('No matching purchase in receipt', 400, 'RECEIPT_NO_MATCH');
-
-  return {
-    expiresAt: new Date(Number(latest.expires_date_ms)),
-    originalTransactionId: latest.original_transaction_id,
-    latestTransactionId: latest.transaction_id,
-  };
-}
-
-// ponytail: guarded stub — implement with google-auth + Play Developer API once Play
-// credentials (GOOGLE_PLAY_SA_JSON) and store products exist. iPhone is the launch device.
-async function verifyGoogle(_receipt: string, _productId: string): Promise<Verification> {
-  throw new AppError('Google Play verification not configured yet', 503, 'IAP_NOT_CONFIGURED');
-}
-
-// ── Entitlement application (idempotent credit grant) ───────────────────────────
-async function applyEntitlement(userId: string, store: Store, def: ProductDef, v: Verification) {
-  const existing = await prisma.subscription.findUnique({ where: { userId } });
-  // Grant credits only when this is a transaction we haven't processed (new purchase or renewal).
-  const isNewTransaction = !existing || existing.lastTransactionId !== v.latestTransactionId;
-  const benefits = PLAN_BENEFITS[def.plan];
-
-  await prisma.$transaction(async (tx) => {
-    await tx.subscription.upsert({
-      where: { userId },
-      create: {
-        userId, plan: def.plan, store, productId: def.productId,
-        expiresAt: v.expiresAt, originalTransactionId: v.originalTransactionId, lastTransactionId: v.latestTransactionId,
-      },
-      update: { plan: def.plan, productId: def.productId, expiresAt: v.expiresAt, lastTransactionId: v.latestTransactionId },
-    });
-    await tx.user.update({
-      where: { id: userId },
-      data: { plan: def.plan, storageLimit: BigInt(benefits.storageBytes) },
-    });
-    // Clear expiry on all files — paid users keep their media indefinitely.
-    await tx.mediaFile.updateMany({
-      where: { userId },
-      data:  { expiresAt: null },
-    });
-    if (isNewTransaction) {
-      const credits = creditsForPurchase(def);
-      await tx.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } });
-      await tx.creditTransaction.create({
-        data: { userId, type: 'PURCHASE', amount: credits, description: `${def.plan} ${def.period} subscription` },
-      });
-    }
-  });
-
-  return isNewTransaction;
-}
-
-export async function verifyPurchase(userId: string, dto: VerifyPurchaseDtoType) {
-  const def = getProduct(dto.productId);
-  if (!def) throw new AppError('Unknown product', 400, 'UNKNOWN_PRODUCT');
-
-  const v = dto.platform === 'APPLE'
-    ? await verifyApple(dto.receipt, dto.productId)
-    : await verifyGoogle(dto.receipt, dto.productId);
-
-  const granted = await applyEntitlement(userId, dto.platform, def, v);
-  const active = v.expiresAt.getTime() > Date.now();
-  return { plan: def.plan, active, expiresAt: v.expiresAt, granted };
-}
-
-// Recheck expiry — lapsed subs downgrade to FREE (blocks new uploads over quota, never deletes).
-export async function getStatus(userId: string) {
-  const sub = await prisma.subscription.findUnique({ where: { userId } });
-  if (!sub) return { plan: 'FREE' as Plan, active: false, expiresAt: null };
-
-  const active = sub.expiresAt.getTime() > Date.now();
-  if (!active) {
-    const thirtyDays = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: userId },
-        data:  { plan: 'FREE', storageLimit: BigInt(PLAN_BENEFITS.FREE.storageBytes) },
-      }),
-      // Start 30-day clock on files that don't already have one.
-      prisma.mediaFile.updateMany({
-        where: { userId, expiresAt: null },
-        data:  { expiresAt: thirtyDays },
-      }),
-    ]);
-    return { plan: 'FREE' as Plan, active: false, expiresAt: sub.expiresAt };
+/** Active production wins; else active sandbox; else FREE (SUB-R7/R8). */
+function effectiveFromSub(sub: SubSnapshot, now = Date.now()): { plan: Plan; expiresAt: Date | null } {
+  if (sub?.plan && sub.expiresAt && sub.expiresAt.getTime() > now) return { plan: sub.plan, expiresAt: sub.expiresAt };
+  if (sub?.sandboxPlan && sub.sandboxExpiresAt && sub.sandboxExpiresAt.getTime() > now) {
+    return { plan: sub.sandboxPlan, expiresAt: sub.sandboxExpiresAt };
   }
-  return { plan: sub.plan, active: true, expiresAt: sub.expiresAt };
+  return { plan: 'FREE', expiresAt: null };
 }
 
-// Cheap plan lookup for the per-tier rate limiter (treats lapsed subs as FREE).
-export async function getEffectivePlan(userId: string): Promise<Plan> {
-  const sub = await prisma.subscription.findUnique({
-    where: { userId },
-    select: { plan: true, expiresAt: true },
+const SNAPSHOT_SELECT = { plan: true, expiresAt: true, sandboxPlan: true, sandboxExpiresAt: true } as const;
+
+/**
+ * Reconcile the User mirror (plan + storageLimit) and media retention to the effective entitlement.
+ * MUST be called with the per-user advisory lock + User row already held by the caller's `tx`
+ * (canonical User → MediaFile order). Returns the effective plan/expiry.
+ */
+export async function reconcileEntitlement(tx: PrismaNS.TransactionClient, userId: string, sub?: SubSnapshot) {
+  const snap = sub !== undefined ? sub : await tx.subscription.findUnique({ where: { userId }, select: SNAPSHOT_SELECT });
+  const eff = effectiveFromSub(snap);
+  const benefits = PLAN_BENEFITS[eff.plan];
+  await tx.user.update({ where: { id: userId }, data: { plan: eff.plan, storageLimit: BigInt(benefits.storageBytes) } });
+  if (eff.plan !== 'FREE') {
+    await tx.mediaFile.updateMany({ where: { userId }, data: { expiresAt: null } });
+  } else {
+    await tx.mediaFile.updateMany({ where: { userId, expiresAt: null }, data: { expiresAt: new Date(Date.now() + THIRTY_DAYS_MS) } });
+  }
+  return eff;
+}
+
+/** Take the per-user advisory lock + User row FOR UPDATE, then run `fn` (User → MediaFile order). */
+export async function withUserLock<T>(userId: string, fn: (tx: PrismaNS.TransactionClient) => Promise<T>): Promise<T> {
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
+    await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+    return fn(tx);
   });
-  if (!sub || sub.expiresAt.getTime() <= Date.now()) return 'FREE';
-  return sub.plan;
 }
 
-// ── RevenueCat webhook (source of truth for entitlements once migrated) ──────────
+// Recheck expiry — a lapsed sub reconciles to FREE (blocks new uploads over quota, never deletes).
+export async function getStatus(userId: string) {
+  const eff = await withUserLock(userId, (tx) => reconcileEntitlement(tx, userId));
+  return { plan: eff.plan, active: eff.plan !== 'FREE', expiresAt: eff.expiresAt };
+}
+
+// Expiry-aware effective plan (SUB-5). Used by the rate limiter, media quota, and streak freezes.
+export async function getEffectivePlan(userId: string): Promise<Plan> {
+  const sub = await prisma.subscription.findUnique({ where: { userId }, select: SNAPSHOT_SELECT });
+  return effectiveFromSub(sub).plan;
+}
+
+// ── RevenueCat webhook (sole entitlement source) ─────────────────────────────────
 export interface RcWebhookEvent {
   id: string;
   type: string;
@@ -149,40 +74,75 @@ export interface RcWebhookEvent {
   original_app_user_id?: string;
   product_id?: string;
   expiration_at_ms?: number | null;
+  event_timestamp_ms?: number | null;
+  environment?: string; // 'PRODUCTION' | 'SANDBOX'
   transaction_id?: string | null;
   original_transaction_id?: string | null;
+  transferred_from?: string[]; // RC TRANSFER: prior owner app_user_ids losing the entitlement
   store?: string;
 }
 
 export type RcResult = { status: 'duplicate' | 'ignored' | 'applied'; detail?: string };
 
-// RC store → our Store enum (we only sell on Apple/Google).
 const RC_STORE_MAP: Record<string, Store> = { APP_STORE: 'APPLE', MAC_APP_STORE: 'APPLE', PLAY_STORE: 'GOOGLE' };
 const RC_ACTIVATE = new Set(['INITIAL_PURCHASE', 'RENEWAL', 'UNCANCELLATION', 'PRODUCT_CHANGE']);
 const RC_GRANT_CREDITS = new Set(['INITIAL_PURCHASE', 'RENEWAL']); // money events only
-const RC_TERMINATE = new Set(['EXPIRATION', 'SUBSCRIPTION_PAUSED']);
+const RC_TERMINATE = new Set(['EXPIRATION']); // SUB-R5: PAUSED does NOT revoke (access until real expiry)
 
 /**
- * Idempotent RevenueCat webhook handler. Reuses the same grant/downgrade logic as the
- * legacy receipt path, but keyed on RC event.id (RC retries on non-2xx). The ProcessedWebhookEvent
- * insert is the dedupe guard — a replayed event.id hits the @id unique constraint (P2002) and the
- * whole transaction rolls back, so nothing is granted twice.
+ * Idempotent RevenueCat webhook. `ProcessedWebhookEvent(event.id)` dedups event REPLAYS (P2002 rolls
+ * the whole txn back → 'duplicate'). Distinct events for the same store transaction are deduped for
+ * CREDITS by the `ProcessedTransaction(store, transactionId)` ledger (SUB-3). Per-user advisory lock
+ * serializes concurrent events + getStatus (SUB-R2). Entitlement is a dual per-env snapshot with
+ * production precedence (SUB-R7/R8); credits granted only for PRODUCTION in prod (SUB-R6).
  */
 export async function handleRcWebhook(event: RcWebhookEvent): Promise<RcResult> {
   const userId = event.app_user_id;
   try {
-    return await prisma.$transaction(async (tx) => {
+    const result = await prisma.$transaction(async (tx): Promise<RcResult> => {
       await tx.processedWebhookEvent.create({ data: { id: event.id, type: event.type, appUserId: userId ?? null } });
 
       if (!userId) return { status: 'ignored', detail: 'no app_user_id' };
-      const user = await tx.user.findUnique({ where: { id: userId }, select: { id: true } });
-      if (!user) return { status: 'ignored', detail: 'unknown user' };
+
+      // Validate trust-boundary fields BEFORE any entitlement/credit effect (SUB-I4): an unknown/missing
+      // environment must NOT be treated as production, and a missing/non-finite timestamp must not
+      // become "now" (an undated older EXPIRATION would otherwise erase a newer renewal). The event.id
+      // is already recorded above, so a malformed event won't be retried forever by RC.
+      const isProd = event.environment === 'PRODUCTION';
+      if (!isProd && event.environment !== 'SANDBOX') return { status: 'ignored', detail: 'invalid environment' };
+      if (typeof event.event_timestamp_ms !== 'number' || !Number.isFinite(event.event_timestamp_ms)) {
+        return { status: 'ignored', detail: 'invalid event_timestamp_ms' };
+      }
+      const ts = event.event_timestamp_ms;
+      const creditsAllowed = isProd || env.NODE_ENV !== 'production';
+
+      // Canonical order: advisory lock → User FOR UPDATE → (Subscription/MediaFile) — matches media audit.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
+      const userRows = await tx.$queryRaw<{ id: string }[]>`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+      if (!userRows.length) return { status: 'ignored', detail: 'unknown user' };
+
+      const sub = await tx.subscription.findUnique({ where: { userId } });
 
       if (RC_TERMINATE.has(event.type)) {
-        const thirtyDays = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-        await tx.user.update({ where: { id: userId }, data: { plan: 'FREE', storageLimit: BigInt(PLAN_BENEFITS.FREE.storageBytes) } });
-        await tx.mediaFile.updateMany({ where: { userId, expiresAt: null }, data: { expiresAt: thirtyDays } });
-        return { status: 'applied', detail: `downgraded (${event.type})` };
+        // Clear ONLY the terminating environment's snapshot, if this event is newer than its watermark.
+        // Upsert (not update): an EXPIRATION delivered before any purchase has no row yet — SUB-I2.
+        if (isProd) {
+          if (ts > (sub?.lastProdEventAt?.getTime() ?? -Infinity)) {
+            await tx.subscription.upsert({
+              where: { userId },
+              create: { userId, lastProdEventAt: new Date(ts) },
+              update: { plan: null, store: null, productId: null, expiresAt: null, lastProdEventAt: new Date(ts) },
+            });
+          }
+        } else if (ts > (sub?.lastSandboxEventAt?.getTime() ?? -Infinity)) {
+          await tx.subscription.upsert({
+            where: { userId },
+            create: { userId, lastSandboxEventAt: new Date(ts) },
+            update: { sandboxPlan: null, sandboxExpiresAt: null, lastSandboxEventAt: new Date(ts) },
+          });
+        }
+        await reconcileEntitlement(tx, userId);
+        return { status: 'applied', detail: `expired (${isProd ? 'prod' : 'sandbox'})` };
       }
 
       if (RC_ACTIVATE.has(event.type)) {
@@ -190,30 +150,71 @@ export async function handleRcWebhook(event: RcWebhookEvent): Promise<RcResult> 
         const store = event.store ? RC_STORE_MAP[event.store] : undefined;
         if (!def || !store || !event.expiration_at_ms) return { status: 'ignored', detail: 'unmapped product/store/expiry' };
         const expiresAt = new Date(event.expiration_at_ms);
-        const benefits = PLAN_BENEFITS[def.plan];
 
-        await tx.subscription.upsert({
-          where: { userId },
-          create: {
-            userId, plan: def.plan, store, productId: def.productId, expiresAt, rcAppUserId: userId,
-            originalTransactionId: event.original_transaction_id ?? null, lastTransactionId: event.transaction_id ?? null,
-          },
-          update: { plan: def.plan, store, productId: def.productId, expiresAt, rcAppUserId: userId, lastTransactionId: event.transaction_id ?? null },
-        });
-        await tx.user.update({ where: { id: userId }, data: { plan: def.plan, storageLimit: BigInt(benefits.storageBytes) } });
-        await tx.mediaFile.updateMany({ where: { userId }, data: { expiresAt: null } });
-
-        if (RC_GRANT_CREDITS.has(event.type)) {
-          const credits = creditsForPurchase(def);
-          await tx.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } });
-          await tx.creditTransaction.create({ data: { userId, type: 'PURCHASE', amount: credits, description: `${def.plan} ${def.period} subscription` } });
+        // ── Money (decoupled from entitlement ordering, SUB-R3): grant credits iff this store
+        //    transaction is newly ledgered, regardless of event order. ──
+        let creditNote = 'no credits';
+        if (RC_GRANT_CREDITS.has(event.type) && creditsAllowed && event.transaction_id) {
+          const inserted = await tx.$queryRaw<{ id: string }[]>`
+            INSERT INTO "ProcessedTransaction" ("id", "store", "transactionId", "userId")
+            VALUES (${randomUUID()}, ${store}::"Store", ${event.transaction_id}, ${userId})
+            ON CONFLICT ("store", "transactionId") DO NOTHING
+            RETURNING id`;
+          if (inserted.length > 0) {
+            const credits = creditsForPurchase(def);
+            await tx.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } });
+            await tx.creditTransaction.create({ data: { userId, type: 'PURCHASE', amount: credits, description: `${def.plan} ${def.period} subscription` } });
+            creditNote = `+${credits} credits`;
+          } else {
+            creditNote = 'credits already granted';
+          }
         }
-        return { status: 'applied', detail: `${event.type} ${def.plan}` };
+
+        // ── Entitlement (ordered per environment; production precedence via effectiveFromSub) ──
+        let entNote = 'entitlement stale (skipped)';
+        if (isProd) {
+          if (ts > (sub?.lastProdEventAt?.getTime() ?? -Infinity)) {
+            await tx.subscription.upsert({
+              where: { userId },
+              create: { userId, plan: def.plan, store, productId: def.productId, expiresAt, lastProdEventAt: new Date(ts), rcAppUserId: userId, originalTransactionId: event.original_transaction_id ?? null, lastTransactionId: event.transaction_id ?? null },
+              update: { plan: def.plan, store, productId: def.productId, expiresAt, lastProdEventAt: new Date(ts), rcAppUserId: userId, lastTransactionId: event.transaction_id ?? null },
+            });
+            entNote = 'prod entitlement applied';
+          }
+        } else if (ts > (sub?.lastSandboxEventAt?.getTime() ?? -Infinity)) {
+          await tx.subscription.upsert({
+            where: { userId },
+            create: { userId, sandboxPlan: def.plan, sandboxExpiresAt: expiresAt, lastSandboxEventAt: new Date(ts), rcAppUserId: userId },
+            update: { sandboxPlan: def.plan, sandboxExpiresAt: expiresAt, lastSandboxEventAt: new Date(ts), rcAppUserId: userId },
+          });
+          entNote = 'sandbox entitlement applied';
+        }
+
+        await reconcileEntitlement(tx, userId);
+        return { status: 'applied', detail: `${event.type} ${def.plan} [${isProd ? 'prod' : 'sandbox'}] ${entNote}, ${creditNote}` };
       }
 
-      // CANCELLATION (keep access until expiry), BILLING_ISSUE (grace), TEST, TRANSFER … — recorded only.
+      // CANCELLATION (access until expiry), BILLING_ISSUE (grace), SUBSCRIPTION_PAUSED, TEST … — recorded only.
       return { status: 'ignored', detail: event.type };
     });
+
+    // SUB-REVIEW-01: on a TRANSFER (restore into another account), the PRIOR owners lose the
+    // entitlement. Runs only after the dedup txn commits (a replay throws P2002 → 'duplicate' above,
+    // skipping this). The new owner (app_user_id) keeps their own sub — its events apply normally now
+    // that originalTransactionId is no longer unique.
+    if (event.type === 'TRANSFER' && Array.isArray(event.transferred_from)) {
+      for (const fromId of event.transferred_from) {
+        await withUserLock(fromId, async (tx) => {
+          await tx.subscription.updateMany({
+            where: { userId: fromId },
+            data: { plan: null, store: null, productId: null, expiresAt: null, sandboxPlan: null, sandboxExpiresAt: null },
+          });
+          await reconcileEntitlement(tx, fromId);
+        }).catch(() => { /* a missing/racing from-user is non-fatal */ });
+      }
+    }
+
+    return result;
   } catch (e) {
     if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === 'P2002') return { status: 'duplicate' };
     throw e;

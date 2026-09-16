@@ -3,12 +3,8 @@ import * as subscriptionsService from './subscriptions.service';
 import { sendSuccess, handleControllerError } from '../../utils/response';
 import { env } from '../../config/env';
 
-export async function verifyPurchase(req: Request, res: Response): Promise<void> {
-  try {
-    const result = await subscriptionsService.verifyPurchase(req.user!.id, req.body);
-    sendSuccess(res, result, 'Purchase verified');
-  } catch (error) { handleControllerError(res, error, 'Failed to verify purchase'); }
-}
+// Legacy POST /verify (Apple receipt verification) removed — RevenueCat is the sole entitlement source
+// and the webhook grants entitlements. The app never called /verify. See PLAN.md #20 (SUB-1/2/6/7).
 
 export async function getStatus(req: Request, res: Response): Promise<void> {
   try {

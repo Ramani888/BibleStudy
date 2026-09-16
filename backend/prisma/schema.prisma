@@ -221,21 +221,45 @@ model StudyPlanProgress {
 }
 
 // Active IAP subscription — one row per user, upserted on verify.
-// originalTransactionId is stable across renewals (dedup key); lastTransactionId
-// is the most recent processed transaction so renewal credit grants stay idempotent.
+// Dual per-environment entitlement snapshots (SUB-R7/R8): plan/store/productId/expiresAt hold the
+// PRODUCTION entitlement (nullable so a sandbox-only or not-yet-purchased row is representable — SUB-R9);
+// sandboxPlan/sandboxExpiresAt hold the SANDBOX entitlement. lastProdEventAt/lastSandboxEventAt are the
+// independent monotonic ordering watermarks (SUB-4). Effective plan = active-production else
+// active-sandbox else FREE, computed in getEffectivePlan. Credit grants are gated by ProcessedTransaction
+// (SUB-3), not by these watermarks.
 model Subscription {
-  id                    String   @id @default(uuid())
-  userId                String   @unique
-  plan                  Plan
-  store                 Store
-  productId             String
-  expiresAt             DateTime
-  originalTransactionId String?  @unique
+  id                    String    @id @default(uuid())
+  userId                String    @unique
+  plan                  Plan?
+  store                 Store?
+  productId             String?
+  expiresAt             DateTime?
+  lastProdEventAt       DateTime?
+  sandboxPlan           Plan?
+  sandboxExpiresAt      DateTime?
+  lastSandboxEventAt    DateTime?
+  // NOT @unique: an account TRANSFER moves originalTransactionId between users, so a unique constraint
+  // would collide on the new owner's renewal (P2002) and swallow their purchase. Dedup is handled by
+  // ProcessedWebhookEvent.id + the ProcessedTransaction ledger (SUB-REVIEW-01).
+  originalTransactionId String?
   lastTransactionId     String?
-  rcAppUserId           String?  // RevenueCat app_user_id (== our userId once logIn'd)
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rcAppUserId           String?   // RevenueCat app_user_id (== our userId once logIn'd)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// SUB-3: durable per-transaction ledger. A credit grant happens iff a (store, transactionId) row is
+// newly inserted here — idempotent across duplicate/reordered webhook events for the same store txn.
+model ProcessedTransaction {
+  id            String   @id @default(uuid())
+  store         Store
+  transactionId String
+  userId        String
+  createdAt     DateTime @default(now())
+
+  @@unique([store, transactionId])
+  @@index([userId])
 }
 
 // Idempotency ledger for RevenueCat webhooks (RC retries on non-2xx). One row per event.id.

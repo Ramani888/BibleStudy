@@ -2,10 +2,25 @@ import cron from 'node-cron';
 import fs from 'fs/promises';
 import path from 'path';
 import { prisma } from '../config/db';
+import { getEffectivePlan } from '../modules/subscriptions/subscriptions.service';
 
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+
+// SUB-REVIEW-02: durable retention reconcile. A user whose subscription lapses naturally but who never
+// opens the app (no verify-on-open) and whose RC EXPIRATION webhook is missed would keep null-expiry
+// (paid) media forever. Give any null-expiry file owned by an effectively-FREE user the 30-day deadline,
+// independent of uploads/webhooks — so mediaCleanup can then age it out.
+async function reconcileLapsedRetention() {
+  const rows = await prisma.mediaFile.findMany({ where: { expiresAt: null }, distinct: ['userId'], select: { userId: true } });
+  for (const { userId } of rows) {
+    if ((await getEffectivePlan(userId)) !== 'FREE') continue; // still entitled → keep indefinitely
+    await prisma.mediaFile.updateMany({ where: { userId, expiresAt: null }, data: { expiresAt: new Date(Date.now() + THIRTY_DAYS_MS) } });
+  }
+}
 
 async function deleteExpiredMedia() {
+  await reconcileLapsedRetention(); // date any lapsed-user null-expiry media first, then sweep
   const expired = await prisma.mediaFile.findMany({
     where: { expiresAt: { lte: new Date() } },
   });

@@ -6,6 +6,8 @@ import sharp from 'sharp';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
 import { AppError, NotFoundError } from '../../utils/errors';
+import { PLAN_BENEFITS } from '../../config/plans';
+import { getEffectivePlan, reconcileEntitlement, withUserLock } from '../subscriptions/subscriptions.service';
 import type { ListMediaDtoType } from './media.dto';
 
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/heic'];
@@ -55,11 +57,16 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
     finalSize = buffer.length;
   }
 
+  // Quota + retention are based on the EFFECTIVE (expiry-aware) plan, not the cached User.plan/limit
+  // mirror (SUB-R4/R5): a naturally-lapsed PRO reads as FREE here even before getStatus reconciles.
+  const effPlan = await getEffectivePlan(userId);
+  const effLimit = BigInt(PLAN_BENEFITS[effPlan].storageBytes);
+
   // Fast pre-check: not atomic — the real enforcement is the conditional UPDATE below.
   const user = await prisma.user.findUniqueOrThrow({ where: { id: userId } });
-  if (user.storageUsed + BigInt(finalSize) > user.storageLimit) {
+  if (user.storageUsed + BigInt(finalSize) > effLimit) {
     throw new AppError(
-      `Storage quota exceeded. You have ${formatBytes(Number(user.storageLimit - user.storageUsed))} remaining.`,
+      `Storage quota exceeded. You have ${formatBytes(Number(effLimit - user.storageUsed))} remaining.`,
       413,
       'QUOTA_EXCEEDED',
     );
@@ -82,7 +89,14 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
   // two concurrent uploads both pass the pre-check before either has incremented.
   // If the DB step fails after writing to disk, clean up the orphaned file.
   try {
-    return await prisma.$transaction(async (tx) => {
+    return await withUserLock(userId, async (tx) => {
+      // Under the per-user lock (advisory + User FOR UPDATE), reconcile the User mirror AND existing
+      // media retention to the effective entitlement — read fresh inside the tx so a concurrent
+      // EXPIRATION can't be lost (SUB-I1) and existing null-expiry files get the FREE deadline too
+      // (SUB-I3). Returns the authoritative effective plan; the conditional UPDATE then enforces
+      // against the reconciled storageLimit (canonical User → MediaFile order).
+      const eff = await reconcileEntitlement(tx, userId);
+
       const affected = await tx.$executeRaw`
         UPDATE "User"
         SET    "storageUsed" = "storageUsed" + ${finalSize}::bigint
@@ -103,11 +117,8 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
         );
       }
 
-      // Read plan INSIDE the tx, after the conditional UPDATE has taken the user-row lock, so a
-      // concurrent plan change (subscriptions.service upgrade/downgrade also writes the user row +
-      // MediaFile.expiresAt) is serialized against us — no stale expiry on a new file.
-      const { plan } = await tx.user.findUniqueOrThrow({ where: { id: userId }, select: { plan: true } });
-      const expiresAt = plan === 'FREE'
+      // Retention from the effective plan (free-tier files expire in 30 days; paid keep indefinitely).
+      const expiresAt = eff.plan === 'FREE'
         ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         : null;
 

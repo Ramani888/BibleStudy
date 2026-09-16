@@ -40,6 +40,11 @@ export function useSubscriptionSync() {
       await identifyUser(userId);
       await refreshCustomerInfo();
       if (cancelled) return;
+      // Hit /status FIRST — it reconciles the server-side entitlement (a naturally-lapsed sub
+      // downgrades to FREE even without an EXPIRATION webhook), so the me() refresh below returns the
+      // reconciled plan the Paywall reads. Otherwise expiry only reflects once a webhook lands.
+      try { await subscriptionsApi.status(); } catch { /* offline — me() still refreshes cached state */ }
+      if (cancelled) return;
       try { updateUser(await authApi.me()); } catch { /* keep cached user */ }
       qc.invalidateQueries({ queryKey: ['subscription'] });
     })();
