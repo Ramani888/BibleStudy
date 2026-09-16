@@ -92,6 +92,7 @@ export function useRemoveFriend() {
       qc.invalidateQueries({ queryKey: ['friends'] });
       qc.invalidateQueries({ queryKey: ['users', friendId] });
       qc.invalidateQueries({ queryKey: ['users', 'search'] });
+      qc.invalidateQueries({ queryKey: ['activities', 'friends'] }); // drop the ex-friend's activities from Home
     },
   });
 }
@@ -105,6 +106,7 @@ export function useBlockUser() {
       qc.invalidateQueries({ queryKey: ['friends'] });
       qc.invalidateQueries({ queryKey: ['users', userId] });
       qc.invalidateQueries({ queryKey: ['users', 'search'] });
+      qc.invalidateQueries({ queryKey: ['activities', 'friends'] }); // blocking removes the friendship → drop their activities from Home
     },
   });
 }
