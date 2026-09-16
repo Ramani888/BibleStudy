@@ -54,10 +54,16 @@ export async function storeNoteEmbedding(noteId: string, title: string, body: st
   const [vec] = await embed([text], 'document');
   if (!vec) return;
 
+  // Guard on the exact title/body we embedded (parity with storeCardEmbedding): if the note was
+  // edited (or deleted) while this async job ran, the row no longer matches and we skip the write —
+  // a stale vector must never overwrite a newer edit's embedding (out-of-order completion would
+  // otherwise leave AI retrieval on old text).
   await prisma.$executeRawUnsafe(
-    `UPDATE "Note" SET embedding = $1::vector WHERE id = $2`,
+    `UPDATE "Note" SET embedding = $1::vector WHERE id = $2 AND title = $3 AND body = $4`,
     vectorToSql(vec),
     noteId,
+    title,
+    body,
   );
 }
 

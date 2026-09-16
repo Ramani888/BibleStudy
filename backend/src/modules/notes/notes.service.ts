@@ -35,16 +35,28 @@ export async function updateNote(userId: string, noteId: string, dto: UpdateNote
   const note = await prisma.note.findFirst({ where: { id: noteId, userId } });
   if (!note) throw new NotFoundError('Note not found');
 
-  const updated = await prisma.note.update({
-    where: { id: noteId },
-    data: {
-      ...(dto.title !== undefined && { title: dto.title }),
-      ...(dto.body  !== undefined && { body:  dto.body  }),
-      ...(dto.tags  !== undefined && { tags:  dto.tags  }),
-    },
+  const contentChanged = dto.title !== undefined || dto.body !== undefined;
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const u = await tx.note.update({
+      where: { id: noteId },
+      data: {
+        ...(dto.title !== undefined && { title: dto.title }),
+        ...(dto.body  !== undefined && { body:  dto.body  }),
+        ...(dto.tags  !== undefined && { tags:  dto.tags  }),
+      },
+    });
+    // Content changed → drop the now-stale vector in the SAME txn so retrieval excludes the note
+    // (retrieveContext filters `embedding IS NOT NULL`) until the guarded async re-embed lands. If
+    // Voyage errors, the embedding stays NULL (note excluded) instead of ranking the new content
+    // with the old vector. Tags-only edits keep the embedding (content unchanged).
+    if (contentChanged) {
+      await tx.$executeRawUnsafe(`UPDATE "Note" SET embedding = NULL WHERE id = $1`, noteId);
+    }
+    return u;
   });
 
-  if (dto.title !== undefined || dto.body !== undefined) {
+  if (contentChanged) {
     storeNoteEmbedding(updated.id, updated.title, updated.body).catch(() => {});
   }
 
@@ -52,9 +64,9 @@ export async function updateNote(userId: string, noteId: string, dto: UpdateNote
 }
 
 export async function deleteNote(userId: string, noteId: string) {
-  const note = await prisma.note.findFirst({ where: { id: noteId, userId } });
-  if (!note) throw new NotFoundError('Note not found');
-
-  await prisma.note.delete({ where: { id: noteId } });
+  // deleteMany scoped by {id,userId}: atomic + IDOR-safe, and a concurrent double-delete no longer
+  // P2025→500 the loser (findFirst→delete-by-id race).
+  const { count } = await prisma.note.deleteMany({ where: { id: noteId, userId } });
+  if (count === 0) throw new NotFoundError('Note not found');
   return { message: 'Note deleted successfully' };
 }

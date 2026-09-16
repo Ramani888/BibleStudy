@@ -316,21 +316,32 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
     throw new ValidationError('Question must be at least 2 characters');
   }
 
-  const updated = await prisma.card.update({
-    where: { id: cardId },
-    data: {
-      ...(dto.type !== undefined && { type: dto.type }),
-      ...(dto.question !== undefined && { question: dto.question }),
-      ...(dto.answer !== undefined && { answer: dto.answer }),
-      ...(dto.imageId !== undefined && { imageId: dto.imageId }),
-      ...(dto.order !== undefined && { order: dto.order }),
-      ...(dto.note !== undefined && { note: dto.note }),
-      ...(dto.isBlurred !== undefined && { isBlurred: dto.isBlurred }),
-      ...(dto.difficulty !== undefined && { difficulty: dto.difficulty }),
-    },
+  const contentChanged = dto.question !== undefined || dto.answer !== undefined;
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const u = await tx.card.update({
+      where: { id: cardId },
+      data: {
+        ...(dto.type !== undefined && { type: dto.type }),
+        ...(dto.question !== undefined && { question: dto.question }),
+        ...(dto.answer !== undefined && { answer: dto.answer }),
+        ...(dto.imageId !== undefined && { imageId: dto.imageId }),
+        ...(dto.order !== undefined && { order: dto.order }),
+        ...(dto.note !== undefined && { note: dto.note }),
+        ...(dto.isBlurred !== undefined && { isBlurred: dto.isBlurred }),
+        ...(dto.difficulty !== undefined && { difficulty: dto.difficulty }),
+      },
+    });
+    // Content changed → clear the stale vector in the same txn (same fix as notes.updateNote /
+    // NOTES-R1): retrieval (`embedding IS NOT NULL`) excludes the card until the guarded re-embed
+    // lands, so a failed re-embed can't leave AI retrieval ranking new Q/A with the old vector.
+    if (contentChanged) {
+      await tx.$executeRawUnsafe(`UPDATE "Card" SET embedding = NULL WHERE id = $1`, cardId);
+    }
+    return u;
   });
 
-  if (dto.question !== undefined || dto.answer !== undefined) {
+  if (contentChanged) {
     storeCardEmbedding(updated.id, updated.question, updated.answer).catch(() => {});
   }
 
