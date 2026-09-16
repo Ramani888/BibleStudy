@@ -34,6 +34,7 @@ frontend/android/app/*.keystore
 # Claude Code local settings — machine-specific, may contain secrets
 .claude/settings.local.json
 .claude/worktrees/
+.claude/scheduled_tasks.lock
 
 # Obsidian local UI state
 biblestudypro/.obsidian/graph.json
