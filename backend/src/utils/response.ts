@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import { ZodError } from 'zod';
 import { AppError } from './errors';
 import { env } from '../config/env';
 
@@ -33,6 +34,11 @@ export const sendError = (
 
 export function handleControllerError(res: Response, error: unknown, fallback = 'Operation failed'): void {
   if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+  // Invalid input parsed inline in a controller (e.g. Dto.parse(req.query)) → 400, not 500.
+  if (error instanceof ZodError) {
+    sendError(res, error.issues[0]?.message ?? 'Invalid request', 400, 'VALIDATION_ERROR');
+    return;
+  }
   // Unexpected error: log server-side, but never return a raw error message (e.g. a Prisma
   // diagnostic exposing query/column internals) to the client in production.
   console.error('Unhandled controller error:', error);

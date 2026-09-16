@@ -103,7 +103,11 @@ export async function uploadFile(userId: string, file: Express.Multer.File) {
         );
       }
 
-      const expiresAt = user.plan === 'FREE'
+      // Read plan INSIDE the tx, after the conditional UPDATE has taken the user-row lock, so a
+      // concurrent plan change (subscriptions.service upgrade/downgrade also writes the user row +
+      // MediaFile.expiresAt) is serialized against us — no stale expiry on a new file.
+      const { plan } = await tx.user.findUniqueOrThrow({ where: { id: userId }, select: { plan: true } });
+      const expiresAt = plan === 'FREE'
         ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
         : null;
 
@@ -150,15 +154,22 @@ export async function deleteFile(userId: string, fileId: string) {
     }
   }
 
-  // Row + quota refund, clamped at 0 so storageUsed can never go negative.
-  await prisma.$transaction([
-    prisma.mediaFile.delete({ where: { id: fileId } }),
-    prisma.$executeRaw`
+  // Row + quota refund, clamped at 0 so storageUsed can never go negative. Refund ONLY if THIS
+  // call removed the row: deleteMany({id,userId}) + count guards against a concurrent delete (a
+  // double-tap, or the cleanup cron racing this) double-refunding, and the loser no longer P2025→500
+  // (delete-by-id would). Refund and delete share one transaction so they commit together.
+  await prisma.$transaction(async (tx) => {
+    // Lock the User row first (same order as subscription activation: User → MediaFile) so a
+    // concurrent plan change can't deadlock this AB-BA.
+    await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${userId} FOR UPDATE`;
+    const { count } = await tx.mediaFile.deleteMany({ where: { id: fileId, userId } });
+    if (count === 0) return; // already removed by a concurrent delete — nothing to refund
+    await tx.$executeRaw`
       UPDATE "User"
       SET    "storageUsed" = GREATEST(0::bigint, "storageUsed" - ${file.sizeBytes}::bigint)
       WHERE  id = ${userId}
-    `,
-  ]);
+    `;
+  });
 
   return { message: 'File deleted successfully' };
 }

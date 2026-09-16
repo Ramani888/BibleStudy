@@ -15,24 +15,40 @@ async function deleteExpiredMedia() {
 
   for (const file of expired) {
     try {
-      // Disk first (tolerate ENOENT). On any other disk error, skip this file so its
-      // row survives and next run retries — never leave an orphan with no DB row.
+      // DB first, conditional on the row STILL being expired. A subscription upgrade can set
+      // expiresAt=null (retention extended) between our snapshot above and now; deleteMany with the
+      // `expiresAt <= now` predicate and the upgrade's updateMany contend for the same row lock, so
+      // whichever commits first wins — we NEVER delete a file whose retention was just extended.
+      // count===0 → extended (or already gone): leave the file entirely, don't touch disk.
+      const deleted = await prisma.$transaction(async (tx) => {
+        // Lock the User row FIRST. Subscription activation locks User (user.update) then MediaFile
+        // (updateMany); acquiring MediaFile before User here would deadlock AB-BA. This matches its
+        // order (User → MediaFile), so the two serialize on the User lock instead.
+        await tx.$queryRaw`SELECT id FROM "User" WHERE id = ${file.userId} FOR UPDATE`;
+        const { count } = await tx.mediaFile.deleteMany({
+          where: { id: file.id, expiresAt: { lte: new Date() } },
+        });
+        if (count === 0) return false;
+        await tx.$executeRaw`
+          UPDATE "User"
+          SET    "storageUsed" = GREATEST(0::bigint, "storageUsed" - ${file.sizeBytes}::bigint)
+          WHERE  id = ${file.userId}
+        `;
+        return true;
+      });
+      if (!deleted) continue;
+
+      // Row is gone → remove the bytes. ENOENT is fine. A rare non-ENOENT failure leaves an orphaned
+      // (already-expired) file on disk — log it; the cron can't retry (row is gone). This is the
+      // deliberate inverse of the old disk-first order: preventing paid-user data loss (an upgrade
+      // racing the delete) outweighs a rare orphaned expired file.
       try {
         await fs.unlink(path.join(UPLOADS_DIR, file.key));
       } catch (err) {
         if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
-          console.error(`[mediaCleanup] disk delete failed for ${file.key}, will retry next run:`, err);
-          continue;
+          console.error(`[mediaCleanup] row deleted but disk unlink failed for ${file.key} (orphaned expired file):`, err);
         }
       }
-      await prisma.$transaction([
-        prisma.mediaFile.delete({ where: { id: file.id } }),
-        prisma.$executeRaw`
-          UPDATE "User"
-          SET    "storageUsed" = GREATEST(0::bigint, "storageUsed" - ${file.sizeBytes}::bigint)
-          WHERE  id = ${file.userId}
-        `,
-      ]);
     } catch (err) {
       console.error(`[mediaCleanup] failed to delete file ${file.id}:`, err);
     }
