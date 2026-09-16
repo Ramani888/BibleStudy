@@ -36,10 +36,15 @@ export async function storeCardEmbedding(cardId: string, question: string, answe
   const [vec] = await embed([text], 'document');
   if (!vec) return;
 
+  // Guard on the exact text we embedded: if the card was edited while this job ran, its
+  // question/answer no longer match and we skip the write — a stale vector must never overwrite
+  // a newer edit's embedding (out-of-order completion would otherwise leave retrieval on old text).
   await prisma.$executeRawUnsafe(
-    `UPDATE "Card" SET embedding = $1::vector WHERE id = $2`,
+    `UPDATE "Card" SET embedding = $1::vector WHERE id = $2 AND question = $3 AND answer = $4`,
     vectorToSql(vec),
     cardId,
+    question,
+    answer,
   );
 }
 

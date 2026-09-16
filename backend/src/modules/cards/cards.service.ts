@@ -169,27 +169,34 @@ export async function applyReviews(
   // $transaction would both compute from the pre-review snapshot and the first
   // would be lost. Normal flow yields one item per card; this is defensive.
   const reviews = [...new Map(results.map(r => [r.cardId, r])).values()];
-  const user = await prisma.user.findUnique({ where: { id: userId }, select: { useFsrs: true } });
-  const cards = await prisma.card.findMany({
-    // Owner-scoped, and optionally constrained to the attempt's own sets so an
-    // injected cardId from an unrelated set can't be rescheduled.
-    where: { id: { in: reviews.map(r => r.cardId) }, set: { userId }, ...(setIds && setIds.length ? { setId: { in: setIds } } : {}) },
-    select: {
-      id: true, interval: true, ease: true, nextReviewAt: true, lastStudiedAt: true,
-      fsrsStability: true, fsrsDifficulty: true, fsrsReps: true, fsrsLapses: true, fsrsState: true, fsrsLearningSteps: true,
-    },
-  });
-  const byId = new Map(cards.map(c => [c.id, c]));
-  const now = new Date();
 
-  const updates = reviews.flatMap(({ cardId, correct }) => {
-    const card = byId.get(cardId);
-    if (!card) return [];
-    const data = user?.useFsrs ? fsrsUpdate(card, correct, now) : sm2Update(card, correct, now);
-    return [prisma.card.update({ where: { id: cardId }, data })];
-  });
+  // Read -> compute -> write must be atomic per user. Otherwise two concurrent submissions both read
+  // the pre-review snapshot and one write is lost: e.g. a wrong answer's lapse (mature interval->0)
+  // gets overwritten by a concurrent correct answer computed from the OLD mature interval (->~260d),
+  // postponing the card for months and inflating mastery, and it does NOT self-correct. A per-user
+  // advisory xact lock (same pattern as the folders module) serializes a user's review writes.
+  await prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${userId}))`;
+    const user = await tx.user.findUnique({ where: { id: userId }, select: { useFsrs: true } });
+    const cards = await tx.card.findMany({
+      // Owner-scoped, and (when setIds is PROVIDED, even empty) constrained to it so an injected
+      // cardId from an unrelated set can't be rescheduled. undefined = owner-scope only.
+      where: { id: { in: reviews.map(r => r.cardId) }, set: { userId }, ...(setIds !== undefined ? { setId: { in: setIds } } : {}) },
+      select: {
+        id: true, interval: true, ease: true, nextReviewAt: true, lastStudiedAt: true,
+        fsrsStability: true, fsrsDifficulty: true, fsrsReps: true, fsrsLapses: true, fsrsState: true, fsrsLearningSteps: true,
+      },
+    });
+    const byId = new Map(cards.map(c => [c.id, c]));
+    const now = new Date();
 
-  if (updates.length > 0) await prisma.$transaction(updates);
+    for (const { cardId, correct } of reviews) {
+      const card = byId.get(cardId);
+      if (!card) continue;
+      const data = user?.useFsrs ? fsrsUpdate(card, correct, now) : sm2Update(card, correct, now);
+      await tx.card.update({ where: { id: cardId }, data });
+    }
+  });
 }
 
 async function verifySetOwnership(userId: string, setId: string) {
@@ -206,8 +213,16 @@ async function verifyCardOwnership(cardId: string, userId: string) {
   return card;
 }
 
+// A user-supplied imageId must reference the caller's OWN media — otherwise a card could point at
+// another user's MediaFile (cross-user coupling: breaks on their expiry/delete, muddies cleanup).
+async function verifyMediaOwnership(userId: string, imageId: string) {
+  const media = await prisma.mediaFile.findFirst({ where: { id: imageId, userId }, select: { id: true } });
+  if (!media) throw new NotFoundError('Image not found');
+}
+
 export async function createCard(userId: string, dto: CreateCardDtoType) {
   await verifySetOwnership(userId, dto.setId);
+  if (dto.imageId) await verifyMediaOwnership(userId, dto.imageId);
 
   const existingCount = await prisma.card.count({ where: { setId: dto.setId } });
 
@@ -235,25 +250,28 @@ export async function createCard(userId: string, dto: CreateCardDtoType) {
 export async function bulkCreateCards(userId: string, dto: BulkCreateCardsDtoType) {
   await verifySetOwnership(userId, dto.setId);
 
-  const cards = await prisma.$transaction(async (tx) => {
-    const existingCount = await tx.card.count({ where: { setId: dto.setId } });
-    return Promise.all(
-      dto.cards.map((card, index) =>
-        tx.card.create({
-          data: {
-            setId: dto.setId,
-            question: card.question,
-            answer: card.answer,
-            note: card.note ?? null,
-            imageId: card.imageId ?? null,
-            order: card.order ?? existingCount + index,
-            isBlurred: card.isBlurred ?? false,
-            difficulty: card.difficulty ?? 'MEDIUM',
-            userId,
-          },
-        })
-      )
-    );
+  // Every referenced image must be the caller's own media (see verifyMediaOwnership).
+  const imageIds = [...new Set(dto.cards.map(c => c.imageId).filter((id): id is string => !!id))];
+  if (imageIds.length > 0) {
+    const owned = await prisma.mediaFile.count({ where: { id: { in: imageIds }, userId } });
+    if (owned !== imageIds.length) throw new NotFoundError('Image not found');
+  }
+
+  const existingCount = await prisma.card.count({ where: { setId: dto.setId } });
+  // Single bulk INSERT (was up to 100 serial creates inside a 5s interactive transaction, which
+  // could time out / hold a connection). createManyAndReturn is one atomic statement that returns rows.
+  const cards = await prisma.card.createManyAndReturn({
+    data: dto.cards.map((card, index) => ({
+      setId: dto.setId,
+      question: card.question,
+      answer: card.answer,
+      note: card.note ?? null,
+      imageId: card.imageId ?? null,
+      order: card.order ?? existingCount + index,
+      isBlurred: card.isBlurred ?? false,
+      difficulty: card.difficulty ?? 'MEDIUM',
+      userId,
+    })),
   });
 
   Promise.all(cards.map(c => storeCardEmbedding(c.id, c.question, c.answer))).catch(() => {});
@@ -287,7 +305,16 @@ export async function getCardById(userId: string, cardId: string) {
 }
 
 export async function updateCard(userId: string, cardId: string, dto: UpdateCardDtoType) {
-  await verifyCardOwnership(cardId, userId);
+  const existing = await verifyCardOwnership(cardId, userId);
+  if (dto.imageId) await verifyMediaOwnership(userId, dto.imageId); // null clears the image (no check)
+
+  // Validate the MERGED result, not just the patch: a QA card must keep a >=2-char question
+  // (CreateCardDto enforces this; without it PUT {question:""} or {type:"QA"} corrupts the card).
+  const effectiveType = dto.type ?? existing.type;
+  const effectiveQuestion = dto.question ?? existing.question;
+  if (effectiveType === 'QA' && effectiveQuestion.trim().length < 2) {
+    throw new ValidationError('Question must be at least 2 characters');
+  }
 
   const updated = await prisma.card.update({
     where: { id: cardId },
@@ -329,6 +356,7 @@ export async function copyCard(userId: string, cardId: string) {
   const copy = await prisma.card.create({
     data: {
       setId: card.setId,
+      type: card.type, // preserve QA vs STORY (omitting it defaulted the copy to QA)
       question: card.question,
       answer: card.answer,
       note: card.note,
@@ -339,6 +367,9 @@ export async function copyCard(userId: string, cardId: string) {
       userId,
     },
   });
+
+  // Index the copy for AI retrieval (createCard/bulkCreate/cloneSet all do this).
+  storeCardEmbedding(copy.id, copy.question, copy.answer).catch(() => {});
 
   return copy;
 }
@@ -364,6 +395,8 @@ export async function moveCard(userId: string, cardId: string, targetSetId: stri
 }
 
 export async function reorderCards(userId: string, dto: ReorderCardsDtoType) {
+  await verifySetOwnership(userId, dto.setId); // canonical ownership guard (was only implied by counts)
+
   // Verify the count matches all cards currently in the set
   const totalCount = await prisma.card.count({ where: { setId: dto.setId, userId } });
   if (totalCount !== dto.cardIds.length) {
