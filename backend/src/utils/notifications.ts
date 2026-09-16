@@ -39,16 +39,23 @@ export async function sendPushToUser(
   data?: Record<string, string>
 ): Promise<void> {
   try {
-    // Persist in-app notification regardless of push config
-    await prisma.notification.create({
-      data: {
-        userId,
-        title,
-        body,
-        type: data?.type ?? 'general',
-        referenceId: data?.id ?? null,
-      },
-    });
+    // Persist in-app notification regardless of push config. Upsert on the (userId,type,referenceId)
+    // unique key so a repeat of the SAME referenced event — a re-sent friend request (reuses its
+    // request.id via the sendRequest upsert) or re-accepting after a friend cycle (friend_accepted +
+    // accepter id) — re-surfaces as fresh + unread instead of being silently dropped by the
+    // constraint (which also skipped the push). Null-ref events (e.g. the weekly share nudge) are not
+    // deduped — Postgres treats null refs as distinct — so they always insert.
+    const type = data?.type ?? 'general';
+    const referenceId = data?.id ?? null;
+    if (referenceId === null) {
+      await prisma.notification.create({ data: { userId, title, body, type, referenceId: null } });
+    } else {
+      await prisma.notification.upsert({
+        where: { userId_type_referenceId: { userId, type, referenceId } },
+        create: { userId, title, body, type, referenceId },
+        update: { title, body, read: false, createdAt: new Date() },
+      });
+    }
 
     const messaging = await getMessaging();
     if (!messaging) return; // Firebase not configured
