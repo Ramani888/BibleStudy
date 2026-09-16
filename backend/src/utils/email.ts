@@ -1,9 +1,11 @@
+import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { env } from '../config/env';
 import { prisma } from '../config/db';
 
 export function generateOTP(): string {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  // CSPRNG — Math.random is not cryptographically secure.
+  return crypto.randomInt(100000, 1000000).toString();
 }
 
 export async function storeOTP(email: string, otp: string): Promise<void> {
@@ -22,7 +24,11 @@ export async function verifyOTP(email: string, otp: string): Promise<boolean> {
     orderBy: { createdAt: 'desc' },
   });
   if (!stored) return false;
-  if (stored.otp !== otp) return false;
+  // Timing-safe compare on BYTE buffers (timingSafeEqual throws on unequal buffer
+  // lengths, so compare Buffer.length — not JS string length, which is UTF-16 units).
+  const a = Buffer.from(stored.otp);
+  const b = Buffer.from(otp);
+  if (a.length !== b.length || !crypto.timingSafeEqual(a, b)) return false;
   await prisma.otpToken.deleteMany({ where: { email } });
   return true;
 }

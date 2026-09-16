@@ -234,8 +234,9 @@ export async function refreshToken(token: string) {
   }
 }
 
-export async function logout(token: string) {
-  await prisma.refreshToken.deleteMany({ where: { token } });
+export async function logout(userId: string, token: string) {
+  // Scope deletion to the authenticated user so one user can't delete another's token.
+  await prisma.refreshToken.deleteMany({ where: { token, userId } });
   return { message: 'Logged out successfully' };
 }
 
@@ -312,6 +313,9 @@ export async function googleAuth(dto: GoogleAuthDtoType) {
   const ticket  = await googleClient.verifyIdToken({ idToken: dto.idToken, audience: env.GOOGLE_CLIENT_ID });
   const payload = ticket.getPayload();
   if (!payload?.sub || !payload.email) throw new UnauthorizedError('Invalid Google token');
+  // Require a provider-VERIFIED email before linking by email — otherwise an unverified
+  // Google email matching an existing account allows takeover of that account.
+  if (payload.email_verified !== true) throw new UnauthorizedError('Google email is not verified');
 
   const { sub: googleId, email, name = 'User', picture } = payload;
 
@@ -348,16 +352,17 @@ export async function appleAuth(dto: AppleAuthDtoType) {
   });
 
   const appleId = appleUser.sub;
-  // Apple only sends email + name on the very first sign-in
-  const email = dto.email ?? appleUser.email;
-  if (!email) throw new UnauthorizedError('Email not provided by Apple. Please try signing in again.');
+  // SECURITY: link/lookup ONLY on the token-VERIFIED email claim (Apple sends it on the
+  // first-ever authorization). Never use client-supplied dto.email — the token signature
+  // proves the caller's Apple identity, not ownership of a request-body email (AUTH-001).
+  const email = appleUser.email;
 
   const givenName  = dto.fullName?.givenName  ?? '';
   const familyName = dto.fullName?.familyName ?? '';
   const name       = [givenName, familyName].filter(Boolean).join(' ') || 'User';
 
   let user = await prisma.user.findFirst({
-    where: { OR: [{ appleId }, { email }] },
+    where: { OR: [{ appleId }, ...(email ? [{ email }] : [])] },
     select: { ...USER_SELECT, appleId: true },
   });
 
@@ -366,6 +371,8 @@ export async function appleAuth(dto: AppleAuthDtoType) {
       await prisma.user.update({ where: { id: user.id }, data: { appleId } });
     }
   } else {
+    // No appleId match and no verified email → cannot safely auto-link (AUTH-003).
+    if (!email) throw new UnauthorizedError('Email not provided by Apple. Please try signing in again.');
     user = await prisma.user.create({
       data: { name, email, appleId, emailVerified: true },
       select: { ...USER_SELECT, appleId: true },

@@ -12,7 +12,7 @@ export const RegisterDto = z.object({
 
 export const VerifyEmailDto = z.object({
   email: z.string().email('Invalid email address'),
-  otp: z.string().length(6, 'OTP must be 6 digits'),
+  otp: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits'),
 });
 
 export const LoginDto = z.object({
@@ -38,7 +38,7 @@ export const ForgotPasswordDto = z.object({
 
 export const ResetPasswordDto = z.object({
   email: z.string().email('Invalid email address'),
-  otp: z.string().length(6, 'OTP must be 6 digits'),
+  otp: z.string().regex(/^\d{6}$/, 'OTP must be 6 digits'),
   newPassword: z
     .string()
     .min(8, 'Password must be at least 8 characters')

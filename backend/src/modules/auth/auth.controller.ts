@@ -67,7 +67,7 @@ export async function refreshToken(req: Request, res: Response): Promise<void> {
 export async function logout(req: Request, res: Response): Promise<void> {
   try {
     const dto = req.body;
-    const result = await authService.logout(dto.refreshToken);
+    const result = await authService.logout(req.user!.id, dto.refreshToken);
     sendSuccess(res, result, result.message);
   } catch (error) {
     if (error instanceof AppError) {
