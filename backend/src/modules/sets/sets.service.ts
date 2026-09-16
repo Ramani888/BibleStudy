@@ -1,5 +1,6 @@
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
+import { storeCardEmbedding } from '../ai/embeddings.service';
 import { CreateSetDtoType, UpdateSetDtoType } from './sets.dto';
 import { NotFoundError } from '../../utils/errors';
 
@@ -49,8 +50,10 @@ export async function listSets(userId: string, folderId?: string) {
 }
 
 export async function getSetById(userId: string, setId: string) {
+  // Scope ownership in the query itself (matches updateSet/deleteSet) rather than fetching every
+  // card then checking set.userId after — no reason to pull another user's card content into memory.
   const set = await prisma.set.findFirst({
-    where: { id: setId },
+    where: { id: setId, userId },
     include: {
       cards: { orderBy: { order: 'asc' } },
       folder: { select: { id: true, name: true } },
@@ -61,8 +64,6 @@ export async function getSetById(userId: string, setId: string) {
   if (!set) {
     throw new NotFoundError('Set not found');
   }
-
-  if (set.userId !== userId) throw new NotFoundError('Set not found');
 
   return set;
 }
@@ -98,8 +99,9 @@ export async function updateSet(userId: string, setId: string, dto: UpdateSetDto
     }
   }
 
-  const updated = await prisma.set.update({
-    where: { id: setId },
+  // Ownership-scoped write (atomic — no check-then-act on the mutation itself).
+  await prisma.set.updateMany({
+    where: { id: setId, userId },
     data: {
       ...(dto.title !== undefined && { title: dto.title }),
       ...(dto.description !== undefined && { description: dto.description }),
@@ -110,7 +112,7 @@ export async function updateSet(userId: string, setId: string, dto: UpdateSetDto
     },
   });
 
-  return updated;
+  return prisma.set.findFirstOrThrow({ where: { id: setId, userId } });
 }
 
 export async function deleteSet(userId: string, setId: string) {
@@ -241,10 +243,14 @@ export async function cloneSet(userId: string, setId: string) {
       folderId: originalSet.userId === userId ? originalSet.folderId : null,
       cards: {
         create: originalSet.cards.map((card) => ({
+          type: card.type, // preserve QA vs STORY — omitting it defaulted every cloned card to QA
           question: card.question,
           answer: card.answer,
           note: card.note,
-          imageId: card.imageId,
+          // Keep the image only when cloning your OWN set. Copying another user's imageId would point
+          // the clone at their MediaFile (a different owner's storage) — a cross-user coupling that
+          // breaks when their file expires/deletes and muddies cleanup. Cross-user clones drop it.
+          imageId: originalSet.userId === userId ? card.imageId : null,
           order: card.order,
           difficulty: card.difficulty,
           isBlurred: card.isBlurred,
@@ -257,6 +263,10 @@ export async function cloneSet(userId: string, setId: string) {
       _count: { select: { cards: true } },
     },
   });
+
+  // Schedule embeddings for the cloned cards (fire-and-forget, like createCard/bulkCreate) — without
+  // this the copies stay invisible to AI personal-library retrieval until each card is edited.
+  Promise.all(clonedSet.cards.map(c => storeCardEmbedding(c.id, c.question, c.answer))).catch(() => {});
 
   await logActivity(userId, 'CREATED_SET', clonedSet.id);
 
