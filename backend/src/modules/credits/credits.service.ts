@@ -370,7 +370,7 @@ function randomCode(len = 6): string {
 export async function getReferralInfo(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { referralCode: true, referredById: true },
+    select: { referralCode: true, referralRedeemedAt: true },
   });
   if (!user) throw new NotFoundError('User not found');
 
@@ -398,7 +398,7 @@ export async function getReferralInfo(userId: string) {
     referredCount,
     rewardPerReferral: REFERRER_REWARD,
     newUserReward: NEW_USER_REWARD,
-    alreadyRedeemed: user.referredById !== null,
+    alreadyRedeemed: user.referralRedeemedAt !== null,
   };
 }
 
@@ -409,26 +409,34 @@ export async function redeemReferral(userId: string, rawCode: string) {
 
   const referrer = await prisma.user.findUnique({
     where: { referralCode: code },
-    select: { id: true },
+    select: { id: true, referredById: true },
   });
   if (!referrer) throw new NotFoundError('That referral code is invalid');
   if (referrer.id === userId) throw new ValidationError('You cannot use your own referral code');
+  // Reject the 2-account reciprocal cycle (A↔B). N-account cycles are a documented non-goal.
+  if (referrer.referredById === userId) throw new ValidationError('Circular referral not allowed');
 
-  const me = await prisma.user.findUnique({ where: { id: userId }, select: { referredById: true } });
+  // referralRedeemedAt is the durable idempotency key (referredById is SetNull-able on referrer deletion).
+  const me = await prisma.user.findUnique({ where: { id: userId }, select: { referralRedeemedAt: true } });
   if (!me) throw new NotFoundError('User not found');
-  if (me.referredById) throw new ConflictError('You have already redeemed a referral code');
+  if (me.referralRedeemedAt) throw new ConflictError('You have already redeemed a referral code');
 
-  // Serializable so two concurrent redeems can't both pass the referredById check.
+  // Serializable so two concurrent redeems can't both pass the marker check.
   let balance: number;
   try {
     balance = await prisma.$transaction(async (tx) => {
-      const fresh = await tx.user.findUnique({ where: { id: userId }, select: { referredById: true } });
-      if (fresh?.referredById) throw new ConflictError('You have already redeemed a referral code');
+      const fresh = await tx.user.findUnique({ where: { id: userId }, select: { referralRedeemedAt: true } });
+      if (fresh?.referralRedeemedAt) throw new ConflictError('You have already redeemed a referral code');
 
-      // Grant the new user their bonus + record who referred them.
+      // Re-read the referrer inside the txn to catch a simultaneous A↔B pair
+      // (serializable would otherwise surface it as a P2034 retry).
+      const freshReferrer = await tx.user.findUnique({ where: { id: referrer.id }, select: { referredById: true } });
+      if (freshReferrer?.referredById === userId) throw new ValidationError('Circular referral not allowed');
+
+      // Grant the new user their bonus + record who referred them + stamp the durable marker.
       const updated = await tx.user.update({
         where: { id: userId },
-        data: { referredById: referrer.id, creditBalance: { increment: NEW_USER_REWARD } },
+        data: { referredById: referrer.id, referralRedeemedAt: new Date(), creditBalance: { increment: NEW_USER_REWARD } },
         select: { creditBalance: true },
       });
       await tx.creditTransaction.create({

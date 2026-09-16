@@ -28,6 +28,7 @@ model User {
   emailVerified   Boolean         @default(false)
   referralCode    String?         @unique  // this user's own invite code (lazy-generated)
   referredById    String?                  // who invited this user (set once on redeem)
+  referralRedeemedAt DateTime?              // immutable redemption marker; never cleared (referredById is SetNull-able, so it can't be the idempotency key)
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
 
