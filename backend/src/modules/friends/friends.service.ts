@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { logActivity } from '../../utils/activity';
 import { sendPushToUser } from '../../utils/notifications';
@@ -11,6 +12,19 @@ const friendSelect = {
   bio: true,
   church: true,
 } as const;
+
+// Serialize all friendship-state mutations (send / accept / block) for a pair of users inside one
+// transaction guarded by a canonical per-pair advisory lock. Without it, accept can interleave with
+// block (re-friending across a block once the block has committed) and two concurrent reciprocal
+// accepts can deadlock on each other's request rows. Sorting the ids gives both directions the same
+// lock key; the xact lock auto-releases on commit/rollback, so a pair's mutations run one at a time.
+async function withPairLock<T>(a: string, b: string, fn: (tx: Prisma.TransactionClient) => Promise<T>): Promise<T> {
+  const key = [a, b].sort().join(':');
+  return prisma.$transaction(async (tx) => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${key}))`;
+    return fn(tx);
+  });
+}
 
 export async function listFriends(userId: string) {
   const friendships = await prisma.friendship.findMany({
@@ -87,39 +101,40 @@ export async function sendRequest(senderId: string, receiverId: string) {
   const receiver = await prisma.user.findUnique({ where: { id: receiverId } });
   if (!receiver) throw new NotFoundError('User not found');
 
-  // Check not blocked
-  const blocked = await prisma.block.findFirst({
-    where: {
-      OR: [
-        { blockerId: senderId, blockedId: receiverId },
-        { blockerId: receiverId, blockedId: senderId },
-      ],
-    },
-  });
-  if (blocked) throw new ValidationError('Cannot send friend request');
+  // All the block / already-friends / duplicate-pending checks and the upsert run inside the
+  // pair lock so they can't interleave with a concurrent block or a reverse-direction send.
+  const request = await withPairLock(senderId, receiverId, async (tx) => {
+    const blocked = await tx.block.findFirst({
+      where: {
+        OR: [
+          { blockerId: senderId, blockedId: receiverId },
+          { blockerId: receiverId, blockedId: senderId },
+        ],
+      },
+    });
+    if (blocked) throw new ValidationError('Cannot send friend request');
 
-  // Check not already friends
-  const existing = await prisma.friendship.findFirst({
-    where: { userId: senderId, friendId: receiverId },
-  });
-  if (existing) throw new ConflictError('Already friends');
+    const existing = await tx.friendship.findFirst({
+      where: { userId: senderId, friendId: receiverId },
+    });
+    if (existing) throw new ConflictError('Already friends');
 
-  // Check no pending request either direction
-  const pendingRequest = await prisma.friendRequest.findFirst({
-    where: {
-      OR: [
-        { senderId, receiverId, status: 'PENDING' },
-        { senderId: receiverId, receiverId: senderId, status: 'PENDING' },
-      ],
-    },
-  });
-  if (pendingRequest) throw new ConflictError('Friend request already pending');
+    const pendingRequest = await tx.friendRequest.findFirst({
+      where: {
+        OR: [
+          { senderId, receiverId, status: 'PENDING' },
+          { senderId: receiverId, receiverId: senderId, status: 'PENDING' },
+        ],
+      },
+    });
+    if (pendingRequest) throw new ConflictError('Friend request already pending');
 
-  const request = await prisma.friendRequest.upsert({
-    where: { senderId_receiverId: { senderId, receiverId } },
-    create: { senderId, receiverId },
-    update: { status: 'PENDING', updatedAt: new Date() },
-    include: { sender: { select: friendSelect }, receiver: { select: friendSelect } },
+    return tx.friendRequest.upsert({
+      where: { senderId_receiverId: { senderId, receiverId } },
+      create: { senderId, receiverId },
+      update: { status: 'PENDING', updatedAt: new Date() },
+      include: { sender: { select: friendSelect }, receiver: { select: friendSelect } },
+    });
   });
 
   // Notify receiver
@@ -132,64 +147,113 @@ export async function sendRequest(senderId: string, receiverId: string) {
 }
 
 export async function acceptRequest(userId: string, requestId: string) {
-  const request = await prisma.friendRequest.findFirst({
-    where: { id: requestId, receiverId: userId, status: 'PENDING' },
-    include: { sender: { select: friendSelect } },
+  // Discover the counterparty so we can take the canonical pair lock. This read is NOT trusted —
+  // every authorization decision below is re-made on a fresh read inside the lock.
+  const pre = await prisma.friendRequest.findFirst({
+    where: { id: requestId, receiverId: userId },
+    select: { senderId: true },
   });
-  if (!request) throw new NotFoundError('Friend request not found');
+  if (!pre) throw new NotFoundError('Friend request not found');
+  const senderId = pre.senderId;
 
-  await prisma.$transaction([
-    prisma.friendRequest.update({ where: { id: requestId }, data: { status: 'ACCEPTED' } }),
-    prisma.friendship.create({ data: { userId, friendId: request.senderId } }),
-    prisma.friendship.create({ data: { userId: request.senderId, friendId: userId } }),
-  ]);
+  const transitioned = await withPairLock(userId, senderId, async (tx) => {
+    const req = await tx.friendRequest.findFirst({ where: { id: requestId, receiverId: userId } });
+    if (!req) throw new NotFoundError('Friend request not found');
 
-  // Log activity for both users
-  await logActivity(userId, 'ADDED_FRIEND', request.senderId);
-  await logActivity(request.senderId, 'ADDED_FRIEND', userId);
+    // Re-check blocks inside the lock: a block that committed after the outer read (or races this
+    // accept) is now visible, so we never friend across a block.
+    const blocked = await tx.block.findFirst({
+      where: {
+        OR: [
+          { blockerId: userId, blockedId: senderId },
+          { blockerId: senderId, blockedId: userId },
+        ],
+      },
+    });
+    if (blocked) throw new ValidationError('Cannot accept friend request');
 
-  // Notify the original sender
-  const receiver = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
-  await sendPushToUser(request.senderId, 'Friend Request Accepted', `${receiver?.name} accepted your friend request`, {
-    type: 'friend_accepted',
-    id: userId,
+    if (req.status === 'ACCEPTED') {
+      // Idempotent retry of a completed accept (lost response) → success no-op, no re-notify.
+      const fs = await tx.friendship.findFirst({ where: { userId, friendId: senderId } });
+      if (fs) return false;
+      throw new NotFoundError('Friend request not found'); // accepted-then-unfriended: stale
+    }
+    if (req.status !== 'PENDING') throw new NotFoundError('Friend request not found'); // REJECTED, etc.
+
+    await tx.friendRequest.update({ where: { id: requestId }, data: { status: 'ACCEPTED' } });
+    // skipDuplicates keeps this idempotent: concurrent/retried accepts and a reciprocal request
+    // from the sendRequest race no longer hit the Friendship unique constraint (P2002 → 500).
+    await tx.friendship.createMany({
+      data: [
+        { userId, friendId: senderId },
+        { userId: senderId, friendId: userId },
+      ],
+      skipDuplicates: true,
+    });
+    // Resolve any reverse-direction pending request so it can't strand as PENDING.
+    await tx.friendRequest.updateMany({
+      where: { senderId: userId, receiverId: senderId, status: 'PENDING' },
+      data: { status: 'ACCEPTED' },
+    });
+    return true;
   });
+
+  // Only the transaction that actually flipped PENDING→ACCEPTED logs activity + notifies.
+  if (transitioned) {
+    await logActivity(userId, 'ADDED_FRIEND', senderId);
+    await logActivity(senderId, 'ADDED_FRIEND', userId);
+    const receiver = await prisma.user.findUnique({ where: { id: userId }, select: { name: true } });
+    await sendPushToUser(senderId, 'Friend Request Accepted', `${receiver?.name} accepted your friend request`, {
+      type: 'friend_accepted',
+      id: userId,
+    });
+  }
 
   return { message: 'Friend request accepted' };
 }
 
 export async function cancelRequest(userId: string, requestId: string) {
-  const request = await prisma.friendRequest.findFirst({
-    where: { id: requestId, senderId: userId, status: 'PENDING' },
+  // Discover the pair, then re-read status inside the lock so a cancel racing an accept can't
+  // delete an already-ACCEPTED request (which would strand the friendship) or 500 accept's update.
+  const pre = await prisma.friendRequest.findFirst({
+    where: { id: requestId, senderId: userId },
+    select: { receiverId: true },
   });
-  if (!request) throw new NotFoundError('Friend request not found');
+  if (!pre) throw new NotFoundError('Friend request not found');
 
-  await prisma.friendRequest.delete({ where: { id: requestId } });
+  await withPairLock(userId, pre.receiverId, async (tx) => {
+    const req = await tx.friendRequest.findFirst({ where: { id: requestId, senderId: userId, status: 'PENDING' } });
+    if (!req) throw new NotFoundError('Friend request not found');
+    await tx.friendRequest.delete({ where: { id: requestId } });
+  });
   return { message: 'Friend request cancelled' };
 }
 
 export async function rejectRequest(userId: string, requestId: string) {
-  const request = await prisma.friendRequest.findFirst({
-    where: { id: requestId, receiverId: userId, status: 'PENDING' },
+  const pre = await prisma.friendRequest.findFirst({
+    where: { id: requestId, receiverId: userId },
+    select: { senderId: true },
   });
-  if (!request) throw new NotFoundError('Friend request not found');
+  if (!pre) throw new NotFoundError('Friend request not found');
 
-  await prisma.friendRequest.update({ where: { id: requestId }, data: { status: 'REJECTED' } });
+  await withPairLock(userId, pre.senderId, async (tx) => {
+    const req = await tx.friendRequest.findFirst({ where: { id: requestId, receiverId: userId, status: 'PENDING' } });
+    if (!req) throw new NotFoundError('Friend request not found');
+    await tx.friendRequest.update({ where: { id: requestId }, data: { status: 'REJECTED' } });
+  });
   return { message: 'Friend request rejected' };
 }
 
 export async function removeFriend(userId: string, friendId: string) {
-  const friendship = await prisma.friendship.findFirst({
-    where: { userId, friendId },
+  // Same pair lock: two users removing each other concurrently used to delete the two rows in
+  // opposite order and deadlock (→ 500). The canonical key serializes them.
+  return withPairLock(userId, friendId, async (tx) => {
+    const friendship = await tx.friendship.findFirst({ where: { userId, friendId } });
+    if (!friendship) throw new NotFoundError('Friend not found');
+    await tx.friendship.deleteMany({ where: { userId, friendId } });
+    await tx.friendship.deleteMany({ where: { userId: friendId, friendId: userId } });
+    return { message: 'Friend removed' };
   });
-  if (!friendship) throw new NotFoundError('Friend not found');
-
-  await prisma.$transaction([
-    prisma.friendship.deleteMany({ where: { userId, friendId } }),
-    prisma.friendship.deleteMany({ where: { userId: friendId, friendId: userId } }),
-  ]);
-
-  return { message: 'Friend removed' };
 }
 
 export async function blockUser(blockerId: string, blockedId: string) {
@@ -198,16 +262,18 @@ export async function blockUser(blockerId: string, blockedId: string) {
   const target = await prisma.user.findUnique({ where: { id: blockedId } });
   if (!target) throw new NotFoundError('User not found');
 
-  await prisma.$transaction([
-    prisma.block.upsert({
+  // Same pair lock as accept/send: guarantees a concurrent acceptRequest either commits fully
+  // before this runs (then its friendship is deleted here) or sees the block and refuses.
+  return withPairLock(blockerId, blockedId, async (tx) => {
+    await tx.block.upsert({
       where: { blockerId_blockedId: { blockerId, blockedId } },
       create: { blockerId, blockedId },
       update: {},
-    }),
-    prisma.friendship.deleteMany({
+    });
+    await tx.friendship.deleteMany({
       where: { OR: [{ userId: blockerId, friendId: blockedId }, { userId: blockedId, friendId: blockerId }] },
-    }),
-    prisma.friendRequest.updateMany({
+    });
+    await tx.friendRequest.updateMany({
       where: {
         OR: [
           { senderId: blockerId, receiverId: blockedId, status: 'PENDING' },
@@ -215,17 +281,16 @@ export async function blockUser(blockerId: string, blockedId: string) {
         ],
       },
       data: { status: 'REJECTED' },
-    }),
-  ]);
-
-  return { message: 'User blocked' };
+    });
+    return { message: 'User blocked' };
+  });
 }
 
 export async function unblockUser(blockerId: string, blockedId: string) {
-  const block = await prisma.block.findFirst({ where: { blockerId, blockedId } });
-  if (!block) throw new NotFoundError('Block not found');
-
-  await prisma.block.delete({ where: { blockerId_blockedId: { blockerId, blockedId } } });
+  // Atomic delete-and-count: concurrent unblocks used to race findFirst→delete and 500 the loser
+  // with P2025. No pair lock needed — unblock only removes the block row (last-writer-wins vs block).
+  const { count } = await prisma.block.deleteMany({ where: { blockerId, blockedId } });
+  if (count === 0) throw new NotFoundError('Block not found');
   return { message: 'User unblocked' };
 }
 
