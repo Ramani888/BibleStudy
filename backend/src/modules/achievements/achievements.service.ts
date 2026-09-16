@@ -63,29 +63,37 @@ export async function checkAchievements(userId: string): Promise<string[]> {
   );
   if (newly.length === 0) return [];
 
-  // Persist unlocks + grant credits atomically per achievement.
-  await prisma.$transaction([
-    prisma.userAchievement.createMany({
-      data: newly.map(a => ({ userId, key: a.key })),
-      skipDuplicates: true,
-    }),
-    prisma.user.update({
-      where: { id: userId },
-      data: { creditBalance: { increment: newly.reduce((s, a) => s + a.reward, 0) } },
-    }),
-    prisma.creditTransaction.createMany({
-      data: newly.map(a => ({
-        userId,
-        type: 'REWARD' as const,
-        amount: a.reward,
-        description: `Achievement unlocked: ${a.title}`,
-      })),
-    }),
-  ]);
+  // Persist unlock + grant credits per achievement, GUARDED by the (userId,key)
+  // composite PK. If a concurrent checkAchievements already inserted the row, the
+  // create raises P2002 and we skip its paired grant — so each achievement's reward
+  // is granted at most once (closes the double-grant race). The PK insert is the
+  // idempotency key, so a stale metrics read or an unrelated User-row conflict can't
+  // double-grant or drop a legit unlock.
+  const granted: typeof newly = [];
+  for (const a of newly) {
+    try {
+      await prisma.$transaction([
+        prisma.userAchievement.create({ data: { userId, key: a.key } }),
+        prisma.user.update({
+          where: { id: userId },
+          data: { creditBalance: { increment: a.reward } },
+        }),
+        prisma.creditTransaction.create({
+          data: { userId, type: 'REWARD' as const, amount: a.reward, description: `Achievement unlocked: ${a.title}` },
+        }),
+      ]);
+      granted.push(a);
+    } catch (e) {
+      if ((e as { code?: string }).code === 'P2002') continue; // already unlocked concurrently — skip grant
+      throw e;
+    }
+  }
+  if (granted.length === 0) return [];
 
-  // Notify (non-critical — persists in-app notification + optional push).
+  // Notify (non-critical — persists in-app notification + optional push). Only for
+  // achievements actually granted by THIS call.
   await Promise.all(
-    newly.map(a =>
+    granted.map(a =>
       sendPushToUser(userId, '🏆 Achievement unlocked!', `${a.title} — +${a.reward} credits`, {
         type: 'achievement',
         id: a.key,
@@ -93,7 +101,7 @@ export async function checkAchievements(userId: string): Promise<string[]> {
     ),
   );
 
-  return newly.map(a => a.key);
+  return granted.map(a => a.key);
 }
 
 // Full achievement list for the user, with unlocked status + progress.
