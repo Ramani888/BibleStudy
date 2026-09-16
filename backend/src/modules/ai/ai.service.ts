@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { randomUUID } from 'crypto';
 import { Prisma } from '@prisma/client';
 import { prisma } from '../../config/db';
 import { env } from '../../config/env';
@@ -94,6 +95,9 @@ async function generateAnswer(system: string, messages: ChatMessage[], media?: M
 
 const FOLLOWUP_DELIMITER = '|||';
 const CARD_DELIMITER = '---CARD---';
+// Answer shown when a model emits ONLY cards with no intro text. Named so askQuestion can
+// detect "the whole response was cards" and avoid charging for an empty answer if cards are withheld.
+const CARDS_ONLY_PLACEHOLDER = 'Here are your flashcards:';
 
 const SYSTEM_PROMPT =
   `You are a helpful Bible study assistant — not a pastor, theologian, or spiritual authority. Answer questions about the Bible, Christian theology, and faith. Always cite the specific Bible verse references (e.g. John 3:16, Romans 8:28) that support your answer. If no verse directly applies, say so. You may make mistakes; encourage the user to verify important interpretations with their pastor or a trusted Bible commentary.
@@ -175,7 +179,7 @@ function parseAIResponse(raw: string): {
 
   // Some models emit cards with no intro text before the first ---CARD---,
   // leaving answerText empty. Fall back so the chat bubble is never blank.
-  const answer = answerText || (suggestedCards.length > 0 ? 'Here are your flashcards:' : answerText);
+  const answer = answerText || (suggestedCards.length > 0 ? CARDS_ONLY_PLACEHOLDER : answerText);
 
   return {
     answer,
@@ -235,6 +239,31 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     );
   }
 
+  // Shared compensation for every post-reserve failure path. refund() reports whether the
+  // increment actually committed, so we NEVER claim a refund we didn't verify; a failed refund
+  // is logged as an unreconciled debit (the ops breadcrumb for manual recovery). ponytail:
+  // compensate-in-catch, consistent with the rest of the credit seam — a durable/idempotent
+  // settlement ledger is the cross-cutting #21 refund-reconciliation task, not this hotfix.
+  // Monitorable manual-recovery breadcrumb for outcomes the DB left ambiguous (a committed write
+  // whose ack was lost). Ops alert on [CREDIT-RECONCILE] and settle AT MOST ONCE (dedupe on op=).
+  // These are UNKNOWN outcomes, never blind instructions to credit. Atomic op-id-with-write = #21.
+  const reconcileMarker = (detail: string, err?: unknown) =>
+    console.error(`[CREDIT-RECONCILE] op=${randomUUID()} fn=ai.askQuestion userId=${userId} ${detail}`, err);
+  const refund = async (amount: number): Promise<boolean> =>
+    prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: amount } } })
+      .then(() => true)
+      .catch((err) => {
+        // Refund outcome UNKNOWN (the UPDATE may have committed before the connection dropped).
+        reconcileMarker(`refundOutcomeUnknown=${amount} — verify balance before crediting; refund may already have committed`, err);
+        return false;
+      });
+  const settleErr = (refunded: boolean, base: string) => new AppError(
+    refunded
+      ? `${base} No credit was charged — please retry.`
+      : `${base} Please retry; contact support if your balance looks wrong.`,
+    500, 'AI_PERSIST_FAILED',
+  );
+
   const userContext = await retrieveContext(userId, dto.question).catch(() => '');
   const system = userContext ? `${SYSTEM_PROMPT}\n\n${userContext}` : SYSTEM_PROMPT;
 
@@ -242,41 +271,70 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
   try {
     rawText = await generateAnswer(system, messages, mediaBlocks);
   } catch (e) {
-    // Refund the reserve on provider error — credit was deducted before the call.
-    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: reserve } } }).catch(() => {});
-    throw e;
+    // Reserve was debited before the call. Refund it; if that verifiably committed, surface the
+    // provider's own error (it honestly reports no charge), else a non-promising settlement error.
+    if (await refund(reserve)) throw e;
+    throw settleErr(false, 'Could not reach the AI provider.');
   }
 
   if (!rawText) {
-    await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: reserve } } }).catch(() => {});
-    throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
+    const refunded = await refund(reserve);
+    if (refunded) throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
+    throw settleErr(false, 'AI returned an empty response.');
   }
 
   const { answer, followUps, suggestedCards } = parseAIResponse(rawText);
 
-  const cost = hasPdf ? CREDIT_COST.pdf
-    : hasImage ? CREDIT_COST.image
-    : suggestedCards.length > 0 ? CREDIT_COST.cards
-    : CREDIT_COST.text;
-  const description = hasPdf ? 'AI PDF chat'
-    : hasImage ? 'AI image chat'
-    : suggestedCards.length > 0 ? 'AI flashcard generation'
-    : 'AI chat question';
-
-  // If text generated cards (cost=2, reserved=1), atomically deduct the extra 1.
-  // WHERE creditBalance >= extra ensures we never go negative.
-  let charge = reserve;
-  if (cost > reserve) {
-    const extra = cost - reserve;
-    const rows = Number(await prisma.$executeRaw`
-      UPDATE "User"
-      SET "creditBalance" = "creditBalance" - ${extra}
-      WHERE id = ${userId} AND "creditBalance" >= ${extra}
-    `);
-    if (rows > 0) charge = cost;
+  // The pre-parse !rawText guard misses output that PARSES to nothing useful: whitespace,
+  // follow-up-only ("|||What next?"), or a truncated card block with no valid Q/A. Don't persist
+  // or bill an empty assistant message — refund the reserve (full media cost included).
+  if (suggestedCards.length === 0 && !answer.trim()) {
+    const refunded = await refund(reserve);
+    if (refunded) throw new AppError('AI returned an empty response. No credit was charged.', 502, 'AI_EMPTY_RESPONSE');
+    throw settleErr(false, 'AI returned an empty response.');
   }
 
-  // No user.update needed — balance already adjusted atomically above.
+  // Media was reserved at full cost upfront; its cards ride along free (locked F decision #3).
+  const isMedia = hasPdf || hasImage;
+  let charge = reserve;
+  let cards = suggestedCards;
+  if (!isMedia && suggestedCards.length > 0) {
+    // Cards cost 2 but we only reserved 1. Atomically deduct the extra credit; if the user
+    // can't afford it — including a CONCURRENT card-gen that already drained the balance —
+    // WITHHOLD the cards and return a text-only answer for 1 credit. Never serve 2-credit
+    // cards for 1 (closes the concurrent-reservation undercharge: two parallel requests on
+    // a balance of 2 each reserve 1, both fail this deduction, both drop cards → 2 charged).
+    let rows: number;
+    try {
+      rows = Number(await prisma.$executeRaw`
+        UPDATE "User"
+        SET "creditBalance" = "creditBalance" - 1
+        WHERE id = ${userId} AND "creditBalance" >= 1
+      `);
+    } catch (e) {
+      // Extra-debit outcome is UNKNOWN — the UPDATE may have committed before the throw. Refund the
+      // definitely-committed reserve, flag the possibly-committed extra credit for manual settlement,
+      // and never claim "no credit charged" (settleErr(false) gives the ambiguous message).
+      await refund(reserve);
+      reconcileMarker('extraCardDebitOutcomeUnknown=1 — verify balance; the extra card credit may have committed', e);
+      throw settleErr(false, 'Could not complete your request.');
+    }
+    if (rows > 0) charge = CREDIT_COST.cards;
+    else cards = [];
+  }
+
+  // If withholding cards leaves no substantive answer (the model returned ONLY cards), don't
+  // bill for an empty response — refund the reserve and surface the shortfall as a paywall.
+  // If that refund can't be verified, report the settlement failure instead of a plain 402.
+  if (!isMedia && cards.length === 0 && suggestedCards.length > 0 && answer === CARDS_ONLY_PLACEHOLDER) {
+    if (!(await refund(charge))) throw settleErr(false, 'Could not complete your request.'); // charge === reserve (1)
+    throw new PaymentRequiredError(`Flashcards need ${CREDIT_COST.cards} credits. Earn more or upgrade to generate cards.`);
+  }
+
+  const description = isMedia
+    ? (hasPdf ? 'AI PDF chat' : 'AI image chat')
+    : cards.length > 0 ? 'AI flashcard generation' : 'AI chat question';
+
   // Upsert session record when sessionId is provided
   const sessionOp = dto.sessionId
     ? prisma.aIChatSession.upsert({
@@ -286,22 +344,35 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
       })
     : null;
 
-  const [, aiChat] = await prisma.$transaction([
-    prisma.creditTransaction.create({
-      data: { userId, type: 'USAGE', amount: -charge, description },
-    }),
-    prisma.aIChat.create({
-      data: {
-        userId,
-        sessionId: dto.sessionId ?? null,
-        question: dto.question,
-        answer,
-        suggestedCards: suggestedCards as unknown as Prisma.InputJsonValue,
-        followUps,
-        creditsUsed: charge,
-      },
-    }),
-  ]);
+  // Balance is already debited; if this persistence fails the user would be charged with no
+  // answer and no ledger row, so refund the actual charge on failure (mirrors generateQuizCards).
+  let aiChat;
+  try {
+    const [, chat] = await prisma.$transaction([
+      prisma.creditTransaction.create({
+        data: { userId, type: 'USAGE', amount: -charge, description },
+      }),
+      prisma.aIChat.create({
+        data: {
+          userId,
+          sessionId: dto.sessionId ?? null,
+          question: dto.question,
+          answer,
+          suggestedCards: cards as unknown as Prisma.InputJsonValue,
+          followUps,
+          creditsUsed: charge,
+        },
+      }),
+    ]);
+    aiChat = chat;
+  } catch (e) {
+    // Transaction outcome is UNKNOWN — it may have committed (chat + USAGE ledger) before the
+    // connection dropped, in which case the refund leaves an inconsistent state. Treat as ambiguous:
+    // refund, flag for reconciliation, and never claim "no credit charged".
+    await refund(charge);
+    reconcileMarker(`persistOutcomeUnknown charge=${charge} — chat/ledger may have committed then been refunded; verify consistency`, e);
+    throw settleErr(false, 'Could not save your answer.');
+  }
 
   // Upsert session outside transaction (non-critical)
   if (sessionOp) {
@@ -315,7 +386,7 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
     question: dto.question,
     answer,
     followUps,
-    suggestedCards,
+    suggestedCards: cards,
     creditsUsed: charge,
     createdAt: aiChat.createdAt,
   };
@@ -560,17 +631,31 @@ export async function clearHistory(userId: string) {
 }
 
 export async function renameSession(userId: string, sessionId: string, title: string) {
-  const session = await prisma.aIChatSession.findFirst({ where: { id: sessionId, userId } });
-  if (!session) throw new NotFoundError('Session not found');
-  await prisma.aIChatSession.update({ where: { id: sessionId }, data: { title } });
+  // Ownership is part of the mutation predicate (atomic — no check-then-act race where a
+  // concurrent delete + foreign recreate of the same session id could be mutated by this call).
+  const updated = await prisma.aIChatSession.updateMany({ where: { id: sessionId, userId }, data: { title } });
+  if (updated.count === 0) throw new NotFoundError('Session not found');
 }
 
 export async function updateSessionTags(userId: string, sessionId: string, tags: string[]) {
-  await prisma.aIChatSession.upsert({
-    where: { id: sessionId },
-    create: { id: sessionId, userId, tags },
-    update: { tags },
-  });
+  // Ownership-guarded, and resilient to orphaned sessions: askQuestion's session-metadata upsert
+  // is best-effort (swallowed) and AIChat.sessionId has no FK, so metadata can legitimately be
+  // absent while the conversation still exists. A blind upsert here would let a caller overwrite
+  // ANY user's tags by guessing the id (IDOR); a plain update would 404 forever on orphans.
+  // Atomic ownership-in-predicate update (no check-then-act race).
+  const updated = await prisma.aIChatSession.updateMany({ where: { id: sessionId, userId }, data: { tags } });
+  if (updated.count > 0) return;
+  // No owned metadata row. It may be an orphaned session (chat exists, metadata was never created,
+  // since AIChat.sessionId has no FK and askQuestion's upsert is best-effort) — prove ownership via
+  // a caller-owned chat, then create. If a concurrent writer created it first, retry the atomic update.
+  const owned = await prisma.aIChat.findFirst({ where: { sessionId, userId }, select: { id: true } });
+  if (!owned) throw new NotFoundError('Session not found');
+  try {
+    await prisma.aIChatSession.create({ data: { id: sessionId, userId, tags } });
+  } catch {
+    const retry = await prisma.aIChatSession.updateMany({ where: { id: sessionId, userId }, data: { tags } });
+    if (retry.count === 0) throw new NotFoundError('Session not found');
+  }
 }
 
 export async function addBookmark(userId: string, chatId: string) {
@@ -623,42 +708,60 @@ export async function getBookmarks(userId: string, page = 1, limit = 20) {
   };
 }
 
-export async function getDailyVerse() {
-  try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 5000);
+// /ai/daily-verse is public (only the global 1000/IP/15min limiter, no per-user throttle) and
+// hit bible-api.com on every call — a burst amplified into many hung outbound fetches. A 24h
+// cache serves ~all hits from memory (a single shared "verse of the day" is also more correct
+// than per-call random); single-flight bounds any cold-cache/outage burst to ONE in-flight call.
+let verseCache: { data: typeof HARDCODED_VERSE; at: number } | null = null;
+let verseInflight: Promise<typeof HARDCODED_VERSE> | null = null;
+const VERSE_TTL_MS = 24 * 60 * 60 * 1000;
 
+async function fetchDailyVerse(): Promise<typeof HARDCODED_VERSE> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 5000);
+  try {
     const response = await fetch('https://bible-api.com/data/web/random', {
       signal: controller.signal,
     });
-    clearTimeout(timer);
-
     if (!response.ok) {
       throw new AppError('Bible API request failed', 502, 'EXTERNAL_API_ERROR');
     }
-
+    // Body read stays under the same abort deadline (timer cleared only in finally).
     const data = await response.json() as {
-      random_verse?: {
-        book?: string;
-        chapter?: number;
-        verse?: number;
-        text?: string;
-      };
+      random_verse?: { book?: string; chapter?: number; verse?: number; text?: string };
     };
-
-    if (data.random_verse) {
-      const verse = data.random_verse;
-      return {
+    // Validate before caching: a 200 with a malformed body (e.g. {"random_verse":{}}) must NOT be
+    // cached, else "undefined undefined:undefined" would be served to every caller for 24h.
+    const verse = data.random_verse;
+    if (verse && verse.book && verse.text?.trim()
+        && Number.isInteger(verse.chapter) && (verse.chapter as number) > 0
+        && Number.isInteger(verse.verse) && (verse.verse as number) > 0) {
+      const result = {
         reference: `${verse.book} ${verse.chapter}:${verse.verse}`,
-        text: verse.text?.trim() ?? '',
-        book: verse.book ?? '',
-        chapter: verse.chapter ?? 0,
-        verse: verse.verse ?? 0,
+        text: verse.text.trim(),
+        book: verse.book,
+        chapter: verse.chapter as number,
+        verse: verse.verse as number,
       };
+      verseCache = { data: result, at: Date.now() }; // cache only well-formed successes
+      return result;
     }
-
-    return HARDCODED_VERSE;
+    return HARDCODED_VERSE; // missing or malformed — serve fallback, do NOT cache
   } catch {
     return HARDCODED_VERSE;
+  } finally {
+    clearTimeout(timer);
   }
+}
+
+export async function getDailyVerse() {
+  if (verseCache && Date.now() - verseCache.at < VERSE_TTL_MS) return verseCache.data;
+  // Single-flight: concurrent cold-cache/outage requests await one shared fetch, so an inbound
+  // burst can never fan out into many outbound calls (during a sustained outage, at most one
+  // retry is in flight at a time). ponytail: single-flight, add negative-cache only if a long
+  // outage under sustained traffic proves serial retries too chatty.
+  if (!verseInflight) {
+    verseInflight = fetchDailyVerse().finally(() => { verseInflight = null; });
+  }
+  return verseInflight;
 }
