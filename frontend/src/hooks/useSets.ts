@@ -47,6 +47,9 @@ export function useDeleteSet() {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['sets'] });
       qc.invalidateQueries({ queryKey: ['folders'] });
+      // Deleting a set cascades its StudyPlanStep + progress rows; refresh plan lists/details so a
+      // mounted PlanDetail doesn't show a phantom step whose "complete" targets a deleted step.
+      qc.invalidateQueries({ queryKey: ['plans'] });
     },
   });
 }

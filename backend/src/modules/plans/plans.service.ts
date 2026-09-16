@@ -88,8 +88,10 @@ export async function updatePlan(userId: string, planId: string, dto: UpdatePlan
 }
 
 export async function deletePlan(userId: string, planId: string) {
-  await assertOwnedPlan(userId, planId);
-  await prisma.studyPlan.delete({ where: { id: planId } });
+  // Atomic ownership-in-predicate: no assert→delete-by-id race (a concurrent double-delete would
+  // P2025→500). Cascade removes steps + progress.
+  const { count } = await prisma.studyPlan.deleteMany({ where: { id: planId, userId } });
+  if (count === 0) throw new NotFoundError('Plan not found');
 }
 
 export async function addStep(userId: string, planId: string, dto: AddStepDtoType) {
@@ -102,9 +104,9 @@ export async function addStep(userId: string, planId: string, dto: AddStepDtoTyp
 }
 
 export async function removeStep(userId: string, stepId: string) {
-  const step = await prisma.studyPlanStep.findFirst({ where: { id: stepId, plan: { userId } } });
-  if (!step) throw new NotFoundError('Step not found');
-  await prisma.studyPlanStep.delete({ where: { id: stepId } });
+  // Atomic: ownership via the plan relation, in one deleteMany — no findFirst→delete-by-id race.
+  const { count } = await prisma.studyPlanStep.deleteMany({ where: { id: stepId, plan: { userId } } });
+  if (count === 0) throw new NotFoundError('Step not found');
 }
 
 export async function reorderSteps(userId: string, planId: string, dto: ReorderStepsDtoType) {
