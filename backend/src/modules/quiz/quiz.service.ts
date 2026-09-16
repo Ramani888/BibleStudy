@@ -144,10 +144,12 @@ export async function getBestForSet(userId: string, setId: string): Promise<numb
 }
 
 export async function getRecentAttempts(userId: string, limit = 20) {
+  // Clamp: a negative limit (?limit=-5) would reach Prisma as a negative take → 500.
+  const take = Math.min(Math.max(Number.isFinite(limit) ? Math.floor(limit) : 20, 1), 50);
   const rows = await prisma.quizAttempt.findMany({
     where: { userId },
     orderBy: { createdAt: 'desc' },
-    take: limit,
+    take,
     include: { set: { select: { title: true } } },
   });
 
