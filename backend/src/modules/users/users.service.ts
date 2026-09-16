@@ -40,22 +40,41 @@ export async function changePassword(userId: string, dto: ChangePasswordDtoType)
   const user = await prisma.user.findUnique({ where: { id: userId } });
   if (!user) throw new NotFoundError('User not found');
 
-  if (user.password) {
-    if (!dto.currentPassword) throw new UnauthorizedError('Current password is required');
-    const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
-    if (!isPasswordValid) throw new UnauthorizedError('Current password is incorrect');
+  if (!user.password) {
+    // OAuth-only account (Google/Apple): enrolling a FIRST password must prove email ownership,
+    // not ride on a (possibly stolen) access token — otherwise a short-lived stolen token becomes a
+    // permanent password credential. Route through the OTP-verified reset flow, which already
+    // supports OAuth accounts (auth.service.resetPassword).
+    throw new UnauthorizedError('To set a password, use "Forgot password" so we can verify your email first.');
   }
+  if (!dto.currentPassword) throw new UnauthorizedError('Current password is required');
+  const isPasswordValid = await bcrypt.compare(dto.currentPassword, user.password);
+  if (!isPasswordValid) throw new UnauthorizedError('Current password is incorrect');
 
   const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
-  await prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } });
-  await prisma.refreshToken.deleteMany({ where: { userId } });
+  // Change credentials and revoke sessions atomically — a partial commit would leave old refresh
+  // tokens valid against the new password.
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: userId }, data: { password: hashedPassword } }),
+    prisma.refreshToken.deleteMany({ where: { userId } }),
+  ]);
 
-  return { message: user.password ? 'Password changed successfully' : 'Password set successfully' };
+  return { message: 'Password changed successfully' };
 }
 
 export async function deleteAccount(userId: string) {
-  await deleteUserFilesFromDisk(userId); // remove disk bytes before the DB cascade drops the rows
+  // 1) Remove disk bytes first. A disk error PROPAGATES here (user + rows still intact → the whole
+  //    deletion is retryable), so we never delete the account while its files stay on public /uploads.
+  await deleteUserFilesFromDisk(userId);
+  // 2) Delete the user. From here the MediaFile.userId FK blocks any new upload from committing its
+  //    row — an in-flight upload FK-fails and its own catch unlinks the file it wrote (media.service).
   await prisma.user.delete({ where: { id: userId } });
+  // 3) Sweep once more: an upload that committed in the tiny window between (1) and (2) had its row
+  //    cascade-deleted but left its file on disk. This second removal catches it (no lock needed).
+  //    Best-effort — the user is gone so it can't be retried via rows; flag if it fails.
+  await deleteUserFilesFromDisk(userId).catch(err =>
+    console.error(`[FILE-RECONCILE] fn=deleteAccount userId=${userId} residualFileSweepFailed — check uploads/users/${userId}`, err),
+  );
   return { message: 'Account deleted successfully' };
 }
 

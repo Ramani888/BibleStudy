@@ -179,10 +179,13 @@ export async function renameFile(userId: string, fileId: string, name: string) {
 /** Best-effort disk cleanup of every file a user owns. Call BEFORE the DB rows are
  *  removed (e.g. account deletion) — the cascade only frees DB rows, not the bytes. */
 export async function deleteUserFilesFromDisk(userId: string) {
-  const files = await prisma.mediaFile.findMany({ where: { userId }, select: { key: true } });
-  await Promise.all(files.map(f =>
-    fs.unlink(path.join(UPLOADS_DIR, f.key)).catch(() => {}),
-  ));
+  // Remove the user's ENTIRE upload tree (all files live under users/<id>/), not a snapshot of
+  // MediaFile rows. This also removes files whose row was written by an upload racing account
+  // deletion — that row is cascade-deleted, but the file would otherwise be orphaned on the public
+  // /uploads route. force:true ignores a missing dir (ENOENT); any OTHER error (EACCES/I/O)
+  // PROPAGATES so account deletion fails and can be retried with the DB rows still intact — never
+  // silently leave a deleted user's files publicly served.
+  await fs.rm(path.join(UPLOADS_DIR, 'users', userId), { recursive: true, force: true });
 }
 
 export async function getStorageUsage(userId: string) {

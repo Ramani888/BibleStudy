@@ -276,13 +276,12 @@ export async function resetPassword(dto: ResetPasswordDtoType) {
 
   const hashedPassword = await bcrypt.hash(dto.newPassword, 12);
 
-  await prisma.user.update({
-    where: { id: user.id },
-    data: { password: hashedPassword },
-  });
-
-  // Invalidate all refresh tokens
-  await prisma.refreshToken.deleteMany({ where: { userId: user.id } });
+  // Change credentials and invalidate all refresh tokens atomically — a partial commit would leave
+  // old refresh tokens valid against the new password.
+  await prisma.$transaction([
+    prisma.user.update({ where: { id: user.id }, data: { password: hashedPassword } }),
+    prisma.refreshToken.deleteMany({ where: { userId: user.id } }),
+  ]);
 
   return { message: 'Password reset successfully' };
 }
