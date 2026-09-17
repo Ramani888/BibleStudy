@@ -39,7 +39,8 @@ export const PRODUCTS: Record<string, ProductDef> = {
 };
 
 export function getProduct(productId: string): ProductDef | undefined {
-  return PRODUCTS[productId];
+  // iOS/App Store sends the exact id; Google Play (RC SDK v6+) sends "subId:basePlanId".
+  return PRODUCTS[productId] ?? PRODUCTS[productId.split(':')[0]];
 }
 
 // Credits to grant for a purchase/renewal: annual pays 12× upfront (E decision #2).

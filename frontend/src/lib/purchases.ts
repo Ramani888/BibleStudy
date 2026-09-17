@@ -56,7 +56,10 @@ export class PurchaseCancelled extends Error {}
 export async function purchaseByProductId(productId: string): Promise<CustomerInfo> {
   if (!configured) throw new Error('Store not available');
   const pkgs = await getPackages();
-  const pkg = pkgs.find(p => p.product.identifier === productId);
+  // iOS product id === productId exactly; Google Play (SDK v6+) reports "subId:basePlanId",
+  // so fall back to a prefix match when the Play subscription id equals our productId.
+  const pkg = pkgs.find(p => p.product.identifier === productId)
+    ?? pkgs.find(p => p.product.identifier.startsWith(`${productId}:`));
   if (!pkg) throw new Error('Product not available');
   try {
     const { customerInfo } = await Purchases.purchasePackage(pkg);
