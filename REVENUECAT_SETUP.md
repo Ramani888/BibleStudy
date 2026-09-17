@@ -19,6 +19,38 @@ The app code and backend webhook are already built (#20). This is **config, not 
 
 ---
 
+## PHASE 0 — Production launch close-out (2026-09-17)
+
+### Backend / prod hardening — ✅ DONE + verified
+Server side is hardened and deployed (Hetzner `94.130.176.8`, pm2 `biblestudypro-api`, **port 3001**):
+- **JWT secrets rotated** 11→64-char distinct base64url (were brute-forceable). Backup `.env.bak-20260917-114925`.
+- **`_prisma_migrations` reconciled** — history was stale (recorded only to Aug 10) + 2 rolled-back dup rows, so a `migrate deploy` would have failed re-creating live tables. Now "36 migrations, up to date". Backup table `_prisma_migrations_bak_20260917_115000`. Reconciling migration `20260917000000_reconcile_base_schema` (referral cols + StreakFreezeLog, idempotent) added to repo.
+- **Security headers live** — HSTS / nosniff / frameguard / no-referrer, `x-powered-by` off.
+- **`RC_WEBHOOK_AUTH` set** in prod `.env` (len 64) — Phase 5 confirmed; unauth webhook → 401.
+- **Paywall shows live localized store prices** (was hardcoded USD → wrong for Brazil/LatAm). Ships in the next app build.
+
+### Remaining to publish — store submission (only the account owner can do these)
+RC wiring is done (Phases 2–6, 8). What's left is submitting the apps.
+
+**Apple — App Store**
+1. Business → Agreements: confirm **Paid Apps Agreement = Active** (was Processing 09-15).
+2. **APNs key**: Apple Developer → Keys → create APNs `.p8` → upload to Firebase project **verdance-bb5c2** (iOS push is blocked until this exists).
+3. Xcode **archive release** (`com.getverdance.app`, v1.0 / build 1) → Transporter → attach the 4 IAP subs → **Submit for review**.
+
+**Google — Play**
+1. Upload signed AAB (`ENVFILE=.env.production ./gradlew bundleRelease`; needs release keystore + `MYAPP_UPLOAD_*` gradle props on the build machine).
+2. **Closed test: 12 testers / 14 days** — mandatory for new personal accounts. Start this first; it's the long pole.
+3. **BillDesk KYC** review (App ID 2609094782) → **Submit**.
+   - Phase 1 (Android service account JSON) must be green in RC before Play purchases validate.
+
+**Both**
+- **i18n**: native skim of **pt** (Brazil launch) first, then es/fr/ko/tl — AI-generated, unreviewed.
+- **Sandbox purchase smoke test** (Phase 7): buy each tier → RC entitlement `premium` active → backend `/status` shows plan → credits land → Paywall shows "Current Plan". Test Restore + cancellation.
+
+> ⚠️ Frontend changes (live paywall prices) reach users only via a **NEW app build** — the backend deploy does not ship them.
+
+---
+
 ## PHASE 1 — Android service account (the current blocker) 🔴
 RevenueCat cannot validate any Play purchase without this. All in the **Google Cloud project linked to your Play account**.
 
@@ -150,3 +182,5 @@ Output: `frontend/android/app/build/outputs/bundle/release/app-release.aab`. (An
 - [x] Phase 6 — `frontend/.env` `REVENUECAT_ANDROID_API_KEY` set (goog_…) 2026-09-17; iOS key present. Takes effect next build.
 - [ ] Phase 7 — Test on tracks
 - [x] Phase 8 — iOS ASC API key ("Valid credentials") + Apple S2S notifications (Prod+Sandbox URLs → RC) DONE 2026-09-17
+- [x] Phase 0 — Prod hardening: JWT secrets rotated 11→64ch, `_prisma_migrations` reconciled (36 up-to-date), security headers deployed, backend live (port 3001), paywall live prices in repo — DONE + verified 2026-09-17 (pushed origin master)
+- [ ] Phase 0 — Publish: Apple submit (agreement + APNs + build + IAP), Play closed-test 12/14d + KYC, i18n pt skim, sandbox purchase smoke test
