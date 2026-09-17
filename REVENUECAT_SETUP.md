@@ -29,19 +29,25 @@ Server side is hardened and deployed (Hetzner `94.130.176.8`, pm2 `biblestudypro
 - **`RC_WEBHOOK_AUTH` set** in prod `.env` (len 64) — Phase 5 confirmed; unauth webhook → 401.
 - **Paywall shows live localized store prices** (was hardcoded USD → wrong for Brazil/LatAm). Ships in the next app build.
 
-### Remaining to publish — store submission (only the account owner can do these)
-RC wiring is done (Phases 2–6, 8). What's left is submitting the apps.
+### Already done (prior sessions — do NOT redo)
+RC + store **wiring is complete**: Phase 1 Android service account (creds Valid), Phases 2–6 + 8.
+- ✅ APNs key in hand — Key ID `Y66XF82J66`, Team `CG433GC6BU`.
+- ✅ iOS: 4 auto-renew subs "Ready for Review"; Apple S2S notifications + ASC API key set.
+- ✅ Android: service account Valid, 4 Play subs created, RC catalog imported, entitlement `premium`, offering current.
+- ✅ Webhook deployed + `RC_WEBHOOK_AUTH` set; both platforms grant credits.
+
+### Genuinely remaining to publish (only the account owner can do these)
+Wiring is done — what's left is **building, testing, and submitting** the apps.
 
 **Apple — App Store**
 1. Business → Agreements: confirm **Paid Apps Agreement = Active** (was Processing 09-15).
-2. **APNs key**: Apple Developer → Keys → create APNs `.p8` → upload to Firebase project **verdance-bb5c2** (iOS push is blocked until this exists).
+2. Last ASC touches: reorder **Pro > Starter** in the subscription group + set the group display name.
 3. Xcode **archive release** (`com.getverdance.app`, v1.0 / build 1) → Transporter → attach the 4 IAP subs → **Submit for review**.
 
 **Google — Play**
 1. Upload signed AAB (`ENVFILE=.env.production ./gradlew bundleRelease`; needs release keystore + `MYAPP_UPLOAD_*` gradle props on the build machine).
-2. **Closed test: 12 testers / 14 days** — mandatory for new personal accounts. Start this first; it's the long pole.
+2. **Closed test: 12 testers / 14 days** — mandatory for new personal accounts. Start first; it's the long pole.
 3. **BillDesk KYC** review (App ID 2609094782) → **Submit**.
-   - Phase 1 (Android service account JSON) must be green in RC before Play purchases validate.
 
 **Both**
 - **i18n**: native skim of **pt** (Brazil launch) first, then es/fr/ko/tl — AI-generated, unreviewed.
