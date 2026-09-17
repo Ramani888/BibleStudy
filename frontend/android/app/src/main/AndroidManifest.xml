@@ -3,8 +3,13 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- No READ_MEDIA_IMAGES: launchImageLibrary uses the Android system photo picker and
+         DocumentPicker uses SAF — neither needs it. Declaring it triggers Google's Photo &
+         Video Permissions policy review.
+         react-native-blob-util declares READ_EXTERNAL_STORAGE unscoped; override it to
+         maxSdkVersion=32 so it only exists on Android <=12 (no-op + policy-clean on 13+). -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" tools:node="replace" />
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
