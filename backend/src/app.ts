@@ -34,6 +34,19 @@ const app = express();
 // Required for rate limiting to work correctly behind a proxy.
 app.set('trust proxy', 1);
 
+// Baseline security response headers. Kept as a tiny middleware (no helmet dep, so no
+// extra server-side install) — enough for a JSON API + static /uploads behind Caddy TLS.
+app.disable('x-powered-by');
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  if (env.NODE_ENV !== 'development') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
+
 // CORS
 // React Native mobile apps do not send an Origin header (not a browser).
 // Allow those unconditionally. Optionally restrict browser-origin requests
