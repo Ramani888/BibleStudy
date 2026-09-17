@@ -6,7 +6,7 @@ import type { BillingPeriod, FreeTierDef, TierDef } from '../../types';
 import { FREE_TIER, TIERS } from '../../types';
 import { useAuthStore } from '../../store';
 import { useIapSubscriptions } from '../../hooks';
-import { openManageSubscriptions } from '../../lib/purchases';
+import { openManageSubscriptions, type StorePrice } from '../../lib/purchases';
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
 import { Typography } from '../../components/ui/Typography';
@@ -15,6 +15,17 @@ import { CheckCircleIcon } from '../../components/icons';
 import { CARD_FILL_LIGHT, palette, spacing, radius, layout, useTheme } from '../../theme';
 
 type AnyTier = TierDef | FreeTierDef;
+type PriceMap = Record<string, StorePrice>;
+
+// Localized currency from the store's numeric price (for the annual "per month" line, which the
+// store only exposes as an annual total). Falls back to bare code if Intl/currency is unavailable.
+function fmtMoney(amount: number, currencyCode: string): string {
+  try {
+    return new Intl.NumberFormat(undefined, { style: 'currency', currency: currencyCode }).format(amount);
+  } catch {
+    return `${currencyCode} ${amount.toFixed(2)}`;
+  }
+}
 
 // Common features included in every paid plan — merged into the included list for paid tiers.
 const PAID_COMMON = [
@@ -100,16 +111,24 @@ function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () =>
 
 // ── Paid plan card ─────────────────────────────────────────────────────────────
 
-function PlanCard({ tier, period, selected, onPress }: {
-  tier: TierDef; period: BillingPeriod; selected: boolean; onPress: () => void;
+function PlanCard({ tier, period, selected, onPress, prices }: {
+  tier: TierDef; period: BillingPeriod; selected: boolean; onPress: () => void; prices: PriceMap;
 }) {
   const { t } = useTranslation(['profile', 'common']);
   const theme = useTheme();
   const isDark = theme.name === 'dark';
   const showBadge = tier.plan === 'PRO' && period === 'annual';
-  const perMonth = (tier.annualPrice / 12).toFixed(2);
   const savingsPct = Math.round((1 - tier.annualPrice / (tier.monthlyPrice * 12)) * 100);
   const showSavings = period === 'annual' && !showBadge;
+
+  // Prefer the live localized store price; fall back to the hardcoded USD label pre-store-load.
+  const monthlyLive = prices[tier.monthly.productId];
+  const annualLive = prices[tier.annual.productId];
+  const monthlyLabel = monthlyLive ? monthlyLive.priceString : `$${tier.monthlyPrice.toFixed(2)}`;
+  const annualTotal = annualLive ? annualLive.priceString : `$${tier.annualPrice.toFixed(2)}`;
+  const annualPerMonth = annualLive
+    ? fmtMoney(annualLive.price / 12, annualLive.currencyCode)
+    : `$${(tier.annualPrice / 12).toFixed(2)}`;
 
   return (
     <Pressable
@@ -146,11 +165,11 @@ function PlanCard({ tier, period, selected, onPress }: {
       <View style={styles.priceBlock}>
         {period === 'annual' ? (
           <>
-            <Typography preset="h4" color={theme.colors.textPrimary}>${perMonth}/mo</Typography>
-            <Typography preset="caption" color={theme.colors.textSecondary}>${tier.annualPrice.toFixed(2)}/yr</Typography>
+            <Typography preset="h4" color={theme.colors.textPrimary}>{annualPerMonth}/mo</Typography>
+            <Typography preset="caption" color={theme.colors.textSecondary}>{annualTotal}/yr</Typography>
           </>
         ) : (
-          <Typography preset="h4" color={theme.colors.textPrimary}>${tier.monthlyPrice.toFixed(2)}/mo</Typography>
+          <Typography preset="h4" color={theme.colors.textPrimary}>{monthlyLabel}/mo</Typography>
         )}
       </View>
     </Pressable>
@@ -190,12 +209,14 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
   const [period, setPeriod] = useState<BillingPeriod>('annual');
   // Pre-select Starter (annual by default) to nudge toward the higher-retention annual plan.
   const [selectedTier, setSelectedTier] = useState<AnyTier>(TIERS[0]);
-  const { buy, restore, loadProducts, processing, error } = useIapSubscriptions();
+  const { buy, restore, loadProducts, processing, error, prices } = useIapSubscriptions();
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
   const paidTier = selectedTier.plan !== 'FREE' ? (selectedTier as TierDef) : null;
   const opt = paidTier ? paidTier[period] : null;
+  // Live localized price for the CTA, falling back to the hardcoded label before the store loads.
+  const ctaPrice = opt ? (prices[opt.productId]?.priceString ?? opt.priceLabel) : '';
 
   // Savings % for toggle — based on selected paid tier or TIERS[0] as fallback
   const savingsTier = paidTier ?? TIERS[0];
@@ -254,6 +275,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
               period={period}
               selected={selectedTier.plan === tier.plan}
               onPress={() => setSelectedTier(tier)}
+              prices={prices}
             />
           ))}
         </View>
@@ -270,7 +292,7 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             label={
               selectedTier.plan === 'FREE' ? t('profile:subscription.freePlan', 'Free Plan') :
               currentPlan === selectedTier.plan ? t('profile:subscription.currentPlan', 'Current Plan') :
-              t('profile:subscription.subscribePrice', { price: opt!.priceLabel, defaultValue: `Subscribe · ${opt!.priceLabel}` })
+              t('profile:subscription.subscribePrice', { price: ctaPrice, defaultValue: `Subscribe · ${ctaPrice}` })
             }
             onPress={() => opt && buy(opt.productId)}
             disabled={selectedTier.plan === 'FREE' || currentPlan === selectedTier.plan || processing}
@@ -279,10 +301,12 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
             fullWidth
           />
           {paidTier && opt && (
+            // Price/period shown on the card + CTA above; keep the disclosure currency-free so it
+            // stays correct in every store currency without $-templated translation strings.
             <Typography preset="caption" color={colors.textSecondary} style={styles.finePrint}>
               {period === 'annual'
-                ? t('profile:paywall.billedAnnuallyFinePrint', { total: paidTier.annualPrice.toFixed(2), monthlyTotal: (paidTier.monthlyPrice * 12).toFixed(2), defaultValue: `Billed $${paidTier.annualPrice.toFixed(2)} annually (vs $${(paidTier.monthlyPrice * 12).toFixed(2)} monthly). Renews until cancelled.` })
-                : t('profile:paywall.billedMonthlyFinePrint', { price: paidTier.monthlyPrice.toFixed(2), defaultValue: `Billed $${paidTier.monthlyPrice.toFixed(2)} monthly. Renews until cancelled.` })}
+                ? t('profile:paywall.renewAnnualFinePrint', 'Billed annually. Renews automatically until cancelled.')
+                : t('profile:paywall.renewMonthlyFinePrint', 'Billed monthly. Renews automatically until cancelled.')}
             </Typography>
           )}
         </View>

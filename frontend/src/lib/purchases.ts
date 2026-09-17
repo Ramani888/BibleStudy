@@ -50,6 +50,27 @@ export async function getPackages(): Promise<PurchasesPackage[]> {
   }
 }
 
+/** Localized store price for a product id (App Store / Play set + currency-converted). */
+export type StorePrice = { priceString: string; price: number; currencyCode: string };
+
+/**
+ * productId → localized store price, so the Paywall shows the real per-country price/currency
+ * instead of a hardcoded USD label. Key strips the Play "subId:basePlanId" suffix (see
+ * purchaseByProductId) so it matches our plans.ts product ids on both platforms.
+ */
+export async function getStorePrices(): Promise<Record<string, StorePrice>> {
+  const map: Record<string, StorePrice> = {};
+  for (const p of await getPackages()) {
+    const id = p.product.identifier.split(':')[0];
+    map[id] = {
+      priceString: p.product.priceString,
+      price: p.product.price,
+      currencyCode: p.product.currencyCode,
+    };
+  }
+  return map;
+}
+
 export class PurchaseCancelled extends Error {}
 
 /** Purchase the package whose store product matches productId. Throws PurchaseCancelled on user cancel. */

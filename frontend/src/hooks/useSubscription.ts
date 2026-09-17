@@ -6,10 +6,11 @@ import { useAuthStore } from '../store/auth.store';
 import {
   identifyUser,
   refreshCustomerInfo,
-  getPackages,
+  getStorePrices,
   purchaseByProductId,
   restore as rcRestore,
   PurchaseCancelled,
+  type StorePrice,
 } from '../lib/purchases';
 import { track } from '../lib/analytics';
 import type { SubscriptionStatus } from '../types';
@@ -58,6 +59,7 @@ export function useIapSubscriptions() {
   const updateUser = useAuthStore(s => s.updateUser);
   const [processing, setProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [prices, setPrices] = useState<Record<string, StorePrice>>({});
 
   const refreshUser = useCallback(async () => {
     try { updateUser(await authApi.me()); } catch { /* keep cached */ }
@@ -66,7 +68,7 @@ export function useIapSubscriptions() {
   }, [qc, updateUser]);
 
   const loadProducts = useCallback(() => {
-    getPackages().catch(() => { /* store not ready */ });
+    getStorePrices().then(setPrices).catch(() => { /* store not ready — keep hardcoded labels */ });
   }, []);
 
   const buy = useCallback(async (productId: string) => {
@@ -91,5 +93,5 @@ export function useIapSubscriptions() {
     finally { setProcessing(false); }
   }, [refreshUser]);
 
-  return { loadProducts, buy, restore, processing, error };
+  return { loadProducts, buy, restore, processing, error, prices };
 }
