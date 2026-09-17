@@ -43,10 +43,11 @@ Paywall is reachable from three places: Profile → "Upgrade to Premium" / "Mana
 
 **Daily login:** `useClaimDailyLogin → creditsApi.claimDailyLogin → POST /credits/daily-login → claimDailyLogin` (invalidates `['credits']`).
 
-**Subscription purchase:**
-`PaywallScreen.buy → useIapSubscriptions.requestPurchase (react-native-iap useIAP) → onPurchaseSuccess(handleSuccess) → getPlatformReceipt → subscriptionsApi.verify → POST /subscriptions/verify → verifyPurchase → verifyApple → applyEntitlement → finishTransaction → refreshUser (authApi.me + invalidate ['credits'],['subscription'])`.
+**Subscription purchase (RevenueCat — hardened 2026-09-16, commit `f32e5f5`):**
+`PaywallScreen.buy → useIapSubscriptions.purchaseByProductId (react-native-purchases / RevenueCat SDK) → Purchases.purchasePackage → refreshUser (authApi.me + invalidate ['credits'],['subscription'])`.
+The CLIENT does NOT tell the backend about the purchase — **RevenueCat's server-to-server webhook is the sole entitlement source**. The backend grants credits/plan/storage from `POST /subscriptions/rc-webhook`. The legacy `POST /subscriptions/verify` (Apple receipt verification) was **removed** — the app never called it and IAP was never live.
 
-**Status / verify-on-open:** `AppNavigator → useSubscriptionSync (on auth mount) → syncEntitlementOnOpen → getActiveSubscriptions → (if active) subscriptionsApi.verify else subscriptionsApi.status → GET /subscriptions/status → getStatus`.
+**Status / verify-on-open:** `AppNavigator → useSubscriptionSync (on auth mount) → identifyUser + refreshCustomerInfo (RC) → subscriptionsApi.status → GET /subscriptions/status (server RECONCILES the entitlement) → authApi.me`. Calling `/status` first means a naturally-lapsed sub downgrades to FREE even before an EXPIRATION webhook lands, so `me()` returns the reconciled plan the Paywall reads.
 
 ## Backend
 
@@ -66,19 +67,19 @@ Paywall is reachable from three places: Profile → "Upgrade to Premium" / "Mana
   - `claimDailyLogin(userId)` — wrapped in a **Serializable** `$transaction` to prevent concurrent claims both passing the "does a REWARD exist today?" check. Also filters out `ACHIEVEMENT_REWARD` description rows when checking for today's reward (so achievement credit grants don't block the daily login). On success: atomically `increment: 1` balance + creates a `REWARD` tx; fires `triggerAchievementCheck` (streak milestones).
 - **Stats validation (controller):** period ∈ `today|week|month|year|custom`; interval ∈ `1h|2h|6h|day|week|month|quarter`; custom requires valid ISO `from`/`to`, `to ≥ from`, and ≤ `MAX_CUSTOM_DAYS` (90); hour intervals only for today/custom; quarter only for year/custom.
 
-### Module `backend/src/modules/subscriptions/`
-- `subscriptions.routes.ts` · `subscriptions.controller.ts` · `subscriptions.service.ts` · `subscriptions.dto.ts`.
-- **Endpoints** (all `authMiddleware`, mounted at `/api/v1/subscriptions`):
-  - `POST /verify` (`validate(VerifyPurchaseDto)`) — verify a store receipt and apply entitlement.
-  - `GET /status` — `{ plan, active, expiresAt }`; recomputes expiry and downgrades a lapsed record to FREE as a side effect.
+### Module `backend/src/modules/subscriptions/` — RevenueCat-only (hardened 2026-09-16, task #20)
+- `subscriptions.routes.ts` · `subscriptions.controller.ts` · `subscriptions.service.ts` (no dto — the legacy `subscriptions.dto.ts` was deleted with `/verify`).
+- **Endpoints** (mounted at `/api/v1/subscriptions`):
+  - `POST /rc-webhook` — **public** (before `authMiddleware`), authed by the `RC_WEBHOOK_AUTH` header. The sole entitlement grant path.
+  - `GET /status` (`authMiddleware`) — `{ plan, active, expiresAt }`; reconciles the effective entitlement (lapsed → FREE) under the per-user lock as a side effect.
+- **Entitlement model (dual per-environment snapshot, production precedence):** `Subscription` holds the PRODUCTION entitlement (`plan/store/productId/expiresAt`, all nullable) AND a SANDBOX snapshot (`sandboxPlan/sandboxExpiresAt`), each with its own monotonic watermark (`lastProdEventAt` / `lastSandboxEventAt`). Effective plan = active-production → else active-sandbox → else FREE.
 - **Service functions:**
-  - `verifyApple(receipt, productId)` — POSTs to Apple `verifyReceipt`, **prod first**, retries **sandbox on status 21007**; non-zero status → `RECEIPT_INVALID` (400); picks the highest `expires_date_ms` for the product; `RECEIPT_NO_MATCH` if none. Requires `APPLE_IAP_SHARED_SECRET` else `IAP_NOT_CONFIGURED` (503).
-  - `verifyGoogle(...)` — **guarded stub**, always throws `IAP_NOT_CONFIGURED` (503). (`ponytail:` comment — implement with Play Developer API once `GOOGLE_PLAY_SA_JSON` + Play products exist.)
-  - `applyEntitlement(userId, store, def, v)` — upserts the `Subscription`, sets `user.plan` + `storageLimit` from `PLAN_BENEFITS`, and **only when `lastTransactionId` differs** (new purchase or renewal) grants credits (`creditsForPurchase`) + writes a `PURCHASE` tx. All in one `$transaction`. Returns `isNewTransaction`.
-  - `verifyPurchase(userId, dto)` — resolves product (`UNKNOWN_PRODUCT` if not in `PRODUCTS`), verifies per platform, applies entitlement; returns `{ plan, active, expiresAt, granted }`.
-  - `getStatus(userId)` — no sub → FREE; expired sub → downgrade user to FREE + FREE storage, return inactive; else active.
-  - `getEffectivePlan(userId)` — cheap `{plan,expiresAt}` lookup for the rate limiter; treats missing/expired as FREE.
-- **DTO `VerifyPurchaseDto`:** `platform: enum(['APPLE','GOOGLE'])`, `productId: string().min(1)`, `receipt: string().min(1)` (Apple base64 app receipt / Google purchaseToken).
+  - `handleRcWebhook(event)` — the whole handler runs in one txn: `ProcessedWebhookEvent(event.id)` insert dedups REPLAYS (P2002 → whole txn rolls back → `duplicate`); then a per-user `pg_advisory_xact_lock` + `User FOR UPDATE` (canonical User→MediaFile order) serializes concurrent events + getStatus. Validates `environment`∈{PRODUCTION,SANDBOX} + finite `event_timestamp_ms` (malformed → ignored). **Credits** are gated by a durable `ProcessedTransaction(store,transactionId)` ledger via `INSERT … ON CONFLICT DO NOTHING RETURNING` (idempotent per store-transaction, decoupled from event order); granted only for PRODUCTION money events in prod. **Entitlement** is applied per-environment, newest-watermark-wins; SANDBOX applies entitlement (App Review shows PRO) but grants no credits in prod. `EXPIRATION` upserts a cleared snapshot (safe before any purchase); `SUBSCRIPTION_PAUSED` does NOT revoke. `TRANSFER` downgrades prior owners (`transferred_from`).
+  - `getStatus(userId)` / `reconcileEntitlement(tx, userId)` — reconcile `User.plan` + `storageLimit` mirror and media retention to the effective entitlement under the user lock.
+  - `getEffectivePlan(userId)` — expiry-aware effective plan; used by the rate limiter, **media quota/retention, and credits streak-freeze** (SUB-5, no stale-paid window).
+  - `withUserLock(userId, fn)` — shared advisory-lock + `User FOR UPDATE` helper (also used by `media.uploadFile`).
+- **No `originalTransactionId @unique`** — transfers move it between users; dedup is via `ProcessedWebhookEvent.id` + the transaction ledger.
+- Verified via the claudex-loop (plan APPROVED 5 rounds, 3 Codex inspections, ~40 runnable DB assertions). Full transcript: repo `PLAN.md` + `PLAN-REVIEW-LOG.md`.
 
 ### Config `backend/src/config/plans.ts` (single source of truth)
 - `PLAN_BENEFITS`: FREE `{credits 0, 250 MB (262_144_000), aiPerHour 30}` · STARTER `{100, 2 GB (2_147_483_648), 60}` · PRO `{500, 10 GB (10_737_418_240), 120}`.
@@ -109,21 +110,40 @@ Paywall is reachable from three places: Profile → "Upgrade to Premium" / "Mana
 - **Atomic credit spend (AI):** `ai.service` uses a single SQL `UPDATE … WHERE creditBalance >= cost RETURNING id` — eliminates the old TOCTOU race where a stale read could allow overdraft.
 - **Idempotent grants:** credits are granted **only on a new `lastTransactionId`**. Verify-on-open / restore / repeated verify calls re-set plan/expiry/storage but do **not** re-grant credits. Sandbox renewals (monthly ≈5 min, annual ≈1 hr) are the way to confirm this.
 - **Annual pays 12× upfront** (E decision #2): annual grants base×12 credits on purchase, not monthly drips.
-- **Apple prod→sandbox fallback:** always hit prod `verifyReceipt` first; status `21007` = sandbox receipt → retry sandbox. Errors: `IAP_NOT_CONFIGURED` (503, missing shared secret), `RECEIPT_INVALID` (400), `RECEIPT_NO_MATCH` (400), `UNKNOWN_PRODUCT` (400).
-- **Lapse → FREE downgrade:** `getStatus` and `getEffectivePlan` compare `expiresAt` to now; an expired sub downgrades `user.plan` to FREE and resets `storageLimit` to the FREE limit. **Never deletes files** — blocks new uploads over the FREE quota only.
-- **Verify-on-open (E decision #1):** `useSubscriptionSync` runs once on authed mount; `syncEntitlementOnOpen` never throws (offline/unconfigured store must not break launch) — it re-verifies an active store receipt (catches renewals) or falls back to the cheap `status` call.
+- **Idempotent credits (hardened):** credits are gated by the durable `ProcessedTransaction(store,transactionId)` ledger, not by a `lastTransactionId` cursor — reordered/duplicate webhook events for the same store transaction grant exactly once, and money processing is decoupled from entitlement ordering (an older-but-unseen paid transaction still grants).
+- **Sandbox split (SUB-R6, owner-approved):** in prod, SANDBOX events apply entitlement (so App-Review purchases show PRO and self-expire) but grant **0 credits** (credits are the only permanent, farmable benefit). Production events grant credits. Production entitlement always takes precedence over sandbox; the sandbox snapshot is preserved so it's used if production later lapses.
+- **Lapse → FREE downgrade (expiry-aware everywhere):** `getEffectivePlan` compares `expiresAt` to now; media quota+retention and credits streak-freeze read it (not the cached `User.plan`), so there's no stale-paid window. `mediaCleanup` also reconciles a lapsed user's null-expiry media so retention doesn't depend on a webhook/upload. **Never deletes files** on downgrade — blocks new uploads over the FREE quota only.
+- **Verify-on-open:** `useSubscriptionSync` runs once on authed mount; it calls `/status` (server reconciles) before `authApi.me()`, and never throws (offline/unconfigured must not break launch).
 - **Per-tier AI rate limit** is separate from credit cost — a user can be rate-limited (429) even with credits, and can run out of credits (402) while under the rate limit.
-- **Google Play is a stub** — the paywall already passes the Android `purchaseToken` but `verifyGoogle` throws 503; Android IAP is deferred.
-- **react-native-iap v16 + Nitro:** built on `react-native-nitro-modules`, which must be a **direct dependency** (`^0.36.5` in package.json) or pod install fails (`NitroModules … depended upon by NitroIap`). StoreKit purchases **don't work in the Simulator** — real iPhone required.
-- **tsconfig paths workaround:** `tsconfig.json` maps `"react-native-iap": ["node_modules/react-native-iap/lib/typescript/src/index.d.ts"]` so TS resolves the v16 types.
-- **Unknown SKUs are silently omitted** by `fetchProducts` — a product-ID typo just makes the tier not appear.
-- **Product IDs are duplicated** in `backend/src/config/plans.ts` and `frontend/src/types/subscription.types.ts` (`TIERS`/`ALL_PRODUCT_IDS`) — change both, and they must match App Store Connect exactly.
+- **RevenueCat is the client SDK for BOTH stores** (`react-native-purchases ^10.9.0` in `frontend/`; `react-native-iap` is NOT installed anymore — the old v16/Nitro notes are obsolete). Client purchases/restores via RC (`frontend/src/lib/purchases.ts`); backend grants from the RC webhook. Purchases **don't work in the Simulator / on debug builds** — a Play-signed track build + license testers (Android) or a Sandbox tester (iOS) is required.
+- **Google Play product-identifier gotcha (RC SDK v6+):** RC reports a Google subscription as `subscriptionId:basePlanId`, not the bare id. So on Play each of the 4 subscriptions must have its **Subscription ID = the full product ID** (`com.biblestudypro.pro.annual`) with one base plan. Code handles the suffix on both ends (2026-09-17): `purchases.ts` prefix-matches `productId + ':'`; `plans.ts getProduct` strips after `:`. iOS sends the exact id (no colon).
+- **RC config is fail-safe:** `configureRevenueCat()` no-ops when the API key is missing; `getPackages()` returns `[]`; `buy()` surfaces "Store not available" as inline text. Paywall UI is driven by static `TIERS`, so it renders (and never crashes) even with RC unconfigured or products not yet active — safe to ship in a closed test before store products exist.
+- **Product IDs are duplicated** in `backend/src/config/plans.ts` and `frontend/src/types/subscription.types.ts` (`TIERS`/`ALL_PRODUCT_IDS`) — change both, and they must match App Store Connect AND Play Console exactly.
 - **Stats gotchas:** custom range ≤ 90 days; hour intervals only today/custom; quarter only year/custom; `getStreak` uses local-date strings (timezone of the server).
 - **BONUS** transaction type exists in the enum but no code path writes it yet.
 
 ## This session's additions (A–G arc)
 
-This is **Phase E** (subscriptions). The whole area is **code-complete**: backend verify/entitlement/rate-limit, the Paywall, verify-on-open, and restore all exist. It is **pending real-world config only** — App Store Connect products (4 SKUs in one subscription group), an active Paid Apps Agreement, and `APPLE_IAP_SHARED_SECRET` in `backend/.env`. See repo-root `IAP_SETUP.md` for the ordered checklist. Earlier arc phases seeded this area: variable credit costs and free-tier AI (A–C), and the achievement/streak surfacing that `claimDailyLogin` triggers.
+This is **Phase E** (subscriptions). The whole area is **code-complete and hardened** (2026-09-16, task #20, commit `f32e5f5`): RevenueCat is the sole entitlement path (legacy `/verify` removed), the RC webhook grants credits/plan/storage, and entitlement is fully expiry-aware. It is **pending real-world config only** — RevenueCat project + App Store Connect products (4 SKUs in one subscription group), an active Paid Apps Agreement, and `RC_WEBHOOK_AUTH` in `backend/.env`. See repo-root `IAP_SETUP.md` for the ordered checklist. Earlier arc phases seeded this area: variable credit costs and free-tier AI (A–C), and the achievement/streak surfacing that `claimDailyLogin` triggers.
+
+## RevenueCat store integration — LIVE setup (started 2026-09-17)
+
+Turning the code-complete Phase E into working purchases. **Full ordered guide + status tracker: repo-root `REVENUECAT_SETUP.md`** (authoritative; `IAP_SETUP.md` is the stale Apple-receipt-era doc — ignore it). RC project **Verdance** (`a5826484`); both apps exist, bundle `com.getverdance.app`: iOS `appb38d4bbf4e`, Play `app29304c8191`.
+
+Progress:
+- ✅ **RC apps created** (iOS + Play).
+- ✅ **iOS In-App Purchase Key** uploaded — "Valid credentials".
+- ✅ **App code Android-safe** — `:basePlanId` handled both ends (`frontend/src/lib/purchases.ts`, `backend/src/config/plans.ts`); both `tsc --noEmit` clean; runnable check confirmed iOS-exact + Android-suffix both resolve to the right tier/credits.
+- ✅ **Phase 1 — Android service account DONE.** GCP project **`bible-study-504809`** ("Bible Study"): enabled Android Publisher + Play Developer Reporting APIs; service account `revenuecat@bible-study-504809.iam.gserviceaccount.com` with roles **Pub/Sub Editor** + **Monitoring Viewer**; JSON key `~/Downloads/bible-study-504809-939afd7d66ee.json` (⚠️ secret, never commit); invited into Play Console with **Admin (all apps)** incl. financial + manage-orders; uploaded to RC → **"Valid credentials"**. (RTDN "Google developer notifications" warning is optional — real-time only, not required for correctness.)
+- ✅ **Phase 3 — Play Console subscriptions DONE** (2026-09-17): 4 subs created, Subscription ID = full product ID, 1 auto-renewing base plan each (monthly/annual), prices $4.99/$39.99/$9.99/$79.99, all **Active** across 174 regions, "Backwards compatible".
+- ✅ **Phase 2 — App Store Connect DONE** (2026-09-17): group "Verdance Premium" + 4 auto-renew subs (same product IDs, $4.99/$39.99/$9.99/$79.99) all "Ready for Review"; review screenshot = `branding/store-screenshots/raw-ios/07-paywall.png` reused ×4 (internal-only, one shot fine). Order Pro>Starter for correct upgrade/downgrade. Subs submit with the next app build.
+- ✅ **Phase 4 — RC catalog DONE (both platforms, 2026-09-17)**: entitlement `premium` = 8 products (4 Android `:basePlanId` + 4 iOS clean IDs); offering `default` (Current) = 4 packages ($rc_monthly/$rc_annual + custom pro_monthly/pro_annual), each holding BOTH an iOS + Android product. RC auto-serves the right store per device — one paywall, both plans, both platforms fully settled.
+- ⬜ **Phase 5 — Webhook** — RC → `https://api.getverdance.com/api/v1/subscriptions/rc-webhook` + Authorization secret → same value in prod `backend/.env` `RC_WEBHOOK_AUTH` (empty now; without it webhook 503s, no grant).
+- ⬜ **Phase 6 — `.env` keys** — `frontend/.env` `REVENUECAT_ANDROID_API_KEY` empty (paste `goog_` Public API Key); verify `appl_` iOS key. Rebuild after (react-native-config bakes at build time).
+- ⬜ **Phase 7 — test on tracks** — license/sandbox testers, buy each tier, confirm webhook → credits+plan land.
+- ✅ **Phase 8 DONE** (2026-09-17): iOS App Store Connect API key uploaded to RC ("Valid credentials") + Apple S2S notifications set (Prod+Sandbox Server URLs → RC incoming-webhook, Version 2). iOS store side fully wired (IAP key + ASC API key + S2S + 4 products Ready for Review).
+
+Bigger picture: this all serves getting the app **live on Play Production** so **BillDesk PA-CB KYC** (rejected "app not live/not accessible", App ID 2609094782) can pass — that needs the mandatory 12-tester/14-day closed test then Production. India-only launch could sidestep BillDesk (it only gates *international* sales).
 
 ## Related
 
