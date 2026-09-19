@@ -465,3 +465,16 @@ sandbox testers, real device / TestFlight. Purchases stay inert until this exist
 Deferred (not one of the 7): **church/group plan pricing** — blocked; groups + group plans (D2) were
 removed. Decide only after they're rebuilt post-launch.
 All numbers are launch defaults; tune with real usage data.
+
+## Launch fixes log
+
+**2026-09-19 — Android Google Sign-In (`DEVELOPER_ERROR`) on Play closed testing.** Testers on the
+closed-test track couldn't sign in with Google. Root cause was **not** the backend (prod `.env`
+`GOOGLE_CLIENT_ID` was correct) — the Play **App signing key** SHA-1 (`cc93bd2b…557fd68c`) was not
+registered as an OAuth Android client, so `GoogleSignin.signIn()` failed client-side before hitting the
+API. Fix: added that SHA-1 + SHA-256 in Firebase (`verdance-bb5c2`, `com.getverdance.app`) and refreshed
+`frontend/android/app/google-services.json` (commit `f604de6`). Confirmed working. Also hardened the
+release build so it always ships prod config: `envConfigFiles` variant mapping in `android/app/build.gradle`
+(`release → .env.production`, `debug → .env`, commit `6ed98a3`) — previously a plain `bundleRelease`
+silently used `.env` (local laptop API URL). Apple Sign-In is iOS-only (hidden on Android by design) and
+works local + live.

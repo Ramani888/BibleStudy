@@ -1,7 +1,7 @@
 ---
 title: Auth & Account
 tags: [feature, auth]
-updated: 2026-08-14
+updated: 2026-09-19
 ---
 
 # Auth & Account
@@ -174,6 +174,13 @@ Deleting a `User` cascades to `RefreshToken`, folders, sets, notes, friendships,
 - Social sign-in **links by email**: signing in with Google/Apple to an address that already has a password account attaches the provider id to that same user (no duplicate account).
 - Apple only sends name/email on the **first** authorization — subsequent sign-ins rely on `sub` + token email; if no email is available it errors.
 - Google/Apple are gracefully "not configured" errors when `GOOGLE_CLIENT_ID` / `APPLE_BUNDLE_ID` env is empty.
+- **Apple button is iOS-only** — `SocialButtons.tsx` gates it behind `Platform.OS === 'ios'` (the native `@invertase/react-native-apple-authentication` flow has no Android equivalent). Correct/intended; Android shows Google only.
+
+**Android Google Sign-In `DEVELOPER_ERROR` (fixed 2026-09-19)**:
+- On Android, `GoogleSignin.signIn()` only issues an idToken if Google matches **(package `com.getverdance.app` + the running app's signing-cert SHA-1)** to a registered OAuth Android client. A mismatch throws `DEVELOPER_ERROR` **client-side, before the backend is ever called** — so the prod `.env` / `googleAuth` service is irrelevant to this error.
+- Symptom this bit us with: Play **closed-testing** builds are re-signed by **Play App Signing** with Google's app-signing key, whose SHA-1 (`cc93bd2b…557fd68c`) was not registered. Fix = add that SHA-1 (+SHA-256) as a fingerprint in Firebase (`verdance-bb5c2` → `com.getverdance.app`) and re-download `google-services.json`. No app rebuild needed (SHA check is server-side; testers just retry after propagation).
+- Which SHA signs which build: **debug keystore** (`5e8f16…abf625`) = local `run-android`; **upload key** (`e7c628…390811`) = your uploaded AAB; **Play App signing key** (`cc93…`) = what testers actually download. All three should be registered. Debug SHA is NOT yet registered (local Android debug Google sign-in will `DEVELOPER_ERROR` until it is; unnoticed because dev tests on iOS).
+- SHA details live in [[Google Credentials]].
 
 **Password rules**:
 - Everywhere a new password is set: min 8, ≥1 uppercase, ≥1 digit (register, reset, change).
