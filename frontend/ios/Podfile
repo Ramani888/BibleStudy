@@ -33,5 +33,16 @@ target 'frontend' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+
+    # Pin the env file per build configuration so Release archives (TestFlight/App
+    # Store) always use .env.production, never the dev .env (LAN IP). The
+    # react-native-config "Config codegen" phase runs in this pod target and reads
+    # $ENVFILE from its build settings.
+    installer.pods_project.targets.each do |target|
+      next unless target.name == 'react-native-config'
+      target.build_configurations.each do |config|
+        config.build_settings['ENVFILE'] = config.name == 'Release' ? '.env.production' : '.env'
+      end
+    end
   end
 end
