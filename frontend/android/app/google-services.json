@@ -30,6 +30,14 @@
           }
         },
         {
+          "client_id": "169277764350-tdu8djhemtf44c0qbmk04857d388v9dm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.getverdance.app",
+            "certificate_hash": "cc93bd2b35b3b7b20ce10e5d3d1cef7f557fd68c"
+          }
+        },
+        {
           "client_id": "169277764350-kbrebkkq0ag11cp2l7mlq32voaipo6d4.apps.googleusercontent.com",
           "client_type": 3
         }
