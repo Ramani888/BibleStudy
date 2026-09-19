@@ -155,6 +155,7 @@ export async function appleAuth(req: Request, res: Response): Promise<void> {
     sendSuccess(res, result, 'Apple sign-in successful');
   } catch (error) {
     if (error instanceof AppError) { sendError(res, error.message, error.statusCode, error.code); return; }
+    console.error('[appleAuth] unexpected error:', error);
     sendError(res, 'Apple sign-in failed', 500, 'INTERNAL_ERROR');
   }
 }

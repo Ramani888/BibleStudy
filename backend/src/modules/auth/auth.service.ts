@@ -1,4 +1,5 @@
 import bcrypt from 'bcryptjs';
+import { createHash } from 'crypto';
 import { OAuth2Client } from 'google-auth-library';
 import appleSignin from 'apple-signin-auth';
 import { prisma } from '../../config/db';
@@ -344,9 +345,14 @@ export async function googleAuth(dto: GoogleAuthDtoType) {
 export async function appleAuth(dto: AppleAuthDtoType) {
   if (!env.APPLE_BUNDLE_ID) throw new ValidationError('Apple Sign-In is not configured');
 
+  // Apple stores SHA256(nonce) in the identity token, but the client sends the raw
+  // nonce. Hash it to match, otherwise verifyIdToken throws "jwt nonce invalid".
+  const hashedNonce = dto.nonce
+    ? createHash('sha256').update(dto.nonce).digest('hex')
+    : undefined;
   const appleUser = await appleSignin.verifyIdToken(dto.identityToken, {
     audience:         env.APPLE_BUNDLE_ID,
-    nonce:            dto.nonce,
+    nonce:            hashedNonce,
     ignoreExpiration: false,
   });
 
