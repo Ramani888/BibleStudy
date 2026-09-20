@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import type { AIStackParamList } from './types';
 import { AIConsentScreen } from '../screens/ai/AIConsentScreen';
 import { AIChatScreen } from '../screens/ai/AIChatScreen';
@@ -10,6 +11,7 @@ const Stack = createNativeStackNavigator<AIStackParamList>();
 
 export function AINavigator() {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -27,7 +29,7 @@ export function AINavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="AIConsent" component={AIConsentScreen} />
       <Stack.Screen name="AIChat" component={AIChatScreen} />
       <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} />

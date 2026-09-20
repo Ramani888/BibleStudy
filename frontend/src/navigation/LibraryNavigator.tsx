@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { useTheme } from '../theme';
 import type { LibraryStackParamList } from './types';
 import { LibraryScreen } from '../screens/library/LibraryScreen';
 import { FolderDetailScreen } from '../screens/library/FolderDetailScreen';
@@ -19,6 +20,7 @@ const Stack = createNativeStackNavigator<LibraryStackParamList>();
 
 export function LibraryNavigator() {
   const navigation = useNavigation();
+  const { colors } = useTheme();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -38,7 +40,7 @@ export function LibraryNavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="Library" component={LibraryScreen} />
       <Stack.Screen name="FolderDetail" component={FolderDetailScreen} />
       <Stack.Screen name="SetDetail" component={SetDetailScreen} />

@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { NavigationContainer, NavigationContainerRef } from '@react-navigation/native';
+import { NavigationContainer, NavigationContainerRef, DefaultTheme, DarkTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import messaging from '@react-native-firebase/messaging';
 
@@ -36,6 +36,14 @@ function SplashScreen() {
 export function RootNavigator() {
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
   const isInitialized = useAuthStore(s => s.isInitialized);
+  const { colors, name } = useTheme();
+
+  // Theme the navigation container so scene transitions never flash the
+  // library default (white) background — matters most in dark mode.
+  const navTheme = useMemo(() => {
+    const base = name === 'dark' ? DarkTheme : DefaultTheme;
+    return { ...base, colors: { ...base.colors, background: colors.background, card: colors.background } };
+  }, [name, colors.background]);
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
   const [onboardingChecked, setOnboardingChecked] = useState(false);
@@ -95,9 +103,9 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef}>
+    <NavigationContainer ref={navigationRef} theme={navTheme}>
       {isAuthenticated ? (
-        <RootStack.Navigator screenOptions={{ headerShown: false }}>
+        <RootStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
           <RootStack.Screen name="App" component={AppNavigator} />
           <RootStack.Screen
             name="Quiz"

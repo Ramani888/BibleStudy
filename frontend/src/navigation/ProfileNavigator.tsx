@@ -1,5 +1,6 @@
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useTheme } from '../theme';
 import type { ProfileStackParamList } from './types';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
@@ -27,8 +28,9 @@ import { PrivacyPolicyScreen } from '../screens/profile/PrivacyPolicyScreen';
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export function ProfileNavigator() {
+  const { colors } = useTheme();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
       <Stack.Screen name="Profile"         component={ProfileScreen}         />
       <Stack.Screen name="EditProfile"     component={EditProfileScreen}     />
       <Stack.Screen name="ChangePassword"  component={ChangePasswordScreen}  />
