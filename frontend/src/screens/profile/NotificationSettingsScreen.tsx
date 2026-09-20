@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
+
+import { registerDeviceToken } from '../../utils/notifications';
 
 import { Screen } from '../../components/ui/Screen';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
@@ -69,7 +72,22 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
   }, []);
 
   const toggle = async (key: keyof NotificationPrefs) => {
-    const updated = { ...prefs, [key]: !prefs[key] };
+    const turningOn = !prefs[key];
+    // Just-in-time OS permission: only ask when the user opts INTO notifications.
+    // Already-granted → returns true silently; declined → keep the toggle off.
+    if (turningOn) {
+      const granted = await registerDeviceToken({ prompt: true });
+      if (!granted) {
+        Toast.show({
+          type: 'info',
+          text1: t('profile:notificationSettings.permissionNeededTitle', 'Notifications are off'),
+          text2: t('profile:notificationSettings.permissionNeededBody', 'Enable notifications for Verdance in your device Settings.'),
+          onPress: () => Linking.openSettings(),
+        });
+        return; // don't flip the toggle on without OS permission
+      }
+    }
+    const updated = { ...prefs, [key]: turningOn };
     setPrefs(updated);
     await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
   };

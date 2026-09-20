@@ -419,6 +419,8 @@
     "unblockedSuccess": "{{name}}님 차단 해제됨"
   },
   "notificationSettings": {
+    "permissionNeededTitle": "알림이 꺼져 있습니다",
+    "permissionNeededBody": "기기 설정에서 Verdance 알림을 켜주세요.",
     "hint": "받고 싶은 알림을 선택하세요"
   },
   "subscription": {

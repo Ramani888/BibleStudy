@@ -419,6 +419,8 @@
     "unblockedSuccess": "Na-unblock si {{name}}"
   },
   "notificationSettings": {
+    "permissionNeededTitle": "Naka-off ang mga notification",
+    "permissionNeededBody": "I-enable ang mga notification para sa Verdance sa Settings ng iyong device.",
     "hint": "Piliin kung aling mga abiso ang gusto mo"
   },
   "subscription": {

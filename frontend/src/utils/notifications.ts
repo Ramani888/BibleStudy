@@ -5,30 +5,40 @@ import { apiPost } from '../api/client';
 import i18n from '../i18n';
 
 /**
- * Request push notification permission, obtain the FCM device token,
- * and register it with the backend.
+ * Obtain the FCM device token and register it with the backend.
  *
+ * `prompt` controls the OS permission dialog:
+ *  - `false` (default): only registers if permission was ALREADY granted —
+ *    never shows a dialog. Use at login so opted-in users keep push silently
+ *    while new users are not walled with a prompt.
+ *  - `true`: requests permission (may show the OS dialog). Use at a contextual,
+ *    user-initiated opt-in (e.g. turning on a notification setting).
+ *
+ * Returns whether the device ended up registered (i.e. permission granted).
  * Safe to call multiple times — the backend upserts on the token value.
- * Silently returns if permission is denied or Firebase is not configured.
  */
-export async function registerDeviceToken(): Promise<void> {
+export async function registerDeviceToken({ prompt = false }: { prompt?: boolean } = {}): Promise<boolean> {
   try {
-    const authStatus = await messaging().requestPermission();
+    const authStatus = prompt
+      ? await messaging().requestPermission()
+      : await messaging().hasPermission();
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
 
-    if (!enabled) return;
+    if (!enabled) return false;
 
     const token = await messaging().getToken();
-    if (!token) return;
+    if (!token) return false;
 
     await apiPost('/users/device-token', {
       token,
       platform: Platform.OS === 'ios' ? 'IOS' : 'ANDROID',
     });
+    return true;
   } catch {
     // Firebase not configured or network error — non-critical
+    return false;
   }
 }
 

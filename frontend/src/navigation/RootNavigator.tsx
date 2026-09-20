@@ -68,7 +68,9 @@ export function RootNavigator() {
     if (!isAuthenticated || notificationsSetUp.current) return;
     notificationsSetUp.current = true;
 
-    registerDeviceToken();
+    // Silent: register push only if already permitted — never prompt at login.
+    // The OS permission dialog is requested contextually from Notification Settings.
+    registerDeviceToken({ prompt: false });
     const unsubRefresh = onTokenRefresh();
     const unsubForeground = setupForegroundHandler();
 

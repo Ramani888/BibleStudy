@@ -352,6 +352,8 @@
     "unblockedSuccess": "{{name}} unblocked"
   },
   "notificationSettings": {
+    "permissionNeededTitle": "Notifications are off",
+    "permissionNeededBody": "Enable notifications for Verdance in your device Settings.",
     "hint": "Choose which notifications you"
   },
   "subscription": {

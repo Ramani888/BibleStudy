@@ -419,6 +419,8 @@
     "unblockedSuccess": "{{name}} débloqué"
   },
   "notificationSettings": {
+    "permissionNeededTitle": "Les notifications sont désactivées",
+    "permissionNeededBody": "Activez les notifications pour Verdance dans les Réglages de votre appareil.",
     "hint": "Choisissez les notifications que vous"
   },
   "subscription": {

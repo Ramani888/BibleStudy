@@ -420,6 +420,8 @@
     "unblockedSuccess": "{{name}} desbloqueado"
   },
   "notificationSettings": {
+    "permissionNeededTitle": "As notificações estão desativadas",
+    "permissionNeededBody": "Ative as notificações do Verdance nas Configurações do seu dispositivo.",
     "hint": "Escolha quais notificações você"
   },
   "subscription": {
