@@ -108,8 +108,13 @@
     "aiSourceLabel": "GÉNÉRER À PARTIR DE",
     "aiSource": {
       "topic": "Un sujet",
-      "sets": "Mes ensembles"
-    }
+      "sets": "Mes ensembles",
+      "document": "Un document"
+    },
+    "chooseDocumentLabel": "CHOISIR UN DOCUMENT",
+    "tapToChooseDocument": "Touchez pour importer un PDF ou une image…",
+    "aiCostMedia": "Coûte 3–5 crédits · lit votre document",
+    "attachDocument": "Ajouter un document"
   },
   "hud": {
     "questionOf": "Question {{current}} sur {{total}}",

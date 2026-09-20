@@ -11,11 +11,15 @@ const MAX_GROUNDING_CARDS = 40;
 
 /**
  * Generate an ephemeral AI quiz (delegates to ai.service — it owns the LLM +
- * credit seam). Sets win over topic: if setIds are given, quiz is grounded in
- * the user's own cards; otherwise it's generated from the topic. Nothing is
- * persisted. Card loading is owner-scoped and happens BEFORE any credit charge.
+ * credit seam). Precedence: a document (media) wins, then the user's own sets,
+ * then a topic. Media ownership + cost are handled inside generateQuizCards.
+ * Nothing is persisted. Card loading is owner-scoped and happens BEFORE any
+ * credit charge.
  */
 export async function generateQuiz(userId: string, dto: GenerateQuizDtoType) {
+  if (dto.mediaIds && dto.mediaIds.length > 0) {
+    return generateQuizCards(userId, { mediaIds: dto.mediaIds, count: dto.count });
+  }
   if (dto.setIds && dto.setIds.length > 0) {
     const cards = await prisma.card.findMany({
       where: { setId: { in: dto.setIds }, set: { userId } }, // owner-scoped
@@ -29,7 +33,7 @@ export async function generateQuiz(userId: string, dto: GenerateQuizDtoType) {
   if (dto.topic) {
     return generateQuizCards(userId, { topic: dto.topic, count: dto.count });
   }
-  throw new ValidationError('Provide a topic or select sets');
+  throw new ValidationError('Provide a document, a topic, or select sets');
 }
 
 /**

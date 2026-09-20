@@ -108,8 +108,13 @@
     "aiSourceLabel": "GUMAWA MULA SA",
     "aiSource": {
       "topic": "Isang paksa",
-      "sets": "Aking mga set"
-    }
+      "sets": "Aking mga set",
+      "document": "Isang dokumento"
+    },
+    "chooseDocumentLabel": "PUMILI NG DOKUMENTO",
+    "tapToChooseDocument": "I-tap para mag-upload ng PDF o larawan…",
+    "aiCostMedia": "Nagkakahalaga ng 3–5 credits · babasahin ang iyong dokumento",
+    "attachDocument": "Magdagdag ng dokumento"
   },
   "hud": {
     "questionOf": "Tanong {{current}} ng {{total}}",

@@ -108,8 +108,13 @@
     "aiSourceLabel": "생성 기준",
     "aiSource": {
       "topic": "주제",
-      "sets": "내 세트"
-    }
+      "sets": "내 세트",
+      "document": "문서"
+    },
+    "chooseDocumentLabel": "문서 선택",
+    "tapToChooseDocument": "PDF나 이미지를 업로드하려면 탭하세요…",
+    "aiCostMedia": "3~5 크레딧 · 문서를 읽습니다",
+    "attachDocument": "문서 추가"
   },
   "hud": {
     "questionOf": "{{total}}개 중 {{current}}번 문제",

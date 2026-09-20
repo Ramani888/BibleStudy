@@ -36,17 +36,19 @@ export const RecordAttemptDto = z
 
 export type RecordAttemptDtoType = z.infer<typeof RecordAttemptDto>;
 
-// AI quiz generation: from a topic OR grounded in the user's own sets (sets win).
-// count capped at 10 to match parseAIResponse's 10-card ceiling; floor 4 so
-// Multiple Choice is available.
+// AI quiz generation: from a document (media) OR the user's own sets OR a topic.
+// Precedence in the service is media > sets > topic. count capped at 10 to match
+// parseAIResponse's 10-card ceiling; floor 4 so Multiple Choice is available.
+// mediaIds max 1 mirrors the chat DTO — one document per quiz.
 export const GenerateQuizDto = z
   .object({
     topic: z.string().trim().min(2, 'topic is too short').max(80, 'topic is too long').optional(),
     setIds: z.array(z.string().min(1).max(64)).optional(),
+    mediaIds: z.array(z.string().uuid()).max(1).optional(),
     count: z.number().int().min(4).max(10).default(8),
   })
-  .refine(d => (d.setIds?.length ?? 0) > 0 || !!d.topic, {
-    message: 'Provide a topic or select sets',
+  .refine(d => (d.mediaIds?.length ?? 0) > 0 || (d.setIds?.length ?? 0) > 0 || !!d.topic, {
+    message: 'Provide a document, a topic, or select sets',
   });
 
 export type GenerateQuizDtoType = z.infer<typeof GenerateQuizDto>;

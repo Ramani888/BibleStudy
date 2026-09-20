@@ -131,6 +131,14 @@ ${CARD_DELIMITER}
 Q: [a clear question]
 A: [a concise answer]`;
 
+// Media-grounded variant: write questions about the attached document/image.
+const QUIZ_FROM_MEDIA_SYSTEM_PROMPT =
+  `You are a Bible-study quiz writer. Using ONLY the content of the attached document or image, write quiz questions that test understanding of that material. Do not introduce facts that are not present in the attachment. Keep each answer concise and include a verse reference when the source provides one. Write in the same language as the document.
+Output ONLY the cards — no introduction, no commentary, no follow-up questions. Format EACH card exactly as:
+${CARD_DELIMITER}
+Q: [a clear question]
+A: [a concise answer]`;
+
 const HARDCODED_VERSE = {
   reference: 'John 3:16',
   text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.',
@@ -401,11 +409,32 @@ export async function askQuestion(userId: string, dto: AskQuestionDtoType) {
  */
 export async function generateQuizCards(
   userId: string,
-  opts: { topic?: string; cards?: { question: string; answer: string }[]; count: number },
+  opts: { topic?: string; cards?: { question: string; answer: string }[]; count: number; mediaIds?: string[] },
 ) {
-  const { topic, cards: material, count } = opts;
+  const { topic, cards: material, count, mediaIds } = opts;
 
-  const cost = CREDIT_COST.cards;
+  // Resolve media before charging so the cost is known upfront (mirrors askQuestion).
+  let mediaBlocks: MediaBlock[] | undefined;
+  let hasPdf = false;
+  let hasImage = false;
+  if (mediaIds && mediaIds.length > 0) {
+    const files = await prisma.mediaFile.findMany({
+      where: { id: { in: mediaIds }, userId },
+      select: { url: true, type: true },
+    });
+    if (files.length !== mediaIds.length) throw new AppError('One or more files not found', 400, 'INVALID_MEDIA');
+    mediaBlocks = files.map(f =>
+      f.type === 'PDF'
+        ? { type: 'document' as const, source: { type: 'url' as const, url: f.url } }
+        : { type: 'image' as const, source: { type: 'url' as const, url: f.url } },
+    );
+    hasPdf = files.some(f => f.type === 'PDF');
+    hasImage = files.some(f => f.type === 'IMAGE');
+  }
+
+  // Media forces paid Claude, so it bills at the media rate (pdf 5 / image 3);
+  // topic/sets quizzes stay at the card rate (2).
+  const cost = hasPdf ? CREDIT_COST.pdf : hasImage ? CREDIT_COST.image : CREDIT_COST.cards;
 
   // Atomic reserve (TOCTOU-safe): check AND decrement in one SQL statement.
   const reserved = await prisma.$queryRaw<{ creditBalance: number }[]>`
@@ -420,17 +449,25 @@ export async function generateQuizCards(
     throw new PaymentRequiredError(`This needs ${cost} credits. Earn more or upgrade to keep generating quizzes.`);
   }
 
-  // Prompt precedence: grounding cards > topic.
-  const system = material && material.length > 0 ? QUIZ_FROM_CARDS_SYSTEM_PROMPT : QUIZ_SYSTEM_PROMPT;
-  const userContent = material && material.length > 0
-    ? `Generate ${count} quiz questions based ONLY on these flashcards:\n` +
-      material.map((c, i) => `${i + 1}. Q: ${c.question.slice(0, 300)} | A: ${c.answer.slice(0, 300)}`).join('\n')
-    : `Generate ${count} Bible-study flashcards on the topic: "${topic}".`;
+  // Prompt precedence: media > grounding cards > topic.
+  let system: string;
+  let userContent: string;
+  if (mediaBlocks) {
+    system = QUIZ_FROM_MEDIA_SYSTEM_PROMPT;
+    userContent = `Generate ${count} quiz questions based ONLY on the attached document.`;
+  } else if (material && material.length > 0) {
+    system = QUIZ_FROM_CARDS_SYSTEM_PROMPT;
+    userContent = `Generate ${count} quiz questions based ONLY on these flashcards:\n` +
+      material.map((c, i) => `${i + 1}. Q: ${c.question.slice(0, 300)} | A: ${c.answer.slice(0, 300)}`).join('\n');
+  } else {
+    system = QUIZ_SYSTEM_PROMPT;
+    userContent = `Generate ${count} Bible-study flashcards on the topic: "${topic}".`;
+  }
   const messages: ChatMessage[] = [{ role: 'user', content: userContent }];
 
   let rawText: string;
   try {
-    rawText = await generateAnswer(system, messages);
+    rawText = await generateAnswer(system, messages, mediaBlocks);
   } catch (e) {
     await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
     throw e;
@@ -442,7 +479,9 @@ export async function generateQuizCards(
   // Need ≥4 so Multiple Choice always has enough distractors client-side.
   if (cards.length < 4) {
     await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});
-    const source = material && material.length > 0 ? 'the selected sets (try adding more cards)' : 'that topic';
+    const source = mediaBlocks
+      ? 'that document (try a clearer or more detailed file)'
+      : material && material.length > 0 ? 'the selected sets (try adding more cards)' : 'that topic';
     throw new AppError(`Could not generate enough quiz questions for ${source}. No credit was charged.`, 502, 'AI_INSUFFICIENT_CARDS');
   }
 
@@ -451,7 +490,7 @@ export async function generateQuizCards(
   // (charge-on-success invariant) — the user retries rather than losing credits.
   try {
     await prisma.creditTransaction.create({
-      data: { userId, type: 'USAGE', amount: -cost, description: 'AI quiz generation' },
+      data: { userId, type: 'USAGE', amount: -cost, description: mediaBlocks ? 'AI quiz generation (document)' : 'AI quiz generation' },
     });
   } catch (e) {
     await prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: cost } } }).catch(() => {});

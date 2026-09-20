@@ -5,14 +5,15 @@ import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import { AppModal, EmptyState } from '../../components/feedback';
+import { ActionSheet, AppModal, ConfirmDialog, EmptyState } from '../../components/feedback';
 import { Button, FilterChip, Screen, SearchBar, Typography } from '../../components/ui';
 import { FormField } from '../../components/forms';
 import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ChevronRightIcon, SearchIcon, SortIcon, StarIcon } from '../../components/icons';
+import { CheckCircleIcon, ChevronRightIcon, FileTextIcon, SearchIcon, SortIcon, StarIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
 import { getErrorMessage } from '../../api';
 import { useCreditBalance, useGenerateQuiz, useSearchToggle, useSets } from '../../hooks';
+import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 
@@ -43,6 +44,11 @@ export function QuizSetupScreen() {
   const { data: creditBalance } = useCreditBalance();
   const AI_QUIZ_COST = 2;
 
+  // Reuse the AI-chat attachment machinery (device pick + upload, My Media picker,
+  // credit gating, one-time content-policy gate) for the "A document" source.
+  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+  const att = useAIChatAttachment(creditBalance?.balance ?? 0, goPaywall);
+
   // Rotating reassurance while the LLM works (the 5–15s where users bail).
   const [genMsgIdx, setGenMsgIdx] = useState(0);
   const genMessages = [
@@ -58,7 +64,7 @@ export function QuizSetupScreen() {
 
   const [selectedSetIds, setSelectedSetIds] = useState<string[]>([]);
   const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>([]);
-  const [aiSource, setAiSource] = useState<'topic' | 'sets'>('topic');
+  const [aiSource, setAiSource] = useState<'topic' | 'sets' | 'media'>('topic');
   const [setPickerOpen, setSetPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
 
@@ -137,7 +143,7 @@ export function QuizSetupScreen() {
   // name + source (topic OR sets) so the completed quiz is recorded with them.
   // AI quizzes default to Multiple Choice — cleanest UX for generated content.
   const runGenerate = useCallback((
-    payload: { topic?: string; setIds?: string[] },
+    payload: { topic?: string; setIds?: string[]; mediaIds?: string[] },
     save: { quizName: string; topic?: string; setIds: string[]; setTitles: string[] },
   ) => {
     if (generate.isPending) return;
@@ -178,9 +184,23 @@ export function QuizSetupScreen() {
     runGenerate({ setIds: selectedSetIds }, { quizName: name, setIds: selectedSetIds, setTitles: selectedSetTitles });
   }, [selectedSetIds, selectedSetTitles, runGenerate, getValues, t]);
 
-  const aiCostLabel = creditBalance !== undefined
-    ? t('quiz:setup.aiCostWithBalance', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Costs ${AI_QUIZ_COST} credits · ${creditBalance.balance} left` })
-    : t('quiz:setup.aiCost', { cost: AI_QUIZ_COST, defaultValue: `Costs ${AI_QUIZ_COST} credits` });
+  // AI quiz grounded in an uploaded document (PDF/image). Name falls back to the file name.
+  const generateFromMedia = useCallback(() => {
+    const file = att.attachment;
+    if (!file) return;
+    const name = (getValues('quizName') || '').trim() || file.name;
+    runGenerate({ mediaIds: [file.id] }, { quizName: name, setIds: [], setTitles: [name] });
+  }, [att.attachment, runGenerate, getValues]);
+
+  // Document quizzes force paid Claude → media rate (image 3 / pdf 5). Before a
+  // file is chosen we can't know which, so show the 3–5 range.
+  const mediaCost = att.attachment?.type === 'PDF' ? 5 : 3;
+  const shownCost = aiSource === 'media' ? mediaCost : AI_QUIZ_COST;
+  const aiCostLabel = aiSource === 'media' && !att.attachment
+    ? t('quiz:setup.aiCostMedia', 'Costs 3–5 credits · reads your document')
+    : creditBalance !== undefined
+      ? t('quiz:setup.aiCostWithBalance', { cost: shownCost, balance: creditBalance.balance, defaultValue: `Costs ${shownCost} credits · ${creditBalance.balance} left` })
+      : t('quiz:setup.aiCost', { cost: shownCost, defaultValue: `Costs ${shownCost} credits` });
 
   const chooseSetsBlock = (
     <View>
@@ -203,6 +223,33 @@ export function QuizSetupScreen() {
     </View>
   );
 
+  const chooseDocumentBlock = (
+    <View>
+      <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseDocumentLabel', 'CHOOSE A DOCUMENT')}</Typography>
+      <Pressable
+        style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
+        onPress={att.handleAttachPress}
+        accessibilityRole="button"
+      >
+        <View style={styles.selectorIcon}>
+          {att.attachment
+            ? <FileTextIcon size={20} color={colors.accent} />
+            : <ChevronRightIcon size={20} color={colors.textDisabled} />}
+        </View>
+        <Typography preset="body" color={att.attachment ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
+          {att.isUploading
+            ? t('common:status.uploading', 'Uploading…')
+            : att.attachment?.name ?? t('quiz:setup.tapToChooseDocument', 'Tap to upload a PDF or image…')}
+        </Typography>
+        {att.attachment
+          ? <Pressable onPress={att.handleClearAttachment} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+              <Typography preset="caption" color={colors.accent}>{t('common:actions.remove', 'Remove')}</Typography>
+            </Pressable>
+          : <ChevronRightIcon size={18} color={colors.textSecondary} />}
+      </Pressable>
+    </View>
+  );
+
   return (
     <Screen
       header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
@@ -211,8 +258,10 @@ export function QuizSetupScreen() {
           <Button
             label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
             loading={generate.isPending}
-            onPress={aiSource === 'topic' ? generateFromTopic : generateFromSets}
-            disabled={generate.isPending || (aiSource === 'sets' && (selectedSetIds.length === 0 || setsTooFew))}
+            onPress={aiSource === 'topic' ? generateFromTopic : aiSource === 'sets' ? generateFromSets : generateFromMedia}
+            disabled={generate.isPending
+              || (aiSource === 'sets' && (selectedSetIds.length === 0 || setsTooFew))
+              || (aiSource === 'media' && (!att.attachment || att.isUploading))}
             fullWidth
           />
         </View>
@@ -230,6 +279,7 @@ export function QuizSetupScreen() {
             <View style={styles.chipRow}>
               <FilterChip label={t('quiz:setup.aiSource.topic', 'A topic')} active={aiSource === 'topic'} onPress={() => setAiSource('topic')} />
               <FilterChip label={t('quiz:setup.aiSource.sets', 'My sets')} active={aiSource === 'sets'} onPress={() => setAiSource('sets')} />
+              <FilterChip label={t('quiz:setup.aiSource.document', 'A document')} active={aiSource === 'media'} onPress={() => setAiSource('media')} />
             </View>
           </View>
 
@@ -238,8 +288,10 @@ export function QuizSetupScreen() {
               <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
               <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
             </View>
-          ) : (
+          ) : aiSource === 'sets' ? (
             chooseSetsBlock
+          ) : (
+            chooseDocumentBlock
           )}
 
           <View style={styles.aiCostRow}>
@@ -329,6 +381,19 @@ export function QuizSetupScreen() {
           <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>
         </View>
       </AppModal>
+
+      {/* ── Document source: attach menu + My Media picker + content-policy gate ── */}
+      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('quiz:setup.attachDocument', 'Add a document')} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
+      <ActionSheet visible={att.pickerVisible} title={t('ai:chat.chooseMedia', 'Choose from My Media')} actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
+      <ConfirmDialog
+        visible={att.policyDialogVisible}
+        title={t('ai:chat.contentPolicy', 'Content Policy')}
+        message={t('ai:chat.contentPolicyMsg', 'Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines.')}
+        confirmLabel={t('common:actions.agree', 'I Agree')}
+        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        onConfirm={att.acceptPolicy}
+        onCancel={() => att.setPolicyDialogVisible(false)}
+      />
     </Screen>
   );
 }

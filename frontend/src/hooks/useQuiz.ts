@@ -23,12 +23,13 @@ export function useCardsForSets(setIds: string[]) {
 }
 
 /**
- * Generate an ephemeral AI quiz from a topic. Nothing is persisted — the
- * returned cards are played once and discarded, so there is no cache to invalidate.
+ * Generate an ephemeral AI quiz from a document, the user's sets, or a topic.
+ * Nothing is persisted — the returned cards are played once and discarded, so
+ * there is no cache to invalidate.
  */
 export function useGenerateQuiz() {
   return useMutation({
-    mutationFn: (body: { topic?: string; setIds?: string[]; count?: number }) =>
+    mutationFn: (body: { topic?: string; setIds?: string[]; mediaIds?: string[]; count?: number }) =>
       quizApi.generateQuiz(body),
   });
 }

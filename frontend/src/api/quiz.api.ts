@@ -3,9 +3,9 @@ import type { QuizAttemptWithSet, RecordAttemptPayload, RecordAttemptResult, Sum
 import type { GeneratedQuizCard } from '../navigation/types';
 
 export const quizApi = {
-  // AI quiz generation — ephemeral cards from a topic OR the user's sets (sets win).
-  // 60s timeout (free models cold-start slowly).
-  generateQuiz: (body: { topic?: string; setIds?: string[]; count?: number }) =>
+  // AI quiz generation — ephemeral cards from a document (media) OR the user's
+  // sets OR a topic. 60s timeout (free models cold-start slowly).
+  generateQuiz: (body: { topic?: string; setIds?: string[]; mediaIds?: string[]; count?: number }) =>
     apiPost<{ cards: GeneratedQuizCard[]; creditsUsed: number }>(
       '/quiz/generate',
       body,

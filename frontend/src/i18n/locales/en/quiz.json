@@ -81,8 +81,13 @@
     "aiSourceLabel": "GENERATE FROM",
     "aiSource": {
       "topic": "A topic",
-      "sets": "My sets"
-    }
+      "sets": "My sets",
+      "document": "A document"
+    },
+    "chooseDocumentLabel": "CHOOSE A DOCUMENT",
+    "tapToChooseDocument": "Tap to upload a PDF or image…",
+    "aiCostMedia": "Costs 3–5 credits · reads your document",
+    "attachDocument": "Add a document"
   },
   "inQuiz": {
     "questionCount": "Question {{current}} of {{total}}",
