@@ -9,7 +9,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
-import { TrashIcon } from '../../components/icons';
+import { SearchIcon, TrashIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
 import {
   ActionSheet,
@@ -21,7 +21,7 @@ import {
 } from '../../components/feedback';
 import { Button, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { Screen } from '../../components/ui/Screen';
-import { useAIChatHistory, useBookmarks } from '../../hooks';
+import { useAIChatHistory, useBookmarks, useSearchToggle } from '../../hooks';
 import { useChatHistoryActions } from '../../hooks/useChatHistoryActions';
 import { useAIChatStore } from '../../store';
 import { useTheme, fontSizes, layout, spacing } from '../../theme';
@@ -137,7 +137,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const { data: bookmarksData, isLoading: isBookmarksLoading, isRefetching: isBookmarksRefetching, refetch: refetchBookmarks } = useBookmarks();
 
   const [viewMode, setViewMode]     = useState<'all' | 'bookmarked'>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const { query: searchQuery, setQuery: setSearchQuery, visible: searchVisible, toggle: toggleSearch, clear: clearSearch } = useSearchToggle();
   const [activeTag, setActiveTag]   = useState<string | null>(null);
 
   const allSessions  = useMemo(() => data?.pages.flatMap(p => p.sessions) ?? [], [data]);
@@ -175,7 +175,28 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   if (isError) return <ErrorState message={t('ai:history.couldNotLoadHistory', 'Could not load history.')} onRetry={refetch} />;
 
   return (
-    <Screen header={<ScreenHeader title={t('ai:history.title')} onBack={() => navigation.goBack()} />}>
+    <Screen
+      header={
+        <ScreenHeader
+          title={t('ai:history.title')}
+          onBack={() => navigation.goBack()}
+          right={
+            viewMode === 'all' ? (
+              <View style={styles.headerGroup}>
+                <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                  <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
+                </Pressable>
+                {allSessions.length > 0 && (
+                  <Pressable onPress={actions.handleClearAll} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
+                    <TrashIcon size={18} color={colors.alert} />
+                  </Pressable>
+                )}
+              </View>
+            ) : undefined
+          }
+        />
+      }
+    >
 
       {/* View mode toggle */}
       <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
@@ -183,7 +204,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           <Pressable
             key={mode}
             style={({ pressed }) => [styles.modeTab, viewMode === mode && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, { opacity: pressed ? 0.85 : 1 }]}
-            onPress={() => { setViewMode(mode); setSearchQuery(''); setActiveTag(null); }}
+            onPress={() => { setViewMode(mode); clearSearch(); setActiveTag(null); }}
           >
             {mode === 'bookmarked' && <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary} />}
             <Typography preset="label" color={viewMode === mode ? colors.accent : colors.textSecondary}>
@@ -195,14 +216,11 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
 
       {viewMode === 'all' && (
         <>
-          <View style={[styles.topBar, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-            <SearchBar placeholder={t('ai:history.searchPlaceholder', 'Search conversations…')} value={searchQuery} onChangeText={setSearchQuery} containerStyle={styles.searchBarContainer} />
-            {allSessions.length > 0 && (
-              <Pressable onPress={actions.handleClearAll} hitSlop={8} style={({ pressed }) => [styles.clearBtn, { opacity: pressed ? 0.85 : 1 }]}>
-                <TrashIcon size={18} color={colors.alert} />
-              </Pressable>
-            )}
-          </View>
+          {searchVisible && (
+            <View style={styles.searchWrap}>
+              <SearchBar placeholder={t('ai:history.searchPlaceholder', 'Search conversations…')} value={searchQuery} onChangeText={setSearchQuery} containerStyle={styles.searchInput} autoFocus />
+            </View>
+          )}
           {hasAnyTaggedSession && <TagFilterBar activeTag={activeTag} onSelect={setActiveTag} colors={colors} />}
         </>
       )}
@@ -280,13 +298,10 @@ const styles = StyleSheet.create({
     gap: spacing.xs, paddingVertical: spacing.md,
     borderBottomWidth: 2, borderBottomColor: 'transparent',
   },
-  topBar: {
-    flexDirection: 'row', alignItems: 'center',
-    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md,
-    gap: spacing.sm, borderBottomWidth: 1,
-  },
-  searchBarContainer: { flex: 1, marginBottom: 0 },
-  clearBtn: { padding: spacing.xs },
+  headerGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
+  iconPressed: { opacity: 0.85 },
+  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
+  searchInput: { marginBottom: 0 },
   tagBarWrapper: { borderBottomWidth: 1 },
   tagBar: { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.sm, gap: spacing.sm },
   tagFilter: { paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: layout.pillRadius, borderWidth: 1 },

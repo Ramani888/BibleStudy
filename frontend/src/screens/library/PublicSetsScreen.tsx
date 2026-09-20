@@ -8,7 +8,7 @@ import { ActionSheet, EmptyState, ErrorState } from '../../components/feedback';
 import { Screen, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
 import { CopyIcon, SearchIcon } from '../../components/icons';
 
-import { useCloneSet, useDebouncedValue, usePublicSets } from '../../hooks';
+import { useCloneSet, useDebouncedValue, usePublicSets, useSearchToggle } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useTheme, spacing, layout } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -21,8 +21,7 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
   const { colors, spacing: sp } = useTheme();
   const { mutate: cloneSet } = useCloneSet();
   const [selectedSet, setSelectedSet] = useState<StudySet | null>(null);
-  const [search, setSearch] = useState('');
-  const [searchVisible, setSearchVisible] = useState(false);
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
 
   const debouncedSearch = useDebouncedValue(search.trim(), 300);
 
@@ -48,11 +47,6 @@ export function PublicSetsScreen({ navigation }: LibraryScreenProps<'PublicSets'
       onMenuPress={() => setSelectedSet(item)}
     />
   ), [navigation]);
-
-  const toggleSearch = useCallback(() => {
-    if (searchVisible) setSearch('');
-    setSearchVisible(v => !v);
-  }, [searchVisible]);
 
   const handleGoBack = useCallback(() => navigation.goBack(), [navigation]);
   const closeSelectedSet = useCallback(() => setSelectedSet(null), []);
