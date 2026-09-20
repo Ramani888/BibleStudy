@@ -121,6 +121,12 @@ export const CloudOfflineIcon: IconComponent = ({ size, color = DEFAULT_COLOR, s
   </Outline>
 );
 
+export const CheckIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 2.4 }) => (
+  <Outline size={size}>
+    <Path d="m5 12 4.5 4.5L19 7" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+  </Outline>
+);
+
 export const CheckCircleIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8, filled }) =>
   filled ? (
     <Outline size={size}>

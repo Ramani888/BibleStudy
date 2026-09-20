@@ -13,6 +13,7 @@ import { getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
 import { layout, spacing, useTheme, palette } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
+import { storage } from '../../utils/storage';
 import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
@@ -35,6 +36,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     setSocialOnly(false);
     try {
       await login(data);
+      await storage.setTosAccepted();
     } catch (err) {
       if (axios.isAxiosError(err)) {
         const code = err.response?.data?.error?.code;
@@ -56,6 +58,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     setSocialLoading('google');
     try {
       await loginWithGoogle();
+      await storage.setTosAccepted();
     } catch (err: any) {
       if (err?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
         Toast.show({ type: 'error', text1: t('googleFailed'), text2: getErrorMessage(err) });
@@ -69,6 +72,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     setSocialLoading('apple');
     try {
       await loginWithApple();
+      await storage.setTosAccepted();
     } catch (err) {
       Toast.show({ type: 'error', text1: t('appleFailed'), text2: getErrorMessage(err) });
     } finally {
