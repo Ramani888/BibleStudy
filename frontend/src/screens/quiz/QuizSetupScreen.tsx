@@ -14,6 +14,7 @@ import Toast from 'react-native-toast-message';
 import { getErrorMessage } from '../../api';
 import { useCreditBalance, useGenerateQuiz, useSearchToggle, useSets } from '../../hooks';
 import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
+import { storage } from '../../utils/storage';
 import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 
@@ -142,10 +143,15 @@ export function QuizSetupScreen() {
   // Fire a generate request → route into the quiz on success. `save` carries the
   // name + source (topic OR sets) so the completed quiz is recorded with them.
   // AI quizzes default to Multiple Choice — cleanest UX for generated content.
-  const runGenerate = useCallback((
-    payload: { topic?: string; setIds?: string[]; mediaIds?: string[] },
-    save: { quizName: string; topic?: string; setIds: string[]; setTitles: string[] },
-  ) => {
+  type GenArgs = {
+    payload: { topic?: string; setIds?: string[]; mediaIds?: string[] };
+    save: { quizName: string; topic?: string; setIds: string[]; setTitles: string[] };
+  };
+  // Pending generation held while we get the user's AI-data consent (Apple 5.1.2:
+  // permission before any content is sent to a third-party AI provider).
+  const [consentGen, setConsentGen] = useState<GenArgs | null>(null);
+
+  const doGenerate = useCallback(({ payload, save }: GenArgs) => {
     if (generate.isPending) return;
     generate.mutate(payload, {
       onSuccess: ({ cards: generatedCards }) => {
@@ -165,6 +171,21 @@ export function QuizSetupScreen() {
       },
     });
   }, [generate, navigation, t]);
+
+  // Consent gate: nothing is sent to the AI until the user has accepted the
+  // one-time AI-data notice. Already-accepted (chat/media) → generate straight away.
+  const runGenerate = useCallback(async (payload: GenArgs['payload'], save: GenArgs['save']) => {
+    if (generate.isPending) return;
+    if (await storage.getAiPolicyAccepted()) doGenerate({ payload, save });
+    else setConsentGen({ payload, save });
+  }, [generate.isPending, doGenerate]);
+
+  const acceptAiConsent = useCallback(async () => {
+    await storage.setAiPolicyAccepted();
+    const pending = consentGen;
+    setConsentGen(null);
+    if (pending) doGenerate(pending);
+  }, [consentGen, doGenerate]);
 
   // AI quiz from a typed topic (validated via zod + handleSubmit). Name falls back
   // to the topic when the user leaves the name field blank.
@@ -393,6 +414,17 @@ export function QuizSetupScreen() {
         cancelLabel={t('common:actions.cancel', 'Cancel')}
         onConfirm={att.acceptPolicy}
         onCancel={() => att.setPolicyDialogVisible(false)}
+      />
+
+      {/* AI data notice — permission before any content is sent to a third-party AI (Apple 5.1.2) */}
+      <ConfirmDialog
+        visible={!!consentGen}
+        title={t('ai:consent.title', 'AI Chat')}
+        message={t('ai:consent.shortNotice', 'The questions you type and any file you attach are sent to our AI providers (OpenRouter and Anthropic) to generate results. Continue?')}
+        confirmLabel={t('common:actions.agree', 'I Agree')}
+        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        onConfirm={acceptAiConsent}
+        onCancel={() => setConsentGen(null)}
       />
     </Screen>
   );
