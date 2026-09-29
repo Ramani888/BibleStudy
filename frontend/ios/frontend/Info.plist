@@ -76,11 +76,11 @@
 		</dict>
 	</dict>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>BibleStudyPro needs access to your photo library to upload images to your media gallery.</string>
+	<string>Verdance uses your photo library so you can choose images to study with. For example, pick a photo of a Bible page or sermon notes to save it in My Media, ask the AI about it, or generate a quiz from it.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>BibleStudyPro needs camera access to take photos for your media gallery.</string>
+	<string>Verdance uses your camera to photograph study material. For example, take a photo of a Bible page, sermon notes, or a study handout to save it in My Media, ask the AI about it, or generate a quiz from it.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>BibleStudyPro needs access to save photos to your library.</string>
+	<string>Verdance saves images to your photo library only when you choose to. For example, saving a study image from My Media to your Photos.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>

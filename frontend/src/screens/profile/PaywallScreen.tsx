@@ -165,8 +165,9 @@ function PlanCard({ tier, period, selected, onPress, prices }: {
       <View style={styles.priceBlock}>
         {period === 'annual' ? (
           <>
-            <Typography preset="h4" color={theme.colors.textPrimary}>{annualPerMonth}/mo</Typography>
-            <Typography preset="caption" color={theme.colors.textSecondary}>{annualTotal}/yr</Typography>
+            {/* Apple 3.1.2(c): the billed amount must be the most conspicuous price; per-month is subordinate. */}
+            <Typography preset="h4" color={theme.colors.textPrimary}>{annualTotal}/yr</Typography>
+            <Typography preset="caption" color={theme.colors.textSecondary}>≈ {annualPerMonth}/mo</Typography>
           </>
         ) : (
           <Typography preset="h4" color={theme.colors.textPrimary}>{monthlyLabel}/mo</Typography>
