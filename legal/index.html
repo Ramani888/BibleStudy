@@ -59,7 +59,7 @@
           { "@type": "Question", "name": "Is Verdance free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. The Free plan lets you study, quiz, use social features, and ask AI questions with earned daily credits. Starter and Pro add more monthly AI credits, media in chat, and storage." } },
           { "@type": "Question", "name": "How is Verdance different from ChatGPT?", "acceptedAnswer": { "@type": "Answer", "text": "Verdance is a purpose-built study system, not a chat box: flashcards, spaced-repetition review, quizzes, study plans, and group study tracked over time. AI is one feature inside it, tuned for scripture with verse citations." } },
           { "@type": "Question", "name": "Can I study with my church or group?", "acceptedAnswer": { "@type": "Answer", "text": "Yes. Create groups, share study plans, and track everyone's progress on a group leaderboard. Social features are free on every plan." } },
-          { "@type": "Question", "name": "What platforms is Verdance on?", "acceptedAnswer": { "@type": "Answer", "text": "Verdance is coming soon to the Apple App Store and Google Play for iPhone and Android." } }
+          { "@type": "Question", "name": "What platforms is Verdance on?", "acceptedAnswer": { "@type": "Answer", "text": "Verdance is available now on the Apple App Store and Google Play for iPhone and Android." } }
         ]
       }
     ]
@@ -131,12 +131,11 @@
     .lede{ font-size:clamp(17px,2vw,20px); color:var(--muted); max-width:540px; margin:18px 0 30px; }
     .badges{ display:flex; gap:14px; flex-wrap:wrap; align-items:center; }
     .store-badge{ display:inline-flex; align-items:center; gap:10px; background:var(--ink); color:#fff;
-      padding:12px 18px; border-radius:14px; opacity:.55; position:relative; cursor:default; }
+      padding:12px 18px; border-radius:14px; text-decoration:none; transition:transform .2s; }
+    .store-badge:hover{ transform:translateY(-2px); }
     .store-badge svg{ width:24px; height:24px; fill:#fff; }
     .store-badge .lines small{ display:block; font-size:10px; letter-spacing:.5px; opacity:.8; }
     .store-badge .lines strong{ display:block; font-size:16px; font-weight:600; line-height:1.1; }
-    .soon-pill{ position:absolute; top:-10px; right:-8px; background:var(--violet); color:#fff;
-      font-size:10px; font-weight:700; letter-spacing:.5px; padding:3px 8px; border-radius:999px; text-transform:uppercase; }
     .trust{ margin-top:22px; font-size:14px; color:var(--muted); display:flex; gap:8px; align-items:center; }
 
     /* phone */
@@ -237,7 +236,7 @@
     .plan ul{ list-style:none; display:grid; gap:11px; margin:10px 0 24px; font-size:14.5px; }
     .plan ul li{ display:flex; gap:9px; } .plan ul li::before{ content:"✓"; font-weight:700; }
     .plan.feat ul li::before{ color:#fff; } .plan:not(.feat) ul li::before{ color:var(--indigo); }
-    .plan .cta{ margin-top:auto; text-align:center; padding:12px; border-radius:12px; font-weight:600; }
+    .plan .cta{ margin-top:auto; text-decoration:none; text-align:center; padding:12px; border-radius:12px; font-weight:600; }
     .plan:not(.feat) .cta{ border:1.5px solid var(--line); color:var(--indigo); }
     .plan.feat .cta{ background:#fff; color:var(--indigo); }
     .badge-pop{ position:absolute; top:-13px; left:50%; transform:translateX(-50%); background:var(--indigo-deep); color:#fff;
@@ -474,7 +473,7 @@
     </nav>
     <a class="btn btn-primary mm-cta" href="#get">Get the App</a>
     <div class="mm-foot">
-      <div class="mm-note">Coming soon · iPhone &amp; Android</div>
+      <div class="mm-note">Now on iPhone &amp; Android</div>
       <div class="mm-legal"><a href="privacy.html">Privacy</a><a href="terms.html">Terms</a><a href="delete-account.html">Delete Account</a><a href="mailto:ddtechservices.work@gmail.com">Contact</a></div>
     </div>
   </div>
@@ -494,16 +493,14 @@
           Turn passages into flashcards, remember them with spaced repetition, quiz yourself,
           and study together with your friends and church — all in one calm, beautiful app.</p>
         <div class="badges reveal" id="get">
-          <span class="store-badge" role="img" aria-label="Coming soon to the App Store">
-            <span class="soon-pill">Soon</span>
+          <a class="store-badge" href="https://apps.apple.com/app/id6810234440" target="_blank" rel="noopener" aria-label="Download on the App Store">
             <svg viewBox="0 0 24 24"><path d="M16.5 3c.1 1-.3 2-1 2.7-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.8-.8 2-1.3 2.8-1.3zM19 17c-.4 1-.6 1.4-1.1 2.3-.7 1.2-1.7 2.7-3 2.7-1.1 0-1.4-.7-3-.7s-1.9.7-3 .7c-1.3 0-2.2-1.3-3-2.5-2-3-2.2-6.4-1-8.3.9-1.3 2.2-2.1 3.5-2.1 1.3 0 2.2.8 3.3.8 1 0 1.7-.8 3.3-.8 1.1 0 2.3.6 3.2 1.7-2.8 1.5-2.4 5.5.1 6.2z"/></svg>
-            <span class="lines"><small>Coming soon on the</small><strong>App Store</strong></span>
-          </span>
-          <span class="store-badge" role="img" aria-label="Coming soon on Google Play">
-            <span class="soon-pill">Soon</span>
+            <span class="lines"><small>Download on the</small><strong>App Store</strong></span>
+          </a>
+          <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.getverdance.app" target="_blank" rel="noopener" aria-label="Get it on Google Play">
             <svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.4.7-.4 1.2v17c0 .5.1.9.4 1.2l.1.1L13 12.6v-.2L3.7 2.2zM17 16.3l-3-3v-.2l3-3 3.5 2c1 .6 1 1.5 0 2.1zM13.5 12.9l3.1 3.1-9.8 5.6c-.5.3-1 .3-1.4 0zm0-1.8L5.4 5.5c.4-.3.9-.3 1.4 0l9.8 5.6z"/></svg>
-            <span class="lines"><small>Coming soon on</small><strong>Google Play</strong></span>
-          </span>
+            <span class="lines"><small>Get it on</small><strong>Google Play</strong></span>
+          </a>
         </div>
         <div class="trust reveal">📖 For iPhone &amp; Android · Free to start · No ads · Cancel anytime</div>
       </div>
@@ -697,7 +694,7 @@
             <li>Friends, groups &amp; leaderboards</li>
             <li>250 MB storage</li>
           </ul>
-          <div class="cta">Coming soon</div>
+          <a class="cta" href="#get">Download free</a>
         </div>
         <div class="plan feat reveal">
           <span class="badge-pop">Most popular</span>
@@ -711,7 +708,7 @@
             <li>Higher AI rate limits</li>
             <li>Everything in Starter</li>
           </ul>
-          <div class="cta">Coming soon</div>
+          <a class="cta" href="#get">Download free</a>
         </div>
         <div class="plan reveal spotlight">
           <span class="tag" style="color:var(--indigo)">Starter</span>
@@ -724,7 +721,7 @@
             <li>Faster AI rate limits</li>
             <li>Everything in Free</li>
           </ul>
-          <div class="cta">Coming soon</div>
+          <a class="cta" href="#get">Download free</a>
         </div>
       </div>
     </div>
@@ -739,33 +736,25 @@
         <details class="reveal"><summary>How is this different from ChatGPT?</summary><p>Verdance is a study system, not a chat box. Flashcards, spaced-repetition review, quizzes, study plans, and group study — all tracked over time. The AI is one feature inside it, tuned for scripture with verse citations.</p></details>
         <details class="reveal"><summary>Can I study with my church or small group?</summary><p>Yes. Create a group, share a study plan, and everyone follows the same steps while a group leaderboard keeps you encouraged. Social features are free on every plan.</p></details>
         <details class="reveal"><summary>Can I cancel anytime?</summary><p>Yes. Subscriptions are billed through the Apple App Store and Google Play, so you can cancel anytime right from your phone's settings — no hidden charges and no cancellation hoops.</p></details>
-        <details class="reveal"><summary>Which devices does it support?</summary><p>Verdance is coming soon to the Apple App Store and Google Play, for both iPhone and Android.</p></details>
+        <details class="reveal"><summary>Which devices does it support?</summary><p>Verdance is available now on the Apple App Store and Google Play, for both iPhone and Android.</p></details>
       </div>
     </div>
   </section>
 
   <!-- ===== CTA BAND ===== -->
-  <section class="cta-band" id="waitlist">
+  <section class="cta-band" id="download">
     <div class="wrap">
       <h2 class="reveal">Study, deepened.</h2>
-      <p class="reveal">Verdance is coming soon to iPhone &amp; Android. Join the waitlist and we'll email you the day it launches.</p>
-      <form class="wl-form reveal" id="wlForm" novalidate>
-        <input type="email" id="wlEmail" name="email" placeholder="you@example.com" required aria-label="Email address" autocomplete="email">
-        <input type="text" id="wlCountry" name="country" class="wl-country" placeholder="Country (optional)" aria-label="Country" autocomplete="country-name">
-        <input type="text" id="wlCompany" name="company" class="wl-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <button type="submit" class="btn btn-primary" id="wlSubmit">Get early access</button>
-      </form>
-      <p class="wl-msg" id="wlMsg" role="status" aria-live="polite"></p>
-      <p class="wl-count" id="wlCount" aria-live="polite"></p>
-      <p class="wl-note reveal">Free to start · Cancel anytime · We'll only email you about launch.</p>
-      <p class="wl-pastor reveal">Know a pastor or small-group leader? <a href="mailto:?subject=Verdance%20%E2%80%94%20Bible%20study%20app&amp;body=Thought%20you%27d%20like%20this%20%E2%80%94%20https%3A%2F%2Fgetverdance.com" style="color:var(--indigo);font-weight:600">Forward Verdance to them</a> — it's the biggest way to help us launch.</p>
+      <p class="reveal">Verdance is free on iPhone &amp; Android. Download it today and start studying.</p>
+      <p class="wl-note reveal">Free to start · No ads · Cancel anytime</p>
+      <p class="wl-pastor reveal">Know a pastor or small-group leader? <a href="mailto:?subject=Verdance%20%E2%80%94%20Bible%20study%20app&amp;body=Thought%20you%27d%20like%20this%20%E2%80%94%20https%3A%2F%2Fgetverdance.com" style="color:var(--indigo);font-weight:600">Forward Verdance to them</a> — it's the biggest way to help Verdance grow.</p>
       <div class="badges reveal" style="justify-content:center;margin-top:28px">
-        <span class="store-badge"><span class="soon-pill">Soon</span>
+        <a class="store-badge" href="https://apps.apple.com/app/id6810234440" target="_blank" rel="noopener" aria-label="Download on the App Store">
           <svg viewBox="0 0 24 24"><path d="M16.5 3c.1 1-.3 2-1 2.7-.7.8-1.8 1.4-2.8 1.3-.1-1 .4-2 1-2.7.8-.8 2-1.3 2.8-1.3zM19 17c-.4 1-.6 1.4-1.1 2.3-.7 1.2-1.7 2.7-3 2.7-1.1 0-1.4-.7-3-.7s-1.9.7-3 .7c-1.3 0-2.2-1.3-3-2.5-2-3-2.2-6.4-1-8.3.9-1.3 2.2-2.1 3.5-2.1 1.3 0 2.2.8 3.3.8 1 0 1.7-.8 3.3-.8 1.1 0 2.3.6 3.2 1.7-2.8 1.5-2.4 5.5.1 6.2z"/></svg>
-          <span class="lines"><small>Coming soon on the</small><strong>App Store</strong></span></span>
-        <span class="store-badge"><span class="soon-pill">Soon</span>
+          <span class="lines"><small>Download on the</small><strong>App Store</strong></span></a>
+        <a class="store-badge" href="https://play.google.com/store/apps/details?id=com.getverdance.app" target="_blank" rel="noopener" aria-label="Get it on Google Play">
           <svg viewBox="0 0 24 24"><path d="M3.6 2.3c-.3.3-.4.7-.4 1.2v17c0 .5.1.9.4 1.2l.1.1L13 12.6v-.2L3.7 2.2zM17 16.3l-3-3v-.2l3-3 3.5 2c1 .6 1 1.5 0 2.1zM13.5 12.9l3.1 3.1-9.8 5.6c-.5.3-1 .3-1.4 0zm0-1.8L5.4 5.5c.4-.3.9-.3 1.4 0l9.8 5.6z"/></svg>
-          <span class="lines"><small>Coming soon on</small><strong>Google Play</strong></span></span>
+          <span class="lines"><small>Get it on</small><strong>Google Play</strong></span></a>
       </div>
     </div>
   </section>
