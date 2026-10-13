@@ -1,0 +1,9 @@
+# Video 1, take C: end on Home, showing the "cards to review" card.
+appId: com.getverdance.app
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: ".*cards to review.*"
+    timeout: 20000
+- waitForAnimationToEnd

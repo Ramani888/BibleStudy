@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- 1080x1920 video frames for promo videos. Screenshot with Playwright:
+     frame.html?cap=Title&sub=Subtitle   → caption background (app footage is overlaid in the slot)
+     frame.html?end=1                    → end card -->
+<html>
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;600;800&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; width: 1080px; height: 1920px; overflow: hidden; }
+  body {
+    font-family: Inter, sans-serif; color: #fff; position: relative;
+    background: linear-gradient(160deg, #8B5CF6 0%, #6366F1 100%);
+  }
+  .glow { position: absolute; border-radius: 50%; filter: blur(120px); opacity: .45; }
+  .g1 { width: 700px; height: 700px; background: #A78BFA; top: -260px; left: -220px; }
+  .g2 { width: 600px; height: 600px; background: #4F46E5; bottom: -200px; right: -200px; }
+  .cap { position: absolute; top: 96px; left: 60px; right: 60px; text-align: center; }
+  .cap h1 { margin: 0; font-weight: 800; font-size: 76px; line-height: 1.05; letter-spacing: -2px; }
+  .cap p { margin: 18px 0 0; font-weight: 500; font-size: 36px; opacity: .88; }
+  /* slot the footage is overlaid into: 690x1500 at (195,370) */
+  .slot { position: absolute; left: 195px; top: 370px; width: 690px; height: 1500px; border-radius: 56px;
+    background: #0F1117; box-shadow: 0 40px 90px -20px rgba(20, 10, 80, .65); }
+  .end { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+  .end svg { width: 260px; height: 260px; filter: drop-shadow(0 24px 50px rgba(20, 10, 80, .45)); }
+  .end .name { font-weight: 800; font-size: 104px; letter-spacing: -3px; margin: 40px 0 8px; }
+  .end .tag { font-weight: 600; font-size: 46px; opacity: .92; }
+  .end .pill { margin-top: 90px; background: #fff; color: #4F46E5; font-weight: 800; font-size: 50px; padding: 30px 64px; border-radius: 999px; }
+  .end .note { margin-top: 34px; font-weight: 500; font-size: 36px; opacity: .85; }
+</style>
+</head>
+<body>
+<div class="glow g1"></div><div class="glow g2"></div>
+<div id="root"></div>
+<script>
+  var q = new URLSearchParams(location.search), root = document.getElementById('root');
+  function esc(s){ return String(s || '').replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  if (q.get('end')) {
+    root.innerHTML = '<div class="end">' +
+      '<svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" rx="228" fill="#fff"/>' +
+      '<path d="M360 372 L512 690 L664 372" stroke="#6366F1" stroke-width="40" stroke-linecap="round" stroke-linejoin="round" fill="none"/>' +
+      '<path d="M512 690 C 452 566 452 452 512 336 C 572 452 572 566 512 690 Z" fill="#8B5CF6"/></svg>' +
+      '<div class="name">Verdance</div><div class="tag">Grow in the Word.</div>' +
+      '<div class="pill">getverdance.com</div><div class="note">Free on iPhone &amp; Android</div></div>';
+  } else {
+    root.innerHTML = '<div class="cap"><h1>' + esc(q.get('cap')) + '</h1>' +
+      (q.get('sub') ? '<p>' + esc(q.get('sub')) + '</p>' : '') + '</div><div class="slot"></div>';
+  }
+</script>
+</body>
+</html>

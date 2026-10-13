@@ -1,0 +1,29 @@
+# Video 1, take A: ask AI for flashcards, save them into the "Philippians 4" set.
+appId: com.getverdance.app
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "AI Assistant, tab.*"
+    timeout: 20000
+- waitForAnimationToEnd
+- tapOn: "AI Assistant, tab.*"
+- waitForAnimationToEnd
+- tapOn: "Ask a question or upload a Bible passage/PDF..."
+- inputText: "Make 5 flashcards on Philippians 4:6-7"
+- tapOn:
+    point: "353,502"          # send button (no label); position with keyboard open
+- extendedWaitUntil:
+    visible: "Save to Set"
+    timeout: 90000
+- waitForAnimationToEnd
+- tapOn: "Save to Set"         # first tap closes the keyboard
+- waitForAnimationToEnd
+- tapOn: "Save to Set"
+- waitForAnimationToEnd
+- scrollUntilVisible:
+    element: "Philippians 4, .*cards"
+    direction: DOWN
+- tapOn: "Philippians 4, .*cards"
+- tapOn: "Save \\d+ Cards"
+- waitForAnimationToEnd

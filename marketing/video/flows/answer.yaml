@@ -1,0 +1,21 @@
+# Answers whichever Philippians 4 question is on screen (one wrong on purpose), then continues.
+appId: com.getverdance.app
+---
+- runFlow:
+    when: { visible: "What should we not be anxious about.*" }
+    commands: [ { tapOn: "[A-D], Anything\\..*" } ]
+- runFlow:
+    when: { visible: "What should we present to God.*" }
+    commands: [ { tapOn: "[A-D], Our requests.*" } ]
+- runFlow:
+    when: { visible: "What will the peace of God do.*" }
+    commands: [ { tapOn: "[A-D], It will guard.*" } ]
+- runFlow:
+    when: { visible: "What is the peace of God superior to.*" }
+    commands: [ { tapOn: "[A-D], (?!All understanding).*" } ]   # the deliberate miss
+- runFlow:
+    when: { visible: "What action should be taken instead.*" }
+    commands: [ { tapOn: "[A-D], Praying.*" } ]
+- waitForAnimationToEnd
+- tapOn: "Continue|Next Question|See Results|Finish.*|Done"
+- waitForAnimationToEnd

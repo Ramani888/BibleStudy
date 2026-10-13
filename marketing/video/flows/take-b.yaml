@@ -1,0 +1,24 @@
+# Video 1, take B: quiz the "Philippians 4" set (multiple choice), see results, end on Home.
+appId: com.getverdance.app
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "Library, tab.*"
+    timeout: 20000
+- tapOn: "Library, tab.*"
+- waitForAnimationToEnd
+- tapOn:
+    point: "360,211"          # "⋮" on the Philippians 4 row (top of the list)
+- waitForAnimationToEnd
+- tapOn:
+    point: "80,507"           # "Quiz" in the set menu
+- waitForAnimationToEnd
+- tapOn:
+    point: "90,728"           # "Multiple choice"
+- waitForAnimationToEnd
+- repeat:
+    times: 5
+    commands:
+      - runFlow: answer.yaml
+- waitForAnimationToEnd

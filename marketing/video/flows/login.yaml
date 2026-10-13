@@ -1,0 +1,16 @@
+# Logs the simulator into the reviewer account.
+# Run: maestro test -e EMAIL=... -e PASSWORD=... login.yaml
+appId: com.getverdance.app
+---
+- launchApp
+- tapOn:
+    text: "Skip"
+    optional: true
+- tapOn: "you@example.com"
+- inputText: ${EMAIL}
+- pressKey: Enter        # email "next" key focuses the password field
+- inputText: ${PASSWORD}
+- pressKey: Enter        # password "done" key submits
+- extendedWaitUntil:
+    notVisible: "Welcome back"
+    timeout: 20000
