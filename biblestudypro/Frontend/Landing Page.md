@@ -54,4 +54,4 @@ Preview locally: `cd legal && python3 -m http.server 8799` → `http://localhost
 (`file://` is blocked in the browser tooling).
 
 ## See also
-- [[Deployment (Hetzner)]] · [[Brand & Assets]] · [[Store Launch (App Store + Play)]]
+- [[Deployment (Hetzner)]] · [[Brand & Assets]] · [[Store Launch (App Store + Play)]] · [[US-Launch-Campaign]] (live store links, campaign `?c=` links, How-it-works section — 2026-10-13)
