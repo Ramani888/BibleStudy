@@ -175,6 +175,27 @@
     .sec-head p{ color:var(--muted); margin-left:auto; max-width:360px; font-size:15px; }
     @media(max-width:760px){ .sec-head{ flex-wrap:wrap; } .sec-head p{ margin:8px 0 0; } }
 
+    /* how it works */
+    .how{ display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; }
+    .how-steps{ list-style:none; display:grid; gap:12px; }
+    .how-step{ display:flex; gap:16px; width:100%; text-align:left; font:inherit; color:inherit; cursor:pointer;
+      background:transparent; border:1px solid transparent; border-radius:18px; padding:16px 18px; position:relative; overflow:hidden;
+      transition:background .3s,border-color .3s; }
+    .how-step:hover{ background:var(--soft); }
+    .how-step[aria-current="step"]{ background:#fff; border-color:var(--line); box-shadow:0 14px 34px -22px rgba(48,32,143,.45); }
+    .how-step .n{ flex:none; width:34px; height:34px; border-radius:50%; display:grid; place-items:center; font-weight:700; font-size:14px;
+      background:var(--soft); color:var(--indigo); transition:background .3s,color .3s; }
+    .how-step[aria-current="step"] .n{ background:var(--grad); color:#fff; }
+    .how-step b{ display:block; font-size:17px; margin-bottom:2px; }
+    .how-step span.t{ color:var(--muted); font-size:15px; line-height:1.5; }
+    .how-step .bar{ position:absolute; left:0; bottom:0; height:3px; width:0; background:var(--grad); }
+    .how-step[aria-current="step"] .bar.run{ animation:howBar var(--how-ms) linear forwards; }
+    @keyframes howBar{ to{ width:100%; } }
+    .how .phone .frame img + img{ position:absolute; inset:12px; width:calc(100% - 24px); }
+    .how .phone .frame img{ opacity:0; transition:opacity .6s ease; }
+    .how .phone .frame img.on{ opacity:1; }
+    @media(max-width:860px){ .how{ grid-template-columns:1fr; gap:32px; } .how .col-phone{ order:-1; } .how .phone{ width:min(260px,70%); } }
+
     /* feature grid */
     .grid{ display:grid; gap:22px; }
     .cols-3{ grid-template-columns:repeat(3,1fr); }
@@ -547,6 +568,33 @@
       </span>
     </div>
   </div>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section class="sec" id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="sec-num">HOW IT WORKS</span>
+        <h2>See how Verdance works</h2>
+        <p>From a passage to lasting memory in four simple steps.</p>
+      </div>
+      <div class="how">
+        <ol class="how-steps reveal" id="howSteps">
+          <li><button type="button" class="how-step" aria-current="step" data-i="0"><span class="n">1</span><span><b>Ask or paste a passage</b><span class="t">Ask about any verse, or paste a passage and ask for flashcards.</span></span><span class="bar"></span></button></li>
+          <li><button type="button" class="how-step" data-i="1"><span class="n">2</span><span><b>Get instant flashcards</b><span class="t">Verdance turns it into clear question-and-answer cards, saved to a set.</span></span><span class="bar"></span></button></li>
+          <li><button type="button" class="how-step" data-i="2"><span class="n">3</span><span><b>Quiz yourself</b><span class="t">Practice with multiple choice, fill-in-the-blank, timed rounds and more.</span></span><span class="bar"></span></button></li>
+          <li><button type="button" class="how-step" data-i="3"><span class="n">4</span><span><b>Review at the right time</b><span class="t">Spaced repetition tells you which cards are due, so what you learn sticks.</span></span><span class="bar"></span></button></li>
+        </ol>
+        <div class="col-phone reveal">
+          <div class="phone"><div class="notch"></div><div class="frame">
+            <img src="screens/05-ai.png" width="720" height="1600" loading="lazy" alt="Verdance AI assistant with suggested Bible questions" class="on" />
+            <img src="screens/03-cards.png" width="720" height="1600" loading="lazy" alt="A Gospel of John flashcard set in Verdance" />
+            <img src="screens/04-quiz.png" width="720" height="1600" loading="lazy" alt="A Verdance fill-in-the-blank quiz question" />
+            <img src="screens/01-home.png" width="720" height="1600" loading="lazy" alt="Verdance home screen showing 12 cards due for review" />
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <!-- ===== 01 FEATURES ===== -->
   <section class="sec" id="features">
@@ -938,5 +986,38 @@
       });
     })();
   </script>
+<script>
+  (function(){
+    var list = document.getElementById('howSteps'); if(!list) return;
+    var steps = list.querySelectorAll('.how-step'), imgs = document.querySelectorAll('#how .frame img');
+    var MS = 4200, cur = 0, timer = null, inView = false, paused = false;
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    list.style.setProperty('--how-ms', MS + 'ms');
+    function show(i){
+      cur = i;
+      steps.forEach(function(b, k){
+        var bar = b.querySelector('.bar'); bar.classList.remove('run');
+        if (k === i) { b.setAttribute('aria-current', 'step'); void bar.offsetWidth; } else b.removeAttribute('aria-current');
+      });
+      imgs.forEach(function(im, k){ im.classList.toggle('on', k === i); });
+      schedule();
+    }
+    function schedule(){
+      clearTimeout(timer);
+      var bar = steps[cur].querySelector('.bar');
+      if (reduce || !inView || paused) { bar.classList.remove('run'); return; }
+      bar.classList.add('run');
+      timer = setTimeout(function(){ show((cur + 1) % steps.length); }, MS);
+    }
+    steps.forEach(function(b){ b.addEventListener('click', function(){ show(+b.dataset.i); }); });
+    var how = document.getElementById('how');
+    function pause(v){ paused = v; schedule(); }
+    how.addEventListener('mouseenter', function(){ pause(true); });
+    how.addEventListener('mouseleave', function(){ pause(false); });
+    how.addEventListener('focusin', function(){ pause(true); });
+    how.addEventListener('focusout', function(){ pause(false); });
+    new IntersectionObserver(function(e){ inView = e[0].isIntersecting; schedule(); }, { threshold: .35 }).observe(how);
+  })();
+</script>
 </body>
 </html>
