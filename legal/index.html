@@ -1019,5 +1019,19 @@
     new IntersectionObserver(function(e){ inView = e[0].isIntersecting; schedule(); }, { threshold: .35 }).observe(how);
   })();
 </script>
+<script>
+  // Campaign pass-through: getverdance.com/?c=tt-v1 tags the store buttons so installs are counted per campaign.
+  (function(){
+    var c = (new URLSearchParams(location.search).get('c') || '').replace(/[^a-z0-9-]/gi, '').slice(0, 40);
+    if (!c) return;
+    var PT = ''; // App Store Connect provider token; ct is only counted once this is set
+    var ios = 'https://apps.apple.com/app/apple-store/id6810234440?' + (PT ? 'pt=' + PT + '&' : '') + 'ct=' + c + '&mt=8';
+    var play = 'https://play.google.com/store/apps/details?id=com.getverdance.app&referrer=' +
+      encodeURIComponent('utm_source=getverdance&utm_medium=web&utm_campaign=' + c);
+    document.querySelectorAll('a.store-badge').forEach(function(a){
+      a.href = a.href.indexOf('apps.apple.com') > -1 ? ios : play;
+    });
+  })();
+</script>
 </body>
 </html>
