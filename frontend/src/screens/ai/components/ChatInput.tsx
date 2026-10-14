@@ -49,7 +49,10 @@ export const ChatInput = React.memo(function ChatInput({
 
   const canSend     = text.trim().length > 0 && !disabled;
   const showCounter = text.length >= WARN_THRESHOLD;
-  const actionCost  = attachmentType === 'PDF' ? 5 : attachmentType === 'IMAGE' ? 3 : 1;
+  // attachmentType falls back to 'PDF' upstream even with nothing attached (so the uploading chip knows its type);
+  // only price media when an attachment is actually present, otherwise it's a plain text question.
+  const hasAttachment = !!isUploading || !!attachmentName;
+  const actionCost  = !hasAttachment ? 1 : attachmentType === 'PDF' ? 5 : attachmentType === 'IMAGE' ? 3 : 1;
 
   const handleSend = useCallback(() => {
     if (!canSend) return;
