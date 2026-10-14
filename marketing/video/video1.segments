@@ -1,0 +1,9 @@
+# name | source | start (s) | length in output (s) | caption frame | speed (optional, default 1)
+a1|take-a.mov|304.3|2.5|cap-a
+a2|take-a.mov|322.9|4.0|cap-a
+a3|take-a2.mov|195.5|3.0|cap-a
+a4|take-a2.mov|289.0|2.5|cap-a
+b1|take-b.mov|44.6|4.0|cap-b1
+b2|take-b.mov|82.0|3.2|cap-b2
+b3|take-b.mov|132.9|3.0|cap-b3
+c|take-c.mov|27.2|3.0|cap-c

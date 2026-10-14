@@ -1,0 +1,18 @@
+# Answers ONE due-card review question (typed or multiple choice) in a single Maestro run, then continues.
+# Copies the question text, looks up the answer in due-answers.js, taps the option or types it.
+appId: com.getverdance.app
+---
+- copyTextFrom: 'Who\ is\ described\ as\ "the\ Word"\ in\ John\ 1\?|What\ was\ the\ first\ miracle\ Jesus\ performed\ in\ John\?|Complete\ John\ 3:16:\ "For\ God\ so\ loved\ the\ world\.\.\."|"The\ Lord\ is\ my\ ___"|"I\ shall\ not\ ___"|"He\ makes\ me\ lie\ down\ in\ green\ ___"|Romans\ 3:23\ —\ "All\ have\ sinned\ and\ fall\ short\ of\ the\ ___\ of\ God\."|Romans\ 6:23\ —\ "The\ wages\ of\ sin\ is\ ___\."|Romans\ 6:23\ —\ "\.\.\.but\ the\ gift\ of\ God\ is\ eternal\ ___\."|How\ many\ books\ are\ in\ the\ Bible\?|How\ many\ books\ in\ the\ Old\ Testament\?|How\ many\ books\ in\ the\ New\ Testament\?|Who\ visited\ Jesus\ at\ night\ in\ John\ 3\?|"I\ am\ the\ ___\ of\ the\ world"\ \(John\ 8:12\)\.|"He\ leads\ me\ beside\ quiet\ ___"|"He\ refreshes\ my\ ___"|Romans\ 5:8\ —\ "While\ we\ were\ still\ sinners,\ ___\ died\ for\ us\."|Romans\ 10:9\ —\ believe\ in\ your\ ___\ that\ God\ raised\ him\.|What\ are\ the\ first\ four\ books\ of\ the\ NT\ called\?|Who\ wrote\ most\ of\ the\ New\ Testament\ letters\?'
+- runScript: due-answers.js
+- runFlow:
+    when: { visible: '[A-D], .*' }
+    commands:
+      - tapOn: '[A-D], ${output.rx}'
+- runFlow:
+    when: { notVisible: '[A-D], .*' }
+    commands:
+      - tapOn: 'Your answer.*'
+      - inputText: ${output.ans}
+      - tapOn: 'QUESTION'          # closes the keyboard so Submit is reachable
+      - tapOn: 'Submit'
+- tapOn: 'Continue|Done'

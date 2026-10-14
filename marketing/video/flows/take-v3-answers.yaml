@@ -1,0 +1,7 @@
+# Video 3: answer every due card in one continuous run (fast, so the quiz clock stays honest).
+appId: com.getverdance.app
+---
+- repeat:
+    times: ${COUNT}
+    commands:
+      - runFlow: answer-due.yaml

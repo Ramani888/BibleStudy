@@ -1,0 +1,18 @@
+# Video 3 start: open Quiz tab and start "Review due cards" (banner has no tappable label → tap its center).
+appId: com.getverdance.app
+---
+- stopApp
+- launchApp
+- extendedWaitUntil:
+    visible: "Quiz, tab.*"
+    timeout: 20000
+- tapOn: "Quiz, tab.*"
+- waitForAnimationToEnd
+- extendedWaitUntil:
+    visible: "Review due cards, .*"
+    timeout: 15000
+- tapOn:
+    point: "201,157"
+- extendedWaitUntil:
+    visible: "QUESTION"
+    timeout: 20000

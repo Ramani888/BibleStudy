@@ -1,0 +1,122 @@
+[
+ {
+  "q": "Who is described as \"the Word\" in John 1?",
+  "a": "Jesus Christ.",
+  "type": "QA",
+  "set": "cf75a09f-bd52-4bb4-8404-aba01a4770a8"
+ },
+ {
+  "q": "What was the first miracle Jesus performed in John?",
+  "a": "Turning water into wine at Cana.",
+  "type": "QA",
+  "set": "cf75a09f-bd52-4bb4-8404-aba01a4770a8"
+ },
+ {
+  "q": "Complete John 3:16: \"For God so loved the world...\"",
+  "a": "\"...that he gave his one and only Son.\"",
+  "type": "QA",
+  "set": "cf75a09f-bd52-4bb4-8404-aba01a4770a8"
+ },
+ {
+  "q": "\"The Lord is my ___\"",
+  "a": "shepherd",
+  "type": "QA",
+  "set": "a6cb4f4b-cc51-4076-b873-7f33c57fd42a"
+ },
+ {
+  "q": "\"I shall not ___\"",
+  "a": "want",
+  "type": "QA",
+  "set": "a6cb4f4b-cc51-4076-b873-7f33c57fd42a"
+ },
+ {
+  "q": "\"He makes me lie down in green ___\"",
+  "a": "pastures",
+  "type": "QA",
+  "set": "a6cb4f4b-cc51-4076-b873-7f33c57fd42a"
+ },
+ {
+  "q": "Romans 3:23 — \"All have sinned and fall short of the ___ of God.\"",
+  "a": "glory",
+  "type": "QA",
+  "set": "687bdc04-cdf1-4b76-821d-26298c3980df"
+ },
+ {
+  "q": "Romans 6:23 — \"The wages of sin is ___.\"",
+  "a": "death",
+  "type": "QA",
+  "set": "687bdc04-cdf1-4b76-821d-26298c3980df"
+ },
+ {
+  "q": "Romans 6:23 — \"...but the gift of God is eternal ___.\"",
+  "a": "life",
+  "type": "QA",
+  "set": "687bdc04-cdf1-4b76-821d-26298c3980df"
+ },
+ {
+  "q": "How many books are in the Bible?",
+  "a": "66.",
+  "type": "QA",
+  "set": "7af3d6db-aff6-4b03-a82f-a6cfbff0acb5"
+ },
+ {
+  "q": "How many books in the Old Testament?",
+  "a": "39.",
+  "type": "QA",
+  "set": "7af3d6db-aff6-4b03-a82f-a6cfbff0acb5"
+ },
+ {
+  "q": "How many books in the New Testament?",
+  "a": "27.",
+  "type": "QA",
+  "set": "7af3d6db-aff6-4b03-a82f-a6cfbff0acb5"
+ },
+ {
+  "q": "Who visited Jesus at night in John 3?",
+  "a": "Nicodemus.",
+  "type": "QA",
+  "set": "cf75a09f-bd52-4bb4-8404-aba01a4770a8"
+ },
+ {
+  "q": "\"I am the ___ of the world\" (John 8:12).",
+  "a": "light",
+  "type": "QA",
+  "set": "cf75a09f-bd52-4bb4-8404-aba01a4770a8"
+ },
+ {
+  "q": "\"He leads me beside quiet ___\"",
+  "a": "waters",
+  "type": "QA",
+  "set": "a6cb4f4b-cc51-4076-b873-7f33c57fd42a"
+ },
+ {
+  "q": "\"He refreshes my ___\"",
+  "a": "soul",
+  "type": "QA",
+  "set": "a6cb4f4b-cc51-4076-b873-7f33c57fd42a"
+ },
+ {
+  "q": "Romans 5:8 — \"While we were still sinners, ___ died for us.\"",
+  "a": "Christ",
+  "type": "QA",
+  "set": "687bdc04-cdf1-4b76-821d-26298c3980df"
+ },
+ {
+  "q": "Romans 10:9 — believe in your ___ that God raised him.",
+  "a": "heart",
+  "type": "QA",
+  "set": "687bdc04-cdf1-4b76-821d-26298c3980df"
+ },
+ {
+  "q": "What are the first four books of the NT called?",
+  "a": "The Gospels.",
+  "type": "QA",
+  "set": "7af3d6db-aff6-4b03-a82f-a6cfbff0acb5"
+ },
+ {
+  "q": "Who wrote most of the New Testament letters?",
+  "a": "Paul.",
+  "type": "QA",
+  "set": "7af3d6db-aff6-4b03-a82f-a6cfbff0acb5"
+ }
+]
