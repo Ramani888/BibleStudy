@@ -455,6 +455,33 @@
     }
     /* no-JS fallback: show everything */
     .no-js .reveal{ opacity:1; transform:none; }
+
+    /* ---------- big screens ----------
+       Content width stops growing at 1320px (like Stripe/Linear/Framer); type and visuals grow
+       smoothly from 1600px and stop at a fixed limit; backgrounds go edge to edge.
+       Each clamp's minimum equals today's size at 1600px, so nothing jumps and laptops are untouched. */
+    :root{ --maxw:clamp(1140px, 64vw, 1320px); }
+    .aurora .a{ width:max(520px,34vw); height:max(520px,34vw); }
+    .aurora .b{ width:max(460px,30vw); height:max(460px,30vw); }
+    .aurora .c{ width:max(420px,28vw); height:max(420px,28vw); }
+    @media(min-width:1600px){
+      body{ font-size:clamp(16px, 1vw, 17px); }
+      .hero{ min-height:min(calc(100svh - 68px - 80px), 1000px); display:flex; align-items:center; }
+      .hero-grid{ width:100%; }
+      h1.hero-title{ font-size:clamp(74px, 4.6vw, 92px); }
+      .lede{ font-size:clamp(20px, 1.25vw, 22px); max-width:600px; }
+      .phone{ width:min(clamp(320px, 20vw, 400px), 80%); }
+      .fan .phone{ width:clamp(240px, 15vw, 280px); }
+      .sec-head h2, .mission h2{ font-size:clamp(44px, 2.75vw, 54px); }
+      .split h3{ font-size:clamp(36px, 2.25vw, 42px); }
+      .cta-band h2{ font-size:clamp(54px, 3.375vw, 64px); }
+      .sec-head p, .how-step span.t, .tile p, .checklist li, .plan ul li, details p{ font-size:clamp(15px, .94vw, 16.5px); }
+      .how-step b, .tile h3{ font-size:clamp(17px, 1.07vw, 19px); }
+      summary{ font-size:clamp(16.5px, 1.04vw, 18px); }
+      .tile{ padding:clamp(28px, 1.75vw, 34px); }
+      .plan{ padding:clamp(32px, 2vw, 38px); }
+      .faq{ max-width:clamp(760px, 47.5vw, 860px); }
+    }
   </style>
 </head>
 <body class="no-js">
