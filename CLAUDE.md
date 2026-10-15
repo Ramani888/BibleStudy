@@ -124,3 +124,12 @@ cd backend && npx prisma migrate dev             # run migrations
 `/meditation-parity <ScreenName>` (audit + fix a screen for Meditation theme parity — dark/light mode, card bg, shadows, tints).
 Subagent roles: `feature-dev:code-architect` (design), `code-explorer` (trace), `code-reviewer` (review),
 `rn-screen-builder`/`rn-reviewer` (RN-specific), `Explore` (fast search), `safe-committer` (commit).
+
+**The user writes plain prompts and does not name skills — pick them yourself, every time:**
+- Any UI/design/"looks plain" request (website `legal/` or app screens) → use `frontend-design` before writing code;
+  for big visual changes offer `/design` options first; if Impeccable is installed, `/impeccable critique` before and
+  `/impeccable polish` after.
+- After any UI change → Playwright screenshots at 390×844 and 1440×900, list differences, fix (max 3 rounds). Never
+  say "done" on UI without screenshots.
+- Bug report → reproduce + root-cause first; before commit run `/code-review`.
+- Briefly tell the user which skill you used, in plain words.
