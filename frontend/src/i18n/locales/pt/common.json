@@ -48,6 +48,7 @@
     "generating": "Gerando...",
     "success": "Sucesso",
     "error": "Ops!",
+    "crashed": "Algo deu errado nesta tela. Tente novamente.",
     "noResults": "Nenhum resultado",
     "noMatchFor": "Nenhum resultado para \"{{query}}\"",
     "empty": "Nada aqui ainda",

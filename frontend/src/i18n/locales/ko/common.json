@@ -48,6 +48,7 @@
     "generating": "생성 중...",
     "success": "성공",
     "error": "오류",
+    "crashed": "이 화면에서 문제가 발생했습니다. 다시 시도해 주세요.",
     "noResults": "결과 없음",
     "noMatchFor": "\"{{query}}\"에 대한 검색 결과가 없습니다",
     "empty": "아직 아무것도 없습니다",

@@ -1,6 +1,7 @@
 export { Skeleton, SetCardSkeleton } from './SkeletonLoader';
 export { EmptyState } from './EmptyState';
 export { ErrorState } from './ErrorState';
+export { CrashBoundary } from './CrashBoundary';
 export { OfflineBanner } from './OfflineBanner';
 export { LoadingOverlay } from './LoadingOverlay';
 export { AppModal } from './Modal';

@@ -10,13 +10,14 @@ import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
 import './src/i18n';
 import { useLanguageStore } from './src/i18n';
 import { queryClient, persistOptions } from './src/lib/queryClient';
-import { OfflineBanner } from './src/components/feedback';
+import { CrashBoundary, OfflineBanner } from './src/components/feedback';
 import { useAuthStore } from './src/store';
 import { useTheme, useThemeStore } from './src/theme';
 import { RootNavigator } from './src/navigation';
 import { configureGoogleSignIn } from './src/utils/socialAuth';
 import { configureRevenueCat } from './src/lib/purchases';
 import { identify, resetAnalytics } from './src/lib/analytics';
+import { setCrashUser } from './src/lib/crashlytics';
 import { useAnalyticsStore } from './src/store';
 import { SplashScreen } from './src/screens/SplashScreen';
 // Enable native screens for better performance
@@ -43,10 +44,11 @@ function AppBootstrap() {
     hydrateAnalytics();
   }, [initialize, hydrateTheme, hydrateLanguage, hydrateAnalytics]);
 
-  // Link analytics to the signed-in user; reset to anonymous on logout.
+  // Link analytics + crash reports to the signed-in user; reset to anonymous on logout.
   useEffect(() => {
     if (userId) identify(userId);
     else resetAnalytics();
+    setCrashUser(userId ?? null);
   }, [userId]);
 
   return (
@@ -55,7 +57,9 @@ function AppBootstrap() {
         barStyle={colors.statusBar}
         backgroundColor={colors.background}
       />
-      <RootNavigator />
+      <CrashBoundary>
+        <RootNavigator />
+      </CrashBoundary>
       <OfflineBanner />
       {showSplash && (
         <SplashScreen

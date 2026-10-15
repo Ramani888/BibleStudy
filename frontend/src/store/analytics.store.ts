@@ -1,11 +1,12 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { configureAnalytics, setAnalyticsEnabled } from '../lib/analytics';
+import { setCrashReportingEnabled } from '../lib/crashlytics';
 
 const STORAGE_KEY = '@bsp/analytics_enabled';
 
 interface AnalyticsState {
-  /** Product-analytics opt-in. Default on; user can opt out in Settings (LGPD). */
+  /** Analytics + crash-reporting opt-in. Default on; user can opt out in Settings (LGPD). */
   enabled: boolean;
   setEnabled: (enabled: boolean) => void;
   /** Apply the persisted preference on app start. */
@@ -17,6 +18,7 @@ export const useAnalyticsStore = create<AnalyticsState>(set => ({
   setEnabled: enabled => {
     set({ enabled });
     setAnalyticsEnabled(enabled);
+    setCrashReportingEnabled(enabled);
     AsyncStorage.setItem(STORAGE_KEY, enabled ? 'true' : 'false').catch(() => {});
   },
   hydrate: async () => {
@@ -26,5 +28,6 @@ export const useAnalyticsStore = create<AnalyticsState>(set => ({
     const enabled = saved !== 'false';
     set({ enabled });
     configureAnalytics({ optedOut: !enabled });
+    setCrashReportingEnabled(enabled);
   },
 }));

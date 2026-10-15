@@ -48,6 +48,7 @@
     "generating": "Bumubuo...",
     "success": "Tagumpay",
     "error": "Naku!",
+    "crashed": "May nangyaring mali sa screen na ito. Pakisubukang muli.",
     "noResults": "Walang resulta",
     "noMatchFor": "Walang resulta para sa \"{{query}}\"",
     "empty": "Wala pa rito",

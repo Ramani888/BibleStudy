@@ -14,6 +14,7 @@ import {
   handleNotificationNavigation,
 } from '../utils/notifications';
 import { storage } from '../utils/storage';
+import { crashLog } from '../lib/crashlytics';
 import type { RootStackParamList } from './types';
 import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
 import { AuthNavigator } from './AuthNavigator';
@@ -49,6 +50,12 @@ export function RootNavigator() {
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const notificationsSetUp = useRef(false);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
+
+  // Screen trail for crash reports ("Home > Quiz > crash").
+  const logScreen = useCallback(() => {
+    const route = navigationRef.current?.getCurrentRoute();
+    if (route) crashLog(`screen: ${route.name}`);
+  }, []);
 
   const navigate = useCallback((screen: string, params: object) => {
     if (navigationRef.current?.isReady()) {
@@ -105,7 +112,7 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer ref={navigationRef} theme={navTheme}>
+    <NavigationContainer ref={navigationRef} theme={navTheme} onReady={logScreen} onStateChange={logScreen}>
       {isAuthenticated ? (
         <RootStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
           <RootStack.Screen name="App" component={AppNavigator} />

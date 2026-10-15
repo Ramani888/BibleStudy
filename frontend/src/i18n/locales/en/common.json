@@ -48,6 +48,7 @@
     "uploading": "Uploading...",
     "success": "Success",
     "error": "Oops!",
+    "crashed": "Something went wrong on this screen. Please try again.",
     "noResults": "No results found",
     "noMatchFor": "No results for \"{{query}}\"",
     "empty": "Nothing here yet",
