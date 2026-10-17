@@ -1,9 +1,11 @@
 ---
 tags: [frontend, brand, assets]
-updated: 2026-09-09
+updated: 2026-10-17
 ---
 
 # Brand & Assets
+
+> **Planned (not applied):** the redesign moves the app icon and splash to one solid theme violet `#6D4AE0` (no gradient). Preview on the canvas — see [[Redesign - Quiet Morning (Canvas)]]. The repo still uses the gradient below until the owner starts implementation.
 
 Public brand = **Verdance**. Display name (both platforms) = **Verdance**. Bundle ID /
 applicationId = **`com.getverdance.app`** (changed 2026-09-09 — see [[Identity & Accounts]]).

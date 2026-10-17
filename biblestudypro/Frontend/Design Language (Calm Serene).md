@@ -5,6 +5,8 @@ updated: 2026-08-07
 
 # Design Language — Calm / Serene
 
+> **Heads-up (2026-10-17):** a full redesign is designed and in review — [[Redesign - Quiet Morning (Canvas)]]. This note describes the look that ships today.
+
 The single reference for the app-wide redesign. Every module we polish follows
 **this** doc, so the whole app feels like one product — not 16 screens each
 styled on a different day. Companion to [[Theme & Components]].

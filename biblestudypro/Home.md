@@ -1,7 +1,7 @@
 ---
 title: BibleStudyPro — Brain
 tags: [home]
-updated: 2026-09-13
+updated: 2026-10-17
 ---
 
 # ✝️ BibleStudyPro — Architecture Brain
@@ -49,7 +49,9 @@ backend (17 modules) + **React Native 0.84 / React 19** app (~67 screens).
 - [[Screen Map]] — every screen and its data source
 - [[Hooks & API Layer]] — how screens talk to the backend
 - [[Theme & Components]] — design tokens + component library
-- [[Design Language (Calm Serene)]] — app-wide redesign reference (start here for styling)
+- [[Redesign - Quiet Morning (Canvas)]] — ⭐ NEW redesign: all screens on the design canvas (v93), audited + fixed module by module, NOT implemented yet (start here)
+- [[Redesign Audit 2026-10-17]] — canvas vs real code, per-module findings, owner decisions, fix progress (v87–v93) and build notes
+- [[Design Language (Calm Serene)]] — current shipped look (to be superseded by the Quiet Morning redesign)
 - [[Localization (i18n)]] — 6 locales, deterministic completeness scan, translation caveats
 - [[Brand & Assets]] — Verdance logo, icons/splash/notification, store + web assets (all from `branding/build-icons.mjs`)
 
