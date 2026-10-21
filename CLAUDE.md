@@ -5,12 +5,27 @@ backend + **React Native 0.84 / React 19** app (NO Expo). Full feature docs live
 Obsidian vault at `biblestudypro/` — open `biblestudypro/Home.md` (MOC) → `biblestudypro/Features/`.
 
 ## Exploration tooling (use BEFORE Grep/Glob/Read)
-This repo has two knowledge graphs — prefer them for exploration; they're cheaper and give structure.
-- **code-review-graph MCP**: `semantic_search_nodes`/`query_graph` (callers/callees/imports/tests),
-  `get_impact_radius` (blast radius), `detect_changes`+`get_review_context` (review), `get_affected_flows`.
-- **graphify** (`graphify-out/`): read `graphify-out/GRAPH_REPORT.md` for architecture questions;
-  use `graphify query/path/explain` for cross-module "how does X relate to Y"; run `graphify update .`
-  after code changes (AST-only, no API cost). Fall back to Grep/Read only when the graph lacks it.
+Prefer the graphs for exploration — cheaper than file crawling and they give structure.
+
+1. **codegraph** — the default. One MCP tool, `codegraph_explore`: ask "how does X work", a flow
+   ("how does X reach Y"), or name a file/symbol to get its current line-numbered source. Returns the
+   relevant source + call paths + blast radius in ONE call, and follows dynamic dispatch (callbacks,
+   React re-render) that grep can't. CLI equivalents: `codegraph explore/impact/callers/callees/node`.
+   Index auto-syncs on file change — nothing to run after edits. Rebuild with `codegraph init` if the
+   repo was just cloned (`.codegraph/` is gitignored, so a fresh machine has no index).
+   - Known gap: it can't parse `export type * from …` (TS 5.0), so `frontend/src/navigation/index.ts`
+     yields no symbols — re-export edges through that barrel are absent. Check it by hand. `tsc`
+     accepts the file; this is a codegraph parser limitation, not a defect in the code.
+   - It returns whole files generously; take what answers the question, don't re-Read what it showed.
+2. **graphify** (`graphify-out/`): `GRAPH_REPORT.md` for architecture questions, `graphify query/path/
+   explain` for cross-module "how does X relate to Y". Run `graphify update .` after code changes
+   (AST-only, no API cost) — unlike codegraph it does NOT auto-sync.
+3. Fall back to Grep/Read only when the graphs lack it.
+
+> **code-review-graph MCP is configured (`.mcp.json`) but unusable as of 2026-10-21** — its index is
+> gitignored so it arrived empty on the Windows PC, and `build_or_update_graph` indexes `node_modules`
+> (116k nodes, 100% under node_modules, 1.2 GB, never finished in 18 min). Don't reach for it until
+> its exclude config is fixed; don't trust a 0-node answer from it as "nothing found".
 
 ## Stack
 | Layer | Tech |

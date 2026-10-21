@@ -22,6 +22,9 @@ Thumbs.db
 # Added by code-review-graph
 .code-review-graph/
 
+# CodeGraph index (local, rebuilt with `codegraph init`)
+.codegraph/
+
 # Graphify transient outputs (graph.json / graph.html / GRAPH_REPORT.md are committed)
 graphify-out/cache/
 graphify-out/manifest.json
