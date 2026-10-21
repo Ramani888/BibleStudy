@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
     "dev:remote": "bash ./start-dev.sh",
-    "tunnel": "ssh -o StrictHostKeyChecking=accept-new -L 5433:localhost:5432 deploy@46.225.189.44 -N",
+    "tunnel": "ssh -o StrictHostKeyChecking=accept-new -L 5433:localhost:5432 root@94.130.176.8 -N",
     "build": "prisma generate && tsc",
     "start": "node dist/server.js",
     "db:generate": "prisma generate",
