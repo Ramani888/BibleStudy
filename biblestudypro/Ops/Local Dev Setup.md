@@ -4,8 +4,11 @@ tags: [ops, dev]
 
 # Local Dev Setup
 
-As of **2026-08-04**, development is **local-only** — the [[Deployment (Hetzner)|Hetzner VPS]]
-is stopped to save cost.
+Development runs against the **local DB** (Postgres on 5434) — that part is unchanged.
+The [[Deployment (Hetzner)|Hetzner VPS]] is **live**, not stopped: verified 2026-10-21,
+`pm2` shows `biblestudypro-api` online ~31 days at `94.130.176.8` (plus a `mindrest-api`
+beside it). The earlier "stopped to save cost" note from 2026-08-04 is wrong — the server
+came back up and prod keeps running while you dev locally.
 
 Since **2026-10-21** the main machine is the **Windows PC** (see [[Moving to Windows PC]]).
 Commands below are Windows unless marked *(Mac)*; the Mac is still needed for **iOS only**.
@@ -26,7 +29,8 @@ cd backend && npm run dev        # local DB on 5434
 ```
 - `npm run dev` → plain dev server (used now, local DB).
 - `npm run dev:remote` → opens an SSH tunnel on **5433** to the remote DB, then
-  starts the server (used when Hetzner is up; `.env` must point at 5433).
+  starts the server (`.env` must point at 5433). Hits the **live prod DB** — only for
+  debugging real data, never for schema work.
 - `npm run tunnel` → just the SSH tunnel.
 
 ## First-time bring-up on a fresh machine

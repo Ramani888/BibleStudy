@@ -30,7 +30,7 @@ It is three products in one codebase:
 | ORM | Prisma 5 / PostgreSQL 16 — see [[Database Schema]] |
 | Auth | JWT access + refresh, OTP email verify — see [[Auth & Token Flow]] |
 | Media | local disk `/uploads`, served by `express.static` |
-| Hosting | Hetzner CX23 VPS + Caddy + PM2 (currently stopped) — see [[Deployment (Hetzner)]] |
+| Hosting | Hetzner CX23 VPS + Caddy + PM2 — **live** at `94.130.176.8` (verified 2026-10-21) — see [[Deployment (Hetzner)]] |
 
 ## Request flow (end to end)
 
