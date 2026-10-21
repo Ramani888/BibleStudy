@@ -1,4 +1,5 @@
 import axios, { AxiosError, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { Platform } from 'react-native';
 import Config from 'react-native-config';
 import { storage } from '../utils/storage';
 import { queryClient } from '../lib/queryClient';
@@ -6,10 +7,16 @@ import { useAuthStore } from '../store/auth.store';
 
 // Config.API_BASE_URL is bundled from .env at NATIVE BUILD time — so .env edits don't take
 // effect on device without a rebuild. In DEV we therefore hardcode the local backend so a
-// Metro reload can switch it instantly (update the IP to your Mac's LAN address). Release
-// builds still use the baked prod URL. Revert this to Config-first before shipping if needed.
+// Metro reload can switch it instantly. Release builds still use the baked prod URL.
+//   Android → localhost, reached through `adb reverse tcp:3010 tcp:3010` (USB or emulator).
+//             Machine-independent: no IP to keep in sync.
+//   iOS     → the Mac's LAN IP, because `localhost` on a real iPhone means the phone itself.
+//             UPDATE THIS when the Mac's Wi-Fi IP changes (`ipconfig getifaddr en0`).
 const BASE_URL = __DEV__
-  ? 'http://192.168.1.4:3010/api/v1'
+  ? Platform.select({
+      android: 'http://localhost:3010/api/v1',
+      default: 'http://192.168.1.5:3010/api/v1',
+    })
   : (Config.API_BASE_URL ?? 'https://api.getverdance.com/api/v1');
 
 export const apiClient = axios.create({
