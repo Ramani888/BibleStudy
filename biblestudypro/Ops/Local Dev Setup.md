@@ -67,11 +67,17 @@ cd backend  && npm install
 cd frontend && npm install
 # bring up the DB container first (see Database above), then:
 cd backend
-npx prisma migrate deploy   # 36 migrations, zero drift
+npx prisma migrate deploy   # 37 migrations, zero column drift
 npx prisma generate
 ```
-Verified on the Windows PC 2026-10-21: 36 applied, 0 failed, `/health` → 200 and
+Verified on the Windows PC 2026-10-21: 37 applied, 0 failed, `/health` → 200 and
 `/api/v1/waitlist/count` → `{"count":0}`.
+
+> Until `20261021000000_reconcile_fsrs_streak_columns` landed, a DB built from
+> migrations alone was **missing** the FSRS columns and `User.streakFreezes`
+> (added via `db push`), and `/auth/register` died with
+> `The column User.streakFreezes does not exist`. The workaround then was
+> `prisma db push`; it is no longer needed — `migrate deploy` is now sufficient.
 
 ⚠️ **`npx prisma migrate status` output is mangled by the rtk hook** — it prints
 "0 applied, 0 pending" even on a fully migrated DB. Trust the DB instead:
@@ -79,6 +85,52 @@ Verified on the Windows PC 2026-10-21: 36 applied, 0 failed, `/health` → 200 a
 docker exec bsp-db psql -U biblestudypro -d biblestudypro \
   -tAc "select count(*) from _prisma_migrations where rolled_back_at is null"
 ```
+
+## Checking for schema drift (`migrate diff`)
+
+Drift = `schema.prisma` has something no migration creates, usually because it was
+applied with `prisma db push`. It is invisible locally (your DB was pushed to) and
+only bites on a rebuild. This has happened **twice** — referral + `StreakFreezeLog`
+(fixed by `20260917000000_reconcile_base_schema`) and the FSRS + streak-freeze
+columns (`20261021000000_reconcile_fsrs_streak_columns`). Check after any `db push`.
+
+Derive the drift mechanically instead of eyeballing the schema:
+```bash
+cd backend
+./node_modules/.bin/prisma migrate diff \
+  --from-migrations prisma/migrations \
+  --to-schema-datamodel prisma/schema.prisma \
+  --shadow-database-url "postgresql://biblestudypro:<pw>@localhost:5434/shadow_drift" \
+  --script
+```
+
+### The pgvector catch
+This fails with `type "vector" does not exist` on `20260810_add_embeddings`, even
+after `CREATE EXTENSION vector` in the shadow DB — **Prisma resets the shadow database
+by dropping schema `public`, which drops the extension with it.** Install the extension
+into a schema that survives the reset and put it on the DB's search path:
+```sql
+CREATE DATABASE shadow_drift;
+\c shadow_drift
+CREATE SCHEMA ext;
+CREATE EXTENSION vector SCHEMA ext;
+ALTER DATABASE shadow_drift SET search_path = public, ext;
+```
+Then the diff runs clean. Drop the scratch DB afterwards.
+
+### Reading the output
+Two `DROP INDEX` lines for `card_embedding_idx` / `note_embedding_idx` always appear.
+They are **not** drift — they are the raw-SQL HNSW indexes from
+`20260810_add_embeddings` that Prisma cannot model, and dropping them would silently
+degrade semantic search. Ignore them; everything else is real drift.
+
+### Writing the fix
+Follow the two reconcile migrations: every statement `ADD COLUMN IF NOT EXISTS`, with
+defaults copied exactly from `schema.prisma`. Prod and existing dev DBs already have
+the columns from the `db push`, so the migration must be a **no-op** there and a real
+create on a rebuild. Verify on a scratch DB before committing: `migrate deploy` onto an
+empty database, re-run `migrate diff` (expect only the two index lines), then apply the
+file a second time and confirm it only emits `NOTICE ... skipping`.
 
 If the role/schema is missing on a **native** install, create the `biblestudypro` role
 and grant it ownership of the `public` schema (Postgres 15+ restricts `CREATE` on

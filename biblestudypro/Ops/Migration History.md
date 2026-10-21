@@ -4,9 +4,14 @@ tags: [ops, database]
 
 # Migration History
 
-Prisma migrations live in `backend/prisma/migrations/`. On **2026-08-04** the
-history was reconciled so it applies cleanly from scratch with **zero drift** vs
-`schema.prisma`. See [[Database Schema]].
+Prisma migrations live in `backend/prisma/migrations/`. **37 migrations** as of
+2026-10-21, applying cleanly from scratch with zero column drift vs `schema.prisma`.
+See [[Database Schema]].
+
+> Drift has recurred **three times**, always the same cause: schema applied with
+> `prisma db push` and no migration written. It is invisible on the machine that was
+> pushed to and only surfaces on a rebuild. **Run the drift check after any `db push`** —
+> recipe in [[Local Dev Setup#Checking for schema drift (`migrate diff`)]].
 
 ## Timeline
 
@@ -45,7 +50,24 @@ Result: `npx prisma migrate deploy` applies all 10 migrations cleanly;
 
 Committed in `32a5ded` (`fix(db): reconcile Prisma migration history with schema`).
 
+## The later reconciliations
+
+| Migration | Drift it closed |
+|-----------|-----------------|
+| `20260917000000_reconcile_base_schema` | `User.referralCode` / `referredById` + the `StreakFreezeLog` table — all added by `db push`, so a fresh DB broke referral redemption and streak-freeze writes |
+| `20261021000000_reconcile_fsrs_streak_columns` | 6 `Card.fsrs*` columns + `User.streakFreezes` / `streakFreezeMilestone` / `useFsrs`, from the quiz+engine sprint `db push`. Found 2026-10-21 bringing up the Windows PC: a migrations-only DB returned 500 on `/auth/register` — *"The column `User.streakFreezes` does not exist"* |
+
+Both are written **`ADD COLUMN IF NOT EXISTS` throughout** with defaults copied from
+`schema.prisma`, so they are a no-op on prod/dev DBs that already carry the columns and
+a real create on a rebuild. That is the pattern to copy for the next one.
+
+Deployed to prod 2026-10-21 (`migrate deploy` over an SSH tunnel on 5433): prod already
+had all 9 columns, so only the history row changed — 36 → 37 applied, 19 users and
+41 cards untouched, API stayed up with no restart. Backup first:
+`/var/backups/bsp/pre-fsrs-migration-20261021-152800.sql.gz`.
+
 ## Caveat for the remote DB
-If a future Hetzner DB was ever managed by `db push`, baseline the two new
-migrations with `prisma migrate resolve --applied` rather than re-running them —
-see [[Deployment (Hetzner)]].
+If a Hetzner DB was ever managed by `db push`, baseline new migrations with
+`prisma migrate resolve --applied` rather than re-running them — or write them
+idempotently, as the two reconcile migrations above do, which makes
+`migrate deploy` safe either way. See [[Deployment (Hetzner)]].
