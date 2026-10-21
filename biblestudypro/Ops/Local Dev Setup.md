@@ -15,13 +15,41 @@ Commands below are Windows unless marked *(Mac)*; the Mac is still needed for **
 Shell: PowerShell for npm/npx, **Git Bash** for `ssh`/`scp` deploys.
 
 ## Database
-- **PostgreSQL 16** on port **5434**.
-  - Windows: installer from postgresql.org; CLI tools live in
-    `C:\Program Files\PostgreSQL\16\bin` (add to PATH or call `psql.exe` by full path).
-  - *(Mac)* Homebrew `postgresql@16`, data dir `/opt/homebrew/var/postgresql@16`.
-- Role + database both named `biblestudypro` (password matches `backend/.env`;
-  role/schema owned by `biblestudypro`).
-- `backend/.env` `DATABASE_URL` points at `localhost:5434`.
+
+Postgres 16 on port **5434**, role + database both named `biblestudypro`
+(password matches `backend/.env`, which points `DATABASE_URL` at `localhost:5434`).
+
+**The schema needs the `pgvector` extension** — `Card.embedding` and `Note.embedding`
+are `vector` columns, added by migration `20260810_add_embeddings`. That migration has
+its `CREATE EXTENSION` line commented out, so the extension must already exist or
+`prisma migrate deploy` dies with `type "vector" does not exist`.
+
+### Windows (current) — Docker image, because of pgvector
+EDB's Windows installer ships no pgvector, and building it from source needs MSVC
+Build Tools (~2 GB). The `pgvector/pgvector:pg16` image has it baked in, so the dev DB
+is a container:
+
+```bash
+docker run -d --name bsp-db --restart unless-stopped -p 5434:5432 \
+  -e POSTGRES_USER=biblestudypro -e POSTGRES_PASSWORD=<same as backend/.env> \
+  -e POSTGRES_DB=biblestudypro \
+  -v bsp-pgdata:/var/lib/postgresql/data pgvector/pgvector:pg16
+docker exec bsp-db psql -U biblestudypro -d biblestudypro -c "CREATE EXTENSION IF NOT EXISTS vector;"
+```
+- Data lives in the named volume **`bsp-pgdata`** — survives container recreation.
+  `docker rm bsp-db` is safe; `docker volume rm bsp-pgdata` wipes the dev DB.
+- **Docker Desktop must be running before `npm run dev`.** The container auto-starts
+  with Docker (`--restart unless-stopped`), so it's one launch, not two.
+- psql without entering the container: `docker exec bsp-db psql -U biblestudypro -d biblestudypro`
+
+> A native PostgreSQL 16 is also installed at `C:\Program Files\PostgreSQL\16`
+> (CLI tools in `…\16\bin`), but its service `postgresql-x64-16` is **Stopped** and set
+> to **Manual** start so it can't take port 5434 from the container. Nothing uses it —
+> safe to uninstall. If you ever switch back to it, pgvector has to be solved first.
+
+### *(Mac)* Homebrew
+Homebrew `postgresql@16`, data dir `/opt/homebrew/var/postgresql@16`, pgvector via
+`brew install pgvector` then `CREATE EXTENSION vector;` in the `biblestudypro` DB.
 
 ## Run the backend
 ```bash
@@ -37,12 +65,25 @@ cd backend && npm run dev        # local DB on 5434
 ```bash
 cd backend  && npm install
 cd frontend && npm install
+# bring up the DB container first (see Database above), then:
 cd backend
-npx prisma migrate deploy   # applies all migrations (clean, zero drift)
+npx prisma migrate deploy   # 36 migrations, zero drift
 npx prisma generate
 ```
-If the local role/schema is missing, create the `biblestudypro` role and grant it
-ownership of the `public` schema (Postgres 15+ restricts `CREATE` on `public`).
+Verified on the Windows PC 2026-10-21: 36 applied, 0 failed, `/health` → 200 and
+`/api/v1/waitlist/count` → `{"count":0}`.
+
+⚠️ **`npx prisma migrate status` output is mangled by the rtk hook** — it prints
+"0 applied, 0 pending" even on a fully migrated DB. Trust the DB instead:
+```bash
+docker exec bsp-db psql -U biblestudypro -d biblestudypro \
+  -tAc "select count(*) from _prisma_migrations where rolled_back_at is null"
+```
+
+If the role/schema is missing on a **native** install, create the `biblestudypro` role
+and grant it ownership of the `public` schema (Postgres 15+ restricts `CREATE` on
+`public`). The Docker image creates role + database from its env vars, so this only
+bites the native path.
 
 `.env` files and `credentials/` are **not in git** — copy them by hand first,
 see [[Moving to Windows PC]].
@@ -98,7 +139,7 @@ Historical bug: dev base URL was hardcoded to `localhost:3010` (an Android
 ## Ports cheat-sheet
 | Port | What |
 |------|------|
-| 5434 | local Postgres (current dev DB) |
+| 5434 | local Postgres — dev DB; on Windows this is the `bsp-db` container (`5434→5432`) |
 | 5433 | SSH tunnel to remote Hetzner DB (only when tunnel open) |
 | 3010 | backend API (`PORT` in `.env`) |
 | 8081 | Metro bundler (device resolves the API host from this) |

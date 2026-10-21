@@ -28,7 +28,10 @@ After copying, change `frontend/.env` API URL to the **PC's** LAN IP for device 
 
 ## 3. Tools to install
 - Node (same major as Mac), Git (comes with **Git Bash** — use it for `scp`/`ssh` deploys)
-- PostgreSQL 16 on port **5434** — see [[Local Dev Setup]]; then `npx prisma migrate dev` in `backend/`
+- **Docker Desktop** — the dev DB is the `pgvector/pgvector:pg16` container `bsp-db` on port
+  **5434**, because the schema needs pgvector and EDB's Windows Postgres doesn't ship it.
+  Exact `docker run` + `CREATE EXTENSION` in [[Local Dev Setup]]; then
+  `npx prisma migrate deploy && npx prisma generate` in `backend/`
 - JDK 17 + Android Studio (SDK, emulator)
 - `npm install` in `backend/` and `frontend/`
 
