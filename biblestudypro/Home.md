@@ -59,6 +59,7 @@ backend (17 modules) + **React Native 0.84 / React 19** app (~67 screens).
 - [[Identity & Accounts]] — ⭐ authoritative app name, bundle IDs, Firebase/OAuth accounts
 - [[Store Launch (App Store + Play)]] — App Store + Play submission status, reviewer account, screenshots
 - [[Local Dev Setup]] — running locally (Postgres 5434)
+- [[Moving to Windows PC]] — checklist to continue work on the Windows PC (secrets, Claude setup, iOS limits)
 - [[Deployment (Hetzner)]] — the VPS setup (LIVE at 94.130.176.8; api.getverdance.com)
 - [[Migration History]] — Prisma migration timeline & the reconciliation
 
