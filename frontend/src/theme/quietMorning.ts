@@ -24,6 +24,8 @@ export interface QMColors {
   heroInk: string;
   heroMuted: string;
   onViolet: string;
+  /** White-on-violet pill (button cost badge). */
+  badgeOnViolet: string;
   /** Brand tile (logo, splash) — identical in light and dark. */
   brand: string;
   /** Soft 140° hero-card fog (violet → warm). */
@@ -103,6 +105,7 @@ export const qmLight: QMColors = {
   heroInk: '#3A2A4A',
   heroMuted: '#6E5A72',
   onViolet: '#FFFFFF',
+  badgeOnViolet: 'rgba(255,255,255,0.2)',
   brand: '#6D4AE0',
   hero: ['#EEE7FC', '#F3ECF8', '#FBF1EA'],
   fogLilac: ['#C4B2FA', 0.32],
@@ -168,6 +171,7 @@ export const qmDark: QMColors = {
   heroInk: '#F4ECF6',
   heroMuted: '#C7B8CF',
   onViolet: '#FFFFFF',
+  badgeOnViolet: 'rgba(255,255,255,0.2)',
   brand: '#6D4AE0',
   hero: ['#2A2140', '#231C33', '#2A1F2E'],
   fogLilac: ['#7C5CF0', 0.16],

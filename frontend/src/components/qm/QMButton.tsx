@@ -1,5 +1,5 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
+import { ActivityIndicator, StyleSheet, View, ViewStyle } from 'react-native';
 import { AnimatedPressable, Typography } from '../ui';
 import type { IconComponent } from '../icons';
 import { useTheme, spacing, radius } from '../../theme';
@@ -18,10 +18,12 @@ interface QMButtonProps {
   style?: ViewStyle;
   /** Leading icon (e.g. "+"). */
   icon?: IconComponent;
+  /** Small pill after the label (e.g. "2 credits"). */
+  badge?: string;
 }
 
 /** Quiet-morning primary button: 56px violet with soft violet drop. */
-export function QMButton({ label, onPress, loading, loadingLabel, off, pressableWhenOff, style, icon: Icon }: QMButtonProps) {
+export function QMButton({ label, onPress, loading, loadingLabel, off, pressableWhenOff, style, icon: Icon, badge }: QMButtonProps) {
   const { qm } = useTheme();
   const disabled = loading || (off && !pressableWhenOff);
   return (
@@ -42,6 +44,11 @@ export function QMButton({ label, onPress, loading, loadingLabel, off, pressable
       <Typography preset="qmButtonLg" color={off ? qm.btnOffInk : qm.onViolet}>
         {loading ? loadingLabel ?? label : label}
       </Typography>
+      {badge && !loading ? (
+        <View style={[styles.badge, { backgroundColor: off ? qm.field : qm.badgeOnViolet }]}>
+          <Typography preset="qmChip" color={off ? qm.btnOffInk : qm.onViolet}>{badge}</Typography>
+        </View>
+      ) : null}
     </AnimatedPressable>
   );
 }
@@ -51,4 +58,5 @@ const styles = StyleSheet.create({
     height: BTN_H, borderRadius: radius.r18,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.s10,
   },
+  badge: { paddingVertical: spacing.xs, paddingHorizontal: spacing.s10, borderRadius: radius.pill },
 });

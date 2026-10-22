@@ -1,40 +1,51 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-
-import { ActionSheet, AppModal, ConfirmDialog, EmptyState } from '../../components/feedback';
-import { Button, FilterChip, Screen, SearchBar, Typography } from '../../components/ui';
-import { FormField } from '../../components/forms';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ChevronRightIcon, FileTextIcon, SearchIcon, SortIcon, StarIcon } from '../../components/icons';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
+
+import {
+  QMBackButton, QMButton, QMConfirmDialog, QMFormField, QMSearchField, QMSegmented, QMSheet, QMSortChip, type QMSheetAction,
+} from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { CardsIcon, CheckIcon, ChevronRightIcon, DocIcon, InfoIcon, SparklesIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api';
-import { useCreditBalance, useGenerateQuiz, useSearchToggle, useSets } from '../../hooks';
+import { useCreditBalance, useGenerateQuiz, useSets } from '../../hooks';
 import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
+import { GeneratingQuizModal } from './components';
 import { storage } from '../../utils/storage';
-import { useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
+import { useTheme, spacing, radius, qmAccent } from '../../theme';
 import { quizSetupSchema, type QuizSetupFormData } from '../../utils/validators';
 
-import { useTranslation } from 'react-i18next';
+type Source = 'topic' | 'sets' | 'media';
 type SortOrder = 'newest' | 'alpha' | 'cards';
-const SORT_LABEL: Record<SortOrder, string> = { newest: 'Recent', alpha: 'A–Z', cards: 'Cards' };
+const SORTS: SortOrder[] = ['newest', 'alpha', 'cards'];
 // Need ≥4 cards to reliably ground a 4-option MC quiz; fewer risks a "not enough
 // questions" failure after the credit is spent, so we gate the button instead.
 const MIN_SET_CARDS = 4;
+const AI_QUIZ_COST = 2;
+const PICK_ROW_H = 60;
+const PICK_BAR_W = 12;
+const PICK_BAR_H = 36;
+const CHECK = 26;
+const TILE = 34;
+const SOURCE_MIN_H = 58;
 
 /**
- * Quiz setup — AI generation only. Make a quiz from a typed topic or grounded in
- * the user's own sets. (The old manual "Practice" lane was removed; playing existing
- * cards now happens via Review-due and retake, which go straight to the Quiz screen.)
+ * Quiz setup — AI generation only. Make a quiz from a typed topic, grounded in the
+ * user's own sets, or from a document. (Playing existing cards happens via
+ * Review-due and retake, which go straight to the Quiz screen.)
  */
 export function QuizSetupScreen() {
-  const { t } = useTranslation(['quiz', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { t } = useTranslation(['quiz', 'library', 'ai', 'common']);
+  const { qm, name: themeName } = useTheme();
+  const dark = themeName === 'dark';
+  const insets = useSafeAreaInsets();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- cross-tab Paywall + root-stack Quiz routes
   const navigation = useNavigation<any>();
 
   const { control, handleSubmit, getValues } = useForm<QuizSetupFormData>({
@@ -43,102 +54,38 @@ export function QuizSetupScreen() {
   });
   const generate = useGenerateQuiz();
   const { data: creditBalance } = useCreditBalance();
-  const AI_QUIZ_COST = 2;
+  const balance = creditBalance?.balance;
 
   // Reuse the AI-chat attachment machinery (device pick + upload, My Media picker,
   // credit gating, one-time content-policy gate) for the "A document" source.
   const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
-  const att = useAIChatAttachment(creditBalance?.balance ?? 0, goPaywall);
+  const att = useAIChatAttachment(balance ?? 0, goPaywall);
 
-  // Rotating reassurance while the LLM works (the 5–15s where users bail).
-  const [genMsgIdx, setGenMsgIdx] = useState(0);
-  const genMessages = [
-    t('quiz:setup.generating.writing', 'Writing your questions…'),
-    t('quiz:setup.generating.grounding', 'Grounding them in scripture…'),
-    t('quiz:setup.generating.almost', 'Almost ready…'),
-  ];
-  useEffect(() => {
-    if (!generate.isPending) { setGenMsgIdx(0); return; }
-    const id = setInterval(() => setGenMsgIdx(i => (i + 1) % genMessages.length), 1800);
-    return () => clearInterval(id);
-  }, [generate.isPending]); // eslint-disable-line react-hooks/exhaustive-deps
-
+  const [source, setSource] = useState<Source>('topic');
   const [selectedSetIds, setSelectedSetIds] = useState<string[]>([]);
-  const [selectedSetTitles, setSelectedSetTitles] = useState<string[]>([]);
-  const [aiSource, setAiSource] = useState<'topic' | 'sets' | 'media'>('topic');
-  const [setPickerOpen, setSetPickerOpen] = useState(false);
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
-
-  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+  const [search, setSearch] = useState('');
   const { data: sets = [], isLoading } = useSets();
 
+  const setById = useMemo(() => new Map(sets.map(s => [s.id, s])), [sets]);
+  const selectedTitles = selectedSetIds.map(id => setById.get(id)?.title ?? '');
   // Total cards across the selected sets — gate generation below the MC threshold.
-  const selectedCardCount = useMemo(
-    () => sets.reduce((n, s) => (selectedSetIds.includes(s.id) ? n + (s._count?.cards ?? 0) : n), 0),
-    [sets, selectedSetIds],
-  );
-  const setsTooFew = aiSource === 'sets' && selectedSetIds.length > 0 && selectedCardCount < MIN_SET_CARDS;
+  const selectedCardCount = selectedSetIds.reduce((n, id) => n + (setById.get(id)?._count?.cards ?? 0), 0);
+  const setsTooFew = source === 'sets' && selectedSetIds.length > 0 && selectedCardCount < MIN_SET_CARDS;
 
-  const cycleSortOrder = useCallback(() =>
-    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'cards' : 'newest'), []);
-
-  const openSetPicker  = useCallback(() => setSetPickerOpen(true), []);
-  const closeSetPicker = useCallback(() => setSetPickerOpen(false), []);
-
-  const filteredSets = useMemo(() => {
+  const pickList = useMemo(() => {
     const q = search.trim().toLowerCase();
-    const filtered = q ? sets.filter(s => s.title.toLowerCase().includes(q)) : [...sets];
-    return filtered.sort((a, b) => {
+    return (q ? sets.filter(s => s.title.toLowerCase().includes(q)) : [...sets]).sort((a, b) => {
       if (sortOrder === 'alpha') return a.title.localeCompare(b.title);
       if (sortOrder === 'cards') return (b._count?.cards ?? 0) - (a._count?.cards ?? 0);
       return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
     });
   }, [sets, search, sortOrder]);
 
-  const handleToggle = useCallback((id: string, title: string) => {
-    if (selectedSetIds.includes(id)) {
-      const idx = selectedSetIds.indexOf(id);
-      setSelectedSetIds(prev => prev.filter(x => x !== id));
-      setSelectedSetTitles(prev => prev.filter((_, i) => i !== idx));
-    } else {
-      setSelectedSetIds(prev => [...prev, id]);
-      setSelectedSetTitles(prev => [...prev, title]);
-    }
-  }, [selectedSetIds]);
-
-  const renderSetRow = useCallback(({ item }: { item: typeof filteredSets[number] }) => {
-    const count = item._count?.cards ?? 0;
-    const selected = selectedSetIds.includes(item.id);
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.setRow,
-          { borderColor: colors.border, backgroundColor: colors.surface },
-          selected && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
-          pressed && styles.rowPressed,
-        ]}
-        onPress={() => handleToggle(item.id, item.title)}
-      >
-        <View style={[styles.checkbox, { borderColor: colors.border }, selected && { borderColor: colors.accent }]}>
-          {selected && <CheckCircleIcon size={18} color={colors.accent} />}
-        </View>
-        <View style={styles.flex}>
-          <Typography preset="h4" color={selected ? colors.accent : colors.textPrimary} numberOfLines={1}>
-            {item.title}
-          </Typography>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {count === 0 ? t('library:cards.noCards', 'No cards yet') : t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
-          </Typography>
-        </View>
-      </Pressable>
-    );
-  }, [selectedSetIds, colors, handleToggle, t]);
-
-  const selectorLabel = selectedSetIds.length === 0
-    ? t('quiz:setup.tapToChooseSets', 'Tap to choose sets…')
-    : selectedSetIds.length === 1
-    ? selectedSetTitles[0]
-    : t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` });
+  const toggleSet = useCallback((id: string) => {
+    setSelectedSetIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  }, []);
 
   // Fire a generate request → route into the quiz on success. `save` carries the
   // name + source (topic OR sets) so the completed quiz is recorded with them.
@@ -164,13 +111,13 @@ export function QuizSetupScreen() {
         const status = (err as { response?: { status?: number } })?.response?.status;
         if (status === 402) {
           Toast.show({ type: 'error', text1: t('quiz:setup.outOfCredits', 'Out of credits'), text2: t('quiz:setup.upgradeToGenerate', 'Upgrade to generate AI quizzes.') });
-          navigation.navigate('ProfileTab', { screen: 'Paywall' });
+          goPaywall();
           return;
         }
         Toast.show({ type: 'error', text1: t('quiz:setup.couldNotGenerate', "Couldn't generate quiz"), text2: getErrorMessage(err) });
       },
     });
-  }, [generate, navigation, t]);
+  }, [generate, navigation, goPaywall, t]);
 
   // Consent gate: nothing is sent to the AI until the user has accepted the
   // one-time AI-data notice. Already-accepted (chat/media) → generate straight away.
@@ -196,296 +143,314 @@ export function QuizSetupScreen() {
   });
 
   // AI quiz grounded in the selected sets' cards. Name falls back to the set names.
-  const generateFromSets = useCallback(() => {
+  const generateFromSets = () => {
     if (selectedSetIds.length === 0) return;
-    const autoTitle = selectedSetTitles.length === 1
-      ? selectedSetTitles[0]
-      : t('library:plans.selectedCount', { count: selectedSetTitles.length, defaultValue: `${selectedSetTitles.length} sets` });
+    const autoTitle = selectedTitles.length === 1
+      ? selectedTitles[0]
+      : t('library:plans.selectedCount', { count: selectedTitles.length, defaultValue: `${selectedTitles.length} sets` });
     const name = (getValues('quizName') || '').trim() || autoTitle;
-    runGenerate({ setIds: selectedSetIds }, { quizName: name, setIds: selectedSetIds, setTitles: selectedSetTitles });
-  }, [selectedSetIds, selectedSetTitles, runGenerate, getValues, t]);
+    runGenerate({ setIds: selectedSetIds }, { quizName: name, setIds: selectedSetIds, setTitles: selectedTitles });
+  };
 
   // AI quiz grounded in an uploaded document (PDF/image). Name falls back to the file name.
-  const generateFromMedia = useCallback(() => {
+  const generateFromMedia = () => {
     const file = att.attachment;
     if (!file) return;
     const name = (getValues('quizName') || '').trim() || file.name;
     runGenerate({ mediaIds: [file.id] }, { quizName: name, setIds: [], setTitles: [name] });
-  }, [att.attachment, runGenerate, getValues]);
+  };
 
   // Document quizzes force paid Claude → media rate (image 3 / pdf 5). Before a
   // file is chosen we can't know which, so show the 3–5 range.
-  const mediaCost = att.attachment?.type === 'PDF' ? 5 : 3;
-  const shownCost = aiSource === 'media' ? mediaCost : AI_QUIZ_COST;
-  const aiCostLabel = aiSource === 'media' && !att.attachment
-    ? t('quiz:setup.aiCostMedia', 'Costs 3–5 credits · reads your document')
-    : creditBalance !== undefined
-      ? t('quiz:setup.aiCostWithBalance', { cost: shownCost, balance: creditBalance.balance, defaultValue: `Costs ${shownCost} credits · ${creditBalance.balance} left` })
-      : t('quiz:setup.aiCost', { cost: shownCost, defaultValue: `Costs ${shownCost} credits` });
+  const cost = source === 'media' ? (att.attachment ? (att.attachment.type === 'PDF' ? 5 : 3) : null) : AI_QUIZ_COST;
+  const lacking = balance !== undefined && balance < (cost ?? 3);
+  const incomplete = (source === 'sets' && (selectedSetIds.length === 0 || setsTooFew))
+    || (source === 'media' && (!att.attachment || att.isUploading));
+  const off = incomplete || lacking;
+  const onMake = lacking ? goPaywall : source === 'topic' ? generateFromTopic : source === 'sets' ? generateFromSets : generateFromMedia;
 
-  const chooseSetsBlock = (
-    <View>
-      <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseSetsLabel', 'CHOOSE SETS')}</Typography>
-      <Pressable
-        style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-        onPress={openSetPicker}
-        accessibilityRole="button"
-      >
-        <View style={styles.selectorIcon}>
-          {selectedSetIds.length > 0
-            ? <CheckCircleIcon size={20} color={colors.accent} />
-            : <ChevronRightIcon size={20} color={colors.textDisabled} />}
-        </View>
-        <Typography preset="body" color={selectedSetIds.length > 0 ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
-          {selectorLabel}
-        </Typography>
-        <ChevronRightIcon size={18} color={colors.textSecondary} />
-      </Pressable>
-    </View>
-  );
+  const consentWhat = consentGen?.payload.topic ? t('quiz:qm.whatTopic', 'your topic')
+    : consentGen?.payload.setIds ? t('quiz:qm.whatSets', 'the cards in the sets you chose')
+    : t('quiz:qm.whatDoc', 'your document');
 
-  const chooseDocumentBlock = (
-    <View>
-      <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.chooseDocumentLabel', 'CHOOSE A DOCUMENT')}</Typography>
-      <Pressable
-        style={({ pressed }) => [styles.selectorRow, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.rowPressed]}
-        onPress={att.handleAttachPress}
-        accessibilityRole="button"
-      >
-        <View style={styles.selectorIcon}>
-          {att.attachment
-            ? <FileTextIcon size={20} color={colors.accent} />
-            : <ChevronRightIcon size={20} color={colors.textDisabled} />}
-        </View>
-        <Typography preset="body" color={att.attachment ? colors.textPrimary : colors.textSecondary} style={styles.flex} numberOfLines={1}>
-          {att.isUploading
-            ? t('common:status.uploading', 'Uploading…')
-            : att.attachment?.name ?? t('quiz:setup.tapToChooseDocument', 'Tap to upload a PDF or image…')}
-        </Typography>
-        {att.attachment
-          ? <Pressable onPress={att.handleClearAttachment} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-              <Typography preset="caption" color={colors.accent}>{t('common:actions.remove', 'Remove')}</Typography>
-            </Pressable>
-          : <ChevronRightIcon size={18} color={colors.textSecondary} />}
-      </Pressable>
-    </View>
-  );
+  const attachActions: QMSheetAction[] = att.attachMenuActions.map(a => ({
+    label: a.label, icon: a.icon ?? DocIcon, onPress: a.onPress, off: 'disabled' in a && a.disabled,
+  }));
+  const mediaActions: QMSheetAction[] = att.pickerActions.map(a => ({
+    label: a.label, icon: a.icon ?? DocIcon, onPress: a.onPress, off: 'disabled' in a && a.disabled,
+  }));
+
+  const sortLabel = sortOrder === 'newest' ? t('common:sort.recent', 'Recent')
+    : sortOrder === 'alpha' ? t('library:qm.sortAZ', 'A to Z') : t('library:qm.sortMostCards', 'Most cards');
+  const n = selectedSetIds.length;
 
   return (
-    <Screen
-      header={<ScreenHeader title={t('quiz:setup.title')} onBack={() => navigation.goBack()} />}
-      footer={
-        <View style={[styles.footer, { borderTopColor: colors.border }]}>
-          <Button
-            label={t('quiz:setup.generateAiQuiz', '✨ Generate AI Quiz')}
-            loading={generate.isPending}
-            onPress={aiSource === 'topic' ? generateFromTopic : aiSource === 'sets' ? generateFromSets : generateFromMedia}
-            disabled={generate.isPending
-              || (aiSource === 'sets' && (selectedSetIds.length === 0 || setsTooFew))
-              || (aiSource === 'media' && (!att.attachment || att.isUploading))}
-            fullWidth
-          />
-        </View>
-      }
-    >
-      <ScrollView style={styles.flex} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-        <View style={styles.section}>
-          <View style={styles.nameField}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.nameLabel', 'QUIZ NAME')}</Typography>
-            <FormField name="quizName" control={control} placeholder={t('quiz:setup.namePlaceholder', 'e.g. Week 3 Review…')} autoCapitalize="sentences" returnKeyType="next" maxLength={80} />
-          </View>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView
+        style={styles.flex}
+        contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.sm }]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <QMBackButton onPress={() => navigation.goBack()} label={t('common:actions.back', 'Back')} />
+        <Typography preset="qmPageTitle" color={qm.ink} style={styles.title}>{t('quiz:qm.newQuiz', 'New quiz')}</Typography>
+        <Typography preset="qmBodyMd" color={qm.muted}>
+          {t('quiz:qm.setupLead', 'Tell Verdance what to ask about. It writes 8 multiple-choice questions for you.')}
+        </Typography>
 
-          <View style={styles.nameField}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.aiSourceLabel', 'GENERATE FROM')}</Typography>
-            <View style={styles.chipRow}>
-              <FilterChip label={t('quiz:setup.aiSource.topic', 'A topic')} active={aiSource === 'topic'} onPress={() => setAiSource('topic')} />
-              <FilterChip label={t('quiz:setup.aiSource.sets', 'My sets')} active={aiSource === 'sets'} onPress={() => setAiSource('sets')} />
-              <FilterChip label={t('quiz:setup.aiSource.document', 'A document')} active={aiSource === 'media'} onPress={() => setAiSource('media')} />
-            </View>
-          </View>
+        <Typography preset="qmFieldLabel" color={qm.body} style={styles.label}>{t('quiz:qm.makeFrom', 'Make it from')}</Typography>
+        <QMSegmented
+          label={t('quiz:qm.makeFrom', 'Make it from')}
+          value={source}
+          onChange={setSource}
+          options={[
+            { key: 'topic', label: t('quiz:setup.aiSource.topic', 'A topic') },
+            { key: 'sets', label: t('quiz:setup.aiSource.sets', 'My sets') },
+            { key: 'media', label: t('quiz:setup.aiSource.document', 'A document') },
+          ]}
+        />
 
-          {aiSource === 'topic' ? (
+        <Animated.View key={source} entering={FadeIn.duration(220)} style={styles.block}>
+          {source === 'topic' && (
             <View>
-              <Typography preset="caption" color={colors.textSecondary} style={styles.sectionLabel}>{t('quiz:setup.topicLabel', 'TOPIC')}</Typography>
-              <FormField name="aiTopic" control={control} placeholder={t('quiz:setup.aiTopicPlaceholder', 'Enter a topic — e.g. Gospel of John')} autoCapitalize="sentences" returnKeyType="done" onSubmitEditing={generateFromTopic} maxLength={100} />
-            </View>
-          ) : aiSource === 'sets' ? (
-            chooseSetsBlock
-          ) : (
-            chooseDocumentBlock
-          )}
-
-          <View style={styles.aiCostRow}>
-            <StarIcon size={12} color={colors.textSecondary} />
-            <Typography preset="caption" color={colors.textSecondary}>{aiCostLabel}</Typography>
-          </View>
-
-          {setsTooFew && (
-            <View style={styles.aiCostRow}>
-              <Typography preset="caption" color={colors.alert} align="center">
-                {t('quiz:setup.tooFewCards', { count: MIN_SET_CARDS, defaultValue: `Pick sets with at least ${MIN_SET_CARDS} cards total to generate a quiz.` })}
-              </Typography>
+              <QMFormField
+                name="aiTopic"
+                control={control}
+                label={t('quiz:qm.topic', 'Topic')}
+                placeholder={t('quiz:qm.topicPlaceholder', 'e.g. Gospel of John')}
+                autoCapitalize="sentences"
+                returnKeyType="done"
+                onSubmitEditing={generateFromTopic}
+                maxLength={100}
+              />
+              <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.topicHelp', 'A book, a person, a theme. 2 to 100 characters.')}</Typography>
             </View>
           )}
+
+          {source === 'sets' && (
+            <View>
+              <Typography preset="qmFieldLabel" color={qm.body}>{t('quiz:qm.yourSets', 'Your sets')}</Typography>
+              <SourceButton
+                tileBg={qm.lilac}
+                icon={<CardsIcon size={18} color={qm.link} />}
+                title={n === 0 ? t('quiz:qm.chooseSets', 'Choose sets') : n === 1 ? selectedTitles[0] : t('quiz:qm.setsChosen', { count: n, defaultValue: `${n} sets chosen` })}
+                sub={n === 0 ? t('quiz:qm.tapToPick', 'Tap to pick one or more') : t('quiz:qm.cardsToAsk', { count: selectedCardCount, defaultValue: `${selectedCardCount} cards to ask from` })}
+                onPress={() => setPickerOpen(true)}
+                trailing={<ChevronRightIcon size={18} color={qm.muted} />}
+              />
+              {setsTooFew && (
+                <View style={[styles.warn, { backgroundColor: qm.errorBg }]} accessibilityRole="alert">
+                  <InfoIcon size={18} color={qm.warm} strokeWidth={2} />
+                  <Typography preset="qmBody" color={qm.warm} style={styles.flex}>
+                    {t('quiz:qm.tooFew', { count: selectedCardCount, min: MIN_SET_CARDS, defaultValue: `These sets have ${selectedCardCount} cards. Pick sets with at least ${MIN_SET_CARDS} cards in total.` })}
+                  </Typography>
+                </View>
+              )}
+            </View>
+          )}
+
+          {source === 'media' && (
+            <View>
+              <Typography preset="qmFieldLabel" color={qm.body}>{t('quiz:qm.pdfOrPhoto', 'A PDF or photo')}</Typography>
+              <SourceButton
+                tileBg={qm.goldBg}
+                icon={<DocIcon size={18} color={qm.goldText} />}
+                dashed={!att.attachment}
+                title={att.isUploading ? t('common:status.uploading', 'Uploading…') : att.attachment?.name ?? t('quiz:qm.addDoc', 'Add a PDF or photo')}
+                sub={att.attachment
+                  ? att.attachment.type === 'PDF' ? t('quiz:qm.pdfCost', 'PDF · 5 credits') : t('quiz:qm.photoCost', 'Photo · 3 credits')
+                  : t('quiz:qm.docSub', 'Verdance reads it and asks about it')}
+                onPress={att.handleAttachPress}
+                trailing={att.isUploading
+                  ? <ActivityIndicator size="small" color={qm.violet} />
+                  : att.attachment
+                    ? (
+                      <Pressable onPress={att.handleClearAttachment} hitSlop={10} accessibilityRole="button">
+                        <Typography preset="qmLink" color={qm.link}>{t('common:actions.remove', 'Remove')}</Typography>
+                      </Pressable>
+                    )
+                    : null}
+              />
+            </View>
+          )}
+        </Animated.View>
+
+        <View style={styles.nameBlock}>
+          <QMFormField
+            name="quizName"
+            control={control}
+            label={t('quiz:qm.quizName', 'Quiz name')}
+            optional={t('library:qm.optional', '(optional)')}
+            placeholder={t('quiz:qm.namePlaceholder', 'e.g. Week 3 review')}
+            autoCapitalize="sentences"
+            returnKeyType="done"
+            maxLength={80}
+          />
+          <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.nameHelp', 'Leave it empty and we will name it after the topic.')}</Typography>
         </View>
       </ScrollView>
 
-      {/* ── Set Picker Sheet ── */}
-      <AppModal visible={setPickerOpen} onClose={closeSetPicker} contentStyle={styles.sheetContent}>
-        <View style={styles.sheetToolbar}>
-          <Typography preset="h4" style={styles.flex}>{t('library:sets.chooseSets', 'Choose Sets')}</Typography>
-          <Pressable
-            style={({ pressed }) => pressed && styles.iconPressed}
-            onPress={toggleSearch}
-            hitSlop={8}
-            accessibilityRole="button"
-          >
-            <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
-          </Pressable>
-          <Pressable
-            style={({ pressed }) => [styles.sortBtn, pressed && styles.iconPressed]}
-            onPress={cycleSortOrder}
-            hitSlop={8}
-            accessibilityRole="button"
-          >
-            <SortIcon size={20} color={colors.accent} />
-            <Typography preset="caption" color={colors.accent}>{t(`quiz:setup.sort.${sortOrder}`, SORT_LABEL[sortOrder])}</Typography>
-          </Pressable>
-        </View>
-
-        {searchVisible && (
-          <SearchBar
-            placeholder={t('library:sets.searchPlaceholder', 'Search sets…')}
-            value={search}
-            onChangeText={setSearch}
-            autoFocus
-            containerStyle={styles.sheetSearch}
-          />
-        )}
-
-        {selectedSetIds.length > 0 && (
-          <View style={styles.selectedBadge}>
-            <Typography preset="caption" color={colors.accent}>
-              {t('library:plans.selectedCount', { count: selectedSetIds.length, defaultValue: `${selectedSetIds.length} sets selected` })}
-            </Typography>
-          </View>
-        )}
-
-        <FlatList
-          data={filteredSets}
-          keyExtractor={s => s.id}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          style={styles.sheetList}
-          ListEmptyComponent={
-            isLoading
-              ? <View style={styles.modalLoading}><ActivityIndicator color={colors.accent} /></View>
-              : <EmptyState title={t('common:status.noResults', 'No sets found')} subtitle={t('quiz:setup.noSetsSub', 'Create a set with cards to start quizzing')} />
-          }
-          renderItem={renderSetRow}
+      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair }]}>
+        <QMButton
+          icon={SparklesIcon}
+          label={t('quiz:qm.makeMyQuiz', 'Make my quiz')}
+          badge={cost === null ? t('quiz:qm.costRange', '3 to 5 credits') : t('quiz:qm.costCredits', { count: cost })}
+          onPress={onMake}
+          off={off}
+          pressableWhenOff={lacking && !incomplete}
+          loading={generate.isPending}
         />
+        {lacking ? (
+          <Typography preset="qmLabel" color={qm.warm} align="center" style={styles.hint} accessibilityRole="alert">
+            {t('quiz:qm.lackLine', { cost: cost ?? t('quiz:qm.threeToFive', '3 to 5'), defaultValue: `Not enough credits — this quiz costs ${cost}.` })}{' '}
+            <Typography preset="qmLabel" color={qm.link} onPress={goPaywall} accessibilityRole="link">{t('quiz:qm.getCredits', 'Get credits')}</Typography>
+          </Typography>
+        ) : balance !== undefined ? (
+          <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.hint}>
+            {t('quiz:qm.balance', { count: balance, defaultValue: `You have ${balance} credits` })}
+          </Typography>
+        ) : null}
+      </View>
 
-        <Button
-          label={selectedSetIds.length === 0 ? t('quiz:setup.selectSetsToContinue', 'Select sets to continue') : t('common:actions.doneCount', { count: selectedSetIds.length, defaultValue: `Done — ${selectedSetIds.length} sets` })}
-          onPress={closeSetPicker}
-          disabled={selectedSetIds.length === 0}
-          fullWidth
-          style={styles.sheetDone}
-        />
-      </AppModal>
-
-      {/* ── AI generation loading overlay (the 5–15s wait) ── */}
-      <AppModal visible={generate.isPending} contentStyle={styles.genModal}>
-        <View style={styles.genWrap}>
-          <ActivityIndicator size="large" color={colors.accent} />
-          <Typography preset="h4" align="center">{t('quiz:setup.generatingTitle', 'Building your quiz…')}</Typography>
-          <Typography preset="body" color={colors.textSecondary} align="center">{genMessages[genMsgIdx]}</Typography>
+      {/* ── Set picker ── */}
+      <QMSheet visible={pickerOpen} onClose={() => setPickerOpen(false)}>
+        <View style={styles.pickHead}>
+          <Typography preset="qmSheetTitle" color={qm.ink}>{t('quiz:qm.chooseSets', 'Choose sets')}</Typography>
+          <QMSortChip label={sortLabel} onPress={() => setSortOrder(s => SORTS[(SORTS.indexOf(s) + 1) % SORTS.length])} />
         </View>
-      </AppModal>
+        <View style={styles.pickSearch}>
+          <QMSearchField value={search} onChangeText={setSearch} placeholder={t('quiz:qm.searchSets', 'Search sets')} />
+        </View>
+        {isLoading ? (
+          <ActivityIndicator color={qm.violet} style={styles.pickLoading} />
+        ) : pickList.length === 0 ? (
+          <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.pickLoading}>
+            {sets.length === 0 ? t('quiz:setup.noSetsSub', 'Create a set with cards to start quizzing') : t('quiz:qm.noSetsMatch', 'No sets match')}
+          </Typography>
+        ) : pickList.map(s => {
+          const on = selectedSetIds.includes(s.id);
+          const count = s._count?.cards ?? 0;
+          return (
+            <Pressable
+              key={s.id}
+              onPress={() => toggleSet(s.id)}
+              style={[styles.pickRow, { borderBottomColor: qm.hair }]}
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: on }}
+              accessibilityLabel={s.title}
+            >
+              <View style={[styles.pickBar, { backgroundColor: qmAccent(qm, dark, s.color)[1] }]} />
+              <View style={styles.flex}>
+                <Typography preset="qmRow" color={qm.ink} numberOfLines={1}>{s.title}</Typography>
+                <Typography preset="qmMeta" color={qm.muted} style={styles.pickMeta}>
+                  {count === 0 ? t('library:cards.noCards', 'No cards yet') : t('library:cards.cardCount', { count })}
+                </Typography>
+              </View>
+              <View style={[styles.check, on ? { backgroundColor: qm.violet } : { borderWidth: 2, borderColor: qm.off }]}>
+                {on && <CheckIcon size={16} color={qm.onViolet} strokeWidth={3} />}
+              </View>
+            </Pressable>
+          );
+        })}
+        <QMButton
+          label={n === 0 ? t('quiz:qm.pickOne', 'Pick at least one set') : t('quiz:qm.doneSets', { count: n, defaultValue: `Done, ${n} sets` })}
+          onPress={() => setPickerOpen(false)}
+          off={n === 0}
+          style={styles.pickDone}
+        />
+      </QMSheet>
 
       {/* ── Document source: attach menu + My Media picker + content-policy gate ── */}
-      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('quiz:setup.attachDocument', 'Add a document')} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
-      <ActionSheet visible={att.pickerVisible} title={t('ai:chat.chooseMedia', 'Choose from My Media')} actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
-      <ConfirmDialog
+      <QMSheet
+        visible={att.attachMenuVisible}
+        onClose={() => att.setAttachMenuVisible(false)}
+        title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('quiz:setup.attachDocument', 'Add a document')}
+        actions={attachActions}
+        note={balance !== undefined ? t('quiz:qm.attachNote', { balance, defaultValue: `A photo costs 3 credits, a PDF costs 5. You have ${balance}.` }) : undefined}
+      />
+      <QMSheet
+        visible={att.pickerVisible}
+        onClose={() => att.setPickerVisible(false)}
+        title={t('ai:chat.chooseMedia', 'Choose from My Media')}
+        actions={mediaActions}
+      />
+      <QMConfirmDialog
         visible={att.policyDialogVisible}
-        title={t('ai:chat.contentPolicy', 'Content Policy')}
-        message={t('ai:chat.contentPolicyMsg', 'Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines.')}
-        confirmLabel={t('common:actions.agree', 'I Agree')}
-        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        title={t('quiz:qm.policyTitle', 'Before you add a document')}
+        message={t('quiz:qm.policyText', 'Only upload things you have the right to use, and keep them appropriate: nothing sexual, violent or illegal. Breaking this can get your account suspended.')}
+        confirmLabel={t('quiz:qm.agree', 'I agree')}
+        cancelLabel={t('quiz:qm.notNow', 'Not now')}
         onConfirm={att.acceptPolicy}
         onCancel={() => att.setPolicyDialogVisible(false)}
       />
 
       {/* AI data notice — permission before any content is sent to a third-party AI (Apple 5.1.2) */}
-      <ConfirmDialog
+      <QMConfirmDialog
         visible={!!consentGen}
-        title={t('ai:consent.title', 'AI Chat')}
-        message={t('ai:consent.shortNotice', 'The questions you type and any file you attach are sent to our AI providers (OpenRouter and Anthropic) to generate results. Continue?')}
-        confirmLabel={t('common:actions.agree', 'I Agree')}
-        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        title={t('quiz:qm.consentTitle', 'Before we make your quiz')}
+        message={t('quiz:qm.consentText', { what: consentWhat, defaultValue: `To write your questions, Verdance sends ${consentWhat} to outside AI providers (OpenRouter and Anthropic). We only ask once.` })}
+        confirmLabel={t('quiz:qm.agree', 'I agree')}
+        cancelLabel={t('quiz:qm.notNow', 'Not now')}
         onConfirm={acceptAiConsent}
         onCancel={() => setConsentGen(null)}
       />
-    </Screen>
+
+      <GeneratingQuizModal visible={generate.isPending} />
+    </View>
+  );
+}
+
+function SourceButton({ tileBg, icon, title, sub, onPress, trailing, dashed }: {
+  tileBg: string; icon: React.ReactNode; title: string; sub: string; onPress: () => void; trailing?: React.ReactNode; dashed?: boolean;
+}) {
+  const { qm } = useTheme();
+  return (
+    <AnimatedPressable
+      scaleTo={0.98}
+      onPress={onPress}
+      style={[
+        styles.source,
+        { backgroundColor: qm.surface },
+        dashed ? { borderWidth: 1.5, borderColor: qm.off } : { boxShadow: `${qm.cardShadow}, inset 0px 0px 0px 1px ${qm.hair}` },
+      ]}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+    >
+      <View style={[styles.tile, { backgroundColor: tileBg }]}>{icon}</View>
+      <View style={styles.flex}>
+        <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{title}</Typography>
+        <Typography preset="qmMeta" color={qm.muted} numberOfLines={1} style={styles.pickMeta}>{sub}</Typography>
+      </View>
+      {trailing}
+    </AnimatedPressable>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  section: { padding: layout.screenPaddingH },
-  sectionLabel: { marginBottom: spacing.md, marginTop: spacing.sm },
-  nameField: { marginBottom: spacing.xl },
-  selectorRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: layout.cardRadiusSm,
-    borderWidth: 1,
+  flex: { flex: 1, minWidth: 0 },
+  scroll: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl },
+  title: { marginTop: spacing.sm, marginBottom: spacing.xs },
+  label: { marginTop: spacing.xxl, marginBottom: spacing.sm },
+  block: { marginTop: spacing.xl },
+  help: { marginTop: spacing.s6 },
+  nameBlock: { marginTop: spacing.xxl },
+  source: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.sm,
+    minHeight: SOURCE_MIN_H, paddingVertical: spacing.md, paddingHorizontal: spacing.lg, borderRadius: radius.md,
   },
-  selectorIcon: { width: spacing.s28, alignItems: 'center' },
-  aiCostRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.xs, marginTop: spacing.md },
-  genModal: { alignItems: 'center' },
-  genWrap: { alignItems: 'center', gap: spacing.lg, paddingVertical: spacing.xl },
-  chipRow: { flexDirection: 'row', gap: spacing.sm, paddingBottom: spacing.xs },
-  rowPressed: { opacity: 0.7 },
-  iconPressed: { opacity: 0.85 },
-  footer: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing.lg,
-    borderTopWidth: 1,
+  tile: { width: TILE, height: TILE, borderRadius: radius.r10, alignItems: 'center', justifyContent: 'center' },
+  warn: {
+    flexDirection: 'row', gap: spacing.s10, marginTop: spacing.s10,
+    paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2,
   },
-  sheetContent: { maxHeight: '85%' },
-  sheetToolbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    marginBottom: spacing.md,
-  },
-  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  sheetSearch: { marginBottom: spacing.sm },
-  selectedBadge: {
-    paddingVertical: spacing.xs,
-    marginBottom: spacing.sm,
-  },
-  sheetList: { flexShrink: 1 },
-  setRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
-    marginBottom: spacing.sm,
-  },
-  checkbox: {
-    width: spacing.xxl,
-    height: spacing.xxl,
-    borderRadius: layout.cardRadius,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sheetDone: { marginTop: spacing.md },
-  modalLoading: { paddingVertical: spacing.xxxl, alignItems: 'center' },
+  footer: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.s14, borderTopWidth: 1 },
+  hint: { marginTop: spacing.sm },
+  pickHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  pickSearch: { marginTop: spacing.md, marginBottom: spacing.sm },
+  pickLoading: { marginVertical: spacing.xxl },
+  pickRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, minHeight: PICK_ROW_H, borderBottomWidth: StyleSheet.hairlineWidth },
+  pickBar: { width: PICK_BAR_W, height: PICK_BAR_H, borderRadius: radius.r6 },
+  pickMeta: { marginTop: spacing.s2 },
+  check: { width: CHECK, height: CHECK, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
+  pickDone: { marginTop: spacing.s14 },
 });
