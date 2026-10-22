@@ -12,9 +12,9 @@ const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const DRAW_MS = 1100;
 const DRAW_DELAY = 200;
 
-/** Canvas score ring: leaf arc draws in, the % counts up with it. Null = unscored dash. */
-export function QMScoreRing({ pct, size, stroke, caption, a11yLabel }: {
-  pct: number | null; size: number; stroke: number; caption?: string; a11yLabel?: string;
+/** Canvas score ring: leaf arc draws in, the % counts up with it. Null = unscored dash. `children` replace the number (Profile avatar). */
+export function QMScoreRing({ pct, size, stroke, caption, a11yLabel, children }: {
+  pct: number | null; size: number; stroke: number; caption?: string; a11yLabel?: string; children?: React.ReactNode;
 }) {
   const { qm } = useTheme();
   const reduce = useReducedMotion();
@@ -44,11 +44,13 @@ export function QMScoreRing({ pct, size, stroke, caption, a11yLabel }: {
         )}
       </Svg>
       <View style={styles.center}>
+        {children ?? <>
         <Typography style={[styles.num, { color: qm.ink, fontSize: big, lineHeight: big * 1.1 }]}>
           {pct === null ? '—' : shown}
           {pct !== null && <Typography style={[styles.num, { color: qm.ink, fontSize: big / 2 }]}>%</Typography>}
         </Typography>
         {caption ? <Typography preset="qmMeta" color={qm.muted} style={styles.caption}>{caption}</Typography> : null}
+        </>}
       </View>
     </View>
   );

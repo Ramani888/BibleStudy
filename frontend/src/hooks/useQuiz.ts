@@ -35,6 +35,15 @@ export function useGenerateQuiz() {
   });
 }
 
+/** Total quizzes taken — Profile stat tile. Under ['quiz'] so attempt saves/deletes refresh it. */
+export function useQuizCount() {
+  return useQuery({
+    queryKey: ['quiz', 'attempts', 'count'],
+    queryFn: quizApi.getAttemptCount,
+    select: d => d.count,
+  });
+}
+
 /** Recent quiz attempts â€” powers the Quiz hub list. */
 export function useRecentQuizAttempts(limit = 20) {
   return useQuery({

@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { useNotifications } from './useNotifications';
 
 const STORAGE_KEY = '@bsp/notification_settings';
 
@@ -37,4 +38,15 @@ export function useNotificationPrefs(): NotificationPrefs {
   }, []));
 
   return prefs;
+}
+
+/** Unread notifications the user hasn't muted — the bell dot/count on Home and Profile. */
+export function useUnreadCount(): number {
+  const { data } = useNotifications(1);
+  const prefs = useNotificationPrefs();
+  return (data?.notifications ?? []).filter(n => {
+    if (n.read) return false;
+    const prefKey = TYPE_TO_PREF[n.type];
+    return prefKey ? prefs[prefKey] !== false : true;
+  }).length;
 }

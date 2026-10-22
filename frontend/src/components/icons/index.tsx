@@ -596,6 +596,26 @@ export const ShareUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, stroke
   </Outline>
 );
 
+export const GiftIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M20 12v8H4v-8M2 7h20v5H2zM12 22V7M12 7H8a2.5 2.5 0 1 1 2.5-2.5zM12 7h4a2.5 2.5 0 1 0-2.5-2.5z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Four-point spark (credits). */
+export const CreditIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Bag (plan / subscription). */
+export const BagIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 7h16v12H4zM8 7V5h8v2" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
 /** Three dots in a row (folder tile menu). */
 export const MoreHorizontalIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
   <Outline size={size}>

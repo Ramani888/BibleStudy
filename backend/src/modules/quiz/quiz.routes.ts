@@ -13,6 +13,7 @@ router.post('/generate',        aiRateLimit, validate(GenerateQuizDto), quizCont
 router.post('/attempts',        validate(RecordAttemptDto), quizController.recordAttempt);
 router.put('/attempts/:id',    validate(RecordAttemptDto), quizController.updateAttempt);
 router.delete('/attempts/:id',                             quizController.deleteAttempt);
+router.get('/attempts/count',                        quizController.getAttemptCount);
 router.get('/attempts/recent',                       quizController.getRecentAttempts);
 router.get('/attempts/:id/responses',                quizController.getAttemptResponses);
 

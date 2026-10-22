@@ -45,7 +45,7 @@ export { useManualRefresh } from './useManualRefresh';
 export { useUpdateProfile, useChangePassword } from './useProfile';
 export { useSetStats } from './useSetStats';
 export { useFolderModal } from './useFolderModal';
-export { useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useCardsForSets, useQuizAttemptResponses, useGenerateQuiz } from './useQuiz';
+export { useQuizAttemptSave, useDeleteQuizAttempt, useRecentQuizAttempts, useQuizCount, useCardsForSets, useQuizAttemptResponses, useGenerateQuiz } from './useQuiz';
 export { useReQuiz } from './useReQuiz';
 
 export {
@@ -70,7 +70,7 @@ export {
   useMarkAllNotificationsRead,
   useDeleteNotification,
 } from './useNotifications';
-export { useNotificationPrefs, TYPE_TO_PREF } from './useNotificationPrefs';
+export { useNotificationPrefs, useUnreadCount, TYPE_TO_PREF } from './useNotificationPrefs';
 export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from './useNotes';
 export { useNoteStats } from './useNoteStats';
 export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';

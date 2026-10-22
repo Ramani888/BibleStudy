@@ -21,6 +21,8 @@ export const quizApi = {
   deleteAttempt: (attemptId: string) =>
     apiDelete(`/quiz/attempts/${attemptId}`),
 
+  getAttemptCount: () => apiGet<{ count: number }>('/quiz/attempts/count'),
+
   getRecentAttempts: (limit = 20) =>
     apiGet<QuizAttemptWithSet[]>(`/quiz/attempts/recent?limit=${limit}`),
 

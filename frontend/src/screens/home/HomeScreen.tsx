@@ -31,9 +31,7 @@ import {
   useReferral,
   useDueSummary,
   useDueCards,
-  useNotifications,
-  useNotificationPrefs,
-  TYPE_TO_PREF,
+  useUnreadCount,
 } from '../../hooks';
 import { useTranslation } from 'react-i18next';
 import { useTheme, spacing, radius, type QMColors } from '../../theme';
@@ -317,8 +315,7 @@ export function HomeScreen() {
   const { data: activityData } = useFriendsActivityFeed();
   const { data: streakData } = useStreak();
   const { data: dueSummary } = useDueSummary();
-  const { data: notifData } = useNotifications(1);
-  const notifPrefs = useNotificationPrefs();
+  const unread = useUnreadCount();
   useAutoDailyClaim();
 
   const nav = useHomeNavigation(navigation);
@@ -373,11 +370,6 @@ export function HomeScreen() {
     () => new Date().toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }),
     [i18n.language],
   );
-  const unread = (notifData?.notifications ?? []).filter(n => {
-    if (n.read) return false;
-    const prefKey = TYPE_TO_PREF[n.type];
-    return prefKey ? notifPrefs[prefKey] !== false : true;
-  }).length;
   const colorAt = (i: number) => qm.setColors[i % qm.setColors.length];
 
   return (

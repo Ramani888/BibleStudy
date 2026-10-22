@@ -147,6 +147,10 @@ export async function getBestForSet(userId: string, setId: string): Promise<numb
   return single.length ? Math.max(...single.map(r => r.scorePct)) : null;
 }
 
+export function getAttemptCount(userId: string) {
+  return prisma.quizAttempt.count({ where: { userId } });
+}
+
 export async function getRecentAttempts(userId: string, limit = 20) {
   // Clamp: a negative limit (?limit=-5) would reach Prisma as a negative take → 500.
   const take = Math.min(Math.max(Number.isFinite(limit) ? Math.floor(limit) : 20, 1), 50);
