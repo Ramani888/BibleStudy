@@ -596,6 +596,77 @@ export const ShareUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, stroke
   </Outline>
 );
 
+/** Three dots in a row (folder tile menu). */
+export const MoreHorizontalIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
+  <Outline size={size}>
+    <Circle cx={5} cy={12} r={1.7} fill={color} />
+    <Circle cx={12} cy={12} r={1.7} fill={color} />
+    <Circle cx={19} cy={12} r={1.7} fill={color} />
+  </Outline>
+);
+
+/** "No folder". */
+export const FolderOffIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM4 4l16 16" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const CardsIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 7h12v13H4zM8 4h12v13" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const PlanIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Quiz modes (canvas sheet rows). */
+export const TypeAnswerIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 7h16M4 12h10M4 17h7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ChoiceIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BlanksIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 12h4M10 12h4M16 12h4" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const TypeOutIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 6h16v12H4zM8 10h8M8 14h5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const OrderIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M9 6h11M9 12h11M9 18h11M4 5l1.5 1.5L4 8M4 11l1.5 1.5L4 14" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ReadIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 6.6C10 5.1 7 4.6 4 5.1v13.4c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5.1c-3-.5-6 0-8 1.5zM12 6.6V20" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const MatchIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M7 7h4v4H7zM13 13h4v4h-4zM11 9h4v4" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
 // ─── Tab bar icons (canvas TabBar). `filled` = active; `cutout` = pill colour
 // for the inner detail (book spine, check, dots) drawn on top of the fill. ────
 

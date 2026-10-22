@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import { ActionSheet } from '../feedback';
+import { QMSheet, type QMSheetAction } from '../qm';
+import { FolderIcon, PencilIcon, PlayIcon, PlusIcon, TrashIcon } from '../icons';
 import type { StudySet } from '../../types';
 
 interface SetActionSheetProps {
@@ -14,6 +15,8 @@ interface SetActionSheetProps {
   onDelete: () => void;
   showAssignFolder?: boolean;
   onAssignFolder?: () => void;
+  /** Current folder name, shown under "Move to folder". */
+  folderName?: string | null;
   isOwner?: boolean;
 }
 
@@ -27,56 +30,23 @@ export function SetActionSheet({
   onDelete,
   showAssignFolder,
   onAssignFolder,
+  folderName,
   isOwner = true,
 }: SetActionSheetProps) {
-  const { t } = useTranslation(['common', 'library']);
-  const actions = [
-    {
-      label: t('library:tabs.study', 'Quiz'),
-      iconName: 'help-circle-outline',
-      onPress: onQuiz,
-    },
-    ...(isOwner
-      ? [
-          {
-            label: t('library:cards.addCard', 'Create Card'),
-            iconName: 'add-circle-outline',
-            onPress: onCreateCard,
-          },
-        ]
-      : []),
+  const { t } = useTranslation('library');
+  const actions: QMSheetAction[] = [
+    { label: t('qm.startQuiz', 'Start a quiz'), icon: PlayIcon, onPress: onQuiz },
+    ...(isOwner ? [{ label: t('qm.addCard', 'Add a card'), icon: PlusIcon, onPress: onCreateCard }] : []),
     ...(isOwner && showAssignFolder && onAssignFolder
-      ? [
-          {
-            label: t('library:folders.assignFolder', 'Assign Folder'),
-            iconName: 'folder-outline',
-            onPress: onAssignFolder,
-          },
-        ]
+      ? [{ label: t('qm.moveToFolder', 'Move to folder'), sub: folderName || t('folders.noFolder', 'No folder'), icon: FolderIcon, onPress: onAssignFolder }]
       : []),
     ...(isOwner
       ? [
-          {
-            label: t('common:actions.edit', 'Edit'),
-            iconName: 'pencil-outline',
-            onPress: onEdit,
-          },
-          {
-            label: t('common:actions.delete', 'Delete'),
-            iconName: 'trash-outline',
-            destructive: true as const,
-            onPress: onDelete,
-          },
+          { label: t('qm.editSet', 'Edit set'), icon: PencilIcon, onPress: onEdit },
+          { label: t('qm.deleteSet', 'Delete set'), icon: TrashIcon, danger: true, onPress: onDelete },
         ]
       : []),
   ];
 
-  return (
-    <ActionSheet
-      visible={visible}
-      title={set?.title}
-      onClose={onClose}
-      actions={actions}
-    />
-  );
+  return <QMSheet visible={visible} title={set?.title} onClose={onClose} actions={actions} />;
 }

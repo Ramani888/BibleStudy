@@ -68,6 +68,14 @@ export interface QMColors {
   fan1: string;
   fan3: string;
   liftShadow: string;
+  /** Sheets, dialogs, segmented pill, sticky bars (Library module on). */
+  sheet: string;
+  scrim: string;
+  quiet: string;
+  onDanger: string;
+  pill: string;
+  pillShadow: string;
+  glass: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -127,6 +135,13 @@ export const qmLight: QMColors = {
   fan1: '#F6E3E1',
   fan3: '#E1EAF6',
   liftShadow: '0px 18px 40px -22px rgba(34,30,51,0.35)',
+  sheet: '#FFFFFF',
+  scrim: 'rgba(20,16,30,0.35)',
+  quiet: '#F1EEF4',
+  onDanger: '#FFFFFF',
+  pill: '#FFFFFF',
+  pillShadow: '0px 2px 8px rgba(34,30,51,0.1)',
+  glass: '#FBF9F6', // ponytail: no blur lib → solid bar, add @react-native-community/blur for real glass
 };
 
 export const qmDark: QMColors = {
@@ -184,7 +199,27 @@ export const qmDark: QMColors = {
   fan1: '#3A2426',
   fan3: '#1E2A3D',
   liftShadow: '0px 0px 0px 1px rgba(255,255,255,0.06)',
+  sheet: '#221D2E',
+  scrim: 'rgba(0,0,0,0.55)',
+  quiet: 'rgba(255,255,255,0.09)',
+  onDanger: '#221D2E',
+  pill: '#2E2840',
+  pillShadow: '0px 0px 0px 1px rgba(255,255,255,0.06)',
+  glass: '#14111B',
 };
+
+/** Mix two #RRGGBB colours: `t` = share of `a` (canvas `color-mix(in srgb, a t%, b)`). */
+export function mixHex(a: string, b: string, t: number): string {
+  const ch = (h: string, i: number) => parseInt(h.slice(1 + i * 2, 3 + i * 2), 16);
+  const out = [0, 1, 2].map(i => Math.round(ch(a, i) * t + ch(b, i) * (1 - t)));
+  return '#' + out.map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+/** User-picked accent → [tile bg, ink]. No colour → lilac/link (canvas `tint()`/`deep()`). */
+export function qmAccent(qm: QMColors, dark: boolean, hex?: string | null): [string, string] {
+  if (!hex || !/^#[0-9a-f]{6}$/i.test(hex)) return [qm.lilac, qm.link];
+  return [mixHex(hex, qm.surface, 0.16), dark ? mixHex(hex, '#FFFFFF', 0.55) : hex];
+}
 
 export const qmFont = {
   serif: 'Literata-Regular',
@@ -220,4 +255,13 @@ export const qmPresets = {
   qmTag:       { fontFamily: qmFont.bold,        fontSize: 11, lineHeight: 14 },
   qmTab:       { fontFamily: qmFont.medium,      fontSize: 11, lineHeight: 14 },
   qmTabOn:     { fontFamily: qmFont.bold,        fontSize: 11, lineHeight: 14 },
+  qmPageTitle: { fontFamily: qmFont.serifDisplay, fontSize: 30, lineHeight: 35, letterSpacing: -0.3 },
+  qmEmptyTitle:{ fontFamily: qmFont.serifMedium, fontSize: 23, lineHeight: 30 },
+  qmSheetTitle:{ fontFamily: qmFont.serifMedium, fontSize: 20, lineHeight: 26 },
+  qmBarTitle:  { fontFamily: qmFont.serifMedium, fontSize: 19, lineHeight: 24 },
+  qmRowTitle:  { fontFamily: qmFont.serifMedium, fontSize: 17, lineHeight: 22 },
+  qmRow:       { fontFamily: qmFont.medium,      fontSize: 16, lineHeight: 21 },
+  qmSegment:   { fontFamily: qmFont.semibold,    fontSize: 15, lineHeight: 20 },
+  qmBodyMd:    { fontFamily: qmFont.regular,     fontSize: 15, lineHeight: 22 },
+  qmChip:      { fontFamily: qmFont.semibold,    fontSize: 12, lineHeight: 15 },
 } as const;
