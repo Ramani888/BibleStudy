@@ -1,295 +1,228 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
+import Animated from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
-import { useNotes, useDeleteNote, useConfirmDialog, useSearchToggle } from '../../hooks';
+import { useNotes, useDeleteNote, useConfirmDialog } from '../../hooks';
 import { formatRelativeShort } from '../../utils/formatters';
-import { SearchBar } from '../../components/ui/SearchBar';
-import { Typography } from '../../components/ui/Typography';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { ConfirmDialog } from '../../components/feedback';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { PlusIcon, SearchIcon, SwapIcon, TrashIcon } from '../../components/icons';
-import Swipeable from 'react-native-gesture-handler/Swipeable';
+import { QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { DocIcon, InfoIcon, PencilIcon, SearchIcon, SortIcon, TrashIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
-import { useTranslation } from 'react-i18next';
-import { CARD_FILL_LIGHT, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
-
-const FAB_SIZE = 56;
-
-type SortOrder = 'newest' | 'oldest' | 'alpha';
-
-const SORT_LABELS: Record<SortOrder, string> = {
-  newest: 'Recent',
-  alpha: 'A–Z',
-  oldest: 'Oldest',
-};
-
-const formatRelativeDate = formatRelativeShort;
+import { radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'Notes'>;
+type SortOrder = 'newest' | 'alpha' | 'oldest';
+
+const SORT_NEXT: Record<SortOrder, SortOrder> = { newest: 'alpha', alpha: 'oldest', oldest: 'newest' };
+const SORT_KEY: Record<SortOrder, string> = { newest: 'sortRecent', alpha: 'sortAlpha', oldest: 'sortOldest' };
+const CHIP_H = 36;
+const DELETE_W = 84;
 
 export function NotesScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
-
-  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const { data: notes = [], isLoading, isFetching, error, refetch } = useNotes();
+  const { data: notes = [], isLoading, isFetching, isError, refetch } = useNotes();
   const deleteNote = useDeleteNote();
-  const { show: showConfirm, dialogProps } = useConfirmDialog();
+  const { show, dialogProps } = useConfirmDialog();
   const openRow = useRef<Swipeable | null>(null);
 
-  const cycleSortOrder = useCallback(() =>
-    setSortOrder(s => s === 'newest' ? 'alpha' : s === 'alpha' ? 'oldest' : 'newest'), []);
+  const q = search.trim().toLowerCase();
+  const sorted = useMemo(() => notes
+    .filter(n => (!q || n.title.toLowerCase().includes(q) || n.body.toLowerCase().includes(q)) && (!activeTag || n.tags.includes(activeTag)))
+    .sort((a, b) => {
+      if (sortOrder === 'alpha') return a.title.localeCompare(b.title);
+      const d = new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      return sortOrder === 'oldest' ? -d : d;
+    }), [notes, q, activeTag, sortOrder]);
 
-  const filtered = useMemo(
-    () => notes.filter(n => {
-      const matchesSearch = !search.trim() ||
-        n.title.toLowerCase().includes(search.toLowerCase()) ||
-        n.body.toLowerCase().includes(search.toLowerCase());
-      const matchesTag = !activeTag || n.tags.includes(activeTag);
-      return matchesSearch && matchesTag;
-    }),
-    [notes, search, activeTag],
-  );
-
-  const sorted = useMemo(
-    () => [...filtered].sort((a, b) => {
-      if (sortOrder === 'alpha')  return a.title.localeCompare(b.title);
-      if (sortOrder === 'oldest') return new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-      return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
-    }),
-    [filtered, sortOrder],
-  );
-
-  const hasTaggedNotes = notes.some(n => n.tags.length > 0);
-
+  // A topic filter whose last note was deleted would leave an empty list with no way back.
   useEffect(() => {
     if (activeTag && !notes.some(n => n.tags.includes(activeTag))) setActiveTag(null);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [notes]);
+  }, [notes, activeTag]);
 
   const handleDelete = useCallback((note: Note) => {
-    showConfirm({
-      title: t('profile:notes.deleteNoteTitle', 'Delete Note'),
-      message: t('profile:notes.deleteNoteMessage', { title: note.title, defaultValue: `Delete "${note.title}"? This cannot be undone.` }),
-      confirmLabel: t('common:actions.delete', 'Delete'),
+    openRow.current?.close();
+    show({
+      title: t('profile:qmNotes.deleteTitle'),
+      message: t('profile:qmNotes.deleteText', { title: note.title }),
+      confirmLabel: t('profile:qmNotes.delete'),
+      cancelLabel: t('profile:qmNotes.keep'),
       variant: 'danger',
       onConfirm: async () => {
         try {
           await deleteNote.mutateAsync(note.id);
-          Toast.show({ type: 'success', text1: t('profile:notes.noteDeleted', 'Note deleted') });
+          Toast.show({ type: 'success', text1: t('profile:qmNotes.deleted') });
         } catch (e) {
           Toast.show({ type: 'error', text1: getErrorMessage(e) });
         }
       },
     });
-  }, [showConfirm, deleteNote, t]);
+  }, [show, deleteNote, t]);
 
-  const renderItem = useCallback(({ item }: { item: Note }) => (
-    <Swipeable
-      renderRightActions={() => (
-        <Pressable style={[styles.deleteAction, { backgroundColor: colors.alert }]} onPress={() => handleDelete(item)}>
-          <TrashIcon size={20} color={palette.white} />
-        </Pressable>
-      )}
-      onSwipeableOpen={(_, swipeable) => {
-        if (openRow.current && openRow.current !== swipeable) {
-          openRow.current.close();
-        }
-        openRow.current = swipeable;
-      }}
-    >
-      <Pressable
-        style={({ pressed }) => [styles.noteCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.noteCardPressed]}
-        onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
-      >
-        <View style={styles.noteHeader}>
-          <Typography preset="label" style={styles.noteTitle} numberOfLines={1}>
-            {item.title}
-          </Typography>
-          <Typography preset="caption" color={colors.textDisabled}>
-            {formatRelativeDate(item.updatedAt)}
-          </Typography>
-        </View>
-        <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>
-          {item.body}
-        </Typography>
-        {item.tags.length > 0 && (
-          <View style={styles.tagRow}>
-            {item.tags.map(tag => (
-              <View key={tag} style={[styles.tagPill, { borderColor: colors.accent, backgroundColor: colors.accentSoft }]}>
-                <Typography preset="caption" color={colors.accent}>{tag}</Typography>
+  const renderItem = useCallback(({ item, index }: { item: Note; index: number }) => {
+    let self: Swipeable | null = null;
+    return (
+      <Animated.View entering={qmRowEnter(index)} style={[styles.cell, { backgroundColor: qm.error }]}>
+        <Swipeable
+          ref={r => { self = r; }}
+          onSwipeableOpen={() => {
+            if (openRow.current && openRow.current !== self) openRow.current.close();
+            openRow.current = self;
+          }}
+          renderRightActions={() => (
+            <Pressable onPress={() => handleDelete(item)} style={({ pressed }) => [styles.delete, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('profile:qmNotes.delete')}>
+              <TrashIcon size={20} color={qm.onDanger} />
+              <Typography preset="qmChip" color={qm.onDanger}>{t('profile:qmNotes.delete')}</Typography>
+            </Pressable>
+          )}
+        >
+          <AnimatedPressable
+            scaleTo={0.99}
+            onPress={() => navigation.navigate('NoteEditor', { noteId: item.id })}
+            style={[styles.card, { backgroundColor: qm.surface }]}
+            accessibilityRole="button"
+            accessibilityLabel={item.title}
+          >
+            <View style={styles.cardHead}>
+              <Typography preset="qmRowTitle" color={qm.ink} numberOfLines={2} style={styles.flex}>{item.title}</Typography>
+              <Typography preset="qmFine" color={qm.muted} numberOfLines={1} style={styles.when}>{formatRelativeShort(item.updatedAt)}</Typography>
+            </View>
+            <Typography preset="qmBody" color={qm.body} numberOfLines={2} style={styles.body}>{item.body}</Typography>
+            {item.tags.length > 0 && (
+              <View style={styles.tags}>
+                {item.tags.map(tag => (
+                  <View key={tag} style={[styles.tag, { backgroundColor: qm.goldBg }]}>
+                    <Typography preset="qmChip" color={qm.goldText}>{tag}</Typography>
+                  </View>
+                ))}
               </View>
-            ))}
-          </View>
-        )}
-      </Pressable>
-    </Swipeable>
-  ), [navigation, handleDelete, colors, isDark]);
+            )}
+          </AnimatedPressable>
+        </Swipeable>
+      </Animated.View>
+    );
+  }, [qm, navigation, handleDelete, t]);
 
-  if (error) return <ErrorState message={t('profile:notes.couldNotLoadNotes', 'Could not load notes')} onRetry={refetch} />;
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <View style={styles.topRow}>
+        <QMBackButton onPress={navigation.goBack} label={t('profile:qmNotes.back')} />
+        <AnimatedPressable
+          scaleTo={0.96}
+          onPress={() => setSortOrder(s => SORT_NEXT[s])}
+          style={[styles.sort, { backgroundColor: qm.field }]}
+          accessibilityRole="button"
+          accessibilityLabel={t('profile:qmNotes.sortA11y', { label: t(`profile:qmNotes.${SORT_KEY[sortOrder]}`) })}
+        >
+          <SortIcon size={14} color={qm.body} strokeWidth={2.2} />
+          <Typography preset="qmChip" color={qm.body}>{t(`profile:qmNotes.${SORT_KEY[sortOrder]}`)}</Typography>
+        </AnimatedPressable>
+      </View>
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmNotes.title')}</Typography>
+      {notes.length > 0 && (
+        <>
+          <QMSearchField value={search} onChangeText={setSearch} placeholder={t('profile:qmNotes.search')} />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipScroll} contentContainerStyle={styles.chips}>
+            {[null, ...NOTE_PREDEFINED_TAGS].map(tag => {
+              const on = activeTag === tag;
+              return (
+                <AnimatedPressable
+                  key={tag ?? 'all'}
+                  scaleTo={0.96}
+                  onPress={() => setActiveTag(tag === null || on ? null : tag)}
+                  style={[styles.chip, { backgroundColor: on ? qm.violet : qm.surface, boxShadow: on ? undefined : qm.cardShadow }]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                >
+                  <Typography preset="qmLink" color={on ? qm.onViolet : qm.body}>{tag ?? t('profile:qmNotes.all')}</Typography>
+                </AnimatedPressable>
+              );
+            })}
+          </ScrollView>
+        </>
+      )}
+      <View style={styles.listGap} />
+    </View>
+  );
+
+  let empty: React.ReactElement | null = null;
+  if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
+  else if (isError) empty = <QMEmpty icon={InfoIcon} title={t('profile:qmNotes.loadFailed')} action={{ label: t('profile:qmNotes.tryAgain'), onPress: () => refetch() }} />;
+  else if (notes.length === 0) empty = <QMEmpty icon={DocIcon} title={t('profile:qmNotes.emptyTitle')} text={t('profile:qmNotes.emptyText')} />;
+  else {
+    empty = (
+      <QMEmpty
+        icon={SearchIcon}
+        title={t('profile:qmNotes.noMatchTitle', { query: search.trim() || activeTag || '' })}
+        text={t('profile:qmNotes.noMatchText')}
+        action={{ label: t('profile:qmNotes.clear'), onPress: () => { setSearch(''); setActiveTag(null); } }}
+      />
+    );
+  }
 
   return (
-    <Screen
-      header={
-        <ScreenHeader
-          title={t('profile:notes.title')}
-          onBack={() => navigation.goBack()}
-          right={
-            <View style={styles.headerActions}>
-              <Pressable onPress={toggleSearch} hitSlop={8}>
-                <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
-              </Pressable>
-              <Pressable style={styles.sortBtn} onPress={cycleSortOrder} hitSlop={8}>
-                <SwapIcon size={16} color={colors.textSecondary} />
-                <Typography preset="caption" color={colors.textSecondary}>
-                  {t(`common:sort.${sortOrder === 'newest' ? 'recent' : sortOrder}`, SORT_LABELS[sortOrder])}
-                </Typography>
-              </Pressable>
-            </View>
-          }
-        />
-      }
-    >
-      <View>
-      {searchVisible && (
-        <View style={styles.searchWrap}>
-          <SearchBar
-            placeholder={t('profile:notes.searchPlaceholder', 'Search notes…')}
-            value={search}
-            onChangeText={setSearch}
-            autoFocus
-          />
-        </View>
-      )}
-
-      {hasTaggedNotes && (
-        <View style={styles.tagBarWrap}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
-            <Pressable
-              style={[styles.tagFilterPill, { borderColor: !activeTag ? colors.accent : colors.border, backgroundColor: !activeTag ? colors.accentSoft : colors.background }]}
-              onPress={() => setActiveTag(null)}
-            >
-              <Typography preset="caption" color={!activeTag ? colors.accent : colors.textSecondary}>{t('common:filter.all', 'All')}</Typography>
-            </Pressable>
-            {NOTE_PREDEFINED_TAGS.map(tag => (
-              <Pressable
-                key={tag}
-                style={[styles.tagFilterPill, { borderColor: activeTag === tag ? colors.accent : colors.border, backgroundColor: activeTag === tag ? colors.accentSoft : colors.background }]}
-                onPress={() => setActiveTag(prev => (prev === tag ? null : tag))}
-              >
-                <Typography preset="caption" color={activeTag === tag ? colors.accent : colors.textSecondary}>
-                  {tag}
-                </Typography>
-              </Pressable>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-      </View>
-
-      <View style={{ flex: 1 }}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={sorted}
+        data={isError ? [] : sorted}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />
-        }
-        ListEmptyComponent={
-          isLoading ? null : (
-            <EmptyState
-                title={t('profile:notes.noNotes', 'No notes yet')}
-                subtitle={t('profile:notes.noNotesSub', 'Tap + to write your first Bible study note')}
-              />
-          )
-        }
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        ListFooterComponent={sorted.length > 0
+          ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.hint}>{t('profile:qmNotes.swipeHint')}</Typography>
+          : null}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
-
-      </View>
-
-      <Pressable
-        style={({ pressed }) => [styles.fab, { backgroundColor: colors.accent }, pressed && styles.fabPressed]}
-        onPress={() => navigation.navigate('NoteEditor', {})}
-      >
-        <PlusIcon size={28} color={colors.textOnAccent} />
-      </Pressable>
-
-      <ConfirmDialog {...dialogProps} />
-    </Screen>
+      {!isLoading && !isError && (
+        <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+          <QMButton icon={PencilIcon} label={t('profile:qmNotes.write')} onPress={() => navigation.navigate('NoteEditor', {})} />
+        </View>
+      )}
+      <QMConfirmDialog {...dialogProps} />
+    </View>
   );
 }
 
+function Separator() {
+  return <View style={styles.sep} />;
+}
+
 const styles = StyleSheet.create({
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  sortBtn: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  searchWrap: {
-    marginHorizontal: layout.screenPaddingH,
-    marginTop: spacing.sm,
-    marginBottom: spacing.xs,
-  },
-  tagBarWrap: { height: 40, marginBottom: spacing.sm },
-  tagBar: { paddingHorizontal: layout.screenPaddingH, alignItems: 'center', gap: spacing.sm },
-  tagFilterPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
-  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.xxxl, flexGrow: 1, paddingTop: spacing.md, gap: spacing.lg },
-  noteCard: {
-    borderRadius: layout.cardRadiusSm,
-    padding: spacing.lg,
-    gap: spacing.xs,
-  },
-  noteCardPressed: { opacity: 0.7 },
-  noteHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.sm,
-  },
-  noteTitle: { flex: 1, fontWeight: fontWeights.semiBold },
-  tagRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, marginTop: spacing.xs },
-  tagPill: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
-  fab: {
-    position: 'absolute',
-    bottom: spacing.xxxl,
-    right: layout.screenPaddingH,
-    width: FAB_SIZE,
-    height: FAB_SIZE,
-    borderRadius: FAB_SIZE / 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fabPressed: { opacity: 0.85 },
-  deleteAction: {
-    width: 72,
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: layout.cardRadiusSm,
-    marginLeft: spacing.sm,
-  },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.7 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, flexGrow: 1 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  sort: { flexDirection: 'row', alignItems: 'center', gap: spacing.s6, height: 38, paddingHorizontal: spacing.md, borderRadius: radius.pill },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.md },
+  chipScroll: { marginTop: spacing.md, marginHorizontal: -spacing.xl },
+  chips: { gap: spacing.sm, paddingHorizontal: spacing.xl, paddingVertical: spacing.xs },
+  chip: { height: CHIP_H, paddingHorizontal: spacing.s14, borderRadius: radius.pill, justifyContent: 'center' },
+  listGap: { height: spacing.md },
+  loading: { marginTop: spacing.xxxl },
+  cell: { borderRadius: radius.r20, overflow: 'hidden' },
+  card: { padding: spacing.lg },
+  cardHead: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s10 },
+  when: { marginTop: spacing.s3 },
+  body: { marginTop: spacing.s6 },
+  tags: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.s6, marginTop: spacing.s10 },
+  tag: { borderRadius: radius.pill, paddingVertical: spacing.xs, paddingHorizontal: spacing.s10 },
+  delete: { width: DELETE_W, alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
+  sep: { height: spacing.s10 },
+  hint: { marginTop: spacing.lg, marginHorizontal: spacing.s6 },
+  footer: { paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
 });

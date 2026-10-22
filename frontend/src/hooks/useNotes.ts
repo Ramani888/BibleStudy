@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { notesApi } from '../api';
-import type { CreateNotePayload, UpdateNotePayload } from '../types';
+import type { CreateNotePayload } from '../types';
 
 export function useNotes() {
   return useQuery({
@@ -17,21 +17,16 @@ export function useNote(id: string) {
   });
 }
 
-export function useCreateNote() {
+/** Create (no id yet) or update one note. The id is passed per call so an autosave right after the
+ * first create updates that note instead of creating a second one. */
+export function useSaveNote() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (payload: CreateNotePayload) => notesApi.create(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['notes'] }),
-  });
-}
-
-export function useUpdateNote(id: string) {
-  const qc = useQueryClient();
-  return useMutation({
-    mutationFn: (payload: UpdateNotePayload) => notesApi.update(id, payload),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ['notes'] });
-      qc.invalidateQueries({ queryKey: ['notes', id] });
+    mutationFn: ({ id, payload }: { id?: string; payload: CreateNotePayload }) =>
+      id ? notesApi.update(id, payload) : notesApi.create(payload),
+    onSuccess: note => {
+      qc.invalidateQueries({ queryKey: ['notes'], exact: true });
+      qc.setQueryData(['notes', note.id], note);
     },
   });
 }
