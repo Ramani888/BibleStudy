@@ -17,9 +17,9 @@ export function Typography({
   children,
   ...rest
 }: TypographyProps) {
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   // Default to the themed primary text color so text is dark-mode aware.
-  const resolved = color ?? colors.textPrimary;
+  const resolved = color ?? qm.ink;
   return (
     <Text
       style={[textPresets[preset], { color: resolved }, align ? { textAlign: align } : null, style]}

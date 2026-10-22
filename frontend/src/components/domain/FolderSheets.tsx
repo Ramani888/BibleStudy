@@ -4,9 +4,8 @@ import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
-import { QMColorSwatches, QMSheet, type QMSheetAction } from '../qm';
+import { PRESET_COLORS, QMColorSwatches, QMSheet, type QMSheetAction } from '../qm';
 import { AnimatedPressable, Typography } from '../ui';
-import { PRESET_COLORS } from '../ui/ColorPicker';
 import { FolderIcon, FolderOffIcon } from '../icons';
 import { useFolders, useUpdateSet, type useFolderModal } from '../../hooks';
 import { getErrorMessage } from '../../api';

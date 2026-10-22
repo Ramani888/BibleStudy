@@ -208,6 +208,12 @@ export const QMFolderTile = React.memo(function QMFolderTile({ name: folderName,
 });
 
 // ─── Colour swatches ("No colour" + presets, 7 per row) ──────────────────────
+export const PRESET_COLORS = [
+  '#7C3AED', '#3B82F6', '#0D9488', '#16A34A',
+  '#CA8A04', '#EA580C', '#DC2626', '#DB2777',
+  '#4F46E5', '#0891B2', '#65A30D', '#E11D48',
+] as const;
+
 export function QMColorSwatches({ value, onChange, presets }: {
   value: string | null; onChange: (c: string | null) => void; presets: readonly string[];
 }) {

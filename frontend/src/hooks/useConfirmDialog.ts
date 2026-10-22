@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import type { ConfirmDialogProps } from '../components/feedback/ConfirmDialog';
+import type { ConfirmDialogProps } from '../components/qm/QMConfirmDialog';
 
 interface ConfirmDialogOptions {
   title: string;

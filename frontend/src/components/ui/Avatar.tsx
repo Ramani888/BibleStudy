@@ -26,7 +26,7 @@ function getInitials(name?: string): string {
 }
 
 export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const dimension = sizeMap[size];
   // ponytail: 18 is off-grid (no fontSizes token); lg=3xl, sm=fontSizes.sm
   const fontSize = size === 'lg' ? fontSizes['3xl'] : size === 'md' ? 18 : fontSizes.sm;
@@ -41,16 +41,16 @@ export function Avatar({ uri, name, size = 'md', style }: AvatarProps) {
     return (
       <Image
         source={{ uri }}
-        style={[{ backgroundColor: colors.gray200 }, circleStyle as ImageStyle, style as ImageStyle]}
+        style={[{ backgroundColor: qm.field }, circleStyle as ImageStyle, style as ImageStyle]}
       />
     );
   }
 
   return (
-    <View style={[styles.fallback, { backgroundColor: colors.accent }, circleStyle, style]}>
+    <View style={[styles.fallback, { backgroundColor: qm.violet }, circleStyle, style]}>
       <Typography
         preset="label"
-        color={colors.textOnAccent}
+        color={qm.onViolet}
         style={{ fontSize, lineHeight: fontSize * lineHeights.tight }}
       >
         {getInitials(name)}

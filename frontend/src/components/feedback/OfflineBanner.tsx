@@ -12,7 +12,7 @@ import { Typography } from '../ui';
 // as "offline" rather than "broken".
 export function OfflineBanner() {
   const { t } = useTranslation('common');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const insets = useSafeAreaInsets();
   const [offline, setOffline] = useState(false);
 
@@ -24,8 +24,8 @@ export function OfflineBanner() {
   if (!offline) return null;
 
   return (
-    <View style={[styles.bar, { backgroundColor: colors.warning, paddingTop: insets.top + spacing.xs }]}>
-      <Typography preset="caption" align="center" color={colors.textOnAccent}>
+    <View style={[styles.bar, { backgroundColor: qm.goldBg, paddingTop: insets.top + spacing.xs }]}>
+      <Typography preset="caption" align="center" color={qm.goldText}>
         {t('common:status.offline', 'You appear to be offline')}
       </Typography>
     </View>

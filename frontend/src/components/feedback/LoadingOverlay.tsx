@@ -10,11 +10,11 @@ interface LoadingOverlayProps {
 }
 
 export function LoadingOverlay({ visible }: LoadingOverlayProps) {
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   return (
     <Modal transparent visible={visible} animationType="fade">
-      <View style={[styles.backdrop, { backgroundColor: colors.overlay }]}>
-        <View style={[styles.box, { backgroundColor: colors.surface }]}>
+      <View style={[styles.backdrop, { backgroundColor: qm.scrim }]}>
+        <View style={[styles.box, { backgroundColor: qm.sheet }]}>
           <LottieView
             source={LOADING_ANIMATION}
             autoPlay

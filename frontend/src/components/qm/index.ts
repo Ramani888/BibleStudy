@@ -11,8 +11,9 @@ export { QMIconSeal, QMPasswordRules, QMResendRow, useResendTimer } from './QMAu
 export { QMSheet } from './QMSheet';
 export type { QMSheetAction } from './QMSheet';
 export { QMConfirmDialog } from './QMConfirmDialog';
+export type { ConfirmDialogProps } from './QMConfirmDialog';
 export {
-  QMSegmented, QMSearchField, QMEmpty, QMAddButton, QMSortChip, QMSetRow, QMFolderTile, QMColorSwatches, QMStickyBar, qmRowEnter,
+  QMSegmented, QMSearchField, QMEmpty, QMAddButton, QMSortChip, QMSetRow, QMFolderTile, QMColorSwatches, PRESET_COLORS, QMStickyBar, qmRowEnter,
 } from './QMListBits';
 export { QMModalScreen } from './QMModalScreen';
 export { QMScoreRing } from './QMScoreRing';

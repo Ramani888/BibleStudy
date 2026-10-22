@@ -1,5 +1,5 @@
 import type { TFunction } from 'i18next';
-import type { QMColors, ThemeColors } from '../../theme';
+import type { QMColors } from '../../theme';
 import type { SummaryItem } from '../../types';
 import type { GeneratedQuizCard, QuizStackParamList } from '../../navigation/types';
 
@@ -56,11 +56,6 @@ export const MODE_NAMES: Record<string, string> = {
   chunks: 'Reorder',
   read: 'Read',
 };
-
-/** Score → semantic color: ≥80 success, ≥50 warning, else alert. */
-export function scoreColor(pct: number, colors: ThemeColors): string {
-  return pct >= 80 ? colors.success : pct >= 50 ? colors.warning : colors.alert;
-}
 
 /** Quiet-morning score tile [bg, ink]: ≥80 leaf, ≥50 gold, else warm; unscored = field. */
 export function qmScoreTone(pct: number | null, qm: QMColors): [string, string] {

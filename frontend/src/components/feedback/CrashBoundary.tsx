@@ -37,9 +37,9 @@ export class CrashBoundary extends Component<CrashBoundaryProps, CrashBoundarySt
 
 function CrashFallback({ onRetry }: { onRetry: () => void }) {
   const { t } = useTranslation('common');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
+    <View style={[styles.root, { backgroundColor: qm.bg }]}>
       <ErrorState message={t('common:status.crashed')} onRetry={onRetry} />
     </View>
   );

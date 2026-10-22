@@ -1,7 +1,7 @@
 /**
  * SVG icon set — hand-written `react-native-svg` components (no icon-font
  * library). One component per icon, uniform 24×24 viewBox, outline style with a
- * 1.8 stroke. Pass `color` from the theme (e.g. `color={colors.accent}`).
+ * 1.8 stroke. Pass `color` from the theme (e.g. `color={qm.violet}`).
  *
  * Paths are the standard Lucide (ISC-licensed) outlines.
  */
@@ -19,7 +19,7 @@ export interface IconProps {
 export type IconComponent = React.FC<IconProps>;
 
 // Neutral mid-gray fallback (visible on both light + dark) for icons rendered
-// without an explicit color. Prefer passing color={colors.*} from the theme.
+// without an explicit color. Prefer passing color={qm.*} from the theme.
 const DEFAULT_COLOR = palette.slate500;
 
 /** Shared wrapper for stroke-based outline icons. */

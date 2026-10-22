@@ -6,9 +6,8 @@ import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
 import { ChevronRightIcon, FolderIcon, FolderOffIcon } from '../../../components/icons';
-import { QMColorSwatches, QMFormField, QMSegmented, QMSheet, type QMSheetAction } from '../../../components/qm';
+import { PRESET_COLORS, QMColorSwatches, QMFormField, QMSegmented, QMSheet, type QMSheetAction } from '../../../components/qm';
 import { Typography } from '../../../components/ui';
-import { PRESET_COLORS } from '../../../components/ui/ColorPicker';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
 import { getErrorMessage } from '../../../api';

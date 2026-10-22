@@ -4,12 +4,23 @@ import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { AnimatedPressable, Typography } from '../ui';
-import type { ConfirmDialogProps } from '../feedback/ConfirmDialog';
 import { useTheme, spacing, radius } from '../../theme';
 
 const BTN_H = 52;
 
-/** Quiet-morning centred confirm (canvas `k-dlg`). Drop-in for `ConfirmDialog` / `useConfirmDialog().dialogProps`. */
+export interface ConfirmDialogProps {
+  visible: boolean;
+  title: string;
+  message: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: 'danger' | 'default';
+  loading?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+/** Quiet-morning centred confirm (canvas `k-dlg`). Takes `useConfirmDialog().dialogProps`. */
 export function QMConfirmDialog({
   visible, title, message, confirmLabel, cancelLabel, variant = 'default', loading = false, onConfirm, onCancel,
 }: ConfirmDialogProps) {

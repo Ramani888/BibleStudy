@@ -1,7 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, ViewStyle } from 'react-native';
 import { spacing, useTheme } from '../../theme';
-import { Button, Typography } from '../ui';
+import { Typography } from '../ui';
+import { QMButton } from '../qm';
 
 interface ErrorStateProps {
   message?: string;
@@ -17,22 +18,22 @@ export function ErrorState({
   style,
 }: ErrorStateProps) {
   const { t } = useTranslation('common');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   return (
     <View style={[styles.container, style]}>
-      <Typography preset="h4" align="center" color={colors.textPrimary}>
+      <Typography preset="h4" align="center" color={qm.ink}>
         {t('common:status.error', 'Oops!')}
       </Typography>
       <Typography
         preset="body"
         align="center"
-        color={colors.textSecondary}
+        color={qm.muted}
         style={styles.message}
       >
         {message ?? t('common:status.error')}
       </Typography>
       {onRetry && (
-        <Button label={t('common:actions.retry', 'Try Again')} variant="outline" onPress={onRetry} style={styles.btn} />
+        <QMButton label={t('common:actions.retry', 'Try Again')} onPress={onRetry} style={styles.btn} />
       )}
     </View>
   );
