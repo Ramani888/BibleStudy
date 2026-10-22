@@ -22,7 +22,7 @@ function AchievementGate() {
 
 export function AppNavigator() {
   const { t } = useTranslation('navigation');
-  const { colors, qm } = useTheme();
+  const { qm } = useTheme();
 
   useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
   useSystemBars(qm.bg); // nav bar blends with the strip under the floating tab bar
@@ -33,7 +33,7 @@ export function AppNavigator() {
       tabBar={props => <FloatingTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        sceneStyle: { backgroundColor: colors.background },
+        sceneStyle: { backgroundColor: qm.bg },
       }}
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: t('tabs.home') }} />

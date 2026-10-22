@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator<QuizStackParamList>();
 
 export function QuizNavigator() {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { qm } = useTheme();
 
   // Reset the Quiz stack to its root only when the user actually switches to
   // another tab — not when a root-stack screen (Quiz, QuizSummary) overlays App.
@@ -35,7 +35,7 @@ export function QuizNavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
       <Stack.Screen name="QuizHub" component={QuizHubScreen} />
       <Stack.Screen name="QuizDetail" component={QuizDetailScreen} />
       <Stack.Screen name="QuizSetup" component={QuizSetupScreen} />

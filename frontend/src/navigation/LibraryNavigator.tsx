@@ -20,7 +20,7 @@ const Stack = createNativeStackNavigator<LibraryStackParamList>();
 
 export function LibraryNavigator() {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { qm } = useTheme();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -40,7 +40,7 @@ export function LibraryNavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
       <Stack.Screen name="Library" component={LibraryScreen} />
       <Stack.Screen name="FolderDetail" component={FolderDetailScreen} />
       <Stack.Screen name="SetDetail" component={SetDetailScreen} />

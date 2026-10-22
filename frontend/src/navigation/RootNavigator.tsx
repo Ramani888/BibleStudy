@@ -37,14 +37,14 @@ function SplashScreen() {
 export function RootNavigator() {
   const isAuthenticated = useAuthStore(s => s.isAuthenticated);
   const isInitialized = useAuthStore(s => s.isInitialized);
-  const { colors, name } = useTheme();
+  const { qm, name } = useTheme();
 
   // Theme the navigation container so scene transitions never flash the
   // library default (white) background — matters most in dark mode.
   const navTheme = useMemo(() => {
     const base = name === 'dark' ? DarkTheme : DefaultTheme;
-    return { ...base, colors: { ...base.colors, background: colors.background, card: colors.background } };
-  }, [name, colors.background]);
+    return { ...base, colors: { ...base.colors, background: qm.bg, card: qm.bg } };
+  }, [name, qm.bg]);
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
   // Onboarding's last step decides where auth opens: "Create my account" → Register.
@@ -116,7 +116,7 @@ export function RootNavigator() {
   return (
     <NavigationContainer ref={navigationRef} theme={navTheme} onReady={logScreen} onStateChange={logScreen}>
       {isAuthenticated ? (
-        <RootStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+        <RootStack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
           <RootStack.Screen name="App" component={AppNavigator} />
           <RootStack.Screen
             name="Quiz"

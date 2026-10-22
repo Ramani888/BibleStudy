@@ -11,7 +11,7 @@ const Stack = createNativeStackNavigator<AIStackParamList>();
 
 export function AINavigator() {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { qm } = useTheme();
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('blur', () => {
@@ -29,7 +29,7 @@ export function AINavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
       <Stack.Screen name="AIConsent" component={AIConsentScreen} />
       <Stack.Screen name="AIChat" component={AIChatScreen} />
       <Stack.Screen name="ChatHistory" component={ChatHistoryScreen} />

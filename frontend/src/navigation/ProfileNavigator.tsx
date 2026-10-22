@@ -28,9 +28,9 @@ import { PrivacyPolicyScreen } from '../screens/profile/PrivacyPolicyScreen';
 const Stack = createNativeStackNavigator<ProfileStackParamList>();
 
 export function ProfileNavigator() {
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
       <Stack.Screen name="Profile"         component={ProfileScreen}         />
       <Stack.Screen name="EditProfile"     component={EditProfileScreen}     />
       <Stack.Screen name="ChangePassword"  component={ChangePasswordScreen}  />
