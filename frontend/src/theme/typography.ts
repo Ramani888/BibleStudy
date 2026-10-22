@@ -1,4 +1,5 @@
 import { Platform, TextStyle } from 'react-native';
+import { qmPresets } from './quietMorning';
 
 /**
  * Typography — Meditation project (exact) + BibleStudy textPresets.
@@ -80,6 +81,7 @@ export const textPresets = {
   caption:  { fontFamily: fontFamily.regular,  fontSize: fontSizes.xs,    fontWeight: fontWeights.regular,  lineHeight: fontSizes.xs   * lh.normal },
   button:   { fontFamily: fontFamily.semibold, fontSize: fontSizes.md,    fontWeight: fontWeights.semiBold, lineHeight: fontSizes.md   * lh.tight },
   buttonSm: { fontFamily: fontFamily.semibold, fontSize: fontSizes.sm,    fontWeight: fontWeights.semiBold, lineHeight: fontSizes.sm   * lh.tight },
+  ...qmPresets,
 } as const;
 
 export type TextPreset = keyof typeof textPresets;

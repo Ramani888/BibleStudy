@@ -1,6 +1,7 @@
 import { useColorScheme } from 'react-native';
 import { useMemo } from 'react';
 import { darkColors, lightColors } from './colors';
+import { qmDark, qmLight } from './quietMorning';
 import { spacing } from './spacing';
 import { radius } from './radius';
 import { typography, textPresets } from './typography';
@@ -28,6 +29,7 @@ export function useTheme(): Theme {
       typography,
       textPresets,
       layout,
+      qm:         name === 'dark' ? qmDark : qmLight,
     }),
     [name],
   );

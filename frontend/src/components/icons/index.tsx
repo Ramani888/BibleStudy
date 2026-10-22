@@ -537,3 +537,55 @@ export const TimerIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWi
     <Circle cx="12" cy="14" r="8" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+// ─── Quiet-morning canvas icons (redesign v93) ────────────────────────────────
+
+export const AskIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8.5L6 20.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BellQMIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M6 16V11a6 6 0 0 1 12 0v5l1.5 2h-15zM10 20.5a2 2 0 0 0 4 0" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Leaf with stem. `filled` = solid leaf (streak line). */
+export const LeafIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8, filled }) => (
+  <Outline size={size}>
+    <Path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14z" fill={filled ? color : 'none'} {...stroke(color, strokeWidth)} />
+    <Path d="M5 19l7-7" {...stroke(filled ? palette.white : color, strokeWidth)} />
+  </Outline>
+);
+
+export const DocIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ImageIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 5h16v14H4zM4 15l4-4 4 4 3-3 5 5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ExploreIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17M15.5 8.5l-2 5-5 2 2-5z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const LeaderboardIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M6 20V12M12 20V5M18 20v-6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const FriendsIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M16 19v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V19M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M17 4a3.5 3.5 0 0 1 0 7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);

@@ -2,6 +2,22 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "assets/fonts/Figtree-Bold.ttf",
+      "sha1": "b9a14d612fe75e5a760dbbc387dce3d2b97df5b2"
+    },
+    {
+      "path": "assets/fonts/Figtree-Medium.ttf",
+      "sha1": "2bf3ecc0d70eac5a4c3bb960ad5bf29b17681d6b"
+    },
+    {
+      "path": "assets/fonts/Figtree-Regular.ttf",
+      "sha1": "c63f9140747d5d98a1825dca595434bde207a376"
+    },
+    {
+      "path": "assets/fonts/Figtree-SemiBold.ttf",
+      "sha1": "214ba3ef2078a3d4bd634cd12ee9058461463110"
+    },
+    {
       "path": "assets/fonts/Inter-Bold.ttf",
       "sha1": "9461e7c083137c2abe6d198f784fb0d341a527a1"
     },
@@ -16,6 +32,18 @@
     {
       "path": "assets/fonts/Inter-SemiBoldItalic.ttf",
       "sha1": "45b62a0ed702c13cb3fa9ccb02e2aec3eab24331"
+    },
+    {
+      "path": "assets/fonts/Literata-Medium.ttf",
+      "sha1": "b6559632bf9f6d27ab396e2c60c234bba98146d2"
+    },
+    {
+      "path": "assets/fonts/Literata-Regular.ttf",
+      "sha1": "3ed541aa21f8ca3fa13de643a397a54f81765fc4"
+    },
+    {
+      "path": "assets/fonts/Literata36pt-Medium.ttf",
+      "sha1": "f5199c72bb35dcf0bbe721bebd340d1584e2b238"
     }
   ]
 }

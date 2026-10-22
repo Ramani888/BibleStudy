@@ -19,10 +19,17 @@
 		<string>Octicons.ttf</string>
 		<string>SimpleLineIcons.ttf</string>
 		<string>Zocial.ttf</string>
-		<string>Inter-SemiBoldItalic.ttf</string>
+		<string>Figtree-Bold.ttf</string>
+		<string>Figtree-Medium.ttf</string>
+		<string>Figtree-Regular.ttf</string>
+		<string>Figtree-SemiBold.ttf</string>
 		<string>Inter-Bold.ttf</string>
 		<string>Inter-Regular.ttf</string>
 		<string>Inter-SemiBold.ttf</string>
+		<string>Inter-SemiBoldItalic.ttf</string>
+		<string>Literata-Medium.ttf</string>
+		<string>Literata-Regular.ttf</string>
+		<string>Literata36pt-Medium.ttf</string>
 	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
@@ -63,9 +70,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<!-- DEV ONLY: allow plain-HTTP to the local backend on the Mac's LAN IP.
-		     Scoped to a private IP — prod (api.getverdance.com) is HTTPS and unaffected.
-		     Update this IP if your Mac's LAN address changes. -->
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>192.168.1.4</key>

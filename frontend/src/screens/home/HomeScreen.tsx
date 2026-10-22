@@ -4,32 +4,27 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import LinearGradient from 'react-native-linear-gradient';
+import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
-import { Avatar, Button, Spacer, Typography, AnimatedPressable } from '../../components/ui';
-import { SetCard } from '../../components/domain';
+import { Avatar, Typography, AnimatedPressable } from '../../components/ui';
 import {
-  FlameIcon,
-  BellIcon,
-  ArrowRightIcon,
+  AskIcon,
+  BellQMIcon,
   ChevronRightIcon,
   CloseIcon,
-  SparklesIcon,
-  SearchIcon,
-  LibraryIcon,
+  LeafIcon,
   type IconComponent,
 } from '../../components/icons';
 import { useAuthStore } from '../../store';
-import { useHomeNavigation } from '../../hooks/useHomeNavigation';
+import { useHomeNavigation, type QuickTint } from '../../hooks/useHomeNavigation';
 import { requestReviewOnce } from '../../utils/requestReview';
 import {
   useSets,
   usePublicSets,
   useFriendsSets,
   useFriendsActivityFeed,
-  useFriends,
-  useFolders,
-  useNotes,
-  useCreditBalance,
   useAutoDailyClaim,
   useStreak,
   useReferral,
@@ -40,7 +35,7 @@ import {
   TYPE_TO_PREF,
 } from '../../hooks';
 import { useTranslation } from 'react-i18next';
-import { useTheme, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
+import { useTheme, spacing, radius, type QMColors } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import type { AppTabParamList } from '../../navigation/types';
@@ -49,6 +44,12 @@ import type { Activity } from '../../types/activities.types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
 
+const FOG_HEIGHT = 420;   // ponytail: canvas fog layer height
+const MINI_CARD_W = 150;  // ponytail: canvas rail-card width
+const QUICK_TILE = 52;    // ponytail: canvas quick-action tile
+const HEADER_BTN = 44;    // canvas header button / avatar size
+const enter = (i: number) => FadeInUp.duration(320).delay(i * 40);
+
 function getGreeting(t: (key: string) => string): string {
   const h = new Date().getHours();
   if (h < 12) return t('greeting.morning');
@@ -56,96 +57,126 @@ function getGreeting(t: (key: string) => string): string {
   return t('greeting.evening');
 }
 
-// ─── Sticky Header ─────────────────────────────────────────────────────────────
-const StickyHeader = React.memo(function StickyHeader({ greeting, name, avatarUri, unread, onAI, onBell, onAvatar }: {
-  greeting: string; name: string; avatarUri?: string | null; unread: number;
-  onAI: () => void; onBell: () => void; onAvatar: () => void;
-}) {
-  const { t } = useTranslation('home');
-  const { colors } = useTheme();
+function tintFor(qm: QMColors, tint: QuickTint): [string, string] {
+  if (tint === 'leaf') return [qm.leafBg, qm.leaf];
+  if (tint === 'gold') return [qm.goldBg, qm.goldText];
+  return [qm.lilac, qm.link];
+}
+
+// ─── Page-top fog (soft lilac top-left + warm top-right) ───────────────────────
+const TopFog = React.memo(function TopFog({ qm }: { qm: QMColors }) {
   return (
-    <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      <Pressable style={({ pressed }) => [styles.headerLeft, pressed && styles.headerLeftPressed]} onPress={onAvatar} accessibilityRole="button" accessibilityLabel={t('a11y.goToProfile')}>
-        <Avatar uri={avatarUri} name={name} size="sm" />
-        <View style={styles.greetingCol}>
-          <Typography preset="caption" color={colors.textSecondary}>{greeting},</Typography>
-          <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{name}</Typography>
-        </View>
-      </Pressable>
-      <View style={styles.headerActions}>
-        <Pressable onPress={onAI} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel={t('a11y.aiChat')}>
-          <SparklesIcon size={20} color={colors.textPrimary} />
-        </Pressable>
-        <Pressable onPress={onBell} hitSlop={8} style={({ pressed }) => [styles.headerIconBtn, { backgroundColor: colors.surfaceMuted }, pressed && styles.headerIconPressed]} accessibilityRole="button" accessibilityLabel={t('a11y.notifications')}>
-          <BellIcon size={20} color={colors.textPrimary} />
-          {unread > 0 && (
-            <View style={[styles.bellBadge, { backgroundColor: colors.alert }]}>
-              <Typography preset="caption" color={colors.textOnAccent}>{unread > 9 ? '9+' : unread}</Typography>
-            </View>
-          )}
-        </Pressable>
-      </View>
-    </View>
+    <Svg pointerEvents="none" style={styles.fog} width="100%" height={FOG_HEIGHT}>
+      <Defs>
+        <RadialGradient id="fogL" cx="0%" cy="0%" fx="0%" fy="0%" rx="120%" ry="60%">
+          <Stop offset="0" stopColor={qm.fogLilac[0]} stopOpacity={qm.fogLilac[1]} />
+          <Stop offset="0.6" stopColor={qm.fogLilac[0]} stopOpacity={0} />
+        </RadialGradient>
+        <RadialGradient id="fogW" cx="100%" cy="0%" fx="100%" fy="0%" rx="90%" ry="50%">
+          <Stop offset="0" stopColor={qm.fogWarm[0]} stopOpacity={qm.fogWarm[1]} />
+          <Stop offset="0.6" stopColor={qm.fogWarm[0]} stopOpacity={0} />
+        </RadialGradient>
+      </Defs>
+      <Rect width="100%" height="100%" fill="url(#fogL)" />
+      <Rect width="100%" height="100%" fill="url(#fogW)" />
+    </Svg>
   );
 });
 
-// ─── Featured card ─────────────────────────────────────────────────────────────
-const FeaturedCard = React.memo(function FeaturedCard({ due, continueSet, streak, freezes, onReview, onContinue, onCreate }: {
-  due?: DueSummary; continueSet: StudySet | null; streak: number; freezes: number;
-  onReview: (setId: string, title: string) => void; onContinue: (s: StudySet) => void; onCreate: () => void;
+// ─── Header ────────────────────────────────────────────────────────────────────
+const Header = React.memo(function Header({ dateLabel, name, avatarUri, unread, onAI, onBell, onAvatar }: {
+  dateLabel: string; name: string; avatarUri?: string | null; unread: number;
+  onAI: () => void; onBell: () => void; onAvatar: () => void;
 }) {
   const { t } = useTranslation('home');
-  const { colors } = useTheme();
-  const hasDue = !!due && due.dueCount > 0 && !!due.topSet;
-  const weekProgress = Math.min(streak, 7) / 7;
-
-  let badge: string, title: string, subtitle: string, onPress: () => void;
-  if (hasDue) {
-    badge = t('featured.due'); title = due!.topSet!.title;
-    subtitle = t('featured.cardsToReview', { count: due!.dueCount });
-    onPress = () => onReview(due!.topSet!.id, due!.topSet!.title);
-  } else if (continueSet) {
-    badge = t('featured.continue'); title = continueSet.title;
-    subtitle = t('library:cards.cardCount', { count: continueSet._count?.cards ?? 0, defaultValue: `${continueSet._count?.cards ?? 0} cards` });
-    onPress = () => onContinue(continueSet);
-  } else {
-    badge = t('featured.start'); title = t('featured.createFirstSet'); subtitle = t('featured.beginJourney'); onPress = onCreate;
-  }
-
+  const { qm } = useTheme();
   return (
-    <View style={styles.heroStack}>
-      {/* Decorative stacked "wallet" layers peeking behind the hero (flat — tint only). */}
-      <View pointerEvents="none" style={[styles.heroLayer, styles.heroLayerBack, { backgroundColor: colors.accent }]} />
-      <View pointerEvents="none" style={[styles.heroLayer, styles.heroLayerMid, { backgroundColor: colors.accent }]} />
-      <AnimatedPressable style={[styles.featured, { backgroundColor: colors.accent }]} onPress={onPress} accessibilityRole="button" accessibilityLabel={title}>
-        <View style={styles.featuredTop}>
-          <View style={[styles.badge, { backgroundColor: colors.textOnAccent }]}>
-            <Typography preset="caption" color={colors.accent}>{badge}</Typography>
+    <View style={styles.header}>
+      <AnimatedPressable scaleTo={0.97} onPress={onAvatar} accessibilityRole="button" accessibilityLabel={t('a11y.goToProfile')}>
+        <Avatar uri={avatarUri} name={name} size="md" style={styles.headerAvatar} />
+      </AnimatedPressable>
+      <Typography preset="qmBody" color={qm.muted} style={styles.flex1} numberOfLines={1}>{dateLabel}</Typography>
+      <AnimatedPressable scaleTo={0.97} onPress={onAI} style={[styles.headerBtn, { backgroundColor: qm.field }]} accessibilityRole="button" accessibilityLabel={t('a11y.aiChat')}>
+        <AskIcon size={20} color={qm.ink} />
+      </AnimatedPressable>
+      <AnimatedPressable
+        scaleTo={0.97}
+        onPress={onBell}
+        style={[styles.headerBtn, { backgroundColor: qm.field }]}
+        accessibilityRole="button"
+        accessibilityLabel={unread > 0 ? `${t('a11y.notifications')}, ${unread}` : t('a11y.notifications')}
+      >
+        <BellQMIcon size={20} color={qm.ink} />
+        {unread > 0 && (
+          <View style={[styles.bellBadge, { backgroundColor: qm.violet, borderColor: qm.field }]}>
+            <Typography preset="qmTag" color={qm.onViolet}>{unread > 9 ? '9+' : unread}</Typography>
           </View>
-          <ArrowRightIcon size={18} color={colors.textOnAccent} />
-        </View>
-        <Typography preset="h4" color={colors.textOnAccent} numberOfLines={1} style={styles.featuredTitle}>{title}</Typography>
-        <Typography preset="bodySm" color={colors.textOnPrimaryMuted}>{subtitle}</Typography>
-        <View style={[styles.progressTrack, { backgroundColor: colors.overlayLight }]}>
-          <View style={[styles.progressFill, { width: `${Math.round(weekProgress * 100)}%`, backgroundColor: colors.textOnAccent }]} />
-        </View>
-        <View style={styles.featuredFooter}>
-          <FlameIcon size={14} color={colors.warning} />
-          <Typography preset="caption" color={colors.textOnPrimaryMuted}>
-            {t('featured.streakGoal', { streak, goal: Math.min(streak, 7) })}
-            {freezes > 0 && `  🧊 ${freezes}`}
-          </Typography>
-        </View>
+        )}
       </AnimatedPressable>
     </View>
   );
 });
 
-// ─── Sunday share-event CTA ─────────────────────────────────────────────────────
-const ShareEventCard = React.memo(function ShareEventCard({ streak, onDismiss }: { streak: number; onDismiss: () => void }) {
-  const { t } = useTranslation(['home', 'library', 'common']);
-  const { colors } = useTheme();
+// ─── Today card (due → continue → start) ───────────────────────────────────────
+const TodayCard = React.memo(function TodayCard({ due, continueSet, streak, freezes, onReview, onContinue, onCreate }: {
+  due?: DueSummary; continueSet: StudySet | null; streak: number; freezes: number;
+  onReview: () => void; onContinue: (s: StudySet) => void; onCreate: () => void;
+}) {
+  const { t } = useTranslation('home');
+  const { qm } = useTheme();
+  const hasDue = !!due && due.dueCount > 0;
 
+  let label: string, title: string, sub: string, btn: string, onPress: () => void;
+  if (hasDue) {
+    label = t('today.dueLabel'); title = t('today.dueTitle', { count: due!.dueCount });
+    sub = t('today.dueSub', { count: due!.dueSets }); btn = t('today.dueBtn'); onPress = onReview;
+  } else if (continueSet) {
+    const count = continueSet._count?.cards ?? 0;
+    label = t('today.continueLabel'); title = continueSet.title;
+    sub = t('today.continueSub', { count }); btn = t('today.continueBtn');
+    onPress = () => onContinue(continueSet);
+  } else {
+    label = t('today.startLabel'); title = t('today.startTitle');
+    sub = t('today.startSub'); btn = t('today.startBtn'); onPress = onCreate;
+  }
+  const isStart = !hasDue && !continueSet;
+  const streakLine = freezes > 0
+    ? t('today.streakRest', { count: streak, rest: freezes })
+    : t('today.streak', { count: streak });
+
+  return (
+    <AnimatedPressable scaleTo={0.97} onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title}. ${btn}`}>
+      <LinearGradient
+        colors={qm.hero as unknown as string[]}
+        locations={[0, 0.55, 1]}
+        start={{ x: 0.18, y: 0 }}
+        end={{ x: 0.82, y: 1 }}
+        style={styles.hero}
+      >
+        <Typography preset="qmLabel" color={qm.heroMuted}>{label}</Typography>
+        <Typography preset="qmTitle" color={qm.heroInk} numberOfLines={2} style={styles.heroTitle}>{title}</Typography>
+        <Typography preset="qmBody" color={qm.heroMuted} style={styles.heroSub}>{sub}</Typography>
+        {!isStart && streak > 0 && (
+          <View style={styles.streakRow}>
+            <LeafIcon size={14} color={qm.leaf} filled />
+            <Typography preset="qmLabel" color={qm.heroInk}>{streakLine}</Typography>
+          </View>
+        )}
+        <View style={styles.heroBtnRow}>
+          <View style={[styles.heroBtn, { backgroundColor: qm.violet, boxShadow: qm.btnShadow }]}>
+            <Typography preset="qmButton" color={qm.onViolet}>{btn}</Typography>
+            <ChevronRightIcon size={16} color={qm.onViolet} strokeWidth={2} />
+          </View>
+        </View>
+      </LinearGradient>
+    </AnimatedPressable>
+  );
+});
+
+// ─── Sunday share card ─────────────────────────────────────────────────────────
+const SundayCard = React.memo(function SundayCard({ streak, onDismiss }: { streak: number; onDismiss: () => void }) {
+  const { t } = useTranslation(['home', 'common']);
+  const { qm } = useTheme();
   const { data: referral } = useReferral();
   const onShare = useCallback(() => {
     const message = t('home:shareEvent.message', {
@@ -157,60 +188,105 @@ const ShareEventCard = React.memo(function ShareEventCard({ streak, onDismiss }:
   }, [t, streak, referral?.code]);
 
   return (
-    <View style={[styles.shareEvent, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-      <Pressable onPress={onDismiss} hitSlop={10} style={styles.shareEventClose} accessibilityRole="button" accessibilityLabel={t('common:actions.close', 'Close')}>
-        <CloseIcon size={16} color={colors.textSecondary} />
+    <View style={[styles.sunday, { backgroundColor: qm.leafBg }]}>
+      <Typography preset="qmBodyLg" color={qm.leafText}>{t('home:shareEvent.title')}</Typography>
+      <Typography preset="qmBody" color={qm.body} style={styles.sundaySub}>{t('home:shareEvent.subtitle')}</Typography>
+      <AnimatedPressable scaleTo={0.97} onPress={onShare} style={[styles.sundayBtn, { backgroundColor: qm.surface }]} accessibilityRole="button">
+        <Typography preset="qmLink" color={qm.leafText}>{t('home:shareEvent.cta')}</Typography>
+      </AnimatedPressable>
+      <Pressable onPress={onDismiss} hitSlop={4} style={styles.sundayClose} accessibilityRole="button" accessibilityLabel={t('common:actions.close', 'Close')}>
+        <CloseIcon size={14} color={qm.leafText} strokeWidth={2.4} />
       </Pressable>
-      <Typography preset="h4" color={colors.textPrimary}>{t('home:shareEvent.title', 'Share your progress 🙌')}</Typography>
-      <Typography preset="bodySm" color={colors.textSecondary}>{t('home:shareEvent.subtitle', 'Send your set or streak to your group — grow in the Word together.')}</Typography>
-      <Spacer size={spacing.sm} />
-      <Button label={t('home:shareEvent.cta', 'Share now')} onPress={onShare} />
     </View>
   );
 });
 
-// ─── Circular quick action ─────────────────────────────────────────────────────
-const QuickAction = React.memo(function QuickAction({ Icon, label, onPress }: { Icon: IconComponent; label: string; onPress: () => void }) {
-  const { colors } = useTheme();
+// ─── Quick action tile ─────────────────────────────────────────────────────────
+const QuickAction = React.memo(function QuickAction({ Icon, label, tint, onPress }: {
+  Icon: IconComponent; label: string; tint: QuickTint; onPress: () => void;
+}) {
+  const { qm } = useTheme();
+  const [bg, ink] = tintFor(qm, tint);
   return (
-    <AnimatedPressable style={styles.quickAction} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
-      <View style={[styles.quickCircle, { borderColor: colors.border }]}>
-        <Icon size={22} color={colors.textPrimary} />
+    <AnimatedPressable scaleTo={0.97} style={styles.quickAction} onPress={onPress} accessibilityRole="button" accessibilityLabel={label}>
+      <View style={[styles.quickTile, { backgroundColor: bg }]}>
+        <Icon size={22} color={ink} />
       </View>
-      <Typography preset="caption" color={colors.textSecondary}>{label}</Typography>
+      <Typography preset="qmCaption" color={qm.ink} align="center" numberOfLines={2}>{label}</Typography>
     </AnimatedPressable>
   );
 });
 
-// ─── Mini set card (horizontal rails) ─────────────────────────────────────────
-const SetMiniCard = React.memo(function SetMiniCard({ set, Icon, onSelect }: { set: StudySet; Icon: IconComponent; onSelect: (s: StudySet) => void }) {
-  const { t } = useTranslation(['home', 'library', 'common']);
-  const { colors, name: themeName } = useTheme();
-  const isDark = themeName === 'dark';
+// ─── Section header ────────────────────────────────────────────────────────────
+const SectionRow = React.memo(function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
+  const { qm } = useTheme();
+  return (
+    <View style={styles.sectionRow}>
+      <Typography preset="qmSection" color={qm.ink}>{title}</Typography>
+      {actionLabel && onAction && (
+        <Pressable onPress={onAction} hitSlop={8} style={({ pressed }) => [styles.seeAll, pressed && styles.pressedDim]} accessibilityRole="button" accessibilityLabel={actionLabel}>
+          <Typography preset="qmLink" color={qm.link}>{actionLabel}</Typography>
+        </Pressable>
+      )}
+    </View>
+  );
+});
+
+// ─── Recent set card (2-col grid) ──────────────────────────────────────────────
+const RecentSetCard = React.memo(function RecentSetCard({ set, color, isDue, onSelect }: {
+  set: StudySet; color: string; isDue: boolean; onSelect: (s: StudySet) => void;
+}) {
+  const { t } = useTranslation('home');
+  const { qm } = useTheme();
   const count = set._count?.cards ?? 0;
-  const handlePress = useCallback(() => onSelect(set), [onSelect, set]);
   return (
     <AnimatedPressable
-      style={[
-        styles.miniCard,
-        { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border },
-      ]}
-      onPress={handlePress}
+      scaleTo={0.97}
+      style={[styles.setCard, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}
+      onPress={() => onSelect(set)}
       accessibilityRole="button"
-      accessibilityLabel={t('home:a11y.openSet', { title: set.title })}
+      accessibilityLabel={t('a11y.openSet', { title: set.title })}
     >
-      <View style={[styles.miniIcon, { borderColor: colors.border }]}>
-        <Icon size={18} color={colors.textPrimary} />
+      <View style={styles.setCardTop}>
+        <View style={[styles.colorBar, { backgroundColor: color }]} />
+        {isDue && (
+          <View style={[styles.dueTag, { backgroundColor: qm.leafBg }]}>
+            <Typography preset="qmTag" color={qm.leafText}>{t('today.due')}</Typography>
+          </View>
+        )}
       </View>
-      <Typography preset="label" color={colors.textPrimary} numberOfLines={2} style={styles.miniTitle}>{set.title}</Typography>
-      <Typography preset="caption" color={colors.textSecondary}>
-        {t('library:cards.cardCount', { count, defaultValue: `${count} cards` })}
+      <Typography preset="qmCardTitle" color={qm.ink} numberOfLines={2} style={styles.setCardTitle}>{set.title}</Typography>
+      <Typography preset="qmMeta" color={qm.muted}>{t('today.cardCount', { count })}</Typography>
+    </AnimatedPressable>
+  );
+});
+
+// ─── Rail card (friends' / community sets) ─────────────────────────────────────
+const RailCard = React.memo(function RailCard({ set, color, showOwner, onSelect }: {
+  set: StudySet; color: string; showOwner: boolean; onSelect: (s: StudySet) => void;
+}) {
+  const { t } = useTranslation('home');
+  const { qm } = useTheme();
+  const count = set._count?.cards ?? 0;
+  const owner = set.user?.name?.split(' ')[0];
+  return (
+    <AnimatedPressable
+      scaleTo={0.97}
+      style={[styles.railCard, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}
+      onPress={() => onSelect(set)}
+      accessibilityRole="button"
+      accessibilityLabel={t('a11y.openSet', { title: set.title })}
+    >
+      <View style={[styles.colorBar, { backgroundColor: color }]} />
+      <Typography preset="qmCardTitle" color={qm.ink} numberOfLines={2} style={styles.railTitle}>{set.title}</Typography>
+      <Typography preset="qmCaption" color={qm.muted} numberOfLines={1}>
+        {showOwner && owner ? t('today.ownerCards', { name: owner, count }) : t('today.cardCount', { count })}
       </Typography>
     </AnimatedPressable>
   );
 });
 
-// ─── Activity feed item ────────────────────────────────────────────────────────
+// ─── Friend activity ───────────────────────────────────────────────────────────
 function activityText(a: Activity, t: (key: string, opts?: Record<string, unknown>) => string): string {
   const name = a.user?.name ?? t('activity.unknownUser');
   switch (a.type) {
@@ -223,72 +299,41 @@ function activityText(a: Activity, t: (key: string, opts?: Record<string, unknow
   }
 }
 
-const ActivityItem = React.memo(function ActivityItem({ activity }: { activity: Activity }) {
+const ActivityRow = React.memo(function ActivityRow({ activity, first }: { activity: Activity; first: boolean }) {
   const { t } = useTranslation('home');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
+  const text = activityText(activity, t);
+  const name = activity.user?.name ?? '';
+  // Bold the friend's name wherever the locale placed it.
+  const at = name ? text.indexOf(name) : -1;
   return (
-    <View style={styles.activityItem}>
+    <View style={[styles.activityRow, !first && { borderTopColor: qm.hair, borderTopWidth: StyleSheet.hairlineWidth }]}>
       <Avatar uri={activity.user?.profileImage} name={activity.user?.name} size="sm" />
-      <View style={styles.flex1}>
-        <Typography preset="label" color={colors.textPrimary} numberOfLines={1}>{activityText(activity, t)}</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>{formatDate(activity.createdAt)}</Typography>
-      </View>
-    </View>
-  );
-});
-
-// ─── Summary stats ─────────────────────────────────────────────────────────────
-const SummaryCard = React.memo(function SummaryCard({ stats }: { stats: Array<{ value: number; label: string }> }) {
-  const { colors, name: themeName } = useTheme();
-  const isDark = themeName === 'dark';
-  return (
-    <View style={styles.summaryCard}>
-      {stats.map(s => (
-        <View
-          key={s.label}
-          style={[
-            styles.summaryStat,
-            { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-          ]}
-        >
-          <Typography preset="h4" color={colors.textPrimary}>{s.value}</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>{s.label}</Typography>
-        </View>
-      ))}
-    </View>
-  );
-});
-
-const SectionRow = React.memo(function SectionRow({ title, actionLabel, onAction }: { title: string; actionLabel?: string; onAction?: () => void }) {
-  const { colors } = useTheme();
-  return (
-    <View style={styles.sectionRow}>
-      <Typography preset="h4" color={colors.textPrimary}>{title}</Typography>
-      {actionLabel && onAction && (
-        <Pressable onPress={onAction} hitSlop={8} style={({ pressed }) => [styles.rowCenter, pressed && styles.seeAllPressed]} accessibilityRole="button" accessibilityLabel={actionLabel}>
-          <Typography preset="label" color={colors.accent}>{actionLabel}</Typography>
-          <ChevronRightIcon size={16} color={colors.accent} />
-        </Pressable>
-      )}
+      <Typography preset="qmBody" color={qm.ink} style={styles.flex1} numberOfLines={2}>
+        {at < 0 ? text : (
+          <>
+            {text.slice(0, at)}
+            <Typography preset="qmLink" color={qm.ink}>{name}</Typography>
+            {text.slice(at + name.length)}
+          </>
+        )}
+      </Typography>
+      <Typography preset="qmCaption" color={qm.muted}>{formatDate(activity.createdAt)}</Typography>
     </View>
   );
 });
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 export function HomeScreen() {
-  const { t } = useTranslation(['home', 'common']);
+  const { t, i18n } = useTranslation(['home', 'common']);
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
-  const { colors } = useTheme();
+  const { qm } = useTheme();
 
   const { data: sets } = useSets();
   const { data: publicData } = usePublicSets();
   const { data: friendsData } = useFriendsSets();
   const { data: activityData } = useFriendsActivityFeed();
-  const { data: friends } = useFriends();
-  const { data: folders } = useFolders();
-  const { data: notes } = useNotes();
-  const { data: creditData } = useCreditBalance();
   const { data: streakData } = useStreak();
   const { data: dueSummary } = useDueSummary();
   const { data: notifData } = useNotifications(1);
@@ -298,13 +343,14 @@ export function HomeScreen() {
   const nav = useHomeNavigation(navigation);
   const dueCards = useDueCards();
 
-  // TODAY card → the spaced-repetition review flow (real, tracked SM-2 session).
+  // Today card → the spaced-repetition review flow (real, tracked SM-2 session).
   const handleReviewDue = useCallback(async () => {
     const res = await dueCards.refetch();
     const cards = res.data ?? [];
     if (cards.length === 0) return;
     const setIds = [...new Set(cards.map(c => c.setId))];
     const title = t('quiz:hub.reviewDue', 'Review due cards');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Quiz is a root-stack route, outside the tab param list
     (navigation as any).navigate('Quiz', { setIds, setTitles: [title], reviewCards: cards, mode: 'mix', quizName: title });
   }, [dueCards, navigation, t]);
 
@@ -317,7 +363,7 @@ export function HomeScreen() {
     if ([3, 7, 30, 100].includes(streak)) requestReviewOnce(`streak_${streak}`);
   }, [streak]);
 
-  // Sunday share-event CTA — shown on Sundays until dismissed for that day.
+  // Sunday share card — shown on Sundays until dismissed for that day.
   // Local-date key (matches getDay's locality) so dismissal doesn't slip across the UTC boundary.
   const [showShareEvent, setShowShareEvent] = useState(false);
   const todayKey = useCallback(() => {
@@ -332,217 +378,187 @@ export function HomeScreen() {
     setShowShareEvent(false);
     AsyncStorage.setItem('@bsp/share_event_dismissed', todayKey()).catch(() => {});
   }, [todayKey]);
+
   const firstName   = user?.name?.split(' ')[0] ?? 'Friend';
   const continueSet = sets?.[0] ?? null;
-  const cardTotal   = useMemo(() => (sets ?? []).reduce((sum, x) => sum + (x._count?.cards ?? 0), 0), [sets]);
   const recentSets  = useMemo(
     () => [...(sets ?? [])].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4),
     [sets],
   );
-
-  const summaryStats = useMemo(() => [
-    { value: friends?.length ?? 0,     label: t('profile:friends.title', 'Friends') },
-    { value: folders?.length ?? 0,     label: t('home:stats.folders', 'Folders') },
-    { value: sets?.length ?? 0,        label: t('home:stats.sets', 'Sets') },
-    { value: cardTotal,                 label: t('library:cards.title', 'Cards') },
-    { value: creditData?.balance ?? 0, label: t('home:stats.credits', 'Credits') },
-    { value: notes?.length ?? 0,       label: t('home:stats.notes', 'Notes') },
-  ], [friends, folders, sets, cardTotal, creditData, notes, t]);
+  // New user (nothing to review, no sets): just the Start card + quick actions.
+  const isNewUser = !(dueSummary && dueSummary.dueCount > 0) && !continueSet;
+  const dateLabel = useMemo(
+    () => new Date().toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }),
+    [i18n.language],
+  );
+  const unread = (notifData?.notifications ?? []).filter(n => {
+    if (n.read) return false;
+    const prefKey = TYPE_TO_PREF[n.type];
+    return prefKey ? notifPrefs[prefKey] !== false : true;
+  }).length;
+  const colorAt = (i: number) => qm.setColors[i % qm.setColors.length];
 
   return (
-    <SafeAreaView style={[styles.safe, { backgroundColor: colors.background }]} edges={['top']}>
-      <StickyHeader
-        greeting={getGreeting(t)}
-        name={firstName}
-        avatarUri={user?.profileImage}
-        unread={
-          (notifData?.notifications ?? []).filter(n => {
-            if (n.read) return false;
-            const prefKey = TYPE_TO_PREF[n.type];
-            return prefKey ? notifPrefs[prefKey] !== false : true;
-          }).length
-        }
-        onAI={nav.onAI}
-        onBell={nav.onBell}
-        onAvatar={nav.onAvatar}
-      />
+    <View style={[styles.root, { backgroundColor: qm.bg }]}>
+      <TopFog qm={qm} />
+      <SafeAreaView style={styles.flex1} edges={['top']}>
+        <ScrollView style={styles.flex1} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <Header
+            dateLabel={dateLabel}
+            name={user?.name ?? firstName}
+            avatarUri={user?.profileImage}
+            unread={unread}
+            onAI={nav.onAI}
+            onBell={nav.onBell}
+            onAvatar={nav.onAvatar}
+          />
+          <Animated.View entering={enter(0)}>
+            <Typography preset="qmDisplay" color={qm.ink} style={styles.greeting}>
+              {getGreeting(t)}, {firstName}
+            </Typography>
+          </Animated.View>
 
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+          <Animated.View entering={enter(1)}>
+            <TodayCard
+              due={dueSummary}
+              continueSet={continueSet}
+              streak={streak}
+              freezes={streakData?.freezes ?? 0}
+              onReview={handleReviewDue}
+              onContinue={nav.goContinue}
+              onCreate={nav.goCreate}
+            />
+          </Animated.View>
 
-        {/* Hero */}
-        <FeaturedCard
-          due={dueSummary}
-          continueSet={continueSet}
-          streak={streak}
-          freezes={streakData?.freezes ?? 0}
-          onReview={handleReviewDue}
-          onContinue={nav.goContinue}
-          onCreate={nav.goCreate}
-        />
+          {showShareEvent && !isNewUser && (
+            <Animated.View entering={enter(2)} style={styles.gapSm}>
+              <SundayCard streak={streak} onDismiss={dismissShareEvent} />
+            </Animated.View>
+          )}
 
-        {/* Sunday share-event CTA */}
-        {showShareEvent && (
-          <>
-            <Spacer size={spacing.md} />
-            <ShareEventCard streak={streak} onDismiss={dismissShareEvent} />
-          </>
-        )}
+          <Animated.View entering={enter(3)} style={styles.quickGrid}>
+            {nav.quickActions.map(a => (
+              <QuickAction key={a.label} Icon={a.Icon} label={a.label} tint={a.tint} onPress={a.onPress} />
+            ))}
+          </Animated.View>
 
-        {/* Quick actions */}
-        <Spacer size={spacing.xxl} />
-        <View style={styles.quickGrid}>
-          {nav.quickActions.map(a => (
-            <QuickAction key={a.label} Icon={a.Icon} label={a.label} onPress={a.onPress} />
-          ))}
-        </View>
+          {!isNewUser && recentSets.length > 0 && (
+            <>
+              <SectionRow title={t('home:sections.recentSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goLibrary} />
+              <View style={styles.setGrid}>
+                {recentSets.map((s, i) => (
+                  <Animated.View key={s.id} entering={enter(4 + i)} style={styles.setGridCell}>
+                    <RecentSetCard set={s} color={colorAt(i)} isDue={dueSummary?.topSet?.id === s.id} onSelect={nav.goContinue} />
+                  </Animated.View>
+                ))}
+              </View>
+            </>
+          )}
 
-        {/* My sets */}
-        {recentSets.length > 0 && (
-          <>
-            <Spacer size={spacing.xxl} />
-            <SectionRow title={t('home:sections.recentSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goLibrary} />
-            <Spacer size={spacing.md} />
-            <View style={styles.setsList}>
-              {recentSets.map(s => (
-                <SetCard
-                  key={s.id}
-                  set={s}
-                  onPress={() => nav.goContinue(s)}
-                  trailing={dueSummary?.topSet?.id === s.id ? (
-                    <View style={[styles.dueBadge, { backgroundColor: colors.successSoft }]}>
-                      <Typography preset="caption" color={colors.success}>{t('home:featured.due', 'DUE')}</Typography>
-                    </View>
-                  ) : undefined}
-                />
-              ))}
-            </View>
-          </>
-        )}
+          {!isNewUser && friendsSets.length > 0 && (
+            <>
+              <SectionRow title={t('home:sections.friendsSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goFriendsSets} />
+              <View style={styles.railWrap}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
+                  {friendsSets.map((s, i) => (
+                    <RailCard key={s.id} set={s} color={colorAt(i + 1)} showOwner onSelect={nav.goViewSet} />
+                  ))}
+                </ScrollView>
+              </View>
+            </>
+          )}
 
-        {/* Summary stats */}
-        <Spacer size={spacing.xxl} />
-        <SummaryCard stats={summaryStats} />
+          {!isNewUser && activities.length > 0 && (
+            <>
+              <SectionRow title={t('home:sections.friendActivity')} />
+              <View style={[styles.activityCard, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+                {activities.map((a, i) => <ActivityRow key={a.id} activity={a} first={i === 0} />)}
+              </View>
+            </>
+          )}
 
-        {/* From your friends */}
-        {friendsSets.length > 0 && (
-          <>
-            <Spacer size={spacing.xxl} />
-            <SectionRow title={t('home:sections.friendsSets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goFriendsSets} />
-            <Spacer size={spacing.md} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
-              {friendsSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={LibraryIcon} onSelect={nav.goViewSet} />
-              ))}
-            </ScrollView>
-          </>
-        )}
-
-        {/* Recent activity */}
-        {activities.length > 0 && (
-          <>
-            <Spacer size={spacing.xxl} />
-            <SectionRow title={t('home:sections.friendActivity')} />
-            <Spacer size={spacing.md} />
-            <View style={styles.activityList}>
-              {activities.map(a => <ActivityItem key={a.id} activity={a} />)}
-            </View>
-          </>
-        )}
-
-        {/* Discover */}
-        {publicSets.length > 0 && (
-          <>
-            <Spacer size={spacing.xxl} />
-            <SectionRow title={t('home:sections.communitySets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goPublicSets} />
-            <Spacer size={spacing.md} />
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
-              {publicSets.map(s => (
-                <SetMiniCard key={s.id} set={s} Icon={SearchIcon} onSelect={nav.goViewSet} />
-              ))}
-            </ScrollView>
-          </>
-        )}
-
-        <Spacer size={spacing.xxxl} />
-      </ScrollView>
-    </SafeAreaView>
+          {!isNewUser && publicSets.length > 0 && (
+            <>
+              <SectionRow title={t('home:sections.communitySets')} actionLabel={t('home:sections.seeAll')} onAction={nav.goPublicSets} />
+              <View style={styles.railWrap}>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.railContent}>
+                  {publicSets.map((s, i) => (
+                    <RailCard key={s.id} set={s} color={colorAt(i + 3)} showOwner={false} onSelect={nav.goViewSet} />
+                  ))}
+                </ScrollView>
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1 },
-  shareEvent: { borderRadius: layout.cardRadiusLg, borderWidth: 1, padding: spacing.xl, gap: spacing.xs },
-  shareEventClose: { position: 'absolute', top: spacing.md, right: spacing.md, zIndex: 1 },
-  scrollView: { flex: 1 },
-  scroll: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
+  root: { flex: 1 },
   flex1: { flex: 1 },
-  rowCenter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
+  fog: { position: 'absolute', top: 0, left: 0, right: 0 },
+  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.huge },
+  pressedDim: { opacity: 0.7 },
+  gapSm: { marginTop: spacing.md },
 
   // Header
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, flex: 1 },
-  greetingCol: { flex: 1 },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  headerIconBtn: { width: spacing.huge, height: spacing.huge, borderRadius: layout.pillRadius, alignItems: 'center', justifyContent: 'center' },
+  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10 },
+  headerAvatar: { width: HEADER_BTN, height: HEADER_BTN, borderRadius: HEADER_BTN / 2 },
+  headerBtn: { width: HEADER_BTN, height: HEADER_BTN, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
   bellBadge: {
-    position: 'absolute', top: spacing.s2, right: spacing.s2, minWidth: spacing.lg, height: spacing.lg,
-    borderRadius: radius.sm, paddingHorizontal: spacing.s2,
+    position: 'absolute', top: spacing.s6, right: spacing.s6, minWidth: spacing.lg, height: spacing.lg,
+    borderRadius: spacing.sm, borderWidth: 2, paddingHorizontal: spacing.s3,
     alignItems: 'center', justifyContent: 'center',
   },
-  headerLeftPressed: { opacity: 0.7 },
-  headerIconPressed: { opacity: 0.85 },
+  greeting: { marginTop: spacing.md, marginBottom: spacing.s18 },
 
-  // Featured card
-  heroStack: { paddingTop: spacing.s22 },
-  heroLayer: { position: 'absolute', height: spacing.huge, borderRadius: layout.cardRadiusLg },
-  heroLayerBack: { top: 0, left: spacing.s28, right: spacing.s28, opacity: 0.3 },
-  heroLayerMid: { top: spacing.s10, left: spacing.lg, right: spacing.lg, opacity: 0.55 },
-  featured: { borderRadius: layout.cardRadiusLg, padding: spacing.xl, gap: spacing.sm },
-  featuredTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  badge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
-  featuredTitle: { marginTop: spacing.xs },
-  progressTrack: { height: spacing.s6, borderRadius: spacing.s2, marginTop: spacing.sm, overflow: 'hidden' },
-  progressFill: { height: spacing.s6, borderRadius: spacing.s2 },
-  featuredFooter: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, marginTop: spacing.xs },
+  // Today card
+  hero: { borderRadius: radius.lg, padding: spacing.xl },
+  heroTitle: { marginTop: spacing.s6 },
+  heroSub: { marginTop: spacing.s6 },
+  streakRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s6, marginTop: spacing.s10 },
+  heroBtnRow: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: spacing.s14 },
+  heroBtn: {
+    height: spacing.huge + 2, paddingHorizontal: spacing.s18, borderRadius: radius.pill, // ponytail: canvas 42px button
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s6,
+  },
+
+  // Sunday card
+  sunday: { borderRadius: radius.r20, padding: spacing.lg, paddingRight: spacing.s48 },
+  sundaySub: { marginTop: spacing.s3 },
+  sundayBtn: { alignSelf: 'flex-start', marginTop: spacing.s10, height: spacing.huge, paddingHorizontal: spacing.s14, borderRadius: radius.r12, justifyContent: 'center' },
+  sundayClose: { position: 'absolute', top: spacing.s6, right: spacing.s6, width: spacing.huge, height: spacing.huge, alignItems: 'center', justifyContent: 'center' },
 
   // Quick actions
-  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', rowGap: spacing.xl },
-  quickAction: { width: '25%', alignItems: 'center', gap: spacing.sm },
-  quickCircle: {
-    width: 56, height: 56, borderRadius: layout.pillRadius, // ponytail: off-grid circle size
-    borderWidth: 1, alignItems: 'center', justifyContent: 'center',
-  },
+  quickGrid: { flexDirection: 'row', flexWrap: 'wrap', marginTop: spacing.s22 },
+  quickAction: { width: '25%', alignItems: 'center', gap: spacing.s6, paddingVertical: spacing.s10, paddingHorizontal: spacing.xs },
+  quickTile: { width: QUICK_TILE, height: QUICK_TILE, borderRadius: radius.r18, alignItems: 'center', justifyContent: 'center' },
 
   // Section header
-  sectionRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  seeAllPressed: { opacity: 0.7 },
-
-  // Recent sets
-  setsList: { gap: spacing.md },
-  dueBadge: { borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: spacing.xs / 2 },
-
-  // Summary stats
-  summaryCard: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-start', rowGap: spacing.md },
-  summaryStat: {
-    width: '31%', aspectRatio: 1.4,
-    alignItems: 'center', justifyContent: 'center', gap: spacing.xs,
-    borderRadius: layout.cardRadiusLg,
+  sectionRow: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline',
+    marginTop: spacing.xxl, marginBottom: spacing.s10, marginHorizontal: spacing.xs,
   },
+  seeAll: { paddingVertical: spacing.s6 },
 
-  // Horizontal rails
-  railContent: { gap: spacing.md, paddingRight: spacing.sm },
-  miniCard: {
-    width: 140, gap: spacing.sm, padding: spacing.lg, // ponytail: off-grid card width
-    borderRadius: layout.cardRadiusSm, borderWidth: 1,
-  },
-  miniIcon: { width: 36, height: 36, borderRadius: layout.pillRadius, borderWidth: 1, alignItems: 'center', justifyContent: 'center' }, // ponytail: off-grid icon size
-  miniTitle: { minHeight: 34 }, // ponytail: off-grid Figma value
+  // Recent sets grid
+  setGrid: { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: -spacing.s5 },
+  setGridCell: { width: '50%', padding: spacing.s5 },
+  setCard: { padding: spacing.s14, borderRadius: radius.r20 },
+  setCardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: spacing.lg + 2 },
+  colorBar: { width: spacing.s28, height: spacing.s6, borderRadius: radius.r3 },
+  dueTag: { borderRadius: radius.r6, paddingHorizontal: spacing.s7, paddingVertical: spacing.s2 },
+  setCardTitle: { marginTop: spacing.md, marginBottom: spacing.xs, minHeight: spacing.s38 + 4 }, // ponytail: 2-line title slot
 
-  // Activity feed
-  activityList: { gap: spacing.lg },
-  activityItem: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  // Rails
+  railWrap: { marginHorizontal: -spacing.xl },
+  railContent: { gap: spacing.s10, paddingHorizontal: spacing.xl, paddingBottom: spacing.xs },
+  railCard: { width: MINI_CARD_W, padding: spacing.s14, borderRadius: radius.r18 },
+  railTitle: { marginTop: spacing.s10, marginBottom: spacing.xs },
+
+  // Activity
+  activityCard: { borderRadius: radius.r20, paddingHorizontal: spacing.lg },
+  activityRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, minHeight: 58 }, // ponytail: canvas row height
 });

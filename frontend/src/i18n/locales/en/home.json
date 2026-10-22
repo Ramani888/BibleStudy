@@ -37,21 +37,21 @@
     "askAI": "Ask AI",
     "newSet": "New Set",
     "library": "Library",
-    "createSet": "Create Set",
-    "studyPlans": "Study Plans",
+    "createSet": "New set",
+    "studyPlans": "Study plans",
     "achievements": "Achievements",
     "leaderboard": "Leaderboard",
     "notes": "Notes",
     "media": "Media",
-    "discover": "Discover",
+    "discover": "Explore",
     "friends": "Friends"
   },
   "sections": {
-    "recentSets": "Recent Sets",
-    "seeAll": "See All",
-    "friendsSets": "Friends' Sets",
-    "communitySets": "Community Sets",
-    "friendActivity": "Friend Activity",
+    "recentSets": "Recent sets",
+    "seeAll": "See all",
+    "friendsSets": "Friends’ sets",
+    "communitySets": "From the community",
+    "friendActivity": "What friends are doing",
     "quickStats": "Quick Stats",
     "recentActivity": "RECENT ACTIVITY"
   },
@@ -70,7 +70,7 @@
   },
   "a11y": {
     "goToProfile": "Go to profile",
-    "aiChat": "AI Chat",
+    "aiChat": "Ask",
     "notifications": "Notifications",
     "openSet": "Open {{title}}"
   },
@@ -84,9 +84,33 @@
     "wasActive": "{{name}} was active"
   },
   "shareEvent": {
-    "title": "Share your progress 🙌",
-    "subtitle": "Send your set or streak to your group — grow in the Word together.",
-    "cta": "Share now",
+    "title": "It’s Sunday. Share your week?",
+    "subtitle": "Send your streak to your church group and grow in the Word together.",
+    "cta": "Share on WhatsApp",
     "message": "🔥 {{streak}}-day streak on Verdance! Join me and grow in the Word: {{url}}"
+  },
+  "today": {
+    "dueLabel": "TODAY’S REVIEW",
+    "dueTitle": "{{count}} card is ready",
+    "dueTitle_other": "{{count}} cards are ready",
+    "dueSub": "From {{count}} of your sets",
+    "dueSub_one": "From 1 of your sets",
+    "dueBtn": "Start review",
+    "continueLabel": "PICK UP WHERE YOU LEFT OFF",
+    "continueSub": "{{count}} card · nothing due today",
+    "continueSub_other": "{{count}} cards · nothing due today",
+    "continueBtn": "Open set",
+    "startLabel": "START HERE",
+    "startTitle": "Create your first study set",
+    "startSub": "Add a few verses and we’ll help you remember them",
+    "startBtn": "Create a set",
+    "streak": "{{count}}-day streak",
+    "streakRest": "{{count}}-day streak · {{rest}} rest day saved",
+    "streakRest_other": "{{count}}-day streak · {{rest}} rest days saved",
+    "due": "Due",
+    "cardCount": "{{count}} card",
+    "cardCount_other": "{{count}} cards",
+    "ownerCards": "{{name}} · {{count}} card",
+    "ownerCards_other": "{{name}} · {{count}} cards"
   }
 }

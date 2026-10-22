@@ -1,4 +1,5 @@
 import { ThemeColors } from './colors';
+import type { QMColors } from './quietMorning';
 import { spacing } from './spacing';
 import { radius } from './radius';
 import { typography, textPresets } from './typography';
@@ -15,4 +16,6 @@ export interface Theme {
   // BibleStudy extension — component layout constants not in Meditation theme
   textPresets: typeof textPresets;
   layout: typeof layout;
+  /** Quiet-morning redesign colours — opt-in per module. */
+  qm: QMColors;
 }
