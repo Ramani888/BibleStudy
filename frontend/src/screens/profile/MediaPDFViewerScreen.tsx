@@ -34,6 +34,9 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
   const [fresh, setFresh] = useState(false);
   const [chrome, setChrome] = useState(true);
   const [page, setPage] = useState({ n: 1, total: 0 });
+  // react-native-pdf has no content inset, so the page starts below the bar instead of under it.
+  // Computed (not measured): the native view doesn't redraw cleanly when resized after first layout.
+  const barH = insets.top + spacing.sm + TOUCH + spacing.md;
 
   const topBar = (
     <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm, backgroundColor: qm.glass, borderBottomColor: qm.hair }]}>
@@ -78,20 +81,22 @@ export function MediaPDFViewerScreen({ route, navigation }: Props) {
 
   return (
     <View style={[styles.flex, { backgroundColor: READER_BG }]}>
-      <Pdf
-        key={fresh ? 'fresh' : 'cached'}
-        source={{ uri: url, cache: !fresh }}
-        style={[styles.pdf, { backgroundColor: READER_BG }]}
-        onLoadComplete={total => { setLoading(false); setPage(p => ({ ...p, total })); }}
-        onPageChanged={(n, total) => setPage({ n, total })}
-        onPageSingleTap={() => setChrome(c => !c)}
-        onError={() => {
-          // A cut-off download stays cached and would fail forever — re-download once before giving up.
-          if (fresh) setError(true);
-          else { setFresh(true); setLoading(true); }
-        }}
-        trustAllCerts={false}
-      />
+      <View style={[styles.flex, { marginTop: barH }]}>
+        <Pdf
+          key={fresh ? 'fresh' : 'cached'}
+          source={{ uri: url, cache: !fresh }}
+          style={[styles.pdf, { backgroundColor: READER_BG }]}
+          onLoadComplete={total => { setLoading(false); setPage(p => ({ ...p, total })); }}
+          onPageChanged={(n, total) => setPage({ n, total })}
+          onPageSingleTap={() => setChrome(c => !c)}
+          onError={() => {
+            // A cut-off download stays cached and would fail forever — re-download once before giving up.
+            if (fresh) setError(true);
+            else { setFresh(true); setLoading(true); }
+          }}
+          trustAllCerts={false}
+        />
+      </View>
       {loading && (
         <View style={[StyleSheet.absoluteFill, styles.center, { backgroundColor: READER_BG }]}>
           <ActivityIndicator size="large" color={qm.violet} />
