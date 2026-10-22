@@ -1,148 +1,150 @@
 import React, { useCallback, useState } from 'react';
-import { ActivityIndicator, FlatList, Pressable, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
-import { Avatar } from '../../components/ui/Avatar';
-import { Typography } from '../../components/ui/Typography';
-import { SearchBar } from '../../components/ui/SearchBar';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, ClockIcon, UserPlusIcon } from '../../components/icons';
-import { useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
-import { useDebouncedValue } from '../../hooks';
-import { getErrorMessage } from '../../api/client';
 import type { UserProfile } from '../../types/friends.types';
+import { QMAvatar, QMBackButton, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { CheckIcon, ClockIcon, PlusIcon, SearchIcon, type IconComponent } from '../../components/icons';
+import { useAcceptFriendRequest, useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
+import { useDebouncedValue, useReferral } from '../../hooks';
+import { getErrorMessage } from '../../api/client';
+import { radius, spacing, useTheme } from '../../theme';
 
-import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'SearchUsers'>;
+type Status = 'friend' | 'incoming' | 'sent' | 'none';
+
+const AVATAR = 44;
+const BTN_H = 40;
+const MIN_CHARS = 2;
 
 export function SearchUsersScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebouncedValue(query, 300);
-  const [sentIds, setSentIds] = useState<Set<string>>(new Set());
-  const { data: users = [], isFetching } = useSearchUsers(debouncedQuery);
+  const q = useDebouncedValue(query.trim(), 300);
+  // Local overrides so a tap shows its result before the search refetches.
+  const [local, setLocal] = useState<Record<string, Status>>({});
+  const { data: users = [], isFetching } = useSearchUsers(q);
   const sendRequest = useSendFriendRequest();
+  const accept = useAcceptFriendRequest();
+  const { data: referral } = useReferral();
 
-  React.useEffect(() => {
-    if (!isFetching) setSentIds(new Set());
-  }, [isFetching]);
+  const statusOf = useCallback((u: UserProfile): Status =>
+    local[u.id] ?? (u.isFriend ? 'friend' : u.pendingRequest?.direction === 'incoming' ? 'incoming' : u.pendingRequest ? 'sent' : 'none'), [local]);
 
-  const handleAdd = useCallback((user: UserProfile) => {
-    sendRequest.mutate(user.id, {
-      onSuccess: () => {
-        setSentIds(prev => new Set(prev).add(user.id));
-        Toast.show({ type: 'success', text1: t('profile:friends.requestSentTo', { name: user.name, defaultValue: `Friend request sent to ${user.name}` }) });
-      },
-      onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-    });
-  }, [sendRequest, t]);
+  const act = useCallback((u: UserProfile, s: Status) => {
+    const onError = (e: unknown) => Toast.show({ type: 'error', text1: getErrorMessage(e) });
+    if (s === 'none') {
+      sendRequest.mutate(u.id, {
+        onSuccess: () => { setLocal(p => ({ ...p, [u.id]: 'sent' })); Toast.show({ type: 'success', text1: t('profile:qmSearch.sentTo', { name: u.name }) }); },
+        onError,
+      });
+    } else if (s === 'incoming' && u.pendingRequest) {
+      accept.mutate(u.pendingRequest.id, { onSuccess: () => setLocal(p => ({ ...p, [u.id]: 'friend' })), onError });
+    }
+  }, [sendRequest, accept, t]);
 
-  const renderItem = useCallback(({ item }: { item: UserProfile }) => {
-    const isFriend = !!item.isFriend;
-    const isPending = !!item.pendingRequest || sentIds.has(item.id);
+  const look: Record<Status, [string, string, string, IconComponent]> = {
+    friend: [t('profile:qmSearch.friends'), qm.leafBg, qm.leafText, CheckIcon],
+    incoming: [t('profile:qmSearch.accept'), qm.violet, qm.onViolet, CheckIcon],
+    sent: [t('profile:qmSearch.requested'), qm.field, qm.muted, ClockIcon],
+    none: [t('profile:qmSearch.add'), qm.lilac, qm.link, PlusIcon],
+  };
+
+  const renderItem = useCallback(({ item, index }: { item: UserProfile; index: number }) => {
+    const s = statusOf(item);
+    const [label, bg, ink, Icon] = look[s];
+    const idle = s === 'friend' || s === 'sent';
+    const sub = s === 'friend'
+      ? (local[item.id] ? t('profile:qmSearch.nowFriends') : t('profile:qmSearch.alreadyFriends'))
+      : s === 'incoming' ? t('profile:qmSearch.wantsYou') : item.church;
     return (
-      <Pressable
-        style={({ pressed }) => [styles.card, { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT }, pressed && styles.cardPressed]}
-        onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
-      >
-        <Avatar uri={item.profileImage ?? null} name={item.name ?? ''} size="sm" />
-        <View style={styles.cardInfo}>
-          <Typography preset="label" numberOfLines={1}>{item.name}</Typography>
-          {item.church ? (
-            <Typography preset="caption" color={colors.textSecondary} numberOfLines={1}>
-              {item.church}
-            </Typography>
-          ) : null}
-        </View>
-        {isFriend ? (
-          <CheckCircleIcon size={22} color={colors.success} />
-        ) : isPending ? (
-          <View style={[styles.pendingBadge, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-            <ClockIcon size={14} color={colors.textSecondary} />
-            <Typography preset="caption" color={colors.textSecondary}>{t('profile:friends.requestSent', 'Sent')}</Typography>
+      <Animated.View entering={qmRowEnter(index)} style={[styles.row, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+        <AnimatedPressable
+          scaleTo={0.98}
+          onPress={() => navigation.navigate('UserProfile', { userId: item.id })}
+          style={styles.who}
+          accessibilityRole="button"
+          accessibilityLabel={item.name}
+        >
+          <QMAvatar uri={item.profileImage} name={item.name} size={AVATAR} />
+          <View style={styles.flex}>
+            <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{item.name}</Typography>
+            {sub ? <Typography preset="qmMeta" color={qm.muted} numberOfLines={1} style={styles.sub}>{sub}</Typography> : null}
           </View>
-        ) : (
-          <Pressable
-            style={({ pressed }) => [styles.addBtn, pressed && styles.addBtnPressed]}
-            onPress={() => handleAdd(item)}
-            hitSlop={8}
-            disabled={sendRequest.isPending}
-          >
-            <UserPlusIcon size={20} color={colors.accent} />
-          </Pressable>
-        )}
-      </Pressable>
+        </AnimatedPressable>
+        <AnimatedPressable
+          scaleTo={0.95}
+          disabled={idle || sendRequest.isPending || accept.isPending}
+          onPress={() => act(item, s)}
+          style={[styles.btn, { backgroundColor: bg }]}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: idle }}
+          accessibilityLabel={`${label}, ${item.name}`}
+        >
+          <Icon size={15} color={ink} strokeWidth={2.2} />
+          <Typography preset="qmLink" color={ink}>{label}</Typography>
+        </AnimatedPressable>
+      </Animated.View>
     );
-  }, [sentIds, handleAdd, navigation, sendRequest.isPending, colors, isDark, t]);
+  }, [qm, statusOf, look, local, navigation, act, sendRequest.isPending, accept.isPending, t]);
 
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <QMBackButton onPress={navigation.goBack} label={t('profile:qmSearch.back')} />
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmSearch.title')}</Typography>
+      <QMSearchField value={query} onChangeText={setQuery} placeholder={t('profile:qmSearch.placeholder')} autoFocus />
+      <Typography preset="qmMeta" color={qm.muted} style={styles.hint}>{t('profile:qmSearch.hint')}</Typography>
+      {isFetching && q.length >= MIN_CHARS && <ActivityIndicator size="small" color={qm.violet} style={styles.spinner} />}
+      <View style={styles.listGap} />
+    </View>
+  );
+
+  const searched = q.length >= MIN_CHARS;
   return (
-    <Screen header={<ScreenHeader title={t('profile:menu.friends')} onBack={() => navigation.goBack()} />}>
-      <View style={styles.searchWrap}>
-        <SearchBar
-          placeholder={t('profile:friends.searchPlaceholder', 'Search by name or email…')}
-          value={query}
-          onChangeText={setQuery}
-          autoFocus
-        />
-      </View>
-
-      {isFetching && debouncedQuery.length > 1 && (
-        <ActivityIndicator size="small" color={colors.accent} style={styles.loader} />
-      )}
-
-      <View style={styles.flex}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={users}
+        data={searched ? users : []}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        extraData={sentIds}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          debouncedQuery.length > 1 && !isFetching ? (
-            <EmptyState title={t('common:status.noResults', 'No users found')} subtitle={t('common:status.noMatchFor', { query: debouncedQuery, defaultValue: `No results for "${debouncedQuery}"` })} />
-          ) : debouncedQuery.length === 0 ? (
-            <EmptyState title={t('profile:friends.findFriends', 'Find Friends')} subtitle={t('profile:friends.findFriendsSub', 'Search by name or email to connect with others.')} />
-          ) : null
-        }
+        extraData={local}
+        ListHeaderComponent={header}
+        ListEmptyComponent={searched && !isFetching
+          ? <QMEmpty icon={SearchIcon} title={t('profile:qmSearch.noMatchTitle')} text={t('profile:qmSearch.noMatchText')} action={{ label: t('profile:qmFriends.invite', { count: referral?.rewardPerReferral ?? 5 }), onPress: () => navigation.navigate('InviteFriends') }} />
+          : null}
+        ListFooterComponent={searched && users.length > 0
+          ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.privacy}>{t('profile:qmSearch.privacy')}</Typography>
+          : null}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       />
-      </View>
-    </Screen>
+    </View>
   );
 }
 
+function Separator() {
+  return <View style={styles.sep} />;
+}
+
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  searchWrap: { padding: layout.screenPaddingH, paddingBottom: spacing.sm },
-  list: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.xxl },
-  separator: { height: spacing.sm },
-  loader: { paddingVertical: spacing.sm },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
-  },
-  cardInfo: { flex: 1, gap: spacing.s2 },
-  addBtn: { padding: spacing.xs },
-  addBtnPressed: { opacity: 0.85 },
-  cardPressed: { opacity: 0.7 },
-  pendingBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
+  flex: { flex: 1, minWidth: 0 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl, flexGrow: 1 },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.s14 },
+  hint: { marginTop: spacing.sm, marginHorizontal: spacing.xs },
+  spinner: { marginTop: spacing.md },
+  listGap: { height: spacing.lg },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.s10, paddingLeft: spacing.md, paddingRight: spacing.s10, borderRadius: radius.r17 + 1 },
+  who: { flex: 1, minWidth: 0, flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  sub: { marginTop: spacing.s2 },
+  btn: { flexDirection: 'row', alignItems: 'center', gap: spacing.s6, height: BTN_H, paddingHorizontal: spacing.s14, borderRadius: radius.r12 },
+  sep: { height: spacing.sm },
+  privacy: { marginTop: spacing.s18, marginHorizontal: spacing.s6 },
 });

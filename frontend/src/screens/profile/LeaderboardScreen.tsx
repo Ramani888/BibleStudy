@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { FlatList, Image, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
 import Animated, {
@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { LeaderboardEntry } from '../../types/friends.types';
-import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
+import { QMAvatar, QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { FriendsIcon, InfoIcon, LeafIcon, PlusIcon } from '../../components/icons';
 import { useLeaderboard } from '../../hooks';
@@ -20,11 +20,6 @@ const RANK_W = 24;
 const SWAY_DEG = 4;
 const SWAY_MS = 2500;
 const FIND_H = 54;
-
-function initials(name: string): string {
-  const p = name.trim().split(/\s+/).filter(Boolean);
-  return p.length ? (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase() : '?';
-}
 
 /** The hero leaf sways gently, like a leaf in a morning breeze. */
 function SwayLeaf() {
@@ -65,13 +60,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         accessibilityLabel={`${index + 1}. ${name}, ${t('profile:qmLeader.streakA11y', { count: item.streak })}`}
       >
         <Typography preset="qmFieldLabel" color={qm.muted} align="center" style={styles.rank}>{index + 1}</Typography>
-        {item.profileImage
-          ? <Image source={{ uri: item.profileImage }} style={[styles.avatar, { backgroundColor: qm.field }]} />
-          : (
-            <View style={[styles.avatar, styles.avatarCenter, { backgroundColor: qm.setColors[index % qm.setColors.length] }]}>
-              <Typography style={[styles.initials, { color: qm.onPastel }]}>{initials(item.name ?? '')}</Typography>
-            </View>
-          )}
+        <QMAvatar uri={item.profileImage} name={item.name} size={AVATAR} />
         <View style={styles.flex}>
           <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{name}</Typography>
           <Typography preset="qmMeta" color={qm.muted} numberOfLines={1} style={styles.meta}>
@@ -153,9 +142,6 @@ const styles = StyleSheet.create({
   row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r17 + 1 },
   meRow: { borderWidth: 2 },
   rank: { width: RANK_W },
-  avatar: { width: AVATAR, height: AVATAR, borderRadius: AVATAR / 2 },
-  avatarCenter: { alignItems: 'center', justifyContent: 'center' },
-  initials: { fontFamily: qmFont.serifMedium, fontSize: 16, lineHeight: 20 },
   meta: { marginTop: spacing.s2 },
   streak: { flexDirection: 'row', alignItems: 'center', gap: spacing.s5 },
   streakNum: { fontFamily: qmFont.serifMedium, fontSize: 19, lineHeight: 24 },

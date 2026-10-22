@@ -17,3 +17,4 @@ export {
 export { QMModalScreen } from './QMModalScreen';
 export { QMScoreRing } from './QMScoreRing';
 export { QMMenuGroup, QMMenuRow, QMSwitch, QMSwitchRow } from './QMMenu';
+export { QMAvatar } from './QMAvatar';

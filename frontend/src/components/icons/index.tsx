@@ -671,6 +671,18 @@ export const ShieldIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeW
   </Outline>
 );
 
+export const InboxIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M3 13.5L6 5h12l3 8.5V19H3zM3 13.5h5l1.5 2.5h5l1.5-2.5h5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const BlockIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 0 0 0-17M6 6l12 12" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
 /** Three dots in a row (folder tile menu). */
 export const MoreHorizontalIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
   <Outline size={size}>

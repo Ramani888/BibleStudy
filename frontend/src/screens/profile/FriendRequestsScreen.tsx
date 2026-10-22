@@ -1,190 +1,163 @@
 import React, { useCallback, useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import { CARD_FILL_LIGHT, layout, palette, radius, spacing, useTheme } from '../../theme';
-import { Avatar } from '../../components/ui/Avatar';
-import { Typography } from '../../components/ui/Typography';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CheckCircleIcon, CloseCircleIcon } from '../../components/icons';
-import {
-  useFriendRequests,
-  useAcceptFriendRequest,
-  useRejectFriendRequest,
-  useCancelFriendRequest,
-} from '../../hooks/useFriends';
-import { getErrorMessage } from '../../api/client';
-import { formatDate } from '../../utils/formatters';
 import type { FriendRequest } from '../../types/friends.types';
+import { QMAvatar, QMBackButton, QMEmpty, QMSegmented, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { InfoIcon, LeafIcon } from '../../components/icons';
+import { useAcceptFriendRequest, useCancelFriendRequest, useFriendRequests, useRejectFriendRequest } from '../../hooks/useFriends';
+import { getErrorMessage } from '../../api/client';
+import { formatRelativeShort } from '../../utils/formatters';
+import { radius, spacing, useTheme } from '../../theme';
 
-import { useTranslation } from 'react-i18next';
 type Props = ProfileScreenProps<'FriendRequests'>;
 type Tab = 'incoming' | 'outgoing';
 
+const AVATAR = 46;
+const BTN_H = 44;
+
 export function FriendRequestsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>('incoming');
+  // Accepted rows stay a moment with a "You're now friends" line before the list refetches them away.
+  const [accepted, setAccepted] = useState<Set<string>>(new Set());
 
-  const { data: incomingRequests = [] } = useFriendRequests('incoming');
-  const { data: requests = [], isFetching, error, refetch } = useFriendRequests(tab);
-
+  const { data: incoming = [] } = useFriendRequests('incoming');
+  const { data: requests = [], isLoading, isFetching, isError, refetch } = useFriendRequests(tab);
   const accept = useAcceptFriendRequest();
   const reject = useRejectFriendRequest();
   const cancel = useCancelFriendRequest();
 
-  const incomingCount = incomingRequests.length;
+  const onError = (e: unknown) => Toast.show({ type: 'error', text1: getErrorMessage(e) });
 
-  const handleAccept = useCallback((requestId: string) => {
-    accept.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'success', text1: t('profile:friends.requestAccepted', 'Friend request accepted') }),
-      onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
+  const handleAccept = useCallback((id: string) => {
+    accept.mutate(id, {
+      onSuccess: () => {
+        setAccepted(prev => new Set(prev).add(id));
+        Toast.show({ type: 'success', text1: t('profile:qmRequests.nowFriends') });
+      },
+      onError,
     });
   }, [accept, t]);
 
-  const handleReject = useCallback((requestId: string) => {
-    reject.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'info', text1: t('profile:friends.requestDeclined', 'Request declined') }),
-      onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-    });
+  const handleDecline = useCallback((id: string) => {
+    reject.mutate(id, { onSuccess: () => Toast.show({ type: 'info', text1: t('profile:qmRequests.declined') }), onError });
   }, [reject, t]);
 
-  const handleCancel = useCallback((requestId: string) => {
-    cancel.mutate(requestId, {
-      onSuccess: () => Toast.show({ type: 'info', text1: t('profile:friends.requestCancelled', 'Request cancelled') }),
-      onError: (e) => Toast.show({ type: 'error', text1: getErrorMessage(e) }),
-    });
+  const handleCancel = useCallback((id: string) => {
+    cancel.mutate(id, { onSuccess: () => Toast.show({ type: 'info', text1: t('profile:qmRequests.cancelled') }), onError });
   }, [cancel, t]);
 
-  const renderItem = useCallback(({ item }: { item: FriendRequest }) => {
+  const renderItem = useCallback(({ item, index }: { item: FriendRequest; index: number }) => {
     const person = tab === 'incoming' ? item.sender : item.receiver;
     if (!person) return null;
-
-    const subtitle = person.church ?? formatDate(item.createdAt);
-
+    const when = formatRelativeShort(item.createdAt);
+    const sub = tab === 'outgoing' ? t('profile:qmRequests.sentOn', { date: when }) : person.church ? `${person.church} · ${when}` : when;
+    const done = accepted.has(item.id);
     return (
-      <View
-        style={[
-          styles.card,
-          { borderColor: colors.border, backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-        ]}
-      >
-        <Pressable
-          style={styles.cardInfo}
+      <Animated.View entering={qmRowEnter(index)} style={[styles.card, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+        <AnimatedPressable
+          scaleTo={0.98}
           onPress={() => navigation.navigate('UserProfile', { userId: person.id })}
+          style={styles.who}
+          accessibilityRole="button"
+          accessibilityLabel={person.name}
         >
-          <Avatar uri={person.profileImage ?? null} name={person.name ?? ''} size="sm" />
-          <View style={styles.cardInfo}>
-            <Typography preset="label" numberOfLines={1}>{person.name}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>{subtitle}</Typography>
+          <QMAvatar uri={person.profileImage} name={person.name} size={AVATAR} />
+          <View style={styles.flex}>
+            <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{person.name}</Typography>
+            <Typography preset="qmMeta" color={qm.muted} numberOfLines={1} style={styles.sub}>{sub}</Typography>
           </View>
-        </Pressable>
-
-        {tab === 'incoming' ? (
-          <View style={styles.requestActions}>
-            <Pressable onPress={() => handleAccept(item.id)} hitSlop={8} style={styles.actionBtn}>
-              <CheckCircleIcon size={28} color={colors.success} />
-            </Pressable>
-            <Pressable onPress={() => handleReject(item.id)} hitSlop={8} style={styles.actionBtn}>
-              <CloseCircleIcon size={28} color={colors.alert} />
-            </Pressable>
-          </View>
+        </AnimatedPressable>
+        {done ? (
+          <Animated.View entering={ZoomIn.springify().damping(12)} style={[styles.friends, { backgroundColor: qm.leafBg }]}>
+            <LeafIcon size={16} color={qm.leaf} filled />
+            <Typography preset="qmFieldLabel" color={qm.leafText}>{t('profile:qmRequests.nowFriends')}</Typography>
+          </Animated.View>
         ) : (
-          <Pressable onPress={() => handleCancel(item.id)} hitSlop={8} style={styles.actionBtn}>
-            <CloseCircleIcon size={26} color={colors.textSecondary} />
-          </Pressable>
+          <View style={styles.btnRow}>
+            {tab === 'incoming' ? (
+              <>
+                <AnimatedPressable scaleTo={0.97} onPress={() => handleDecline(item.id)} style={[styles.btn, { backgroundColor: qm.field }]} accessibilityRole="button">
+                  <Typography preset="qmButton" color={qm.ink}>{t('profile:qmRequests.decline')}</Typography>
+                </AnimatedPressable>
+                <AnimatedPressable scaleTo={0.97} onPress={() => handleAccept(item.id)} style={[styles.btn, { backgroundColor: qm.violet, boxShadow: qm.btnShadow }]} accessibilityRole="button">
+                  <Typography preset="qmButton" color={qm.onViolet}>{t('profile:qmRequests.accept')}</Typography>
+                </AnimatedPressable>
+              </>
+            ) : (
+              <AnimatedPressable scaleTo={0.97} onPress={() => handleCancel(item.id)} style={[styles.btn, { backgroundColor: qm.field }]} accessibilityRole="button">
+                <Typography preset="qmButton" color={qm.ink}>{t('profile:qmRequests.cancelReq')}</Typography>
+              </AnimatedPressable>
+            )}
+          </View>
         )}
-      </View>
+      </Animated.View>
     );
-  }, [tab, colors, isDark, handleAccept, handleReject, handleCancel, navigation]);
+  }, [tab, qm, accepted, navigation, handleAccept, handleDecline, handleCancel, t]);
 
-  if (error) return <ErrorState message={t('profile:friends.couldNotLoadRequests', 'Could not load requests')} onRetry={refetch} />;
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <QMBackButton onPress={navigation.goBack} label={t('profile:qmRequests.back')} />
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmRequests.title')}</Typography>
+      <QMSegmented<Tab>
+        label={t('profile:qmRequests.title')}
+        value={tab}
+        onChange={setTab}
+        options={[
+          { key: 'incoming', label: incoming.length > 0 ? `${t('profile:qmRequests.forYou')}  ·  ${incoming.length}` : t('profile:qmRequests.forYou') },
+          { key: 'outgoing', label: t('profile:qmRequests.sent') },
+        ]}
+      />
+      <View style={styles.listGap} />
+    </View>
+  );
+
+  let empty: React.ReactElement | null = null;
+  if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
+  else if (isError) empty = <QMEmpty icon={InfoIcon} title={t('profile:qmRequests.loadFailed')} action={{ label: t('profile:qmRequests.tryAgain'), onPress: () => refetch() }} />;
+  else empty = <QMEmpty icon={LeafIcon} title={t('profile:qmRequests.emptyTitle')} text={tab === 'incoming' ? t('profile:qmRequests.emptyIn') : t('profile:qmRequests.emptyOut')} />;
 
   return (
-    <Screen
-      edges={['top']}
-      header={<ScreenHeader title={t('profile:menu.friendRequests')} onBack={() => navigation.goBack()} />}
-    >
-      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
-        <Pressable
-          style={[styles.tab, tab === 'incoming' && { borderBottomWidth: 2, borderBottomColor: colors.accent }]}
-          onPress={() => setTab('incoming')}
-        >
-          <View style={styles.tabContent}>
-            <Typography preset="label" color={tab === 'incoming' ? colors.accent : colors.textSecondary}>
-              {t('profile:friends.incoming', 'Incoming')}
-            </Typography>
-            {incomingCount > 0 ? (
-              <View style={[styles.badge, { backgroundColor: colors.accent }]}>
-                <Typography preset="caption" color={palette.white}>{incomingCount}</Typography>
-              </View>
-            ) : null}
-          </View>
-        </Pressable>
-        <Pressable
-          style={[styles.tab, tab === 'outgoing' && { borderBottomWidth: 2, borderBottomColor: colors.accent }]}
-          onPress={() => setTab('outgoing')}
-        >
-          <Typography preset="label" color={tab === 'outgoing' ? colors.accent : colors.textSecondary}>
-            {t('profile:friends.sent', 'Sent')}
-          </Typography>
-        </Pressable>
-      </View>
-
-      <View style={styles.listWrapper}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={requests}
+        data={isError ? [] : requests}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-        contentContainerStyle={requests.length === 0 ? styles.emptyContainer : styles.list}
-        ListEmptyComponent={
-          <EmptyState
-            title={t('profile:friends.noRequests', 'No Requests')}
-            subtitle={tab === 'incoming' ? t('profile:friends.noPendingRequests', 'No pending friend requests') : t('profile:friends.noSentRequests', 'No sent requests')}
-          />
-        }
+        extraData={accepted}
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
-      </View>
-    </Screen>
+    </View>
   );
 }
 
+function Separator() {
+  return <View style={styles.sep} />;
+}
+
 const styles = StyleSheet.create({
-  tabs: {
-    flexDirection: 'row',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  tab: { flex: 1, paddingVertical: spacing.md, alignItems: 'center' },
-  tabContent: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  badge: {
-    borderRadius: radius.r10,
-    minWidth: spacing.xl,
-    height: spacing.xl,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xs,
-  },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing.xxl },
-  separator: { height: spacing.sm },
-  emptyContainer: { flex: 1, justifyContent: 'center' },
-  listWrapper: { flex: 1 },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.md,
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
-  },
-  cardInfo: { flex: 1, gap: spacing.s2 },
-  requestActions: { flexDirection: 'row', gap: spacing.xs },
-  actionBtn: { padding: spacing.xs },
+  flex: { flex: 1, minWidth: 0 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl, flexGrow: 1 },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.s14 },
+  listGap: { height: spacing.lg },
+  card: { paddingVertical: spacing.s14, paddingHorizontal: spacing.lg, borderRadius: radius.r20 },
+  who: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  sub: { marginTop: spacing.s2 },
+  btnRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.md },
+  btn: { flex: 1, height: BTN_H, borderRadius: radius.r12 + 2, alignItems: 'center', justifyContent: 'center' },
+  friends: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.md, paddingVertical: spacing.s10, paddingHorizontal: spacing.md, borderRadius: radius.r12 },
+  sep: { height: spacing.s10 },
+  loading: { marginTop: spacing.xxxl },
 });
