@@ -21,5 +21,4 @@ export { ListCard } from './ListCard';
 export { SearchBar } from './SearchBar';
 export { Switch } from './Switch';
 export { Checkbox } from './Checkbox';
-export { CelebrationBurst } from './CelebrationBurst';
 export { ScoreRing } from './ScoreRing';

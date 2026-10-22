@@ -1,341 +1,181 @@
-import React, { useMemo } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  View,
-} from 'react-native';
+import React, { useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Achievement, AchievementCategory } from '../../types';
-import { useAchievements, useReferral } from '../../hooks';
-import { Typography } from '../../components/ui/Typography';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { shareToWhatsApp, buildReferralLink } from '../../utils';
-import {
-  AlbumsIcon, BackIcon, BookIcon, BookmarkIcon, BuildingIcon,
-  CheckCircleIcon, CompassIcon, FlameIcon, FolderIcon, LockIcon,
-  ShareIcon, SparklesIcon, StarIcon, TrophyIcon, UsersIcon,
-} from '../../components/icons';
-import { useTheme, palette, spacing, layout, radius, CARD_FILL_LIGHT } from '../../theme';
+import { useAchievements } from '../../hooks';
+import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { InfoIcon, LockIcon } from '../../components/icons';
+import { ACHIEVEMENT_ICON, AchievementUnlockModal } from '../../components/feedback/AchievementUnlockModal';
+import { qmFont, radius, spacing, useTheme } from '../../theme';
 
-const ICON_BY_KEY: Record<string, React.ComponentType<{ size?: number; color?: string }>> = {
-  card: BookmarkIcon, cards: AlbumsIcon, folder: FolderIcon, quiz: CompassIcon,
-  star: StarIcon, compass: CompassIcon, flame: FlameIcon, users: UsersIcon,
-  group: BuildingIcon, sparkles: SparklesIcon, book: BookIcon,
-};
+const TILE = 48;
+const LOCK = 20;
+const HERO_BAR = 8;
+const ROW_BAR = 6;
 
-const CATEGORY_LABELS: Record<AchievementCategory, string> = {
-  study: 'Study', quiz: 'Quiz', streak: 'Streak', social: 'Community', ai: 'AI',
-};
-const CATEGORY_ORDER: AchievementCategory[] = ['streak', 'study', 'quiz', 'ai', 'social'];
+// Canvas groups: streak, study, quiz, then Ask + friends together.
+const GROUPS: { label: string; cats: AchievementCategory[] }[] = [
+  { label: 'qmAch.catStreak', cats: ['streak'] },
+  { label: 'qmAch.catStudy', cats: ['study'] },
+  { label: 'qmAch.catQuiz', cats: ['quiz'] },
+  { label: 'qmAch.catAskFriends', cats: ['ai', 'social'] },
+];
 
-const AMBER      = '#F79009';
-const AMBER_SOFT = 'rgba(247,144,9,0.15)';
-
-// ── Status badge ────────────────────────────────────────────────────────────
-
-function StatusBadge({ achievement: a }: { achievement: Achievement }) {
-  const { t } = useTranslation(['profile', 'common']);
-  const { colors } = useTheme();
-  const inProgress = !a.unlocked && a.progress > 0;
-
-  if (a.unlocked) {
-    return (
-      <View style={[styles.badge, { backgroundColor: colors.successSoft }]}>
-        <CheckCircleIcon size={13} color={colors.success} />
-        <Typography preset="caption" color={colors.success}> +{a.reward}</Typography>
-      </View>
-    );
-  }
-  if (inProgress) {
-    return (
-      <View style={[styles.badge, { backgroundColor: AMBER_SOFT }]}>
-        <Typography preset="caption" color={AMBER}>{a.progress}/{a.threshold}</Typography>
-      </View>
-    );
-  }
+/** A progress bar that fills once on mount. */
+function Fill({ pct, color, track, height }: { pct: number; color: string; track: string; height: number }) {
+  const w = useSharedValue(0);
+  useEffect(() => {
+    w.value = withDelay(300, withTiming(pct, { duration: 1000, easing: Easing.bezier(0.3, 0.9, 0.3, 1), reduceMotion: ReduceMotion.System }));
+  }, [w, pct]);
+  const fill = useAnimatedStyle(() => ({ width: `${w.value}%` }));
   return (
-    <View style={[styles.badge, { backgroundColor: colors.badgeLockedBg }]}>
-      <LockIcon size={12} color={colors.textSecondary} />
-      <Typography preset="caption" color={colors.textSecondary}> {t('profile:achievements.locked', 'Locked')}</Typography>
+    <View style={[styles.track, { height, borderRadius: height / 2, backgroundColor: track }]}>
+      <Animated.View style={[styles.fillBar, { borderRadius: height / 2, backgroundColor: color }, fill]} />
     </View>
   );
 }
-
-// ── Achievement card ─────────────────────────────────────────────────────────
-
-function AchievementCard({ achievement: a, colors, isDark, onShare }: { achievement: Achievement; colors: ReturnType<typeof useTheme>['colors']; isDark: boolean; onShare?: () => void }) {
-  const Icon = ICON_BY_KEY[a.icon] ?? TrophyIcon;
-  const isLocked = !a.unlocked && a.progress === 0;
-
-  return (
-    <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder }]}>
-      <View style={isLocked ? styles.cardLocked : undefined}>
-        <View style={styles.cardTop}>
-          <View style={styles.emojiBadge}>
-            <Icon size={22} color={a.unlocked ? colors.accent : colors.textSecondary} />
-          </View>
-          <Typography preset="label" color={colors.textPrimary} style={styles.cardTitle} numberOfLines={2}>
-            {a.title}
-          </Typography>
-          <StatusBadge achievement={a} />
-          {a.unlocked && onShare && (
-            <Pressable onPress={onShare} hitSlop={8} style={styles.shareBtn} accessibilityRole="button">
-              <ShareIcon size={18} color={colors.textSecondary} />
-            </Pressable>
-          )}
-        </View>
-
-        <Typography preset="caption" color={colors.textSecondary} style={styles.cardDesc}>
-          {a.description}
-        </Typography>
-
-        {!a.unlocked && a.threshold > 0 && (
-          <>
-            <View style={[styles.track, { backgroundColor: colors.sliderTrack }]}>
-              <View
-                style={[
-                  styles.fill,
-                  {
-                    backgroundColor: colors.sliderFill,
-                    width: `${Math.round(Math.min(a.progress / a.threshold, 1) * 100)}%`,
-                  },
-                ]}
-              />
-            </View>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.progressText}>
-              {a.progress} / {a.threshold}
-            </Typography>
-          </>
-        )}
-      </View>
-    </View>
-  );
-}
-
-import { useTranslation } from 'react-i18next';
 
 export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achievements'>) {
   const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: achievements = [], isLoading, error, refetch } = useAchievements();
-  const { data: referral } = useReferral();
+  const { data: achievements = [], isLoading, isError, refetch } = useAchievements();
+  const [celebrate, setCelebrate] = useState<Achievement | null>(null);
 
-  const shareAchievement = (a: Achievement) => {
-    shareToWhatsApp(
-      t('profile:achievements.shareMessage', {
-        title: a.title,
-        url: buildReferralLink(referral?.code),
-        defaultValue: 'I just unlocked "{{title}}" on Verdance 📖✨ Join me: {{url}}',
-      }),
-      'achievement',
-    );
-  };
+  const done = achievements.filter(a => a.unlocked).length;
+  const total = achievements.length;
+  // "Next up" = the unfinished one you're furthest along.
+  const next = useMemo(() => achievements
+    .filter(a => !a.unlocked)
+    .sort((a, b) => b.progress / b.threshold - a.progress / a.threshold || a.threshold - b.threshold)[0], [achievements]);
 
-  const unlockedCount = useMemo(() => achievements.filter(a => a.unlocked).length, [achievements]);
-  const remaining = achievements.length - unlockedCount;
-
-  const grouped = useMemo(() => {
-    // Status rank: unlocked → in-progress → locked, then ascending threshold.
+  const groups = useMemo(() => {
+    // Status rank: reached → in progress → locked, then smallest goal first.
     const rank = (a: Achievement) => (a.unlocked ? 0 : a.progress > 0 ? 1 : 2);
-    const map = new Map<AchievementCategory, Achievement[]>();
-    for (const a of achievements) {
-      if (!map.has(a.category)) map.set(a.category, []);
-      map.get(a.category)!.push(a);
-    }
-    return CATEGORY_ORDER.filter(c => map.has(c)).map(c => ({
-      category: c,
-      items: map.get(c)!.slice().sort((a, b) => rank(a) - rank(b) || a.threshold - b.threshold),
-    }));
+    return GROUPS.map(g => ({
+      label: g.label,
+      items: achievements.filter(a => g.cats.includes(a.category)).sort((a, b) => rank(a) - rank(b) || a.threshold - b.threshold),
+    })).filter(g => g.items.length > 0);
   }, [achievements]);
 
+  let row = 0;
   return (
-    <View style={[styles.root, { backgroundColor: colors.background }]}>
-      <StatusBar barStyle="light-content" />
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+        <QMBackButton onPress={navigation.goBack} label={t('profile:qmAch.back')} />
+        <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmAch.title')}</Typography>
 
-      {/* ── Indigo header ── */}
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
+        {isLoading ? (
+          <ActivityIndicator color={qm.violet} style={styles.loading} />
+        ) : isError ? (
+          <QMEmpty icon={InfoIcon} title={t('profile:qmAch.loadFailed')} action={{ label: t('profile:qmAch.tryAgain'), onPress: () => refetch() }} />
+        ) : (
+          <>
+            <Animated.View entering={qmRowEnter(0)}>
+              <LinearGradient colors={qm.hero as unknown as string[]} locations={[0, 0.55, 1]} start={{ x: 0.18, y: 0 }} end={{ x: 0.82, y: 1 }} style={styles.hero}>
+                <View style={styles.heroCount}>
+                  <Typography style={[styles.heroNum, { color: qm.heroInk }]}>{done}</Typography>
+                  <Typography preset="qmBodyLg" color={qm.heroMuted}>{t('profile:qmAch.reached', { total })}</Typography>
+                </View>
+                <Fill pct={total ? (done / total) * 100 : 0} color={qm.leaf} track={qm.ghost} height={HERO_BAR} />
+                <Typography preset="qmBody" color={qm.heroMuted} style={styles.heroNote}>
+                  {t('profile:qmAch.eachAdds', { reward: achievements[0]?.reward ?? 5 })}{' '}
+                  {next ? t('profile:qmAch.nextUp', { title: next.title }) : t('profile:qmAch.allDone')}
+                </Typography>
+              </LinearGradient>
+            </Animated.View>
 
-        {/* Back + title row */}
-        <View style={styles.headerTop}>
-          <Pressable onPress={navigation.goBack} hitSlop={10} style={styles.back}>
-            <BackIcon size={24} color={palette.white} />
-          </Pressable>
-          <Typography preset="h4" color={palette.white}>{t('profile:menu.achievements')}</Typography>
-        </View>
-
-        {/* Trophy + stats */}
-        <View style={styles.headerBody}>
-          <View style={styles.trophyBadge}>
-            <TrophyIcon size={36} color={palette.white} />
-          </View>
-          <View style={styles.headerStats}>
-            <Typography preset="h2" color={palette.white}>
-              {t('profile:achievements.unlocked', { count: unlockedCount, defaultValue: `${unlockedCount} unlocked` })}
-            </Typography>
-            <Typography preset="caption" color="rgba(255,255,255,0.85)" style={styles.remainingText}>
-              {t('profile:achievements.remaining', { count: remaining, defaultValue: `${remaining} remaining` })}
-            </Typography>
-          </View>
-        </View>
-
-        {/* Progress dots */}
-        <View style={styles.dots}>
-          {achievements.map((a, i) => (
-            <View
-              key={i}
-              style={[styles.dot, a.unlocked ? styles.dotFilled : styles.dotEmpty]}
-            />
-          ))}
-        </View>
-      </View>
-
-      {/* ── Content ── */}
-      {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
-      ) : error ? (
-        <ErrorState onRetry={refetch} />
-      ) : (
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[styles.scroll, { paddingBottom: insets.bottom + spacing.xxxl }]}
-        >
-          {grouped.map(({ category, items }) => (
-            <View key={category} style={styles.section}>
-              <Typography preset="label" color={colors.textSecondary} style={styles.sectionTitle}>
-                {t(`profile:achievements.categories.${category}`, CATEGORY_LABELS[category])}
-              </Typography>
-              {items.map(a => (
-                <AchievementCard key={a.key} achievement={a} colors={colors} isDark={isDark} onShare={() => shareAchievement(a)} />
-              ))}
-            </View>
-          ))}
-        </ScrollView>
-      )}
+            {groups.map(g => (
+              <View key={g.label}>
+                <Typography preset="qmLabel" color={qm.muted} style={styles.section}>{t(`profile:${g.label}`)}</Typography>
+                <View style={styles.list}>
+                  {g.items.map(a => {
+                    const inProgress = !a.unlocked && a.progress > 0;
+                    const locked = !a.unlocked && !inProgress;
+                    const Icon = ACHIEVEMENT_ICON[a.category];
+                    const [tileBg, tileInk] = a.unlocked ? [qm.leafBg, qm.leaf] : inProgress ? [qm.goldBg, qm.goldText] : [qm.field, qm.off];
+                    const a11y = a.unlocked
+                      ? t('profile:qmAch.a11yReached', { title: a.title })
+                      : inProgress ? t('profile:qmAch.a11yProgress', { title: a.title, progress: a.progress, threshold: a.threshold })
+                        : t('profile:qmAch.a11yLocked', { title: a.title });
+                    return (
+                      <Animated.View key={a.key} entering={qmRowEnter(++row)}>
+                        <AnimatedPressable
+                          scaleTo={0.97}
+                          disabled={!a.unlocked}
+                          onPress={() => setCelebrate(a)}
+                          style={[styles.row, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}
+                          accessibilityRole={a.unlocked ? 'button' : 'text'}
+                          accessibilityLabel={a11y}
+                        >
+                          <View style={[styles.tile, { backgroundColor: tileBg }]}>
+                            <Icon size={24} color={tileInk} />
+                            {locked && (
+                              <View style={[styles.lock, { backgroundColor: qm.surface, borderColor: qm.hair }]}>
+                                <LockIcon size={11} color={qm.off} strokeWidth={2.6} />
+                              </View>
+                            )}
+                          </View>
+                          <View style={styles.flex}>
+                            <Typography preset="qmBodyLg" color={locked ? qm.muted : qm.ink}>{a.title}</Typography>
+                            <Typography preset="qmMeta" color={qm.muted} style={styles.desc}>{a.description}</Typography>
+                            {!a.unlocked && a.threshold > 1 && (
+                              <View style={styles.progRow}>
+                                <View style={styles.flex}>
+                                  <Fill pct={Math.min(a.progress / a.threshold, 1) * 100} color={qm.gold} track={qm.lilac} height={ROW_BAR} />
+                                </View>
+                                <Typography preset="qmChip" color={qm.goldText}>
+                                  {t('profile:qmAch.progress', { progress: a.progress, threshold: a.threshold })}
+                                </Typography>
+                              </View>
+                            )}
+                          </View>
+                          {a.unlocked && a.reward > 0 && (
+                            <View style={[styles.chip, { backgroundColor: qm.leafBg }]}>
+                              <Typography preset="qmChip" color={qm.leafText}>{t('profile:qmAch.creditsChip', { count: a.reward })}</Typography>
+                            </View>
+                          )}
+                        </AnimatedPressable>
+                      </Animated.View>
+                    );
+                  })}
+                </View>
+              </View>
+            ))}
+          </>
+        )}
+      </ScrollView>
+      <AchievementUnlockModal achievement={celebrate} onDismiss={() => setCelebrate(null)} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-
-  // Header
-  header: {
-    backgroundColor: palette.indigo500,
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-    paddingHorizontal: layout.screenPaddingH,
-    paddingBottom: spacing.xl,
+  flex: { flex: 1, minWidth: 0 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.s14 },
+  loading: { marginTop: spacing.xxxl },
+  hero: { borderRadius: radius.r20 + 2, paddingVertical: spacing.s18, paddingHorizontal: spacing.xl },
+  heroCount: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm, marginBottom: spacing.md },
+  heroNum: { fontFamily: qmFont.serifDisplay, fontSize: 38, lineHeight: 44 },
+  heroNote: { marginTop: spacing.s10 },
+  track: { overflow: 'hidden' },
+  fillBar: { height: '100%' },
+  section: { marginTop: spacing.xxl, marginBottom: spacing.sm, marginHorizontal: spacing.xs },
+  list: { gap: spacing.s10 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, paddingVertical: spacing.s14, paddingHorizontal: spacing.lg, borderRadius: radius.r20 },
+  tile: { width: TILE, height: TILE, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  lock: {
+    position: 'absolute', right: -spacing.xs, bottom: -spacing.xs, width: LOCK, height: LOCK, borderRadius: LOCK / 2,
+    borderWidth: StyleSheet.hairlineWidth, alignItems: 'center', justifyContent: 'center',
   },
-  headerTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
-    height: 40,
-  },
-  back: {
-    width: 32,
-    height: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: -6,
-  },
-  headerBody: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.lg,
-    marginTop: spacing.md,
-  },
-  trophyBadge: {
-    width: 72,
-    height: 72,
-    borderRadius: radius.r45,
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  headerStats: { flex: 1 },
-  remainingText: { marginTop: spacing.s2, opacity: 0.85 },
-  dots: {
-    flexDirection: 'row',
-    gap: spacing.xs,
-    marginTop: spacing.s18,
-  },
-  dot: {
-    flex: 1,
-    height: 6,
-    borderRadius: radius.r3,
-  },
-  dotFilled: { backgroundColor: palette.white },
-  dotEmpty:  { backgroundColor: 'rgba(255,255,255,0.25)' },
-
-  // Scroll
-  scroll: { paddingTop: spacing.xl },
-
-  // Sections
-  section: {
-    marginTop: spacing.s28,
-    paddingHorizontal: layout.screenPaddingH,
-  },
-  sectionTitle: {
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    marginBottom: spacing.s14,
-    marginLeft: spacing.xs,
-  },
-
-  // Cards
-  card: {
-    borderRadius: radius.md,
-    borderWidth: 1,
-    padding: spacing.lg,
-    marginBottom: spacing.md,
-  },
-  cardLocked: { opacity: 0.6 },
-  cardTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-  },
-  emojiBadge: {
-    width: 28,
-    alignItems: 'center',
-  },
-  cardTitle: { flex: 1 },
-  shareBtn: { padding: spacing.xs },
-  cardDesc: {
-    marginTop: spacing.sm,
-    lineHeight: 18,
-  },
-  track: {
-    height: 4,
-    borderRadius: radius.r2,
-    marginTop: spacing.s14,
-    overflow: 'hidden',
-  },
-  fill: {
-    height: '100%',
-    borderRadius: radius.r2,
-  },
-  progressText: {
-    marginTop: spacing.sm,
-  },
-
-  // Badge
-  badge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.s10,
-    height: 24,
-    borderRadius: radius.sm,
-    alignSelf: 'flex-start',
-  },
+  desc: { marginTop: spacing.s2 },
+  progRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.sm },
+  chip: { borderRadius: radius.pill, paddingVertical: spacing.s5, paddingHorizontal: spacing.s10 },
 });

@@ -89,6 +89,8 @@ export interface QMColors {
   ghost: string;
   blank: string;
   sheetShadow: string;
+  /** Dark ink on the pastel avatar/set colours (same in both modes). */
+  onPastel: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -164,6 +166,7 @@ export const qmLight: QMColors = {
   ghost: 'rgba(255,255,255,0.8)',
   blank: '#C9C4D3',
   sheetShadow: '0px -12px 40px -20px rgba(34,30,51,0.35)',
+  onPastel: '#3A2A4A',
   glass: '#FBF9F6', // ponytail: no blur lib → solid bar, add @react-native-community/blur for real glass
 };
 
@@ -239,6 +242,7 @@ export const qmDark: QMColors = {
   ghost: 'rgba(255,255,255,0.08)',
   blank: '#4A4358',
   sheetShadow: '0px -1px 0px rgba(255,255,255,0.06)',
+  onPastel: '#3A2A4A',
 };
 
 /** Mix two #RRGGBB colours: `t` = share of `a` (canvas `color-mix(in srgb, a t%, b)`). */

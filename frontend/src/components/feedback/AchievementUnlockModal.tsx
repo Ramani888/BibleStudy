@@ -1,158 +1,96 @@
 import React from 'react';
-import { Pressable, StatusBar, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import LinearGradient from 'react-native-linear-gradient';
-import Svg, { Circle, Defs, RadialGradient, Stop } from 'react-native-svg';
+import { Modal, Pressable, StyleSheet, View } from 'react-native';
+import Animated, { Easing, FadeIn, ZoomIn } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
-import { TrophyIcon } from '../icons';
+import { AnimatedPressable } from '../ui/AnimatedPressable';
 import { Typography } from '../ui/Typography';
-import { CelebrationBurst } from '../ui/CelebrationBurst';
-import { palette, radius, spacing } from '../../theme';
+import { AskIcon, CardsIcon, FriendsIcon, LeafIcon, TabQuizIcon, type IconComponent } from '../icons';
+import { useReferral } from '../../hooks/useCredits';
+import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import { requestReviewOnce } from '../../utils/requestReview';
-import type { Achievement } from '../../types';
+import { radius, spacing, useTheme } from '../../theme';
+import type { Achievement, AchievementCategory } from '../../types';
 
-const BADGE_OUTER = 89;
-const BADGE_INNER = 66;
+const TILE = 120;
+const TILE_RADIUS = 40;
+const BTN_H = 52;
+
+/** One drawing per achievement family (canvas Achievements icons). */
+export const ACHIEVEMENT_ICON: Record<AchievementCategory, IconComponent> = {
+  streak: LeafIcon, study: CardsIcon, quiz: TabQuizIcon, ai: AskIcon, social: FriendsIcon,
+};
+
+/** Share an unlocked achievement with the user's invite link (WhatsApp, falls back to the share sheet). */
+export function useShareAchievement() {
+  const { t } = useTranslation('profile');
+  const { data: referral } = useReferral();
+  return (a: Achievement) => shareToWhatsApp(
+    t('achievements.shareMessage', { title: a.title, url: buildReferralLink(referral?.code), defaultValue: 'I just unlocked "{{title}}" on Verdance 📖✨ Join me: {{url}}' }),
+    'achievement',
+  );
+}
 
 interface AchievementUnlockModalProps {
   achievement: Achievement | null;
   onDismiss: () => void;
 }
 
-import { useTranslation } from 'react-i18next';
-
-export function AchievementUnlockModal({ achievement, onDismiss }: AchievementUnlockModalProps) {
-  const { t } = useTranslation(['profile', 'common']);
-  const insets = useSafeAreaInsets();
-  if (!achievement) return null;
+/** Quiet-morning milestone card: the leaf grows in, credits chip, Share / Continue. */
+export function AchievementUnlockModal({ achievement: a, onDismiss }: AchievementUnlockModalProps) {
+  const { t } = useTranslation('profile');
+  const { qm } = useTheme();
+  const share = useShareAchievement();
+  if (!a) return null;
+  const Icon = ACHIEVEMENT_ICON[a.category] ?? LeafIcon;
+  const done = () => { onDismiss(); requestReviewOnce('achievement'); };
 
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
-      <StatusBar barStyle="light-content" />
-      <CelebrationBurst trigger={achievement.key} />
-
-      <View style={styles.content}>
-        <View style={styles.badge}>
-          <Svg width={BADGE_OUTER} height={BADGE_OUTER} style={StyleSheet.absoluteFill}>
-            <Defs>
-              <RadialGradient
-                id="badgeRing"
-                cx={BADGE_OUTER / 2}
-                cy={BADGE_OUTER / 2}
-                r={BADGE_OUTER / 2}
-                gradientUnits="userSpaceOnUse">
-                <Stop offset="0" stopColor={palette.indigo500} />
-                <Stop offset="1" stopColor="#4B4FFF" />
-              </RadialGradient>
-            </Defs>
-            <Circle
-              cx={BADGE_OUTER / 2}
-              cy={BADGE_OUTER / 2}
-              r={BADGE_OUTER / 2 - 1}
-              fill="url(#badgeRing)"
-              fillOpacity={0.15}
-              stroke={palette.indigo500}
-              strokeWidth={1}
-            />
-            <Circle cx={BADGE_OUTER / 2} cy={BADGE_OUTER / 2} r={BADGE_INNER / 2} fill={palette.indigo500} />
-          </Svg>
-          <TrophyIcon size={34} color={palette.white} />
-        </View>
-
-        <Typography style={styles.eyebrow}>{t('profile:achievements.unlockedBanner', 'Achievement Unlocked')}</Typography>
-        <Typography style={styles.title}>{achievement.title}</Typography>
-        <Typography style={styles.desc}>{achievement.description}</Typography>
-
-        {achievement.reward > 0 && (
-          <View style={styles.rewardPill}>
-            <Typography style={styles.rewardText}>+{achievement.reward} {t('profile:credits.credits', 'credits')}</Typography>
+    <Modal visible transparent animationType="fade" statusBarTranslucent onRequestClose={done}>
+      <Pressable style={[styles.scrim, { backgroundColor: qm.scrim }]} onPress={done} accessibilityLabel={t('qmAch.continue')} />
+      <View style={styles.center} pointerEvents="box-none">
+        <Animated.View
+          entering={ZoomIn.duration(600).springify().damping(14)}
+          style={[styles.card, { backgroundColor: qm.surface }]}
+          accessibilityRole="alert"
+          accessibilityLabel={`${t('qmAch.eyebrow')}. ${a.title}`}
+        >
+          <View style={[styles.tile, { backgroundColor: qm.leafBg }]}>
+            <Animated.View entering={ZoomIn.delay(300).duration(1000).easing(Easing.bezier(0.3, 1.6, 0.5, 1))}>
+              <Icon size={64} color={qm.leaf} strokeWidth={1.4} />
+            </Animated.View>
           </View>
-        )}
-
-        <Pressable onPress={() => { onDismiss(); requestReviewOnce('achievement'); }} style={styles.continueBtn}>
-          <LinearGradient
-            colors={[palette.violet500, palette.indigo500]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            style={[StyleSheet.absoluteFill, styles.btnGradient]}
-          />
-          <Typography style={styles.btnText}>{t('common:actions.continue', 'Continue')}</Typography>
-        </Pressable>
+          <Typography preset="qmLabel" color={qm.goldText} align="center" style={styles.eyebrow}>{t('qmAch.eyebrow')}</Typography>
+          <Typography preset="qmTitle" color={qm.ink} align="center" style={styles.title}>{a.title}</Typography>
+          <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.desc}>{a.description}</Typography>
+          {a.reward > 0 && (
+            <Animated.View entering={FadeIn.delay(500)} style={[styles.chip, { backgroundColor: qm.leafBg }]}>
+              <Typography preset="qmFieldLabel" color={qm.leafText}>{t('qmAch.added', { count: a.reward })}</Typography>
+            </Animated.View>
+          )}
+          <View style={styles.btnRow}>
+            <AnimatedPressable scaleTo={0.97} onPress={() => share(a)} style={[styles.btn, { backgroundColor: qm.field }]} accessibilityRole="button">
+              <Typography preset="qmButton" color={qm.ink}>{t('qmAch.share')}</Typography>
+            </AnimatedPressable>
+            <AnimatedPressable scaleTo={0.97} onPress={done} style={[styles.btn, { backgroundColor: qm.violet, boxShadow: qm.btnShadow }]} accessibilityRole="button">
+              <Typography preset="qmButton" color={qm.onViolet}>{t('qmAch.continue')}</Typography>
+            </AnimatedPressable>
+          </View>
+        </Animated.View>
       </View>
-    </View>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: palette.ink900,
-    paddingHorizontal: spacing.xxl,
-    zIndex: 9999,
-  },
-  content: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  badge: {
-    width: BADGE_OUTER,
-    height: BADGE_OUTER,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: spacing.xl,
-  },
-  eyebrow: {
-    fontSize: 13,
-    fontWeight: '700',
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-    color: palette.indigo500,
-    textAlign: 'center',
-    marginBottom: spacing.sm,
-  },
-  title: {
-    fontSize: 30,
-    fontWeight: '700',
-    lineHeight: 38,
-    color: palette.white,
-    textAlign: 'center',
-    marginBottom: spacing.md,
-  },
-  desc: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: 'rgba(255,255,255,0.55)',
-    textAlign: 'center',
-  },
-  rewardPill: {
-    marginTop: spacing.lg,
-    backgroundColor: 'rgba(99,102,241,0.2)',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    borderColor: palette.indigo500,
-  },
-  rewardText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: palette.indigo300,
-  },
-  continueBtn: {
-    alignSelf: 'stretch',
-    marginHorizontal: -8,
-    height: 48,
-    borderRadius: radius.lg,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: spacing.xxxl,
-  },
-  btnGradient: { borderRadius: radius.lg },
-  btnText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: palette.white,
-  },
+  scrim: { ...StyleSheet.absoluteFillObject },
+  center: { ...StyleSheet.absoluteFillObject, justifyContent: 'center', paddingHorizontal: spacing.xxl },
+  card: { borderRadius: radius.lg + 4, paddingTop: spacing.s28, paddingHorizontal: spacing.s22, paddingBottom: spacing.s22, alignItems: 'center' },
+  tile: { width: TILE, height: TILE, borderRadius: TILE_RADIUS, alignItems: 'center', justifyContent: 'center' },
+  eyebrow: { marginTop: spacing.s18 },
+  title: { marginTop: spacing.s6 },
+  desc: { marginTop: spacing.xs },
+  chip: { marginTop: spacing.s14, borderRadius: radius.pill, paddingVertical: spacing.s7, paddingHorizontal: spacing.s14 },
+  btnRow: { flexDirection: 'row', gap: spacing.s10, marginTop: spacing.xl, alignSelf: 'stretch' },
+  btn: { flex: 1, height: BTN_H, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
 });
