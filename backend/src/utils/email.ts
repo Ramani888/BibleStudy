@@ -108,3 +108,35 @@ export async function sendPasswordResetEmail(email: string, otp: string): Promis
     `,
   });
 }
+
+const escapeHtml = (v: string) =>
+  v.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+export async function sendUserReportEmail(r: {
+  id: string; reason: string; note?: string | null;
+  reporter: { id: string; name: string; email: string };
+  reported: { id: string; name: string; email: string };
+}): Promise<void> {
+  const transporter = createTransporter();
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:4px 12px 4px 0;color:#6B6580;">${label}</td><td style="padding:4px 0;">${escapeHtml(value)}</td></tr>`;
+  await transporter.sendMail({
+    from: `"Verdance" <${env.EMAIL_USER}>`,
+    to: env.REPORTS_EMAIL,
+    // Names are user-controlled — keep them out of the subject line.
+    subject: `User report: ${r.reason} (${r.id.slice(0, 8)})`,
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #221E33;">
+        <h2 style="color: #6D4AE0;">New user report</h2>
+        <table style="border-collapse: collapse; font-size: 14px;">
+          ${row('Report ID', r.id)}
+          ${row('Reason', r.reason)}
+          ${row('Reported', `${r.reported.name} <${r.reported.email}> (${r.reported.id})`)}
+          ${row('Reported by', `${r.reporter.name} <${r.reporter.email}> (${r.reporter.id})`)}
+        </table>
+        ${r.note ? `<p style="margin-top:16px;"><strong>Note:</strong><br>${escapeHtml(r.note).replace(/\n/g, '<br>')}</p>` : ''}
+        <p style="color:#6B6580;margin-top:24px;">Stored in the Report table (status OPEN).</p>
+      </div>
+    `,
+  });
+}

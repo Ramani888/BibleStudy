@@ -79,3 +79,4 @@ export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRena
 export { usePickMedia } from './usePickMedia';
 export { useSystemBars } from './useSystemBars';
 export { useNewAchievements } from './useNewAchievements';
+export { useReportUser } from './useReports';

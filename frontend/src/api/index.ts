@@ -16,3 +16,4 @@ export { quizApi } from './quiz.api';
 export { achievementsApi } from './achievements.api';
 export { plansApi } from './plans.api';
 export { subscriptionsApi } from './subscriptions.api';
+export { reportsApi } from './reports.api';

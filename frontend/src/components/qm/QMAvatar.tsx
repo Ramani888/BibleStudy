@@ -4,7 +4,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { Typography } from '../ui';
 import { qmFont, useTheme } from '../../theme';
 
-function initials(name?: string | null): string {
+export function initialsOf(name?: string | null): string {
   const p = (name ?? '').trim().split(/\s+/).filter(Boolean);
   return p.length ? (p[0][0] + (p.length > 1 ? p[p.length - 1][0] : '')).toUpperCase() : '?';
 }
@@ -25,7 +25,7 @@ export function QMAvatar({ uri, name, size = 44 }: { uri?: string | null; name?:
   const fontSize = Math.round(size * 0.36);
   return (
     <View style={[circle, styles.center, { backgroundColor: bg }]}>
-      <Typography style={[styles.text, { color: qm.onPastel, fontSize, lineHeight: Math.round(fontSize * 1.25) }]}>{initials(name)}</Typography>
+      <Typography style={[styles.text, { color: qm.onPastel, fontSize, lineHeight: Math.round(fontSize * 1.25) }]}>{initialsOf(name)}</Typography>
     </View>
   );
 }

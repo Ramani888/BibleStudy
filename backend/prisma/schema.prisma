@@ -47,6 +47,8 @@ model User {
   friendOf                Friendship[]          @relation("FriendOf")
   blockedUsers            Block[]               @relation("Blocker")
   blockedBy               Block[]               @relation("Blocked")
+  reportsMade             Report[]              @relation("Reporter")
+  reportsAgainst          Report[]              @relation("Reported")
   activities              Activity[]
   notifications           Notification[]
   notes                   Note[]
@@ -363,6 +365,22 @@ model Friendship {
   @@index([friendId])
 }
 
+// A user reporting another user (Apple 1.2). Also emailed to support when created.
+model Report {
+  id         String       @id @default(uuid())
+  reporterId String
+  reportedId String
+  reason     ReportReason
+  note       String?
+  status     ReportStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  reporter   User         @relation("Reporter", fields: [reporterId], references: [id], onDelete: Cascade)
+  reported   User         @relation("Reported", fields: [reportedId], references: [id], onDelete: Cascade)
+
+  @@index([reportedId])
+  @@index([status, createdAt])
+}
+
 model Block {
   id        String   @id @default(uuid())
   blockerId String
@@ -508,6 +526,19 @@ enum TransactionType {
   REWARD
   PURCHASE
   BONUS
+}
+
+enum ReportReason {
+  HATEFUL
+  SPAM
+  INAPPROPRIATE_CONTENT
+  IMPERSONATION
+  OTHER
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
 }
 
 enum FriendRequestStatus {

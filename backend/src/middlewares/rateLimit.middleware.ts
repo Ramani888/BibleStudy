@@ -36,6 +36,21 @@ export const generalRateLimit = rateLimit({
   },
 });
 
+// Reports email a human, so keep them rare: 10 an hour per user.
+export const reportRateLimit = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  max: 10,
+  keyGenerator: userOrIpKey,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    data: null,
+    message: 'Too many reports, please try again later.',
+    error: { code: 'RATE_LIMIT_EXCEEDED', details: null },
+  },
+});
+
 export const authRateLimit = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10,

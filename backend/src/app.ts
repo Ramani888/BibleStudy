@@ -27,6 +27,7 @@ import achievementsRoutes from './modules/achievements/achievements.routes';
 import plansRoutes from './modules/plans/plans.routes';
 import subscriptionsRoutes from './modules/subscriptions/subscriptions.routes';
 import waitlistRoutes from './modules/waitlist/waitlist.routes';
+import reportsRoutes from './modules/reports/reports.routes';
 
 const app = express();
 
@@ -107,6 +108,7 @@ app.use('/api/v1/cards',       cardsRoutes);
 app.use('/api/v1/ai',          aiRoutes);
 app.use('/api/v1/credits',     creditsRoutes);
 app.use('/api/v1/friends',     friendsRoutes);
+app.use('/api/v1/reports',     reportsRoutes);
 app.use('/api/v1/activities',      activitiesRoutes);
 app.use('/api/v1/notifications',   notificationsRoutes);
 app.use('/api/v1/notes',           notesRoutes);

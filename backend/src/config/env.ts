@@ -24,6 +24,8 @@ const envSchema = z.object({
   EMAIL_PORT: z.string().transform(Number).default('587'),
   EMAIL_USER: z.string().min(1, 'EMAIL_USER is required'),
   EMAIL_PASS: z.string().min(1, 'EMAIL_PASS is required'),
+  // Where user reports (Report a user) are emailed.
+  REPORTS_EMAIL: z.string().email().default('ddtechservices.work@gmail.com'),
   CLIENT_URL: z.string().optional().default(''),
   PORT: z.string().transform(Number).default('3001'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
