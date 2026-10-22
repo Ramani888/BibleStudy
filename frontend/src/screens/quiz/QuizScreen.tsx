@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, BackHandler, Pressable, StatusBar, StyleSheet, View } from 'react-native'; // StatusBar used imperatively via useFocusEffect
-import { useFocusEffect, useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
@@ -37,8 +37,6 @@ export function QuizScreen() {
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
   const { setIds, setTitles, mode = 'mix', quizName, topic, retakeAttemptId, generatedCards, reviewCards, ephemeral = false } = params;
-
-  const isFocused = useIsFocused();
 
   useFocusEffect(useCallback(() => {
     StatusBar.setHidden(true, 'fade');
@@ -158,7 +156,6 @@ export function QuizScreen() {
           summaryItems={summaryItems}
           retakeAttemptId={retakeAttemptId}
           ephemeral={ephemeral}
-          isFocused={isFocused}
           onExit={goBack}
         />
       </View>

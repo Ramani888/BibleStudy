@@ -1,16 +1,17 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
+import { ScrollView, StyleSheet, View } from 'react-native';
+import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
-
 import { useTranslation } from 'react-i18next';
-import { Button, Typography } from '../../../components/ui';
-import { ListIcon, StarIcon, StarOutlineIcon } from '../../../components/icons';
+
+import { QMButton, QMScoreRing } from '../../../components/qm';
+import { AnimatedPressable, Typography } from '../../../components/ui';
+import { InfoIcon, LeafIcon } from '../../../components/icons';
 import { useQuizAttemptSave, useStreak } from '../../../hooks';
-import { fontWeights, layout, spacing, useTheme } from '../../../theme';
+import { useAuthStore } from '../../../store';
+import { radius, spacing, useTheme } from '../../../theme';
 import { requestReviewOnce } from '../../../utils/requestReview';
 import type { SummaryItem } from '../../../types';
-import { scoreColor } from '../quizUi';
 
 const QUOTE_TIERS: { minScore: number; key: string }[] = [
   { minScore: 90, key: 'excellent' },
@@ -23,8 +24,11 @@ function getQuoteKey(score: number): string {
   return (QUOTE_TIERS.find(q => score >= q.minScore) ?? QUOTE_TIERS[QUOTE_TIERS.length - 1]).key;
 }
 
-const RESULT_ICON_SIZE = 56;
-const AUTO_EXIT_SECS = 5;
+const RING = 176;
+const RING_STROKE = 12;
+const SECOND_BTN_H = 48;
+
+const rise = (i: number) => FadeInUp.duration(320).delay(600 + i * 60);
 
 interface Props {
   setIds: string[];
@@ -40,36 +44,36 @@ interface Props {
   retakeAttemptId?: string;
   /** Ephemeral AI quiz — no real set/cards, so skip recording (SM-2/history). */
   ephemeral?: boolean;
-  isFocused: boolean;
   onExit: () => void;
 }
 
+/** Results never auto-close (canvas decision) — the user leaves with Done. */
 export function QuizResultScreen({
   setIds, setTitle, mode, quizName, topic,
   total, correct, scorePct, timeSecs,
-  summaryItems, retakeAttemptId, ephemeral, isFocused, onExit,
+  summaryItems, retakeAttemptId, ephemeral, onExit,
 }: Props) {
   const { t } = useTranslation(['quiz', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const navigation = useNavigation();
-  const { save, isPending, isError, error } = useQuizAttemptSave(retakeAttemptId);
+  const { qm } = useTheme();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- QuizSummary / Quiz are root-stack routes
+  const navigation = useNavigation<any>();
+  const { save, isPending, isError } = useQuizAttemptSave(retakeAttemptId);
   const { data: streakData } = useStreak();
+  const firstName = useAuthStore(s => s.user?.name?.split(' ')[0]);
   const saved = useRef(false);
+  const [best, setBest] = useState<number | null>(null);
 
   // Close the study loop: re-quiz just the missed items as an ephemeral quiz
   // (works for both manual and AI quizzes — reconstructs QA cards from responses).
-  const missed = summaryItems.filter(i => !i.isCorrect);
+  const missed = summaryItems.filter(i => !i.isCorrect && i.mode !== 'read');
   const handlePracticeMissed = useCallback(() => {
     const generatedCards = missed.map(i => ({ question: i.prompt, answer: i.correctAnswer }));
-    (navigation as any).push('Quiz', {
+    navigation.push('Quiz', {
       setIds: [], setTitles: [t('quiz:results.practiceMissed', 'Practice missed')],
       mode: 'mc', quizName: t('quiz:results.practiceMissed', 'Practice missed'), generatedCards,
       ephemeral: true, // a quick re-drill of missed items — not a new history entry
     });
   }, [missed, navigation, t]);
-  const [best, setBest] = useState<number | null>(null);
-  const [countdown, setCountdown] = useState(AUTO_EXIT_SECS);
 
   // Save once on mount — unified hook handles create vs update.
   // Ephemeral AI quizzes have no real set/cards, so they are never recorded.
@@ -82,167 +86,150 @@ export function QuizResultScreen({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Countdown only ticks when save is done AND this screen is in the foreground.
-  // If user navigates to QuizSummary, isFocused becomes false and the interval
-  // is cleared — so the auto-exit doesn't fire while they're reviewing answers.
-  useEffect(() => {
-    if (isPending || !isFocused) return;
-    const id = setInterval(() => {
-      setCountdown(c => {
-        if (c <= 1) { clearInterval(id); onExit(); return 0; }
-        return c - 1;
-      });
-    }, 1000);
-    return () => clearInterval(id);
-  }, [isPending, isFocused, onExit]);
-
-  const scoreCol = scoreColor(scorePct, colors);
+  const scored = total > 0;
+  const perfect = scored && correct === total;
   const isNewBest = best !== null && scorePct >= best;
   const qk = getQuoteKey(scorePct);
-  const quote = {
-    text: t(`quiz:result.quotes.${qk}.text`),
-    sub: t(`quiz:result.quotes.${qk}.sub`),
-  };
+  const name = firstName ?? '';
+  const title = !scored ? t('quiz:qm.niceRead', 'Nicely read')
+    : perfect ? t('quiz:qm.perfectTitle', 'Every one right')
+    : scorePct >= 70 ? t('quiz:qm.titleGreat', { name, defaultValue: `Great work, ${name}` })
+    : scorePct >= 50 ? t('quiz:qm.titleGood', { name, defaultValue: `Good effort, ${name}` })
+    : t('quiz:qm.titleKeepGoing', { name, defaultValue: `Keep going, ${name}` });
+  const minutes = timeSecs == null ? null : timeSecs < 60
+    ? t('quiz:qm.seconds', { count: timeSecs })
+    : t('quiz:qm.minutes', { count: Math.round(timeSecs / 60) });
+  const streak = streakData?.streak ?? 0;
+  const freezes = streakData?.freezes ?? 0;
 
   const openSummary = useCallback(() => {
-    (navigation as any).navigate('QuizSummary', {
-      items: summaryItems,
-      title: setTitle,
-      scorePct,
-      total,
-      correct,
-      exitToHub: true,
+    navigation.navigate('QuizSummary', {
+      items: summaryItems, title: setTitle, scorePct, total, correct, exitToHub: true,
     });
   }, [navigation, summaryItems, setTitle, scorePct, total, correct]);
 
   return (
-    <Animated.View entering={FadeIn.duration(500)} style={styles.wrap}>
-      <StarIcon size={RESULT_ICON_SIZE} color={colors.warning} />
-      <Typography preset="h2" align="center">{t('quiz:results.quizComplete', 'Quiz Complete!')}</Typography>
-      <Typography preset="body" color={colors.textSecondary} align="center" style={styles.sub}>
-        {setTitle}
-      </Typography>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <View style={styles.center}>
+          <View>
+            <QMScoreRing
+              pct={scored ? scorePct : null}
+              size={RING}
+              stroke={RING_STROKE}
+              caption={scored ? t('quiz:qm.rightOf', { correct, total, defaultValue: `${correct} of ${total} right` }) : undefined}
+              a11yLabel={scored ? t('quiz:qm.ringA11y', { pct: scorePct }) : undefined}
+            />
+            {perfect && (
+              <Animated.View entering={ZoomIn.delay(1100).springify().damping(9)} style={styles.leaf}>
+                <LeafIcon size={46} color={qm.leaf} strokeWidth={1.6} />
+              </Animated.View>
+            )}
+          </View>
+          <Animated.View entering={rise(0)}>
+            <Typography preset="qmTitle" color={qm.ink} align="center" style={styles.title}>{title}</Typography>
+          </Animated.View>
+          <Animated.View entering={rise(1)}>
+            <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.kind}>
+              {t(`quiz:result.quotes.${qk}.sub`)}
+            </Typography>
+          </Animated.View>
+        </View>
 
-      <View style={styles.scoreWrap}>
-        <Typography style={[styles.scoreNumber, { color: scoreCol }]}>{scorePct}%</Typography>
-        <Typography preset="caption" color={colors.textSecondary}>
-          {t('quiz:results.scoreFraction', { correct, total, defaultValue: `${correct} / ${total} correct` })}
+        {(streak > 0 || isNewBest) && (
+          <Animated.View entering={rise(2)} style={styles.chips}>
+            {streak > 0 && (
+              <View style={[styles.chip, { backgroundColor: qm.leafBg }]}>
+                <LeafIcon size={13} color={qm.leafText} filled />
+                <Typography preset="qmLabel" color={qm.leafText}>{t('home:today.streak', { count: streak })}</Typography>
+              </View>
+            )}
+            {streak > 0 && freezes > 0 && (
+              <View style={[styles.chip, { backgroundColor: qm.lilac }]}>
+                <Typography preset="qmLabel" color={qm.lilacInk}>{t('quiz:qm.restSaved', { count: freezes, defaultValue: `${freezes} rest day saved` })}</Typography>
+              </View>
+            )}
+            {isNewBest && (
+              <Animated.View entering={ZoomIn.delay(200).springify().damping(9)} style={[styles.chip, { backgroundColor: qm.goldBg }]}>
+                <Typography preset="qmLabel" color={qm.goldText}>{t('quiz:qm.newBest', 'New best')}</Typography>
+              </Animated.View>
+            )}
+          </Animated.View>
+        )}
+
+        {isError && (
+          <View style={[styles.warn, { backgroundColor: qm.errorBg }]} accessibilityRole="alert">
+            <InfoIcon size={18} color={qm.warm} strokeWidth={2} />
+            <Typography preset="qmBody" color={qm.warm} style={styles.flex}>
+              {t('quiz:qm.saveFailed', 'Couldn’t save this result. Check your connection.')}
+            </Typography>
+          </View>
+        )}
+
+        {scored && (
+          <Animated.View entering={rise(3)} style={styles.tiles}>
+            <View style={[styles.tile, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+              <Typography preset="qmTitle" color={qm.ink}>{t('quiz:qm.ofTotal', { correct, total })}</Typography>
+              <Typography preset="qmCaption" color={qm.muted} style={styles.tileSub}>{t('quiz:qm.answeredRight', 'answered right')}</Typography>
+            </View>
+            {minutes && (
+              <View style={[styles.tile, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+                <Typography preset="qmTitle" color={qm.ink}>{minutes}</Typography>
+                <Typography preset="qmCaption" color={qm.muted} style={styles.tileSub}>{t('quiz:qm.timeSpent', 'time spent')}</Typography>
+              </View>
+            )}
+          </Animated.View>
+        )}
+
+        {best !== null && !isNewBest && (
+          <Typography preset="qmButton" color={qm.body} align="center" style={styles.best}>
+            {t('quiz:qm.best', { score: best, defaultValue: `Best: ${best}%` })}
+          </Typography>
+        )}
+        <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.meta}>
+          {topic ? `${setTitle} · ${topic}` : setTitle}
         </Typography>
+      </ScrollView>
+
+      <View style={[styles.footer, { borderTopColor: qm.hair }]}>
+        {missed.length > 0 && (
+          <QMButton
+            label={t('quiz:qm.practiceMissed', { count: missed.length, defaultValue: `Practice the ${missed.length} you missed` })}
+            onPress={handlePracticeMissed}
+          />
+        )}
+        {summaryItems.length > 0 && (
+          <AnimatedPressable scaleTo={0.97} onPress={openSummary} style={[styles.second, { backgroundColor: qm.lilac }]} accessibilityRole="button">
+            <Typography preset="qmButton" color={qm.lilacInk}>{t('quiz:qm.everyAnswer', 'See every answer')}</Typography>
+          </AnimatedPressable>
+        )}
+        {missed.length > 0 ? (
+          <AnimatedPressable scaleTo={0.97} onPress={onExit} disabled={isPending} style={[styles.second, { backgroundColor: qm.field }]} accessibilityRole="button">
+            <Typography preset="qmButtonLg" color={qm.ink}>{t('common:actions.done', 'Done')}</Typography>
+          </AnimatedPressable>
+        ) : (
+          <QMButton label={t('common:actions.done', 'Done')} onPress={onExit} loading={isPending} />
+        )}
       </View>
-
-      {/* Motivational quote — same style as home screen verse card */}
-      <View style={[styles.quoteCard, { backgroundColor: colors.accent }]}>
-        <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteTopLeft]}>"</Typography>
-        <Typography preset="verse" color={colors.textOnAccent} style={[styles.quoteMark, styles.quoteBottomRight]}>"</Typography>
-        <Typography preset="verse" color={colors.textOnAccent} style={styles.quoteText}>{quote.text}</Typography>
-        <Typography preset="label" color={colors.textOnPrimaryMuted} style={styles.quoteSub}>{quote.sub}</Typography>
-      </View>
-
-      {/* Streak — loss-aversion nudge to come back tomorrow (+ freeze count) */}
-      {!!streakData?.streak && streakData.streak > 0 && (
-        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-          <Typography preset="caption" color={colors.textPrimary}>
-            {t('quiz:results.streakDays', { count: streakData.streak, defaultValue: `🔥 ${streakData.streak}-day streak` })}
-            {!!streakData.freezes && streakData.freezes > 0 && `  🧊 ${streakData.freezes}`}
-          </Typography>
-        </View>
-      )}
-
-      {/* Summary icon button */}
-      <Pressable
-        onPress={openSummary}
-        style={({ pressed }) => [styles.reviewBtn, { opacity: pressed ? 0.85 : 1 }]}
-        accessibilityRole="button"
-        accessibilityLabel={t('quiz:summary.title', 'View summary')}
-      >
-        <View style={[styles.reviewIcon, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-          <ListIcon size={22} color={colors.textSecondary} />
-        </View>
-        <Typography preset="caption" color={colors.textSecondary}>{t('quiz:results.reviewQuestions', 'Review')}</Typography>
-      </Pressable>
-
-      {best !== null && (
-        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-          {isNewBest
-            ? <StarIcon size={16} color={colors.warning} />
-            : <StarOutlineIcon size={16} color={colors.textSecondary} />
-          }
-          <Typography preset="caption" color={isNewBest ? colors.warning : colors.textSecondary}>
-            {isNewBest ? t('quiz:results.newBest', 'New best!') : t('quiz:results.bestScore', { score: best, defaultValue: `Best: ${best}%` })}
-          </Typography>
-        </View>
-      )}
-
-      {isError && (
-        <View style={[styles.pill, { backgroundColor: colors.surfaceMuted, borderColor: colors.alert }]}>
-          <Typography preset="caption" color={colors.alert}>
-            {t('quiz:results.saveFailed', { message: (error as any)?.message ?? t('common:status.unknownError', 'Unknown error'), defaultValue: `Save failed: ${(error as any)?.message ?? 'Unknown error'}` })}
-          </Typography>
-        </View>
-      )}
-
-      {missed.length > 0 && (
-        <Button
-          label={t('quiz:results.practiceMissedCount', { count: missed.length, defaultValue: `Practice ${missed.length} you missed` })}
-          variant="secondary"
-          onPress={handlePracticeMissed}
-          fullWidth
-        />
-      )}
-
-      <Button
-        label={`${t('common:actions.done')} (${countdown})`}
-        loading={isPending}
-        onPress={onExit}
-        fullWidth
-      />
-    </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrap: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: layout.screenPaddingH,
-    gap: spacing.lg,
-  },
-  sub:       { marginTop: -spacing.sm },
-  scoreWrap: { alignItems: 'center', gap: spacing.s2 },
-  // ponytail: fontSize 52 / lineHeight 64 are off-grid hero display values — no matching tokens
-  scoreNumber: { fontSize: 52, fontWeight: fontWeights.bold, lineHeight: 64 },
-  reviewBtn: { alignItems: 'center', gap: spacing.xs },
-  reviewIcon: {
-    width: layout.avatarMd,
-    height: layout.avatarMd,
-    borderRadius: layout.avatarMd / 2,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  pill: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
-  quoteCard: {
-    alignSelf: 'stretch',
-    borderRadius: layout.cardRadiusLg,
-    paddingHorizontal: spacing.xxl,
-    paddingVertical: spacing.xl,
-    justifyContent: 'center',
-    gap: spacing.sm,
-    overflow: 'hidden',
-  },
-  quoteText: { fontStyle: 'italic', textAlign: 'center' },
-  quoteSub: { textAlign: 'center' },
-  // ponytail: fontSize 52 / lineHeight 56 are off-grid decorative values — no matching tokens
-  quoteMark: { position: 'absolute', fontSize: 52, lineHeight: 56, opacity: 0.22 },
-  quoteTopLeft: { top: spacing.sm, left: spacing.lg },
-  quoteBottomRight: { bottom: spacing.sm, right: spacing.lg },
+  flex: { flex: 1, minWidth: 0 },
+  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.s48, paddingBottom: spacing.xxl },
+  center: { alignItems: 'center' },
+  leaf: { position: 'absolute', right: -spacing.s6, top: spacing.xs },
+  title: { marginTop: spacing.xl, marginBottom: spacing.s6 },
+  kind: { maxWidth: 300 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm, marginTop: spacing.s18 },
+  chip: { flexDirection: 'row', alignItems: 'center', gap: spacing.s5, paddingVertical: spacing.s6, paddingHorizontal: spacing.s10 + 1, borderRadius: radius.pill },
+  warn: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10, marginTop: spacing.lg, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2 },
+  tiles: { flexDirection: 'row', gap: spacing.s10, marginTop: spacing.xl },
+  tile: { flex: 1, alignItems: 'center', padding: spacing.s14, borderRadius: radius.r18 },
+  tileSub: { marginTop: spacing.s2 },
+  best: { marginTop: spacing.lg },
+  meta: { marginTop: spacing.s6 },
+  footer: { gap: spacing.sm, paddingHorizontal: spacing.xl, paddingTop: spacing.s14, paddingBottom: spacing.lg, borderTopWidth: 1 },
+  second: { height: SECOND_BTN_H, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
 });
