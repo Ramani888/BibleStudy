@@ -1,7 +1,7 @@
 ---
 tags: [frontend, design, redesign, canvas]
 updated: 2026-10-17
-status: in-review (design only — NOT implemented)
+status: implementing (Home, Tab bar, Sign-in, Library done)
 ---
 
 # Redesign — "Quiet Morning" (design canvas)
@@ -127,3 +127,4 @@ Every module checked against the real code: [[Redesign Audit 2026-10-17]]. Struc
 - 2026-10-17: owner decisions (onboarding 3 steps, Create my account → Register, Terms billing both stores); light fog gradients brought back (v84–85); full 7-module audit vs real code; canvas pages reorganized by app tab (v86); every module fixed v87 Home · v88 Sign-in · v89 Library · v90 Quiz · v91 Ask · v92 Profile · v93 Friends/Notes/Media (~70 new state/variant boards). Implementation still not started.
 
 Related: [[Brand & Assets]] · [[Design Language (Calm Serene)]] · [[Theme & Components]] · [[Screen Map]] · [[Sheet & Modal Components]]
+- 2026-10-22: implementation under way, module by module. Done: Home (e7840d4, b12c018), floating tab bar (247e98b), Sign-in (a2df7ca), **Library** (3ddb933 → 3321ca3: Library root, FolderDetail, SetDetail, set + card forms, study plans, Explore / Friends' sets). Shared kit in `frontend/src/components/qm/` (sheet, confirm dialog, segmented switch, search field, empty state, set row, folder tile, colour swatches, sticky bar, modal-form shell). Open owner question: canvas "Copy card to another set" needs a backend route; app keeps "Duplicate card". Next: Quiz.
