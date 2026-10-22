@@ -40,10 +40,11 @@ Prefer the graphs for exploration — cheaper than file crawling and they give s
 | IAP | react-native-iap v16 (+ react-native-nitro-modules) |
 
 ## Backend
-Base URL `/api/v1`. **17 modules**, each `backend/src/modules/<m>/` with the same 4 files:
+Base URL `/api/v1`. **18 modules**, each `backend/src/modules/<m>/` with the same 4 files:
 `<m>.routes.ts` · `<m>.controller.ts` · `<m>.service.ts` (owns ALL Prisma) · `<m>.dto.ts` (zod):
 `auth`, `users`, `folders`, `sets`, `cards`, `ai`, `credits`, `friends`, `activities`,
-`notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`, `waitlist`.
+`notifications`, `notes`, `media`, `quiz`, `achievements`, `plans`, `subscriptions`, `waitlist`, `reports`
+(user reports → `Report` table + email to `REPORTS_EMAIL`).
 
 - Prisma access lives ONLY in `*.service.ts` — controllers/routes never call Prisma directly.
 - Every new module must be mounted in `backend/src/app.ts` and get a migration via `prisma migrate dev`.
