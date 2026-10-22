@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated from 'react-native-reanimated';
@@ -50,12 +50,12 @@ export function SearchUsersScreen({ navigation }: Props) {
     }
   }, [sendRequest, accept, t]);
 
-  const look: Record<Status, [string, string, string, IconComponent]> = {
+  const look = useMemo<Record<Status, [string, string, string, IconComponent]>>(() => ({
     friend: [t('profile:qmSearch.friends'), qm.leafBg, qm.leafText, CheckIcon],
     incoming: [t('profile:qmSearch.accept'), qm.violet, qm.onViolet, CheckIcon],
     sent: [t('profile:qmSearch.requested'), qm.field, qm.muted, ClockIcon],
     none: [t('profile:qmSearch.add'), qm.lilac, qm.link, PlusIcon],
-  };
+  }), [qm, t]);
 
   const renderItem = useCallback(({ item, index }: { item: UserProfile; index: number }) => {
     const s = statusOf(item);

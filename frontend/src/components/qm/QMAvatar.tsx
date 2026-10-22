@@ -12,8 +12,8 @@ function initials(name?: string | null): string {
 /** Same name → same pastel, so a person keeps their colour on every screen. */
 function toneOf(name: string, count: number): number {
   let h = 0;
-  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) | 0;
-  return Math.abs(h) % count;
+  for (let i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) % 1_000_003;
+  return h % count;
 }
 
 /** Photo, or serif initials on a pastel circle (canvas people avatars). */
