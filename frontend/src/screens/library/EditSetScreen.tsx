@@ -1,38 +1,35 @@
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-
 import { useTranslation } from 'react-i18next';
-import { ConfirmDialog, ErrorState } from '../../components/feedback';
-import { SetForm, type SetFormHandle } from './components/SetForm';
-import { Button, Screen, ScreenHeader, Typography } from '../../components/ui';
-import { TrashIcon } from '../../components/icons';
 
+import { SetForm, type SetFormHandle } from './components/SetForm';
+import { QMButton, QMConfirmDialog, QMEmpty, QMModalScreen } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { RefreshIcon, TrashIcon } from '../../components/icons';
 import { useConfirmDialog, useSet, useUpdateSet, useDeleteSet } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, radius } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
-const ICON_SIZE = 20;
+const BTN_H = 52;
 
 export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet'>) {
   const { t } = useTranslation(['library', 'common']);
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const { setId } = route.params;
   const { data: set, isLoading, isError, refetch } = useSet(setId);
   const { mutateAsync: updateSet } = useUpdateSet();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
   const { show, dialogProps } = useConfirmDialog();
-
   const formRef = useRef<SetFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const header = <ScreenHeader title={t('library:sets.editSet')} handle />;
-
   const handleDelete = () => {
+    const count = set?._count?.cards ?? 0;
     show({
-      title: t('common:dialogs.deleteConfirmTitle'),
-      message: t('library:dialogs.deleteSetMessage', 'All cards in this set will also be deleted. This cannot be undone.'),
+      title: t('library:qm.deleteSetTitle', 'Delete this set?'),
+      message: t('library:qm.deleteSetMessage', { title: set?.title ?? '', count }),
       confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: async () => {
@@ -47,39 +44,26 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
     });
   };
 
-  if (isLoading) {
-    return (
-      <Screen header={header}>
-        <View style={styles.loading}>
-          <ActivityIndicator color={colors.accent} size="large" />
-        </View>
-      </Screen>
-    );
-  }
-
-  if (isError || !set) {
-    return (
-      <Screen header={header}>
-        <ErrorState message={t('library:sets.couldNotLoadSet', 'Could not load set.')} onRetry={refetch} />
-      </Screen>
-    );
-  }
-
-  const footer = (
-    <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label={t('common:actions.saveChanges', 'Save Changes')} onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
-    </View>
-  );
+  const ready = !isLoading && !isError && !!set;
 
   return (
-    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View>
+    <QMModalScreen
+      title={t('library:qm.editSet', 'Edit set')}
+      onCancel={navigation.goBack}
+      footer={ready ? <QMButton label={t('library:qm.saveChanges', 'Save changes')} onPress={() => formRef.current?.submit()} loading={submitting} style={styles.flex} /> : undefined}
+    >
+      {isLoading ? (
+        <ActivityIndicator color={qm.violet} style={styles.loading} />
+      ) : !set || isError ? (
+        <QMEmpty
+          style={styles.loading}
+          icon={RefreshIcon}
+          title={t('library:qm.setFailedTitle', 'This set did not load')}
+          text={t('library:qm.loadFailedText', 'Check your connection, then try again.')}
+          action={{ label: t('library:qm.tryAgain', 'Try again'), onPress: () => refetch() }}
+        />
+      ) : (
+        <>
           <SetForm
             ref={formRef}
             defaultValues={set}
@@ -90,37 +74,27 @@ export function EditSetScreen({ navigation, route }: LibraryScreenProps<'EditSet
               navigation.goBack();
             }}
           />
-        </View>
-        <View>
-          <View style={[styles.deleteSection, { borderTopColor: colors.border }]}>
-            <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => [styles.deleteRow, pressed && styles.rowPressed]}>
-              <TrashIcon size={ICON_SIZE} color={colors.alert} />
-              <Typography preset="label" color={colors.alert}>{t('library:sets.deleteSet', 'Delete Set')}</Typography>
-            </Pressable>
-          </View>
-        </View>
-      </ScrollView>
-
-      <ConfirmDialog {...dialogProps} />
-    </Screen>
+          <AnimatedPressable
+            scaleTo={0.97}
+            onPress={handleDelete}
+            style={[styles.delete, { borderColor: qm.line }]}
+            accessibilityRole="button"
+          >
+            <TrashIcon size={18} color={qm.error} strokeWidth={2} />
+            <Typography preset="qmButtonLg" color={qm.error}>{t('library:qm.deleteSetCta', 'Delete this set')}</Typography>
+          </AnimatedPressable>
+        </>
+      )}
+      <QMConfirmDialog {...dialogProps} />
+    </QMModalScreen>
   );
 }
 
 const styles = StyleSheet.create({
   flex: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.huge },
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  footer: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing.sm,
-    borderTopWidth: 1,
+  loading: { marginTop: spacing.huge },
+  delete: {
+    marginTop: spacing.s28, height: BTN_H, borderRadius: radius.r12 + 2, borderWidth: 1,
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.sm,
   },
-  deleteSection: {
-    marginTop: spacing.xxl,
-    alignItems: 'center',
-    paddingVertical: spacing.lg,
-    borderTopWidth: 1,
-  },
-  deleteRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  rowPressed: { opacity: 0.7 },
 });

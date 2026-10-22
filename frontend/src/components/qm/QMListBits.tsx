@@ -1,6 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, TextInput, TextInputProps, View } from 'react-native';
-import Animated, { FadeInUp, SharedValue, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { FadeInUp, SharedValue, runOnJS, useAnimatedReaction, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -255,12 +255,15 @@ export function QMStickyBar({ title, scrollY, threshold = 56, right }: {
 }) {
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  // Hidden bar must not swallow taps meant for the big header under it.
+  const [shown, setShown] = useState(false);
+  useAnimatedReaction(() => scrollY.value > threshold, (v, prev) => { if (v !== prev) runOnJS(setShown)(v); }, [threshold]);
   const anim = useAnimatedStyle(() => ({
     opacity: withTiming(scrollY.value > threshold ? 1 : 0, { duration: 200 }),
   }));
   return (
     <Animated.View
-      pointerEvents="box-none"
+      pointerEvents={shown ? 'box-none' : 'none'}
       style={[styles.bar, { paddingTop: insets.top, height: insets.top + BAR_H, backgroundColor: qm.glass, borderBottomColor: qm.hair }, anim]}
     >
       <Typography preset="qmBarTitle" color={qm.ink} numberOfLines={1} style={styles.flex}>{title}</Typography>

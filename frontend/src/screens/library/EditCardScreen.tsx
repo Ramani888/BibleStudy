@@ -1,78 +1,66 @@
 import React, { useRef, useState } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet } from 'react-native';
 import Toast from 'react-native-toast-message';
-
 import { useTranslation } from 'react-i18next';
-import { CardForm, type CardFormHandle } from './components/CardForm';
-import { ErrorState } from '../../components/feedback';
-import { Button, Screen, ScreenHeader } from '../../components/ui';
 
-import { useCardById, useUpdateCard } from '../../hooks';
+import { CardForm, type CardFormHandle } from './components/CardForm';
+import { QMButton, QMEmpty, QMModalScreen } from '../../components/qm';
+import { RefreshIcon } from '../../components/icons';
+import { useCardById, useSets, useUpdateCard } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 
 export function EditCardScreen({ navigation, route }: LibraryScreenProps<'EditCard'>) {
   const { t } = useTranslation(['library', 'common']);
-  const { colors } = useTheme();
-
+  const { qm } = useTheme();
   const { cardId, setId } = route.params;
   const { data: card, isLoading, isError, error, refetch } = useCardById(cardId);
+  const { data: sets = [] } = useSets();
   const { mutateAsync: updateCard } = useUpdateCard(setId);
   const formRef = useRef<CardFormHandle>(null);
   const [submitting, setSubmitting] = useState(false);
-
-  const header = <ScreenHeader title={t('library:cards.editCard')} handle />;
-
-  if (isLoading) {
-    return (
-      <Screen header={header}>
-        <View style={styles.loading}>
-          <ActivityIndicator color={colors.accent} size="large" />
-        </View>
-      </Screen>
-    );
-  }
-  if (isError || !card) {
-    return (
-      <Screen header={header}>
-        <ErrorState message={getErrorMessage(error) || t('library:cards.cardNotFound', 'Card not found')} onRetry={refetch} />
-      </Screen>
-    );
-  }
-
-  const footer = (
-    <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label={t('common:actions.save')} onPress={() => formRef.current?.submit()} loading={submitting} fullWidth />
-    </View>
-  );
+  const ready = !isLoading && !isError && !!card;
 
   return (
-    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <CardForm
-        ref={formRef}
-        lockedType
-        defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
-        onSubmittingChange={setSubmitting}
-        onSubmit={async ({ type, question, answer, note }) => {
-          try {
-            await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
-            Toast.show({ type: 'success', text1: t('library:cards.cardUpdated', 'Card updated!') });
-            navigation.goBack();
-          } catch (err) {
-            Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
-          }
-        }}
-      />
-    </Screen>
+    <QMModalScreen
+      title={t('library:qm.editCard', 'Edit card')}
+      sub={sets.find(s => s.id === setId)?.title}
+      onCancel={navigation.goBack}
+      footer={ready ? <QMButton label={t('library:qm.save', 'Save')} onPress={() => formRef.current?.submit()} loading={submitting} style={styles.flex} /> : undefined}
+    >
+      {isLoading ? (
+        <ActivityIndicator color={qm.violet} style={styles.loading} />
+      ) : !card || isError ? (
+        <QMEmpty
+          style={styles.loading}
+          icon={RefreshIcon}
+          title={t('library:cards.cardNotFound', 'Card not found')}
+          text={getErrorMessage(error) || undefined}
+          action={{ label: t('library:qm.tryAgain', 'Try again'), onPress: () => refetch() }}
+        />
+      ) : (
+        <CardForm
+          ref={formRef}
+          lockedType
+          defaultValues={{ type: card.type, question: card.question, answer: card.answer, note: card.note }}
+          onSubmittingChange={setSubmitting}
+          onSubmit={async ({ type, question, answer, note }) => {
+            try {
+              await updateCard({ id: cardId, payload: { type, question, answer, note: note || null } });
+              Toast.show({ type: 'success', text1: t('library:cards.cardUpdated', 'Card updated!') });
+              navigation.goBack();
+            } catch (err) {
+              Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
+            }
+          }}
+        />
+      )}
+    </QMModalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  loading: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  footer: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing.sm,
-    borderTopWidth: 1,
-  },
+  flex: { flex: 1 },
+  loading: { marginTop: spacing.huge },
 });

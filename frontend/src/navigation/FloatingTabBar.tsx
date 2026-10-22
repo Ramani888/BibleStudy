@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 
@@ -30,9 +31,15 @@ const TAB_ICONS: Record<keyof AppTabParamList, typeof TabHomeIcon> = {
  * Quiet-morning floating pill tab bar. Sits in normal layout (not absolute), so
  * no screen needs extra bottom padding; the strip around it is the page colour.
  */
+const FULL_SCREEN = new Set(['CreateSet', 'EditSet', 'CreateCard', 'EditCard', 'CreatePlan']);
+
 export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+
+  // Full-screen modal forms (canvas rule) hide the bar.
+  const nested = getFocusedRouteNameFromRoute(state.routes[state.index]);
+  if (nested && FULL_SCREEN.has(nested)) return null;
 
   return (
     <View style={[styles.wrap, { backgroundColor: qm.bg, paddingBottom: Math.max(insets.bottom, spacing.md) }]}>

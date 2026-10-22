@@ -1,21 +1,24 @@
-import React, { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { forwardRef, useEffect, useImperativeHandle, useMemo, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
 
-import { ChevronRightIcon, FolderIcon } from '../../../components/icons';
-import { FormField } from '../../../components/forms';
-import { Badge, ColorPicker, Typography, Divider } from '../../../components/ui';
-
-import { AppModal } from '../../../components/feedback';
+import { ChevronRightIcon, FolderIcon, FolderOffIcon } from '../../../components/icons';
+import { QMColorSwatches, QMFormField, QMSegmented, QMSheet, type QMSheetAction } from '../../../components/qm';
+import { Typography } from '../../../components/ui';
+import { PRESET_COLORS } from '../../../components/ui/ColorPicker';
 import { useFolders } from '../../../hooks';
 import { createSetSchema, type CreateSetFormData } from '../../../utils/validators';
 import { getErrorMessage } from '../../../api';
-import { layout, spacing, useTheme } from '../../../theme';
+import { useTheme, spacing, radius, qmAccent, qmFont } from '../../../theme';
 import type { Visibility, CardLayout, StudySet } from '../../../types';
 
-const ICON_SIZE = 18;
+const COVER_W = 132;
+const COVER_H = 162;
+const COVER_STRIPE = 10;
+const FIELD_H = 52;
 
 /** Imperative handle so the screen can pin the submit button in its footer. */
 export interface SetFormHandle {
@@ -29,54 +32,41 @@ interface SetFormProps {
   onSubmittingChange?: (submitting: boolean) => void;
 }
 
-const VISIBILITY_OPTIONS: { value: Visibility; label: string; desc: string }[] = [
-  { value: 'PRIVATE', label: 'Private', desc: 'Only you' },
-  { value: 'PUBLIC', label: 'Public', desc: 'Everyone' },
-  { value: 'FRIENDS', label: 'Friends', desc: 'Shared link' },
-];
-
-const LAYOUT_OPTIONS: { value: CardLayout; label: string }[] = [
-  { value: 'DEFAULT', label: 'Default' },
-  { value: 'MINIMAL', label: 'Minimal' },
-  { value: 'DETAILED', label: 'Detailed' },
-];
-
-import { useTranslation } from 'react-i18next';
+const VISIBILITY: Visibility[] = ['PRIVATE', 'FRIENDS', 'PUBLIC'];
+const LAYOUTS: CardLayout[] = ['DEFAULT', 'MINIMAL', 'DETAILED'];
 
 export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
   { defaultValues, onSubmit, onSubmittingChange },
   ref,
 ) {
   const { t } = useTranslation(['library', 'common']);
-  const { colors } = useTheme();
+  const { qm, name: themeName } = useTheme();
   const [visibility, setVisibility] = useState<Visibility>(defaultValues?.visibility ?? 'PRIVATE');
   const [cardLayout, setCardLayout] = useState<CardLayout>(defaultValues?.layout ?? 'DEFAULT');
   const [folderId, setFolderId] = useState<string | null>(defaultValues?.folderId ?? null);
-  const [selectedColor, setSelectedColor] = useState<string | null>(defaultValues?.color ?? null);
+  const [color, setColor] = useState<string | null>(defaultValues?.color ?? null);
   const [folderPickerOpen, setFolderPickerOpen] = useState(false);
 
   const { data: folders = [] } = useFolders();
-
   const selectedFolder = folders.find(f => f.id === folderId);
 
   // If the stored folderId references a folder that no longer exists, clear it
   useEffect(() => {
-    if (folderId && folders.length > 0 && !selectedFolder) {
-      setFolderId(null);
-    }
+    if (folderId && folders.length > 0 && !selectedFolder) setFolderId(null);
   }, [folderId, folders, selectedFolder]);
 
-  const { control, handleSubmit, formState: { isSubmitting } } = useForm<CreateSetFormData>({
+  const { control, handleSubmit, watch, formState: { isSubmitting } } = useForm<CreateSetFormData>({
     resolver: zodResolver(createSetSchema),
     defaultValues: {
       title: defaultValues?.title ?? '',
       description: defaultValues?.description ?? '',
     },
   });
+  const title = watch('title') ?? '';
 
   const handleSave = async (data: CreateSetFormData) => {
     try {
-      await onSubmit({ ...data, visibility, layout: cardLayout, folderId, color: selectedColor });
+      await onSubmit({ ...data, visibility, layout: cardLayout, folderId, color });
     } catch (err) {
       Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) });
     }
@@ -88,180 +78,136 @@ export const SetForm = forwardRef<SetFormHandle, SetFormProps>(function SetForm(
     onSubmittingChange?.(isSubmitting);
   }, [isSubmitting, onSubmittingChange]);
 
+  const dark = themeName === 'dark';
+  const [coverBg, coverInk] = qmAccent(qm, dark, color);
+  const folderActions = useMemo<QMSheetAction[]>(() => [
+    { label: t('library:folders.noFolder', 'No folder'), icon: FolderOffIcon, iconColor: qm.muted, tick: !folderId, onPress: () => setFolderId(null) },
+    ...folders.map(f => ({
+      label: f.name, icon: FolderIcon, iconColor: f.color ? qmAccent(qm, dark, f.color)[1] : qm.link,
+      tick: folderId === f.id, onPress: () => setFolderId(f.id),
+    })),
+  ], [folders, folderId, qm, dark, t]);
+
+  const visDesc = {
+    PRIVATE: t('library:qm.visPrivate', 'Only you can see this set.'),
+    FRIENDS: t('library:qm.visFriends', 'Your friends can see it in Friends’ sets.'),
+    PUBLIC: t('library:qm.visPublic', 'Everyone can find it in Explore and add it to their library.'),
+  }[visibility];
+
   return (
-    <View style={styles.container}>
-      <FormField
-        name="title"
-        control={control}
-        label={t('library:sets.titleLabel', 'Title')}
-        placeholder={t('library:sets.titlePlaceholder', 'e.g. Romans Study')}
-        autoCapitalize="sentences"
-        returnKeyType="next"
-        maxLength={200}
-      />
+    <View>
+      <View style={styles.coverWrap}>
+        <View style={[styles.cover, { backgroundColor: coverBg, boxShadow: qm.cardShadow }]} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <View style={[styles.coverStripe, { backgroundColor: coverInk }]} />
+          <Typography preset="qmDisplay" color={coverInk} style={styles.coverInitial}>{(title.trim().charAt(0) || '?').toUpperCase()}</Typography>
+          <Typography preset="qmMeta" color={coverInk} numberOfLines={2} style={styles.coverName}>{title.trim() || t('library:qm.yourSet', 'Your set')}</Typography>
+        </View>
+      </View>
 
-      <FormField
-        name="description"
-        control={control}
-        label={t('library:sets.descLabel', 'Description (optional)')}
-        placeholder={t('library:sets.descPlaceholder', 'What is this set about?')}
-        autoCapitalize="sentences"
-        maxLength={1000}
-      />
+      <View style={styles.fields}>
+        <QMFormField
+          name="title"
+          control={control}
+          label={t('library:sets.titleLabel', 'Title')}
+          placeholder={t('library:qm.titlePlaceholder', 'e.g. Romans study')}
+          autoCapitalize="sentences"
+          returnKeyType="next"
+          maxLength={200}
+        />
+        <QMFormField
+          name="description"
+          control={control}
+          label={t('library:sets.description', 'Description')}
+          optional={t('library:qm.optional', '(optional)')}
+          placeholder={t('library:sets.descPlaceholder', 'What is this set about?')}
+          autoCapitalize="sentences"
+          multiline
+          maxLength={1000}
+          style={styles.desc}
+        />
 
-      {/* Folder picker */}
-      <View>
-        <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          {t('library:sets.folderOptional', 'Folder (optional)')}
-        </Typography>
-        <Pressable style={({ pressed }) => [styles.picker, { backgroundColor: colors.surfaceMuted }, pressed && styles.btnPressed]} onPress={() => setFolderPickerOpen(true)}>
-          <Typography preset="body" color={selectedFolder ? colors.textPrimary : colors.textDisabled}>
-            {selectedFolder ? selectedFolder.name : t('library:folders.noFolder', 'No folder')}
+        <View style={styles.group}>
+          <Typography preset="qmFieldLabel" color={qm.ink}>
+            {t('library:qm.folder', 'Folder')}
+            <Typography preset="qmBody" color={qm.muted}>{` ${t('library:qm.optional', '(optional)')}`}</Typography>
           </Typography>
-          <ChevronRightIcon size={ICON_SIZE} color={colors.textSecondary} />
-        </Pressable>
-      </View>
-
-      {/* Color */}
-      <View>
-        <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          {t('library:sets.color', 'Color')}
-        </Typography>
-        <ColorPicker value={selectedColor} onChange={setSelectedColor} />
-      </View>
-
-      {/* Visibility */}
-      <View>
-        <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          {t('library:sets.visibility', 'Visibility')}
-        </Typography>
-        <View style={styles.optionRow}>
-          {VISIBILITY_OPTIONS.map(opt => (
-            <Pressable
-              key={opt.value}
-              style={({ pressed }) => [
-                styles.optionChip,
-                { backgroundColor: visibility === opt.value ? colors.accentSoft : colors.surfaceMuted },
-                visibility === opt.value && { borderWidth: 1.5, borderColor: colors.accent },
-                pressed && styles.btnPressed,
-              ]}
-              onPress={() => setVisibility(opt.value)}
-            >
-              <Typography
-                preset="label"
-                color={visibility === opt.value ? colors.accent : colors.textSecondary}
-              >
-                {t(`library:sets.visibility${opt.value}`, opt.label)}
-              </Typography>
-              <Typography
-                preset="caption"
-                color={visibility === opt.value ? colors.textSecondary : colors.textDisabled}
-              >
-                {t(`library:sets.visibilityDesc${opt.value}`, opt.desc)}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-
-      {/* Layout */}
-      <View>
-        <Typography preset="label" color={colors.textSecondary} style={styles.fieldLabel}>
-          {t('library:sets.cardLayout', 'Card Layout')}
-        </Typography>
-        <View style={styles.optionRow}>
-          {LAYOUT_OPTIONS.map(opt => (
-            <Pressable
-              key={opt.value}
-              style={({ pressed }) => [
-                styles.layoutChip,
-                { backgroundColor: cardLayout === opt.value ? colors.accentSoft : colors.surfaceMuted },
-                cardLayout === opt.value && { borderWidth: 1.5, borderColor: colors.accent },
-                pressed && styles.btnPressed,
-              ]}
-              onPress={() => setCardLayout(opt.value)}
-            >
-              <Typography
-                preset="label"
-                color={cardLayout === opt.value ? colors.accent : colors.textSecondary}
-              >
-                {t(`library:sets.layout${opt.value}`, opt.label)}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
-      </View>
-
-      {/* Folder picker modal */}
-      <AppModal
-        visible={folderPickerOpen}
-        title={t('library:folders.chooseFolder', 'Choose Folder')}
-        onClose={() => setFolderPickerOpen(false)}
-      >
-        <ScrollView style={styles.folderScroll} showsVerticalScrollIndicator={false}>
-          <Pressable style={({ pressed }) => [styles.folderOption, pressed && styles.rowPressed]} onPress={() => { setFolderId(null); setFolderPickerOpen(false); }}>
-            <Typography preset="body" color={!folderId ? colors.accent : colors.textPrimary}>
-              {t('library:folders.noFolder', 'No folder')}
+          <Pressable
+            onPress={() => setFolderPickerOpen(true)}
+            style={({ pressed }) => [styles.picker, { backgroundColor: qm.surface, borderColor: qm.line }, pressed && styles.dim]}
+            accessibilityRole="button"
+            accessibilityLabel={`${t('library:qm.folder', 'Folder')}: ${selectedFolder?.name ?? t('library:folders.noFolder', 'No folder')}`}
+          >
+            <FolderIcon size={20} color={selectedFolder?.color ? qmAccent(qm, dark, selectedFolder.color)[1] : qm.muted} />
+            <Typography preset="qmInput" color={selectedFolder ? qm.ink : qm.muted} style={styles.flex} numberOfLines={1}>
+              {selectedFolder?.name ?? t('library:folders.noFolder', 'No folder')}
             </Typography>
-            {!folderId && <Badge label={t('common:status.selected', 'Selected')} variant="primary" />}
+            <ChevronRightIcon size={18} color={qm.muted} />
           </Pressable>
-          <Divider marginV={spacing.xs} />
-          {folders.map(folder => (
-            <React.Fragment key={folder.id}>
-              <Pressable
-                style={({ pressed }) => [styles.folderOption, pressed && styles.rowPressed]}
-                onPress={() => { setFolderId(folder.id); setFolderPickerOpen(false); }}
-              >
-                <View style={styles.folderRow}>
-                  <FolderIcon size={ICON_SIZE} color={folderId === folder.id ? colors.accent : colors.textSecondary} />
-                  <Typography preset="body" color={folderId === folder.id ? colors.accent : colors.textPrimary}>
-                    {folder.name}
-                  </Typography>
-                </View>
-                {folderId === folder.id && <Badge label={t('common:status.selected', 'Selected')} variant="primary" />}
-              </Pressable>
-              <Divider marginV={spacing.xs} />
-            </React.Fragment>
-          ))}
-        </ScrollView>
-      </AppModal>
+        </View>
+
+        <View style={styles.group}>
+          <Typography preset="qmFieldLabel" color={qm.ink}>
+            {t('library:sets.color', 'Color')}
+            <Typography preset="qmBody" color={qm.muted}>{` ${t('library:qm.optional', '(optional)')}`}</Typography>
+          </Typography>
+          <View style={styles.swatches}><QMColorSwatches value={color} onChange={setColor} presets={PRESET_COLORS} /></View>
+        </View>
+
+        <View style={styles.group}>
+          <Typography preset="qmFieldLabel" color={qm.ink}>{t('library:qm.whoCanSee', 'Who can see it')}</Typography>
+          <View style={styles.seg}>
+            <QMSegmented
+              label={t('library:qm.whoCanSee', 'Who can see it')}
+              value={visibility}
+              onChange={setVisibility}
+              options={VISIBILITY.map(v => ({ key: v, label: t(`library:sets.visibility${v}`) }))}
+            />
+          </View>
+          <Typography preset="qmMeta" color={qm.muted} style={styles.visDesc}>{visDesc}</Typography>
+        </View>
+
+        <View style={styles.group}>
+          <Typography preset="qmFieldLabel" color={qm.ink}>{t('library:qm.cardLayout', 'Card layout')}</Typography>
+          <View style={styles.seg}>
+            <QMSegmented
+              label={t('library:qm.cardLayout', 'Card layout')}
+              value={cardLayout}
+              onChange={setCardLayout}
+              options={LAYOUTS.map(l => ({ key: l, label: t(`library:sets.layout${l}`) }))}
+            />
+          </View>
+        </View>
+      </View>
+
+      <QMSheet
+        visible={folderPickerOpen}
+        onClose={() => setFolderPickerOpen(false)}
+        title={t('library:qm.chooseFolder', 'Choose a folder')}
+        actions={folderActions}
+      />
     </View>
   );
 });
 
 const styles = StyleSheet.create({
-  container: { gap: spacing.lg },
-  fieldLabel: { marginBottom: spacing.s6 },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  coverWrap: { alignItems: 'center', paddingTop: spacing.sm, paddingBottom: spacing.s22 },
+  cover: {
+    width: COVER_W, height: COVER_H, borderRadius: radius.r21 + 1, overflow: 'hidden',
+    justifyContent: 'flex-end', padding: spacing.s14,
+  },
+  coverStripe: { position: 'absolute', left: 0, top: 0, bottom: 0, width: COVER_STRIPE, opacity: 0.35 },
+  coverInitial: { fontSize: 40, lineHeight: 44 },
+  coverName: { marginTop: spacing.sm, fontFamily: qmFont.serif },
+  fields: { gap: spacing.lg },
+  desc: { minHeight: 72 }, // ponytail: canvas 3-row textarea
+  group: { gap: spacing.s6 },
   picker: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    height: layout.inputHeight,
-    borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing.lg,
+    height: FIELD_H, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2, borderWidth: 1,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s10,
   },
-  optionRow: { flexDirection: 'row', gap: spacing.sm },
-  optionChip: {
-    flex: 1,
-    borderRadius: layout.cardRadius,
-    padding: spacing.md,
-    alignItems: 'center',
-    gap: spacing.s2,
-  },
-  layoutChip: {
-    flex: 1,
-    borderRadius: layout.cardRadius,
-    paddingVertical: spacing.md,
-    alignItems: 'center',
-  },
-  folderOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.md,
-  },
-  folderScroll: { maxHeight: 300 }, // ponytail: off-grid modal cap
-  folderRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  btnPressed: { opacity: 0.85 },
-  rowPressed: { opacity: 0.7 },
+  swatches: { marginTop: spacing.xs },
+  seg: { marginTop: spacing.xs },
+  visDesc: { marginTop: spacing.xs, marginHorizontal: spacing.s2 },
 });
