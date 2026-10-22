@@ -1,18 +1,9 @@
-import React, { useMemo } from 'react';
-import { StyleSheet } from 'react-native';
+import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { AppTabParamList } from './types';
-import { fontSizes, fontWeights, layout, spacing, useTheme, type ThemeColors } from '../theme';
-import {
-  HomeIcon,
-  LibraryIcon,
-  QuizIcon,
-  SparklesIcon,
-  UserIcon,
-  type IconComponent,
-} from '../components/icons';
+import { useTheme } from '../theme';
+import { FloatingTabBar } from './FloatingTabBar';
 import { HomeScreen } from '../screens/home/HomeScreen';
 import { LibraryNavigator } from './LibraryNavigator';
 import { QuizNavigator } from './QuizNavigator';
@@ -24,14 +15,6 @@ import { AchievementUnlockModal } from '../components/feedback/AchievementUnlock
 
 const Tab = createBottomTabNavigator<AppTabParamList>();
 
-const TAB_ICONS: Record<keyof AppTabParamList, IconComponent> = {
-  HomeTab: HomeIcon,
-  LibraryTab: LibraryIcon,
-  QuizTab: QuizIcon,
-  AITab: SparklesIcon,
-  ProfileTab: UserIcon,
-};
-
 function AchievementGate() {
   const { achievement, dismiss } = useNewAchievements();
   return <AchievementUnlockModal achievement={achievement} onDismiss={dismiss} />;
@@ -39,28 +22,19 @@ function AchievementGate() {
 
 export function AppNavigator() {
   const { t } = useTranslation('navigation');
-  const insets = useSafeAreaInsets();
-  const { colors } = useTheme();
-  const styles = useMemo(() => makeStyles(colors, insets.bottom), [colors, insets.bottom]);
+  const { colors, qm } = useTheme();
 
   useSubscriptionSync(); // verify-on-open: re-sync subscription entitlement at launch
-  useSystemBars(colors.bottomBar);
+  useSystemBars(qm.bg); // nav bar blends with the strip under the floating tab bar
 
   return (
     <>
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      tabBar={props => <FloatingTabBar {...props} />}
+      screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: colors.background },
-        tabBarActiveTintColor: colors.accent,
-        tabBarInactiveTintColor: colors.tabInactive,
-        tabBarStyle: styles.tabBar,
-        tabBarLabelStyle: styles.tabLabel,
-        tabBarIcon: ({ color, size, focused }) => {
-          const TabIcon = TAB_ICONS[route.name as keyof AppTabParamList];
-          return <TabIcon size={size ?? 24} color={color} filled={focused} />;
-        },
-      })}
+      }}
     >
       <Tab.Screen name="HomeTab"    component={HomeScreen}       options={{ title: t('tabs.home') }} />
       <Tab.Screen name="LibraryTab" component={LibraryNavigator} options={{ title: t('tabs.library') }} />
@@ -74,19 +48,3 @@ export function AppNavigator() {
     </>
   );
 }
-
-const makeStyles = (colors: ThemeColors, bottomInset: number) =>
-  StyleSheet.create({
-    tabBar: {
-      backgroundColor: colors.bottomBar,
-      borderTopColor: colors.border,
-      borderTopWidth: StyleSheet.hairlineWidth,
-      height: layout.tabBarHeight + bottomInset,
-      paddingTop: spacing.xs,
-      paddingBottom: bottomInset + spacing.xs,
-    },
-    tabLabel: {
-      fontSize: fontSizes.xs,
-      fontWeight: fontWeights.medium,
-    },
-  });

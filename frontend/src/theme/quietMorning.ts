@@ -41,6 +41,12 @@ export interface QMColors {
   verseRef: string;
   verseBtn: string;
   verseShadow: string;
+  /** Floating tab bar. */
+  tabBg: string;
+  tabShadow: string;
+  tabIdle: string;
+  tabOn: string;
+  tabPill: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -78,6 +84,11 @@ export const qmLight: QMColors = {
   verseRef: '#6D4AE0',
   verseBtn: 'rgba(255,255,255,0.72)',
   verseShadow: '0px 18px 40px -22px rgba(109,74,224,0.35)',
+  tabBg: '#FFFFFF',
+  tabShadow: '0px 10px 30px -12px rgba(34,30,51,0.28), 0px 0px 0px 1px rgba(34,30,51,0.04)',
+  tabIdle: '#6B6580',
+  tabOn: '#6D4AE0',
+  tabPill: '#EEE9FB',
 };
 
 export const qmDark: QMColors = {
@@ -113,6 +124,11 @@ export const qmDark: QMColors = {
   verseRef: '#B3A0FA',
   verseBtn: 'rgba(255,255,255,0.09)',
   verseShadow: '0px 0px 0px 1px rgba(255,255,255,0.05)',
+  tabBg: '#201B2A',
+  tabShadow: '0px 12px 32px -12px rgba(0,0,0,0.6), 0px 0px 0px 1px rgba(255,255,255,0.08)',
+  tabIdle: '#A69FB6',
+  tabOn: '#C9BBFF',
+  tabPill: '#2E2647',
 };
 
 export const qmFont = {
@@ -141,4 +157,6 @@ export const qmPresets = {
   qmMeta:      { fontFamily: qmFont.regular,     fontSize: 13, lineHeight: 18 },
   qmCaption:   { fontFamily: qmFont.medium,      fontSize: 12, lineHeight: 15 },
   qmTag:       { fontFamily: qmFont.bold,        fontSize: 11, lineHeight: 14 },
+  qmTab:       { fontFamily: qmFont.medium,      fontSize: 11, lineHeight: 14 },
+  qmTabOn:     { fontFamily: qmFont.bold,        fontSize: 11, lineHeight: 14 },
 } as const;

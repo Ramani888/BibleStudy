@@ -595,3 +595,50 @@ export const ShareUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, stroke
     <Path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+// ─── Tab bar icons (canvas TabBar). `filled` = active; `cutout` = pill colour
+// for the inner detail (book spine, check, dots) drawn on top of the fill. ────
+
+interface TabIconProps extends IconProps { cutout?: string }
+
+export const TabHomeIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_COLOR, filled }) => (
+  <Outline size={size}>
+    <Path d="M4 10.4 12 4l8 6.4V19a1 1 0 0 1-1 1h-4.5v-4.5a2.5 2.5 0 0 0-5 0V20H5a1 1 0 0 1-1-1z" fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+  </Outline>
+);
+
+export const TabLibraryIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_COLOR, filled, cutout = palette.white }) => (
+  <Outline size={size}>
+    <Path d="M12 6.6C10 5.1 7 4.6 4 5.1v13.4c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5.1c-3-.5-6 0-8 1.5z" fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+    {filled
+      ? <Path d="M12 7.4v11.4" {...stroke(cutout, 1.6)} />
+      : <Path d="M12 6.6V20" {...stroke(color, 1.8)} />}
+  </Outline>
+);
+
+export const TabQuizIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_COLOR, filled, cutout = palette.white }) => (
+  <Outline size={size}>
+    <Path d="M8.5 4.5H17a2.5 2.5 0 0 1 2.5 2.5v8.5" {...stroke(color, 1.8)} />
+    <Path d="M7 8h6.5a2.5 2.5 0 0 1 2.5 2.5v7a2.5 2.5 0 0 1-2.5 2.5H7a2.5 2.5 0 0 1-2.5-2.5v-7A2.5 2.5 0 0 1 7 8z" fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+    <Path d="M7.6 14.2l1.9 1.9 3.4-3.8" {...stroke(filled ? cutout : color, 1.8)} />
+  </Outline>
+);
+
+export const TabAskIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_COLOR, filled, cutout = palette.white }) => {
+  const dot = filled ? cutout : color;
+  return (
+    <Outline size={size}>
+      <Path d="M5 5h14a1.5 1.5 0 0 1 1.5 1.5v9A1.5 1.5 0 0 1 19 17h-8.5L6 20.5V17H5a1.5 1.5 0 0 1-1.5-1.5v-9A1.5 1.5 0 0 1 5 5z" fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+      <Circle cx={8.5} cy={11} r={1.1} fill={dot} />
+      <Circle cx={12} cy={11} r={1.1} fill={dot} />
+      <Circle cx={15.5} cy={11} r={1.1} fill={dot} />
+    </Outline>
+  );
+};
+
+export const TabProfileIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_COLOR, filled }) => (
+  <Outline size={size}>
+    <Circle cx={12} cy={8.5} r={3.6} fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+    <Path d={filled ? 'M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6z' : 'M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6'} fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
+  </Outline>
+);
