@@ -1,67 +1,87 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import {
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  Share,
-  StyleSheet,
-  View,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { FlatList, KeyboardAvoidingView, Platform, Pressable, Share, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
+import { useTranslation } from 'react-i18next';
 
-import { ActionSheet, ConfirmDialog } from '../../components/feedback';
-import { Typography } from '../../components/ui';
-import { BookmarkIcon, ClockIcon, CopyIcon, FileTextIcon, MoreVerticalIcon, PlusIcon, RefreshIcon, ShareIcon, SparklesIcon, StarIcon, StarOutlineIcon } from '../../components/icons';
+import { QMButton, QMConfirmDialog, QMSheet, type QMSheetAction } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import {
+  BookIcon, BookmarkIcon, CardsIcon, ClockIcon, CopyIcon, DocIcon, InfoIcon, MoreHorizontalIcon, PlusIcon, RefreshIcon, ShareUpIcon, SparklesIcon,
+  type IconComponent,
+} from '../../components/icons';
 import { ChatInput } from './components/ChatInput';
 import { CardProposalSheet } from './components/CardProposalSheet';
 import { ChatMessageItem } from './components/ChatMessageItem';
-import { useAuthStore, useAIChatStore, type ChatUIMessage } from '../../store';
-import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useConfirmDialog, useCreditBalance, useMarkCardsSaved, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
+import { SparkMark } from './components/SparkMark';
+import { FAILED, TYPING, isPlaceholder } from './chatMarks';
+import { useAIChatStore, type ChatUIMessage } from '../../store';
+import { useAIChat, useAddBookmark, useBookmarks, useBulkCreateCards, useCreditBalance, useMarkCardsSaved, useRemoveBookmark, useUpdateSessionTags } from '../../hooks';
 import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { detectTags } from '../../utils/tagDetector';
+import { formatBytes, truncate } from '../../utils/formatters';
 import { getErrorMessage } from '../../api';
-import { useTranslation } from 'react-i18next';
-import { layout, spacing, useTheme } from '../../theme';
+import { useTheme, spacing, radius } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
-import type { ChatMessage, SuggestedCard } from '../../types';
+import type { ChatMessage, MediaFileType, SuggestedCard } from '../../types';
 
-const ICON_SIZE = 20;
-const EMPTY_ICON_SIZE = 48;
-const TYPING_INDICATOR = '__typing__' as const;
+const TOUCH = 44;
+const STARTER_TILE = 30;
+const MIN_MEDIA_COST = 3;
+const NO_MEDIA_TILE = 56;
+const CARD_Q_MAX = 300;
+const CARD_A_MAX = 1000;
+
+type Media = { id: string; name: string; type: MediaFileType; localUri?: string };
+type Sheet = 'menu' | 'message' | null;
+
+/** Complete user→AI pairs only (orphaned or failed questions are skipped), last 20 turns. */
+function buildHistory(list: ChatUIMessage[]): ChatMessage[] {
+  const settled = list.filter(m => !isPlaceholder(m.text));
+  const out: ChatMessage[] = [];
+  for (let i = 0; i < settled.length; i++) {
+    const msg = settled[i];
+    const next = settled[i + 1];
+    if (msg.role === 'user' && next?.role === 'ai') {
+      out.push({ role: 'user', content: msg.text }, { role: 'assistant', content: next.text });
+      i++;
+    }
+  }
+  return out.slice(-20);
+}
 
 export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const { t, i18n } = useTranslation(['ai', 'common']);
-  const { colors } = useTheme();
-  const user = useAuthStore(s => s.user);
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const autoSend = route.params?.autoSend;
 
   // Active conversation lives in the store, so it survives navigation. The chat
   // shown is always what's here until cleared or a history session is loaded.
-  const messages      = useAIChatStore(s => s.messages);
-  const setMessages   = useAIChatStore(s => s.setMessages);
-  const sessionId     = useAIChatStore(s => s.sessionId);
-  const tags          = useAIChatStore(s => s.tags);
-  const setTags       = useAIChatStore(s => s.setTags);
+  const messages        = useAIChatStore(s => s.messages);
+  const setMessages     = useAIChatStore(s => s.setMessages);
+  const sessionId       = useAIChatStore(s => s.sessionId);
+  const tags            = useAIChatStore(s => s.tags);
+  const setTags         = useAIChatStore(s => s.setTags);
   const savedMessageIds = useAIChatStore(s => s.savedMessageIds);
-  const markSaved     = useAIChatStore(s => s.markSaved);
-  const unmarkSaved   = useAIChatStore(s => s.unmarkSaved);
-  const clearChat     = useAIChatStore(s => s.clear);
+  const markSaved       = useAIChatStore(s => s.markSaved);
+  const unmarkSaved     = useAIChatStore(s => s.unmarkSaved);
+  const clearChat       = useAIChatStore(s => s.clear);
 
   const listRef = useRef<FlatList>(null);
   const lastAutoSendRef = useRef<string | undefined>(undefined);
-  const { show, dialogProps } = useConfirmDialog();
 
   const [saveModal, setSaveModal] = useState<{ visible: boolean; cards: SuggestedCard[]; messageId: string; chatId?: string }>({
     visible: false, cards: [], messageId: '',
   });
-  const [sheet, setSheet] = useState<{ visible: boolean; message: ChatUIMessage | null }>({
-    visible: false, message: null,
-  });
-  const [menuVisible, setMenuVisible] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>(null);
+  const [target, setTarget] = useState<ChatUIMessage | null>(null);
+  const [newChatOpen, setNewChatOpen] = useState(false);
+  // Set names cards were saved to this visit (store only keeps the "saved" flag).
+  const [savedTo, setSavedTo] = useState<Record<string, string>>({});
 
   const { mutate: sendMessage, isPending }       = useAIChat();
   const { mutateAsync: bulkCreateCards }         = useBulkCreateCards();
@@ -78,9 +98,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     () => new Set(bookmarksData?.bookmarks.map(b => b.id) ?? []),
     [bookmarksData],
   );
-  const hasExportableMessages = messages.some(m => m.text !== TYPING_INDICATOR);
+  const hasExportableMessages = messages.some(m => !isPlaceholder(m.text));
 
   const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+  const goCredits = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Credits' }), [navigation]);
+  const goMedia   = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }), [navigation]);
 
   const att = useAIChatAttachment(creditBalance, goPaywall);
 
@@ -93,8 +115,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   // ─── Core send logic ──────────────────────────────────────────────────────
 
-  const handleSend = useCallback(
-    (question: string) => {
+  const send = useCallback(
+    (question: string, media: Media | null) => {
       if (isBalanceLoading) return;
 
       if (creditBalance <= 0) {
@@ -102,34 +124,19 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         return;
       }
 
-      // Build history from complete user+assistant pairs only. Orphaned user
-      // messages (left over from failed API calls) are skipped.
-      const settled = messages.filter(m => m.text !== TYPING_INDICATOR);
-      const rawHistory: ChatMessage[] = [];
-      for (let i = 0; i < settled.length; i++) {
-        const msg = settled[i];
-        const next = settled[i + 1];
-        if (msg.role === 'user' && next?.role === 'ai') {
-          rawHistory.push({ role: 'user', content: msg.text });
-          rawHistory.push({ role: 'assistant', content: next.text });
-          i++;
-        }
-      }
-      const history = rawHistory.slice(-20);
-
-      // Snapshot + clear the attachment now so it's sent once and the composer resets.
-      const snap = att.attachment;
-      att.setAttachment(null);
-
+      const history = buildHistory(messages);
       const userMsgId = Date.now().toString();
       setMessages(prev => [
         ...prev,
-        { id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: snap ? (snap.type === 'PDF' ? 5 : 3) : 1, attachmentName: snap?.name, attachmentType: snap?.type, attachmentLocalUri: snap?.localUri },
-        { id: `${userMsgId}_typing`, role: 'ai', text: TYPING_INDICATOR, timestamp: Date.now() },
+        {
+          id: userMsgId, role: 'user', text: question, timestamp: Date.now(), creditsUsed: media ? (media.type === 'PDF' ? 5 : 3) : 1,
+          attachmentId: media?.id, attachmentName: media?.name, attachmentType: media?.type, attachmentLocalUri: media?.localUri,
+        },
+        { id: `${userMsgId}_typing`, role: 'ai', text: TYPING, timestamp: Date.now() },
       ]);
 
       sendMessage(
-        { question, history, sessionId, mediaIds: snap ? [snap.id] : undefined },
+        { question, history, sessionId, mediaIds: media ? [media.id] : undefined },
         {
           onSuccess: data => {
             setMessages(prev =>
@@ -156,21 +163,42 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             }
           },
           onError: err => {
-            setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
             // Out of credits / over quota (402) → surface an upgrade prompt in context.
             const status = (err as { response?: { status?: number } })?.response?.status;
             if (status === 402) {
+              setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
               Toast.show({ type: 'error', text1: t('ai:chat.outOfCredits', 'Out of credits'), text2: t('ai:chat.upgradeToKeepGoing', 'Upgrade to keep using AI chat.') });
               goPaywall();
               return;
             }
-            Toast.show({ type: 'error', text1: t('ai:chat.couldNotGetResponse', 'Could not get response'), text2: getErrorMessage(err) });
+            // Leave the question in place with an inline "Try again" card. No response
+            // at all = offline → the card's own "check your connection" line.
+            const errorText = (err as { response?: unknown })?.response ? getErrorMessage(err) : undefined;
+            setMessages(prev => prev.map(m => m.id === `${userMsgId}_typing` ? { ...m, text: FAILED, errorText } : m));
           },
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, att, goPaywall, t],
+    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, goPaywall, t],
   );
+
+  const handleSend = useCallback((question: string) => {
+    // Snapshot + clear the attachment now so it's sent once and the composer resets.
+    const snap = att.attachment;
+    att.setAttachment(null);
+    send(question, snap);
+  }, [att, send]);
+
+  const handleRetry = useCallback((failed: ChatUIMessage) => {
+    const idx = messages.findIndex(m => m.id === failed.id);
+    const userMsg = messages[idx - 1];
+    if (idx < 1 || userMsg?.role !== 'user') return;
+    setMessages(prev => prev.filter(m => m.id !== failed.id && m.id !== userMsg.id));
+    const media = userMsg.attachmentId && userMsg.attachmentName && userMsg.attachmentType
+      ? { id: userMsg.attachmentId, name: userMsg.attachmentName, type: userMsg.attachmentType, localUri: userMsg.attachmentLocalUri }
+      : null;
+    send(userMsg.text, media);
+  }, [messages, setMessages, send]);
 
   useEffect(() => {
     if (!autoSend || isBalanceLoading || autoSend === lastAutoSendRef.current) return;
@@ -185,23 +213,12 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
       const userMsg = messages[idx - 1];
       if (!userMsg || userMsg.role !== 'user') return;
 
-      const before = messages.slice(0, idx - 1).filter(m => m.text !== TYPING_INDICATOR);
-      const rawHistory: ChatMessage[] = [];
-      for (let i = 0; i < before.length; i++) {
-        const msg = before[i];
-        const next = before[i + 1];
-        if (msg.role === 'user' && next?.role === 'ai') {
-          rawHistory.push({ role: 'user', content: msg.text });
-          rawHistory.push({ role: 'assistant', content: next.text });
-          i++;
-        }
-      }
-      const history = rawHistory.slice(-20);
+      const history = buildHistory(messages.slice(0, idx - 1));
 
       setMessages(prev =>
         prev.map(m =>
           m.id === item.id
-            ? { ...m, text: TYPING_INDICATOR, chatId: undefined, followUps: undefined, suggestedCards: undefined }
+            ? { ...m, text: TYPING, chatId: undefined, followUps: undefined, suggestedCards: undefined }
             : m,
         ),
       );
@@ -231,34 +248,14 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
 
   // ─── Sheet actions ────────────────────────────────────────────────────────
 
-  const handleLongPress = useCallback((item: ChatUIMessage) => {
-    if (item.text === TYPING_INDICATOR) return;
-    setSheet({ visible: true, message: item });
+  const handleMore = useCallback((item: ChatUIMessage) => {
+    if (isPlaceholder(item.text)) return;
+    setTarget(item);
+    setSheet('message');
   }, []);
 
-  const handleCopyMessage = useCallback(() => {
-    if (!sheet.message) return;
-    Clipboard.setString(sheet.message.text);
-    Toast.show({ type: 'success', text1: t('common:status.copiedToClipboard', 'Copied to clipboard') });
-  }, [sheet.message, t]);
-
-  const handleShareMessage = useCallback(() => {
-    if (!sheet.message) return;
-    Share.share({ message: sheet.message.text });
-  }, [sheet.message]);
-
-  const handleToggleBookmark = useCallback(() => {
-    const chatId = sheet.message?.chatId;
-    if (!chatId) return;
-    if (bookmarkedChatIds.has(chatId)) {
-      removeBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarkRemoved', 'Bookmark removed') }) });
-    } else {
-      addBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarked', 'Bookmarked') }) });
-    }
-  }, [sheet.message, bookmarkedChatIds, removeBookmark, addBookmark, t]);
-
   const handleExport = useCallback(() => {
-    const exportable = messages.filter(m => m.text !== TYPING_INDICATOR);
+    const exportable = messages.filter(m => !isPlaceholder(m.text));
     if (exportable.length === 0) return;
     const youLabel = t('ai:export.you', 'You');
     const aiLabel = t('ai:export.ai', 'AI');
@@ -269,17 +266,25 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     Share.share({ message: `${header}\n${divider}\n\n${lines}` });
   }, [messages, t, i18n]);
 
-  const handleClearChat = useCallback(() => {
-    if (messages.length === 0) return;
-    show({ title: t('ai:chat.newConversation', 'New Conversation'), message: t('ai:chat.clearConfirmMessage', 'Clear the current chat and start fresh?'), confirmLabel: t('common:actions.clear', 'Clear'), variant: 'danger', onConfirm: () => clearChat() });
-  }, [messages.length, show, clearChat, t]);
+  const handleNewChat = useCallback(() => {
+    if (messages.length === 0 && !att.attachment) return;
+    setNewChatOpen(true);
+  }, [messages.length, att.attachment]);
 
-  const handleSaveCards = useCallback(async (setId: string, selectedCards?: SuggestedCard[]) => {
-    const cardsToSave = selectedCards ?? saveModal.cards;
+  const confirmNewChat = useCallback(() => {
+    setNewChatOpen(false);
+    if (att.attachment) att.handleClearAttachment();
+    setSavedTo({});
+    clearChat();
+  }, [att, clearChat]);
+
+  const handleSaveCards = useCallback(async (setId: string, setTitle: string) => {
+    const cardsToSave = saveModal.cards;
     try {
       await bulkCreateCards({ setId, cards: cardsToSave });
-      Toast.show({ type: 'success', text1: t('ai:chat.cardsSavedToast', { count: cardsToSave.length, defaultValue: `${cardsToSave.length} cards saved!` }) });
+      Toast.show({ type: 'success', text1: t('ai:qm.chat.savedToast', { set: setTitle, defaultValue: `Saved to ${setTitle}` }) });
       markSaved(saveModal.messageId);
+      setSavedTo(prev => ({ ...prev, [saveModal.messageId]: setTitle }));
       if (saveModal.chatId) markCardsSaved(saveModal.chatId);
       setSaveModal({ visible: false, cards: [], messageId: '' });
     } catch (e) {
@@ -288,110 +293,163 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     }
   }, [bulkCreateCards, saveModal, markCardsSaved, markSaved, t]);
 
-  const isCurrentMessageBookmarked = sheet.message?.chatId ? bookmarkedChatIds.has(sheet.message.chatId) : false;
+  const targetBookmarked = target?.chatId ? bookmarkedChatIds.has(target.chatId) : false;
 
-  const sheetActions = useMemo(() => sheet.message ? [
-    { label: t('common:actions.copy', 'Copy'),  icon: CopyIcon,  onPress: handleCopyMessage },
-    { label: t('common:actions.share', 'Share'), icon: ShareIcon, onPress: handleShareMessage },
-    ...(sheet.message.role === 'ai' ? [
-      { label: t('ai:chat.regenerate', 'Regenerate'), icon: RefreshIcon, onPress: () => sheet.message && handleRegenerate(sheet.message), disabled: isPending },
-      { label: isCurrentMessageBookmarked ? t('ai:chat.removeBookmark', 'Remove Bookmark') : t('ai:chat.bookmark', 'Bookmark'), icon: isCurrentMessageBookmarked ? StarIcon : StarOutlineIcon, onPress: handleToggleBookmark, disabled: !sheet.message.chatId },
-      { label: t('ai:chat.saveAsCard', 'Save as Card'), icon: BookmarkIcon, onPress: () => {
-        if (!sheet.message) return;
-        setSaveModal({ visible: true, cards: [{ question: sheet.message.userQuestion ?? sheet.message.text, answer: sheet.message.text }], messageId: sheet.message.id, chatId: sheet.message.chatId });
-      }},
-    ] : []),
-  ] : [],
-  [sheet.message, handleCopyMessage, handleShareMessage, handleRegenerate, isPending,
-   isCurrentMessageBookmarked, handleToggleBookmark, t]);
+  const messageActions = useMemo<QMSheetAction[]>(() => {
+    if (!target) return [];
+    const base: QMSheetAction[] = [
+      {
+        label: t('common:actions.copy', 'Copy'), icon: CopyIcon,
+        onPress: () => { Clipboard.setString(target.text); Toast.show({ type: 'success', text1: t('common:status.copiedToClipboard', 'Copied to clipboard') }); },
+      },
+      { label: t('common:actions.share', 'Share'), icon: ShareUpIcon, onPress: () => Share.share({ message: target.text }) },
+    ];
+    if (target.role !== 'ai') return base;
+    return [
+      ...base,
+      {
+        label: targetBookmarked ? t('ai:qm.chat.removeBookmark', 'Remove bookmark') : t('ai:qm.chat.bookmark', 'Bookmark'),
+        icon: BookmarkIcon, off: !target.chatId,
+        onPress: () => {
+          const chatId = target.chatId;
+          if (!chatId) return;
+          if (targetBookmarked) removeBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarkRemoved', 'Bookmark removed') }) });
+          else addBookmark(chatId, { onSuccess: () => Toast.show({ type: 'success', text1: t('ai:chat.bookmarked', 'Bookmarked') }) });
+        },
+      },
+      {
+        label: t('ai:qm.chat.saveAsCard', 'Save as a card'), icon: CardsIcon,
+        // Card limits are 300 / 1000 chars (cards.dto) — long answers are trimmed, not rejected.
+        onPress: () => setSaveModal({ visible: true, cards: [{ question: truncate(target.userQuestion ?? target.text, CARD_Q_MAX), answer: truncate(target.text, CARD_A_MAX) }], messageId: target.id, chatId: target.chatId }),
+      },
+      { label: t('ai:qm.chat.askAgain', 'Ask again for a new answer'), icon: RefreshIcon, off: isPending, onPress: () => handleRegenerate(target) },
+    ];
+  }, [target, targetBookmarked, isPending, handleRegenerate, addBookmark, removeBookmark, t]);
 
-  const suggestions = useMemo(() => [
-    t('ai:suggestions.0', { defaultValue: 'What does the Gospel of John teach about eternal life?' }),
-    t('ai:suggestions.1', { defaultValue: 'Explain the Sermon on the Mount' }),
-    t('ai:suggestions.2', { defaultValue: 'What is the significance of the Psalms?' }),
-    t('ai:suggestions.3', { defaultValue: 'Who were the twelve apostles?' }),
-  ], [t]);
+  const menuActions: QMSheetAction[] = [
+    { label: t('ai:qm.chat.history', 'Past conversations'), icon: ClockIcon, onPress: () => navigation.navigate('ChatHistory') },
+    { label: t('ai:qm.chat.shareChat', 'Share this conversation'), icon: ShareUpIcon, off: !hasExportableMessages, onPress: handleExport },
+  ];
+
+  const lowCredits = creditBalance < MIN_MEDIA_COST;
+  const attachActions: QMSheetAction[] = lowCredits ? [] : att.attachMenuActions.map(a => ({
+    label: a.label, icon: a.icon, onPress: a.onPress,
+    trailing: 'cost' in a && a.cost ? t('ai:qm.chat.credits', { count: a.cost }) : undefined,
+  }));
+  const mediaActions: QMSheetAction[] = att.pickerActions.flatMap(a => 'file' in a && a.file ? [{
+    label: a.label, icon: a.icon, onPress: a.onPress,
+    sub: `${a.file.type === 'PDF' ? 'PDF' : t('ai:qm.chat.photo', 'Photo')} · ${formatBytes(a.file.sizeBytes)}`,
+    trailing: t('ai:qm.chat.credits', { count: a.file.type === 'PDF' ? 5 : 3 }),
+  }] : []);
+
+  const starters = useMemo<{ text: string; icon: IconComponent; bg: string; ink: string; cost?: string }[]>(() => [
+    { text: t('ai:qm.starters.context', 'What is the historical context of Philippians 4:13?'), icon: ClockIcon, bg: qm.lilac, ink: qm.link },
+    { text: t('ai:qm.starters.prodigal', 'Explain the parable of the Prodigal Son'), icon: BookIcon, bg: qm.goldBg, ink: qm.goldText },
+    { text: t('ai:qm.starters.cards', 'Make 5 flashcards on the Armor of God in Ephesians 6'), icon: CardsIcon, bg: qm.leafBg, ink: qm.leaf, cost: t('ai:qm.chat.credits', { count: 2 }) },
+    { text: t('ai:qm.starters.grace', 'What is the difference between grace and mercy?'), icon: SparklesIcon, bg: qm.lilac, ink: qm.link },
+  ], [t, qm]);
 
   // ─── Render ───────────────────────────────────────────────────────────────
 
-  const renderItem = useCallback(({ item }: { item: ChatUIMessage }) => (
-    <ChatMessageItem
-      item={item}
-      userName={user?.name}
-      userImage={user?.profileImage}
-      isPending={isPending}
-      isBalanceLoading={isBalanceLoading}
-      savedMessageIds={savedMessageIds}
-      colors={colors as unknown as Record<string, string>}
-      onLongPress={handleLongPress}
-      onSend={handleSend}
-      onSaveCards={(cards, messageId, chatId) => setSaveModal({ visible: true, cards, messageId, chatId })}
-    />
-  ), [user, isPending, isBalanceLoading, savedMessageIds, colors, handleLongPress, handleSend]);
+  const lastAiId = useMemo(() => [...messages].reverse().find(m => m.role === 'ai')?.id, [messages]);
+
+  const renderItem = useCallback(({ item, index }: { item: ChatUIMessage; index: number }) => {
+    const prev = messages[index - 1];
+    return (
+      <ChatMessageItem
+        item={item}
+        cost={item.role === 'ai' && prev?.role === 'user' && !item.isHistorical ? prev.creditsUsed : undefined}
+        isLast={item.id === lastAiId}
+        busy={isPending || isBalanceLoading}
+        bookmarked={!!item.chatId && bookmarkedChatIds.has(item.chatId)}
+        savedTo={savedTo[item.id] ?? (savedMessageIds.has(item.id) || undefined)}
+        onMore={handleMore}
+        onSend={handleSend}
+        onRetry={handleRetry}
+        onSaveCards={(cards, messageId, chatId) => setSaveModal({ visible: true, cards, messageId, chatId })}
+      />
+    );
+  }, [messages, lastAiId, isPending, isBalanceLoading, bookmarkedChatIds, savedTo, savedMessageIds, handleMore, handleSend, handleRetry]);
+
+  const welcome = (
+    <View>
+      <Animated.View entering={FadeInUp.duration(320)} style={styles.welcome}>
+        <SparkMark size={46} small={false} />
+        <Typography preset="qmEmptyTitle" color={qm.ink} align="center" style={styles.welcomeTitle}>
+          {t('ai:qm.chat.welcomeTitle', 'What are you reading today?')}
+        </Typography>
+        <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.welcomeText}>
+          {t('ai:qm.chat.welcomeText', 'Ask about a passage, get it explained with verses, or turn it into flashcards.')}
+        </Typography>
+      </Animated.View>
+      <View style={styles.starters}>
+        {starters.map((s, i) => (
+          <Animated.View key={s.text} entering={FadeInUp.duration(320).delay(120 + i * 50)}>
+            <AnimatedPressable
+              scaleTo={0.97}
+              onPress={() => handleSend(s.text)}
+              disabled={isBalanceLoading || isPending}
+              style={[styles.starter, { backgroundColor: qm.surface, boxShadow: qm.optLine }]}
+              accessibilityRole="button"
+            >
+              <View style={[styles.starterTile, { backgroundColor: s.bg }]}>
+                <s.icon size={16} color={s.ink} strokeWidth={2} />
+              </View>
+              <Typography preset="qmBodyMd" color={qm.ink} style={styles.flex}>{s.text}</Typography>
+              {s.cost ? (
+                <View style={[styles.costPill, { backgroundColor: qm.field }]}>
+                  <Typography preset="qmChip" color={qm.muted}>{s.cost}</Typography>
+                </View>
+              ) : null}
+            </AnimatedPressable>
+          </Animated.View>
+        ))}
+      </View>
+      <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.disclaimer}>
+        {t('ai:qm.chat.disclaimer', 'AI answers point to Bible verses but can still make mistakes. Check important things with your pastor or a trusted commentary.')}
+      </Typography>
+    </View>
+  );
 
   return (
-    <KeyboardAvoidingView style={[styles.safe, { backgroundColor: colors.background }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-    <SafeAreaView style={styles.flex} edges={['top']}>
-
-      {/* Header */}
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <View style={styles.headerLeft}>
-          <View style={[styles.aiBadge, { backgroundColor: colors.accent }]}>
-            <SparklesIcon size={ICON_SIZE} color={colors.textOnAccent} />
-          </View>
-          <View>
-            <Typography preset="h4">{t('ai:title')}</Typography>
-            <Typography preset="caption" color={colors.textSecondary}>{t('ai:chat.poweredBy', 'Powered by Claude')}</Typography>
-          </View>
+    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
+        <View style={styles.flex}>
+          <Typography preset="qmDisplay" color={qm.ink} accessibilityRole="header">{t('ai:qm.chat.title', 'Ask')}</Typography>
+          <Typography preset="qmMeta" color={qm.muted}>{t('ai:qm.chat.sub', 'Your Bible study helper')}</Typography>
         </View>
-        <View style={styles.headerRight}>
-          <Pressable onPress={handleClearChat} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-            <PlusIcon size={ICON_SIZE} color={colors.textSecondary} />
-          </Pressable>
-          <Pressable onPress={() => setMenuVisible(true)} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-            <MoreVerticalIcon size={ICON_SIZE} color={colors.textSecondary} />
-          </Pressable>
-        </View>
+        <Pressable
+          onPress={handleNewChat}
+          style={({ pressed }) => [styles.round, { backgroundColor: qm.field }, pressed && styles.dim]}
+          accessibilityRole="button"
+          accessibilityLabel={t('ai:qm.chat.newChat', 'New conversation')}
+        >
+          <PlusIcon size={19} color={qm.ink} strokeWidth={2} />
+        </Pressable>
+        <Pressable
+          onPress={() => setSheet('menu')}
+          style={({ pressed }) => [styles.round, { backgroundColor: qm.field }, pressed && styles.dim]}
+          accessibilityRole="button"
+          accessibilityLabel={t('ai:qm.chat.moreA11y', 'More options')}
+        >
+          <MoreHorizontalIcon size={19} color={qm.ink} />
+        </Pressable>
       </View>
 
-      {/* Messages */}
       <FlatList
         ref={listRef}
         data={messages}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        extraData={savedMessageIds}
-        ListEmptyComponent={
-          <View style={styles.emptyWrap}>
-            <SparklesIcon size={EMPTY_ICON_SIZE} color={colors.accent} />
-            <Typography preset="h4" align="center">{t('ai:empty.headline')}</Typography>
-            <Typography preset="body" color={colors.textSecondary} align="center" style={styles.emptySub}>
-              {t('ai:empty.subtitle')}
-            </Typography>
-            <View style={styles.suggestions}>
-              {suggestions.map(s => (
-                <Pressable
-                  key={s}
-                  style={({ pressed }) => [styles.suggestion, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
-                  onPress={() => handleSend(s)}
-                  disabled={isBalanceLoading}
-                >
-                  <Typography preset="bodySm" color={colors.accent}>{s}</Typography>
-                </Pressable>
-              ))}
-            </View>
-            <Typography preset="caption" color={colors.textSecondary} align="center" style={styles.emptySub}>
-              {t('ai:chat.disclaimer', 'AI answers cite Bible verses but may contain errors. Verify important interpretations with your pastor or a trusted commentary.')}
-            </Typography>
-          </View>
-        }
+        keyboardShouldPersistTaps="handled"
+        ListEmptyComponent={welcome}
         renderItem={renderItem}
       />
 
-      {/* Input */}
       <ChatInput
         onSend={handleSend}
+        working={isPending}
         disabled={isPending || isBalanceLoading}
         creditBalance={isBalanceLoading ? undefined : creditBalance}
         attachmentName={att.attachment?.name ?? null}
@@ -401,57 +459,108 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onAttachPress={att.handleAttachPress}
         onClearAttachment={att.handleClearAttachment}
         onUpgrade={goPaywall}
+        onClaim={goCredits}
       />
 
-      <ActionSheet visible={att.attachMenuVisible} title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('ai:chat.attachFile', 'Attach a file')} actions={att.attachMenuActions} onClose={() => att.setAttachMenuVisible(false)} />
-      <ActionSheet visible={att.pickerVisible} title={t('ai:chat.chooseMedia', 'Choose from My Media')} actions={att.pickerActions} onClose={() => att.setPickerVisible(false)} />
-      <ActionSheet visible={sheet.visible} title={sheet.message?.role === 'user' ? t('ai:chat.yourMessage', 'Your message') : t('ai:chat.aiResponse', 'AI response')} actions={sheetActions} onClose={() => setSheet({ visible: false, message: null })} />
-      <ActionSheet
-        visible={menuVisible}
-        title={t('ai:title')}
-        onClose={() => setMenuVisible(false)}
-        actions={[
-          { label: t('ai:chat.exportChat', 'Export chat'), icon: FileTextIcon, disabled: !hasExportableMessages, onPress: handleExport },
-          { label: t('ai:chat.history', 'Chat history'), icon: ClockIcon, onPress: () => navigation.navigate('ChatHistory') },
-        ]}
+      <QMSheet visible={sheet === 'menu'} onClose={() => setSheet(null)} actions={menuActions} />
+      <QMSheet
+        visible={sheet === 'message'}
+        onClose={() => { setSheet(null); setTarget(null); }}
+        title={target?.role === 'user' ? t('ai:chat.yourMessage', 'Your message') : t('ai:qm.chat.answer', 'Answer')}
+        actions={messageActions}
       />
+
+      <QMSheet
+        visible={att.attachMenuVisible}
+        onClose={() => att.setAttachMenuVisible(false)}
+        title={att.isUploading ? t('common:status.uploading', 'Uploading…') : t('ai:chat.attachFile', 'Attach a file')}
+        sub={lowCredits ? undefined : t('ai:qm.chat.attachSub', { balance: creditBalance, defaultValue: `A photo costs 3 credits, a PDF costs 5. You have ${creditBalance}.` })}
+        actions={attachActions}
+      >
+        {lowCredits && (
+          <View style={styles.sheetBody}>
+            <View style={[styles.lowBox, { backgroundColor: qm.errorBg }]}>
+              <InfoIcon size={18} color={qm.warm} strokeWidth={2} />
+              <Typography preset="qmBodyMd" color={qm.ink} style={styles.flex}>
+                {t('ai:qm.chat.lowCredits', { count: Math.max(creditBalance, 0), defaultValue: `You have ${Math.max(creditBalance, 0)} credits. Photos cost 3, PDFs 5.` })}
+              </Typography>
+            </View>
+            <QMButton label={t('ai:qm.chat.getCredits', 'Get more credits')} onPress={() => { att.setAttachMenuVisible(false); goPaywall(); }} style={styles.sheetBtn} />
+          </View>
+        )}
+      </QMSheet>
+
+      <QMSheet
+        visible={att.pickerVisible}
+        onClose={() => att.setPickerVisible(false)}
+        title={t('ai:qm.chat.fromMedia', 'From My Media')}
+        sub={mediaActions.length ? t('ai:qm.chat.fromMediaSub', { balance: creditBalance, defaultValue: `Pick a file you saved before. You have ${creditBalance} credits.` }) : undefined}
+        actions={mediaActions}
+      >
+        {mediaActions.length === 0 && (
+          <View style={styles.noMedia}>
+            <View style={[styles.noMediaTile, { backgroundColor: qm.lilac }]}>
+              <DocIcon size={28} color={qm.link} strokeWidth={1.6} />
+            </View>
+            <Typography preset="qmSheetTitle" color={qm.ink} align="center" style={styles.noMediaTitle}>{t('ai:attach.noFiles', 'No files in My Media')}</Typography>
+            <Typography preset="qmBodyMd" color={qm.muted} align="center">
+              {t('ai:qm.chat.noMediaText', 'PDFs and photos you upload are kept there, so you can use them again.')}
+            </Typography>
+            <Pressable onPress={() => { att.setPickerVisible(false); goMedia(); }} style={styles.noMediaLink} accessibilityRole="link">
+              <Typography preset="qmButton" color={qm.link}>{t('ai:qm.chat.openMedia', 'Open My Media')}</Typography>
+            </Pressable>
+          </View>
+        )}
+      </QMSheet>
 
       <CardProposalSheet visible={saveModal.visible} cards={saveModal.cards} onSave={handleSaveCards} onClose={() => setSaveModal({ visible: false, cards: [], messageId: '' })} />
 
-      <ConfirmDialog {...dialogProps} />
+      <QMConfirmDialog
+        visible={newChatOpen}
+        title={t('ai:qm.chat.newChatTitle', 'Start a new chat?')}
+        message={t('ai:qm.chat.newChatText', 'This clears the current conversation. It stays in Past conversations.')}
+        confirmLabel={t('ai:qm.chat.startNew', 'Start new')}
+        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        onConfirm={confirmNewChat}
+        onCancel={() => setNewChatOpen(false)}
+      />
 
       {/* Content policy — one-time, before first attachment */}
-      <ConfirmDialog
+      <QMConfirmDialog
         visible={att.policyDialogVisible}
-        title={t('ai:chat.contentPolicy', 'Content Policy')}
-        message={t('ai:chat.contentPolicyMsg', 'Please keep attachments appropriate.\n\nDo not upload sexual, violent, or illegal content. Violations may result in account suspension.\n\nBy continuing, you agree to our content guidelines.')}
-        confirmLabel={t('common:actions.agree', 'I Agree')}
-        cancelLabel={t('common:actions.cancel', 'Cancel')}
+        title={t('quiz:qm.policyTitle', 'Before you add a document')}
+        message={t('quiz:qm.policyText', 'Only upload things you have the right to use, and keep them appropriate: nothing sexual, violent or illegal. Breaking this can get your account suspended.')}
+        confirmLabel={t('quiz:qm.agree', 'I agree')}
+        cancelLabel={t('quiz:qm.notNow', 'Not now')}
         onConfirm={att.acceptPolicy}
         onCancel={() => att.setPolicyDialogVisible(false)}
       />
-
-    </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  safe:   { flex: 1 },
-  flex:   { flex: 1 },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md, borderBottomWidth: 1,
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  header: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, paddingLeft: spacing.xl, paddingRight: spacing.lg, paddingBottom: spacing.s10 },
+  round: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  list: { flexGrow: 1, paddingHorizontal: spacing.xl, paddingBottom: spacing.lg },
+  welcome: { alignItems: 'center', marginTop: spacing.s18 },
+  welcomeTitle: { marginTop: spacing.md, marginBottom: spacing.s6 },
+  welcomeText: { maxWidth: 300 },
+  starters: { gap: spacing.sm, marginTop: spacing.s22 },
+  starter: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    paddingVertical: spacing.s13, paddingHorizontal: spacing.s14, borderRadius: radius.md,
   },
-  headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  aiBadge: {
-    width: spacing.huge, height: spacing.huge, borderRadius: layout.cardRadius,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  list: { padding: layout.screenPaddingH, paddingTop: spacing.lg, flexGrow: 1 },
-  emptyWrap: { flex: 1, alignItems: 'center', paddingTop: spacing.xxxl, gap: spacing.md },
-  emptySub:  { paddingHorizontal: spacing.lg },
-  suggestions: { width: '100%', gap: spacing.sm, marginTop: spacing.sm },
-  suggestion:  { borderRadius: layout.cardRadius, borderWidth: 1, padding: spacing.md },
+  starterTile: { width: STARTER_TILE, height: STARTER_TILE, borderRadius: radius.r10, alignItems: 'center', justifyContent: 'center' },
+  costPill: { paddingVertical: spacing.xs, paddingHorizontal: spacing.sm, borderRadius: radius.pill },
+  disclaimer: { marginTop: spacing.s18, marginHorizontal: spacing.sm },
+  sheetBody: { paddingHorizontal: spacing.md },
+  lowBox: { flexDirection: 'row', gap: spacing.s10, alignItems: 'flex-start', padding: spacing.md, borderRadius: radius.md, marginTop: spacing.s6 },
+  sheetBtn: { marginTop: spacing.lg },
+  noMedia: { alignItems: 'center', paddingTop: spacing.sm, paddingHorizontal: spacing.md },
+  noMediaTile: { width: NO_MEDIA_TILE, height: NO_MEDIA_TILE, borderRadius: radius.r18, alignItems: 'center', justifyContent: 'center' },
+  noMediaTitle: { marginTop: spacing.md, marginBottom: spacing.s6 },
+  noMediaLink: { marginTop: spacing.md, minHeight: TOUCH, justifyContent: 'center' },
 });

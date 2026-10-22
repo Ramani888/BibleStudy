@@ -15,9 +15,11 @@ export interface ChatUIMessage {
   suggestedCards?: SuggestedCard[];
   isHistorical?: boolean;   // loaded from Chat History (banner suppressed)
   userQuestion?: string;    // question that prompted this AI response (for Save as Card)
+  attachmentId?: string;       // media id, so a failed question can be retried with its file
   attachmentName?: string;     // name of an attached file (user messages only)
   attachmentType?: 'IMAGE' | 'PDF';
   attachmentLocalUri?: string; // local/S3 URI for image thumbnail
+  errorText?: string;          // failed answer (text = FAILED marker): why, shown with Try again
 }
 
 function generateUUID(): string {

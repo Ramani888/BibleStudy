@@ -307,4 +307,7 @@ export const qmPresets = {
   qmBlankWord: { fontFamily: qmFont.serif,       fontSize: 18, lineHeight: 24 },
   qmTile:      { fontFamily: qmFont.serif,       fontSize: 17, lineHeight: 24 },
   qmRead:      { fontFamily: qmFont.serif,       fontSize: 21, lineHeight: 34 },
+  // Ask
+  qmChat:      { fontFamily: qmFont.regular,     fontSize: 15, lineHeight: 24 },
+  qmChatBold:  { fontFamily: qmFont.semibold,    fontSize: 15, lineHeight: 24 },
 } as const;

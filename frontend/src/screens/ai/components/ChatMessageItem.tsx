@@ -1,134 +1,306 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn } from 'react-native-reanimated';
-import { ChatBubble } from '../../../components/domain';
-import { AlbumsIcon, ArrowRightIcon, CheckCircleIcon, FileTextIcon } from '../../../components/icons';
-import { Typography } from '../../../components/ui';
-import { layout, radius, spacing } from '../../../theme';
+import Animated, {
+  FadeIn, FadeInDown, FadeInUp, cancelAnimation, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSequence, withTiming,
+} from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
+
+import { AnimatedPressable, Typography } from '../../../components/ui';
+import {
+  ArrowRightIcon, BookmarkSolidIcon, CardsIcon, CheckIcon, DocIcon, ImageIcon, InfoIcon, MoreHorizontalIcon, RefreshIcon,
+} from '../../../components/icons';
+import { useTheme, spacing, radius } from '../../../theme';
 import type { ChatUIMessage } from '../../../store';
 import type { SuggestedCard } from '../../../types';
+import { FAILED, TYPING } from '../chatMarks';
 
-const TYPING_INDICATOR = '__typing__' as const;
+const TOUCH = 40;
+const DOT = 7;
+const THUMB_W = 200;
+const THUMB_H = 150;
+const AURA = 2;
+const CARDS_TILE = 34;
 
 type Props = {
   item: ChatUIMessage;
-  userName?: string | null | undefined;
-  userImage?: string | null | undefined;
-  isPending: boolean;
-  isBalanceLoading: boolean;
-  savedMessageIds: Set<string>;
-  colors: Record<string, string>;
-  onLongPress: (item: ChatUIMessage) => void;
+  /** Credits the question behind this answer cost. */
+  cost?: number;
+  /** Follow-up chips only under the newest answer. */
+  isLast: boolean;
+  busy: boolean;
+  bookmarked: boolean;
+  /** Cards from this answer were saved (set name when known). */
+  savedTo?: string | true;
+  onMore: (item: ChatUIMessage) => void;
   onSend: (q: string) => void;
+  onRetry: (item: ChatUIMessage) => void;
   onSaveCards: (cards: SuggestedCard[], messageId: string, chatId?: string) => void;
 };
 
-import { useTranslation } from 'react-i18next';
+function formatTime(ts: number, lang: string): string {
+  return new Date(ts).toLocaleTimeString(lang, { hour: 'numeric', minute: '2-digit' });
+}
 
-export function ChatMessageItem({
-  item, userName, userImage,
-  isPending, isBalanceLoading, savedMessageIds, colors,
-  onLongPress, onSend, onSaveCards,
+export const ChatMessageItem = React.memo(function ChatMessageItem({
+  item, cost, isLast, busy, bookmarked, savedTo, onMore, onSend, onRetry, onSaveCards,
 }: Props) {
-  const { t } = useTranslation(['ai', 'common']);
-  return (
-    <View>
-      {item.role === 'user' && item.attachmentType === 'IMAGE' && item.attachmentLocalUri ? (
-        <Image source={{ uri: item.attachmentLocalUri }} style={styles.msgImageThumb} resizeMode="cover" />
-      ) : item.role === 'user' && item.attachmentName ? (
-        <View style={[styles.attachmentChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-          <FileTextIcon size={14} color={colors.accent} />
-          <Typography preset="caption" color={colors.accent} numberOfLines={1} style={styles.attachmentChipText}>
-            {item.attachmentName}
-          </Typography>
-        </View>
-      ) : null}
+  const { t, i18n } = useTranslation(['ai', 'common']);
+  const { qm } = useTheme();
+  const time = formatTime(item.timestamp, i18n.language || 'en');
 
-      <Pressable onLongPress={() => onLongPress(item)} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-        <ChatBubble
-          role={item.role}
-          text={item.text}
-          creditsUsed={item.creditsUsed}
-          userName={userName ?? undefined}
-          userImage={userImage ?? undefined}
-          isTyping={item.text === TYPING_INDICATOR}
-          timestamp={item.text !== TYPING_INDICATOR ? item.timestamp : undefined}
-        />
+  if (item.role === 'user') {
+    const isImage = item.attachmentType === 'IMAGE' && !!item.attachmentLocalUri;
+    return (
+      <Animated.View entering={FadeInDown.duration(320).springify().damping(18)} style={styles.userCol}>
+        {isImage && <Image source={{ uri: item.attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />}
+        <Pressable onLongPress={() => onMore(item)} style={[styles.userBubble, { backgroundColor: qm.violet }]}>
+          {!isImage && item.attachmentName ? (
+            <View style={[styles.sentFile, { backgroundColor: qm.badgeOnViolet }]}>
+              {item.attachmentType === 'IMAGE' ? <ImageIcon size={16} color={qm.onViolet} strokeWidth={2} /> : <DocIcon size={16} color={qm.onViolet} strokeWidth={2} />}
+              <Typography preset="qmChip" color={qm.onViolet} numberOfLines={1} style={styles.flex}>{item.attachmentName}</Typography>
+            </View>
+          ) : null}
+          <Typography preset="qmBodyMd" color={qm.onViolet}>{item.text}</Typography>
+        </Pressable>
+        <View style={styles.userFoot}>
+          <Typography preset="qmFine" color={qm.muted}>{time}</Typography>
+          <Pressable onPress={() => onMore(item)} style={styles.footBtn} accessibilityRole="button" accessibilityLabel={t('ai:qm.chat.messageOptions', 'Message options')}>
+            <MoreHorizontalIcon size={16} color={qm.muted} />
+          </Pressable>
+        </View>
+      </Animated.View>
+    );
+  }
+
+  if (item.text === TYPING) {
+    return (
+      <View style={[styles.aura, { borderColor: qm.violet }]}>
+        <View style={[styles.typing, { backgroundColor: qm.surface }]} accessibilityRole="progressbar" accessibilityLabel={t('ai:qm.chat.writing', 'Writing an answer…')}>
+          <TypingDots />
+          <Typography preset="qmBody" color={qm.muted}>{t('ai:qm.chat.writing', 'Writing an answer…')}</Typography>
+        </View>
+      </View>
+    );
+  }
+
+  if (item.text === FAILED) {
+    return (
+      <Animated.View entering={FadeInUp.duration(320)} style={[styles.answer, styles.failed, { backgroundColor: qm.surface, boxShadow: qm.optLine }]} accessibilityRole="alert">
+        <View style={styles.failRow}>
+          <InfoIcon size={20} color={qm.warm} strokeWidth={2} />
+          <View style={styles.flex}>
+            <Typography preset="qmSegment" color={qm.ink}>{t('ai:qm.chat.failedTitle', 'Couldn’t get an answer')}</Typography>
+            <Typography preset="qmBody" color={qm.muted} style={styles.failText}>
+              {item.errorText || t('ai:qm.chat.failedText', 'Check your connection and try again.')}
+            </Typography>
+          </View>
+        </View>
+        <AnimatedPressable scaleTo={0.97} disabled={busy} onPress={() => onRetry(item)} style={[styles.retry, { backgroundColor: qm.lilac }]} accessibilityRole="button">
+          <RefreshIcon size={15} color={qm.lilacInk} strokeWidth={2.2} />
+          <Typography preset="qmLink" color={qm.lilacInk}>{t('ai:qm.chat.tryAgain', 'Try again')}</Typography>
+        </AnimatedPressable>
+      </Animated.View>
+    );
+  }
+
+  const cards = item.suggestedCards ?? [];
+  const meta = cost ? `${time} · ${t('ai:qm.chat.credits', { count: cost, defaultValue: cost === 1 ? '1 credit' : `${cost} credits` })}` : time;
+
+  return (
+    <Animated.View entering={FadeInUp.duration(320)}>
+      <Pressable onLongPress={() => onMore(item)} style={[styles.answer, { backgroundColor: qm.surface, boxShadow: qm.optLine }]}>
+        <Markdown text={item.text} />
+        <View style={styles.answerFoot}>
+          <Typography preset="qmFine" color={qm.muted}>{meta}</Typography>
+          <Pressable onPress={() => onMore(item)} style={styles.footBtn} accessibilityRole="button" accessibilityLabel={t('ai:qm.chat.answerOptions', 'Answer options')}>
+            <MoreHorizontalIcon size={18} color={qm.muted} />
+          </Pressable>
+        </View>
+        {bookmarked && (
+          <View style={styles.ribbon} accessibilityLabel={t('ai:chat.bookmarked', 'Bookmarked')}>
+            <BookmarkSolidIcon size={18} color={qm.goldText} />
+          </View>
+        )}
       </Pressable>
 
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.followUps && item.followUps.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={styles.followUps}>
-          {item.followUps.map((q, i) => (
-            <Pressable
-              key={i}
-              style={({ pressed }) => [styles.followUpChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }, { opacity: pressed ? 0.7 : 1 }]}
-              onPress={() => onSend(q)}
-              disabled={isPending || isBalanceLoading}
-            >
-              <ArrowRightIcon size={12} color={colors.accent} />
-              <Typography preset="caption" color={colors.accent} style={styles.followUpText}>{q}</Typography>
-            </Pressable>
-          ))}
-        </Animated.View>
-      )}
-
-      {item.role === 'ai' && item.text !== TYPING_INDICATOR && item.suggestedCards && item.suggestedCards.length > 0 && (
-        <Animated.View entering={FadeIn.duration(200)} style={[styles.cardBanner, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-          <AlbumsIcon size={16} color={colors.accent} />
-          <Typography preset="bodySm" color={colors.accent} style={styles.cardBannerText}>
-            {t('ai:chat.cardsReady', { count: item.suggestedCards.length, defaultValue: `${item.suggestedCards.length} flashcards ready` })}
+      {cards.length > 0 && (
+        <Animated.View entering={FadeIn.duration(200)} style={[styles.cards, { backgroundColor: savedTo ? qm.leafBg : qm.lilac }]}>
+          <View style={[styles.cardsTile, { backgroundColor: qm.surface }]}>
+            <CardsIcon size={18} color={savedTo ? qm.leafText : qm.lilacInk} strokeWidth={2} />
+          </View>
+          <Typography preset="qmSegment" color={savedTo ? qm.leafText : qm.lilacInk} style={styles.flex}>
+            {savedTo
+              ? typeof savedTo === 'string'
+                ? t('ai:qm.chat.cardsSavedTo', { count: cards.length, set: savedTo, defaultValue: `${cards.length} cards saved to ${savedTo}` })
+                : t('ai:qm.chat.cardsSaved', { count: cards.length, defaultValue: `${cards.length} cards saved` })
+              : t('ai:chat.cardsReady', { count: cards.length })}
           </Typography>
-          {savedMessageIds.has(item.id) ? (
-            <View style={styles.savedChip}>
-              <CheckCircleIcon size={14} color={colors.success} />
-              <Typography preset="caption" color={colors.success}> {t('common:status.saved', 'Saved')}</Typography>
-            </View>
+          {savedTo ? (
+            <Animated.View entering={FadeIn.duration(300)} style={styles.savedChip}>
+              <CheckIcon size={18} color={qm.leaf} strokeWidth={2.6} />
+              <Typography preset="qmLink" color={qm.leafText}>{t('common:status.saved', 'Saved')}</Typography>
+            </Animated.View>
           ) : (
-            <Pressable
-              style={({ pressed }) => [styles.saveToSetBtn, { backgroundColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
-              onPress={() => onSaveCards(item.suggestedCards!, item.id, item.chatId)}
-              hitSlop={8}
+            <AnimatedPressable
+              scaleTo={0.95}
+              onPress={() => onSaveCards(cards, item.id, item.chatId)}
+              style={[styles.saveBtn, { backgroundColor: qm.violet }]}
+              accessibilityRole="button"
             >
-              <Typography preset="caption" color={colors.textOnAccent}>{t('ai:chat.saveToSet', 'Save to Set')}</Typography>
-            </Pressable>
+              <Typography preset="qmLink" color={qm.onViolet}>{t('ai:qm.chat.saveToSet', 'Save to a set')}</Typography>
+            </AnimatedPressable>
           )}
         </Animated.View>
       )}
+
+      {isLast && item.followUps && item.followUps.length > 0 && (
+        <Animated.View entering={FadeIn.duration(240)}>
+          <Typography preset="qmMeta" color={qm.muted} style={styles.keepGoing}>{t('ai:qm.chat.keepGoing', 'Keep going')}</Typography>
+          <View style={styles.followUps}>
+            {item.followUps.map(q => (
+              <AnimatedPressable
+                key={q}
+                scaleTo={0.97}
+                disabled={busy}
+                onPress={() => onSend(q)}
+                style={[styles.followUp, { backgroundColor: qm.lilac }]}
+                accessibilityRole="button"
+              >
+                <ArrowRightIcon size={14} color={qm.lilacInk} strokeWidth={2.2} />
+                <Typography preset="qmBody" color={qm.lilacInk} style={styles.followText}>{q}</Typography>
+              </AnimatedPressable>
+            ))}
+          </View>
+        </Animated.View>
+      )}
+    </Animated.View>
+  );
+});
+
+// ── Breathing dots ───────────────────────────────────────────────────────────
+
+function Dot({ delay }: { delay: number }) {
+  const { qm } = useTheme();
+  const v = useSharedValue(0.3);
+  useEffect(() => {
+    v.value = withDelay(delay, withRepeat(withSequence(withTiming(1, { duration: 600 }), withTiming(0.3, { duration: 600 })), -1));
+    return () => cancelAnimation(v);
+  }, [delay, v]);
+  const style = useAnimatedStyle(() => ({ opacity: v.value, transform: [{ scale: 0.8 + v.value * 0.2 }] }));
+  return <Animated.View style={[styles.dot, { backgroundColor: qm.muted }, style]} />;
+}
+
+function TypingDots() {
+  return (
+    <View style={styles.dots}>
+      <Dot delay={0} /><Dot delay={150} /><Dot delay={300} />
+    </View>
+  );
+}
+
+// ── Minimal markdown: **bold**, "- " bullets, blank-line paragraphs ──────────
+
+function Inline({ text }: { text: string }) {
+  const { qm } = useTheme();
+  const parts = text.split(/(\*\*[^*]+?\*\*|\*[^*\s][^*]*?\*)/);
+  return (
+    <>
+      {parts.map((p, i) => p.startsWith('**') && p.endsWith('**')
+        ? <Typography key={i} preset="qmChatBold" color={qm.ink}>{p.slice(2, -2)}</Typography>
+        : p.length > 2 && p.startsWith('*') && p.endsWith('*')
+          ? <Typography key={i} preset="qmChat" color={qm.body} style={styles.italic}>{p.slice(1, -1)}</Typography>
+          : p)}
+    </>
+  );
+}
+
+function Markdown({ text }: { text: string }) {
+  const { qm } = useTheme();
+  const blocks = text.trim().split(/\n{2,}/);
+  return (
+    <View style={styles.md}>
+      {blocks.map((block, bi) => {
+        const lines = block.split('\n').filter(l => l.trim().length > 0);
+        if (!lines.some(l => /^[-*•]\s/.test(l.trim()))) {
+          return <Typography key={bi} preset="qmChat" color={qm.body}><Inline text={lines.join('\n')} /></Typography>;
+        }
+        return (
+          <View key={bi} style={styles.bullets}>
+            {lines.map((line, li) => {
+              const l = line.trim();
+              // A lead-in line inside a list ("In essence:") stays flush left.
+              if (!/^[-*•]\s/.test(l)) return <Typography key={li} preset="qmChat" color={qm.body}><Inline text={l} /></Typography>;
+              return (
+                <View key={li} style={styles.bulletRow}>
+                  <Typography preset="qmChat" color={qm.body} style={styles.bulletDot}>•</Typography>
+                  <Typography preset="qmChat" color={qm.body} style={styles.flex}><Inline text={l.replace(/^[-*•]\s+/, '')} /></Typography>
+                </View>
+              );
+            })}
+          </View>
+        );
+      })}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  msgImageThumb: {
-    width: 200, height: 150, borderRadius: layout.cardRadius,
-    alignSelf: 'flex-end', marginRight: spacing.lg, marginBottom: spacing.xs,
+  flex: { flex: 1, minWidth: 0 },
+  userCol: { alignItems: 'flex-end', marginTop: spacing.s10 },
+  thumb: { width: THUMB_W, height: THUMB_H, borderRadius: radius.r18, marginBottom: spacing.xs },
+  userBubble: {
+    maxWidth: '82%', paddingVertical: spacing.md, paddingHorizontal: spacing.lg,
+    borderTopLeftRadius: radius.r20, borderTopRightRadius: radius.r20, borderBottomLeftRadius: radius.r20, borderBottomRightRadius: radius.r6,
   },
-  attachmentChip: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.s6,
-    alignSelf: 'flex-end', maxWidth: '80%',
-    marginRight: spacing.lg, marginBottom: spacing.xs,
-    borderWidth: 1, borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.s6,
-  },
-  attachmentChipText: { flexShrink: 1 },
-  followUps: {
-    paddingLeft: spacing.huge, paddingRight: spacing.lg,
-    gap: spacing.sm, marginTop: -spacing.xs, marginBottom: spacing.md,
-  },
-  followUpChip: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.xs,
-    borderRadius: layout.pillRadius, borderWidth: 1,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.s6,
-    alignSelf: 'flex-start',
-  },
-  followUpText: { flexShrink: 1 },
-  cardBanner: {
+  sentFile: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    marginTop: spacing.sm, marginLeft: spacing.huge, marginRight: spacing.lg,
-    marginBottom: spacing.md, paddingVertical: spacing.sm, paddingHorizontal: spacing.md,
-    borderRadius: radius.r10, borderWidth: 1,
+    marginTop: -spacing.s2, marginHorizontal: -spacing.s6, marginBottom: spacing.sm,
+    paddingVertical: spacing.sm, paddingHorizontal: spacing.s10, borderRadius: radius.r12,
   },
-  cardBannerText: { flex: 1 },
-  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  saveToSetBtn: { borderRadius: radius.sm, paddingVertical: spacing.s6, paddingHorizontal: spacing.md },
+  userFoot: { flexDirection: 'row', alignItems: 'center', gap: spacing.s2, marginTop: spacing.s2, marginRight: -spacing.sm },
+  footBtn: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  aura: {
+    alignSelf: 'flex-start', marginTop: spacing.s10, borderWidth: AURA,
+    borderTopLeftRadius: radius.r21 + 1, borderTopRightRadius: radius.r21 + 1, borderBottomRightRadius: radius.r21 + 1, borderBottomLeftRadius: radius.sm,
+  },
+  typing: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s10, paddingVertical: spacing.s13, paddingHorizontal: spacing.lg,
+    borderTopLeftRadius: radius.r20, borderTopRightRadius: radius.r20, borderBottomRightRadius: radius.r20, borderBottomLeftRadius: radius.r6,
+  },
+  dots: { flexDirection: 'row', gap: spacing.s5 },
+  dot: { width: DOT, height: DOT, borderRadius: DOT / 2 },
+  answer: {
+    alignSelf: 'flex-start', maxWidth: '94%', marginTop: spacing.s10,
+    paddingTop: spacing.lg, paddingHorizontal: spacing.lg, paddingBottom: spacing.xs,
+    borderTopLeftRadius: radius.r20, borderTopRightRadius: radius.r20, borderBottomRightRadius: radius.r20, borderBottomLeftRadius: radius.r6,
+  },
+  answerFoot: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: spacing.xs, marginRight: -spacing.sm },
+  ribbon: { position: 'absolute', top: -spacing.s6, right: spacing.s14 },
+  // Fixed width: its flex text would otherwise shrink the card to the icon.
+  failed: { width: '94%' },
+  failRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s10 },
+  failText: { marginTop: spacing.s2 },
+  retry: {
+    alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: spacing.s6,
+    height: TOUCH, paddingHorizontal: spacing.lg, borderRadius: radius.r12, marginTop: spacing.md, marginBottom: spacing.md,
+  },
+  cards: {
+    maxWidth: '94%', flexDirection: 'row', alignItems: 'center', gap: spacing.md,
+    marginTop: spacing.s10, paddingVertical: spacing.md, paddingLeft: spacing.s14, paddingRight: spacing.md, borderRadius: radius.r18,
+  },
+  cardsTile: { width: CARDS_TILE, height: CARDS_TILE, borderRadius: radius.r10 + 1, alignItems: 'center', justifyContent: 'center' },
+  savedChip: { flexDirection: 'row', alignItems: 'center', gap: spacing.xs, paddingRight: spacing.s6 },
+  saveBtn: { height: TOUCH, paddingHorizontal: spacing.s14, borderRadius: radius.r12, alignItems: 'center', justifyContent: 'center' },
+  keepGoing: { marginTop: spacing.lg, marginBottom: spacing.sm },
+  followUps: { alignItems: 'flex-start', gap: spacing.sm },
+  followUp: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingVertical: spacing.s10, paddingHorizontal: spacing.s14, borderRadius: radius.pill, maxWidth: '100%',
+  },
+  followText: { flexShrink: 1 },
+  md: { gap: spacing.sm },
+  bullets: { gap: spacing.xs },
+  bulletRow: { flexDirection: 'row', gap: spacing.sm },
+  bulletDot: { width: spacing.md },
+  italic: { fontStyle: 'italic' },
 });

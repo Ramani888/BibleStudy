@@ -51,7 +51,8 @@ export type QuizStackParamList = {
 
 // ─── AI Stack ─────────────────────────────────────────────────────────────────
 export type AIStackParamList = {
-  AIConsent: undefined;
+  // autoSend is forwarded to AIChat once consent is stored.
+  AIConsent: { autoSend?: string } | undefined;
   // The active conversation lives in the AI chat store (survives navigation).
   // Pass autoSend to open the screen and immediately send a pre-formed question.
   AIChat: { autoSend?: string } | undefined;

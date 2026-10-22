@@ -1,24 +1,24 @@
-import React, { useCallback, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Image, Pressable, StyleSheet, TextInput, View } from 'react-native';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { fontSizes, layout, lineHeights, radius, spacing, useTheme, palette } from '../../../theme';
-import { Typography } from '../../../components/ui';
-import { StarIcon, ArrowUpIcon, FileTextIcon, PlusIcon, CloseIcon } from '../../../components/icons';
 
-const SEND_ICON_SIZE = 18;
-const CREDIT_ICON_SIZE = 12;
+import { AnimatedPressable, Typography } from '../../../components/ui';
+import { ArrowUpIcon, CloseIcon, DocIcon, ImageIcon, InfoIcon, PlusIcon } from '../../../components/icons';
+import { useTheme, spacing, radius, textPresets } from '../../../theme';
+import { wantsCards } from '../chatMarks';
+
+const BTN = 40;
+const THUMB = 28;
 const MAX_LENGTH = 1000;
 const WARN_THRESHOLD = 900;
+const INPUT_MAX_H = 110;
+const AURA = 2;
 
 interface ChatInputProps {
   onSend: (text: string) => void;
+  /** An answer is being written → violet outline, input says so. */
+  working?: boolean;
   disabled?: boolean;
   creditBalance?: number;
   attachmentName?: string | null;
@@ -28,252 +28,140 @@ interface ChatInputProps {
   onAttachPress?: () => void;
   onClearAttachment?: () => void;
   onUpgrade?: () => void;
+  onClaim?: () => void;
 }
 
+/** Quiet-morning composer: cost line, attachment chip, [+] field [↑]. */
 export const ChatInput = React.memo(function ChatInput({
-  onSend,
-  disabled,
-  creditBalance,
-  attachmentName,
-  attachmentType,
-  attachmentLocalUri,
-  isUploading,
-  onAttachPress,
-  onClearAttachment,
-  onUpgrade,
+  onSend, working, disabled, creditBalance, attachmentName, attachmentType, attachmentLocalUri,
+  isUploading, onAttachPress, onClearAttachment, onUpgrade, onClaim,
 }: ChatInputProps) {
   const { t } = useTranslation('ai');
-  const { colors } = useTheme();
-  const inputRef = useRef<TextInput>(null);
+  const { qm } = useTheme();
   const [text, setText] = useState('');
 
-  const canSend     = text.trim().length > 0 && !disabled;
-  const showCounter = text.length >= WARN_THRESHOLD;
-  // attachmentType falls back to 'PDF' upstream even with nothing attached (so the uploading chip knows its type);
-  // only price media when an attachment is actually present, otherwise it's a plain text question.
+  // attachmentType falls back to 'PDF' upstream even with nothing attached; only price
+  // media when something is actually attached.
   const hasAttachment = !!isUploading || !!attachmentName;
-  const actionCost  = !hasAttachment ? 1 : attachmentType === 'PDF' ? 5 : attachmentType === 'IMAGE' ? 3 : 1;
+  const cost = hasAttachment ? (attachmentType === 'PDF' ? 5 : 3) : wantsCards(text) ? 2 : 1;
+  const outOfCredits = creditBalance !== undefined && creditBalance <= 0;
+  const canSend = (text.trim().length > 0 || (!!attachmentName && !isUploading)) && !disabled && !outOfCredits && !isUploading;
 
   const handleSend = useCallback(() => {
     if (!canSend) return;
-    const msg = text.trim();
+    const msg = text.trim() || t('ai:qm.chat.fileQuestion', 'What are the main points of this file?');
     setText('');
     onSend(msg);
-    requestAnimationFrame(() => inputRef.current?.focus());
-  }, [canSend, text, onSend]);
+  }, [canSend, text, onSend, t]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
-
-      {/* State 6 — credits warning */}
-      {creditBalance !== undefined && (
-        <View style={styles.creditRow}>
-          <StarIcon size={CREDIT_ICON_SIZE} color={creditBalance > 0 ? colors.textSecondary : colors.alert} />
-          <Typography preset="caption" color={creditBalance > 0 ? colors.textSecondary : colors.alert}>
-            {creditBalance > 0
-              ? t('composer.costsInfo', { count: actionCost, balance: creditBalance, defaultValue: `Costs ${actionCost} ${actionCost === 1 ? 'credit' : 'credits'} · ${creditBalance} remaining` })
-              : t('composer.noCreditsPrompt', 'No credits — claim your daily credit or')}
+    <View style={[styles.wrap, { backgroundColor: qm.bg }]}>
+      {creditBalance !== undefined && !outOfCredits && (
+        <Typography preset="qmFine" color={qm.muted} style={styles.cost}>
+          {t('ai:qm.chat.costLine', { count: cost, balance: creditBalance, defaultValue: `Costs ${cost} ${cost === 1 ? 'credit' : 'credits'} · ${creditBalance} left` })}
+        </Typography>
+      )}
+      {outOfCredits && (
+        <View style={[styles.noCredits, { backgroundColor: qm.errorBg }]} accessibilityRole="alert">
+          <InfoIcon size={18} color={qm.warm} strokeWidth={2} />
+          <Typography preset="qmBody" color={qm.ink} style={styles.flex}>
+            <Typography preset="qmLink" color={qm.ink}>{t('ai:qm.chat.noCredits', 'No credits left')}</Typography>
+            {' — '}
+            <Typography preset="qmLink" color={qm.link} onPress={onClaim} accessibilityRole="link">{t('ai:qm.chat.claimDaily', 'claim your daily credit')}</Typography>
+            {t('ai:qm.chat.or', ' or ')}
+            <Typography preset="qmLink" color={qm.link} onPress={onUpgrade} accessibilityRole="link">{t('ai:composer.upgrade', 'Upgrade')}</Typography>
           </Typography>
-          {creditBalance <= 0 && onUpgrade && (
-            <Pressable onPress={onUpgrade} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-              <Typography preset="caption" color={colors.accent}> {t('composer.upgrade', 'Upgrade')}</Typography>
-            </Pressable>
+        </View>
+      )}
+
+      <View style={[styles.aura, { borderColor: working ? qm.violet : qm.bg }]}>
+        <View style={[styles.box, { backgroundColor: qm.surface, boxShadow: qm.tabShadow }]}>
+          {hasAttachment && (
+            <Animated.View entering={FadeInUp.duration(320)} style={[styles.chip, { backgroundColor: qm.goldBg }]}>
+              {attachmentType === 'IMAGE' && attachmentLocalUri
+                ? <Image source={{ uri: attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />
+                : attachmentType === 'IMAGE'
+                  ? <ImageIcon size={18} color={qm.goldText} strokeWidth={2} />
+                  : <DocIcon size={18} color={qm.goldText} strokeWidth={2} />}
+              <Typography preset="qmLink" color={qm.goldText} numberOfLines={1} style={styles.flex}>
+                {isUploading ? t('ai:qm.chat.uploading', 'Uploading…') : attachmentName}
+              </Typography>
+              {isUploading
+                ? <ActivityIndicator size="small" color={qm.goldText} />
+                : (
+                  <Pressable onPress={onClearAttachment} hitSlop={8} style={styles.chipX} accessibilityRole="button" accessibilityLabel={t('ai:qm.chat.removeFile', 'Remove attachment')}>
+                    <CloseIcon size={14} color={qm.goldText} strokeWidth={2.4} />
+                  </Pressable>
+                )}
+            </Animated.View>
+          )}
+          <View style={styles.row}>
+            {onAttachPress && (
+              <AnimatedPressable
+                scaleTo={0.92}
+                onPress={onAttachPress}
+                disabled={disabled}
+                style={[styles.round, { backgroundColor: qm.field }, disabled && styles.dim]}
+                accessibilityRole="button"
+                accessibilityLabel={t('ai:qm.chat.attachA11y', 'Attach a PDF or photo')}
+              >
+                <PlusIcon size={18} color={qm.ink} strokeWidth={2} />
+              </AnimatedPressable>
+            )}
+            <TextInput
+              style={[styles.input, { color: qm.ink }]}
+              placeholder={working ? t('ai:qm.chat.writing', 'Writing an answer…') : t('ai:qm.chat.placeholder', 'Ask a question')}
+              placeholderTextColor={qm.muted}
+              accessibilityLabel={t('ai:qm.chat.placeholder', 'Ask a question')}
+              value={text}
+              onChangeText={setText}
+              multiline
+              maxLength={MAX_LENGTH}
+              textAlignVertical="center"
+            />
+            <AnimatedPressable
+              scaleTo={0.92}
+              onPress={handleSend}
+              disabled={!canSend}
+              style={[styles.round, { backgroundColor: canSend ? qm.violet : qm.btnOff }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('ai:qm.chat.send', 'Send')}
+              accessibilityState={{ disabled: !canSend }}
+            >
+              <ArrowUpIcon size={18} color={canSend ? qm.onViolet : qm.btnOffInk} strokeWidth={2} />
+            </AnimatedPressable>
+          </View>
+          {text.length >= WARN_THRESHOLD && (
+            <Typography preset="qmFine" color={qm.error} style={styles.counter}>{text.length} / {MAX_LENGTH}</Typography>
           )}
         </View>
-      )}
-
-      {/* State 5 — attachment: image thumbnail or PDF chip */}
-      {(isUploading || !!attachmentName) && (
-        attachmentType === 'IMAGE' && attachmentLocalUri ? (
-          // Image: thumbnail with spinner overlay while uploading, clear button after
-          <View style={styles.thumbWrap}>
-            <Image source={{ uri: attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />
-            {isUploading ? (
-              <View style={styles.thumbOverlay}>
-                <ActivityIndicator size="small" color={palette.white} />
-              </View>
-            ) : (
-              <Pressable style={({ pressed }) => [styles.thumbClearBtn, { opacity: pressed ? 0.85 : 1 }]} onPress={onClearAttachment} hitSlop={8}>
-                <CloseIcon size={10} color={palette.white} />
-              </Pressable>
-            )}
-          </View>
-        ) : (
-          // PDF (or unknown type during upload): text chip with spinner or file icon
-          <View style={[styles.attachChip, { backgroundColor: colors.accentSoft, borderColor: colors.cardBorder }]}>
-            {isUploading
-              ? <ActivityIndicator size="small" color={colors.accent} style={styles.chipSpinner} />
-              : <FileTextIcon size={14} color={colors.accent} />
-            }
-            <Typography preset="caption" color={colors.accent} style={styles.attachName} numberOfLines={1}>
-              {attachmentName ?? t('chat.uploadingPlaceholder', 'Uploading…')}
-            </Typography>
-            {!isUploading && (
-              <Pressable onPress={onClearAttachment} hitSlop={8} style={({ pressed }) => ({ opacity: pressed ? 0.85 : 1 })}>
-                <CloseIcon size={14} color={colors.textSecondary} />
-              </Pressable>
-            )}
-          </View>
-        )
-      )}
-
-      {/* States 1–4 — single container, always */}
-      <View style={[styles.inputBox, { backgroundColor: colors.surfaceMuted }]}>
-        {/* Text input — grows from minHeight to maxHeight, then scrolls */}
-        <TextInput
-          ref={inputRef}
-          style={[styles.input, { color: colors.textPrimary }]}
-          placeholder={t('composer.placeholder')}
-          placeholderTextColor={colors.textSecondary}
-          value={text}
-          onChangeText={setText}
-          multiline
-          scrollEnabled
-          maxLength={MAX_LENGTH}
-          returnKeyType="default"
-          editable
-          textAlignVertical="top"
-        />
-
-        {/* Counter — only near limit */}
-        {showCounter && (
-          <Typography preset="caption" color={colors.alert} style={styles.counter}>
-            {text.length} / {MAX_LENGTH}
-          </Typography>
-        )}
-
-        {/* Bottom row: [+] ··· [↑]  — pinned to bottom via flex-end on container */}
-        <View style={styles.bottomRow}>
-          {onAttachPress ? (
-            <Pressable
-              onPress={onAttachPress}
-              disabled={disabled}
-              hitSlop={12}
-              style={({ pressed }) => [styles.attachIconBtn, disabled && styles.inputDisabled, { opacity: disabled ? 0.5 : pressed ? 0.85 : 1 }]}
-            >
-              <PlusIcon size={22} color={colors.textSecondary} />
-            </Pressable>
-          ) : <View style={styles.attachPlaceholder} />}
-
-          <Pressable
-            style={({ pressed }) => [styles.sendBtn, { backgroundColor: colors.accent }, canSend ? styles.sendActive : styles.sendInactive, canSend && { opacity: pressed ? 0.85 : 1 }]}
-            onPress={handleSend}
-            disabled={!canSend}
-            hitSlop={8}
-          >
-            <ArrowUpIcon size={SEND_ICON_SIZE} color={colors.textOnAccent} />
-          </Pressable>
-        </View>
       </View>
-
     </View>
   );
 });
 
 const styles = StyleSheet.create({
-  container: {
-    borderTopWidth: 1,
-    paddingTop: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-    gap: spacing.sm,
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.5 },
+  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.sm, paddingBottom: spacing.md },
+  cost: { paddingHorizontal: spacing.sm, paddingBottom: spacing.s6 },
+  noCredits: {
+    flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s10,
+    marginHorizontal: spacing.s2, marginBottom: spacing.s10, paddingVertical: spacing.s10, paddingHorizontal: spacing.s14, borderRadius: radius.md,
   },
-
-  creditRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: spacing.xs,
+  aura: { borderRadius: radius.r28, borderWidth: AURA },
+  box: { borderRadius: radius.r28 - AURA, padding: spacing.s6 },
+  chip: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s10,
+    margin: spacing.xs, marginBottom: spacing.s6, paddingVertical: spacing.sm, paddingHorizontal: spacing.s10, borderRadius: radius.r12 + 2,
   },
-
-  thumbWrap: {
-    position: 'relative',
-    width: 64 /* ponytail: off-grid Figma value */,
-    height: 64,
-    borderRadius: layout.cardRadius,
-    overflow: 'hidden',
-    alignSelf: 'flex-start',
-  },
-  thumb: {
-    width: 64 /* ponytail: off-grid Figma value */,
-    height: 64,
-  },
-  thumbOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  thumbClearBtn: {
-    position: 'absolute',
-    top: spacing.xs,
-    right: spacing.xs,
-    width: spacing.s18,
-    height: spacing.s18,
-    borderRadius: radius.pill,
-    backgroundColor: 'rgba(0,0,0,0.55)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  attachChip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.s6,
-    alignSelf: 'flex-start',
-    maxWidth: '80%',
-    borderWidth: 1,
-    borderRadius: layout.pillRadius,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.s6,
-  },
-  attachName: { flexShrink: 1 },
-  chipSpinner: { width: spacing.s14, height: spacing.s14 },
-
-  // One box — filled, no hard border
-  inputBox: {
-    borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
-  },
-
+  thumb: { width: THUMB, height: THUMB, borderRadius: radius.r6 },
+  chipX: { width: spacing.s22, height: spacing.s22, alignItems: 'center', justifyContent: 'center' },
+  row: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.s6 },
+  round: { width: BTN, height: BTN, borderRadius: BTN / 2, alignItems: 'center', justifyContent: 'center' },
   input: {
-    minHeight: spacing.xxl,
-    maxHeight: 160 /* ponytail: off-grid Figma value */,
-    fontSize: fontSizes.md,
-    lineHeight: fontSizes.md * lineHeights.normal,
-    padding: 0,
-    margin: 0,
+    flex: 1, minWidth: 0, minHeight: BTN, maxHeight: INPUT_MAX_H,
+    paddingVertical: spacing.s10, paddingHorizontal: spacing.xs, ...textPresets.qmInput, fontSize: textPresets.qmBodyMd.fontSize,
   },
-  inputDisabled: { opacity: 0.5 },
-
-  counter: {
-    textAlign: 'right',
-    marginTop: spacing.xs,
-  },
-
-  // [+] icon-only · spacer · [↑] circle  — bottom of the box
-  bottomRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: spacing.sm,
-  },
-  attachIconBtn: {
-    padding: spacing.xs,
-  },
-  attachPlaceholder: {
-    width: spacing.s30,
-  },
-
-  sendBtn: {
-    marginLeft: 'auto',
-    width: 34 /* ponytail: off-grid Figma value */,
-    height: 34,
-    borderRadius: radius.pill,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  sendActive:   { opacity: 1 },
-  sendInactive: { opacity: 0.3 },
+  counter: { textAlign: 'right', paddingHorizontal: spacing.sm, paddingBottom: spacing.xs },
 });

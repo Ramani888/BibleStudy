@@ -727,3 +727,17 @@ export const ChevronLeftIcon: IconComponent = ({ size, color = DEFAULT_COLOR, st
     <Path d="M15 5l-7 7 7 7" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+/** Paper plane (AI consent "What we send"). */
+export const SendIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 12l16-8-6 16-2.5-6.5z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Solid ribbon (bookmarked answer). */
+export const BookmarkSolidIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
+  <Outline size={size}>
+    <Path d="M7 3h10v18l-5-4-5 4z" fill={color} />
+  </Outline>
+);

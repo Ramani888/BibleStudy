@@ -4,6 +4,8 @@ const KEYS = {
   ACCESS_TOKEN: '@bsp/access_token',
   REFRESH_TOKEN: '@bsp/refresh_token',
   AI_POLICY_ACCEPTED: '@bsp/ai_policy_accepted',
+  // Attachment content rules — separate from AI consent so agreeing to one never skips the other.
+  CONTENT_POLICY_ACCEPTED: '@bsp/content_policy_accepted',
   TOS_ACCEPTED: '@bsp/tos_accepted',
   ONBOARDING_SEEN: '@bsp/onboarding_seen',
   LANGUAGE_CODE: '@bsp/language_code',
@@ -42,6 +44,14 @@ export const storage = {
 
   async setAiPolicyAccepted(): Promise<void> {
     await AsyncStorage.setItem(KEYS.AI_POLICY_ACCEPTED, 'true');
+  },
+
+  async getContentPolicyAccepted(): Promise<boolean> {
+    return (await AsyncStorage.getItem(KEYS.CONTENT_POLICY_ACCEPTED)) === 'true';
+  },
+
+  async setContentPolicyAccepted(): Promise<void> {
+    await AsyncStorage.setItem(KEYS.CONTENT_POLICY_ACCEPTED, 'true');
   },
 
   async getTosAccepted(): Promise<boolean> {

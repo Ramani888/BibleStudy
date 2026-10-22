@@ -200,7 +200,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     { label: t('library:qm.moveCard', 'Move to another set'), icon: ArrowRightIcon, off: !otherSets.length, sub: otherSets.length ? undefined : t('library:sets.noOtherSets', 'No other sets available'), onPress: () => setSheet('move') },
     {
       label: t('library:qm.askAICard', 'Ask AI about this card'), icon: AskIcon,
-      onPress: () => navigation.navigate('AITab', { screen: 'AIChat', params: { autoSend: `Explain this flashcard:\nQ: ${target.question}\nA: ${target.answer}` } }),
+      // Via AIConsent so a first-time user can't skip consent.
+      onPress: () => navigation.navigate('AITab', { screen: 'AIConsent', params: { autoSend: `Explain this flashcard:\nQ: ${target.question}\nA: ${target.answer}` } }),
     },
     { label: t('library:qm.deleteCard', 'Delete card'), icon: TrashIcon, danger: true, onPress: () => deleteCard(target) },
   ] : [];

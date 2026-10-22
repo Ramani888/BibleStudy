@@ -31,6 +31,8 @@ export interface QMSheetAction {
   tick?: boolean;
   /** Lilac-filled row (e.g. Mix). */
   highlight?: boolean;
+  /** Muted text at the row's end (e.g. "3 credits"). */
+  trailing?: string;
 }
 
 interface QMSheetProps {
@@ -149,6 +151,7 @@ function SheetRow({ action: a, line, onRun }: { action: QMSheetAction; line: boo
         <Typography preset="qmRow" color={ink}>{a.label}</Typography>
         {a.sub ? <Typography preset="qmMeta" color={qm.muted} style={styles.rowSub}>{a.sub}</Typography> : null}
       </View>
+      {a.trailing ? <Typography preset="qmMeta" color={qm.muted}>{a.trailing}</Typography> : null}
       {a.tick && <CheckIcon size={20} color={qm.link} strokeWidth={2.4} />}
     </AnimatedPressable>
   );
