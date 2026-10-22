@@ -667,6 +667,13 @@ export const MatchIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWi
   </Outline>
 );
 
+/** 2×3 drag handle dots. */
+export const GripIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
+  <Outline size={size}>
+    {[6, 12, 18].map(y => [9, 15].map(x => <Circle key={`${x}-${y}`} cx={x} cy={y} r={1.6} fill={color} />))}
+  </Outline>
+);
+
 // ─── Tab bar icons (canvas TabBar). `filled` = active; `cutout` = pill colour
 // for the inner detail (book spine, check, dots) drawn on top of the fill. ────
 
