@@ -1,26 +1,27 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Modal, StyleSheet, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
-import { AppModal } from '../../../components/feedback';
 import { Typography } from '../../../components/ui';
 import { spacing, useTheme } from '../../../theme';
 
-/** The 5–15s "generating" overlay shown while an AI quiz is (re)generated. */
+/** The 5–15s full-screen "Making your quiz…" overlay while an AI quiz is (re)generated. */
 export function GeneratingQuizModal({ visible }: { visible: boolean }) {
   const { t } = useTranslation('quiz');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   return (
-    <AppModal visible={visible} contentStyle={styles.modal}>
-      <View style={styles.wrap}>
-        <ActivityIndicator size="large" color={colors.accent} />
-        <Typography preset="h4" align="center">{t('setup.generatingTitle', 'Building your quiz…')}</Typography>
+    <Modal visible={visible} animationType="fade" statusBarTranslucent onRequestClose={() => {}}>
+      <View style={[styles.wrap, { backgroundColor: qm.bg }]} accessibilityRole="progressbar" accessibilityLiveRegion="polite">
+        <ActivityIndicator size="large" color={qm.violet} />
+        <Typography preset="qmTitle" color={qm.ink} align="center" style={styles.title}>{t('qm.making', 'Making your quiz…')}</Typography>
+        <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.sub}>{t('qm.makingSub', 'This takes a few seconds')}</Typography>
       </View>
-    </AppModal>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  modal: { alignItems: 'center' },
-  wrap: { alignItems: 'center', gap: spacing.lg, paddingVertical: spacing.xl },
+  wrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xl },
+  title: { marginTop: spacing.s22 },
+  sub: { marginTop: spacing.sm },
 });

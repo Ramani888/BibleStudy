@@ -1,4 +1,5 @@
-import type { ThemeColors } from '../../theme';
+import type { TFunction } from 'i18next';
+import type { QMColors, ThemeColors } from '../../theme';
 import type { SummaryItem } from '../../types';
 import type { GeneratedQuizCard, QuizStackParamList } from '../../navigation/types';
 
@@ -8,6 +9,18 @@ type QuizParams = QuizStackParamList['Quiz'];
  *  UUIDs). Used to decide retake behaviour — see reQuizParams. */
 const isGeneratedResponses = (responses?: SummaryItem[]): boolean =>
   !!responses?.some(r => r.cardId?.startsWith('gen-'));
+
+/**
+ * Source an AI re-quiz regenerates from (charged), or null when the retake is a free
+ * replay: the topic wins, else the grounding sets of a generated quiz.
+ */
+export function reQuizSource(
+  a: { setIds: string[]; topic?: string },
+  responses?: SummaryItem[],
+): { topic?: string; setIds?: string[] } | null {
+  if (!isGeneratedResponses(responses)) return null;
+  return a.topic ? { topic: a.topic } : a.setIds.length > 0 ? { setIds: a.setIds } : null;
+}
 
 /**
  * Params to re-quiz an existing attempt. An AI quiz (topic OR set-grounded) has no
@@ -47,4 +60,16 @@ export const MODE_NAMES: Record<string, string> = {
 /** Score → semantic color: ≥80 success, ≥50 warning, else alert. */
 export function scoreColor(pct: number, colors: ThemeColors): string {
   return pct >= 80 ? colors.success : pct >= 50 ? colors.warning : colors.alert;
+}
+
+/** Quiet-morning score tile [bg, ink]: ≥80 leaf, ≥50 gold, else warm; unscored = field. */
+export function qmScoreTone(pct: number | null, qm: QMColors): [string, string] {
+  if (pct === null) return [qm.field, qm.muted];
+  return pct >= 80 ? [qm.leafBg, qm.leafText] : pct >= 50 ? [qm.goldBg, qm.goldText] : [qm.errorBg, qm.warm];
+}
+
+/** Sentence-case mode label (canvas copy): `modes.*`, with `modeNames.mix` for Mix. */
+export function qmModeName(mode: string | null | undefined, t: TFunction): string {
+  const m = mode ?? 'mix';
+  return m === 'mix' ? t('quiz:modeNames.mix', 'Mix') : t(`quiz:modes.${m}`, MODE_NAMES[m] ?? m);
 }

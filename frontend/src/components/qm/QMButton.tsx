@@ -1,6 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, StyleSheet, ViewStyle } from 'react-native';
 import { AnimatedPressable, Typography } from '../ui';
+import type { IconComponent } from '../icons';
 import { useTheme, spacing, radius } from '../../theme';
 
 const BTN_H = 56; // canvas bottom primary button
@@ -15,10 +16,12 @@ interface QMButtonProps {
   off?: boolean;
   pressableWhenOff?: boolean;
   style?: ViewStyle;
+  /** Leading icon (e.g. "+"). */
+  icon?: IconComponent;
 }
 
 /** Quiet-morning primary button: 56px violet with soft violet drop. */
-export function QMButton({ label, onPress, loading, loadingLabel, off, pressableWhenOff, style }: QMButtonProps) {
+export function QMButton({ label, onPress, loading, loadingLabel, off, pressableWhenOff, style, icon: Icon }: QMButtonProps) {
   const { qm } = useTheme();
   const disabled = loading || (off && !pressableWhenOff);
   return (
@@ -35,6 +38,7 @@ export function QMButton({ label, onPress, loading, loadingLabel, off, pressable
       accessibilityState={{ disabled: !!off || !!loading, busy: !!loading }}
     >
       {loading && <ActivityIndicator size="small" color={qm.onViolet} />}
+      {!loading && Icon && <Icon size={18} color={off ? qm.btnOffInk : qm.onViolet} strokeWidth={2} />}
       <Typography preset="qmButtonLg" color={off ? qm.btnOffInk : qm.onViolet}>
         {loading ? loadingLabel ?? label : label}
       </Typography>

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 
 import { getErrorMessage } from '../api';
-import { reQuizParams } from '../screens/quiz/quizUi';
+import { reQuizParams, reQuizSource } from '../screens/quiz/quizUi';
 import type { SummaryItem } from '../types';
 import { useConfirmDialog } from './useConfirmDialog';
 import { useCreditBalance } from './useCredits';
@@ -65,19 +65,16 @@ export function useReQuiz() {
 
   const reQuiz = useCallback((attempt: ReQuizAttempt, responses?: SummaryItem[]) => {
     if (generate.isPending) return;
-    const isGenerated = !!responses?.some(r => r.cardId?.startsWith('gen-'));
-    // Source to regenerate from: the topic wins, else the grounding sets.
-    const source: { topic?: string; setIds?: string[] } | null =
-      attempt.topic ? { topic: attempt.topic }
-      : isGenerated && attempt.setIds.length > 0 ? { setIds: attempt.setIds }
-      : null;
+    const source = reQuizSource(attempt, responses);
 
     // AI quiz with a known source → confirm + regenerate fresh questions (charged).
-    if (isGenerated && source) {
+    if (source) {
       if (creditBalance && creditBalance.balance < AI_QUIZ_COST) { goPaywall(); return; }
       show({
-        title: t('quiz:reQuiz.confirmTitle', 'New questions?'),
-        message: t('quiz:reQuiz.confirmMessage', { cost: AI_QUIZ_COST, defaultValue: `Re-quiz makes new questions from the same source and uses ${AI_QUIZ_COST} credits.` }),
+        title: source.topic ? t('quiz:qm.reQuizTopicTitle', 'Make a new quiz on the same topic?') : t('quiz:qm.reQuizSetsTitle', 'Make a new quiz from the same sets?'),
+        message: creditBalance
+          ? t('quiz:qm.reQuizMessage', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Verdance writes fresh questions. Uses ${AI_QUIZ_COST} credits. You have {{balance}}.` })
+          : t('quiz:reQuiz.confirmMessage', { cost: AI_QUIZ_COST }),
         confirmLabel: t('quiz:reQuiz.confirmCta', { cost: AI_QUIZ_COST, defaultValue: `Use ${AI_QUIZ_COST} credits` }),
         onConfirm: () => regenerate(attempt, source),
       });

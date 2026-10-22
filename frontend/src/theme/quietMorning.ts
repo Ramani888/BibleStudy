@@ -54,6 +54,8 @@ export interface QMColors {
   focusRing: string;
   error: string;
   errorBg: string;
+  /** Soft 'missed' ink on errorBg (quiz scores, missed answers). */
+  warm: string;
   off: string;
   btnOff: string;
   btnOffInk: string;
@@ -123,6 +125,7 @@ export const qmLight: QMColors = {
   focusRing: '0px 0px 0px 4px rgba(124,92,240,0.18)',
   error: '#B4442F',
   errorBg: '#FBEDEA',
+  warm: '#A4573F',
   off: '#B9B3C4',
   btnOff: '#D9D3E6',
   btnOffInk: '#7C7690',
@@ -187,6 +190,7 @@ export const qmDark: QMColors = {
   focusRing: '0px 0px 0px 4px rgba(124,92,240,0.18)',
   error: '#F08C78',
   errorBg: '#33201D',
+  warm: '#E7A08C',
   off: '#5C5468',
   btnOff: '#2A2535',
   btnOffInk: '#8A8398',
