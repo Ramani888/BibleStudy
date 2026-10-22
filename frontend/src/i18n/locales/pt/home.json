@@ -3,47 +3,40 @@
     "morning": "Bom dia",
     "afternoon": "Boa tarde",
     "evening": "Boa noite",
-    "streak": "Sequência de {{count}} dias! Continue assim",
-    "streak_one": "Dia 1 de sequência! Ótimo começo",
     "streakDays": "Sequência de {{count}} dia",
     "streakDays_other": "Sequência de {{count}} dias"
   },
-  "stats": {
-    "dueToday": "Para hoje",
-    "cardsLearned": "Cartões aprendidos",
-    "streakDays": "Dias de sequência",
-    "totalSets": "Total de conjuntos",
-    "cardsCount": "{{count}} cartões",
-    "sets": "Conjuntos",
-    "folders": "Pastas",
-    "notes": "Notas",
-    "cards": "Cartões",
-    "credits": "Créditos"
+  "featured": {
+    "due": "PENDENTE",
+    "continue": "CONTINUAR",
+    "start": "COMEÇAR",
+    "createFirstSet": "Crie seu primeiro conjunto de estudo",
+    "beginJourney": "Comece sua jornada",
+    "streakGoal": "Sequência de {{streak}} dias · meta semanal {{goal}}/7",
+    "cardsToReview": "{{count}} cartão para revisar",
+    "cardsToReview_other": "{{count}} cartões para revisar"
   },
   "dailyVerse": {
     "title": "Versículo do Dia",
-    "reflection": "Reflexão diária",
     "share": "Compartilhar versículo",
-    "createCard": "Criar cartão com este versículo",
-    "copied": "Versículo copiado para a área de transferência",
-    "saveAsCard": "Salvar como cartão"
+    "saveAsCard": "Salvar como cartão",
+    "reflection": "Reflexão diária",
+    "copied": "Versículo copiado para a área de transferência"
   },
-  "recentSets": {
-    "title": "Continuar Estudando",
-    "seeAll": "Ver tudo",
-    "empty": "Nenhum conjunto recente",
-    "emptySub": "Comece a estudar um conjunto para vê-lo aqui",
-    "cardCount": "{{count}} cartão",
-    "cardCount_other": "{{count}} cartões",
-    "dueCount": "{{count}} pendente",
-    "dueCount_other": "{{count}} pendentes"
+  "streak": {
+    "day": "Sequência de {{count}} dia",
+    "days": "Sequência de {{count}} dias",
+    "keepGoing": "Continue com o ótimo trabalho!",
+    "streakLost": "Estude hoje para manter sua sequência",
+    "flameDays": "🔥 Sequência de {{count}} dia",
+    "flameDays_other": "🔥 Sequência de {{count}} dias"
   },
   "quickActions": {
     "title": "Ações Rápidas",
-    "newSet": "Novo Conjunto",
+    "search": "Buscar",
     "askAI": "Perguntar à IA",
-    "quickQuiz": "Quiz Rápido",
-    "dailyVerse": "Versículo Diário",
+    "newSet": "Novo Conjunto",
+    "library": "Biblioteca",
     "createSet": "Criar conjunto",
     "studyPlans": "Planos de estudo",
     "achievements": "Conquistas",
@@ -51,9 +44,29 @@
     "notes": "Notas",
     "media": "Mídia",
     "discover": "Descobrir",
-    "friends": "Amigos",
-    "search": "Buscar",
-    "library": "Biblioteca"
+    "friends": "Amigos"
+  },
+  "sections": {
+    "recentSets": "Conjuntos recentes",
+    "seeAll": "Ver tudo",
+    "friendsSets": "Conjuntos dos amigos",
+    "communitySets": "Conjuntos da comunidade",
+    "friendActivity": "Atividade dos amigos",
+    "quickStats": "Resumo rápido",
+    "recentActivity": "ATIVIDADE RECENTE"
+  },
+  "stats": {
+    "sets": "Conjuntos",
+    "folders": "Pastas",
+    "notes": "Notas",
+    "cards": "Cartões",
+    "credits": "Créditos"
+  },
+  "empty": {
+    "noRecentSets": "Nenhum conjunto de estudo recente ainda",
+    "noFriendsSets": "Nenhum conjunto público de amigos ainda",
+    "noCommunitySets": "Explore conjuntos de estudo da comunidade",
+    "noActivity": "Nenhuma atividade recente de amigos"
   },
   "a11y": {
     "goToProfile": "Ir para o perfil",
@@ -70,43 +83,45 @@
     "wroteNote": "{{name}} escreveu uma nota",
     "wasActive": "{{name}} esteve ativo"
   },
-  "featured": {
-    "due": "PENDENTE",
-    "continue": "CONTINUAR",
-    "start": "COMEÇAR",
-    "createFirstSet": "Crie seu primeiro conjunto de estudo",
-    "beginJourney": "Comece sua jornada",
-    "streakGoal": "Sequência de {{streak}} dias · meta semanal {{goal}}/7",
-    "cardsToReview": "{{count}} cartão para revisar",
-    "cardsToReview_other": "{{count}} cartões para revisar"
-  },
-  "streak": {
-    "day": "Sequência de {{count}} dia",
-    "days": "Sequência de {{count}} dias",
-    "keepGoing": "Continue com o ótimo trabalho!",
-    "streakLost": "Estude hoje para manter sua sequência",
-    "flameDays": "🔥 Sequência de {{count}} dia",
-    "flameDays_other": "🔥 Sequência de {{count}} dias"
-  },
-  "sections": {
-    "recentSets": "Conjuntos recentes",
-    "seeAll": "Ver tudo",
-    "friendsSets": "Conjuntos dos amigos",
-    "communitySets": "Conjuntos da comunidade",
-    "friendActivity": "Atividade dos amigos",
-    "quickStats": "Resumo rápido",
-    "recentActivity": "ATIVIDADE RECENTE"
-  },
-  "empty": {
-    "noRecentSets": "Nenhum conjunto de estudo recente ainda",
-    "noFriendsSets": "Nenhum conjunto público de amigos ainda",
-    "noCommunitySets": "Explore conjuntos de estudo da comunidade",
-    "noActivity": "Nenhuma atividade recente de amigos"
-  },
   "shareEvent": {
     "title": "Compartilhe seu progresso 🙌",
     "subtitle": "Envie seu conjunto ou sequência para o seu grupo — cresçam juntos na Palavra.",
     "cta": "Compartilhar agora",
     "message": "🔥 Sequência de {{streak}} dias no Verdance! Junte-se a mim e cresça na Palavra: {{url}}"
+  },
+  "today": {
+    "dueLabel": "REVISÃO DE HOJE",
+    "dueTitle": "{{count}} cartão está pronto",
+    "dueTitle_other": "{{count}} cartões estão prontos",
+    "dueSub": "De {{count}} dos seus conjuntos",
+    "dueSub_one": "De 1 dos seus conjuntos",
+    "dueBtn": "Começar revisão",
+    "continueLabel": "CONTINUE DE ONDE PAROU",
+    "continueSub": "{{count}} cartão · nada pendente hoje",
+    "continueSub_other": "{{count}} cartões · nada pendente hoje",
+    "continueBtn": "Abrir conjunto",
+    "startLabel": "COMECE AQUI",
+    "startTitle": "Crie seu primeiro conjunto de estudo",
+    "startSub": "Adicione alguns versículos e ajudaremos você a lembrá-los",
+    "startBtn": "Criar um conjunto",
+    "streak": "Sequência de {{count}} dias",
+    "streak_one": "Sequência de {{count}} dia",
+    "restSaved": "{{count}} dias de descanso guardados",
+    "restSaved_one": "{{count}} dia de descanso guardado",
+    "due": "Pendente",
+    "cardCount": "{{count}} cartão",
+    "cardCount_other": "{{count}} cartões",
+    "ownerCards": "{{name}} · {{count}} cartão",
+    "ownerCards_other": "{{name}} · {{count}} cartões"
+  },
+  "verse": {
+    "label": "Versículo de hoje",
+    "new": "NOVO",
+    "memorize": "Memorizar",
+    "added": "Adicionado a Versículos diários",
+    "share": "Compartilhar versículo",
+    "setTitle": "Versículos diários",
+    "translation": "World English Bible",
+    "translationShort": "WEB"
   }
 }

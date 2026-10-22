@@ -3,47 +3,40 @@
     "morning": "Buenos días",
     "afternoon": "Buenas tardes",
     "evening": "Buenas noches",
-    "streak": "¡Racha de {{count}} días! Sigue así",
-    "streak_one": "¡Día 1 de racha! Gran comienzo",
     "streakDays": "Racha de {{count}} día",
     "streakDays_other": "Racha de {{count}} días"
   },
-  "stats": {
-    "dueToday": "Pendiente hoy",
-    "cardsLearned": "Tarjetas aprendidas",
-    "streakDays": "Días de racha",
-    "totalSets": "Sets totales",
-    "cardsCount": "{{count}} tarjetas",
-    "sets": "Conjuntos",
-    "folders": "Carpetas",
-    "notes": "Notas",
-    "cards": "Tarjetas",
-    "credits": "Créditos"
+  "featured": {
+    "due": "PENDIENTE",
+    "continue": "CONTINUAR",
+    "start": "EMPEZAR",
+    "createFirstSet": "Crea tu primer set de estudio",
+    "beginJourney": "Comienza tu camino",
+    "streakGoal": "Racha de {{streak}} días · meta semanal {{goal}}/7",
+    "cardsToReview": "{{count}} tarjeta por repasar",
+    "cardsToReview_other": "{{count}} tarjetas por repasar"
   },
   "dailyVerse": {
     "title": "Versículo del Día",
-    "reflection": "Reflexión diaria",
     "share": "Compartir versículo",
-    "createCard": "Crear tarjeta con este versículo",
-    "copied": "Versículo copiado al portapapeles",
-    "saveAsCard": "Guardar como tarjeta"
+    "saveAsCard": "Guardar como tarjeta",
+    "reflection": "Reflexión diaria",
+    "copied": "Versículo copiado al portapapeles"
   },
-  "recentSets": {
-    "title": "Continuar Estudiando",
-    "seeAll": "Ver todo",
-    "empty": "No hay sets recientes",
-    "emptySub": "Comienza a estudiar un set para verlo aquí",
-    "cardCount": "{{count}} tarjeta",
-    "cardCount_other": "{{count}} tarjetas",
-    "dueCount": "{{count}} pendiente",
-    "dueCount_other": "{{count}} pendientes"
+  "streak": {
+    "day": "Racha de {{count}} día",
+    "days": "Racha de {{count}} días",
+    "keepGoing": "¡Sigue así, vas muy bien!",
+    "streakLost": "Estudia hoy para mantener tu racha",
+    "flameDays": "🔥 Racha de {{count}} día",
+    "flameDays_other": "🔥 Racha de {{count}} días"
   },
   "quickActions": {
     "title": "Acciones Rápidas",
-    "newSet": "Nuevo Set",
+    "search": "Buscar",
     "askAI": "Preguntar a IA",
-    "quickQuiz": "Cuestionario Rápido",
-    "dailyVerse": "Versículo Diario",
+    "newSet": "Nuevo Set",
+    "library": "Biblioteca",
     "createSet": "Crear set",
     "studyPlans": "Planes de estudio",
     "achievements": "Logros",
@@ -51,9 +44,29 @@
     "notes": "Notas",
     "media": "Archivos",
     "discover": "Descubrir",
-    "friends": "Amigos",
-    "search": "Buscar",
-    "library": "Biblioteca"
+    "friends": "Amigos"
+  },
+  "sections": {
+    "recentSets": "Sets recientes",
+    "seeAll": "Ver todo",
+    "friendsSets": "Sets de amigos",
+    "communitySets": "Sets de la comunidad",
+    "friendActivity": "Actividad de amigos",
+    "quickStats": "Estadísticas rápidas",
+    "recentActivity": "ACTIVIDAD RECIENTE"
+  },
+  "stats": {
+    "sets": "Conjuntos",
+    "folders": "Carpetas",
+    "notes": "Notas",
+    "cards": "Tarjetas",
+    "credits": "Créditos"
+  },
+  "empty": {
+    "noRecentSets": "Aún no hay sets de estudio recientes",
+    "noFriendsSets": "Aún no hay sets públicos de amigos",
+    "noCommunitySets": "Explora los sets de estudio de la comunidad",
+    "noActivity": "No hay actividad reciente de amigos"
   },
   "a11y": {
     "goToProfile": "Ir al perfil",
@@ -70,43 +83,45 @@
     "wroteNote": "{{name}} escribió una nota",
     "wasActive": "{{name}} estuvo activo"
   },
-  "featured": {
-    "due": "PENDIENTE",
-    "continue": "CONTINUAR",
-    "start": "EMPEZAR",
-    "createFirstSet": "Crea tu primer set de estudio",
-    "beginJourney": "Comienza tu camino",
-    "streakGoal": "Racha de {{streak}} días · meta semanal {{goal}}/7",
-    "cardsToReview": "{{count}} tarjeta por repasar",
-    "cardsToReview_other": "{{count}} tarjetas por repasar"
-  },
-  "streak": {
-    "day": "Racha de {{count}} día",
-    "days": "Racha de {{count}} días",
-    "keepGoing": "¡Sigue así, vas muy bien!",
-    "streakLost": "Estudia hoy para mantener tu racha",
-    "flameDays": "🔥 Racha de {{count}} día",
-    "flameDays_other": "🔥 Racha de {{count}} días"
-  },
-  "sections": {
-    "recentSets": "Sets recientes",
-    "seeAll": "Ver todo",
-    "friendsSets": "Sets de amigos",
-    "communitySets": "Sets de la comunidad",
-    "friendActivity": "Actividad de amigos",
-    "quickStats": "Estadísticas rápidas",
-    "recentActivity": "ACTIVIDAD RECIENTE"
-  },
-  "empty": {
-    "noRecentSets": "Aún no hay sets de estudio recientes",
-    "noFriendsSets": "Aún no hay sets públicos de amigos",
-    "noCommunitySets": "Explora los sets de estudio de la comunidad",
-    "noActivity": "No hay actividad reciente de amigos"
-  },
   "shareEvent": {
     "title": "Comparte tu progreso 🙌",
     "subtitle": "Envía tu set o racha a tu grupo: crezcan juntos en la Palabra.",
     "cta": "Compartir ahora",
-    "message": "🔥 ¡Racha de {{streak}} días en Verdance! Únete y crece en la Palabra: https://getverdance.com"
+    "message": "🔥 ¡Racha de {{streak}} días en Verdance! Únete y crece en la Palabra: {{url}}"
+  },
+  "today": {
+    "dueLabel": "REPASO DE HOY",
+    "dueTitle": "{{count}} tarjeta está lista",
+    "dueTitle_other": "{{count}} tarjetas están listas",
+    "dueSub": "De {{count}} de tus sets",
+    "dueSub_one": "De 1 de tus sets",
+    "dueBtn": "Empezar repaso",
+    "continueLabel": "SIGUE DONDE LO DEJASTE",
+    "continueSub": "{{count}} tarjeta · nada pendiente hoy",
+    "continueSub_other": "{{count}} tarjetas · nada pendiente hoy",
+    "continueBtn": "Abrir set",
+    "startLabel": "EMPIEZA AQUÍ",
+    "startTitle": "Crea tu primer set de estudio",
+    "startSub": "Agrega unos versículos y te ayudaremos a recordarlos",
+    "startBtn": "Crear un set",
+    "streak": "Racha de {{count}} días",
+    "streak_one": "Racha de {{count}} día",
+    "restSaved": "{{count}} días de descanso guardados",
+    "restSaved_one": "{{count}} día de descanso guardado",
+    "due": "Pendiente",
+    "cardCount": "{{count}} tarjeta",
+    "cardCount_other": "{{count}} tarjetas",
+    "ownerCards": "{{name}} · {{count}} tarjeta",
+    "ownerCards_other": "{{name}} · {{count}} tarjetas"
+  },
+  "verse": {
+    "label": "Versículo de hoy",
+    "new": "NUEVO",
+    "memorize": "Memorizar",
+    "added": "Agregado a Versículos diarios",
+    "share": "Compartir versículo",
+    "setTitle": "Versículos diarios",
+    "translation": "World English Bible",
+    "translationShort": "WEB"
   }
 }

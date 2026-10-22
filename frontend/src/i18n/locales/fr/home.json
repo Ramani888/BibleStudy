@@ -3,47 +3,40 @@
     "morning": "Bonjour",
     "afternoon": "Bon après-midi",
     "evening": "Bonsoir",
-    "streak": "{{count}} jours d'affilée ! Continuez comme ça",
-    "streak_one": "1er jour d'affilée ! Excellent début",
     "streakDays": "Série de {{count}} jour",
     "streakDays_other": "Série de {{count}} jours"
   },
-  "stats": {
-    "dueToday": "À réviser aujourd'hui",
-    "cardsLearned": "Cartes apprises",
-    "streakDays": "Jours d'affilée",
-    "totalSets": "Total des séries",
-    "cardsCount": "{{count}} cartes",
-    "sets": "Ensembles",
-    "folders": "Dossiers",
-    "notes": "Notes",
-    "cards": "Cartes",
-    "credits": "Crédits"
+  "featured": {
+    "due": "À RÉVISER",
+    "continue": "CONTINUER",
+    "start": "COMMENCER",
+    "createFirstSet": "Créez votre premier ensemble d'étude",
+    "beginJourney": "Commencez votre parcours",
+    "streakGoal": "{{streak}} jours de suite · objectif hebdo {{goal}}/7",
+    "cardsToReview": "{{count}} carte à réviser",
+    "cardsToReview_other": "{{count}} cartes à réviser"
   },
   "dailyVerse": {
     "title": "Verset du Jour",
-    "reflection": "Méditation quotidienne",
     "share": "Partager le verset",
-    "createCard": "Créer une carte avec ce verset",
-    "copied": "Verset copié dans le presse-papiers",
-    "saveAsCard": "Enregistrer comme carte"
+    "saveAsCard": "Enregistrer comme carte",
+    "reflection": "Méditation quotidienne",
+    "copied": "Verset copié dans le presse-papiers"
   },
-  "recentSets": {
-    "title": "Continuer l'Étude",
-    "seeAll": "Voir tout",
-    "empty": "Aucune série récente",
-    "emptySub": "Commencez à étudier une série pour la voir ici",
-    "cardCount": "{{count}} carte",
-    "cardCount_other": "{{count}} cartes",
-    "dueCount": "{{count}} à réviser",
-    "dueCount_other": "{{count}} à réviser"
+  "streak": {
+    "day": "{{count}} jour de suite",
+    "days": "{{count}} jours de suite",
+    "keepGoing": "Continuez, c'est excellent !",
+    "streakLost": "Étudiez aujourd'hui pour garder votre série",
+    "flameDays": "🔥 Série de {{count}} jour",
+    "flameDays_other": "🔥 Série de {{count}} jours"
   },
   "quickActions": {
     "title": "Actions Rapides",
-    "newSet": "Nouvelle Série",
+    "search": "Rechercher",
     "askAI": "Demander à l'IA",
-    "quickQuiz": "Quiz Rapide",
-    "dailyVerse": "Verset Quotidien",
+    "newSet": "Nouvelle Série",
+    "library": "Bibliothèque",
     "createSet": "Créer un ensemble",
     "studyPlans": "Plans d'étude",
     "achievements": "Réussites",
@@ -51,9 +44,29 @@
     "notes": "Notes",
     "media": "Médias",
     "discover": "Découvrir",
-    "friends": "Amis",
-    "search": "Rechercher",
-    "library": "Bibliothèque"
+    "friends": "Amis"
+  },
+  "sections": {
+    "recentSets": "Ensembles récents",
+    "seeAll": "Tout voir",
+    "friendsSets": "Ensembles des amis",
+    "communitySets": "Ensembles de la communauté",
+    "friendActivity": "Activité des amis",
+    "quickStats": "Statistiques rapides",
+    "recentActivity": "ACTIVITÉ RÉCENTE"
+  },
+  "stats": {
+    "sets": "Ensembles",
+    "folders": "Dossiers",
+    "notes": "Notes",
+    "cards": "Cartes",
+    "credits": "Crédits"
+  },
+  "empty": {
+    "noRecentSets": "Aucun ensemble d'étude récent",
+    "noFriendsSets": "Aucun ensemble public d'amis pour l'instant",
+    "noCommunitySets": "Explorez les ensembles d'étude de la communauté",
+    "noActivity": "Aucune activité récente d'amis"
   },
   "a11y": {
     "goToProfile": "Aller au profil",
@@ -70,43 +83,45 @@
     "wroteNote": "{{name}} a écrit une note",
     "wasActive": "{{name}} était actif"
   },
-  "featured": {
-    "due": "À RÉVISER",
-    "continue": "CONTINUER",
-    "start": "COMMENCER",
-    "createFirstSet": "Créez votre premier ensemble d'étude",
-    "beginJourney": "Commencez votre parcours",
-    "streakGoal": "{{streak}} jours de suite · objectif hebdo {{goal}}/7",
-    "cardsToReview": "{{count}} carte à réviser",
-    "cardsToReview_other": "{{count}} cartes à réviser"
-  },
-  "streak": {
-    "day": "{{count}} jour de suite",
-    "days": "{{count}} jours de suite",
-    "keepGoing": "Continuez, c'est excellent !",
-    "streakLost": "Étudiez aujourd'hui pour garder votre série",
-    "flameDays": "🔥 Série de {{count}} jour",
-    "flameDays_other": "🔥 Série de {{count}} jours"
-  },
-  "sections": {
-    "recentSets": "Ensembles récents",
-    "seeAll": "Tout voir",
-    "friendsSets": "Ensembles des amis",
-    "communitySets": "Ensembles de la communauté",
-    "friendActivity": "Activité des amis",
-    "quickStats": "Statistiques rapides",
-    "recentActivity": "ACTIVITÉ RÉCENTE"
-  },
-  "empty": {
-    "noRecentSets": "Aucun ensemble d'étude récent",
-    "noFriendsSets": "Aucun ensemble public d'amis pour l'instant",
-    "noCommunitySets": "Explorez les ensembles d'étude de la communauté",
-    "noActivity": "Aucune activité récente d'amis"
-  },
   "shareEvent": {
     "title": "Partagez vos progrès 🙌",
     "subtitle": "Envoyez votre série à votre groupe — grandissez ensemble dans la Parole.",
     "cta": "Partager",
-    "message": "🔥 Série de {{streak}} jours sur Verdance ! Rejoignez-moi et grandissez dans la Parole : https://getverdance.com"
+    "message": "🔥 {{streak}} jours d'affilée sur Verdance ! Rejoignez-moi et grandissez dans la Parole : {{url}}"
+  },
+  "today": {
+    "dueLabel": "RÉVISION DU JOUR",
+    "dueTitle": "{{count}} carte est prête",
+    "dueTitle_other": "{{count}} cartes sont prêtes",
+    "dueSub": "Dans {{count}} de vos séries",
+    "dueSub_one": "Dans 1 de vos séries",
+    "dueBtn": "Commencer la révision",
+    "continueLabel": "REPRENEZ OÙ VOUS EN ÉTIEZ",
+    "continueSub": "{{count}} carte · rien à réviser aujourd'hui",
+    "continueSub_other": "{{count}} cartes · rien à réviser aujourd'hui",
+    "continueBtn": "Ouvrir la série",
+    "startLabel": "COMMENCEZ ICI",
+    "startTitle": "Créez votre première série d'étude",
+    "startSub": "Ajoutez quelques versets et nous vous aiderons à les retenir",
+    "startBtn": "Créer une série",
+    "streak": "{{count}} j d'affilée",
+    "streak_one": "{{count}} j d'affilée",
+    "restSaved": "{{count}} jours de repos gardés",
+    "restSaved_one": "{{count}} jour de repos gardé",
+    "due": "À réviser",
+    "cardCount": "{{count}} carte",
+    "cardCount_other": "{{count}} cartes",
+    "ownerCards": "{{name}} · {{count}} carte",
+    "ownerCards_other": "{{name}} · {{count}} cartes"
+  },
+  "verse": {
+    "label": "Verset du jour",
+    "new": "NOUVEAU",
+    "memorize": "Mémoriser ce verset",
+    "added": "Ajouté aux Versets du jour",
+    "share": "Partager le verset",
+    "setTitle": "Versets du jour",
+    "translation": "World English Bible",
+    "translationShort": "WEB"
   }
 }

@@ -119,8 +119,9 @@ const TodayCard = React.memo(function TodayCard({ due, continueSet, streak, free
     sub = t('today.startSub'); btn = t('today.startBtn'); onPress = onCreate;
   }
   const isStart = !hasDue && !continueSet;
+  // Two keys so each half pluralises on its own number (streak days vs saved rest days).
   const streakLine = freezes > 0
-    ? t('today.streakRest', { count: streak, rest: freezes })
+    ? `${t('today.streak', { count: streak })} · ${t('today.restSaved', { count: freezes })}`
     : t('today.streak', { count: streak });
 
   return (
