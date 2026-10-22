@@ -31,7 +31,7 @@ const TAB_ICONS: Record<keyof AppTabParamList, typeof TabHomeIcon> = {
  * Quiet-morning floating pill tab bar. Sits in normal layout (not absolute), so
  * no screen needs extra bottom padding; the strip around it is the page colour.
  */
-const FULL_SCREEN = new Set(['CreateSet', 'EditSet', 'CreateCard', 'EditCard', 'CreatePlan']);
+const FULL_SCREEN = new Set(['CreateSet', 'EditSet', 'CreateCard', 'EditCard', 'CreatePlan', 'Paywall']);
 
 export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { qm } = useTheme();

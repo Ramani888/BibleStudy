@@ -31,6 +31,7 @@ export { useCreditBalance, useCreditTransactions, useCreditStats, useStreak, use
 export type { CreditStatsPeriod, CreditInterval } from './useCredits';
 export { useAutoDailyClaim } from './useAutoDailyClaim';
 export { useWeeklyChart } from './useWeeklyChart';
+export type { SimplePeriod } from './useWeeklyChart';
 export { useChatHistoryActions } from './useChatHistoryActions';
 export { useMediaUpload } from './useMediaUpload';
 export { useMediaActions } from './useMediaActions';

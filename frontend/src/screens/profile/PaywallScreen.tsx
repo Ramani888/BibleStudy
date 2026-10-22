@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { Linking, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeIn, useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { BillingPeriod, FreeTierDef, TierDef } from '../../types';
-import { FREE_TIER, TIERS } from '../../types';
+import type { BillingPeriod, TierDef } from '../../types';
+import { TIERS } from '../../types';
 import { useAuthStore } from '../../store';
-import { useIapSubscriptions } from '../../hooks';
+import { useIapSubscriptions, useSubscriptionStatus } from '../../hooks';
 import { openManageSubscriptions, type StorePrice } from '../../lib/purchases';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
-import { CheckCircleIcon } from '../../components/icons';
-import { CARD_FILL_LIGHT, palette, spacing, radius, layout, useTheme } from '../../theme';
+import { QMButton, QMFog, QMSegmented, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { CheckIcon, CloseIcon, LinkIcon } from '../../components/icons';
+import { qmFont, radius, spacing, useTheme } from '../../theme';
 
-type AnyTier = TierDef | FreeTierDef;
 type PriceMap = Record<string, StorePrice>;
+
+const TERMS_URL = 'https://getverdance.com/terms.html';
+const PRIVACY_URL = 'https://getverdance.com/privacy.html';
+const TOUCH = 44;
+const RADIO = 22;
+const RADIO_ON = 7;
+const TICK = 24;
+const FOG_H = 440;
 
 // Localized currency from the store's numeric price (for the annual "per month" line, which the
 // store only exposes as an annual total). Falls back to bare code if Intl/currency is unavailable.
@@ -27,397 +35,230 @@ function fmtMoney(amount: number, currencyCode: string): string {
   }
 }
 
-// Common features included in every paid plan — merged into the included list for paid tiers.
-const PAID_COMMON = [
-  'AI-powered Bible study chat',
-  'Unlimited scripture card sets',
-  'Spaced repetition review system',
-  'PDF & image media uploads',
-  'Community friends & leaderboard',
-  'Study plans & group sessions',
-];
-
-// Map each benefit string (source-of-truth in subscription.types.ts, kept English there)
-// to an i18n key so the paywall list localizes without touching the config file.
-const FEATURE_KEY: Record<string, string> = {
-  '1 AI credit per day': 'freeCredit',
-  'Unlimited flashcard sets & cards': 'unlimitedSets',
-  'Spaced repetition review': 'spacedReview',
-  'Quizzes & study streaks': 'quizStreaks',
-  'Friends & leaderboard': 'friendsLeaderboard',
-  '250 MB media storage': 'storage250',
-  '100 AI credits per month': 'credits100',
-  'Image & PDF analysis': 'imagePdfAnalysis',
-  '2 GB media storage': 'storage2gb',
-  'Credit usage statistics': 'creditStats',
-  '500 AI credits per month': 'credits500',
-  'Priority AI responses': 'priorityAi',
-  '10 GB media storage': 'storage10gb',
-  'Advanced study analytics': 'advancedAnalytics',
-  'AI-powered Bible study chat': 'aiChat',
-  'Unlimited scripture card sets': 'unlimitedScripture',
-  'Spaced repetition review system': 'spacedSystem',
-  'PDF & image media uploads': 'mediaUploads',
-  'Community friends & leaderboard': 'communityLeaderboard',
-  'Study plans & group sessions': 'studyPlans',
-};
-
-function getIncludedFeatures(tier: AnyTier): string[] {
-  if (tier.plan === 'FREE') return tier.benefits;
-  return [...(tier as TierDef).benefits, ...PAID_COMMON];
+/** Live store price, falling back to the plans.ts USD label before the store loads. */
+function priceOf(tier: TierDef, period: BillingPeriod, prices: PriceMap) {
+  const live = prices[tier[period].productId];
+  // Fallback is the bare USD number: priceLabel carries "/yr", and the cards/CTA add the period in words.
+  const billed = live?.priceString ?? `$${(period === 'annual' ? tier.annualPrice : tier.monthlyPrice).toFixed(2)}`;
+  const perMonth = period === 'annual'
+    ? (live ? fmtMoney(live.price / 12, live.currencyCode) : `$${(tier.annualPrice / 12).toFixed(2)}`)
+    : null;
+  return { billed, perMonth };
 }
 
-// ── Radio dot ─────────────────────────────────────────────────────────────────
-
-function Radio({ selected }: { selected: boolean }) {
-  const { colors } = useTheme();
-  return (
-    <View style={[styles.radio, { borderColor: selected ? colors.accent : colors.border }]}>
-      {selected && <View style={[styles.radioDot, { backgroundColor: colors.accent }]} />}
-    </View>
-  );
-}
-
-// ── Free plan card ─────────────────────────────────────────────────────────────
-
-function FreePlanCard({ selected, onPress }: { selected: boolean; onPress: () => void }) {
-  const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const isDark = theme.name === 'dark';
-  return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.planCard,
-        pressed && styles.cardPressed,
-        {
-          backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
-          borderColor: selected ? theme.colors.accent : theme.colors.cardBorder,
-          borderWidth: selected ? 1.5 : 1,
-        },
-      ]}
-    >
-      <Radio selected={selected} />
-      <View style={styles.planText}>
-        <Typography preset="h4" color={theme.colors.textPrimary}>{t('profile:subscription.free', 'Free')}</Typography>
-        <Typography preset="caption" color={theme.colors.textSecondary}>{t('profile:subscription.noCardNeeded', 'No card needed')}</Typography>
-      </View>
-      <Typography preset="h4" color={theme.colors.textPrimary}>$0</Typography>
-    </Pressable>
-  );
-}
-
-// ── Paid plan card ─────────────────────────────────────────────────────────────
-
-function PlanCard({ tier, period, selected, onPress, prices }: {
-  tier: TierDef; period: BillingPeriod; selected: boolean; onPress: () => void; prices: PriceMap;
+function PlanCard({ tier, period, prices, selected, current, badge, onPress }: {
+  tier: TierDef; period: BillingPeriod; prices: PriceMap; selected: boolean; current: boolean; badge: boolean; onPress: () => void;
 }) {
-  const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const isDark = theme.name === 'dark';
-  const showBadge = tier.plan === 'PRO' && period === 'annual';
-  const savingsPct = Math.round((1 - tier.annualPrice / (tier.monthlyPrice * 12)) * 100);
-  const showSavings = period === 'annual' && !showBadge;
-
-  // Prefer the live localized store price; fall back to the hardcoded USD label pre-store-load.
-  const monthlyLive = prices[tier.monthly.productId];
-  const annualLive = prices[tier.annual.productId];
-  const monthlyLabel = monthlyLive ? monthlyLive.priceString : `$${tier.monthlyPrice.toFixed(2)}`;
-  const annualTotal = annualLive ? annualLive.priceString : `$${tier.annualPrice.toFixed(2)}`;
-  const annualPerMonth = annualLive
-    ? fmtMoney(annualLive.price / 12, annualLive.currencyCode)
-    : `$${(tier.annualPrice / 12).toFixed(2)}`;
-
+  const { t } = useTranslation('profile');
+  const { qm } = useTheme();
+  const yearly = period === 'annual';
+  const { billed, perMonth } = priceOf(tier, period, prices);
+  const ring = useAnimatedStyle(() => ({ borderColor: withTiming(selected ? qm.violet : qm.hair, { duration: 250 }) }), [selected, qm]);
   return (
-    <Pressable
-      accessibilityRole="radio"
-      accessibilityState={{ selected }}
-      onPress={onPress}
-      style={({ pressed }) => [
-        styles.planCard,
-        pressed && styles.cardPressed,
-        {
-          backgroundColor: isDark ? theme.colors.chipIdle : CARD_FILL_LIGHT,
-          borderColor: selected ? theme.colors.accent : theme.colors.cardBorder,
-          borderWidth: selected ? 1.5 : 1,
-        },
-      ]}
-    >
-      <Radio selected={selected} />
-      <View style={styles.planText}>
-        {showBadge && (
-          <View style={[styles.badge, { backgroundColor: theme.colors.success }]}>
-            <Typography preset="caption" color={palette.white}>{t('profile:subscription.bestValue', 'Best Value')}</Typography>
+    <AnimatedPressable scaleTo={0.98} onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected }}>
+      <Animated.View style={[styles.plan, { backgroundColor: qm.surface, boxShadow: qm.cardShadow, borderWidth: selected ? 2 : 1 }, ring]}>
+        <View style={[styles.radio, selected ? { borderWidth: RADIO_ON, borderColor: qm.violet, backgroundColor: qm.surface } : { borderWidth: 2, borderColor: qm.off }]} />
+        <View style={styles.flex}>
+          <View style={styles.planName}>
+            <Typography preset="qmSection" color={qm.ink}>{tier.name}</Typography>
+            {badge && (
+              <View style={[styles.tag, { backgroundColor: qm.goldBg }]}>
+                <Typography preset="qmTag" color={qm.goldText}>{t('qmPlans.bestValue')}</Typography>
+              </View>
+            )}
+            {current && (
+              <View style={[styles.tag, { backgroundColor: qm.lilac }]}>
+                <Typography preset="qmTag" color={qm.lilacInk}>{t('qmPlans.currentPlan')}</Typography>
+              </View>
+            )}
           </View>
-        )}
-        {showSavings && (
-          <View style={[styles.savingsBadge, { borderColor: theme.colors.accent }]}>
-            <Typography preset="caption" color={theme.colors.accent}>{t('profile:subscription.savePctBadge', { pct: savingsPct, defaultValue: `Save ${savingsPct}%` })}</Typography>
-          </View>
-        )}
-        <Typography preset="h4" color={theme.colors.textPrimary}>{tier.name}</Typography>
-        <Typography preset="caption" color={theme.colors.textSecondary}>
-          {period === 'annual' ? t('profile:subscription.billedAnnually', 'Billed annually') : t('profile:subscription.billedMonthly', 'Billed monthly')}
-        </Typography>
-      </View>
-      <View style={styles.priceBlock}>
-        {period === 'annual' ? (
-          <>
-            {/* Apple 3.1.2(c): the billed amount must be the most conspicuous price; per-month is subordinate. */}
-            <Typography preset="h4" color={theme.colors.textPrimary}>{annualTotal}/yr</Typography>
-            <Typography preset="caption" color={theme.colors.textSecondary}>≈ {annualPerMonth}/mo</Typography>
-          </>
-        ) : (
-          <Typography preset="h4" color={theme.colors.textPrimary}>{monthlyLabel}/mo</Typography>
-        )}
-      </View>
-    </Pressable>
-  );
-}
-
-// ── Included features (merged section) ────────────────────────────────────────
-
-function IncludedSection({ tier }: { tier: AnyTier }) {
-  const { t } = useTranslation(['profile', 'common']);
-  const { colors } = useTheme();
-  const features = getIncludedFeatures(tier);
-  return (
-    <View style={styles.includedSection}>
-      <Typography preset="h4" color={colors.textPrimary} style={styles.includedTitle}>
-        {t('profile:subscription.whatsIncluded', { name: tier.name, defaultValue: `What's included with ${tier.name}` })}
-      </Typography>
-      {features.map(f => (
-        <View key={f} style={styles.featureRow}>
-          <CheckCircleIcon size={22} color={colors.accent} />
-          <Typography preset="body" color={colors.textPrimary} style={styles.featureLabel}>{FEATURE_KEY[f] ? t(`profile:paywall.features.${FEATURE_KEY[f]}`, f) : f}</Typography>
+          <Typography preset="qmBody" color={qm.muted} style={styles.planSub}>
+            {yearly ? t('qmPlans.creditsYear', { count: (tier.credits * 12).toLocaleString() }) : t('qmPlans.creditsMonth', { count: tier.credits })}
+          </Typography>
         </View>
-      ))}
-    </View>
+        {/* Apple 3.1.2(c): the billed amount is the biggest price; per-month stays subordinate. */}
+        <View style={styles.priceCol}>
+          <Typography style={[styles.price, { color: qm.ink }]}>{billed}</Typography>
+          <Typography preset="qmMeta" color={qm.muted}>{yearly ? t('qmPlans.aYear') : t('qmPlans.aMonth')}</Typography>
+          {perMonth && <Typography preset="qmFine" color={qm.muted}>{t('qmPlans.aboutMonthly', { price: perMonth })}</Typography>}
+        </View>
+      </Animated.View>
+    </AnimatedPressable>
   );
 }
-
-import { useTranslation } from 'react-i18next';
 
 export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
-  const { t } = useTranslation(['profile', 'common']);
-  const { colors } = useTheme();
-  const user = useAuthStore(s => s.user);
-  const currentPlan = user?.plan ?? 'FREE';
-  const isSubscribed = currentPlan !== 'FREE';
+  const { t, i18n } = useTranslation(['profile', 'common']);
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const currentPlan = useAuthStore(s => s.user?.plan ?? 'FREE');
+  const subscribed = currentPlan !== 'FREE';
+  const { data: status } = useSubscriptionStatus();
 
   const [period, setPeriod] = useState<BillingPeriod>('annual');
-  // Pre-select Starter (annual by default) to nudge toward the higher-retention annual plan.
-  const [selectedTier, setSelectedTier] = useState<AnyTier>(TIERS[0]);
+  // Subscribers open on their own plan; free users on Starter (annual nudges higher retention).
+  const [selected, setSelected] = useState<TierDef>(TIERS.find(x => x.plan === currentPlan) ?? TIERS[0]);
   const { buy, restore, loadProducts, processing, error, prices } = useIapSubscriptions();
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
-  const paidTier = selectedTier.plan !== 'FREE' ? (selectedTier as TierDef) : null;
-  const opt = paidTier ? paidTier[period] : null;
-  // Live localized price for the CTA, falling back to the hardcoded label before the store loads.
-  const ctaPrice = opt ? (prices[opt.productId]?.priceString ?? opt.priceLabel) : '';
+  const yearly = period === 'annual';
+  const opt = selected[period];
+  const { billed } = priceOf(selected, period, prices);
+  const savingsPct = Math.round((1 - selected.annualPrice / (selected.monthlyPrice * 12)) * 100);
+  // ponytail: the current sub's billing period isn't stored client-side, so any period of the
+  // current plan counts as "Your plan" — switching period goes through Manage subscription.
+  const same = subscribed && selected.plan === currentPlan;
 
-  // Savings % for toggle — based on selected paid tier or TIERS[0] as fallback
-  const savingsTier = paidTier ?? TIERS[0];
-  const savingsPct = Math.round((1 - savingsTier.annualPrice / (savingsTier.monthlyPrice * 12)) * 100);
+  const cta = !subscribed
+    ? t(yearly ? 'profile:qmPlans.subscribeYear' : 'profile:qmPlans.subscribeMonth', { price: billed })
+    : same ? t('profile:qmPlans.yourPlanCta')
+      : t(yearly ? 'profile:qmPlans.switchYear' : 'profile:qmPlans.switchMonth', { name: selected.name, price: billed });
+  const fine = same ? t('profile:qmPlans.fineSame') : t(yearly ? 'profile:qmPlans.fineYear' : 'profile:qmPlans.fineMonth', { price: billed });
+
+  const currentTier = TIERS.find(x => x.plan === currentPlan);
+  const renewDate = status?.expiresAt
+    ? new Date(status.expiresAt).toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' })
+    : null;
+
+  const perks = [
+    t('profile:qmPlans.perkCredits', { count: selected.credits }),
+    t('profile:qmPlans.perkStorage', { size: selected.storage }),
+    ...(selected.plan === 'PRO' ? [t('profile:qmPlans.perkRate', { count: selected.aiPerHour })] : []),
+    t('profile:qmPlans.perkKeep'),
+    t('profile:qmPlans.perkFree'),
+  ];
 
   return (
-    <Screen header={<ScreenHeader title={t('profile:menu.upgradeToPremium')} onBack={navigation.goBack} />}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-
-        {/* ── Hero ── */}
-        <View style={styles.hero}>
-          <Typography preset="caption" color={colors.accent} style={styles.brand}>
-            {t('common:appName', 'Verdance')}
-          </Typography>
-          <Typography preset="h1" color={colors.textPrimary} style={styles.heroTitle}>
-            {t('profile:subscription.premium', 'Premium')}
-          </Typography>
-          <Typography preset="body" color={colors.textSecondary} style={styles.heroTagline}>
-            {t('profile:subscription.tagline', 'Bible study is free. Credits unlock AI assistance.')}
-          </Typography>
-        </View>
-
-        {/* ── Billing toggle ── */}
-        <View style={[styles.toggle, { backgroundColor: colors.surfaceMuted, borderColor: period === 'annual' ? colors.accent : 'transparent' }]}>
-          {(['monthly', 'annual'] as BillingPeriod[]).map(p => {
-            const active = period === p;
-            return (
-              <Pressable
-                key={p}
-                style={({ pressed }) => [styles.toggleBtn, active && { backgroundColor: colors.accent }, pressed && styles.cardPressed]}
-                onPress={() => setPeriod(p)}
-              >
-                <Typography preset="label" color={active ? palette.white : colors.textSecondary}>
-                  {p === 'monthly' ? t('profile:paywall.monthly', 'Monthly') : t('profile:paywall.annual', 'Annual')}
-                </Typography>
-                {p === 'annual' && (
-                  <Typography preset="caption" color={active ? palette.white : colors.success}>
-                    {t('profile:paywall.savePct', { pct: savingsPct, defaultValue: ` · save ${savingsPct}%` })}
-                  </Typography>
-                )}
-              </Pressable>
-            );
-          })}
-        </View>
-
-        {/* ── Plan cards ── */}
-        <View style={styles.plans}>
-          <FreePlanCard
-            selected={selectedTier.plan === 'FREE'}
-            onPress={() => setSelectedTier(FREE_TIER)}
-          />
-          {TIERS.map(tier => (
-            <PlanCard
-              key={tier.plan}
-              tier={tier}
-              period={period}
-              selected={selectedTier.plan === tier.plan}
-              onPress={() => setSelectedTier(tier)}
-              prices={prices}
-            />
-          ))}
-        </View>
-
-        {/* ── Merged included features ── */}
-        <IncludedSection tier={selectedTier} />
-
-        {/* ── CTA ── */}
-        <View style={styles.cta}>
-          {!!error && (
-            <Typography preset="caption" color={colors.alert} style={styles.errorText}>{error}</Typography>
-          )}
-          <Button
-            label={
-              selectedTier.plan === 'FREE' ? t('profile:subscription.freePlan', 'Free Plan') :
-              currentPlan === selectedTier.plan ? t('profile:subscription.currentPlan', 'Current Plan') :
-              t('profile:subscription.subscribePrice', { price: ctaPrice, defaultValue: `Subscribe · ${ctaPrice}` })
-            }
-            onPress={() => opt && buy(opt.productId)}
-            disabled={selectedTier.plan === 'FREE' || currentPlan === selectedTier.plan || processing}
-            loading={processing}
-            variant="primary"
-            fullWidth
-          />
-          {paidTier && opt && (
-            // Price/period shown on the card + CTA above; keep the disclosure currency-free so it
-            // stays correct in every store currency without $-templated translation strings.
-            <Typography preset="caption" color={colors.textSecondary} style={styles.finePrint}>
-              {period === 'annual'
-                ? t('profile:paywall.renewAnnualFinePrint', 'Billed annually. Renews automatically until cancelled.')
-                : t('profile:paywall.renewMonthlyFinePrint', 'Billed monthly. Renews automatically until cancelled.')}
-            </Typography>
-          )}
-        </View>
-
-        {/* ── Links ── */}
-        <View style={styles.links}>
-          <Pressable onPress={restore} disabled={processing} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="label" color={colors.accent}>{t('profile:subscription.restore', 'Restore Purchases')}</Typography>
-          </Pressable>
-          {isSubscribed && (
-            <Pressable onPress={openManageSubscriptions} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-              <Typography preset="label" color={colors.textSecondary}>{t('profile:subscription.manage', 'Manage Subscription')}</Typography>
+        <QMFog height={FOG_H} />
+        <View style={[styles.hero, { paddingTop: insets.top + spacing.sm }]}>
+          <View style={styles.topRow}>
+            <AnimatedPressable
+              scaleTo={0.95}
+              onPress={navigation.goBack}
+              style={[styles.close, { backgroundColor: qm.ghost }]}
+              accessibilityRole="button"
+              accessibilityLabel={t('profile:qmPlans.close')}
+            >
+              <CloseIcon size={18} color={qm.ink} strokeWidth={2} />
+            </AnimatedPressable>
+            <Pressable onPress={restore} disabled={processing} hitSlop={6} style={({ pressed }) => [styles.restore, pressed && styles.dim]} accessibilityRole="button">
+              <Typography preset="qmLink" color={qm.ink}>{t('profile:qmPlans.restore')}</Typography>
             </Pressable>
-          )}
-          <Pressable onPress={() => Linking.openURL('https://getverdance.com/terms.html')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.terms', 'Terms of Use')}</Typography>
-          </Pressable>
-          <Pressable onPress={() => Linking.openURL('https://getverdance.com/privacy.html')} style={({ pressed }) => [styles.link, pressed && styles.cardPressed]}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.linkUnderline}>{t('profile:legal.privacy', 'Privacy Policy')}</Typography>
-          </Pressable>
+          </View>
+          <Animated.View entering={qmRowEnter(0)}>
+            <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>
+              {subscribed && currentTier ? t('profile:qmPlans.yourPlan', { name: currentTier.name }) : t('profile:qmPlans.heroTitle')}
+            </Typography>
+          </Animated.View>
+          <Animated.View entering={qmRowEnter(1)}>
+            <Typography preset="qmBodyMd" color={qm.body}>
+              {!subscribed ? t('profile:qmPlans.heroLead') : renewDate ? t('profile:qmPlans.renews', { date: renewDate }) : t('profile:qmPlans.switchAny')}
+            </Typography>
+          </Animated.View>
         </View>
 
+        <View style={styles.body}>
+          <QMSegmented
+            label={t('profile:qmPlans.billing')}
+            value={period}
+            onChange={setPeriod}
+            options={[
+              { key: 'monthly', label: t('profile:qmPlans.monthly') },
+              { key: 'annual', label: `${t('profile:qmPlans.yearly')}  ·  ${t('profile:qmPlans.save', { pct: savingsPct })}` },
+            ]}
+          />
+
+          <View style={styles.plans} accessibilityRole="radiogroup">
+            {TIERS.map(tier => (
+              <PlanCard
+                key={tier.plan}
+                tier={tier}
+                period={period}
+                prices={prices}
+                selected={selected.plan === tier.plan}
+                current={tier.plan === currentPlan}
+                badge={tier.plan === 'PRO' && yearly && tier.plan !== currentPlan}
+                onPress={() => setSelected(tier)}
+              />
+            ))}
+          </View>
+
+          <Typography preset="qmBarTitle" color={qm.ink} style={styles.perksTitle}>
+            {t('profile:qmPlans.whatYouGet', { name: selected.name })}
+          </Typography>
+          <Animated.View key={selected.plan} entering={FadeIn.duration(350)} style={styles.perks}>
+            {perks.map(p => (
+              <View key={p} style={styles.perk}>
+                <View style={[styles.tick, { backgroundColor: qm.leafBg }]}>
+                  <CheckIcon size={13} color={qm.leaf} strokeWidth={3} />
+                </View>
+                <Typography preset="qmBodyMd" color={qm.body} style={styles.flex}>{p}</Typography>
+              </View>
+            ))}
+          </Animated.View>
+
+          {!subscribed && (
+            <View style={[styles.freeCard, { backgroundColor: qm.field }]}>
+              <Typography preset="qmFieldLabel" color={qm.ink}>{t('profile:qmPlans.freeTitle')}</Typography>
+              <Typography preset="qmBody" color={qm.muted} style={styles.freeText}>{t('profile:qmPlans.freeText')}</Typography>
+            </View>
+          )}
+        </View>
       </ScrollView>
-    </Screen>
+
+      <View style={[styles.bar, { backgroundColor: qm.glass, borderTopColor: qm.hair, paddingBottom: insets.bottom + spacing.md }]}>
+        {!!error && <Typography preset="qmError" color={qm.error} align="center" style={styles.error}>{error}</Typography>}
+        <QMButton label={cta} onPress={() => buy(opt.productId)} off={same} loading={processing} />
+        <Typography preset="qmFine" color={qm.muted} align="center" style={styles.fine}>{fine}</Typography>
+        {subscribed && (
+          <Pressable onPress={openManageSubscriptions} style={({ pressed }) => [styles.manage, pressed && styles.dim]} accessibilityRole="link">
+            <Typography preset="qmLink" color={qm.link}>{t('profile:qmPlans.manage')}</Typography>
+            <LinkIcon size={14} color={qm.link} strokeWidth={2} />
+          </Pressable>
+        )}
+        <View style={styles.links}>
+          <Pressable onPress={() => Linking.openURL(TERMS_URL)} hitSlop={6} accessibilityRole="link">
+            <Typography preset="qmChip" color={qm.link}>{t('profile:qmPlans.terms')}</Typography>
+          </Pressable>
+          <Pressable onPress={() => Linking.openURL(PRIVACY_URL)} hitSlop={6} accessibilityRole="link">
+            <Typography preset="qmChip" color={qm.link}>{t('profile:qmPlans.privacy')}</Typography>
+          </Pressable>
+        </View>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.s48,
-  },
-
-  // Hero
-  hero: { alignItems: 'center', marginTop: spacing.md },
-  brand: { letterSpacing: 2, textTransform: 'uppercase' },
-  heroTitle: { marginTop: spacing.s2, textAlign: 'center' },
-  heroTagline: { fontStyle: 'italic', marginTop: spacing.s6, textAlign: 'center' },
-
-  // Toggle
-  toggle: {
-    flexDirection: 'row',
-    borderRadius: layout.cardRadius,
-    borderWidth: 1.5,
-    padding: spacing.xs,
-    marginTop: spacing.xxl,
-  },
-  toggleBtn: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.sm,
-    borderRadius: layout.cardRadius - 2,
-  },
-
-  // Plan cards
-  plans: { marginTop: spacing.xxl, gap: spacing.lg },
-  planCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: radius.r20,
-    paddingHorizontal: spacing.s18,
-    paddingVertical: spacing.s18,
-    gap: spacing.s14,
-  },
-  planText: { flex: 1, gap: spacing.xs },
-  priceBlock: { alignItems: 'flex-end', gap: spacing.xs },
-  badge: {
-    alignSelf: 'flex-start',
-    borderRadius: radius.pill,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    marginBottom: spacing.s6,
-  },
-  savingsBadge: {
-    alignSelf: 'flex-start',
-    borderRadius: radius.pill,
-    borderWidth: 1,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    marginBottom: spacing.s6,
-  },
-
-  // Radio
-  radio: {
-    width: spacing.xxl,
-    height: spacing.xxl,
-    borderRadius: radius.r12,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  radioDot: { width: 11, height: 11, borderRadius: radius.r6 }, // ponytail: off-grid Figma value
-  cardPressed: { opacity: 0.7 },
-
-  // Merged included section
-  includedSection: { marginTop: spacing.s28 },
-  includedTitle: { marginBottom: spacing.sm },
-  featureRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginTop: spacing.lg },
-  featureLabel: { flex: 1 },
-
-  // CTA
-  cta: { marginTop: spacing.xxxl, gap: spacing.md },
-  errorText: { textAlign: 'center' },
-  finePrint: { textAlign: 'center' },
-
-  // Links
-  links: { alignItems: 'center', marginTop: spacing.xl, gap: spacing.xs },
-  link: { paddingVertical: spacing.sm },
-  linkUnderline: { textDecorationLine: 'underline' },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  scroll: { paddingBottom: spacing.xxxl },
+  hero: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xl },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  close: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, marginLeft: -spacing.s6, alignItems: 'center', justifyContent: 'center' },
+  restore: { height: TOUCH, justifyContent: 'center', paddingHorizontal: spacing.s6 },
+  h1: { marginTop: spacing.s14, marginBottom: spacing.s6 },
+  body: { paddingHorizontal: spacing.xl, paddingTop: spacing.xs },
+  plans: { gap: spacing.s10, marginTop: spacing.s14 },
+  plan: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s14, padding: spacing.lg, borderRadius: radius.r20 },
+  radio: { width: RADIO, height: RADIO, borderRadius: RADIO / 2, marginTop: spacing.s2 },
+  planName: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
+  planSub: { marginTop: spacing.s3 },
+  tag: { borderRadius: radius.r6, paddingHorizontal: spacing.s7, paddingVertical: spacing.s3 },
+  priceCol: { alignItems: 'flex-end' },
+  price: { fontFamily: qmFont.serifMedium, fontSize: 22, lineHeight: 26 },
+  perksTitle: { marginTop: spacing.xxl, marginBottom: spacing.md },
+  perks: { gap: spacing.md },
+  perk: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  tick: { width: TICK, height: TICK, borderRadius: TICK / 2, alignItems: 'center', justifyContent: 'center' },
+  freeCard: { marginTop: spacing.s22, paddingVertical: spacing.s14, paddingHorizontal: spacing.lg, borderRadius: radius.r17 + 1 },
+  freeText: { marginTop: spacing.xs },
+  bar: { paddingTop: spacing.md, paddingHorizontal: spacing.xl, borderTopWidth: StyleSheet.hairlineWidth },
+  error: { marginBottom: spacing.sm },
+  fine: { marginTop: spacing.sm },
+  manage: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.s6, height: spacing.huge, marginTop: spacing.xs },
+  links: { flexDirection: 'row', justifyContent: 'center', gap: spacing.s18, marginTop: spacing.sm },
 });
