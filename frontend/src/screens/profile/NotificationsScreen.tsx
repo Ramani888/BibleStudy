@@ -1,238 +1,198 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
-
+import Animated from 'react-native-reanimated';
+import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
+
 import type { ProfileScreenProps } from '../../navigation/types';
-import { formatDateTime } from '../../utils/formatters';
-import { layout, palette, spacing, useTheme } from '../../theme';
-import { Typography } from '../../components/ui/Typography';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { formatDateWithTime } from '../../utils/formatters';
+import { radius, spacing, useTheme, type QMColors } from '../../theme';
+import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { InfoIcon, LeafIcon, MegaphoneIcon, PersonCheckIcon, PersonPlusIcon, TrashIcon, type IconComponent } from '../../components/icons';
 import {
-  BellIcon,
-  TrashIcon,
-  TrophyIcon,
-  UserPlusIcon,
-  UsersIcon,
-  type IconComponent,
-} from '../../components/icons';
-import {
-  useNotifications,
-  useMarkNotificationRead,
-  useMarkAllNotificationsRead,
-  useDeleteNotification,
-  useNotificationPrefs,
-  TYPE_TO_PREF,
+  useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead, useDeleteNotification, useNotificationPrefs, TYPE_TO_PREF,
 } from '../../hooks';
 import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
+type Section = { key: 'today' | 'yesterday' | 'earlier'; data: Notification[] };
 
+const ICON = 40;
+const DOT = 9;
+const DELETE_W = 84;
+const DAY_MS = 86_400_000;
 
-function getNotificationIcon(type: Notification['type']): IconComponent {
+function kind(type: Notification['type'], qm: QMColors): [IconComponent, string, string] {
   switch (type) {
-    case 'friend_request':  return UserPlusIcon;
-    case 'friend_accepted': return UsersIcon;
-    case 'achievement':     return TrophyIcon;
-    case 'system':
-    default:                return BellIcon;
+    case 'friend_request': return [PersonPlusIcon, qm.lilac, qm.link];
+    case 'friend_accepted': return [PersonCheckIcon, qm.lilac, qm.link];
+    case 'achievement': return [LeafIcon, qm.leafBg, qm.leaf];
+    default: return [MegaphoneIcon, qm.goldBg, qm.goldText];
   }
 }
 
-function groupByDate(notifications: Notification[]): { title: string; data: Notification[] }[] {
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const yesterdayStart = new Date(todayStart.getTime() - 86_400_000);
-
-  const buckets = {
-    Today: [] as Notification[],
-    Yesterday: [] as Notification[],
-    Earlier: [] as Notification[],
-  };
-
-  for (const n of notifications) {
+function groupByDate(list: Notification[]): Section[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const yesterday = new Date(today.getTime() - DAY_MS);
+  const out: Section[] = [{ key: 'today', data: [] }, { key: 'yesterday', data: [] }, { key: 'earlier', data: [] }];
+  for (const n of list) {
     const d = new Date(n.createdAt);
-    if (d >= todayStart) buckets.Today.push(n);
-    else if (d >= yesterdayStart) buckets.Yesterday.push(n);
-    else buckets.Earlier.push(n);
+    out[d >= today ? 0 : d >= yesterday ? 1 : 2].data.push(n);
   }
-
-  return (['Today', 'Yesterday', 'Earlier'] as const)
-    .filter(k => buckets[k].length > 0)
-    .map(k => ({ title: k, data: buckets[k] }));
+  return out.filter(s => s.data.length > 0);
 }
 
 export function NotificationsScreen({ navigation, route }: Props) {
   const { t } = useTranslation(['profile', 'common']);
-  const { colors } = useTheme();
-  const { data, isLoading, isFetching, error, refetch } = useNotifications();
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { data, isLoading, isFetching, isError, refetch } = useNotifications();
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
   const deleteNotification = useDeleteNotification();
-
   const prefs = useNotificationPrefs();
 
-  const notifications = useMemo(() => {
-    const all = data?.notifications ?? [];
-    return all.filter(n => {
-      const prefKey = TYPE_TO_PREF[n.type];
-      return prefKey ? prefs[prefKey] !== false : true;
-    });
-  }, [data, prefs]);
-
-  const unreadCount = data?.unreadCount ?? 0;
+  const notifications = useMemo(() => (data?.notifications ?? []).filter(n => {
+    const prefKey = TYPE_TO_PREF[n.type];
+    return prefKey ? prefs[prefKey] !== false : true;
+  }), [data, prefs]);
   const sections = useMemo(() => groupByDate(notifications), [notifications]);
+  const hasUnread = notifications.some(n => !n.read);
 
-  const openSwipeableRef = useRef<Swipeable | null>(null);
+  const openSwipeable = useRef<Swipeable | null>(null);
 
-  const renderItem = useCallback(({ item }: { item: Notification }) => {
-    const NotifIcon = getNotificationIcon(item.type);
-    let thisSwipeable: Swipeable | null = null;
+  const goBack = useCallback(() => {
+    if (route.params?.from === 'Home') {
+      navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
+      navigation.getParent()?.navigate('HomeTab');
+    } else {
+      navigation.goBack();
+    }
+  }, [navigation, route.params?.from]);
+
+  const remove = useCallback((id: string) => {
+    deleteNotification.mutate(id, {
+      onSuccess: () => Toast.show({ type: 'info', text1: t('profile:qmNotifList.deleted') }),
+    });
+  }, [deleteNotification, t]);
+
+  const renderItem = useCallback(({ item, index, section }: { item: Notification; index: number; section: Section }) => {
+    const [Icon, tint, ink] = kind(item.type, qm);
+    const first = index === 0;
+    const last = index === section.data.length - 1;
+    let self: Swipeable | null = null;
     return (
-      <Swipeable
-        ref={r => { thisSwipeable = r; }}
-        onSwipeableOpen={() => {
-          if (openSwipeableRef.current !== thisSwipeable) openSwipeableRef.current?.close();
-          openSwipeableRef.current = thisSwipeable;
-        }}
-        renderRightActions={() => (
-          <Pressable
-            style={({ pressed }) => [styles.deleteAction, { backgroundColor: colors.alert }, pressed && styles.iconBtnPressed]}
-            onPress={() => deleteNotification.mutate(item.id)}
-          >
-            <TrashIcon size={20} color={palette.white} />
-          </Pressable>
-        )}
+      <Animated.View
+        entering={qmRowEnter(index)}
+        style={[styles.cell, { backgroundColor: qm.error }, first && styles.cellFirst, last && styles.cellLast]}
       >
-        <Pressable
-          style={({ pressed }) => [
-            styles.notificationRow,
-            { backgroundColor: item.read ? colors.background : colors.surfaceMuted },
-            pressed && styles.rowPressed,
-          ]}
-          onPress={() => {
-            if (!item.read) markRead.mutate(item.id);
-            if (item.type === 'friend_request' || item.type === 'friend_accepted') {
-              navigation.navigate('Friends');
-            } else if (item.type === 'achievement') {
-              navigation.navigate('Achievements');
-            }
+        <Swipeable
+          ref={r => { self = r; }}
+          onSwipeableOpen={() => {
+            if (openSwipeable.current !== self) openSwipeable.current?.close();
+            openSwipeable.current = self;
           }}
+          renderRightActions={() => (
+            <Pressable
+              style={({ pressed }) => [styles.delete, pressed && styles.dim]}
+              onPress={() => remove(item.id)}
+              accessibilityRole="button"
+              accessibilityLabel={t('profile:qmNotifList.delete')}
+            >
+              <TrashIcon size={20} color={qm.onDanger} />
+              <Typography preset="qmChip" color={qm.onDanger}>{t('profile:qmNotifList.delete')}</Typography>
+            </Pressable>
+          )}
         >
-          <View style={[styles.iconWrapper, { backgroundColor: colors.accentSoft }]}>
-            <NotifIcon size={20} color={colors.accent} />
-          </View>
-          <View style={styles.info}>
-            <Typography preset="label" color={colors.textPrimary}>
-              {item.title}
-            </Typography>
-            <Typography preset="bodySm" color={colors.textSecondary} numberOfLines={2}>
-              {item.body}
-            </Typography>
-            <Typography preset="caption" color={colors.textDisabled}>
-              {formatDateTime(item.createdAt)}
-            </Typography>
-          </View>
-        </Pressable>
-      </Swipeable>
+          <AnimatedPressable
+            scaleTo={0.99}
+            onPress={() => {
+              if (!item.read) markRead.mutate(item.id);
+              if (item.type === 'friend_request' || item.type === 'friend_accepted') navigation.navigate('Friends');
+              else if (item.type === 'achievement') navigation.navigate('Achievements');
+            }}
+            style={[styles.row, { backgroundColor: item.read ? qm.surface : qm.unread }, !first && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: qm.hair }]}
+            accessibilityRole="button"
+            accessibilityLabel={`${item.read ? '' : `${t('profile:qmNotifList.unread')}. `}${item.title}. ${item.body}`}
+          >
+            <View style={[styles.icon, { backgroundColor: tint }]}>
+              <Icon size={19} color={ink} strokeWidth={2} />
+            </View>
+            <View style={styles.flex}>
+              <Typography preset={item.read ? 'qmRow' : 'qmBodyLg'} color={qm.ink}>{item.title}</Typography>
+              <Typography preset="qmBody" color={qm.body} numberOfLines={2} style={styles.body}>{item.body}</Typography>
+              <Typography preset="qmFine" color={qm.muted} style={styles.when}>{formatDateWithTime(item.createdAt)}</Typography>
+            </View>
+            {!item.read && <View style={[styles.dot, { backgroundColor: qm.violet }]} />}
+          </AnimatedPressable>
+        </Swipeable>
+      </Animated.View>
     );
-  }, [colors, markRead, deleteNotification, navigation]);
+  }, [qm, markRead, navigation, remove, t]);
 
-  const renderSectionHeader = useCallback(
-    ({ section: { title } }: { section: { title: string } }) => {
-      const sectionTitle =
-        title === 'Today'
-          ? t('common:time.today', 'Today')
-          : title === 'Yesterday'
-          ? t('common:time.yesterday', 'Yesterday')
-          : t('common:time.earlier', 'Earlier');
-      return (
-        <View style={[styles.sectionHeader, { backgroundColor: colors.background }]}>
-          <Typography preset="caption" color={colors.textSecondary}>{sectionTitle}</Typography>
-        </View>
-      );
-    },
-    [colors.textSecondary, colors.background, t],
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <View style={styles.topRow}>
+        <QMBackButton onPress={goBack} label={t('profile:qmNotifList.back')} />
+        {hasUnread && (
+          <AnimatedPressable scaleTo={0.97} onPress={() => markAllRead.mutate()} style={[styles.markAll, { backgroundColor: qm.lilac }]} accessibilityRole="button">
+            <Typography preset="qmLink" color={qm.link}>{t('profile:qmNotifList.markAll')}</Typography>
+          </AnimatedPressable>
+        )}
+      </View>
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmNotifList.title')}</Typography>
+    </View>
   );
 
-  if (error) return <ErrorState message={t('profile:notifications.couldNotLoadNotifications', 'Could not load notifications')} onRetry={refetch} />;
-
-  const headerRight = unreadCount > 0 ? (
-    <Pressable onPress={() => markAllRead.mutate()} hitSlop={8} style={({ pressed }) => pressed && styles.iconBtnPressed}>
-      <Typography preset="label" color={colors.accent}>{t('common:actions.markAllRead')}</Typography>
-    </Pressable>
-  ) : undefined;
+  let empty: React.ReactElement | null = null;
+  if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
+  else if (isError) empty = <QMEmpty icon={InfoIcon} title={t('profile:qmNotifList.loadFailed')} action={{ label: t('profile:qmNotifList.tryAgain'), onPress: () => refetch() }} />;
+  else empty = <QMEmpty icon={LeafIcon} title={t('profile:qmNotifList.emptyTitle')} text={t('profile:qmNotifList.emptyText')} />;
 
   return (
-    <Screen
-      edges={['top']}
-      header={
-        <ScreenHeader
-          title={t('profile:menu.notifications')}
-          onBack={() => {
-            if (route.params?.from === 'Home') {
-              navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
-              navigation.getParent()?.navigate('HomeTab');
-            } else {
-              navigation.goBack();
-            }
-          }}
-          right={headerRight}
-        />
-      }
-    >
-      <View style={styles.listWrapper}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <SectionList
-        sections={sections}
+        sections={isError ? [] : sections}
         keyExtractor={item => item.id}
         renderItem={renderItem}
-        renderSectionHeader={renderSectionHeader}
-        refreshControl={<RefreshControl refreshing={isFetching} onRefresh={refetch} tintColor={colors.accent} />}
+        renderSectionHeader={({ section }) => (
+          <Typography preset="qmLabel" color={qm.muted} style={styles.section}>{t(`profile:qmNotifList.${section.key}`)}</Typography>
+        )}
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        ListFooterComponent={sections.length > 0 ? (
+          <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.hint}>{t('profile:qmNotifList.swipeHint')}</Typography>
+        ) : null}
         stickySectionHeadersEnabled={false}
-        contentContainerStyle={sections.length === 0 ? styles.emptyContainer : styles.list}
-        ListEmptyComponent={
-          !isLoading ? (
-            <EmptyState title={t('profile:notifications.emptyTitle', 'No Notifications')} subtitle={t('profile:notifications.emptySubtitle', "You're all caught up!")} />
-          ) : null
-        }
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
-      </View>
-    </Screen>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  list: { paddingBottom: spacing.lg },
-  emptyContainer: { flex: 1, justifyContent: 'center' },
-  sectionHeader: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.xs,
-  },
-  notificationRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: spacing.md,
-    paddingHorizontal: layout.screenPaddingH,
-    gap: spacing.md,
-  },
-  iconWrapper: {
-    width: spacing.huge,
-    height: spacing.huge,
-    borderRadius: layout.pillRadius,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  info: { flex: 1, gap: spacing.s2 },
-  deleteAction: {
-    width: 72, // ponytail: off-grid Figma value
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  listWrapper: { flex: 1 },
-  rowPressed: { opacity: 0.7 },
-  iconBtnPressed: { opacity: 0.85 },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.7 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl, flexGrow: 1 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  markAll: { height: spacing.huge, paddingHorizontal: spacing.s14, borderRadius: radius.pill, justifyContent: 'center' },
+  h1: { marginTop: spacing.s6 },
+  section: { marginTop: spacing.s22, marginBottom: spacing.sm, marginHorizontal: spacing.xs },
+  cell: { overflow: 'hidden' },
+  cellFirst: { borderTopLeftRadius: radius.r20, borderTopRightRadius: radius.r20 },
+  cellLast: { borderBottomLeftRadius: radius.r20, borderBottomRightRadius: radius.r20 },
+  row: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, paddingVertical: spacing.s14, paddingHorizontal: spacing.lg },
+  icon: { width: ICON, height: ICON, borderRadius: ICON / 2, alignItems: 'center', justifyContent: 'center' },
+  body: { marginTop: spacing.s2 },
+  when: { marginTop: spacing.xs },
+  dot: { width: DOT, height: DOT, borderRadius: DOT / 2, marginTop: spacing.s6 },
+  delete: { width: DELETE_W, alignItems: 'center', justifyContent: 'center', gap: spacing.xs },
+  loading: { marginTop: spacing.xxxl },
+  hint: { marginTop: spacing.s18, marginHorizontal: spacing.s6 },
 });
