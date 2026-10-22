@@ -1,512 +1,412 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  Dimensions,
-  FlatList,
-  Image,
-  Pressable,
-  RefreshControl,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
+import { ActivityIndicator, FlatList, Image, Pressable, RefreshControl, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, {
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from 'react-native-reanimated';
+import Animated, { Easing, FadeIn, ReduceMotion, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
-import type { MediaFile, MediaFileType, StorageUsage } from '../../types';
-import { useMediaFiles, useStorageUsage, useSearchToggle } from '../../hooks';
-import { formatRelativeShort } from '../../utils/formatters';
+import type { MediaFile, MediaFileType } from '../../types';
+import { useMediaFiles, useStorageUsage } from '../../hooks';
 import { useMediaUpload } from '../../hooks/useMediaUpload';
 import { useMediaActions } from '../../hooks/useMediaActions';
-import { Typography } from '../../components/ui/Typography';
-import { Button } from '../../components/ui/Button';
-import { SearchBar } from '../../components/ui/SearchBar';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { ConfirmDialog } from '../../components/feedback';
-import { ActionSheet } from '../../components/feedback/ActionSheet';
-import { AppModal } from '../../components/feedback/Modal';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
+import { useAuthStore } from '../../store';
+import { formatRelativeShort } from '../../utils/formatters';
 import {
-  AlbumsIcon, CameraIcon, CheckCircleIcon, ChevronRightIcon,
-  FileTextIcon, PencilIcon, PlusIcon, SearchIcon, ShareIcon,
-  SortIcon, TrashIcon, ClockIcon, ArrowUpIcon,
-  type IconComponent,
+  QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMInput, QMSearchField, QMSegmented, QMSheet, qmRowEnter, type QMSheetAction,
+} from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import {
+  CameraIcon, CheckIcon, ChevronRightIcon, ClockIcon, CloseIcon, DocIcon, ImageIcon, InfoIcon, PencilIcon, PlusIcon, SearchIcon,
+  ShareUpIcon, SortIcon, TrashIcon, ArrowUpIcon, type IconComponent,
 } from '../../components/icons';
-import { CARD_FILL_LIGHT, fontSizes, fontWeights, layout, spacing, useTheme, palette } from '../../theme';
+import { radius, spacing, useTheme } from '../../theme';
 import { MediaImageViewer } from './MediaImageViewer';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CELL_GAP  = 3;
-const CELL_SIZE = (SCREEN_WIDTH - CELL_GAP * 2) / 3;
-const FAB_SIZE  = 56;
-
 type SortOrder = 'newest' | 'oldest' | 'alpha';
-const SORT_ICONS: Record<SortOrder, IconComponent> = {
-  newest: ClockIcon, oldest: ArrowUpIcon, alpha: SortIcon,
-};
+const SORT_NEXT: Record<SortOrder, SortOrder> = { newest: 'oldest', oldest: 'alpha', alpha: 'newest' };
+const SORT_ICON: Record<SortOrder, IconComponent> = { newest: ClockIcon, oldest: ArrowUpIcon, alpha: SortIcon };
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
+const GRID_GAP = 6;
+const COLS = 3;
+const TOUCH = 44;
+const BAR_H = 8;
+const TICK = 24;
+const PDF_TILE_W = 44;
+const PDF_TILE_H = 54;
+const EXPIRY_SOON_DAYS = 7;
+const MB = 1048576;
 
 function fmtBytes(n: number): string {
-  if (n < 1048576) return `${(n / 1024).toFixed(0)} KB`;
-  const mb = n / 1048576;
-  return mb >= 1000 ? `${(mb / 1024).toFixed(1)} GB` : `${mb.toFixed(1)} MB`;
+  if (n < MB) return `${Math.round(n / 1024)} KB`;
+  const mb = n / MB;
+  return mb >= 1024 ? `${+(mb / 1024).toFixed(1)} GB` : `${+mb.toFixed(1)} MB`;
 }
 
-const fmtDate = formatRelativeShort;
-
-/** Returns days until expiry, or null if the file doesn't expire. */
-function daysUntilExpiry(expiresAt: string | null): number | null {
+/** Days until a free-plan file is deleted, or null when it never expires. */
+function daysLeft(expiresAt: string | null): number | null {
   if (!expiresAt) return null;
-  const ms = new Date(expiresAt).getTime() - Date.now();
-  return Math.max(0, Math.ceil(ms / (1000 * 60 * 60 * 24)));
+  return Math.max(0, Math.ceil((new Date(expiresAt).getTime() - Date.now()) / 86_400_000));
 }
 
-function ExpiryBadge({ expiresAt }: { expiresAt: string | null }) {
-  const { t } = useTranslation('profile');
-  const { colors } = useTheme();
-  const days = daysUntilExpiry(expiresAt);
-  if (days === null || days > 7) return null;
-  const label = days === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDays', { days, defaultValue: `Expires in ${days}d` });
-  return (
-    <View style={[styles.expiryBadge, { backgroundColor: colors.warning }]}>
-      <Typography preset="caption" color={palette.white} style={styles.expiryBadgeText}>{label}</Typography>
-    </View>
-  );
-}
-
-// ─── FadeImage ───────────────────────────────────────────────────────────────
-
-const AnimatedImage = Animated.createAnimatedComponent(Image);
-
-function FadeImage({ uri, style }: { uri: string; style: object }) {
-  const { colors } = useTheme();
-  const opacity = useSharedValue(0);
-  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-  return (
-    <View style={[style, { backgroundColor: colors.surfaceMuted }]}>
-      <AnimatedImage
-        source={{ uri }}
-        style={[StyleSheet.absoluteFill, animStyle]}
-        resizeMode="cover"
-        onLoad={() => { opacity.value = withTiming(1, { duration: 250 }); }}
-      />
-    </View>
-  );
-}
-
-// ─── StorageBar ──────────────────────────────────────────────────────────────
-
-function StorageBar({ used, limit, percent }: StorageUsage) {
-  const { t } = useTranslation('profile');
-  const { colors } = useTheme();
-  const barColor = percent >= 90 ? colors.alert : percent >= 70 ? colors.warning : colors.accent;
-  const anim = useSharedValue(0);
+function Meter({ pct }: { pct: number }) {
+  const { qm } = useTheme();
+  const w = useSharedValue(0);
   useEffect(() => {
-    anim.value = withTiming(percent / 100, { duration: 700 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [percent]);
-  const barStyle = useAnimatedStyle(() => ({
-    width: `${anim.value * 100}%` as `${number}%`,
-    backgroundColor: barColor,
-  }));
+    w.value = withTiming(pct, { duration: 900, easing: Easing.bezier(0.3, 0.9, 0.3, 1), reduceMotion: ReduceMotion.System });
+  }, [w, pct]);
+  const fill = useAnimatedStyle(() => ({ width: `${w.value}%` }));
+  const color = pct >= 90 ? qm.warm : qm.violet;
   return (
-    <View style={sbStyles.wrap}>
-      <View style={[sbStyles.track, { backgroundColor: colors.surfaceMuted }]}>
-        <Animated.View style={[sbStyles.fill, barStyle]} />
-      </View>
-      <Typography preset="caption" color={colors.textSecondary}>
-        {t('profile:media.storageUsedOfLimit', { used: fmtBytes(used), limit: fmtBytes(limit), percent, defaultValue: `${fmtBytes(used)} of ${fmtBytes(limit)} used · ${percent}%` })}
-      </Typography>
+    <View style={[styles.bar, { backgroundColor: pct >= 90 ? qm.errorBg : qm.lilac }]}>
+      <Animated.View style={[styles.barFill, { backgroundColor: color }, fill]} />
     </View>
   );
 }
-
-const sbStyles = StyleSheet.create({
-  wrap:  { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md, gap: spacing.s6 },
-  track: { height: 4, borderRadius: 2, overflow: 'hidden' },
-  fill:  { height: '100%', borderRadius: 2 },
-});
-
-// ─── UploadToast ─────────────────────────────────────────────────────────────
-
-function UploadToast({ visible, progress, filename }: { visible: boolean; progress: number; filename: string }) {
-  const { t } = useTranslation('common');
-  const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const translateY = useSharedValue(100);
-  useEffect(() => {
-    translateY.value = withTiming(visible ? 0 : 100, { duration: 220 });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible]);
-  const animStyle = useAnimatedStyle(() => ({ transform: [{ translateY: translateY.value }] }));
-  return (
-    <Animated.View style={[
-      utStyles.container,
-      { backgroundColor: colors.background, borderColor: colors.border, bottom: insets.bottom + spacing.sm },
-      animStyle,
-    ]}>
-      <ActivityIndicator size="small" color={colors.accent} />
-      <View style={utStyles.info}>
-        <Typography preset="caption" numberOfLines={1} color={colors.textPrimary}>
-          {filename ? t('common:status.uploadingFile', { filename, defaultValue: `Uploading ${filename}` }) : t('common:status.uploading', 'Uploading…')}
-        </Typography>
-        <View style={[utStyles.track, { backgroundColor: colors.surfaceMuted }]}>
-          <View style={[utStyles.bar, { width: `${progress}%`, backgroundColor: colors.accent }]} />
-        </View>
-      </View>
-      <Typography preset="caption" color={colors.accent} style={utStyles.pct}>
-        {progress}%
-      </Typography>
-    </Animated.View>
-  );
-}
-
-const utStyles = StyleSheet.create({
-  container: {
-    position: 'absolute', left: spacing.lg, right: spacing.lg,
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    borderWidth: 1, borderRadius: layout.cardRadius,
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
-  },
-  info:  { flex: 1, gap: spacing.xs },
-  track: { height: 3, borderRadius: 2, overflow: 'hidden' },
-  bar:   { height: '100%', borderRadius: 2 },
-  pct:   { minWidth: 32, textAlign: 'right', fontWeight: fontWeights.semiBold },
-});
-
-// ─── Main Screen ──────────────────────────────────────────────────────────────
-
-import { useTranslation } from 'react-i18next';
 
 export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
   const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const cell = (width - spacing.xl * 2 - GRID_GAP * (COLS - 1)) / COLS;
 
-  const [activeTab,    setActiveTab]    = useState<MediaFileType>('IMAGE');
-  const [sortOrder,    setSortOrder]    = useState<SortOrder>('newest');
-  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
-  const [viewerVisible, setViewerVisible] = useState(false);
-  const [viewerIndex,  setViewerIndex]  = useState(0);
+  const plan = useAuthStore(s => s.user?.plan ?? 'FREE');
+  const [tab, setTab] = useState<MediaFileType>('IMAGE');
+  const [sort, setSort] = useState<SortOrder>('newest');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [search, setSearch] = useState('');
+  const [banner, setBanner] = useState(true);
+  const [addOpen, setAddOpen] = useState(false);
+  const [viewer, setViewer] = useState<number | null>(null);
 
-  const { data: allFiles = [], isLoading, isFetching, error, refetch } = useMediaFiles();
+  const { data: allFiles = [], isLoading, isFetching, isError, refetch } = useMediaFiles();
   const { data: storage } = useStorageUsage();
-
-  const upload  = useMediaUpload();
+  const upload = useMediaUpload();
   const actions = useMediaActions();
 
-  const imageFiles  = useMemo(() => allFiles.filter(f => f.type === 'IMAGE'), [allFiles]);
-  const pdfFiles    = useMemo(() => allFiles.filter(f => f.type === 'PDF'),   [allFiles]);
-  const activeFiles = activeTab === 'IMAGE' ? imageFiles : pdfFiles;
+  const images = useMemo(() => allFiles.filter(f => f.type === 'IMAGE'), [allFiles]);
+  const pdfs = useMemo(() => allFiles.filter(f => f.type === 'PDF'), [allFiles]);
+  const q = search.trim().toLowerCase();
+  const shown = useMemo(() => {
+    const base = (tab === 'IMAGE' ? images : pdfs).filter(f => !q || f.name.toLowerCase().includes(q));
+    if (sort === 'oldest') return [...base].reverse();
+    if (sort === 'alpha') return [...base].sort((a, b) => a.name.localeCompare(b.name));
+    return base;
+  }, [tab, images, pdfs, q, sort]);
 
-  const sortedFiles = useMemo(() => {
-    if (sortOrder === 'newest') return activeFiles;
-    const arr = [...activeFiles];
-    if (sortOrder === 'oldest') return arr.reverse();
-    return arr.sort((a, b) => a.name.localeCompare(b.name));
-  }, [activeFiles, sortOrder]);
+  const selecting = actions.selectionMode;
+  const picked = actions.selectedIds.size;
+  const hasAny = allFiles.length > 0;
+  const room = storage ? Math.max(0, storage.limit - storage.used) : 0;
 
-  const filteredFiles = useMemo(() => {
-    if (!search.trim()) return sortedFiles;
-    const q = search.trim().toLowerCase();
-    return sortedFiles.filter(f => f.name.toLowerCase().includes(q));
-  }, [sortedFiles, search]);
+  const switchTab = (k: MediaFileType) => { setTab(k); if (selecting) actions.exitSelectionMode(); };
 
-  const SortIconComp = SORT_ICONS[sortOrder];
-  const cycleSortOrder = useCallback(() =>
-    setSortOrder(s => s === 'newest' ? 'oldest' : s === 'oldest' ? 'alpha' : 'newest'), []);
+  const openFile = useCallback((f: MediaFile) => {
+    if (selecting) { actions.handleToggleSelect(f.id); return; }
+    if (f.type === 'PDF') navigation.navigate('MediaPDFViewer', { url: f.url, name: f.name });
+    else setViewer(images.findIndex(x => x.id === f.id));
+  }, [selecting, actions, navigation, images]);
 
-  const renderImageItem = useCallback(({ item, index }: { item: MediaFile; index: number }) => {
-    const isSelected = actions.selectedIds.has(item.id);
+  const renderPhoto = useCallback(({ item, index }: { item: MediaFile; index: number }) => {
+    const on = actions.selectedIds.has(item.id);
+    const days = plan === 'FREE' ? daysLeft(item.expiresAt) : null;
     return (
-      <Pressable
-        style={({ pressed }) => [s.imageCell, pressed && !actions.selectionMode && { opacity: 0.85 }]}
-        onPress={() => actions.selectionMode ? actions.handleToggleSelect(item.id) : (setViewerIndex(index), setViewerVisible(true))}
-        onLongPress={() => actions.handleLongPress(item, actions.selectionMode)}
-      >
-        <FadeImage uri={item.url} style={s.imageFill} />
-        {isSelected && (
-          <View style={[styles.selectionOverlay, { backgroundColor: colors.overlay }]}>
-            <CheckCircleIcon size={28} color={palette.white} />
-          </View>
-        )}
-        <ExpiryBadge expiresAt={item.expiresAt} />
-      </Pressable>
-    );
-  }, [actions, colors.overlay]);
-
-  const renderPDFItem = useCallback(({ item }: { item: MediaFile }) => {
-    const isSelected = actions.selectedIds.has(item.id);
-    return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.pdfCard,
-          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-          pressed && styles.pdfCardPressed,
-          isSelected && { borderColor: colors.accent, borderWidth: 1.5, backgroundColor: colors.accentSoft },
-        ]}
-        onPress={() => actions.selectionMode
-          ? actions.handleToggleSelect(item.id)
-          : navigation.navigate('MediaPDFViewer', { url: item.url, name: item.name })}
-        onLongPress={() => actions.handleLongPress(item, actions.selectionMode)}
-      >
-        <View style={[styles.pdfIconBox, { backgroundColor: colors.accentSoft }]}>
-          <FileTextIcon size={26} color={colors.accent} />
-        </View>
-        <View style={s.pdfInfo}>
-          <Typography preset="label" numberOfLines={1} style={s.pdfName}>{item.name}</Typography>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {fmtBytes(item.sizeBytes)} · {fmtDate(item.createdAt)}
-          </Typography>
-          {daysUntilExpiry(item.expiresAt) !== null && daysUntilExpiry(item.expiresAt)! <= 7 && (
-            <Typography preset="caption" color={colors.warning}>
-              {daysUntilExpiry(item.expiresAt) === 0 ? t('profile:media.expiresToday', 'Expires today') : t('profile:media.expiresInDaysUpgrade', { days: daysUntilExpiry(item.expiresAt), defaultValue: `Expires in ${daysUntilExpiry(item.expiresAt)}d · Upgrade to keep` })}
-            </Typography>
+      <Animated.View entering={qmRowEnter(index)}>
+        <AnimatedPressable
+          scaleTo={0.96}
+          onPress={() => openFile(item)}
+          onLongPress={() => actions.handleLongPress(item, selecting)}
+          style={[styles.cell, { width: cell, height: cell, backgroundColor: qm.field }, on && [styles.cellOn, { borderColor: qm.violet }]]}
+          accessibilityRole="button"
+          accessibilityLabel={item.name}
+          accessibilityState={{ selected: on }}
+        >
+          <Image source={{ uri: item.url }} style={StyleSheet.absoluteFill} resizeMode="cover" />
+          {days !== null && days <= EXPIRY_SOON_DAYS && (
+            <View style={[styles.expiry, { backgroundColor: qm.goldBg }]}>
+              <Typography preset="qmTag" color={qm.goldText}>{days === 0 ? t('profile:qmMedia.today') : t('profile:qmMedia.daysLeft', { count: days })}</Typography>
+            </View>
           )}
-        </View>
-        {isSelected
-          ? <CheckCircleIcon size={22} color={colors.accent} />
-          : <ChevronRightIcon size={18} color={colors.textDisabled} />
-        }
-      </Pressable>
+          {selecting && (
+            <View style={[styles.tick, on ? { backgroundColor: qm.violet } : [styles.tickOff, { borderColor: qm.onViolet }]]}>
+              {on && <CheckIcon size={14} color={qm.onViolet} strokeWidth={3} />}
+            </View>
+          )}
+        </AnimatedPressable>
+      </Animated.View>
     );
-  }, [actions, navigation, isDark, colors, t]);
+  }, [qm, cell, plan, selecting, actions, openFile, t]);
+
+  const renderPdf = useCallback(({ item, index }: { item: MediaFile; index: number }) => {
+    const on = actions.selectedIds.has(item.id);
+    const days = plan === 'FREE' ? daysLeft(item.expiresAt) : null;
+    return (
+      <Animated.View entering={qmRowEnter(index)}>
+        <AnimatedPressable
+          scaleTo={0.98}
+          onPress={() => openFile(item)}
+          onLongPress={() => actions.handleLongPress(item, selecting)}
+          style={[styles.pdfRow, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }, on && [styles.pdfOn, { borderColor: qm.violet }]]}
+          accessibilityRole="button"
+          accessibilityLabel={item.name}
+          accessibilityState={{ selected: on }}
+        >
+          <View style={[styles.pdfTile, { backgroundColor: qm.errorBg }]}>
+            <Typography preset="qmTag" color={qm.warm}>PDF</Typography>
+          </View>
+          <View style={styles.flex}>
+            <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{item.name}</Typography>
+            <Typography preset="qmMeta" color={qm.muted} style={styles.sub}>{fmtBytes(item.sizeBytes)} · {formatRelativeShort(item.createdAt)}</Typography>
+            {days !== null && days <= EXPIRY_SOON_DAYS && (
+              <Typography preset="qmChip" color={qm.goldText} style={styles.sub}>{t('profile:qmMedia.pdfExpiry', { count: days })}</Typography>
+            )}
+          </View>
+          {selecting ? (
+            <View style={[styles.tick, on ? { backgroundColor: qm.violet } : [styles.tickOff, { borderColor: qm.off }]]}>
+              {on && <CheckIcon size={14} color={qm.onViolet} strokeWidth={3} />}
+            </View>
+          ) : <ChevronRightIcon size={16} color={qm.muted} strokeWidth={2} />}
+        </AnimatedPressable>
+      </Animated.View>
+    );
+  }, [qm, plan, selecting, actions, openFile, t]);
+
+  const SortI = SORT_ICON[sort];
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <View style={styles.topRow}>
+        <QMBackButton onPress={navigation.goBack} label={t('profile:qmMedia.back')} />
+        {(shown.length > 0 || selecting) && (
+          <AnimatedPressable
+            scaleTo={0.96}
+            onPress={() => (selecting ? actions.exitSelectionMode() : actions.setSelectionMode(true))}
+            style={[styles.selectBtn, { backgroundColor: selecting ? qm.lilac : qm.field }]}
+            accessibilityRole="button"
+          >
+            <Typography preset="qmLink" color={selecting ? qm.link : qm.body}>{selecting ? t('profile:qmMedia.cancel') : t('profile:qmMedia.select')}</Typography>
+          </AnimatedPressable>
+        )}
+      </View>
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmMedia.title')}</Typography>
+
+      {storage && (
+        <View style={[styles.meter, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+          <View style={styles.meterHead}>
+            <Typography preset="qmBody" color={qm.body}>{t('profile:qmMedia.used', { used: fmtBytes(storage.used), limit: fmtBytes(storage.limit) })}</Typography>
+            {plan !== 'PRO' && (
+              <Pressable onPress={() => navigation.navigate('Paywall')} hitSlop={8} accessibilityRole="link">
+                <Typography preset="qmLink" color={qm.link}>{t('profile:qmMedia.moreRoom')}</Typography>
+              </Pressable>
+            )}
+          </View>
+          <Meter pct={Math.min(100, storage.percent)} />
+        </View>
+      )}
+
+      {plan === 'FREE' && banner && hasAny && (
+        <Animated.View entering={FadeIn} style={[styles.banner, { backgroundColor: qm.goldBg }]}>
+          <ClockIcon size={18} color={qm.goldText} />
+          <Typography preset="qmBody" color={qm.goldText} style={styles.flex}>
+            {t('profile:qmMedia.freeBanner')}{' '}
+            <Typography preset="qmLink" color={qm.goldText} style={styles.underline} onPress={() => navigation.navigate('Paywall')}>{t('profile:qmMedia.freeBannerLink')}</Typography>
+          </Typography>
+          <Pressable onPress={() => setBanner(false)} hitSlop={10} accessibilityRole="button" accessibilityLabel={t('profile:qmMedia.dismiss')}>
+            <CloseIcon size={16} color={qm.goldText} strokeWidth={2} />
+          </Pressable>
+        </Animated.View>
+      )}
+
+      <View style={styles.tools}>
+        <View style={styles.flex}>
+          <QMSegmented<MediaFileType>
+            label={t('profile:qmMedia.tabs')}
+            value={tab}
+            onChange={switchTab}
+            options={[
+              { key: 'IMAGE', label: t('profile:qmMedia.photos', { count: images.length }) },
+              { key: 'PDF', label: t('profile:qmMedia.pdfs', { count: pdfs.length }) },
+            ]}
+          />
+        </View>
+        <AnimatedPressable scaleTo={0.95} onPress={() => { setSearchOpen(o => !o); setSearch(''); }} style={[styles.touch, { backgroundColor: searchOpen ? qm.lilac : qm.field }]} accessibilityRole="button" accessibilityLabel={t('profile:qmMedia.searchA11y')}>
+          <SearchIcon size={18} color={searchOpen ? qm.link : qm.ink} />
+        </AnimatedPressable>
+        <AnimatedPressable scaleTo={0.95} onPress={() => setSort(s => SORT_NEXT[s])} style={[styles.touch, { backgroundColor: qm.field }]} accessibilityRole="button" accessibilityLabel={t(`profile:qmMedia.sortA11y_${sort}`)}>
+          <SortI size={18} color={qm.ink} />
+        </AnimatedPressable>
+      </View>
+      {searchOpen && <View style={styles.searchWrap}><QMSearchField value={search} onChangeText={setSearch} placeholder={t('profile:qmMedia.search')} autoFocus /></View>}
+      <View style={styles.listGap} />
+    </View>
+  );
+
+  let empty: React.ReactElement | null = null;
+  if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
+  else if (isError) empty = <QMEmpty icon={InfoIcon} title={t('profile:qmMedia.loadFailed')} action={{ label: t('profile:qmMedia.tryAgain'), onPress: () => refetch() }} />;
+  else if (q) empty = <QMEmpty icon={SearchIcon} title={t('profile:qmMedia.noMatch', { query: search.trim() })} text={t('profile:qmMedia.noMatchText')} />;
+  else if (tab === 'IMAGE') empty = <QMEmpty icon={ImageIcon} title={t('profile:qmMedia.noPhotos')} text={t('profile:qmMedia.noPhotosText')} />;
+  else empty = <QMEmpty icon={DocIcon} title={t('profile:qmMedia.noPdfs')} text={t('profile:qmMedia.noPdfsText')} />;
+
+  const fileActions: QMSheetAction[] = actions.actionSheetFile ? [
+    {
+      label: t('profile:qmMedia.rename'), icon: PencilIcon,
+      onPress: () => {
+        const f = actions.actionSheetFile;
+        if (f) actions.setRenameState({ visible: true, file: f, value: f.name.replace(/\.[^.]+$/, '') });
+      },
+    },
+    { label: t('profile:qmMedia.share'), icon: ShareUpIcon, onPress: () => { if (actions.actionSheetFile) actions.handleShare(actions.actionSheetFile); } },
+    { label: t('profile:qmMedia.delete'), icon: TrashIcon, danger: true, onPress: () => { if (actions.actionSheetFile) actions.handleDelete(actions.actionSheetFile); } },
+  ] : [];
+
+  const addActions: QMSheetAction[] = [
+    { label: t('profile:qmMedia.takePhoto'), sub: t('profile:qmMedia.upTo'), icon: CameraIcon, onPress: upload.handlePickFromCamera },
+    { label: t('profile:qmMedia.fromLibrary'), sub: t('profile:qmMedia.upTo'), icon: ImageIcon, onPress: upload.handlePickImage },
+    { label: t('profile:qmMedia.choosePdf'), sub: t('profile:qmMedia.upToPdf'), icon: DocIcon, onPress: upload.handlePickPDF },
+  ];
+
+  const ext = actions.renameState.file?.name.match(/\.[^.]+$/)?.[0] ?? '';
 
   return (
-    <Screen header={<ScreenHeader title={t('profile:media.title')} onBack={() => navigation.goBack()} />}>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <FlatList
+        key={tab}
+        data={isError ? [] : shown}
+        keyExtractor={item => item.id}
+        renderItem={tab === 'IMAGE' ? renderPhoto : renderPdf}
+        numColumns={tab === 'IMAGE' ? COLS : 1}
+        columnWrapperStyle={tab === 'IMAGE' ? styles.gridRow : undefined}
+        extraData={actions.selectedIds}
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        ListFooterComponent={shown.length > 0 && !selecting
+          ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.hint}>{t('profile:qmMedia.hint')}</Typography>
+          : null}
+        ItemSeparatorComponent={tab === 'PDF' ? Separator : GridSeparator}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
+      />
 
-      {/* Storage quota bar */}
-      {storage && <StorageBar {...storage} />}
-
-      {/* Tab row / Selection header */}
-      {actions.selectionMode ? (
-        <View style={styles.selectionHeader}>
-          <Pressable onPress={actions.exitSelectionMode} hitSlop={8}>
-            <Typography preset="caption" color={colors.accent}>{t('common:actions.cancel', 'Cancel')}</Typography>
-          </Pressable>
-          <Typography preset="caption" style={s.selectionCount}>
-            {t('library:plans.selectedCount', { count: actions.selectedIds.size, defaultValue: `${actions.selectedIds.size} selected` })}
-          </Typography>
-          <Pressable onPress={() => actions.handleBulkDelete(actions.selectedIds.size)} disabled={actions.selectedIds.size === 0} hitSlop={8}
-            style={actions.selectedIds.size === 0 ? styles.btnDisabled : undefined}>
-            <TrashIcon size={20} color={colors.alert} />
-          </Pressable>
-        </View>
-      ) : (
-        <View style={styles.tabRow}>
-          {(['IMAGE', 'PDF'] as const).map(tab => {
-            const count  = tab === 'IMAGE' ? imageFiles.length : pdfFiles.length;
-            const active = activeTab === tab;
-            return (
-              <Pressable
-                key={tab}
-                style={[styles.tabPill, { borderColor: colors.border, backgroundColor: colors.background }, active && { borderColor: colors.accent, backgroundColor: colors.accentSoft }]}
-                onPress={() => setActiveTab(tab)}
-              >
-                {tab === 'IMAGE'
-                  ? <AlbumsIcon  size={15} color={active ? colors.accent : colors.textSecondary} />
-                  : <FileTextIcon size={15} color={active ? colors.accent : colors.textSecondary} />
-                }
-                <Typography preset="caption" color={active ? colors.accent : colors.textSecondary} style={active ? s.tabLabelActive : undefined}>
-                  {tab === 'IMAGE' ? t('profile:media.images', 'Images') : t('profile:media.pdfs', 'PDFs')}
-                </Typography>
-                {!isLoading && count > 0 && (
-                  <View style={[styles.badge, active ? { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: colors.accent } : { backgroundColor: colors.surfaceMuted }]}>
-                    <Typography preset="caption" color={active ? colors.accent : colors.textSecondary} style={s.badgeText}>{count}</Typography>
-                  </View>
-                )}
-              </Pressable>
-            );
-          })}
-          <Pressable onPress={cycleSortOrder} style={s.iconBtn} hitSlop={8}>
-            <SortIconComp size={20} color={colors.textSecondary} />
-          </Pressable>
-          <Pressable onPress={toggleSearch} style={s.iconBtn} hitSlop={8}>
-            <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
-          </Pressable>
-          <Pressable onPress={() => actions.setSelectionMode(true)} style={s.iconBtn} hitSlop={8}>
-            <CheckCircleIcon size={20} color={colors.textSecondary} />
-          </Pressable>
-        </View>
+      {upload.uploadMedia.isPending && (
+        <Animated.View entering={FadeIn} style={[styles.uploading, { backgroundColor: qm.surface, boxShadow: qm.liftShadow }]}>
+          <View style={styles.uploadHead}>
+            <ActivityIndicator size="small" color={qm.violet} />
+            <Typography preset="qmFieldLabel" color={qm.ink} numberOfLines={1} style={styles.flex}>{t('profile:qmMedia.uploading', { pct: upload.uploadProgress })}</Typography>
+          </View>
+          <View style={[styles.upTrack, { backgroundColor: qm.lilac }]}>
+            <View style={[styles.upFill, { width: `${upload.uploadProgress}%`, backgroundColor: qm.violet }]} />
+          </View>
+        </Animated.View>
       )}
 
-      {searchVisible && !actions.selectionMode && (
-        <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder={t('profile:media.searchPlaceholder', 'Search files…')} autoFocus />
-        </View>
-      )}
-
-      {/* Content */}
-      <View style={s.contentArea}>
-        {error ? (
-          <ErrorState message={t('profile:media.couldNotLoad', 'Could not load media')} onRetry={refetch} />
-        ) : activeTab === 'IMAGE' ? (
-          <FlatList
-            key="images"
-            data={filteredFiles}
-            keyExtractor={item => item.id}
-            renderItem={renderImageItem}
-            numColumns={3}
-            columnWrapperStyle={s.imageRow}
-            style={s.list}
-            contentContainerStyle={s.imageListContent}
-            refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title={search ? t('common:status.noResults', 'No results') : t('profile:media.noImagesYet', 'No images yet')} subtitle={search ? t('profile:media.noImagesMatch', { query: search, defaultValue: `No images match "${search}"` }) : t('profile:media.tapToUploadPhoto', 'Tap + to upload your first photo')} />}
+      <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+        {selecting ? (
+          <QMButton
+            icon={TrashIcon}
+            label={picked === 0 ? t('profile:qmMedia.pickToDelete') : t('profile:qmMedia.deleteN', { count: picked })}
+            off={picked === 0}
+            onPress={() => actions.handleBulkDelete(picked)}
           />
         ) : (
-          <FlatList
-            key="pdfs"
-            data={filteredFiles}
-            keyExtractor={item => item.id}
-            renderItem={renderPDFItem}
-            style={s.list}
-            contentContainerStyle={s.pdfListContent}
-            refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={colors.accent} colors={[colors.accent]} />}
-            ListEmptyComponent={<EmptyState title={search ? t('common:status.noResults', 'No results') : t('profile:media.noPdfsYet', 'No PDFs yet')} subtitle={search ? t('profile:media.noPdfsMatch', { query: search, defaultValue: `No PDFs match "${search}"` }) : t('profile:media.tapToUploadPdf', 'Tap + to upload your first PDF')} />}
+          <QMButton
+            icon={PlusIcon}
+            label={tab === 'IMAGE' ? t('profile:qmMedia.addPhoto') : t('profile:qmMedia.addPdf')}
+            loading={upload.uploadMedia.isPending}
+            onPress={() => setAddOpen(true)}
           />
         )}
-
-        {/* FAB */}
-        {!actions.selectionMode && (
-          <Pressable
-            style={({ pressed }) => [styles.fab, { backgroundColor: colors.accent }, pressed && styles.fabPressed, upload.uploadMedia.isPending && styles.fabDisabled]}
-            onPress={activeTab === 'IMAGE' ? () => upload.setPickSheetVisible(true) : upload.handlePickPDF}
-            disabled={upload.uploadMedia.isPending}
-          >
-            <PlusIcon size={28} color={colors.textOnAccent} />
-          </Pressable>
-        )}
-
-        <UploadToast visible={upload.uploadMedia.isPending} progress={upload.uploadProgress} filename={upload.uploadFilename} />
       </View>
 
       <MediaImageViewer
-        visible={viewerVisible}
-        images={imageFiles}
-        initialIndex={viewerIndex}
-        onClose={() => setViewerVisible(false)}
+        visible={viewer !== null}
+        images={images}
+        initialIndex={viewer ?? 0}
+        onClose={() => setViewer(null)}
         onShare={actions.handleShare}
       />
 
-      <ActionSheet
-        visible={upload.pickSheetVisible}
-        title={t('profile:media.addImage', 'Add Image')}
-        actions={[
-          { label: t('profile:editProfile.chooseFromLibrary', 'Photo Library'), icon: AlbumsIcon, onPress: upload.handlePickImage },
-          { label: t('profile:editProfile.takePhoto', 'Take Photo'),    icon: CameraIcon, onPress: upload.handlePickFromCamera },
-        ]}
-        onClose={() => upload.setPickSheetVisible(false)}
+      <QMSheet
+        visible={addOpen}
+        onClose={() => setAddOpen(false)}
+        title={t('profile:qmMedia.addTitle')}
+        sub={storage ? t('profile:qmMedia.roomLeft', { room: fmtBytes(room) }) : undefined}
+        actions={addActions}
       />
-
-      <ActionSheet
-        visible={actions.actionSheetFile !== null}
-        title={actions.actionSheetFile?.name}
-        actions={[
-          {
-            label: t('common:actions.rename', 'Rename'), icon: PencilIcon,
-            onPress: () => {
-              if (!actions.actionSheetFile) return;
-              actions.setRenameState({ visible: true, file: actions.actionSheetFile, value: actions.actionSheetFile.name.replace(/\.[^.]+$/, '') });
-            },
-          },
-          { label: t('common:actions.share', 'Share'),  icon: ShareIcon, onPress: () => { if (actions.actionSheetFile) actions.handleShare(actions.actionSheetFile); } },
-          { label: t('common:actions.delete', 'Delete'), icon: TrashIcon, destructive: true, onPress: () => { if (actions.actionSheetFile) actions.handleDelete(actions.actionSheetFile); } },
-        ]}
-        onClose={() => actions.setActionSheetFile(null)}
-      />
-
-      <AppModal visible={actions.renameState.visible} title={t('profile:media.renameFile', 'Rename File')} onClose={() => actions.setRenameState({ visible: false, file: null, value: '' })}>
-        <TextInput
-          value={actions.renameState.value}
-          onChangeText={v => actions.setRenameState(st => ({ ...st, value: v }))}
-          style={[styles.renameInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceMuted }]}
-          autoFocus selectTextOnFocus returnKeyType="done"
-          onSubmitEditing={actions.handleRenameConfirm}
-          maxLength={255 - (actions.renameState.file?.name.match(/\.[^.]+$/)?.[0]?.length ?? 0)}
-          placeholder={t('profile:media.fileName', 'File name')}
-          placeholderTextColor={colors.textSecondary}
-        />
-        <View style={s.gap3} />
-        <Button label={t('common:actions.save', 'Save')} onPress={actions.handleRenameConfirm} loading={actions.renameMedia.isPending} disabled={!actions.renameState.value.trim() || actions.renameMedia.isPending} />
-        <View style={s.gap2} />
-      </AppModal>
-
-      <ConfirmDialog {...actions.dialogProps} />
-    </Screen>
+      <QMSheet visible={!!actions.actionSheetFile} onClose={() => actions.setActionSheetFile(null)} title={actions.actionSheetFile?.name} actions={fileActions} />
+      <QMSheet
+        visible={actions.renameState.visible}
+        onClose={() => actions.setRenameState({ visible: false, file: null, value: '' })}
+        title={t('profile:qmMedia.renameTitle')}
+      >
+        <View style={styles.renameBody}>
+          <QMInput
+            value={actions.renameState.value}
+            onChangeText={v => actions.setRenameState(st => ({ ...st, value: v }))}
+            placeholder={t('profile:qmMedia.fileName')}
+            autoFocus
+            selectTextOnFocus
+            returnKeyType="done"
+            onSubmitEditing={actions.handleRenameConfirm}
+            maxLength={255 - ext.length}
+            fill={qm.bg}
+          />
+          <QMButton
+            label={t('profile:qmMedia.save')}
+            onPress={actions.handleRenameConfirm}
+            loading={actions.renameMedia.isPending}
+            off={!actions.renameState.value.trim()}
+            style={styles.renameBtn}
+          />
+        </View>
+      </QMSheet>
+      <QMConfirmDialog {...actions.dialogProps} />
+    </View>
   );
 }
 
-// ─── Styles ───────────────────────────────────────────────────────────────────
-
-const s = StyleSheet.create({
-  contentArea:      { flex: 1 },
-  list:             { flex: 1 },
-  imageListContent: { paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1, paddingTop: CELL_GAP },
-  imageRow:         { gap: CELL_GAP },
-  imageCell:        { width: CELL_SIZE, height: CELL_SIZE },
-  imageFill:        { width: '100%', height: '100%' },
-  pdfListContent:   { paddingHorizontal: layout.screenPaddingH, paddingBottom: FAB_SIZE + spacing.s48, flexGrow: 1, gap: spacing.lg },
-  pdfInfo:          { flex: 1, gap: spacing.s2 },
-  pdfName:          { fontWeight: fontWeights.medium },
-  selectionCount:   { fontWeight: fontWeights.semiBold },
-  tabLabelActive:   { fontWeight: fontWeights.semiBold },
-  badgeText:        { fontSize: 10, fontWeight: fontWeights.semiBold },
-  iconBtn:          { width: 36, height: 36, alignItems: 'center', justifyContent: 'center' },
-  gap3:             { height: spacing.md },
-  gap2:             { height: spacing.sm },
-});
+function Separator() {
+  return <View style={styles.sep} />;
+}
+function GridSeparator() {
+  return <View style={styles.gridSep} />;
+}
 
 const styles = StyleSheet.create({
-  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
-  selectionHeader: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    marginHorizontal: layout.screenPaddingH, marginVertical: spacing.md, height: 40,
-  },
-  tabRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    marginHorizontal: layout.screenPaddingH, marginBottom: spacing.md,
-  },
-  tabPill: {
-    flexGrow: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.s6, paddingVertical: spacing.s10,
-    borderRadius: spacing.s10, borderWidth: 1,
-  },
-  badge: {
-    minWidth: 18, height: 18, borderRadius: 9, paddingHorizontal: spacing.xs,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  pdfCard: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    borderRadius: layout.cardRadiusSm, padding: spacing.lg,
-  },
-  pdfCardPressed:  { opacity: 0.7 },
-  pdfIconBox: {
-    width: 52, height: 52, borderRadius: layout.cardRadiusSm,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  selectionOverlay: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
-  expiryBadge: { position: 'absolute', bottom: 4, left: 4, borderRadius: 4, paddingHorizontal: 4, paddingVertical: 2 },
-  expiryBadgeText: { fontSize: 9, fontWeight: '700' },
-  fab: {
-    position: 'absolute', bottom: spacing.xxxl, right: layout.screenPaddingH,
-    width: FAB_SIZE, height: FAB_SIZE, borderRadius: FAB_SIZE / 2,
-    alignItems: 'center', justifyContent: 'center',
-  },
-  fabPressed:  { opacity: 0.85 },
-  fabDisabled: { opacity: 0.5 },
-  btnDisabled: { opacity: 0.4 },
-  renameInput: {
-    borderWidth: 1, borderRadius: spacing.s10,
-    paddingHorizontal: spacing.lg, paddingVertical: spacing.md,
-    fontSize: fontSizes.md,
-  },
+  flex: { flex: 1, minWidth: 0 },
+  underline: { textDecorationLine: 'underline' },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xl, flexGrow: 1 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  selectBtn: { height: 38, paddingHorizontal: spacing.s14, borderRadius: radius.pill, justifyContent: 'center' },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.md },
+  meter: { padding: spacing.s14, borderRadius: radius.r17 + 1 },
+  meterHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
+  bar: { height: BAR_H, borderRadius: BAR_H / 2, marginTop: spacing.s10, overflow: 'hidden' },
+  barFill: { height: '100%', borderRadius: BAR_H / 2 },
+  banner: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s10, marginTop: spacing.s10, padding: spacing.md, borderRadius: radius.md },
+  tools: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.s14 },
+  touch: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  searchWrap: { marginTop: spacing.s10 },
+  listGap: { height: spacing.s14 },
+  loading: { marginTop: spacing.xxxl },
+  gridRow: { gap: GRID_GAP },
+  gridSep: { height: GRID_GAP },
+  cell: { borderRadius: radius.r12, overflow: 'hidden' },
+  cellOn: { borderWidth: 3 },
+  pdfOn: { borderWidth: 2 },
+  expiry: { position: 'absolute', left: spacing.xs, bottom: spacing.xs, borderRadius: radius.r6, paddingHorizontal: spacing.s5, paddingVertical: spacing.s2 },
+  tick: { position: 'absolute', top: spacing.s6, right: spacing.s6, width: TICK, height: TICK, borderRadius: TICK / 2, alignItems: 'center', justifyContent: 'center' },
+  tickOff: { borderWidth: 2 },
+  pdfRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r17 + 1 },
+  pdfTile: { width: PDF_TILE_W, height: PDF_TILE_H, borderRadius: radius.r10, alignItems: 'center', justifyContent: 'center' },
+  sub: { marginTop: spacing.s2 },
+  sep: { height: spacing.s10 },
+  hint: { marginTop: spacing.lg, marginHorizontal: spacing.s6 },
+  footer: { paddingHorizontal: spacing.xl, paddingVertical: spacing.md },
+  uploading: { position: 'absolute', left: spacing.xl, right: spacing.xl, bottom: spacing.s80 + spacing.sm, padding: spacing.md, borderRadius: radius.md },
+  uploadHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10 },
+  upTrack: { height: 4, borderRadius: 2, marginTop: spacing.s10, overflow: 'hidden' },
+  upFill: { height: '100%', borderRadius: 2 },
+  renameBody: { paddingHorizontal: spacing.s10 },
+  renameBtn: { marginTop: spacing.s14 },
 });

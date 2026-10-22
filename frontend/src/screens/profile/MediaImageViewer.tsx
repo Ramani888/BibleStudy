@@ -10,12 +10,20 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureDetector, GestureHandlerRootView, Gesture } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
 
 import type { MediaFile } from '../../types';
 import { Typography } from '../../components/ui';
-import { CloseIcon, ShareIcon } from '../../components/icons';
-import { layout, palette, radius, spacing } from '../../theme';
+import { ChevronLeftIcon, ChevronRightIcon, CloseIcon, ShareUpIcon } from '../../components/icons';
+import { palette, spacing } from '../../theme';
+
+const TOUCH = 44;
+// ponytail: the viewer is always dark (photos read best on black), so its chrome uses fixed overlay tones, not theme tokens.
+const SCRIM_TOP = 'rgba(0,0,0,0.45)';
+const SCRIM_BOTTOM = 'rgba(0,0,0,0.5)';
+const GLASS_BTN = 'rgba(255,255,255,0.14)';
+const SOFT_WHITE = 'rgba(255,255,255,0.7)';
 
 const { width: W, height: H } = Dimensions.get('window');
 
@@ -27,7 +35,7 @@ interface Props {
   onShare: (file: MediaFile) => void;
 }
 
-function PinchableImage({ url }: { url: string }) {
+function PinchableImage({ url, onTap }: { url: string; onTap: () => void }) {
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const tx = useSharedValue(0);
@@ -53,12 +61,15 @@ function PinchableImage({ url }: { url: string }) {
     })
     .onEnd(() => { savedTx.value = tx.value; savedTy.value = ty.value; });
 
+  // A single tap shows/hides the bars; it never fires mid-pinch.
+  const tap = Gesture.Tap().maxDuration(250).onEnd((_e, ok) => { if (ok) runOnJS(onTap)(); });
+
   const animStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }, { translateX: tx.value }, { translateY: ty.value }],
   }));
 
   return (
-    <GestureDetector gesture={Gesture.Simultaneous(pinch, pan)}>
+    <GestureDetector gesture={Gesture.Simultaneous(pinch, pan, tap)}>
       <Animated.View style={[StyleSheet.absoluteFill, animStyle]}>
         <Image source={{ uri: url }} style={styles.img} resizeMode="contain" />
       </Animated.View>
@@ -67,26 +78,34 @@ function PinchableImage({ url }: { url: string }) {
 }
 
 export function MediaImageViewer({ visible, images, initialIndex, onClose, onShare }: Props) {
+  const { t } = useTranslation('profile');
   const insets = useSafeAreaInsets();
   const flatRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const [chrome, setChrome] = useState(true);
+  const toggle = useCallback(() => setChrome(c => !c), []);
 
-  const onMomentumEnd = useCallback((e: any) => {
+  const onMomentumEnd = useCallback((e: { nativeEvent: { contentOffset: { x: number } } }) => {
     setCurrentIndex(Math.round(e.nativeEvent.contentOffset.x / W));
   }, []);
 
+  const go = (i: number) => {
+    if (i < 0 || i >= images.length) return;
+    flatRef.current?.scrollToIndex({ index: i, animated: true });
+    setCurrentIndex(i);
+  };
+
   const currentFile = images[currentIndex];
 
-  const renderImageItem = useCallback(({ item }: { item: typeof images[number] }) => (
+  const renderImageItem = useCallback(({ item }: { item: MediaFile }) => (
     <View style={styles.page}>
-      <PinchableImage url={item.url} />
+      <PinchableImage url={item.url} onTap={toggle} />
     </View>
-  ), []);
+  ), [toggle]);
 
   return (
-    <Modal visible={visible} statusBarTranslucent animationType="fade" onRequestClose={onClose}>
+    <Modal visible={visible} statusBarTranslucent animationType="fade" onRequestClose={onClose} onShow={() => { setCurrentIndex(initialIndex); setChrome(true); }}>
       <GestureHandlerRootView style={styles.root}>
-
         <FlatList
           ref={flatRef}
           data={images}
@@ -108,47 +127,36 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
           removeClippedSubviews
         />
 
-        {/* Counter */}
-        {images.length > 1 && (
-          <View style={[styles.counter, { top: insets.top + spacing.md }]}>
-            <View style={styles.counterPill}>
-              <Typography preset="caption" color={palette.white}>
-                {currentIndex + 1} / {images.length}
-              </Typography>
-            </View>
-          </View>
-        )}
-
-        {/* Share */}
-        {currentFile && (
-          <Pressable
-            style={({ pressed }) => [styles.iconBtn, styles.shareBtn, { top: insets.top + spacing.md }, pressed && styles.btnPressed]}
-            onPress={() => onShare(currentFile)}
-            hitSlop={12}
-          >
-            <ShareIcon size={20} color={palette.white} />
-          </Pressable>
-        )}
-
-        {/* Close */}
-        <Pressable
-          style={({ pressed }) => [styles.iconBtn, styles.closeBtn, { top: insets.top + spacing.md }, pressed && styles.btnPressed]}
-          onPress={onClose}
-          hitSlop={12}
-        >
-          <CloseIcon size={22} color={palette.white} />
-        </Pressable>
-
-        {/* Caption */}
-        {currentFile && (
-          <View style={[styles.caption, { bottom: insets.bottom + spacing.lg }]}>
-            {/* ponytail: rgba semi-transparent white on photo overlay, no theme token */}
-        <Typography preset="caption" color="rgba(255,255,255,0.8)" numberOfLines={1}>
-              {currentFile.name}
+        {chrome && (
+          <View style={[styles.topBar, { paddingTop: insets.top + spacing.sm }]}>
+            <Pressable onPress={onClose} hitSlop={6} style={({ pressed }) => [styles.btn, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('qmViewer.close')}>
+              <CloseIcon size={18} color={palette.white} strokeWidth={2} />
+            </Pressable>
+            <Typography preset="qmSegment" color={palette.white} align="center" style={styles.flex}>
+              {images.length > 1 ? t('qmViewer.count', { n: currentIndex + 1, total: images.length }) : ''}
             </Typography>
+            {currentFile ? (
+              <Pressable onPress={() => onShare(currentFile)} hitSlop={6} style={({ pressed }) => [styles.btn, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('qmViewer.share')}>
+                <ShareUpIcon size={19} color={palette.white} strokeWidth={2} />
+              </Pressable>
+            ) : <View style={styles.btnSpacer} />}
           </View>
         )}
 
+        {chrome && currentFile && (
+          <View style={[styles.bottomBar, { paddingBottom: insets.bottom + spacing.lg }]}>
+            <Pressable onPress={() => go(currentIndex - 1)} disabled={currentIndex === 0} hitSlop={6} style={({ pressed }) => [styles.btn, (pressed || currentIndex === 0) && styles.dim]} accessibilityRole="button" accessibilityLabel={t('qmViewer.prev')}>
+              <ChevronLeftIcon size={18} color={palette.white} strokeWidth={2} />
+            </Pressable>
+            <View style={styles.flex}>
+              <Typography preset="qmSegment" color={palette.white} align="center" numberOfLines={1}>{currentFile.name}</Typography>
+              <Typography preset="qmMeta" color={SOFT_WHITE} align="center" style={styles.hint}>{t('qmViewer.hint')}</Typography>
+            </View>
+            <Pressable onPress={() => go(currentIndex + 1)} disabled={currentIndex >= images.length - 1} hitSlop={6} style={({ pressed }) => [styles.btn, (pressed || currentIndex >= images.length - 1) && styles.dim]} accessibilityRole="button" accessibilityLabel={t('qmViewer.next')}>
+              <ChevronRightIcon size={18} color={palette.white} strokeWidth={2} />
+            </Pressable>
+          </View>
+        )}
       </GestureHandlerRootView>
     </Modal>
   );
@@ -156,30 +164,19 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: palette.black },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.4 },
   page: { width: W, height: H, justifyContent: 'center' },
-  img:  { width: W, height: H },
-
-  counter: {
-    position: 'absolute', left: 0, right: 0, alignItems: 'center',
+  img: { width: W, height: H },
+  topBar: {
+    position: 'absolute', top: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: spacing.s6,
+    paddingHorizontal: spacing.md, paddingBottom: spacing.md, backgroundColor: SCRIM_TOP,
   },
-  counterPill: {
-    backgroundColor: 'rgba(0,0,0,0.5)', // ponytail: overlay on photo, no theme token
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.cardRadius,
+  bottomBar: {
+    position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: spacing.s10,
+    paddingHorizontal: spacing.lg, paddingTop: spacing.xl, backgroundColor: SCRIM_BOTTOM,
   },
-
-  iconBtn: {
-    position: 'absolute',
-    width: spacing.huge, height: spacing.huge, borderRadius: radius.r20,
-    backgroundColor: 'rgba(0,0,0,0.5)', // ponytail: overlay on photo, no theme token
-    alignItems: 'center', justifyContent: 'center',
-  },
-  btnPressed: { opacity: 0.85 },
-  shareBtn: { left: spacing.lg },
-  closeBtn: { right: spacing.lg },
-
-  caption: {
-    position: 'absolute', left: spacing.lg, right: spacing.lg, alignItems: 'center',
-  },
+  btn: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, backgroundColor: GLASS_BTN, alignItems: 'center', justifyContent: 'center' },
+  btnSpacer: { width: TOUCH },
+  hint: { marginTop: spacing.s2 },
 });
