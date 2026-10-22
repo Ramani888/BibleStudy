@@ -653,6 +653,24 @@ export const MegaphoneIcon: IconComponent = ({ size, color = DEFAULT_COLOR, stro
   </Outline>
 );
 
+export const MailIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M5.5 5.5h13A2.5 2.5 0 0 1 21 8v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16V8a2.5 2.5 0 0 1 2.5-2.5zM3.5 7l8.5 6.5L20.5 7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const FlagIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M5 21V4h11l-1.5 4L16 12H5" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const ShieldIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 3l7 3v6c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
 /** Three dots in a row (folder tile menu). */
 export const MoreHorizontalIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
   <Outline size={size}>

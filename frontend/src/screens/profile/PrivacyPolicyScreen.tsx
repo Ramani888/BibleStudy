@@ -1,95 +1,105 @@
-import React from 'react';
-import { ScrollView, StyleSheet, View } from 'react-native';
+import React, { useState } from 'react';
+import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
-
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, { FadeInUp, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
-import { Typography } from '../../components/ui';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
+
+import { QMBackButton, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { ChevronDownIcon, LeafIcon } from '../../components/icons';
 import { radius, spacing, useTheme } from '../../theme';
 
-const LAST_UPDATED = 'August 2026';
+// Bump with every change to the policy text below (and the website's privacy.html).
+const LAST_UPDATED = new Date(2026, 9, 22);
+const CONTACT = 'ddtechservices.work@gmail.com';
+const SHORT = ['short1', 'short2', 'short3', 'short4', 'short5', 'short6'] as const;
+const SECTIONS = ['s1', 's2', 's3', 's4', 's5', 's6', 's7', 's8'] as const;
+const ROW_H = 56;
 
-interface SectionProps {
-  title: string;
-  body: string;
+function Chevron({ open }: { open: boolean }) {
+  const { qm } = useTheme();
+  const spin = useAnimatedStyle(() => ({ transform: [{ rotate: withTiming(open ? '180deg' : '0deg', { duration: 300 }) }] }), [open]);
+  return <Animated.View style={spin}><ChevronDownIcon size={18} color={qm.muted} strokeWidth={2} /></Animated.View>;
 }
 
-function Section({ title, body }: SectionProps) {
-  const { colors } = useTheme();
+/** Shown from Settings / About / Plans and, signed out, from Login + Register (AuthNavigator). */
+export function PrivacyPolicyScreen() {
+  const { t, i18n } = useTranslation(['profile', 'common']);
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const navigation = useNavigation();
+  const [open, setOpen] = useState<number>(2);
+  const updated = LAST_UPDATED.toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' });
+
   return (
-    <View style={[styles.card, { backgroundColor: colors.surface }]}>
-      <Typography preset="label" color={colors.textPrimary} style={styles.sectionTitle}>
-        {title}
-      </Typography>
-      <Typography preset="body" color={colors.textSecondary} style={styles.body}>
-        {body}
-      </Typography>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: insets.bottom + spacing.xxxl }]} showsVerticalScrollIndicator={false}>
+        <QMBackButton onPress={navigation.goBack} label={t('profile:qmPrivacy.back')} />
+        <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmPrivacy.title')}</Typography>
+        <Typography preset="qmBody" color={qm.muted}>{t('profile:qmPrivacy.updated', { date: updated })}</Typography>
+
+        <Animated.View entering={qmRowEnter(0)}>
+          <LinearGradient colors={qm.hero as unknown as string[]} locations={[0, 0.55, 1]} start={{ x: 0.18, y: 0 }} end={{ x: 0.82, y: 1 }} style={styles.hero}>
+            <Typography preset="qmBarTitle" color={qm.heroInk}>{t('profile:qmPrivacy.shortTitle')}</Typography>
+            <View style={styles.shortList}>
+              {SHORT.map(k => (
+                <View key={k} style={styles.shortRow}>
+                  <View style={styles.leaf}><LeafIcon size={16} color={qm.leaf} filled /></View>
+                  <Typography preset="qmBodyMd" color={qm.heroInk} style={styles.flex}>{t(`profile:qmPrivacy.${k}`)}</Typography>
+                </View>
+              ))}
+            </View>
+          </LinearGradient>
+        </Animated.View>
+
+        <Typography preset="qmLabel" color={qm.muted} style={styles.section}>{t('profile:qmPrivacy.full')}</Typography>
+        <Animated.View entering={qmRowEnter(1)} style={[styles.card, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+          {SECTIONS.map((k, i) => {
+            const isOpen = open === i;
+            return (
+              <View key={k} style={i > 0 && { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: qm.hair }}>
+                <AnimatedPressable
+                  scaleTo={0.99}
+                  onPress={() => setOpen(isOpen ? -1 : i)}
+                  style={styles.secHead}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: isOpen }}
+                >
+                  <Typography preset="qmBodyLg" color={qm.ink} style={styles.flex}>{t(`profile:qmPrivacy.${k}Title`)}</Typography>
+                  <Chevron open={isOpen} />
+                </AnimatedPressable>
+                {isOpen && (
+                  <Animated.View entering={FadeInUp.duration(320)}>
+                    <Typography preset="qmBodyMd" color={qm.body} style={styles.secBody}>{t(`profile:qmPrivacy.${k}`)}</Typography>
+                  </Animated.View>
+                )}
+              </View>
+            );
+          })}
+        </Animated.View>
+
+        <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.contact}>
+          {t('profile:qmPrivacy.questions')}
+          <Typography preset="qmChip" color={qm.link} onPress={() => Linking.openURL(`mailto:${CONTACT}`)} accessibilityRole="link">{CONTACT}</Typography>
+        </Typography>
+      </ScrollView>
     </View>
   );
 }
 
-export function PrivacyPolicyScreen() {
-  const { t } = useTranslation(['profile', 'common']);
-  const { colors } = useTheme();
-  const navigation = useNavigation();
-
-  return (
-    <Screen edges={['top']} header={<ScreenHeader title={t('profile:settings.privacyPolicy')} onBack={() => navigation.goBack()} />}>
-      <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-
-        <Typography preset="caption" color={colors.textSecondary} style={styles.updated}>
-          {t('profile:legal.lastUpdated', { date: LAST_UPDATED, defaultValue: `Last updated: ${LAST_UPDATED}` })}
-        </Typography>
-
-        <Section
-          title={t('profile:legal.privacySec1Title', 'Information We Collect')}
-          body={t('profile:legal.privacySec1Body', 'We collect your name, email address, and the content you create (flashcard sets, notes, and study plans) to provide our service. We also collect anonymous usage analytics to improve the app.')}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec2Title', 'How We Use Your Data')}
-          body={t('profile:legal.privacySec2Body', "Your data is used solely to deliver Verdance's features — generating AI responses, syncing your study progress, and enabling social features like friend leaderboards. We never sell your personal information.")}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec3Title', 'AI Processing')}
-          body={t('profile:legal.privacySec3Body', 'Text you send to the AI chat is processed by third-party AI providers (OpenRouter / Anthropic Claude) to generate responses. Media files (images, PDFs) are sent to Anthropic Claude for analysis. These providers operate under their own privacy policies.')}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec4Title', 'Data Storage')}
-          body={t('profile:legal.privacySec4Body', 'Your data is stored securely on our servers. Passwords are hashed and never stored in plain text. We use industry-standard encryption for data in transit (TLS) and at rest.')}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec5Title', 'Data Retention & Deletion')}
-          body={t('profile:legal.privacySec5Body', 'You can delete your account at any time from Settings → Delete Account. This permanently removes all your personal data, sets, cards, notes, and media within 30 days.')}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec6Title', 'Third-Party Services')}
-          body={t('profile:legal.privacySec6Body', 'We use Apple In-App Purchase for subscriptions, Firebase Cloud Messaging for push notifications, and AI providers for chat features. Each service has its own privacy policy governing how they handle data.')}
-        />
-
-        <Section
-          title={t('profile:legal.privacySec7Title', 'Contact Us')}
-          body={t('profile:legal.privacySec7Body', "For privacy-related questions or data requests, contact us at:\nddtechservices.work@gmail.com")}
-        />
-
-      </ScrollView>
-    </Screen>
-  );
-}
-
 const styles = StyleSheet.create({
-  scroll: { padding: spacing.lg, gap: spacing.s14, paddingBottom: spacing.s48 },
-  updated: { textAlign: 'center', marginBottom: spacing.xs },
-  card: {
-    borderRadius: radius.md,
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  sectionTitle: { marginBottom: spacing.xs },
-  body: { lineHeight: 22 },
+  flex: { flex: 1, minWidth: 0 },
+  content: { paddingHorizontal: spacing.xl },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.xs },
+  hero: { marginTop: spacing.lg, padding: spacing.s18, borderRadius: radius.r20 + 2 },
+  shortList: { gap: spacing.s10, marginTop: spacing.md },
+  shortRow: { flexDirection: 'row', gap: spacing.s10 },
+  leaf: { marginTop: spacing.s3 },
+  section: { marginTop: spacing.xxl, marginBottom: spacing.sm, marginHorizontal: spacing.xs },
+  card: { borderRadius: radius.r20, paddingHorizontal: spacing.lg },
+  secHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10, minHeight: ROW_H },
+  secBody: { marginBottom: spacing.lg },
+  contact: { marginTop: spacing.lg, marginHorizontal: spacing.s6 },
 });
