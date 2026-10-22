@@ -1,130 +1,161 @@
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated from 'react-native-reanimated';
+import Svg, { Circle } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
+
+import { QMAddButton, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { ChevronLeftIcon, LeafIcon, PlanIcon, RefreshIcon, SearchIcon } from '../../components/icons';
+import { usePlans, useManualRefresh } from '../../hooks';
+import { useTheme, spacing, radius } from '../../theme';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
-import { usePlans, useManualRefresh, useSearchToggle } from '../../hooks';
-import { Screen, ScreenHeader, SearchBar } from '../../components/ui';
-import { Typography } from '../../components/ui/Typography';
-import { ProgressBar } from '../../components/ui/ProgressBar';
-import { EmptyState } from '../../components/feedback/EmptyState';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { PlusIcon, BookIcon, SearchIcon } from '../../components/icons';
-import { CARD_FILL_LIGHT, layout, spacing, useTheme } from '../../theme';
 
-const ICON_SIZE = 20;
+const TOUCH = 44;
+const RING = 56;
+const RING_R = 22;
+const RING_W = 6;
+const RING_LEN = 2 * Math.PI * RING_R;
 
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
   const { t } = useTranslation(['library', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
   const { data: plans = [], isLoading, error, refetch } = usePlans();
   const { refreshing, onRefresh } = useManualRefresh(refetch);
-  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+  const [search, setSearch] = useState('');
 
-  const filteredPlans = useMemo(() => {
-    if (!search.trim()) return plans;
-    const q = search.trim().toLowerCase();
-    return plans.filter(p =>
-      p.title.toLowerCase().includes(q) ||
-      (p.description ?? '').toLowerCase().includes(q),
-    );
-  }, [plans, search]);
+  const q = search.trim().toLowerCase();
+  const filtered = useMemo(
+    () => (q ? plans.filter(p => p.title.toLowerCase().includes(q) || (p.description ?? '').toLowerCase().includes(q)) : plans),
+    [plans, q],
+  );
+  const newPlan = useCallback(() => navigation.navigate('CreatePlan'), [navigation]);
 
-  const handleNavCreatePlan = useCallback(() => navigation.navigate('CreatePlan'), [navigation]);
-
-  const renderItem = useCallback(({ item }: { item: PlanListItem }) => {
+  const renderItem = useCallback(({ item, index }: { item: PlanListItem; index: number }) => {
     const pct = item.totalSteps > 0 ? item.completedSteps / item.totalSteps : 0;
+    const done = item.totalSteps > 0 && item.completedSteps === item.totalSteps;
     return (
-      <Pressable
-        style={({ pressed }) => [
-          styles.card,
-          { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.cardBorder },
-          pressed && styles.cardPressed,
-        ]}
-        onPress={() => navigation.navigate('PlanDetail', { planId: item.id })}
-      >
-        <Typography preset="h4" numberOfLines={1}>{item.title}</Typography>
-        {!!item.description && (
-          <Typography preset="caption" color={colors.textSecondary} numberOfLines={2}>{item.description}</Typography>
-        )}
-        <View style={styles.progressRow}>
-          <ProgressBar progress={pct} color={colors.accent} style={styles.bar} />
-          <Typography preset="caption" color={colors.textSecondary}>
-            {item.completedSteps}/{item.totalSteps}
-          </Typography>
-        </View>
-      </Pressable>
+      <Animated.View entering={qmRowEnter(index)}>
+        <AnimatedPressable
+          scaleTo={0.98}
+          onPress={() => navigation.navigate('PlanDetail', { planId: item.id })}
+          style={[styles.card, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}
+          accessibilityRole="button"
+          accessibilityLabel={item.title}
+        >
+          <View style={styles.ring}>
+            <Svg width={RING} height={RING} style={styles.ringSvg}>
+              <Circle cx={RING / 2} cy={RING / 2} r={RING_R} stroke={qm.lilac} strokeWidth={RING_W} fill="none" />
+              <Circle
+                cx={RING / 2} cy={RING / 2} r={RING_R}
+                stroke={done ? qm.leaf : qm.violet} strokeWidth={RING_W} fill="none" strokeLinecap="round"
+                strokeDasharray={RING_LEN} strokeDashoffset={RING_LEN * (1 - pct)}
+              />
+            </Svg>
+            {done
+              ? <LeafIcon size={22} color={qm.leaf} />
+              : <Typography preset="qmTag" color={qm.ink} style={styles.pct}>{Math.round(pct * 100)}%</Typography>}
+          </View>
+          <View style={styles.flex}>
+            <Typography preset="qmRowTitle" color={qm.ink} style={styles.title}>{item.title}</Typography>
+            {item.description ? <Typography preset="qmBody" color={qm.muted} numberOfLines={2} style={styles.desc}>{item.description}</Typography> : null}
+            <Typography preset="qmLabel" color={done ? qm.leafText : qm.link} style={styles.steps}>
+              {done
+                ? t('library:qm.planComplete', 'Plan complete')
+                : t('library:qm.stepsDone', { done: item.completedSteps, total: item.totalSteps, defaultValue: `${item.completedSteps} of ${item.totalSteps} steps done` })}
+            </Typography>
+          </View>
+        </AnimatedPressable>
+      </Animated.View>
     );
-  }, [navigation, isDark, colors]);
+  }, [navigation, qm, t]);
+
+  const header = (
+    <View style={{ paddingTop: insets.top + spacing.sm }}>
+      <View style={styles.topRow}>
+        <Pressable onPress={navigation.goBack} style={({ pressed }) => [styles.back, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('common:actions.back', 'Back')}>
+          <ChevronLeftIcon size={20} color={qm.ink} />
+        </Pressable>
+        <QMAddButton onPress={newPlan} label={t('library:qm.newPlanA11y', 'Create a study plan')} />
+      </View>
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('library:qm.plansTitle', 'Study plans')}</Typography>
+      <Typography preset="qmBodyMd" color={qm.muted}>{t('library:qm.plansSub', 'A guided path through your sets, one step at a time.')}</Typography>
+      {plans.length > 0 && (
+        <View style={styles.search}>
+          <QMSearchField value={search} onChangeText={setSearch} placeholder={t('library:qm.searchPlans', 'Search your plans')} />
+        </View>
+      )}
+      <View style={styles.headerEnd} />
+    </View>
+  );
+
+  let empty: React.ReactElement | null = null;
+  if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
+  else if (error) {
+    empty = (
+      <QMEmpty style={styles.emptyGap} icon={RefreshIcon}
+        title={t('library:qm.plansFailedTitle', 'Your plans did not load')}
+        text={t('library:qm.loadFailedText', 'Check your connection, then try again.')}
+        action={{ label: t('library:qm.tryAgain', 'Try again'), onPress: onRefresh }} />
+    );
+  } else if (!plans.length) {
+    empty = (
+      <QMEmpty style={styles.emptyGap} icon={PlanIcon}
+        title={t('library:plans.emptyTitle', 'No study plans yet')}
+        text={t('library:qm.plansEmptyText', 'A plan walks you through your sets in order, one step at a time.')}
+        action={{ label: t('library:qm.firstPlan', 'Make your first plan'), onPress: newPlan }} />
+    );
+  } else if (!filtered.length) {
+    empty = (
+      <QMEmpty style={styles.emptyGap} icon={SearchIcon}
+        title={t('library:qm.noPlansMatch', 'No plans match')}
+        text={t('library:qm.noMatchText', { query: search.trim() })}
+        action={{ label: t('library:qm.clearSearch', 'Clear search'), onPress: () => setSearch('') }} />
+    );
+  }
 
   return (
-    <Screen
-      header={
-        <ScreenHeader
-          title={t('library:studyPlans.title')}
-          onBack={navigation.goBack}
-          right={
-            <View style={styles.headerRight}>
-              <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                <SearchIcon size={ICON_SIZE} color={searchVisible ? colors.accent : colors.textSecondary} />
-              </Pressable>
-              <Pressable onPress={handleNavCreatePlan} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                <PlusIcon size={22} color={colors.accent} />
-              </Pressable>
-            </View>
-          }
-        />
-      }
-    >
-      {searchVisible && (
-        <View style={styles.searchWrap}>
-          <SearchBar value={search} onChangeText={setSearch} placeholder={t('library:plans.searchPlaceholder', 'Search plans…')} autoFocus />
-        </View>
-      )}
-      {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
-      ) : error ? (
-        <ErrorState onRetry={refetch} />
-      ) : filteredPlans.length === 0 ? (
-        <View style={styles.centered}>
-          <EmptyState
-            icon={<BookIcon size={48} color={colors.accent} />}
-            title={search ? t('common:status.noResults', 'No results') : t('library:plans.emptyTitle', 'No study plans yet')}
-            subtitle={search ? t('common:status.noMatchFor', { query: search, defaultValue: `No plans match "${search}"` }) : t('library:plans.emptySub', 'Tap + to create a guided path through your sets.')}
-          />
-        </View>
-      ) : (
-        <View style={styles.flex}>
-        <FlatList
-          data={filteredPlans}
-          keyExtractor={p => p.id}
-          renderItem={renderItem}
-          contentContainerStyle={styles.list}
-          showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.accent} />}
-        />
-        </View>
-      )}
-    </Screen>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <FlatList
+        data={isLoading || error ? [] : filtered}
+        keyExtractor={p => p.id}
+        renderItem={renderItem}
+        ListHeaderComponent={header}
+        ListEmptyComponent={empty}
+        ItemSeparatorComponent={Separator}
+        contentContainerStyle={styles.content}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />}
+      />
+    </View>
   );
 }
 
+function Separator() {
+  return <View style={styles.sep} />;
+}
+
 const styles = StyleSheet.create({
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  flex: { flex: 1 },
-  headerRight: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
-  list: { padding: layout.screenPaddingH, gap: spacing.md },
-  card: {
-    borderRadius: layout.cardRadius,
-    borderWidth: 1,
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  cardPressed: { opacity: 0.7 },
-  iconPressed: { opacity: 0.85 },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: spacing.xs },
-  bar: { flex: 1 },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl },
+  topRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  back: { width: TOUCH, height: TOUCH, marginLeft: -spacing.s10, alignItems: 'center', justifyContent: 'center' },
+  h1: { marginTop: spacing.s10, marginBottom: spacing.xs },
+  search: { marginTop: spacing.lg },
+  headerEnd: { height: spacing.lg },
+  sep: { height: spacing.md },
+  card: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg, padding: spacing.lg, borderRadius: radius.r21 + 1, marginTop: 0 },
+  ring: { width: RING, height: RING, alignItems: 'center', justifyContent: 'center' },
+  ringSvg: { position: 'absolute', transform: [{ rotate: '-90deg' }] },
+  pct: { fontSize: 13 },
+  title: { fontSize: 18, lineHeight: 23 },
+  desc: { marginTop: spacing.s3 },
+  steps: { marginTop: spacing.sm },
+  loading: { marginTop: spacing.huge },
+  emptyGap: { marginTop: spacing.s48 },
 });

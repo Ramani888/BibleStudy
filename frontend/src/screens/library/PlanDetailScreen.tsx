@@ -1,48 +1,50 @@
-import React, { useCallback } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Share, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import LinearGradient from 'react-native-linear-gradient';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-
 import { useTranslation } from 'react-i18next';
-import type { LibraryScreenProps } from '../../navigation/types';
-import type { PlanStep } from '../../types';
-import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog, useReferral } from '../../hooks';
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { Typography } from '../../components/ui/Typography';
-import { ProgressBar } from '../../components/ui/ProgressBar';
-import { ErrorState } from '../../components/feedback/ErrorState';
-import { ConfirmDialog } from '../../components/feedback';
-import { CheckCircleIcon, ShareIcon, TrashIcon } from '../../components/icons';
+
+import { QMButton, QMConfirmDialog, QMEmpty, QMSheet, type QMSheetAction } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { AskIcon, CheckIcon, ChevronLeftIcon, LeafIcon, RefreshIcon, ShareUpIcon, TrashIcon } from '../../components/icons';
+import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog, useReferral, useManualRefresh } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { shareToWhatsApp, buildReferralLink } from '../../utils';
-import { layout, radius, spacing, useTheme } from '../../theme';
+import { useTheme, spacing, radius, mixHex } from '../../theme';
+import type { LibraryScreenProps } from '../../navigation/types';
+import type { PlanStep } from '../../types';
+
+const TOUCH = 44;
+const CHECK = 36;
+const TRACK_H = 8;
+const FROST = { light: 'rgba(255,255,255,0.6)', dark: 'rgba(0,0,0,0.22)' } as const;
 
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
   const { t } = useTranslation(['library', 'common']);
+  const { qm, name: themeName } = useTheme();
+  const dark = themeName === 'dark';
+  const insets = useSafeAreaInsets();
   const { planId } = route.params;
-  const { colors } = useTheme();
   const { data: plan, isLoading, error, refetch } = usePlan(planId);
+  const { refreshing, onRefresh } = useManualRefresh(refetch);
   const toggleStep = useToggleStep(planId);
   const deletePlan = useDeletePlan();
   const { show, dialogProps } = useConfirmDialog();
   const { data: referral } = useReferral();
+  const [shareOpen, setShareOpen] = useState(false);
 
-  const handleShare = useCallback(() => {
-    if (!plan) return;
-    shareToWhatsApp(
-      t('library:plans.shareMessage', {
-        title: plan.title,
-        url: buildReferralLink(referral?.code),
-        defaultValue: 'Studying "{{title}}" on Verdance 📖 Want to join me? {{url}}',
-      }),
-      'plan',
-    );
-  }, [plan, referral?.code, t]);
+  const shareText = useCallback(() => (plan ? t('library:plans.shareMessage', {
+    title: plan.title,
+    url: buildReferralLink(referral?.code),
+    defaultValue: 'Studying "{{title}}" on Verdance 📖 Want to join me? {{url}}',
+  }) : ''), [plan, referral?.code, t]);
 
   const handleDelete = useCallback(() => {
     show({
-      title: t('library:plans.deletePlanTitle', 'Delete plan?'),
-      message: t('library:plans.deletePlanMessage', 'This removes the plan and its progress. Your sets are not affected.'),
+      title: t('library:qm.deletePlanTitle', 'Delete this plan?'),
+      message: t('library:qm.deletePlanMessage', 'Your sets stay in your library. Only the plan goes.'),
       confirmLabel: t('common:actions.delete'),
       variant: 'danger',
       onConfirm: () =>
@@ -53,96 +55,178 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
     });
   }, [show, deletePlan, planId, navigation, t]);
 
-  const renderStep = (step: PlanStep, index: number) => (
-    <View key={step.id} style={[styles.step, { borderBottomColor: colors.border }]}>
-      <Pressable
-        onPress={() => toggleStep.mutate({ stepId: step.id, completed: step.completed })}
-        hitSlop={8}
-        disabled={toggleStep.isPending}
-        style={({ pressed }) => pressed && styles.iconPressed}
-      >
-        {step.completed
-          ? <CheckCircleIcon size={26} color={colors.success} />
-          : <View style={[styles.emptyCircle, { borderColor: colors.textDisabled }]} />}
-      </Pressable>
-      <Pressable
-        style={({ pressed }) => [styles.stepBody, step.set && pressed && styles.rowPressed]}
-        onPress={() =>
-          step.set
-            ? navigation.navigate('SetDetail', { setId: step.set.id, setTitle: step.set.title, isOwner: true })
-            : undefined
-        }
-        disabled={!step.set}
-      >
-        <Typography preset="body" numberOfLines={1} color={step.completed ? colors.textSecondary : colors.textPrimary}>
-          {index + 1}. {step.title || step.set?.title || t('library:sets.setRemoved', 'Set removed')}
-        </Typography>
-        {step.set && (
-          <Typography preset="caption" color={colors.textSecondary}>{t('library:cards.cardCount', { count: step.set.cardCount, defaultValue: `${step.set.cardCount} cards` })}</Typography>
-        )}
-      </Pressable>
-    </View>
+  const openSet = useCallback((step: PlanStep) => {
+    if (step.set) navigation.navigate('SetDetail', { setId: step.set.id, setTitle: step.set.title, isOwner: true });
+  }, [navigation]);
+
+  const shareActions: QMSheetAction[] = [
+    { label: t('library:qm.shareWhatsApp', 'Share on WhatsApp'), icon: AskIcon, onPress: () => shareToWhatsApp(shareText(), 'plan') },
+    { label: t('library:qm.shareMore', 'More ways to share'), icon: ShareUpIcon, onPress: () => { Share.share({ message: shareText() }).catch(() => {}); } },
+  ];
+
+  const frost = dark ? FROST.dark : FROST.light;
+  const roundBtn = (onPress: () => void, label: string, icon: React.ReactNode) => (
+    <Pressable onPress={onPress} style={({ pressed }) => [styles.round, { backgroundColor: frost }, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={label}>
+      {icon}
+    </Pressable>
   );
 
+  if (isLoading || error || !plan) {
+    return (
+      <View style={[styles.flex, { backgroundColor: qm.bg, paddingTop: insets.top + spacing.sm }]}>
+        <View style={styles.pad}>{roundBtn(navigation.goBack, t('common:actions.back', 'Back'), <ChevronLeftIcon size={20} color={qm.ink} />)}</View>
+        {isLoading
+          ? <ActivityIndicator color={qm.violet} style={styles.loading} />
+          : <QMEmpty style={styles.loading} icon={RefreshIcon}
+              title={t('library:qm.planFailedTitle', 'This plan did not load')}
+              text={t('library:qm.loadFailedText', 'Check your connection, then try again.')}
+              action={{ label: t('library:qm.tryAgain', 'Try again'), onPress: () => refetch() }} />}
+      </View>
+    );
+  }
+
+  const total = plan.totalSteps;
+  const count = plan.completedSteps;
+  const complete = total > 0 && count === total;
+  const pct = total ? count / total : 0;
+  const nextIdx = plan.steps.findIndex(s => !s.completed && !!s.set);
+  const next = nextIdx >= 0 ? plan.steps[nextIdx] : null;
+
   return (
-    <Screen
-      header={
-        <ScreenHeader
-          title={plan?.title ?? t('library:plans.plan', 'Plan')}
-          onBack={navigation.goBack}
-          right={
-            <View style={styles.headerActions}>
-              <Pressable onPress={handleShare} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                <ShareIcon size={20} color={colors.textSecondary} />
-              </Pressable>
-              <Pressable onPress={handleDelete} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                <TrashIcon size={20} color={colors.textSecondary} />
-              </Pressable>
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />}
+      >
+        <View style={[styles.hero, { paddingTop: insets.top + spacing.sm }]}>
+          <LinearGradient colors={[...qm.verse]} start={{ x: 0, y: 0 }} end={{ x: 0.6, y: 1 }} style={StyleSheet.absoluteFill} />
+          <View style={styles.heroBar}>
+            {roundBtn(navigation.goBack, t('common:actions.back', 'Back'), <ChevronLeftIcon size={20} color={qm.verseInk} />)}
+            <View style={styles.heroBtns}>
+              {roundBtn(() => setShareOpen(true), t('library:qm.sharePlan', 'Share plan'), <ShareUpIcon size={19} color={qm.verseInk} strokeWidth={2} />)}
+              {roundBtn(handleDelete, t('library:qm.deletePlan', 'Delete plan'), <TrashIcon size={19} color={qm.verseInk} strokeWidth={2} />)}
             </View>
-          }
-        />
-      }
-    >
-      {isLoading ? (
-        <View style={styles.centered}><ActivityIndicator color={colors.accent} /></View>
-      ) : error || !plan ? (
-        <ErrorState onRetry={refetch} />
-      ) : (
-        <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-          <View>
-          {!!plan.description && (
-            <Typography preset="body" color={colors.textSecondary} style={styles.desc}>{plan.description}</Typography>
+          </View>
+          <View style={styles.heroText}>
+            <Typography preset="qmPageTitle" color={qm.verseInk}>{plan.title}</Typography>
+            {plan.description ? <Typography preset="qmBodyMd" color={qm.body} style={styles.desc}>{plan.description}</Typography> : null}
+            <View style={styles.progressHead}>
+              <Typography preset="qmLink" color={qm.verseInk}>{t('library:qm.yourProgress', 'Your progress')}</Typography>
+              <Typography preset="qmLink" color={qm.verseInk}>{t('library:qm.stepsOf', { done: count, total, defaultValue: `${count} of ${total} steps` })}</Typography>
+            </View>
+            <View style={[styles.track, { backgroundColor: mixHex(qm.violet, qm.verse[1], dark ? 0.2 : 0.15) }]}>
+              <View style={[styles.fill, { width: `${pct * 100}%`, backgroundColor: complete ? qm.leaf : qm.violet }]} />
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.body}>
+          {complete && (
+            <Animated.View entering={ZoomIn.springify().damping(14)} style={[styles.party, { backgroundColor: qm.leafBg }]}>
+              <LeafIcon size={28} color={qm.leaf} filled />
+              <View style={styles.flex}>
+                <Typography preset="qmSheetTitle" color={qm.leafText}>{t('library:qm.planComplete', 'Plan complete')}</Typography>
+                <Typography preset="qmBody" color={qm.body}>{t('library:qm.planCompleteText', 'You finished every step. Well done.')}</Typography>
+              </View>
+            </Animated.View>
           )}
-          <View style={styles.progressRow}>
-            <ProgressBar progress={plan.totalSteps > 0 ? plan.completedSteps / plan.totalSteps : 0} color={colors.accent} style={styles.bar} />
-            <Typography preset="label" color={colors.accent}>{plan.completedSteps}/{plan.totalSteps}</Typography>
-          </View>
-          {plan.completedSteps === plan.totalSteps && plan.totalSteps > 0 && (
-            <Typography preset="bodySm" color={colors.success} style={styles.done}>{t('library:plans.planComplete', '🎉 Plan complete!')}</Typography>
+          {next?.set && (
+            <View style={[styles.next, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+              <Typography preset="qmLabel" color={qm.link}>{t('library:qm.upNext', { n: nextIdx + 1, defaultValue: `Up next: step ${nextIdx + 1}` })}</Typography>
+              <Typography preset="qmSheetTitle" color={qm.ink} style={styles.nextTitle}>{next.title || next.set.title}</Typography>
+              <Typography preset="qmBody" color={qm.muted}>{t('library:cards.cardCount', { count: next.set.cardCount })}</Typography>
+              <QMButton label={t('library:qm.openThisSet', 'Open this set')} onPress={() => openSet(next)} style={styles.nextBtn} />
+            </View>
           )}
-          </View>
+
+          <Typography preset="qmSection" color={qm.ink} style={styles.stepsH}>{t('library:qm.steps', 'Steps')}</Typography>
           <View>
-          <View style={styles.steps}>{plan.steps.map(renderStep)}</View>
+            <View style={[styles.rail, { backgroundColor: qm.line }]} />
+            {plan.steps.map((step, i) => {
+              const done = step.completed;
+              const isNext = i === nextIdx;
+              const removed = !step.set;
+              return (
+                <View key={step.id} style={styles.stepRow}>
+                  <Pressable
+                    onPress={() => toggleStep.mutate({ stepId: step.id, completed: step.completed })}
+                    disabled={toggleStep.isPending}
+                    hitSlop={6}
+                    style={[styles.check, {
+                      borderColor: done ? qm.leaf : isNext ? qm.violet : qm.line,
+                      backgroundColor: done ? qm.leaf : qm.bg,
+                    }]}
+                    accessibilityRole="checkbox"
+                    accessibilityState={{ checked: done }}
+                    accessibilityLabel={t('library:qm.markStep', { n: i + 1, defaultValue: `Mark step ${i + 1} as done` })}
+                  >
+                    {done
+                      ? <Animated.View entering={ZoomIn.springify().damping(10)}><CheckIcon size={16} color={qm.onViolet} strokeWidth={3} /></Animated.View>
+                      : <Typography preset="qmTag" color={isNext ? qm.link : qm.muted} style={styles.stepN}>{i + 1}</Typography>}
+                  </Pressable>
+                  <AnimatedPressable
+                    scaleTo={0.98}
+                    disabled={removed}
+                    onPress={() => openSet(step)}
+                    style={[
+                      styles.stepCard,
+                      isNext ? { backgroundColor: qm.lilac } : { backgroundColor: qm.surface, boxShadow: qm.cardShadow },
+                      removed ? styles.removed : done ? styles.doneRow : null,
+                    ]}
+                    accessibilityRole="button"
+                  >
+                    <Typography preset="qmButton" color={qm.ink} numberOfLines={1} style={done && [styles.strike, { textDecorationColor: qm.muted }]}>
+                      {removed ? t('library:sets.setRemoved', 'Set removed') : step.title || step.set?.title}
+                    </Typography>
+                    <Typography preset="qmMeta" color={qm.muted} style={styles.stepMeta}>
+                      {removed ? t('library:qm.setWasDeleted', 'This set was deleted') : t('library:cards.cardCount', { count: step.set?.cardCount ?? 0 })}
+                    </Typography>
+                  </AnimatedPressable>
+                </View>
+              );
+            })}
           </View>
-        </ScrollView>
-      )}
-      <ConfirmDialog {...dialogProps} />
-    </Screen>
+        </View>
+      </ScrollView>
+
+      <QMSheet visible={shareOpen} onClose={() => setShareOpen(false)} title={t('library:qm.sharePlanTitle', 'Share this plan')} sub={plan.title} actions={shareActions} />
+      <QMConfirmDialog {...dialogProps} />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  scroll: { padding: layout.screenPaddingH, paddingBottom: spacing.xxxl },
-  desc: { marginBottom: spacing.md },
-  progressRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, marginBottom: spacing.sm },
-  bar: { flex: 1 },
-  done: { marginBottom: spacing.sm },
-  steps: { marginTop: spacing.md, gap: spacing.xs },
-  step: { flexDirection: 'row', alignItems: 'center', gap: spacing.md, paddingVertical: spacing.md, borderBottomWidth: 1 },
-  stepBody: { flex: 1, gap: spacing.s2 },
-  emptyCircle: { width: spacing.xxl, height: spacing.xxl, borderRadius: radius.r12, borderWidth: 2 },
-  iconPressed: { opacity: 0.85 },
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  rowPressed: { opacity: 0.7 },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  pad: { paddingHorizontal: spacing.lg },
+  loading: { marginTop: spacing.huge },
+  content: { paddingBottom: spacing.xxxl },
+  hero: {
+    paddingHorizontal: spacing.lg, paddingBottom: spacing.xxl, overflow: 'hidden',
+    borderBottomLeftRadius: radius.xl, borderBottomRightRadius: radius.xl,
+  },
+  heroBar: { flexDirection: 'row', justifyContent: 'space-between' },
+  heroBtns: { flexDirection: 'row', gap: spacing.sm },
+  round: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  heroText: { paddingTop: spacing.lg, paddingHorizontal: spacing.xs },
+  desc: { marginTop: spacing.sm },
+  progressHead: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.s18 },
+  track: { height: TRACK_H, borderRadius: TRACK_H / 2, overflow: 'hidden', marginTop: spacing.sm },
+  fill: { height: '100%', borderRadius: TRACK_H / 2 },
+  body: { paddingHorizontal: spacing.xl, paddingTop: spacing.xl, gap: spacing.md },
+  party: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, padding: spacing.s18, borderRadius: radius.r21 + 1 },
+  next: { padding: spacing.s18, borderRadius: radius.r21 + 1 },
+  nextTitle: { marginTop: spacing.s6 },
+  nextBtn: { marginTop: spacing.s14, height: 52, borderRadius: radius.md },
+  stepsH: { marginTop: spacing.md, fontSize: 16 },
+  rail: { position: 'absolute', left: CHECK / 2 - 1, top: spacing.xxl, bottom: spacing.xxl, width: 2 },
+  stepRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, paddingVertical: spacing.s6 },
+  check: { width: CHECK, height: CHECK, borderRadius: CHECK / 2, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  stepN: { fontSize: 13 },
+  stepCard: { flex: 1, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.md },
+  removed: { opacity: 0.55 },
+  doneRow: { opacity: 0.75 },
+  strike: { textDecorationLine: 'line-through' },
+  stepMeta: { marginTop: spacing.s2 },
 });

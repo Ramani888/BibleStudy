@@ -1,21 +1,26 @@
 import React, { useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-
 import { useTranslation } from 'react-i18next';
-import type { LibraryScreenProps } from '../../navigation/types';
+
+import { QMButton, QMEmpty, QMInput, QMModalScreen } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { CardsIcon } from '../../components/icons';
 import { useSets, useCreatePlan } from '../../hooks';
-import { Button, Screen, ScreenHeader } from '../../components/ui';
-import { Typography } from '../../components/ui/Typography';
-import { Input } from '../../components/ui/Input';
 import { getErrorMessage } from '../../api';
-import { useTheme, spacing, layout } from '../../theme';
+import { useTheme, spacing, radius, qmAccent } from '../../theme';
+import type { LibraryScreenProps } from '../../navigation/types';
 
-type Props = LibraryScreenProps<'CreatePlan'>;
+const BADGE = 32;
+const BAR_W = 10;
+const BAR_H = 36;
+const ROW_MIN_H = 60;
 
-export function CreatePlanScreen({ navigation }: Props) {
+export function CreatePlanScreen({ navigation }: LibraryScreenProps<'CreatePlan'>) {
   const { t } = useTranslation(['library', 'common']);
-  const { colors } = useTheme();
+  const { qm, name: themeName } = useTheme();
+  const dark = themeName === 'dark';
   const { data: sets = [], isLoading } = useSets();
   const createPlan = useCreatePlan();
 
@@ -26,7 +31,7 @@ export function CreatePlanScreen({ navigation }: Props) {
   const toggle = (id: string) =>
     setSelected(prev => (prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]));
 
-  const canSave = title.trim().length > 0 && selected.length > 0 && !createPlan.isPending;
+  const ready = title.trim().length > 0 && selected.length > 0;
 
   const handleSave = () => {
     createPlan.mutate(
@@ -41,92 +46,116 @@ export function CreatePlanScreen({ navigation }: Props) {
     );
   };
 
-  const header = <ScreenHeader title={t('library:plans.createPlan', 'Create Study Plan')} handle />;
-  const footer = (
-    <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label={t('library:plans.createPlan', 'Create Study Plan')} onPress={handleSave} disabled={!canSave} loading={createPlan.isPending} fullWidth />
-    </View>
-  );
-
   return (
-    <Screen header={header} footer={footer} edges={['top', 'bottom']} keyboardAvoiding>
-      <ScrollView
-        style={styles.flex}
-        contentContainerStyle={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.inputs}>
-          <Input placeholder={t('library:plans.titlePlaceholder', 'Plan title')} value={title} onChangeText={setTitle} maxLength={200} />
-          <Input placeholder={t('library:plans.descPlaceholder', 'Description (optional)')} value={description} onChangeText={setDescription} maxLength={1000} multiline style={styles.descInput} />
-        </View>
+    <QMModalScreen
+      title={t('library:qm.newPlan', 'New study plan')}
+      onCancel={navigation.goBack}
+      footer={(
+        <QMButton
+          label={ready ? t('library:qm.createPlanSteps', { count: selected.length }) : t('library:qm.createPlan', 'Create plan')}
+          onPress={handleSave}
+          off={!ready}
+          loading={createPlan.isPending}
+          style={styles.flex}
+        />
+      )}
+    >
+      <View style={styles.fields}>
+        <QMInput
+          label={t('library:qm.planName', 'Plan name')}
+          value={title}
+          onChangeText={setTitle}
+          maxLength={200}
+          placeholder={t('library:qm.planNamePlaceholder', 'e.g. Romans in 30 days')}
+          autoCapitalize="sentences"
+        />
+        <QMInput
+          label={t('library:sets.description', 'Description')}
+          optional={t('library:qm.optional', '(optional)')}
+          value={description}
+          onChangeText={setDescription}
+          maxLength={1000}
+          multiline
+          placeholder={t('library:qm.planDescPlaceholder', 'What is this plan for?')}
+          autoCapitalize="sentences"
+        />
+      </View>
 
-        <View>
-          <Typography preset="label" color={colors.textSecondary} style={styles.label}>
-            {t('library:plans.pickSetsInOrder', { count: selected.length, defaultValue: `Pick sets in order (${selected.length} selected)` })}
-          </Typography>
-        </View>
-
-        {isLoading ? (
-          <ActivityIndicator color={colors.accent} style={styles.loader} />
-        ) : sets.length === 0 ? (
-          <Typography preset="bodySm" color={colors.textSecondary} style={styles.empty}>
-            {t('library:sets.noSets', 'No sets yet — create some sets first.')}
-          </Typography>
-        ) : (
-          sets.map(set => {
-            const idx = selected.indexOf(set.id);
-            const isSel = idx >= 0;
-            return (
-              <Pressable
-                key={set.id}
-                style={({ pressed }) => [
-                  styles.setRow,
-                  { borderColor: isSel ? colors.accent : colors.border, backgroundColor: isSel ? colors.accentSoft : colors.surface },
-                  pressed && styles.rowPressed,
-                ]}
-                onPress={() => toggle(set.id)}
-              >
-                <View
+      {isLoading ? (
+        <ActivityIndicator color={qm.violet} style={styles.loading} />
+      ) : sets.length === 0 ? (
+        <QMEmpty
+          style={styles.empty}
+          icon={CardsIcon}
+          title={t('library:qm.needSetTitle', 'You need a set first')}
+          text={t('library:qm.needSetText', 'A plan is built from your sets. Make a set, then come back to plan your path.')}
+          action={{ label: t('library:qm.createSet', 'Create a set'), onPress: () => navigation.replace('CreateSet', {}) }}
+        />
+      ) : (
+        <>
+          <View style={styles.pickHead}>
+            <Typography preset="qmSection" color={qm.ink} style={styles.pickTitle}>{t('library:qm.pickSets', 'Pick your sets in order')}</Typography>
+            <Typography preset="qmBody" color={qm.muted}>{t('library:qm.selected', { count: selected.length, defaultValue: `${selected.length} selected` })}</Typography>
+          </View>
+          <Typography preset="qmBody" color={qm.muted} style={styles.pickHint}>{t('library:qm.pickHint', 'Tap sets in the order you want to study them. Tap again to remove.')}</Typography>
+          <View style={styles.list}>
+            {sets.map(set => {
+              const idx = selected.indexOf(set.id);
+              const on = idx >= 0;
+              const ink = qmAccent(qm, dark, set.color)[1];
+              const count = set._count?.cards ?? 0;
+              return (
+                <AnimatedPressable
+                  key={set.id}
+                  scaleTo={0.98}
+                  onPress={() => toggle(set.id)}
                   style={[
-                    styles.badge,
-                    isSel
-                      ? { backgroundColor: colors.accent }
-                      : { borderWidth: 1.5, borderColor: colors.border },
+                    styles.row,
+                    on
+                      ? { backgroundColor: qm.lilac, boxShadow: `inset 0px 0px 0px 2px ${qm.violet}` }
+                      : { backgroundColor: qm.surface, boxShadow: qm.cardShadow },
                   ]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on }}
+                  accessibilityLabel={on ? `${set.title}, ${t('library:qm.stepN', { n: idx + 1, defaultValue: `step ${idx + 1}` })}` : set.title}
                 >
-                  <Typography preset="caption" color={isSel ? colors.textOnAccent : colors.textSecondary}>
-                    {isSel ? idx + 1 : ''}
-                  </Typography>
-                </View>
-                <Typography preset="body" numberOfLines={1} style={styles.setTitle}>{set.title}</Typography>
-              </Pressable>
-            );
-          })
-        )}
-      </ScrollView>
-    </Screen>
+                  <View style={[styles.badge, on ? { backgroundColor: qm.violet } : [styles.badgeOff, { borderColor: qm.line }]]}>
+                    {on && (
+                      <Animated.View key={idx} entering={ZoomIn.springify().damping(10)}>
+                        <Typography preset="qmLabel" color={qm.onViolet}>{idx + 1}</Typography>
+                      </Animated.View>
+                    )}
+                  </View>
+                  <View style={[styles.bar, { backgroundColor: ink }]} />
+                  <View style={styles.flex}>
+                    <Typography preset="qmBodyLg" color={qm.ink} numberOfLines={1}>{set.title}</Typography>
+                    <Typography preset="qmMeta" color={qm.muted} style={styles.meta}>{t('library:cards.cardCount', { count })}</Typography>
+                  </View>
+                </AnimatedPressable>
+              );
+            })}
+          </View>
+        </>
+      )}
+    </QMModalScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
-  scroll: { padding: layout.screenPaddingH, gap: spacing.md },
-  inputs: { gap: spacing.md },
-  descInput: { minHeight: 72 }, // ponytail: off-grid Figma value
-  label: { marginTop: spacing.sm },
-  loader: { marginVertical: spacing.lg },
-  empty: { textAlign: 'center', marginVertical: spacing.lg },
-  setRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.md,
-    padding: spacing.md, borderRadius: layout.cardRadius, borderWidth: 1.5,
+  flex: { flex: 1, minWidth: 0 },
+  fields: { gap: spacing.lg },
+  loading: { marginTop: spacing.xxl },
+  empty: { marginTop: spacing.huge },
+  pickHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', marginTop: spacing.xxl },
+  pickTitle: { fontSize: 16 },
+  pickHint: { marginTop: spacing.xs, marginBottom: spacing.md },
+  list: { gap: spacing.sm },
+  row: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s14, minHeight: ROW_MIN_H,
+    paddingVertical: spacing.s10, paddingHorizontal: spacing.s14, borderRadius: radius.r18,
   },
-  rowPressed: { opacity: 0.7 },
-  badge: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' }, // ponytail: off-grid Figma values (26, 13)
-  setTitle: { flex: 1 },
-  footer: {
-    padding: layout.screenPaddingH,
-    paddingBottom: spacing.sm,
-    borderTopWidth: 1,
-  },
+  badge: { width: BADGE, height: BADGE, borderRadius: BADGE / 2, alignItems: 'center', justifyContent: 'center' },
+  badgeOff: { borderWidth: 2 },
+  bar: { width: BAR_W, height: BAR_H, borderRadius: radius.r5 },
+  meta: { marginTop: spacing.s2 },
 });
