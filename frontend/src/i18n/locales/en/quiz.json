@@ -251,6 +251,17 @@
     "clearSearch": "Clear search",
     "startNew": "Start a new quiz",
     "making": "Making your quiz…",
-    "makingSub": "This takes a few seconds"
+    "makingSub": "This takes a few seconds",
+    "deleteA11y": "Delete this quiz",
+    "correct": "correct",
+    "ringA11y": "{{pct}} percent correct",
+    "ofTotal": "{{correct}} of {{total}}",
+    "answeredRight": "answered right",
+    "timeSpent": "time spent",
+    "seconds": "{{count}} sec",
+    "minutes": "{{count}} min",
+    "firstTry": "First try",
+    "includingMissed": "Including the {{count}} you missed",
+    "retakeHint": "New questions · {{cost}} credits. You have {{balance}}."
   }
 }

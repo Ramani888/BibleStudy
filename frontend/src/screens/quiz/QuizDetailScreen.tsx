@@ -1,31 +1,44 @@
 import React, { useCallback } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import { useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
-import { Button, Screen, ScoreRing, Typography } from '../../components/ui';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { CalendarIcon, CheckCircleIcon, ClockIcon, ListIcon, TimerIcon, TrashIcon, TrophyIcon } from '../../components/icons';
-import { useConfirmDialog, useDeleteQuizAttempt, useQuizAttemptResponses, useReQuiz, useRecentQuizAttempts } from '../../hooks';
-import { ConfirmDialog } from '../../components/feedback';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Animated, { FadeInUp } from 'react-native-reanimated';
+import { useTranslation } from 'react-i18next';
+
+import { QMBackButton, QMButton, QMConfirmDialog, QMScoreRing } from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { CheckIcon, ChevronRightIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon } from '../../components/icons';
+import {
+  useConfirmDialog, useCreditBalance, useDeleteQuizAttempt, useQuizAttemptResponses, useReQuiz, useRecentQuizAttempts,
+} from '../../hooks';
 import { GeneratingQuizModal } from './components';
-import { fontSizes, fontWeights, useTheme, spacing, layout, CARD_FILL_LIGHT } from '../../theme';
-import { formatDate, formatDateWithTime, formatDuration } from '../../utils/formatters';
+import { useTheme, spacing, radius } from '../../theme';
+import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { SummaryItem } from '../../types';
-import { MODE_NAMES, scoreColor } from './quizUi';
+import { qmModeName, reQuizSource } from './quizUi';
 
-import { useTranslation } from 'react-i18next';
+const TOUCH = 44;
+const RING = 160;
+const RING_STROKE = 11;
+const AI_QUIZ_COST = 2;
+const ROW_H = 52;
+
 type Params = QuizStackParamList['QuizDetail'];
+
+const rise = (i: number) => FadeInUp.duration(320).delay(500 + i * 80);
 
 export function QuizDetailScreen() {
   const { t } = useTranslation(['quiz', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- QuizSummary is a root-stack route, outside the Quiz stack
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
   const { mutate: deleteAttempt, isPending } = useDeleteQuizAttempt();
   const { show, dialogProps } = useConfirmDialog();
   const { data: attempts = [] } = useRecentQuizAttempts(50);
+  const { data: credits } = useCreditBalance();
 
   const live = attempts.find(a => a.id === params.id);
   const id        = params.id;
@@ -42,24 +55,27 @@ export function QuizDetailScreen() {
   const timeSecs    = live?.timeSecs    ?? params.timeSecs;
 
   const scored = total > 0;
-  const scoreCol = scoreColor(scorePct, colors);
-  const modeLabel = mode ? t(`quiz:modeNames.${mode}`, MODE_NAMES[mode] ?? mode) : '—';
-  const setsLabel = setTitles.length === 1 ? setTitles[0] : setTitles.join(' · ');
-  const isPerfect = scored && scorePct === 100;
+  const setsLabel = setTitles.join(' · ');
   const isRetaken = practicedAt !== createdAt;
+  const missed = total - correct;
+  const source = topic
+    ? t('quiz:detail.fromTopic', { topic })
+    : setIds.length > 1 ? t('quiz:detail.setsCount', { count: setIds.length }) : setTitles[0] || null;
+
+  const { data: responsesData } = useQuizAttemptResponses(params.id);
+  const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
+  const hasAnswers = !!storedResponses && storedResponses.length > 0;
 
   const handleDelete = useCallback(() => {
     show({
-      title: t('quiz:detail.deleteTitle'),
-      message: t('quiz:detail.deleteMessage'),
+      title: t('quiz:qm.deleteTitle', 'Delete this quiz?'),
+      message: t('quiz:qm.deleteMessage', 'It will be removed from your history. Your cards and sets stay as they are.'),
       confirmLabel: t('common:actions.delete'),
+      cancelLabel: t('quiz:qm.keepIt', 'Keep it'),
       variant: 'danger',
       onConfirm: () => deleteAttempt(id, { onSuccess: () => navigation.goBack() }),
     });
   }, [show, deleteAttempt, id, navigation, t]);
-
-  const { data: responsesData } = useQuizAttemptResponses(params.id);
-  const storedResponses = responsesData?.responses as SummaryItem[] | undefined;
 
   // AI quizzes regenerate fresh questions from their topic/sets (charges credits);
   // old/real quizzes replay. useReQuiz handles the confirm + generate + fallback.
@@ -68,194 +84,145 @@ export function QuizDetailScreen() {
     () => reQuiz({ id, setIds, setTitles, mode, quizName, topic }, storedResponses),
     [reQuiz, id, setIds, setTitles, mode, quizName, topic, storedResponses],
   );
+  const charged = !!reQuizSource({ setIds, topic }, storedResponses);
+  const lacking = charged && !!credits && credits.balance < AI_QUIZ_COST;
+  const hint = !charged
+    ? t('quiz:qm.freeRetake', 'Free to retake')
+    : credits
+      ? t('quiz:qm.retakeHint', { cost: AI_QUIZ_COST, balance: credits.balance, defaultValue: 'New questions · {{cost}} credits. You have {{balance}}.' })
+      : t('quiz:qm.costCredits', { count: AI_QUIZ_COST });
 
-  const footer = (
-    <View style={[styles.footer, { borderTopColor: colors.border }]}>
-      <Button label={t('quiz:summary.reQuiz', 'Re-Quiz')} onPress={handleReQuiz} fullWidth />
-    </View>
-  );
+  const openSummary = () => navigation.navigate('QuizSummary', {
+    items: storedResponses, title: quizName ?? setsLabel, scorePct, total, correct,
+  });
+
+  const minutes = timeSecs == null ? null : timeSecs < 60
+    ? t('quiz:qm.seconds', { count: timeSecs, defaultValue: `${timeSecs} sec` })
+    : t('quiz:qm.minutes', { count: Math.round(timeSecs / 60), defaultValue: `${Math.round(timeSecs / 60)} min` });
 
   return (
-    <Screen
-      header={
-        <ScreenHeader
-          title={quizName ?? setsLabel ?? t('quiz:detail.title', 'Quiz Details')}
-          onBack={() => navigation.goBack()}
-          right={
-            <View style={styles.headerActions}>
-              {storedResponses && storedResponses.length > 0 && (
-                <Pressable
-                  style={({ pressed }) => pressed && styles.iconPressed}
-                  onPress={() => navigation.navigate('QuizSummary' as any, {
-                    items: storedResponses,
-                    title: quizName ?? setsLabel,
-                    scorePct, total, correct,
-                  })}
-                  hitSlop={12}
-                  accessibilityRole="button"
-                  accessibilityLabel={t('quiz:detail.viewSummary', 'View summary')}
-                >
-                  <ListIcon size={20} color={colors.textSecondary} />
-                </Pressable>
-              )}
-              <Pressable
-                style={({ pressed }) => pressed && styles.iconPressed}
-                onPress={handleDelete}
-                hitSlop={12}
-                disabled={isPending}
-                accessibilityRole="button"
-              >
-                <TrashIcon size={20} color={colors.alert} />
-              </Pressable>
-            </View>
-          }
-        />
-      }
-      footer={footer}
-    >
-      <ScrollView
-        contentContainerStyle={styles.scroll}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* ── Hero ── */}
-        <View style={styles.hero}>
-          {isPerfect && <TrophyIcon size={32} color={colors.warning} />}
-          <ScoreRing pct={scored ? scorePct : null} color={scoreCol} />
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView contentContainerStyle={[styles.scroll, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+        <View style={styles.topRow}>
+          <QMBackButton onPress={() => navigation.goBack()} label={t('common:actions.back', 'Back')} />
+          <Pressable
+            onPress={handleDelete}
+            disabled={isPending}
+            style={({ pressed }) => [styles.iconBtn, pressed && styles.dim]}
+            accessibilityRole="button"
+            accessibilityLabel={t('quiz:qm.deleteA11y', 'Delete this quiz')}
+          >
+            <TrashIcon size={20} color={qm.muted} />
+          </Pressable>
         </View>
 
-        {/* ── Mode + sets chips ── */}
-        <View style={styles.chips}>
-          <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-            <Typography preset="caption" color={colors.textSecondary}>{modeLabel}</Typography>
-          </View>
-          {/* Source: topic, multiple sets, or a single set. */}
-          {topic ? (
-            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.fromTopic', { topic, defaultValue: `Topic · ${topic}` })}</Typography>
+        <View style={styles.center}>
+          <QMScoreRing
+            pct={scored ? scorePct : null}
+            size={RING}
+            stroke={RING_STROKE}
+            caption={scored ? t('quiz:qm.correct', 'correct') : undefined}
+            a11yLabel={scored ? t('quiz:qm.ringA11y', { pct: scorePct, defaultValue: `${scorePct} percent correct` }) : undefined}
+          />
+          <Animated.View entering={rise(0)}>
+            <Typography preset="qmTitle" color={qm.ink} align="center" style={styles.title}>
+              {quizName ?? setsLabel ?? t('quiz:detail.title')}
+            </Typography>
+          </Animated.View>
+          <Animated.View entering={rise(1)} style={styles.chips}>
+            <View style={[styles.chip, { backgroundColor: qm.lilac }]}>
+              <Typography preset="qmLabel" color={qm.lilacInk}>{qmModeName(mode, t)}</Typography>
             </View>
-          ) : setIds.length > 1 ? (
-            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.setsCount', { count: setIds.length })}</Typography>
-            </View>
-          ) : setTitles.length === 1 && !!setTitles[0] ? (
-            <View style={[styles.chip, { backgroundColor: colors.surfaceMuted, borderColor: colors.border }]}>
-              <Typography preset="caption" color={colors.textSecondary}>{setTitles[0]}</Typography>
-            </View>
-          ) : null}
-        </View>
-
-        {/* ── Stat tiles ── */}
-        {scored && (
-          <View style={styles.statsRow}>
-            <View style={[styles.statTile, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
-              <CheckCircleIcon size={18} color={colors.success} />
-              <Typography style={[styles.statValue, { color: colors.textPrimary }]}>{correct}/{total}</Typography>
-              <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.correctLabel', 'Correct')}</Typography>
-            </View>
-            {timeSecs != null && (
-              <View style={[styles.statTile, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
-                <TimerIcon size={18} color={colors.textSecondary} />
-                <Typography style={[styles.statValue, { color: colors.textPrimary }]}>{formatDuration(timeSecs)}</Typography>
-                <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.timeSpent', 'Time spent')}</Typography>
+            {source && (
+              <View style={[styles.chip, { backgroundColor: qm.goldBg }]}>
+                <Typography preset="qmLabel" color={qm.goldText} numberOfLines={1}>{source}</Typography>
               </View>
             )}
-          </View>
+          </Animated.View>
+        </View>
+
+        {scored && (
+          <Animated.View entering={rise(2)} style={styles.tiles}>
+            <View style={[styles.tile, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+              <CheckIcon size={20} color={qm.leaf} />
+              <Typography preset="qmTitle" color={qm.ink} style={styles.tileNum}>
+                {t('quiz:qm.ofTotal', { correct, total, defaultValue: `${correct} of ${total}` })}
+              </Typography>
+              <Typography preset="qmMeta" color={qm.muted}>{t('quiz:qm.answeredRight', 'answered right')}</Typography>
+            </View>
+            {minutes && (
+              <View style={[styles.tile, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
+                <ClockIcon size={20} color={qm.link} />
+                <Typography preset="qmTitle" color={qm.ink} style={styles.tileNum}>{minutes}</Typography>
+                <Typography preset="qmMeta" color={qm.muted}>{t('quiz:qm.timeSpent', 'time spent')}</Typography>
+              </View>
+            )}
+          </Animated.View>
         )}
 
-        {/* ── Date info card ── */}
-        <View style={[styles.card, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
+        <Animated.View entering={rise(3)} style={[styles.card, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }]}>
           <View style={styles.cardRow}>
-            <View style={styles.cardRowLeft}>
-              <ClockIcon size={16} color={colors.textSecondary} />
-              <Typography preset="caption" color={colors.textSecondary}>
-                {isRetaken ? t('quiz:detail.lastPracticed', 'Last practiced') : t('quiz:detail.practiced', 'Practiced')}
-              </Typography>
-            </View>
-            <Typography preset="body" color={colors.textPrimary}>
-              {formatDateWithTime(practicedAt)}
+            <Typography preset="qmBodyMd" color={qm.muted}>
+              {isRetaken ? t('quiz:detail.lastPracticed', 'Last practiced') : t('quiz:detail.practiced', 'Practiced')}
             </Typography>
+            <Typography preset="qmButton" color={qm.ink}>{formatDateWithTime(practicedAt)}</Typography>
           </View>
-
           {isRetaken && (
-            <>
-              <View style={[styles.divider, { backgroundColor: colors.divider }]} />
-              <View style={styles.cardRow}>
-                <View style={styles.cardRowLeft}>
-                  <CalendarIcon size={16} color={colors.textSecondary} />
-                  <Typography preset="caption" color={colors.textSecondary}>{t('quiz:detail.firstAttempt', 'First attempt')}</Typography>
-                </View>
-                <Typography preset="body" color={colors.textPrimary}>
-                  {formatDate(createdAt)}
-                </Typography>
-              </View>
-            </>
+            <View style={[styles.cardRow, styles.cardRowTop, { borderTopColor: qm.hair }]}>
+              <Typography preset="qmBodyMd" color={qm.muted}>{t('quiz:qm.firstTry', 'First try')}</Typography>
+              <Typography preset="qmButton" color={qm.ink}>{formatDateWithTime(createdAt)}</Typography>
+            </View>
           )}
-        </View>
+        </Animated.View>
+
+        {hasAnswers && (
+          <Animated.View entering={rise(4)}>
+            <AnimatedPressable scaleTo={0.97} onPress={openSummary} style={[styles.link, { backgroundColor: qm.lilac }]} accessibilityRole="button">
+              <ListIcon size={22} color={qm.lilacInk} />
+              <View style={styles.flex}>
+                <Typography preset="qmBodyLg" color={qm.lilacInk}>{t('quiz:qm.everyAnswer', 'See every answer')}</Typography>
+                {missed > 0 && (
+                  <Typography preset="qmMeta" color={qm.lilacInk} style={styles.linkSub}>
+                    {t('quiz:qm.includingMissed', { count: missed, defaultValue: `Including the ${missed} you missed` })}
+                  </Typography>
+                )}
+              </View>
+              <ChevronRightIcon size={18} color={qm.lilacInk} strokeWidth={2} />
+            </AnimatedPressable>
+          </Animated.View>
+        )}
       </ScrollView>
-      <ConfirmDialog {...dialogProps} />
-      <ConfirmDialog {...reQuizDialog} />
+
+      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair }]}>
+        <QMButton icon={RefreshIcon} label={t('quiz:qm.quizAgain', 'Quiz me again')} onPress={handleReQuiz} />
+        <Typography preset="qmMeta" color={lacking ? qm.warm : qm.muted} align="center" style={styles.hint}>{hint}</Typography>
+      </View>
+
+      <QMConfirmDialog {...dialogProps} />
+      <QMConfirmDialog {...reQuizDialog} />
       <GeneratingQuizModal visible={isGenerating} />
-    </Screen>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: spacing.xxxl,
-    paddingBottom: spacing.xxl,
-    gap: spacing.xxl,
-    alignItems: 'center',
-  },
-
-  // Hero
-  hero: { alignItems: 'center', gap: spacing.sm },
-  iconPressed: { opacity: 0.85 },
-
-  // Stat tiles
-  statsRow: { flexDirection: 'row', gap: spacing.md, width: '100%' },
-  statTile: {
-    flex: 1,
-    alignItems: 'center',
-    gap: spacing.xs,
-    paddingVertical: spacing.lg,
-    borderRadius: layout.cardRadiusLg,
-    borderWidth: 1,
-  },
-  statValue: { fontSize: fontSizes.lg, fontWeight: fontWeights.bold },
-
-  // Chips
-  headerActions: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  chips: { flexDirection: 'row', gap: spacing.sm, flexWrap: 'wrap', justifyContent: 'center' },
-  chip: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: layout.pillRadius,
-    borderWidth: 1,
-  },
-
-  // Info card
-  card: {
-    width: '100%',
-    borderRadius: layout.cardRadiusLg,
-    borderWidth: 1,
-    overflow: 'hidden',
-  },
-  cardRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: spacing.xl,
-    paddingVertical: spacing.lg,
-  },
-  cardRowLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  divider: { height: 1 },
-
-  // Footer
-  footer: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingVertical: spacing.lg,
-    borderTopWidth: 1,
-    gap: spacing.md,
-  },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.6 },
+  scroll: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  iconBtn: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center', marginRight: -spacing.s10 },
+  center: { alignItems: 'center', marginTop: spacing.s6 },
+  title: { marginTop: spacing.s18, marginBottom: spacing.s10 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: spacing.sm },
+  chip: { paddingVertical: spacing.s6, paddingHorizontal: spacing.md, borderRadius: radius.pill, maxWidth: '100%' },
+  tiles: { flexDirection: 'row', gap: spacing.s10, marginTop: spacing.xxl },
+  tile: { flex: 1, borderRadius: radius.r20, padding: spacing.lg },
+  tileNum: { marginTop: spacing.s6 },
+  card: { marginTop: spacing.md, borderRadius: radius.r20, paddingHorizontal: spacing.lg, paddingVertical: spacing.xs },
+  cardRow: { minHeight: ROW_H, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.md },
+  cardRowTop: { borderTopWidth: 1 },
+  link: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, marginTop: spacing.md, padding: spacing.lg, borderRadius: radius.r20 },
+  linkSub: { marginTop: spacing.s2, opacity: 0.8 },
+  footer: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.s14, borderTopWidth: 1 },
+  hint: { marginTop: spacing.sm },
 });

@@ -15,3 +15,4 @@ export {
   QMSegmented, QMSearchField, QMEmpty, QMAddButton, QMSortChip, QMSetRow, QMFolderTile, QMColorSwatches, QMStickyBar, qmRowEnter,
 } from './QMListBits';
 export { QMModalScreen } from './QMModalScreen';
+export { QMScoreRing } from './QMScoreRing';
