@@ -453,6 +453,26 @@
     "pickSets": "Pick your sets in order",
     "selected": "{{count}} selected",
     "pickHint": "Tap sets in the order you want to study them. Tap again to remove.",
-    "stepN": "step {{n}}"
+    "stepN": "step {{n}}",
+    "addedToLibrary": "Added “{{title}}” to your library",
+    "inLibraryA11y": "{{title}} is in your library",
+    "addToLibraryA11y": "Add {{title}} to your library",
+    "added": "Added",
+    "add": "Add",
+    "friendsCount_one": "{{count}} set shared by your friends",
+    "friendsCount_other": "{{count}} sets shared by your friends",
+    "friendsSub": "Sets your friends share with you",
+    "publicCount_one": "{{count}} public set from the community",
+    "publicCount_other": "{{count}} public sets from the community",
+    "publicSub": "Public sets from the community",
+    "friendsTitle": "Friends’ sets",
+    "exploreTitle": "Explore sets",
+    "searchFriendsSets": "Search friends’ sets",
+    "searchPublic": "Search public sets",
+    "browseFailedTitle": "These sets did not load",
+    "noFriendsSets": "No friends’ sets yet",
+    "noFriendsSetsText": "When your friends mark sets as Friends, they’ll show here.",
+    "findFriends": "Find friends",
+    "noPublicText": "Check back soon. New sets from the community show up here."
   }
 }

@@ -145,9 +145,11 @@ export function QMSortChip({ label, onPress }: { label: string; onPress: () => v
 }
 
 // ─── Set row (tile with initial + title + meta + optional chip + ⋮) ─────────
-export const QMSetRow = React.memo(function QMSetRow({ title, color, meta, chip, onPress, onMenu, menuLabel, trailing }: {
+export const QMSetRow = React.memo(function QMSetRow({ title, color, meta, chip, onPress, onMenu, menuLabel, trailing, right }: {
   title: string; color?: string | null; meta: string; chip?: string;
   onPress: () => void; onMenu?: () => void; menuLabel?: string; trailing?: React.ReactNode;
+  /** Own control after the row's tap area (e.g. an Add button). */
+  right?: React.ReactNode;
 }) {
   const { qm, name } = useTheme();
   const [bg, ink] = qmAccent(qm, name === 'dark', color);
@@ -170,6 +172,7 @@ export const QMSetRow = React.memo(function QMSetRow({ title, color, meta, chip,
         </View>
         {trailing}
       </AnimatedPressable>
+      {right}
       {onMenu && (
         <Pressable onPress={onMenu} hitSlop={4} style={({ pressed }) => [styles.menu, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={menuLabel}>
           <MoreVerticalIcon size={20} color={qm.muted} />
