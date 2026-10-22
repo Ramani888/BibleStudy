@@ -9,6 +9,7 @@ import {
   useUpdateSessionTags,
 } from './index';
 import { PencilIcon, TagIcon, TrashIcon } from '../components/icons';
+import type { QMSheetAction } from '../components/qm';
 import type { ChatSession } from '../types';
 
 export function useChatHistoryActions(
@@ -36,9 +37,10 @@ export function useChatHistoryActions(
     if (!sheet.session?.sessionId) return;
     const sessionId = sheet.session.sessionId;
     showConfirm({
-      title: t('ai:history.deleteConfirmTitle', 'Delete conversation?'),
-      message: t('ai:history.deleteConfirmMessage', 'This conversation and all its messages will be permanently deleted.'),
+      title: t('ai:qm.history.deleteTitle', 'Delete this conversation?'),
+      message: t('ai:qm.history.deleteText', 'It will be removed from your history for good. Cards you saved from it stay in your sets.'),
       confirmLabel: t('common:actions.delete', 'Delete'),
+      cancelLabel: t('ai:qm.history.keep', 'Keep'),
       variant: 'danger',
       onConfirm: () => {
         deleteSession(sessionId, {
@@ -52,9 +54,10 @@ export function useChatHistoryActions(
   const handleClearAll = () => {
     if (allSessions.length === 0) return;
     showConfirm({
-      title: t('ai:history.clearAllTitle', 'Clear All History'),
-      message: t('ai:history.clearAllMessage', 'All conversations and messages will be permanently deleted. This cannot be undone.'),
-      confirmLabel: t('ai:history.clearAll', 'Clear all history'),
+      title: t('ai:qm.history.clearTitle', 'Clear all history?'),
+      message: t('ai:qm.history.clearText', 'Every conversation will be deleted for good. Your flashcards and sets stay as they are.'),
+      confirmLabel: t('ai:qm.history.clearAll', 'Clear all'),
+      cancelLabel: t('ai:qm.history.keep', 'Keep'),
       variant: 'danger',
       onConfirm: () => {
         clearHistory(undefined, {
@@ -97,7 +100,7 @@ export function useChatHistoryActions(
     setTagsModal(prev => ({
       ...prev,
       selected: prev.selected.includes(tag)
-        ? prev.selected.filter(t => t !== tag)
+        ? prev.selected.filter(x => x !== tag)
         : [...prev.selected, tag],
     }));
   };
@@ -116,10 +119,11 @@ export function useChatHistoryActions(
     );
   };
 
-  const sheetActions = [
-    { label: t('common:actions.rename', 'Rename'),    icon: PencilIcon, onPress: handleOpenRename,   disabled: !sheet.session?.sessionId },
-    { label: t('ai:history.editTags', 'Edit Tags'), icon: TagIcon,    onPress: handleOpenTags,     disabled: !sheet.session?.sessionId },
-    { label: t('common:actions.delete', 'Delete'),    icon: TrashIcon,  onPress: handleDeleteSession, destructive: true, disabled: !sheet.session?.sessionId || isDeleting },
+  const legacy = !sheet.session?.sessionId;
+  const sheetActions: QMSheetAction[] = [
+    { label: t('common:actions.rename', 'Rename'), icon: PencilIcon, onPress: handleOpenRename, off: legacy },
+    { label: t('ai:qm.history.editTopics', 'Edit topics'), icon: TagIcon, onPress: handleOpenTags, off: legacy },
+    { label: t('common:actions.delete', 'Delete'), icon: TrashIcon, onPress: handleDeleteSession, danger: true, off: legacy || isDeleting },
   ];
 
   return {

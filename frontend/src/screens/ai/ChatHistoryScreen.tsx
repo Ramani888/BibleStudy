@@ -1,316 +1,359 @@
 import React, { useCallback, useMemo, useState } from 'react';
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
-import { SearchIcon, TrashIcon } from '../../components/icons';
+import { ActivityIndicator, FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import Toast from 'react-native-toast-message';
+import { useTranslation } from 'react-i18next';
+
 import {
-  ActionSheet,
-  AppModal,
-  ConfirmDialog,
-  EmptyState,
-  ErrorState,
-  LoadingOverlay,
-} from '../../components/feedback';
-import { Button, ScreenHeader, SearchBar, Spacer, Typography } from '../../components/ui';
-import { Screen } from '../../components/ui/Screen';
-import { useAIChatHistory, useBookmarks, useSearchToggle } from '../../hooks';
+  QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMSearchField, QMSegmented, QMSheet,
+} from '../../components/qm';
+import { AnimatedPressable, Typography } from '../../components/ui';
+import { AskIcon, BookmarkIcon, InfoIcon, SearchIcon, TagIcon, TrashIcon } from '../../components/icons';
+import { LoadingOverlay } from '../../components/feedback';
+import { useAIChatHistory, useBookmarks, useManualRefresh } from '../../hooks';
 import { useChatHistoryActions } from '../../hooks/useChatHistoryActions';
 import { useAIChatStore } from '../../store';
-import { useTheme, fontSizes, layout, spacing } from '../../theme';
+import { useTheme, spacing, radius, textPresets } from '../../theme';
 import type { BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
-import { BookmarkCard, SessionCard } from './components/ChatHistoryCards';
-import { StarIcon } from '../../components/icons';
+import { BookmarkCard, HistorySkeleton, SessionCard, tagLabel } from './components/ChatHistoryCards';
 
 const PREDEFINED_TAGS = [
   'Theology', 'Old Testament', 'New Testament',
   'Prayer', 'History', 'Devotional', 'Prophecy',
 ] as const;
+const MAX_TAGS = 5;     // ai.dto UpdateSessionTags
+const TAG_MAX = 50;
+const TITLE_MAX = 200;
+const CHIP_H = 36;
+const FIELD_H = 48;
+const TOUCH = 44;
 
-// Tag values are stored/filtered in English; only the DISPLAY is translated.
-const TAG_KEY: Record<string, string> = {
-  'Theology': 'theology', 'Old Testament': 'oldTestament', 'New Testament': 'newTestament',
-  'Prayer': 'prayer', 'History': 'history', 'Devotional': 'devotional', 'Prophecy': 'prophecy',
-};
-const tagLabel = (tag: string, t: TFunction) => t(`ai:tags.${TAG_KEY[tag] ?? tag}`, { defaultValue: tag });
+type Row = { kind: 'head'; key: string; label: string } | { kind: 'session'; key: string; session: ChatSession; index: number };
 
-const ListSeparator = () => <Spacer size={spacing.md} />;
-
-// ─── Sub-components ───────────────────────────────────────────────────────────
-
-function TagFilterBar({ activeTag, onSelect, colors }: {
-  activeTag: string | null;
-  onSelect: (tag: string | null) => void;
-  colors: ReturnType<typeof useTheme>['colors'];
-}) {
-  const { t } = useTranslation('common');
-  return (
-    <View style={[styles.tagBarWrapper, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.tagBar}>
-        <Pressable
-          style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === null && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
-          onPress={() => onSelect(null)}
-        >
-          <Typography preset="caption" color={activeTag === null ? colors.textOnAccent : colors.textSecondary}>{t('common:filter.all', 'All')}</Typography>
-        </Pressable>
-        {PREDEFINED_TAGS.map(tag => (
-          <Pressable
-            key={tag}
-            style={({ pressed }) => [styles.tagFilter, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, activeTag === tag && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
-            onPress={() => onSelect(activeTag === tag ? null : tag)}
-          >
-            <Typography preset="caption" color={activeTag === tag ? colors.textOnAccent : colors.textSecondary}>{tagLabel(tag, t)}</Typography>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </View>
-  );
+function dayBucket(iso: string): 'today' | 'yesterday' | 'earlier' {
+  const d = new Date(iso);
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+  if (d >= start) return 'today';
+  start.setDate(start.getDate() - 1);
+  return d >= start ? 'yesterday' : 'earlier';
 }
-
-function RenameModal({ visible, value, isRenaming, onClose, onChange, onSave, colors }: {
-  visible: boolean; value: string; isRenaming: boolean;
-  onClose: () => void; onChange: (v: string) => void; onSave: () => void;
-  colors: ReturnType<typeof useTheme>['colors'];
-}) {
-  const { t } = useTranslation(['ai', 'common']);
-  return (
-    <AppModal visible={visible} title={t('ai:history.renameTitle', 'Rename Conversation')} onClose={onClose} showHandle>
-      <TextInput
-        style={[styles.renameInput, { borderColor: colors.border, color: colors.textPrimary, backgroundColor: colors.surfaceMuted }]}
-        value={value}
-        onChangeText={onChange}
-        placeholder={t('ai:history.namePlaceholder', 'Conversation name…')}
-        placeholderTextColor={colors.textSecondary}
-        autoFocus
-        maxLength={200}
-      />
-      <Button label={t('common:actions.save', 'Save')} loading={isRenaming} onPress={onSave} disabled={!value.trim()} fullWidth style={styles.renameModalBtn} />
-    </AppModal>
-  );
-}
-
-function TagsModal({ visible, selected, isUpdatingTags, onClose, onToggle, onSave, colors }: {
-  visible: boolean; selected: string[]; isUpdatingTags: boolean;
-  onClose: () => void; onToggle: (tag: string) => void; onSave: () => void;
-  colors: ReturnType<typeof useTheme>['colors'];
-}) {
-  const { t } = useTranslation(['ai', 'common']);
-  return (
-    <AppModal visible={visible} title={t('ai:history.editTags', 'Edit Tags')} onClose={onClose} showHandle>
-      <View style={styles.tagGrid}>
-        {PREDEFINED_TAGS.map(tag => {
-          const active = selected.includes(tag);
-          return (
-            <Pressable
-              key={tag}
-              style={({ pressed }) => [styles.tagOption, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }, active && { backgroundColor: colors.accent, borderColor: colors.accent }, { opacity: pressed ? 0.85 : 1 }]}
-              onPress={() => onToggle(tag)}
-            >
-              <Typography preset="bodySm" color={active ? colors.textOnAccent : colors.textPrimary}>{tagLabel(tag, t)}</Typography>
-            </Pressable>
-          );
-        })}
-      </View>
-      <Button label={t('common:actions.save', 'Save')} loading={isUpdatingTags} onPress={onSave} fullWidth style={styles.tagsModalBtn} />
-    </AppModal>
-  );
-}
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
-
-import { useTranslation } from 'react-i18next';
-import type { TFunction } from 'i18next';
 
 export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) {
   const { t } = useTranslation(['ai', 'common']);
-  const { colors } = useTheme();
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
 
-  const { data, isLoading, isError, isRefetching, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useAIChatHistory();
-  const { data: bookmarksData, isLoading: isBookmarksLoading, isRefetching: isBookmarksRefetching, refetch: refetchBookmarks } = useBookmarks();
+  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useAIChatHistory();
+  const { data: bookmarksData, isLoading: isBookmarksLoading, refetch: refetchBookmarks } = useBookmarks();
+  const { refreshing, onRefresh } = useManualRefresh(() => Promise.all([refetch(), refetchBookmarks()]));
 
-  const [viewMode, setViewMode]     = useState<'all' | 'bookmarked'>('all');
-  const { query: searchQuery, setQuery: setSearchQuery, visible: searchVisible, toggle: toggleSearch, clear: clearSearch } = useSearchToggle();
-  const [activeTag, setActiveTag]   = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'all' | 'bookmarked'>('all');
+  const [search, setSearch] = useState('');
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [newTopic, setNewTopic] = useState('');
 
   const allSessions  = useMemo(() => data?.pages.flatMap(p => p.sessions) ?? [], [data]);
   const allBookmarks = bookmarksData?.bookmarks ?? [];
 
   const actions = useChatHistoryActions(navigation, allSessions);
 
-  const filteredSessions = useMemo(
-    () => allSessions.filter(s => {
-      const matchesSearch = searchQuery.trim() === '' || (s.customTitle || s.title).toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesTag    = activeTag === null || s.tags?.includes(activeTag);
-      return matchesSearch && matchesTag;
-    }),
-    [allSessions, searchQuery, activeTag],
-  );
+  // Filter chips: the built-in topics plus any custom ones already in use.
+  const topicNames = useMemo(() => {
+    const extra = new Set<string>();
+    allSessions.forEach(s => s.tags?.forEach(tag => { if (!(PREDEFINED_TAGS as readonly string[]).includes(tag)) extra.add(tag); }));
+    return [...PREDEFINED_TAGS, ...extra];
+  }, [allSessions]);
+
+  const q = search.trim().toLowerCase();
+  const rows = useMemo<Row[]>(() => {
+    const out: Row[] = [];
+    let last = '';
+    let i = 0;
+    allSessions
+      .filter(s => (!q || (s.customTitle || s.title).toLowerCase().includes(q)) && (!activeTag || s.tags?.includes(activeTag)))
+      .forEach(s => {
+        const b = dayBucket(s.startedAt);
+        if (b !== last) {
+          last = b;
+          out.push({ kind: 'head', key: `h-${b}`, label: t(`ai:qm.history.${b}`, { defaultValue: b }) });
+        }
+        out.push({ kind: 'session', key: s.sessionId ?? s.messages[0]?.id ?? `s-${i}`, session: s, index: i++ });
+      });
+    return out;
+  }, [allSessions, q, activeTag, t]);
 
   const handleContinue = useCallback((session: ChatSession) => {
     useAIChatStore.getState().loadSession(session);
     navigation.navigate('AIChat');
   }, [navigation]);
 
-  const handleLongPress = useCallback((session: ChatSession) => {
+  const handleMore = useCallback((session: ChatSession) => {
     if (!session.sessionId) {
-      Toast.show({ type: 'info', text1: t('ai:history.cannotManage', 'Cannot manage this conversation'), text2: t('ai:history.legacyMessagesInfo', 'Legacy messages cannot be renamed or deleted.') });
+      Toast.show({ type: 'info', text1: t('ai:qm.history.legacy', 'This older chat can’t be changed') });
       return;
     }
     actions.setSheet({ visible: true, session });
   }, [actions, t]);
 
-  const renderSession  = useCallback(({ item }: { item: ChatSession })    => <SessionCard  session={item} onLongPress={handleLongPress} onContinue={handleContinue} />, [handleLongPress, handleContinue]);
-  const renderBookmark = useCallback(({ item }: { item: BookmarkedChat }) => <BookmarkCard chat={item} />, []);
+  const renderRow = useCallback(({ item }: { item: Row }) => item.kind === 'head'
+    ? <Typography preset="qmLabel" color={qm.muted} style={styles.group}>{item.label.toUpperCase()}</Typography>
+    : <SessionCard session={item.session} index={item.index} onMore={handleMore} onContinue={handleContinue} />,
+  [qm, handleMore, handleContinue]);
+  const renderBookmark = useCallback(({ item, index }: { item: BookmarkedChat; index: number }) => <BookmarkCard chat={item} index={index} />, []);
 
-  const hasAnyTaggedSession = allSessions.some(s => s.tags?.length > 0);
+  // ─── Topics sheet helpers ──────────────────────────────────────────────────
+  const selected = actions.tagsModal.selected;
+  const sheetTopics = useMemo(() => [...new Set([...topicNames, ...selected])], [topicNames, selected]);
+  const addTopic = () => {
+    const name = newTopic.trim();
+    if (!name || selected.length >= MAX_TAGS) return;
+    if (!selected.includes(name)) actions.handleToggleTag(name);
+    setNewTopic('');
+  };
 
-  if (isError) return <ErrorState message={t('ai:history.couldNotLoadHistory', 'Could not load history.')} onRetry={refetch} />;
+  const isAll = viewMode === 'all';
 
-  return (
-    <Screen
-      header={
-        <ScreenHeader
-          title={t('ai:history.title')}
-          onBack={() => navigation.goBack()}
-          right={
-            viewMode === 'all' ? (
-              <View style={styles.headerGroup}>
-                <Pressable onPress={toggleSearch} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                  <SearchIcon size={20} color={searchVisible ? colors.accent : colors.textSecondary} />
-                </Pressable>
-                {allSessions.length > 0 && (
-                  <Pressable onPress={actions.handleClearAll} hitSlop={8} style={({ pressed }) => pressed && styles.iconPressed}>
-                    <TrashIcon size={18} color={colors.alert} />
-                  </Pressable>
-                )}
-              </View>
-            ) : undefined
-          }
-        />
-      }
-    >
-
-      {/* View mode toggle */}
-      <View style={[styles.modeToggle, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
-        {(['all', 'bookmarked'] as const).map(mode => (
-          <Pressable
-            key={mode}
-            style={({ pressed }) => [styles.modeTab, viewMode === mode && { borderBottomColor: colors.accent, borderBottomWidth: 2 }, { opacity: pressed ? 0.85 : 1 }]}
-            onPress={() => { setViewMode(mode); clearSearch(); setActiveTag(null); }}
-          >
-            {mode === 'bookmarked' && <StarIcon size={14} color={viewMode === 'bookmarked' ? colors.accent : colors.textSecondary} />}
-            <Typography preset="label" color={viewMode === mode ? colors.accent : colors.textSecondary}>
-              {mode === 'all' ? t('ai:history.all') : t('ai:history.bookmarked')}
-            </Typography>
+  const header = (
+    <View>
+      <View style={styles.topRow}>
+        <QMBackButton onPress={() => navigation.goBack()} label={t('common:actions.back', 'Back')} />
+        <View style={styles.flex} />
+        {isAll && allSessions.length > 0 && (
+          <Pressable onPress={actions.handleClearAll} style={({ pressed }) => [styles.icon, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('ai:history.clearAll', 'Clear all history')}>
+            <TrashIcon size={20} color={qm.muted} />
           </Pressable>
-        ))}
+        )}
       </View>
-
-      {viewMode === 'all' && (
+      <Typography preset="qmPageTitle" color={qm.ink} style={styles.title} accessibilityRole="header">{t('ai:qm.history.title', 'Past conversations')}</Typography>
+      <QMSegmented
+        label={t('ai:qm.history.title', 'Past conversations')}
+        value={viewMode}
+        onChange={m => { setViewMode(m); setSearch(''); setActiveTag(null); }}
+        options={[{ key: 'all', label: t('ai:history.all', 'All') }, { key: 'bookmarked', label: t('ai:history.bookmarked', 'Bookmarked') }]}
+      />
+      {isAll && !isLoading && !isError && allSessions.length > 0 && (
         <>
-          {searchVisible && (
-            <View style={styles.searchWrap}>
-              <SearchBar placeholder={t('ai:history.searchPlaceholder', 'Search conversations…')} value={searchQuery} onChangeText={setSearchQuery} containerStyle={styles.searchInput} autoFocus />
-            </View>
-          )}
-          {hasAnyTaggedSession && <TagFilterBar activeTag={activeTag} onSelect={setActiveTag} colors={colors} />}
+          <View style={styles.search}>
+            <QMSearchField value={search} onChangeText={setSearch} placeholder={t('ai:qm.history.search', 'Search conversations')} />
+          </View>
+          {/* No height on the horizontal ScrollView — the wrapping View sizes it. */}
+          <View style={styles.chipsWrap}>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
+              {[null, ...topicNames].map(tag => {
+                const on = activeTag === tag;
+                return (
+                  <AnimatedPressable
+                    key={tag ?? 'all'}
+                    scaleTo={0.95}
+                    onPress={() => setActiveTag(on ? null : tag)}
+                    style={[styles.chip, { backgroundColor: on ? qm.violet : qm.field }]}
+                    accessibilityRole="button"
+                    accessibilityState={{ selected: on }}
+                  >
+                    <Typography preset="qmLink" color={on ? qm.onViolet : qm.body}>{tag ? tagLabel(tag, t) : t('ai:history.all', 'All')}</Typography>
+                  </AnimatedPressable>
+                );
+              })}
+            </ScrollView>
+          </View>
         </>
       )}
+    </View>
+  );
 
-      {viewMode === 'bookmarked' ? (
+  let allEmpty: React.ReactElement | null = null;
+  if (isLoading) allEmpty = <HistorySkeleton />;
+  else if (isError) {
+    allEmpty = (
+      <QMEmpty
+        style={styles.empty}
+        icon={InfoIcon}
+        title={t('ai:qm.history.errorTitle', 'Couldn’t load your conversations')}
+        text={t('ai:qm.history.errorText', 'Check your connection and try again. Nothing was lost.')}
+        action={{ label: t('ai:qm.chat.tryAgain', 'Try again'), onPress: () => refetch() }}
+      />
+    );
+  } else if (allSessions.length === 0) {
+    allEmpty = <QMEmpty style={styles.empty} icon={AskIcon} title={t('ai:qm.history.emptyTitle', 'No conversations yet')} text={t('ai:qm.history.emptyText', 'Ask a question and it will be saved here, so you can pick it up later.')} />;
+  } else if (q) {
+    allEmpty = (
+      <QMEmpty
+        style={styles.empty}
+        icon={SearchIcon}
+        title={t('ai:qm.history.noMatch', 'No conversations match')}
+        text={t('ai:qm.history.noMatchText', { query: search.trim(), defaultValue: `Nothing called “${search.trim()}”. Try a different word.` })}
+        action={{ label: t('quiz:qm.clearSearch', 'Clear search'), onPress: () => setSearch('') }}
+      />
+    );
+  } else {
+    allEmpty = <QMEmpty style={styles.empty} icon={TagIcon} title={t('ai:qm.history.noTopicTitle', 'Nothing with this topic')} text={t('ai:qm.history.noTopicText', 'Try another topic, or tap All.')} />;
+  }
+
+  const refresh = <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />;
+  const contentStyle = [styles.content, { paddingTop: insets.top + spacing.xs }];
+
+  return (
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      {isAll ? (
         <FlatList
-          style={styles.fill}
-          data={allBookmarks}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.list}
+          data={isLoading || isError ? [] : rows}
+          keyExtractor={r => r.key}
+          renderItem={renderRow}
+          ListHeaderComponent={header}
+          ListEmptyComponent={allEmpty}
+          ItemSeparatorComponent={Separator}
+          contentContainerStyle={contentStyle}
+          keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={isBookmarksRefetching} onRefresh={refetchBookmarks} tintColor={colors.accent} />}
-          ItemSeparatorComponent={ListSeparator}
-          ListEmptyComponent={
-            !isBookmarksLoading
-              ? <EmptyState title={t('ai:history.noBookmarks', 'No bookmarks yet')} subtitle={t('ai:history.noBookmarksSub', 'Long-press any AI response and tap Bookmark to save it here')} />
-              : <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
-          }
-          renderItem={renderBookmark}
+          refreshControl={refresh}
+          onEndReached={() => hasNextPage && !isFetchingNextPage && fetchNextPage()}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={isFetchingNextPage ? (
+            <View style={styles.moreRow} accessibilityRole="progressbar">
+              <ActivityIndicator size="small" color={qm.muted} />
+              <Typography preset="qmBody" color={qm.muted}>{t('ai:qm.history.loadingMore', 'Loading more…')}</Typography>
+            </View>
+          ) : null}
         />
       ) : (
         <FlatList
-          style={styles.fill}
-          data={filteredSessions}
-          keyExtractor={item => item.sessionId ?? item.messages[0]?.id ?? 'unknown'}
-          contentContainerStyle={styles.list}
+          data={allBookmarks}
+          keyExtractor={b => b.id}
+          renderItem={renderBookmark}
+          ListHeaderComponent={<View style={styles.markHead}>{header}</View>}
+          ListEmptyComponent={isBookmarksLoading
+            ? <ActivityIndicator color={qm.violet} style={styles.loading} />
+            : <QMEmpty style={styles.empty} icon={BookmarkIcon} title={t('ai:history.noBookmarks', 'No bookmarks yet')} text={t('ai:qm.history.noBookmarksText', 'Tap ··· on any answer and choose Bookmark to keep it here.')} />}
+          ItemSeparatorComponent={Separator}
+          contentContainerStyle={contentStyle}
           showsVerticalScrollIndicator={false}
-          refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor={colors.accent} />}
-          ItemSeparatorComponent={ListSeparator}
-          onEndReached={() => hasNextPage && fetchNextPage()}
-          onEndReachedThreshold={0.3}
-          ListEmptyComponent={
-            !isLoading
-              ? <EmptyState title={searchQuery ? t('common:status.noResults', 'No results found') : t('ai:history.noHistory', 'No chat history yet')} subtitle={searchQuery ? t('common:status.tryDifferentSearch', 'Try a different search term') : t('ai:history.noHistorySub', 'Your conversations with the AI assistant will appear here')} />
-              : <View style={styles.loadingWrap}><ActivityIndicator color={colors.accent} /></View>
-          }
-          ListFooterComponent={isFetchingNextPage ? <View style={styles.footerLoader}><ActivityIndicator color={colors.accent} size="small" /></View> : null}
-          renderItem={renderSession}
+          refreshControl={refresh}
         />
       )}
 
-      <ActionSheet visible={actions.sheet.visible} title={t('ai:history.conversation', 'Conversation')} actions={actions.sheetActions} onClose={() => actions.setSheet({ visible: false, session: null })} />
+      <QMSheet
+        visible={actions.sheet.visible}
+        onClose={() => actions.setSheet({ visible: false, session: null })}
+        title={actions.sheet.session ? actions.sheet.session.customTitle || actions.sheet.session.title : undefined}
+        actions={actions.sheetActions}
+      />
 
-      <RenameModal
+      <QMSheet
         visible={actions.renameModal.visible}
-        value={actions.renameModal.value}
-        isRenaming={actions.isRenaming}
         onClose={() => actions.setRenameModal({ visible: false, session: null, value: '' })}
-        onChange={v => actions.setRenameModal(prev => ({ ...prev, value: v }))}
-        onSave={actions.handleSaveRename}
-        colors={colors}
-      />
+        title={t('common:actions.rename', 'Rename')}
+        sub={t('ai:qm.history.renameSub', 'A short name helps you find it later.')}
+      >
+        <View style={styles.form}>
+          <BottomSheetTextInput
+            value={actions.renameModal.value}
+            onChangeText={v => actions.setRenameModal(prev => ({ ...prev, value: v }))}
+            onSubmitEditing={actions.handleSaveRename}
+            maxLength={TITLE_MAX}
+            autoFocus
+            returnKeyType="done"
+            placeholder={t('ai:history.namePlaceholder', 'Conversation name…')}
+            placeholderTextColor={qm.muted}
+            accessibilityLabel={t('ai:history.namePlaceholder', 'Conversation name…')}
+            style={[styles.field, { backgroundColor: qm.field, color: qm.ink }]}
+          />
+          <QMButton
+            label={t('common:actions.save', 'Save')}
+            onPress={actions.handleSaveRename}
+            loading={actions.isRenaming}
+            off={!actions.renameModal.value.trim()}
+            style={styles.formBtn}
+          />
+        </View>
+      </QMSheet>
 
-      <TagsModal
+      <QMSheet
         visible={actions.tagsModal.visible}
-        selected={actions.tagsModal.selected}
-        isUpdatingTags={actions.isUpdatingTags}
-        onClose={() => actions.setTagsModal({ visible: false, session: null, selected: [] })}
-        onToggle={actions.handleToggleTag}
-        onSave={actions.handleSaveTags}
-        colors={colors}
-      />
+        onClose={() => { setNewTopic(''); actions.setTagsModal({ visible: false, session: null, selected: [] }); }}
+        title={t('ai:qm.history.editTopics', 'Edit topics')}
+        sub={t('ai:qm.history.topicsSub', { max: MAX_TAGS, defaultValue: `Tap to add or remove, up to ${MAX_TAGS}. Topics help you filter later.` })}
+      >
+        <View style={styles.form}>
+          <View style={styles.topicGrid}>
+            {sheetTopics.map(tag => {
+              const on = selected.includes(tag);
+              const full = !on && selected.length >= MAX_TAGS;
+              return (
+                <AnimatedPressable
+                  key={tag}
+                  scaleTo={0.95}
+                  disabled={full}
+                  onPress={() => actions.handleToggleTag(tag)}
+                  style={[styles.topic, { backgroundColor: on ? qm.violet : qm.field }, full && styles.dim]}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: on, disabled: full }}
+                >
+                  <Typography preset="qmLink" color={on ? qm.onViolet : qm.body}>{tagLabel(tag, t)}</Typography>
+                </AnimatedPressable>
+              );
+            })}
+          </View>
+          <View style={styles.addRow}>
+            <BottomSheetTextInput
+              value={newTopic}
+              onChangeText={setNewTopic}
+              onSubmitEditing={addTopic}
+              maxLength={TAG_MAX}
+              returnKeyType="done"
+              placeholder={t('ai:qm.history.addTopic', 'Add a topic')}
+              placeholderTextColor={qm.muted}
+              accessibilityLabel={t('ai:qm.history.addTopic', 'Add a topic')}
+              style={[styles.field, styles.flex, { backgroundColor: qm.field, color: qm.ink }]}
+            />
+            <AnimatedPressable
+              scaleTo={0.95}
+              onPress={addTopic}
+              disabled={!newTopic.trim() || selected.length >= MAX_TAGS}
+              style={[styles.addBtn, { backgroundColor: newTopic.trim() && selected.length < MAX_TAGS ? qm.violet : qm.field }]}
+              accessibilityRole="button"
+            >
+              <Typography preset="qmSegment" color={newTopic.trim() && selected.length < MAX_TAGS ? qm.onViolet : qm.muted}>{t('ai:qm.history.add', 'Add')}</Typography>
+            </AnimatedPressable>
+          </View>
+          <QMButton label={t('common:actions.save', 'Save')} onPress={actions.handleSaveTags} loading={actions.isUpdatingTags} style={styles.formBtn} />
+        </View>
+      </QMSheet>
 
       <LoadingOverlay visible={actions.isDeleting || actions.isClearingHistory} />
-      <ConfirmDialog {...actions.dialogProps} />
-    </Screen>
+      <QMConfirmDialog {...actions.dialogProps} />
+    </View>
   );
 }
 
+function Separator() {
+  return <View style={styles.sep} />;
+}
+
 const styles = StyleSheet.create({
-  fill: { flex: 1 },
-  modeToggle: { flexDirection: 'row', borderBottomWidth: 1 },
-  modeTab: {
-    flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.xs, paddingVertical: spacing.md,
-    borderBottomWidth: 2, borderBottomColor: 'transparent',
-  },
-  headerGroup: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
-  iconPressed: { opacity: 0.85 },
-  searchWrap: { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md },
-  searchInput: { marginBottom: 0 },
-  tagBarWrapper: { borderBottomWidth: 1 },
-  tagBar: { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.sm, gap: spacing.sm },
-  tagFilter: { paddingHorizontal: spacing.md, paddingVertical: spacing.xs, borderRadius: layout.pillRadius, borderWidth: 1 },
-  list: { padding: layout.screenPaddingH, paddingBottom: spacing.huge, flexGrow: 1 },
-  loadingWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingTop: spacing.s80 },
-  footerLoader: { paddingVertical: spacing.lg, alignItems: 'center' },
-  renameInput: { borderWidth: 1.5, borderRadius: layout.cardRadius, paddingHorizontal: spacing.lg, paddingVertical: spacing.md, fontSize: fontSizes.md },
-  tagGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  tagOption: { paddingHorizontal: spacing.md, paddingVertical: spacing.sm, borderRadius: layout.pillRadius, borderWidth: 1 },
-  renameModalBtn: { marginTop: spacing.md },
-  tagsModalBtn: { marginTop: spacing.lg },
+  flex: { flex: 1, minWidth: 0 },
+  dim: { opacity: 0.5 },
+  content: { flexGrow: 1, paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl },
+  topRow: { flexDirection: 'row', alignItems: 'center', marginLeft: -spacing.s10 },
+  icon: { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  title: { marginTop: spacing.s6, marginBottom: spacing.s14 },
+  search: { marginTop: spacing.md },
+  chipsWrap: { marginTop: spacing.md, marginHorizontal: -spacing.xl },
+  chips: { gap: spacing.sm, paddingHorizontal: spacing.xl },
+  chip: { height: CHIP_H, paddingHorizontal: spacing.s14, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  group: { marginTop: spacing.s22 },
+  markHead: { marginBottom: spacing.lg },
+  sep: { height: spacing.s10 },
+  empty: { marginTop: spacing.s48 },
+  loading: { marginTop: spacing.s48 },
+  moreRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: spacing.s10, paddingTop: spacing.s18, paddingBottom: spacing.xs },
+  form: { paddingHorizontal: spacing.md, paddingTop: spacing.s6 },
+  field: { height: FIELD_H, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2, ...textPresets.qmInput, fontSize: textPresets.qmBodyMd.fontSize },
+  formBtn: { marginTop: spacing.lg },
+  topicGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  topic: { height: CHIP_H + 2, paddingHorizontal: spacing.s14, borderRadius: radius.pill, alignItems: 'center', justifyContent: 'center' },
+  addRow: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.s14 },
+  addBtn: { height: FIELD_H, paddingHorizontal: spacing.lg, borderRadius: radius.r12 + 2, alignItems: 'center', justifyContent: 'center' },
 });

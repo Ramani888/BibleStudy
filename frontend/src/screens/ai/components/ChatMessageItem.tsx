@@ -198,7 +198,10 @@ function TypingDots() {
   );
 }
 
-// ── Minimal markdown: **bold**, "- " bullets, blank-line paragraphs ──────────
+// ── Minimal markdown: **bold**, *italic*, "- " bullets, blank-line paragraphs ─
+
+/** Same text without the markdown marks (one-line previews). */
+export const plainText = (text: string) => text.replace(/\*\*([^*]+?)\*\*/g, '$1').replace(/\*([^*\s][^*]*?)\*/g, '$1').replace(/^\s*[-*•]\s+/gm, '');
 
 function Inline({ text }: { text: string }) {
   const { qm } = useTheme();
@@ -214,7 +217,7 @@ function Inline({ text }: { text: string }) {
   );
 }
 
-function Markdown({ text }: { text: string }) {
+export function Markdown({ text }: { text: string }) {
   const { qm } = useTheme();
   const blocks = text.trim().split(/\n{2,}/);
   return (
