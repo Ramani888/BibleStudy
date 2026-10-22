@@ -86,7 +86,7 @@ use `edges={['bottom']}`/all-edges on a tab-hosted screen.
   always via a hook.
 - API: `<module>.api.ts` imports from `./client`, returns raw response data.
 - TS strict is on. No `any` without an inline comment justifying it. Types in `src/types/<domain>.types.ts`.
-- Theme: never hardcode colors/spacing/text — use `colors.*`, `spacing[n]`, `<Typography preset="…">`.
+- Theme: never hardcode colors/spacing/text — use `useTheme().qm.*` (the only colour set — legacy `colors` was removed), `spacing[n]`, `<Typography preset="…">`.
   No raw `<Text>` in screens. No magic numbers for style values.
 
 ## Process rules

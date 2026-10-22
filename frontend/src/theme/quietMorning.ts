@@ -1,7 +1,6 @@
 /**
- * "Quiet morning" redesign tokens (canvas v93). Screens opt in one module at a
- * time via `useTheme().qm` + the `qm*` text presets; untouched screens keep the
- * legacy tokens. Fold into `colors.ts` once every module has moved over.
+ * "Quiet morning" colour tokens (canvas v93) — the app's only colour set.
+ * Read them via `useTheme().qm`; pair with the `qm*` text presets.
  */
 export interface QMColors {
   bg: string;

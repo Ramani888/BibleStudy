@@ -34,7 +34,7 @@ function AppBootstrap() {
   const hydrateTheme = useThemeStore(s => s.hydrate);
   const hydrateLanguage = useLanguageStore(s => s.hydrate);
   const hydrateAnalytics = useAnalyticsStore(s => s.hydrate);
-  const { colors } = useTheme();
+  const { qm, name } = useTheme();
   const [showSplash, setShowSplash] = useState(true);
 
   useEffect(() => {
@@ -54,8 +54,8 @@ function AppBootstrap() {
   return (
     <View style={styles.root}>
       <StatusBar
-        barStyle={colors.statusBar}
-        backgroundColor={colors.background}
+        barStyle={name === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={qm.bg}
       />
       <CrashBoundary>
         <RootNavigator />

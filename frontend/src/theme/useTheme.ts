@@ -1,6 +1,5 @@
 import { useColorScheme } from 'react-native';
 import { useMemo } from 'react';
-import { darkColors, lightColors } from './colors';
 import { qmDark, qmLight } from './quietMorning';
 import { spacing } from './spacing';
 import { radius } from './radius';
@@ -23,7 +22,6 @@ export function useTheme(): Theme {
   return useMemo(
     () => ({
       name,
-      colors:     name === 'dark' ? darkColors : lightColors,
       spacing,
       radius,
       typography,

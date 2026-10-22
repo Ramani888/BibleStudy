@@ -57,6 +57,3 @@ export const palette = {
 } as const;
 
 export type Palette = typeof palette;
-
-/** Light-mode frosted lavender card fill, shared across feature cards. */
-export const CARD_FILL_LIGHT = '#F3EFFF';

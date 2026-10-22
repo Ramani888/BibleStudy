@@ -11,7 +11,7 @@ import { useTheme } from '../theme';
 export function useSystemBars(color?: string): void {
   const theme = useTheme();
   const isDark = theme.name === 'dark';
-  const barColor = color ?? theme.colors.bottomBar;
+  const barColor = color ?? theme.qm.bg;
 
   useEffect(() => {
     if (Platform.OS !== 'android') return;
