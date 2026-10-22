@@ -46,6 +46,11 @@ export const storage = {
     await AsyncStorage.setItem(KEYS.AI_POLICY_ACCEPTED, 'true');
   },
 
+  /** Settings → AI helper off: Ask and AI quizzes ask for consent again before sending anything. */
+  async clearAiPolicyAccepted(): Promise<void> {
+    await AsyncStorage.removeItem(KEYS.AI_POLICY_ACCEPTED);
+  },
+
   async getContentPolicyAccepted(): Promise<boolean> {
     return (await AsyncStorage.getItem(KEYS.CONTENT_POLICY_ACCEPTED)) === 'true';
   },

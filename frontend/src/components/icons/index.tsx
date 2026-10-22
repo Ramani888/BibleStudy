@@ -616,6 +616,43 @@ export const BagIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidt
   </Outline>
 );
 
+export const SunIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 4v1.5M12 18.5V20M4 12h1.5M18.5 12H20M6.3 6.3l1 1M16.7 16.7l1 1M6.3 17.7l1-1M16.7 7.3l1-1M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const MoonIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M19 14.5A7.5 7.5 0 0 1 9.5 5a7.5 7.5 0 1 0 9.5 9.5z" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const PhoneIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M8 3h8a1.5 1.5 0 0 1 1.5 1.5v15A1.5 1.5 0 0 1 16 21H8a1.5 1.5 0 0 1-1.5-1.5v-15A1.5 1.5 0 0 1 8 3zM11 18h2" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+/** Friend-request person + plus / accepted person + tick / megaphone (notification kinds). */
+export const PersonPlusIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M15 19v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V19M9 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M19 8v6M22 11h-6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const PersonCheckIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M16 19v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V19M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M16 10l2 2 4-4" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
+export const MegaphoneIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M4 10v4h3l5 4V6L7 10zM16 9a4 4 0 0 1 0 6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);
+
 /** Three dots in a row (folder tile menu). */
 export const MoreHorizontalIcon: IconComponent = ({ size, color = DEFAULT_COLOR }) => (
   <Outline size={size}>

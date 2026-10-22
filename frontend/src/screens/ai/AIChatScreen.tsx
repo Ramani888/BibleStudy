@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FlatList, KeyboardAvoidingView, Platform, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -23,6 +24,7 @@ import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { detectTags } from '../../utils/tagDetector';
 import { formatBytes, truncate } from '../../utils/formatters';
 import { getErrorMessage } from '../../api';
+import { storage } from '../../utils/storage';
 import { useTheme, spacing, radius } from '../../theme';
 import type { AIScreenProps } from '../../navigation/types';
 import type { ChatMessage, MediaFileType, SuggestedCard } from '../../types';
@@ -70,6 +72,11 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   const markSaved       = useAIChatStore(s => s.markSaved);
   const unmarkSaved     = useAIChatStore(s => s.unmarkSaved);
   const clearChat       = useAIChatStore(s => s.clear);
+
+  // AI helper switched off in Settings → back through consent before anything is sent.
+  useFocusEffect(useCallback(() => {
+    storage.getAiPolicyAccepted().then(ok => { if (!ok) navigation.replace('AIConsent'); }).catch(() => {});
+  }, [navigation]));
 
   const listRef = useRef<FlatList>(null);
   const lastAutoSendRef = useRef<string | undefined>(undefined);

@@ -29,7 +29,7 @@ export const qmRowEnter = (i: number) => FadeInUp.duration(320).delay(Math.min(i
 
 // ─── Segmented control with sliding pill ─────────────────────────────────────
 export function QMSegmented<K extends string>({ options, value, onChange, label }: {
-  options: { key: K; label: string }[]; value: K; onChange: (k: K) => void; label: string;
+  options: { key: K; label: string; icon?: IconComponent }[]; value: K; onChange: (k: K) => void; label: string;
 }) {
   const { qm } = useTheme();
   const [w, setW] = useState(0);
@@ -55,6 +55,7 @@ export function QMSegmented<K extends string>({ options, value, onChange, label 
           accessibilityRole="tab"
           accessibilityState={{ selected: o.key === value }}
         >
+          {o.icon && <o.icon size={15} color={o.key === value ? qm.ink : qm.muted} strokeWidth={2.2} />}
           <Typography preset="qmSegment" color={o.key === value ? qm.ink : qm.muted}>{o.label}</Typography>
         </Pressable>
       ))}
@@ -280,7 +281,7 @@ const styles = StyleSheet.create({
   dim: { opacity: 0.6 },
   seg: { flexDirection: 'row', padding: SEG_PAD, borderRadius: radius.r12 + 2 },
   segPill: { position: 'absolute', top: SEG_PAD, left: SEG_PAD, height: SEG_H, borderRadius: radius.r10 + 1 },
-  segBtn: { flex: 1, height: SEG_H, alignItems: 'center', justifyContent: 'center' },
+  segBtn: { flex: 1, height: SEG_H, flexDirection: 'row', gap: spacing.s6, alignItems: 'center', justifyContent: 'center' },
   search: {
     flexDirection: 'row', alignItems: 'center', gap: spacing.s10,
     height: SEARCH_H, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2,

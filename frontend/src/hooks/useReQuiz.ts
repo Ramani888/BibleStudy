@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Toast from 'react-native-toast-message';
 
 import { getErrorMessage } from '../api';
+import { storage } from '../utils/storage';
 import { reQuizParams, reQuizSource } from '../screens/quiz/quizUi';
 import type { SummaryItem } from '../types';
 import { useConfirmDialog } from './useConfirmDialog';
@@ -70,13 +71,21 @@ export function useReQuiz() {
     // AI quiz with a known source → confirm + regenerate fresh questions (charged).
     if (source) {
       if (creditBalance && creditBalance.balance < AI_QUIZ_COST) { goPaywall(); return; }
-      show({
-        title: source.topic ? t('quiz:qm.reQuizTopicTitle', 'Make a new quiz on the same topic?') : t('quiz:qm.reQuizSetsTitle', 'Make a new quiz from the same sets?'),
-        message: creditBalance
-          ? t('quiz:qm.reQuizMessage', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Verdance writes fresh questions. Uses ${AI_QUIZ_COST} credits. You have {{balance}}.` })
-          : t('quiz:reQuiz.confirmMessage', { cost: AI_QUIZ_COST }),
-        confirmLabel: t('quiz:reQuiz.confirmCta', { cost: AI_QUIZ_COST, defaultValue: `Use ${AI_QUIZ_COST} credits` }),
-        onConfirm: () => regenerate(attempt, source),
+      const cost = creditBalance
+        ? t('quiz:qm.reQuizMessage', { cost: AI_QUIZ_COST, balance: creditBalance.balance, defaultValue: `Verdance writes fresh questions. Uses ${AI_QUIZ_COST} credits. You have {{balance}}.` })
+        : t('quiz:reQuiz.confirmMessage', { cost: AI_QUIZ_COST });
+      // AI helper may have been switched off in Settings → fold the consent notice into this one dialog.
+      storage.getAiPolicyAccepted().catch(() => false).then(accepted => {
+        const what = source.topic ? t('quiz:qm.whatTopic', 'your topic') : t('quiz:qm.whatSets', 'the cards in the sets you chose');
+        show({
+          title: source.topic ? t('quiz:qm.reQuizTopicTitle', 'Make a new quiz on the same topic?') : t('quiz:qm.reQuizSetsTitle', 'Make a new quiz from the same sets?'),
+          message: accepted ? cost : `${t('quiz:qm.consentText', { what })}\n\n${cost}`,
+          confirmLabel: t('quiz:reQuiz.confirmCta', { cost: AI_QUIZ_COST, defaultValue: `Use ${AI_QUIZ_COST} credits` }),
+          onConfirm: async () => {
+            if (!accepted) await storage.setAiPolicyAccepted();
+            regenerate(attempt, source);
+          },
+        });
       });
       return;
     }

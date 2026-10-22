@@ -70,7 +70,8 @@ export {
   useMarkAllNotificationsRead,
   useDeleteNotification,
 } from './useNotifications';
-export { useNotificationPrefs, useUnreadCount, TYPE_TO_PREF } from './useNotificationPrefs';
+export { useNotificationPrefs, useUnreadCount, TYPE_TO_PREF, NOTIF_PREFS_KEY, NOTIF_DEFAULTS } from './useNotificationPrefs';
+export type { NotificationPrefs } from './useNotificationPrefs';
 export { useNotes, useNote, useCreateNote, useUpdateNote, useDeleteNote } from './useNotes';
 export { useNoteStats } from './useNoteStats';
 export { useMediaFiles, useStorageUsage, useUploadMedia, useDeleteMedia, useRenameMedia, useBulkDeleteMedia } from './useMedia';

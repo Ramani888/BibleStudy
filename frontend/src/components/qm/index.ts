@@ -16,4 +16,4 @@ export {
 } from './QMListBits';
 export { QMModalScreen } from './QMModalScreen';
 export { QMScoreRing } from './QMScoreRing';
-export { QMMenuGroup, QMMenuRow } from './QMMenu';
+export { QMMenuGroup, QMMenuRow, QMSwitch, QMSwitchRow } from './QMMenu';

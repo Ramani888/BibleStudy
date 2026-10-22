@@ -113,14 +113,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   },
 
   deleteAccount: async () => {
-    try {
-      await removeDeviceToken();
-      await usersApi.deleteAccount();
-    } finally {
-      await logoutRevenueCat();
-      await storage.clearTokens();
-      get().reset();
-    }
+    await removeDeviceToken();
+    // A failed delete throws here and leaves you signed in — the screen shows the error.
+    await usersApi.deleteAccount();
+    await logoutRevenueCat();
+    await storage.clearTokens();
+    get().reset();
   },
 
   forgotPassword: async (payload: ForgotPasswordPayload) => {

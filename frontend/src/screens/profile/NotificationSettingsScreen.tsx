@@ -1,137 +1,88 @@
 import React, { useEffect, useState } from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
+import { QMBackButton, QMMenuGroup, QMSwitchRow } from '../../components/qm';
+import { Typography } from '../../components/ui';
+import { LeafIcon, MegaphoneIcon, PersonCheckIcon, PersonPlusIcon, type IconComponent } from '../../components/icons';
+import { NOTIF_DEFAULTS, NOTIF_PREFS_KEY, type NotificationPrefs } from '../../hooks';
 import { registerDeviceToken } from '../../utils/notifications';
-
-import { Screen } from '../../components/ui/Screen';
-import { ScreenHeader } from '../../components/ui/ScreenHeader';
-import { Switch } from '../../components/ui/Switch';
-import { Typography } from '../../components/ui/Typography';
-import { CARD_FILL_LIGHT, spacing, radius, useTheme } from '../../theme';
-import { layout } from '../../constants/layout';
+import { spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
 
-const STORAGE_KEY = '@bsp/notification_settings';
-
-interface NotificationPrefs {
-  friendRequests: boolean;
-  friendAccepted: boolean;
-  achievements:   boolean;
-  system:         boolean;
-}
-
-const DEFAULTS: NotificationPrefs = {
-  friendRequests: true,
-  friendAccepted: true,
-  achievements:   true,
-  system:         true,
-};
-
-const SETTING_KEYS: { key: keyof NotificationPrefs; labelKey: string; defaultLabel: string; descKey: string; defaultDesc: string }[] = [
-  { key: 'friendRequests', labelKey: 'friendRequests', defaultLabel: 'Friend Requests', descKey: 'friendRequestsDesc', defaultDesc: 'When someone sends you a friend request' },
-  { key: 'friendAccepted', labelKey: 'friendAccepted', defaultLabel: 'Friend Accepted', descKey: 'friendAcceptedDesc', defaultDesc: 'When someone accepts your friend request' },
-  { key: 'achievements',   labelKey: 'achievements',   defaultLabel: 'Achievements',   descKey: 'achievementsDesc',   defaultDesc: 'When you unlock a new achievement' },
-  { key: 'system',         labelKey: 'system',         defaultLabel: 'System',         descKey: 'systemDesc',         defaultDesc: 'App announcements and important updates' },
+const KINDS: { key: keyof NotificationPrefs; copy: string; icon: IconComponent; tone: 'violet' | 'leaf' | 'gold' }[] = [
+  { key: 'friendRequests', copy: 'friendRequests', icon: PersonPlusIcon, tone: 'violet' },
+  { key: 'friendAccepted', copy: 'friendAccepted', icon: PersonCheckIcon, tone: 'violet' },
+  { key: 'achievements', copy: 'achievements', icon: LeafIcon, tone: 'leaf' },
+  { key: 'system', copy: 'news', icon: MegaphoneIcon, tone: 'gold' },
 ];
 
-function PreferenceCard({
-  title, description, value, onToggle, isDark,
-}: {
-  title: string; description: string; value: boolean; onToggle: () => void; isDark: boolean;
-}) {
-  const { colors } = useTheme();
+export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'NotificationSettings'>) {
+  const { t } = useTranslation(['profile', 'common']);
+  const { qm } = useTheme();
+  const insets = useSafeAreaInsets();
+  const [prefs, setPrefs] = useState<NotificationPrefs>(NOTIF_DEFAULTS);
+
+  useEffect(() => {
+    AsyncStorage.getItem(NOTIF_PREFS_KEY)
+      .then(raw => { if (raw) setPrefs({ ...NOTIF_DEFAULTS, ...JSON.parse(raw) }); })
+      .catch(() => setPrefs(NOTIF_DEFAULTS)); // corrupt/failed read — fall back to defaults
+  }, []);
+
+  const toggle = async (key: keyof NotificationPrefs, on: boolean) => {
+    // Just-in-time OS permission: only ask when the user opts INTO notifications.
+    if (on && !(await registerDeviceToken({ prompt: true }))) {
+      Toast.show({
+        type: 'info',
+        text1: t('profile:qmNotif.offTitle'),
+        text2: t('profile:qmNotif.offText'),
+        onPress: () => Linking.openSettings(),
+      });
+      return; // don't flip on without OS permission
+    }
+    const updated = { ...prefs, [key]: on };
+    setPrefs(updated);
+    await AsyncStorage.setItem(NOTIF_PREFS_KEY, JSON.stringify(updated));
+  };
+
+  const tint = (tone: 'violet' | 'leaf' | 'gold'): [string, string] =>
+    tone === 'leaf' ? [qm.leafBg, qm.leaf] : tone === 'gold' ? [qm.goldBg, qm.goldText] : [qm.lilac, qm.link];
+
   return (
-    <View style={[
-      styles.card,
-      { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT },
-    ]}>
-      <View style={styles.cardText}>
-        <Typography preset="label" color={colors.textPrimary}>{title}</Typography>
-        <Typography preset="caption" color={colors.textSecondary} style={styles.cardSub}>{description}</Typography>
-      </View>
-      <Switch value={value} onValueChange={onToggle} />
+    <View style={[styles.flex, { backgroundColor: qm.bg }]}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+        <QMBackButton onPress={navigation.goBack} label={t('profile:qmSettings.back')} />
+        <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmNotif.title')}</Typography>
+        <Typography preset="qmBodyMd" color={qm.muted}>{t('profile:qmNotif.sub')}</Typography>
+
+        <QMMenuGroup label={t('profile:qmNotif.section')} style={styles.group}>
+          {KINDS.map((k, i) => (
+            <QMSwitchRow
+              key={k.key}
+              first={i === 0}
+              icon={k.icon}
+              tint={tint(k.tone)}
+              label={t(`profile:qmNotif.${k.copy}`)}
+              hint={t(`profile:qmNotif.${k.copy}Hint`)}
+              value={prefs[k.key]}
+              onChange={v => toggle(k.key, v)}
+            />
+          ))}
+        </QMMenuGroup>
+
+        <Typography preset="qmMeta" color={qm.muted} style={styles.footer}>{t('profile:qmNotif.footer')}</Typography>
+      </ScrollView>
     </View>
   );
 }
 
-export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'NotificationSettings'>) {
-  const { t } = useTranslation(['profile', 'common']);
-  const theme = useTheme();
-  const isDark = theme.name === 'dark';
-  const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
-
-  useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY)
-      .then(raw => {
-        if (raw) setPrefs({ ...DEFAULTS, ...JSON.parse(raw) });
-      })
-      .catch(() => setPrefs(DEFAULTS)); // corrupt/failed read — fall back to defaults
-  }, []);
-
-  const toggle = async (key: keyof NotificationPrefs) => {
-    const turningOn = !prefs[key];
-    // Just-in-time OS permission: only ask when the user opts INTO notifications.
-    // Already-granted → returns true silently; declined → keep the toggle off.
-    if (turningOn) {
-      const granted = await registerDeviceToken({ prompt: true });
-      if (!granted) {
-        Toast.show({
-          type: 'info',
-          text1: t('profile:notificationSettings.permissionNeededTitle', 'Notifications are off'),
-          text2: t('profile:notificationSettings.permissionNeededBody', 'Enable notifications for Verdance in your device Settings.'),
-          onPress: () => Linking.openSettings(),
-        });
-        return; // don't flip the toggle on without OS permission
-      }
-    }
-    const updated = { ...prefs, [key]: turningOn };
-    setPrefs(updated);
-    await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
-  };
-
-  return (
-    <Screen header={<ScreenHeader title={t('profile:menu.notifications')} onBack={() => navigation.goBack()} />}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <Typography preset="caption" color={theme.colors.textSecondary} style={styles.hint}>
-          {t('profile:notificationSettings.hint', "Choose which notifications you'd like to receive.")}
-        </Typography>
-        <View style={styles.list}>
-          {SETTING_KEYS.map(s => (
-            <PreferenceCard
-              key={s.key}
-              title={t(`profile:notificationSettings.${s.labelKey}`, s.defaultLabel)}
-              description={t(`profile:notificationSettings.${s.descKey}`, s.defaultDesc)}
-              value={prefs[s.key]}
-              onToggle={() => toggle(s.key)}
-              isDark={isDark}
-            />
-          ))}
-        </View>
-      </ScrollView>
-    </Screen>
-  );
-}
-
 const styles = StyleSheet.create({
-  scroll: {
-    paddingHorizontal: layout.screenPaddingH,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.s48,
-  },
-  hint: { marginBottom: spacing.xl },
-  list: { gap: spacing.lg },
-  card: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    minHeight: 78,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.s18,
-    paddingVertical: spacing.lg,
-    gap: spacing.md,
-  },
-  cardText: { flex: 1 },
-  cardSub: { marginTop: spacing.xs },
+  flex: { flex: 1 },
+  content: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxxl },
+  h1: { marginTop: spacing.s6, marginBottom: spacing.xs },
+  group: { marginTop: spacing.xs },
+  footer: { marginTop: spacing.s14, marginHorizontal: spacing.s6 },
 });

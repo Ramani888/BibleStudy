@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 import { useNotifications } from './useNotifications';
 
-const STORAGE_KEY = '@bsp/notification_settings';
+export const NOTIF_PREFS_KEY = '@bsp/notification_settings';
 
 export interface NotificationPrefs {
   friendRequests: boolean;
@@ -12,7 +12,7 @@ export interface NotificationPrefs {
   system:         boolean;
 }
 
-const DEFAULTS: NotificationPrefs = {
+export const NOTIF_DEFAULTS: NotificationPrefs = {
   friendRequests: true,
   friendAccepted: true,
   achievements:   true,
@@ -29,11 +29,11 @@ export const TYPE_TO_PREF: Record<string, keyof NotificationPrefs> = {
 
 // Re-reads prefs from AsyncStorage every time the screen comes into focus.
 export function useNotificationPrefs(): NotificationPrefs {
-  const [prefs, setPrefs] = useState<NotificationPrefs>(DEFAULTS);
+  const [prefs, setPrefs] = useState<NotificationPrefs>(NOTIF_DEFAULTS);
 
   useFocusEffect(useCallback(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then(raw => {
-      setPrefs(raw ? { ...DEFAULTS, ...JSON.parse(raw) } : DEFAULTS);
+    AsyncStorage.getItem(NOTIF_PREFS_KEY).then(raw => {
+      setPrefs(raw ? { ...NOTIF_DEFAULTS, ...JSON.parse(raw) } : NOTIF_DEFAULTS);
     });
   }, []));
 
