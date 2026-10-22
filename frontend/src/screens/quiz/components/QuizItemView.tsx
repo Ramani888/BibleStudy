@@ -1,11 +1,33 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import Animated, {
+  FadeIn, FadeInRight, SlideInDown, ZoomIn, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming,
+} from 'react-native-reanimated';
+import LinearGradient from 'react-native-linear-gradient';
+import { useTranslation } from 'react-i18next';
 
-import { Button, Typography } from '../../../components/ui';
-import { layout, spacing, useTheme, CARD_FILL_LIGHT, radius } from '../../../theme';
+import { QMButton } from '../../../components/qm';
+import { AnimatedPressable, Typography } from '../../../components/ui';
+import { CheckIcon, CloseIcon, LeafIcon } from '../../../components/icons';
+import { qmFont, radius, spacing, textPresets, useTheme } from '../../../theme';
 import type { QuizItem } from '../../../types';
+import { normalize } from '../../../hooks/useQuizSession';
+import { qmModeName } from '../quizUi';
 
 const LETTERS = ['A', 'B', 'C', 'D'];
+const OPT_MIN_H = 60;
+const BADGE = 30;
+const SLOT_MIN_W = 86;
+const SLOT_H = 36;
+const TILE_H = 44;
+const POOL_MIN_H = 52;
+const PLACED_MIN_H = 120;
+const DOT = 8;
+const USED_OPACITY = 0.35;
+const DIM_OPACITY = 0.55;
+const HIDDEN_BLUR = 18;
+const HIDDEN_OPACITY = 0.35;
+const NO_OFFSET = { width: 0, height: 0 };
 
 // mirrors the private helpers in useQuizSession — not worth exporting for two callers
 // MUST stay byte-identical to core() in useQuizSession (blank tiles vs grading).
@@ -41,6 +63,12 @@ interface Props {
   onNext: () => void;
   onFinish: () => void;
   bottomInset?: number;
+  /** Muted source line in the chip row (set / quiz name). */
+  setName?: string;
+  /** Practice round that isn't recorded (e.g. practise-missed). */
+  ephemeral?: boolean;
+  /** Real cards feed SM-2: a miss reschedules for tomorrow — say so. */
+  comesBack?: boolean;
 }
 
 function getDefaultResponse(item: QuizItem): unknown {
@@ -60,17 +88,14 @@ function getCanCheck(item: QuizItem, response: unknown): boolean {
   }
 }
 
-import { useTranslation } from 'react-i18next';
-
 export function QuizItemView({
   item, initialResponse, onResponseChange, onSubmit,
   submitted, lastCorrect, correctAnswer,
   isLast, onNext, onFinish, bottomInset = 0,
+  setName, ephemeral, comesBack,
 }: Props) {
   const { t } = useTranslation(['quiz', 'common']);
-  const theme = useTheme();
-  const { colors } = theme;
-  const isDark = theme.name === 'dark';
+  const { qm } = useTheme();
 
   const [response, setResponseState] = useState<unknown>(() => initialResponse ?? getDefaultResponse(item));
   // Read mode: CONTINUE locked until all phrases tapped
@@ -85,33 +110,43 @@ export function QuizItemView({
   const isMC = item.mode === 'mc' || item.mode === 'story_mc';
   const isCorrect = lastCorrect === true;
   const canCheck = !submitted && scored && !isMC && getCanCheck(item, response);
+  const big = isMC || item.mode === 'type_answer' || item.mode === 'type_verbatim';
+  const goOn = isLast ? onFinish : onNext;
 
   return (
     <View style={styles.wrap}>
       <ScrollView
-        contentContainerStyle={styles.scroll}
+        contentContainerStyle={[styles.scroll, submitted && scored && styles.scrollUnderSheet]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        {/* Question card */}
-        <View style={[styles.questionCard, { backgroundColor: isDark ? colors.chipIdle : CARD_FILL_LIGHT, borderColor: colors.border }]}>
-          <View style={styles.cardHeaderRow}>
-            <Typography preset="caption" color={colors.textSecondary} style={styles.label}>{modeLabel(item, t)}</Typography>
-            {!!item.difficulty && (
-              <View style={styles.diffPip}>
-                <View style={[styles.diffDot, { backgroundColor: item.difficulty === 'EASY' ? colors.success : item.difficulty === 'HARD' ? colors.alert : colors.warning }]} />
-                <Typography preset="caption" color={colors.textSecondary}>
+        <Animated.View entering={FadeInRight.duration(320)}>
+          <View style={styles.chips}>
+            <View style={[styles.chip, { backgroundColor: qm.lilac }]}>
+              <Typography preset="qmLabel" color={qm.lilacInk}>{qmModeName(item.mode, t)}</Typography>
+            </View>
+            {scored && !!item.difficulty && (
+              <View style={styles.diff}>
+                <View style={[styles.dot, { backgroundColor: item.difficulty === 'EASY' ? qm.leaf : item.difficulty === 'HARD' ? qm.warm : qm.gold }]} />
+                <Typography preset="qmMeta" color={qm.muted}>
                   {t(`quiz:difficulty.${item.difficulty.toLowerCase()}`, item.difficulty.charAt(0) + item.difficulty.slice(1).toLowerCase())}
                 </Typography>
               </View>
             )}
+            {(!scored || ephemeral) && (
+              <View style={[styles.chip, { backgroundColor: qm.goldBg }]}>
+                <Typography preset="qmLabel" color={qm.goldText}>
+                  {!scored ? t('quiz:qm.notScored', 'Practice · not scored') : t('quiz:inQuiz.practiceNotSaved', 'Practice · not saved')}
+                </Typography>
+              </View>
+            )}
+            {!!setName && <Typography preset="qmMeta" color={qm.muted} numberOfLines={1} style={styles.setName}>{setName}</Typography>}
           </View>
-          {!!promptText(item) && (
-            <Typography preset="h3" color={colors.textPrimary}>{promptText(item)}</Typography>
+          {!!item.prompt && (
+            <Typography preset={big ? 'qmPrompt' : 'qmPromptSm'} color={qm.ink} style={styles.prompt}>{item.prompt}</Typography>
           )}
-        </View>
+        </Animated.View>
 
-        {/* Answer input area */}
         <View style={styles.answerArea}>
           <Body
             item={item}
@@ -124,59 +159,52 @@ export function QuizItemView({
             onAllRevealed={() => setAllRevealed(true)}
           />
         </View>
-
-        {/* Feedback banner — shown after submit for scored modes */}
-        {submitted && scored && (
-          <View style={[styles.feedbackBanner, { backgroundColor: isCorrect ? colors.successSoft : colors.errorSurface }]}>
-            <Typography preset="label" color={isCorrect ? colors.success : colors.difficultyHard} style={styles.feedbackTitle}>
-              {isCorrect ? `✓  ${t('quiz:inQuiz.correct')}` : `✗  ${t('quiz:inQuiz.incorrect')}`}
-            </Typography>
-            {!isCorrect && (
-              <View style={styles.correctAnswerWrap}>
-                <Typography preset="caption" color={colors.textSecondary}>{t('quiz:inQuiz.correctAnswer')}</Typography>
-                <Typography preset="body" color={colors.textPrimary} style={styles.correctAnswerText}>{correctAnswer}</Typography>
-              </View>
-            )}
-          </View>
-        )}
       </ScrollView>
 
-      {/* Footer */}
-      <View style={[styles.footer, { borderTopColor: colors.divider, paddingBottom: Math.max(bottomInset, spacing.lg) }]}>
-        {/* Non-MC scored, not yet submitted → full-width CHECK ANSWER */}
-        {!submitted && scored && !isMC && (
-          <Button
-            label={t('common:actions.submit', 'CHECK ANSWER')}
-            onPress={() => onSubmit(response)}
-            disabled={!canCheck}
-            style={styles.fullWidth}
-          />
-        )}
+      {/* Check (non-MC scored) · Continue (read) */}
+      {!submitted && (scored ? !isMC : true) && (
+        <View style={[styles.footer, { paddingBottom: Math.max(bottomInset, spacing.lg) + spacing.md }]}>
+          {scored
+            ? <QMButton label={t('quiz:qm.check', 'Check')} onPress={() => onSubmit(response)} off={!canCheck} />
+            : <QMButton label={t('common:actions.continue', 'Continue')} onPress={goOn} off={!allRevealed} />}
+        </View>
+      )}
 
-        {/* MC not submitted → nothing (tap an option to auto-submit) */}
-
-        {/* After submit, or read mode → full-width CONTINUE / FINISH */}
-        {(submitted || !scored) && (
-          <Button
-            label={isLast ? t('common:actions.done', 'FINISH') : t('common:actions.continue', 'CONTINUE')}
-            onPress={isLast ? onFinish : onNext}
-            disabled={!allRevealed}
-            style={styles.fullWidth}
-          />
-        )}
-      </View>
+      {/* Feedback sheet — after submit for scored modes */}
+      {submitted && scored && (
+        <Animated.View
+          entering={SlideInDown.springify().damping(18).stiffness(160)}
+          style={[styles.sheet, { backgroundColor: isCorrect ? qm.okSheet : qm.noSheet, boxShadow: qm.sheetShadow, paddingBottom: Math.max(bottomInset, spacing.lg) + spacing.lg }]}
+          accessibilityLiveRegion="polite"
+        >
+          <View style={styles.sheetHead}>
+            <Animated.View entering={ZoomIn.delay(120).springify().damping(10)}>
+              {isCorrect
+                ? <LeafIcon size={24} color={qm.okInk} filled />
+                : <View style={[styles.noBadge, { backgroundColor: qm.noInk }]}><CloseIcon size={14} color={qm.noSheet} strokeWidth={3} /></View>}
+            </Animated.View>
+            <Typography preset="qmSheetTitle" color={isCorrect ? qm.okInk : qm.noInk}>
+              {isCorrect ? t('quiz:qm.correctTitle', 'Correct') : t('quiz:qm.notQuite', 'Not quite')}
+            </Typography>
+          </View>
+          {!isCorrect && (
+            <>
+              <View style={[styles.ghost, { backgroundColor: qm.ghost }]}>
+                <Typography preset="qmLabel" color={qm.muted}>{t('quiz:qm.correctAnswer', 'Correct answer')}</Typography>
+                <Typography preset="qmPromptSm" color={qm.ink} style={styles.ghostText}>{correctAnswer}</Typography>
+              </View>
+              {comesBack && (
+                <Typography preset="qmBody" color={qm.body} style={styles.comesBack}>
+                  {t('quiz:qm.comesBack', 'This card comes back tomorrow so it sticks.')}
+                </Typography>
+              )}
+            </>
+          )}
+          <QMButton label={t('common:actions.continue', 'Continue')} onPress={goOn} style={styles.sheetBtn} />
+        </Animated.View>
+      )}
     </View>
   );
-}
-
-function modeLabel(item: QuizItem, t: (key: string) => string): string {
-  return t(`quiz:modeHeaders.${item.mode}`);
-}
-
-function promptText(item: QuizItem): string {
-  if (item.mode === 'blanks' || item.mode === 'chunks') return item.prompt ?? '';
-  if (item.mode === 'read') return item.prompt ?? '';
-  return item.prompt;
 }
 
 // ─── per-mode inputs ──────────────────────────────────────────────────────────
@@ -199,7 +227,7 @@ function Body({ item, response, onChangeResponse, submitted, lastCorrect, correc
       return <MC item={item} response={response as number | null} onChangeResponse={onChangeResponse} submitted={submitted} lastCorrect={lastCorrect} correctAnswer={correctAnswer} onSubmit={onSubmit} />;
     case 'type_answer':
     case 'type_verbatim':
-      return <TypeIn item={item} response={response as string} onChangeResponse={onChangeResponse} submitted={submitted} />;
+      return <TypeIn item={item} response={response as string} onChangeResponse={onChangeResponse} submitted={submitted} lastCorrect={lastCorrect} />;
     case 'blanks':
       return <WordBank item={item} onChangeResponse={onChangeResponse} submitted={submitted} />;
     case 'chunks':
@@ -211,89 +239,122 @@ function Body({ item, response, onChangeResponse, submitted, lastCorrect, correc
 
 // ─── MC ───────────────────────────────────────────────────────────────────────
 
+type MCItem = Extract<QuizItem, { mode: 'mc' | 'story_mc' }>;
+
 function MC({ item, response, onChangeResponse, submitted, lastCorrect, correctAnswer, onSubmit }: {
-  item: any; response: number | null; onChangeResponse: (r: unknown) => void;
+  item: MCItem; response: number | null; onChangeResponse: (r: unknown) => void;
   submitted: boolean; lastCorrect: boolean | null; correctAnswer: string;
   onSubmit: (r: unknown) => void;
 }) {
-  const { colors } = useTheme();
   const correctIndex = item.options.indexOf(correctAnswer);
-
   return (
-    <>
-      {item.options.map((opt: string, i: number) => {
-        const isSelected = response === i;
-        const isThisCorrect = submitted && i === correctIndex;
-        const isThisWrong = submitted && isSelected && lastCorrect === false;
+    <View style={styles.options} accessibilityRole="radiogroup">
+      {item.options.map((opt, i) => (
+        <Option
+          key={i}
+          letter={LETTERS[i]}
+          text={opt}
+          serif={item.mode === 'story_mc'}
+          state={!submitted ? 'idle' : i === correctIndex ? 'right' : response === i && lastCorrect === false ? 'wrong' : 'dim'}
+          onPress={() => {
+            if (submitted) return;
+            onChangeResponse(i);
+            onSubmit(i);
+          }}
+        />
+      ))}
+    </View>
+  );
+}
 
-        return (
-          <Pressable
-            key={i}
-            onPress={() => {
-              if (submitted) return;
-              onChangeResponse(i);
-              onSubmit(i);
-            }}
-            style={({ pressed }) => [
-              styles.option,
-              { borderColor: colors.border, backgroundColor: colors.surface },
-              isSelected && !submitted && { borderColor: colors.accent, backgroundColor: colors.accentSoft },
-              isThisCorrect && { borderColor: colors.success, backgroundColor: colors.successSoft },
-              isThisWrong && { borderColor: colors.difficultyHard, backgroundColor: colors.errorSurface },
-              pressed && !submitted && styles.optionPressed,
-            ]}
-          >
-            <View style={[
-              styles.letter,
-              { backgroundColor: colors.surfaceMuted },
-              isSelected && !submitted && { backgroundColor: colors.accent },
-              isThisCorrect && { backgroundColor: colors.success },
-              isThisWrong && { backgroundColor: colors.difficultyHard },
-            ]}>
-              <Typography
-                preset="label"
-                color={(isSelected && !submitted) || isThisCorrect || isThisWrong ? colors.background : colors.textSecondary}
-              >
-                {LETTERS[i]}
-              </Typography>
-            </View>
-            <Typography preset="body" color={colors.textPrimary} style={styles.flex}>{opt}</Typography>
-          </Pressable>
-        );
-      })}
-    </>
+function Option({ letter, text, serif, state, onPress }: {
+  letter: string; text: string; serif: boolean; state: 'idle' | 'right' | 'wrong' | 'dim'; onPress: () => void;
+}) {
+  const { qm } = useTheme();
+  // Right answer pops, a wrong pick nudges sideways (canvas okpop / nudge).
+  const scale = useSharedValue(1);
+  const x = useSharedValue(0);
+  useEffect(() => {
+    if (state === 'right') scale.value = withSequence(withTiming(1.03, { duration: 160 }), withSpring(1, { damping: 10 }));
+    if (state === 'wrong') x.value = withSequence(withTiming(-4, { duration: 90 }), withTiming(4, { duration: 90 }), withTiming(0, { duration: 90 }));
+  }, [state, scale, x]);
+  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }, { translateX: x.value }] }));
+
+  const ring = state === 'right' ? `inset 0px 0px 0px 2px ${qm.leaf}` : state === 'wrong' ? `inset 0px 0px 0px 2px ${qm.warm}` : qm.optLine;
+  const bg = state === 'right' ? qm.leafBg : state === 'wrong' ? qm.errorBg : qm.surface;
+  const badgeBg = state === 'right' ? qm.leaf : state === 'wrong' ? qm.warm : qm.field;
+  const badgeInk = state === 'right' || state === 'wrong' ? qm.onViolet : qm.muted;
+  return (
+    <Animated.View style={[anim, state === 'dim' && styles.dim]}>
+      <AnimatedPressable
+        scaleTo={0.98}
+        disabled={state !== 'idle'}
+        onPress={onPress}
+        style={[styles.option, { backgroundColor: bg, boxShadow: ring }]}
+        accessibilityRole="radio"
+        accessibilityState={{ checked: state === 'right' || state === 'wrong' }}
+        accessibilityLabel={text}
+      >
+        <View style={[styles.badge, { backgroundColor: badgeBg }]}>
+          {state === 'right'
+            ? <CheckIcon size={16} color={badgeInk} strokeWidth={3} />
+            : <Typography preset="qmButton" color={badgeInk}>{letter}</Typography>}
+        </View>
+        <Typography preset={serif ? 'qmOptionSerif' : 'qmOption'} color={qm.ink} style={styles.flex}>{text}</Typography>
+      </AnimatedPressable>
+    </Animated.View>
   );
 }
 
 // ─── Type in ─────────────────────────────────────────────────────────────────
 
-function TypeIn({ item, response, onChangeResponse, submitted }: { item: any; response: string; onChangeResponse: (r: unknown) => void; submitted: boolean }) {
+function TypeIn({ item, response, onChangeResponse, submitted, lastCorrect }: {
+  item: Extract<QuizItem, { mode: 'type_answer' | 'type_verbatim' }>; response: string;
+  onChangeResponse: (r: unknown) => void; submitted: boolean; lastCorrect: boolean | null;
+}) {
   const { t } = useTranslation(['quiz', 'common']);
-  const { colors } = useTheme();
+  const { qm } = useTheme();
+  const [focused, setFocused] = useState(false);
+  const verbatim = item.mode === 'type_verbatim';
+  const ring = submitted
+    ? `inset 0px 0px 0px 2px ${lastCorrect ? qm.leaf : qm.warm}`
+    : focused ? `inset 0px 0px 0px 2px ${qm.violet}` : qm.optLine;
   return (
-    <TextInput
-      style={[styles.input, { borderColor: colors.border, backgroundColor: colors.surfaceMuted, color: colors.textPrimary }]}
-      value={response}
-      onChangeText={onChangeResponse}
-      placeholder={t('quiz:summary.yourAnswer', 'Your answer…')}
-      placeholderTextColor={colors.textSecondary}
-      multiline={item.mode === 'type_verbatim'}
-      autoCapitalize="none"
-      editable={!submitted}
-    />
+    <View>
+      <Typography preset="qmFieldLabel" color={qm.body}>{t('quiz:qm.yourAnswer', 'Your answer')}</Typography>
+      <TextInput
+        style={[styles.input, verbatim ? styles.inputVerbatim : styles.inputShort, { backgroundColor: qm.surface, boxShadow: ring, color: qm.ink }]}
+        value={response}
+        onChangeText={onChangeResponse}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        placeholder={verbatim ? t('quiz:qm.typeVerbatimHint', 'Type the whole passage') : t('quiz:qm.typeHint', 'Type your answer')}
+        placeholderTextColor={qm.muted}
+        multiline
+        autoCapitalize="sentences"
+        autoCorrect={false}
+        editable={!submitted}
+      />
+      <Typography preset="qmMeta" color={qm.muted} style={styles.help}>
+        {t('quiz:qm.typeRules', 'Capitals, punctuation and accents don’t matter. Spelling does.')}
+      </Typography>
+    </View>
   );
 }
 
-// ─── Word Bank (replaces TextInput blanks) ────────────────────────────────────
+// ─── Word Bank (blanks) ───────────────────────────────────────────────────────
 
 type Tile = { id: number; word: string };
 
-function WordBank({ item, onChangeResponse, submitted }: { item: any; onChangeResponse: (r: unknown) => void; submitted: boolean }) {
-  const { colors } = useTheme();
+function WordBank({ item, onChangeResponse, submitted }: {
+  item: Extract<QuizItem, { mode: 'blanks' }>; onChangeResponse: (r: unknown) => void; submitted: boolean;
+}) {
+  const { t } = useTranslation('quiz');
+  const { qm } = useTheme();
 
   // Generate shuffled tiles once per item — each blank gets a tile with a stable id
   const tiles = useMemo<Tile[]>(() =>
-    shuffled(item.blankAt.map((tokenIdx: number, k: number) => ({ id: k, word: coreWord(item.tokens[tokenIdx]) }))),
+    shuffled(item.blankAt.map((tokenIdx, k) => ({ id: k, word: coreWord(item.tokens[tokenIdx]) }))),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [],
   );
@@ -303,7 +364,7 @@ function WordBank({ item, onChangeResponse, submitted }: { item: any; onChangeRe
 
   const commit = (next: (number | null)[]) => {
     setPlaced(next);
-    onChangeResponse(next.map(id => id !== null ? tiles.find(t => t.id === id)!.word : ''));
+    onChangeResponse(next.map(id => id !== null ? tiles.find(x => x.id === id)!.word : ''));
   };
 
   const placeTile = (tileId: number) => {
@@ -323,59 +384,56 @@ function WordBank({ item, onChangeResponse, submitted }: { item: any; onChangeRe
   };
 
   const usedIds = new Set(placed.filter(id => id !== null));
-  const available = tiles.filter(t => !usedIds.has(t.id));
-
-  // Build display: tokens with placed-word chips or empty tap targets for blanks
-  const blankPos = new Map<number, number>(item.blankAt.map((tokenIdx: number, k: number) => [tokenIdx, k]));
+  const blankPos = new Map<number, number>(item.blankAt.map((tokenIdx, k) => [tokenIdx, k]));
 
   return (
-    <View style={styles.wordBankWrap}>
-      {/* Verse with blank slots */}
-      <View style={styles.blanksWrap}>
-        {item.tokens.map((tok: string, i: number) => {
-          if (blankPos.has(i)) {
-            const k = blankPos.get(i)!;
-            const filledWord = placed[k] !== null ? tiles.find(t => t.id === placed[k])!.word : null;
-            return (
-              <Pressable
-                key={i}
-                onPress={() => removeFromBlank(k)}
-                style={[
-                  styles.blankSlot,
-                  { borderColor: filledWord ? colors.accent : colors.border, backgroundColor: filledWord ? colors.accentSoft : 'transparent' },
-                ]}
-              >
-                <Typography
-                  preset="body"
-                  color={filledWord ? colors.accent : colors.textDisabled}
-                  style={styles.blankSlotText}
-                >
-                  {filledWord ?? '___'}
-                </Typography>
-              </Pressable>
-            );
-          }
-          return <Typography key={i} preset="body" color={colors.textPrimary} style={styles.word}>{tok}</Typography>;
+    <View>
+      <View style={styles.verse}>
+        {item.tokens.map((tok, i) => {
+          if (!blankPos.has(i)) return <Typography key={i} preset="qmBlanks" color={qm.ink}>{tok}</Typography>;
+          const k = blankPos.get(i)!;
+          const word = placed[k] !== null ? tiles.find(x => x.id === placed[k])!.word : null;
+          // Same rule as gradeItem: normalised word vs the token it replaced.
+          const right = !!word && normalize(word) === normalize(coreWord(item.tokens[i]));
+          const bg = !word ? qm.surface : submitted ? (right ? qm.leafBg : qm.errorBg) : qm.lilac;
+          return (
+            <Pressable
+              key={i}
+              onPress={() => removeFromBlank(k)}
+              style={[styles.slot, { backgroundColor: bg }, !word && { borderBottomWidth: 2, borderBottomColor: qm.blank }]}
+              accessibilityRole="button"
+              accessibilityLabel={word ? t('quiz:qm.slotFilled', { word, defaultValue: `${word}, tap to empty` }) : t('quiz:qm.slotEmpty', 'Empty gap')}
+            >
+              <Typography preset="qmBlankWord" color={qm.ink}>{word ?? ''}</Typography>
+            </Pressable>
+          );
         })}
       </View>
-
-      {/* Available word tiles */}
       {!submitted && (
-        <View style={styles.tileArea}>
-          {available.map(tile => (
-            <Pressable
-              key={tile.id}
-              onPress={() => placeTile(tile.id)}
-              style={({ pressed }) => [
-                styles.tile,
-                { borderColor: colors.accent, backgroundColor: colors.surface },
-                pressed && styles.tilePressed,
-              ]}
-            >
-              <Typography preset="body" color={colors.accent}>{tile.word}</Typography>
-            </Pressable>
-          ))}
-        </View>
+        <>
+          <Typography preset="qmMeta" color={qm.muted} style={styles.blanksHelp}>
+            {t('quiz:qm.blanksHelp', 'Tap a word to fill the next gap. Tap a gap to empty it.')}
+          </Typography>
+          <View style={styles.tiles}>
+            {tiles.map(tile => {
+              const used = usedIds.has(tile.id);
+              return (
+                <View key={tile.id} style={used && styles.used}>
+                  <AnimatedPressable
+                    scaleTo={0.95}
+                    disabled={used}
+                    onPress={() => placeTile(tile.id)}
+                    style={[styles.tile, { backgroundColor: qm.surface, boxShadow: qm.optLine }]}
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: used }}
+                  >
+                    <Typography preset="qmTile" color={qm.ink}>{tile.word}</Typography>
+                  </AnimatedPressable>
+                </View>
+              );
+            })}
+          </View>
+        </>
       )}
     </View>
   );
@@ -383,49 +441,61 @@ function WordBank({ item, onChangeResponse, submitted }: { item: any; onChangeRe
 
 // ─── Chunks ───────────────────────────────────────────────────────────────────
 
-function Chunks({ item, response, onChangeResponse, submitted }: { item: any; response: string[]; onChangeResponse: (r: unknown) => void; submitted: boolean }) {
+function Chunks({ item, response, onChangeResponse, submitted }: {
+  item: Extract<QuizItem, { mode: 'chunks' }>; response: string[]; onChangeResponse: (r: unknown) => void; submitted: boolean;
+}) {
   const { t } = useTranslation(['quiz', 'common']);
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const chunkKey = (c: string, i: number) => `${i}::${c}`;
   const unkey = (k: string) => k.slice(k.indexOf('::') + 2);
 
   return (
-    <>
-      <View style={styles.chunkArea}>
+    <View>
+      <View style={[styles.placed, response.length === 0 && styles.placedNone, { backgroundColor: qm.field }]} accessibilityLiveRegion="polite">
+        {response.length === 0 && (
+          <Typography preset="qmBody" color={qm.muted} align="center" style={styles.placedEmpty}>
+            {t('quiz:qm.chunksHelp', 'Tap the pieces in the right order')}
+          </Typography>
+        )}
         {response.map((k, i) => (
-          <View key={i} style={[styles.chunkPicked, { backgroundColor: colors.accentSoft }]}>
-            <Typography preset="body" color={colors.textPrimary}>{unkey(k)}</Typography>
-          </View>
+          <Animated.View key={k} entering={FadeIn.duration(220)} style={[styles.piece, { backgroundColor: qm.surface, boxShadow: qm.optLine }]}>
+            <Typography preset="qmLabel" color={qm.link}>{i + 1}</Typography>
+            <Typography preset="qmTile" color={qm.ink} style={styles.flex}>{unkey(k)}</Typography>
+          </Animated.View>
         ))}
       </View>
-      <View style={styles.spacer} />
-      <View style={styles.chunkArea}>
-        {item.chunks.map((c: string, i: number) => {
+      <View style={styles.pool}>
+        {item.chunks.map((c, i) => {
           const key = chunkKey(c, i);
           if (response.includes(key)) return null;
           return (
-            <Pressable
+            <AnimatedPressable
               key={key}
-              onPress={() => !submitted && onChangeResponse([...response, key])}
-              style={({ pressed }) => [styles.chunk, { borderColor: colors.accent }, pressed && !submitted && styles.chunkPressed]}
+              scaleTo={0.97}
+              disabled={submitted}
+              onPress={() => onChangeResponse([...response, key])}
+              style={[styles.poolItem, { backgroundColor: qm.surface, boxShadow: qm.optLine }]}
+              accessibilityRole="button"
             >
-              <Typography preset="body" color={colors.accent}>{c}</Typography>
-            </Pressable>
+              <Typography preset="qmTile" color={qm.ink}>{c}</Typography>
+            </AnimatedPressable>
           );
         })}
       </View>
       {response.length > 0 && !submitted && (
-        <Button label={t('common:actions.undo', 'Undo')} variant="outline" onPress={() => onChangeResponse(response.slice(0, -1))} style={styles.undoBtn} />
+        <Pressable onPress={() => onChangeResponse(response.slice(0, -1))} hitSlop={8} style={styles.undo} accessibilityRole="button">
+          <Typography preset="qmLink" color={qm.link}>{t('quiz:qm.undoLast', 'Undo last')}</Typography>
+        </Pressable>
       )}
-    </>
+    </View>
   );
 }
 
 // ─── Tap to Reveal (read mode) ────────────────────────────────────────────────
 
-function TapToReveal({ item, onAllRevealed }: { item: any; onAllRevealed: () => void }) {
+function TapToReveal({ item, onAllRevealed }: { item: Extract<QuizItem, { mode: 'read' }>; onAllRevealed: () => void }) {
   const { t } = useTranslation('quiz');
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const phrases = useMemo(() => splitPhrases(item.text), [item.text]);
   const [revealed, setRevealed] = useState(0);
 
@@ -434,29 +504,38 @@ function TapToReveal({ item, onAllRevealed }: { item: any; onAllRevealed: () => 
     setRevealed(next);
     if (next >= phrases.length) onAllRevealed();
   };
+  const done = revealed >= phrases.length;
 
   return (
-    <Pressable onPress={revealed < phrases.length ? tapNext : undefined} style={styles.tapRevealWrap}>
-      <View style={styles.blanksWrap}>
-        {phrases.map((phrase, i) => (
-          <Typography
-            key={i}
-            preset="body"
-            color={i < revealed ? colors.textPrimary : colors.textDisabled}
-            style={[styles.phrase, i < revealed && styles.phraseRevealed]}
-          >
-            {phrase}
-          </Typography>
-        ))}
+    <View>
+      <Pressable
+        onPress={done ? undefined : tapNext}
+        accessibilityRole="button"
+        accessibilityLabel={t('quiz:qm.revealNext', 'Reveal the next line')}
+      >
+        <LinearGradient colors={qm.verse as unknown as string[]} locations={[0, 0.6, 1]} start={{ x: 0.3, y: 0 }} end={{ x: 0.7, y: 1 }} style={styles.verseCard}>
+          {phrases.map((phrase, i) => (
+            <Typography
+              key={i}
+              preset="qmRead"
+              // Hidden lines: transparent text + blurred shadow (RN has no CSS blur filter).
+              style={i < revealed
+                ? { color: qm.verseInk }
+                : { color: 'transparent', textShadowColor: qm.verseInk, textShadowRadius: HIDDEN_BLUR, textShadowOffset: NO_OFFSET, opacity: HIDDEN_OPACITY }}
+            >
+              {phrase}
+            </Typography>
+          ))}
+        </LinearGradient>
+      </Pressable>
+      <View style={[styles.revealPill, { backgroundColor: qm.lilac }]}>
+        <Typography preset="qmLabel" color={qm.lilacInk}>
+          {done
+            ? t('quiz:qm.allShown', { count: phrases.length, defaultValue: `All ${phrases.length} lines shown` })
+            : t('quiz:qm.tapReveal', { revealed, total: phrases.length, defaultValue: `Tap to reveal · ${revealed} of ${phrases.length}` })}
+        </Typography>
       </View>
-      {revealed < phrases.length && (
-        <View style={[styles.tapHint, { borderColor: colors.border, backgroundColor: colors.surfaceMuted }]}>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {t('quiz:play.tapToRevealProgress', { revealed, total: phrases.length, defaultValue: `Tap to reveal (${revealed}/${phrases.length})` })}
-          </Typography>
-        </View>
-      )}
-    </Pressable>
+    </View>
   );
 }
 
@@ -464,88 +543,60 @@ function TapToReveal({ item, onAllRevealed }: { item: any; onAllRevealed: () => 
 
 const styles = StyleSheet.create({
   wrap:   { flex: 1 },
-  flex:   { flex: 1 },
-  scroll: { paddingBottom: spacing.lg },
-  questionCard: {
-    margin: layout.screenPaddingH,
-    padding: spacing.xl,
-    borderRadius: layout.cardRadiusLg,
-    borderWidth: 1,
-    gap: spacing.sm,
-    minHeight: 100, // ponytail: off-grid, no spacing token for 100
-    justifyContent: 'center',
-  },
-  label:      { letterSpacing: 0.5 },
-  cardHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.xs },
-  diffPip:    { flexDirection: 'row', alignItems: 'center', gap: spacing.xs },
-  diffDot:    { width: 8, height: 8, borderRadius: 4 },
-  answerArea: { paddingHorizontal: layout.screenPaddingH },
-  // Feedback
-  feedbackBanner: {
-    marginHorizontal: layout.screenPaddingH,
-    marginTop: spacing.lg,
-    borderRadius: layout.cardRadius,
-    padding: spacing.lg,
-    gap: spacing.sm,
-  },
-  feedbackTitle:     { fontWeight: '700' },
-  correctAnswerWrap: { gap: spacing.xs, marginTop: spacing.xs },
-  correctAnswerText: { fontWeight: '600' },
-  // Footer
-  footer:    { paddingHorizontal: layout.screenPaddingH, paddingTop: spacing.md, borderTopWidth: 1 },
-  fullWidth: { width: '100%' },
-  // MC options
+  flex:   { flex: 1, minWidth: 0 },
+  dim:    { opacity: DIM_OPACITY },
+  used:   { opacity: USED_OPACITY },
+  scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.xxl },
+  scrollUnderSheet: { paddingBottom: spacing.s80 * 3 }, // room to scroll answers clear of the feedback sheet
+  chips:  { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
+  chip:   { paddingVertical: spacing.s5, paddingHorizontal: spacing.s10 + 1, borderRadius: radius.pill },
+  diff:   { flexDirection: 'row', alignItems: 'center', gap: spacing.s5 },
+  dot:    { width: DOT, height: DOT, borderRadius: DOT / 2 },
+  setName: { flexShrink: 1 },
+  prompt: { marginTop: spacing.xl },
+  answerArea: { marginTop: spacing.s22 },
+  options: { gap: spacing.s10 },
   option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
-    padding: spacing.lg,
-    borderRadius: layout.cardRadiusSm,
-    borderWidth: 1.5,
-    marginBottom: spacing.md,
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s14, minHeight: OPT_MIN_H,
+    paddingVertical: spacing.s14, paddingHorizontal: spacing.lg, borderRadius: radius.r18,
   },
-  letter:        { width: spacing.s28, height: spacing.s28, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  optionPressed: { opacity: 0.7 },
-  // Type input
+  badge: { width: BADGE, height: BADGE, borderRadius: BADGE / 2, alignItems: 'center', justifyContent: 'center' },
   input: {
-    borderWidth: 1.5,
-    borderRadius: layout.cardRadius,
-    padding: spacing.lg,
-    minHeight: layout.inputHeight,
-    textAlignVertical: 'top',
+    marginTop: spacing.sm, paddingVertical: spacing.s14, paddingHorizontal: spacing.lg, borderRadius: radius.md,
+    ...textPresets.qmAnswer, textAlignVertical: 'top',
   },
-  // Word bank (blanks)
-  wordBankWrap: { gap: spacing.lg },
-  blanksWrap:   { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.xs },
-  word:         { marginRight: spacing.xs },
-  blankSlot: {
-    borderWidth: 1.5,
-    borderRadius: radius.sm,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.s2,
-    minWidth: 60, // ponytail: off-grid, no spacing token for 60
+  inputShort: { minHeight: spacing.s80 },
+  inputVerbatim: { minHeight: spacing.s80 * 2, fontFamily: qmFont.serif },
+  help: { marginTop: spacing.sm },
+  blanksHelp: { marginTop: spacing.lg },
+  verse: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', columnGap: spacing.s5, rowGap: spacing.s10 },
+  slot: {
+    minWidth: SLOT_MIN_W, height: SLOT_H, paddingHorizontal: spacing.s10, borderRadius: radius.r10,
+    alignItems: 'center', justifyContent: 'center',
   },
-  blankSlotText: { textAlign: 'center' },
-  tileArea: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
-  tile:      { borderWidth: 1.5, borderRadius: radius.r10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-  tilePressed: { opacity: 0.7 },
-  // Chunks
-  chunkArea:    { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, minHeight: 44 }, // ponytail: minHeight 44 — no spacing token
-  chunk:        { borderWidth: 1.5, borderRadius: radius.r10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-  chunkPressed: { opacity: 0.7 },
-  chunkPicked:  { borderRadius: radius.r10, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
-  spacer:       { height: spacing.md },
-  undoBtn:      { marginTop: spacing.md },
-  // Tap to reveal
-  tapRevealWrap: { gap: spacing.lg },
-  phrase:        { marginRight: spacing.xs },
-  phraseRevealed: { opacity: 1 },
-  tapHint: {
-    alignSelf: 'center',
-    marginTop: spacing.lg,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm,
-    borderRadius: radius.r10,
-    borderWidth: 1,
+  tiles: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md },
+  tile: { height: TILE_H, paddingHorizontal: spacing.lg, borderRadius: radius.r12, justifyContent: 'center' },
+  placed: { minHeight: PLACED_MIN_H, padding: spacing.md, borderRadius: radius.r18, gap: spacing.sm },
+  placedNone: { justifyContent: 'center' },
+  placedEmpty: { alignSelf: 'center' },
+  piece: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.s10,
+    paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2,
   },
+  pool: { gap: spacing.sm, marginTop: spacing.s14 },
+  poolItem: { minHeight: POOL_MIN_H, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2, justifyContent: 'center' },
+  undo: { alignSelf: 'flex-start', marginTop: spacing.s10, paddingVertical: spacing.s10, paddingHorizontal: spacing.s14 },
+  verseCard: { padding: spacing.xl, borderRadius: radius.r21 + 1 },
+  revealPill: { alignSelf: 'center', marginTop: spacing.s14, paddingVertical: spacing.sm, paddingHorizontal: spacing.s14, borderRadius: radius.pill },
+  footer: { paddingHorizontal: spacing.xl, paddingTop: spacing.md },
+  sheet: {
+    position: 'absolute', left: 0, right: 0, bottom: 0,
+    paddingTop: spacing.s22, paddingHorizontal: spacing.xl, borderTopLeftRadius: radius.r28, borderTopRightRadius: radius.r28,
+  },
+  sheetHead: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10 },
+  noBadge: { width: spacing.s22, height: spacing.s22, borderRadius: spacing.s22 / 2, alignItems: 'center', justifyContent: 'center' },
+  ghost: { marginTop: spacing.md, paddingVertical: spacing.md, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2 },
+  ghostText: { marginTop: spacing.xs },
+  comesBack: { marginTop: spacing.s10 },
+  sheetBtn: { marginTop: spacing.lg },
 });

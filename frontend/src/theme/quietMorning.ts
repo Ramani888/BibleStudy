@@ -80,6 +80,15 @@ export interface QMColors {
   pill: string;
   pillShadow: string;
   glass: string;
+  /** Quiz play (module 4): answer rows, feedback sheet, blank gaps. */
+  optLine: string;
+  okSheet: string;
+  okInk: string;
+  noSheet: string;
+  noInk: string;
+  ghost: string;
+  blank: string;
+  sheetShadow: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -147,6 +156,14 @@ export const qmLight: QMColors = {
   onDanger: '#FFFFFF',
   pill: '#FFFFFF',
   pillShadow: '0px 2px 8px rgba(34,30,51,0.1)',
+  optLine: 'inset 0px 0px 0px 1px rgba(34,30,51,0.08), 0px 6px 18px -14px rgba(34,30,51,0.35)',
+  okSheet: '#EEF5EF',
+  okInk: '#3F6B4A',
+  noSheet: '#FBF3EE',
+  noInk: '#8A5A2E',
+  ghost: 'rgba(255,255,255,0.8)',
+  blank: '#C9C4D3',
+  sheetShadow: '0px -12px 40px -20px rgba(34,30,51,0.35)',
   glass: '#FBF9F6', // ponytail: no blur lib → solid bar, add @react-native-community/blur for real glass
 };
 
@@ -214,6 +231,14 @@ export const qmDark: QMColors = {
   pill: '#2E2840',
   pillShadow: '0px 0px 0px 1px rgba(255,255,255,0.06)',
   glass: '#14111B',
+  optLine: 'inset 0px 0px 0px 1px rgba(255,255,255,0.07)',
+  okSheet: '#1B2820',
+  okInk: '#9BCDA6',
+  noSheet: '#2E2219',
+  noInk: '#E7B48A',
+  ghost: 'rgba(255,255,255,0.08)',
+  blank: '#4A4358',
+  sheetShadow: '0px -1px 0px rgba(255,255,255,0.06)',
 };
 
 /** Mix two #RRGGBB colours: `t` = share of `a` (canvas `color-mix(in srgb, a t%, b)`). */
@@ -272,4 +297,14 @@ export const qmPresets = {
   qmSegment:   { fontFamily: qmFont.semibold,    fontSize: 15, lineHeight: 20 },
   qmBodyMd:    { fontFamily: qmFont.regular,     fontSize: 15, lineHeight: 22 },
   qmChip:      { fontFamily: qmFont.semibold,    fontSize: 12, lineHeight: 15 },
+  // Quiz play
+  qmPrompt:    { fontFamily: qmFont.serif,       fontSize: 24, lineHeight: 35 },
+  qmPromptSm:  { fontFamily: qmFont.serif,       fontSize: 20, lineHeight: 29 },
+  qmOption:    { fontFamily: qmFont.medium,      fontSize: 17, lineHeight: 25 },
+  qmOptionSerif:{ fontFamily: qmFont.serifMedium, fontSize: 16, lineHeight: 23 },
+  qmAnswer:    { fontFamily: qmFont.regular,     fontSize: 17, lineHeight: 25 },
+  qmBlanks:    { fontFamily: qmFont.serif,       fontSize: 20, lineHeight: 36 },
+  qmBlankWord: { fontFamily: qmFont.serif,       fontSize: 18, lineHeight: 24 },
+  qmTile:      { fontFamily: qmFont.serif,       fontSize: 17, lineHeight: 24 },
+  qmRead:      { fontFamily: qmFont.serif,       fontSize: 21, lineHeight: 34 },
 } as const;

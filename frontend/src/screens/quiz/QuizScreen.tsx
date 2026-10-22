@@ -3,12 +3,14 @@ import { ActivityIndicator, BackHandler, Pressable, StatusBar, StyleSheet, View 
 import { useFocusEffect, useIsFocused, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+
 import { Typography } from '../../components/ui';
-import { BackIcon } from '../../components/icons';
+import { QMConfirmDialog, QMEmpty } from '../../components/qm';
+import { CardsIcon, CloseIcon, InfoIcon } from '../../components/icons';
 import { useCardsForSets, useConfirmDialog } from '../../hooks';
-import { ConfirmDialog } from '../../components/feedback';
 import { buildSummaryItems, useQuizSession } from '../../hooks/useQuizSession';
-import { layout, spacing, useTheme } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { QuizItemView, QuizResultScreen } from './components';
 import type { Card, QuizSelectableMode } from '../../types';
 import type { GeneratedQuizCard } from '../../navigation/types';
@@ -25,15 +27,12 @@ function toEphemeralCard(c: GeneratedQuizCard, i: number): Card {
   };
 }
 
-function formatTime(s: number): string {
-  return `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-}
 
 import { useTranslation } from 'react-i18next';
 
 export function QuizScreen() {
   const { t } = useTranslation(['quiz', 'common']);
-  const { colors } = useTheme();
+  const { qm } = useTheme();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation();
   const { params } = useRoute<RouteProp<{ Quiz: Params }, 'Quiz'>>();
@@ -72,6 +71,7 @@ export function QuizScreen() {
   const { show, dialogProps } = useConfirmDialog();
   const showRef = useRef(show);
   showRef.current = show;
+  const askQuitRef = useRef<() => void>(() => {});
 
   const [elapsed, setElapsed] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -88,16 +88,7 @@ export function QuizScreen() {
   // Fix 8: only register BackHandler during an active quiz (not loading/error/complete)
   useEffect(() => {
     if (isLoading || isError || !s.isAvailable || s.isComplete) return;
-    const handler = BackHandler.addEventListener('hardwareBackPress', () => {
-      showRef.current({
-        title: t('quiz:setup.cancelQuiz', 'Quit quiz?'),
-        message: t('quiz:setup.cancelWarning', 'Your progress will be lost.'),
-        confirmLabel: t('common:actions.confirm', 'Quit'),
-        variant: 'danger',
-        onConfirm: goBack,
-      });
-      return true;
-    });
+    const handler = BackHandler.addEventListener('hardwareBackPress', () => { askQuitRef.current(); return true; });
     return () => handler.remove();
   }, [isLoading, isError, s.isAvailable, s.isComplete, t]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -107,47 +98,59 @@ export function QuizScreen() {
   }, [s]);
 
   const headerTitle = quizName ?? (setTitles.length === 1 ? setTitles[0] : t('quiz:hub.setsCount', { count: setTitles.length }));
+  const askQuit = useCallback(() => showRef.current({
+    title: t('quiz:qm.leaveTitle', 'Leave this quiz?'),
+    message: t('quiz:qm.leaveText', 'Your answers in this round won’t be saved.'),
+    confirmLabel: t('quiz:qm.leave', 'Leave'),
+    cancelLabel: t('quiz:qm.keepGoing', 'Keep going'),
+    onConfirm: goBack,
+  }), [goBack, t]);
+  askQuitRef.current = askQuit;
 
-  // Fix 1: back button on error/loading/unavailable states (gesture is disabled globally)
-  const safeHeader = (
-    <View style={[styles.safeHeader, { paddingTop: insets.top }]}>
-      <Pressable
-        style={({ pressed }) => pressed && styles.backPressed}
-        onPress={goBack}
-        hitSlop={12}
-        accessibilityRole="button"
-        accessibilityLabel={t('common:actions.goBack', 'Go back')}
-      >
-        <BackIcon size={24} color={colors.textPrimary} />
-      </Pressable>
+  // Back button on error/loading/unavailable states (gesture is disabled globally)
+  const closeBtn = (onPress: () => void) => (
+    <Pressable
+      style={({ pressed }) => [styles.close, { backgroundColor: qm.field }, pressed && styles.dim]}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={t('quiz:qm.leaveA11y', 'Leave quiz')}
+    >
+      <CloseIcon size={18} color={qm.ink} strokeWidth={2} />
+    </Pressable>
+  );
+  const bare = (body: React.ReactNode) => (
+    <View style={[styles.fill, { backgroundColor: qm.bg }]}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>{closeBtn(goBack)}</View>
+      {body}
     </View>
   );
 
-  if (isError) return (
-    <View style={[styles.fill, { backgroundColor: colors.background }]}>
-      {safeHeader}
-      <View style={styles.center}><Typography preset="h4" align="center">{t('common:status.failedToLoad', 'Failed to load cards')}</Typography></View>
-    </View>
+  if (isError) return bare(
+    <QMEmpty
+      style={styles.msg}
+      icon={InfoIcon}
+      title={t('quiz:qm.loadQuizFailed', 'Couldn’t load this quiz')}
+      text={t('quiz:qm.loadFailedText', 'Check your connection and try again.')}
+      action={{ label: t('quiz:qm.tryAgain', 'Try again'), onPress: () => { fetched.refetch(); } }}
+    />,
   );
 
-  if (isLoading) return (
-    <View style={[styles.fill, { backgroundColor: colors.background }]}>
-      {safeHeader}
-      <View style={styles.center}><ActivityIndicator color={colors.accent} /></View>
-    </View>
-  );
+  if (isLoading) return bare(<ActivityIndicator color={qm.violet} style={styles.msg} />);
 
-  if (!s.isAvailable) return (
-    <View style={[styles.fill, { backgroundColor: colors.background }]}>
-      {safeHeader}
-      <View style={styles.center}><Typography preset="h4" align="center">{t('quiz:inQuiz.emptyState', 'Nothing to quiz here')}</Typography></View>
-    </View>
+  if (!s.isAvailable) return bare(
+    <QMEmpty
+      style={styles.msg}
+      icon={CardsIcon}
+      title={t('quiz:inQuiz.emptyState', 'Nothing to quiz here')}
+      text={t('quiz:qm.emptyText2', 'This set has no cards yet. Add a few cards, then come back.')}
+      action={{ label: t('common:actions.goBack', 'Go back'), onPress: goBack }}
+    />,
   );
 
   if (s.isComplete) {
     const summaryItems = buildSummaryItems(s.items, responses);
     return (
-      <View style={[styles.fill, { backgroundColor: colors.background, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+      <View style={[styles.fill, { backgroundColor: qm.bg, paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <QuizResultScreen
           setIds={setIds} setTitle={headerTitle} mode={mode} quizName={quizName} topic={topic}
           total={s.scoredTotal} correct={s.correctCount} scorePct={s.scorePct}
@@ -163,32 +166,14 @@ export function QuizScreen() {
   }
 
   return (
-    <View style={[styles.fill, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { paddingTop: insets.top + spacing.sm }]}>
-        <View style={styles.timerWrap}>
-          <Typography preset="label" color={colors.textSecondary} style={styles.timer}>
-            {formatTime(elapsed)}
-          </Typography>
-        </View>
-        <Typography preset="label" color={colors.textPrimary} numberOfLines={1} style={styles.title}>
-          {headerTitle}
+    <View style={[styles.fill, { backgroundColor: qm.bg }]}>
+      <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
+        {closeBtn(askQuit)}
+        <ProgressBar progress={s.progress} step={s.index} total={s.total} />
+        <Typography preset="qmButton" color={qm.muted} style={styles.counter}>
+          {t('quiz:qm.stepOf', { step: s.index + 1, total: s.total, defaultValue: `${s.index + 1} of ${s.total}` })}
         </Typography>
-        <View style={styles.counterWrap}>
-          <Typography preset="label" color={colors.textSecondary}>{s.index + 1}/{s.total}</Typography>
-        </View>
       </View>
-
-      <View style={[styles.progressTrack, { backgroundColor: colors.surfaceMuted }]}>
-        <View style={[styles.progressFill, { width: `${Math.round(s.progress * 100)}%` as any, backgroundColor: colors.accent }]} />
-      </View>
-
-      {ephemeral && (
-        <View style={styles.ephemeralBadge}>
-          <Typography preset="caption" color={colors.textSecondary}>
-            {t('quiz:inQuiz.practiceNotSaved', 'Practice · not saved')}
-          </Typography>
-        </View>
-      )}
 
       {s.item && (
         <QuizItemView
@@ -204,24 +189,43 @@ export function QuizScreen() {
           onNext={s.next}
           onFinish={finish}
           bottomInset={insets.bottom}
+          setName={headerTitle}
+          ephemeral={ephemeral}
+          comesBack={!isGenerated && !ephemeral}
         />
       )}
-      <ConfirmDialog {...dialogProps} />
+      <QMConfirmDialog {...dialogProps} />
     </View>
   );
 }
 
+function ProgressBar({ progress, step, total }: { progress: number; step: number; total: number }) {
+  const { qm } = useTheme();
+  const [w, setW] = useState(0);
+  const anim = useAnimatedStyle(() => ({ width: withSpring(w * progress, { damping: 16, stiffness: 140 }) }), [w, progress]);
+  return (
+    <View
+      onLayout={e => setW(e.nativeEvent.layout.width)}
+      style={[styles.track, { backgroundColor: qm.lilac }]}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: total, now: step }}
+    >
+      <Animated.View style={[styles.bar, { backgroundColor: qm.violet }, anim]} />
+    </View>
+  );
+}
+
+const TOUCH = 44;
+const TRACK_H = 8;
+const COUNTER_MIN_W = 52;
+
 const styles = StyleSheet.create({
-  fill:          { flex: 1 },
-  center:        { flex: 1, alignItems: 'center', justifyContent: 'center', padding: layout.screenPaddingH },
-  safeHeader:    { paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.md },
-  header:        { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md },
-  timerWrap:     { width: 56, alignItems: 'flex-start' }, // ponytail: off-grid, no spacing.s56
-  timer:         { fontVariant: ['tabular-nums'] },
-  title:         { flex: 1, textAlign: 'center' },
-  counterWrap:   { width: 56, alignItems: 'flex-end' }, // ponytail: off-grid, no spacing.s56
-  backPressed:   { opacity: 0.85 },
-  progressTrack: { height: layout.progressBarHeight, width: '100%' },
-  progressFill:  { height: layout.progressBarHeight },
-  ephemeralBadge:{ alignItems: 'center', paddingTop: spacing.sm },
+  fill:    { flex: 1 },
+  dim:     { opacity: 0.6 },
+  header:  { flexDirection: 'row', alignItems: 'center', gap: spacing.s10, paddingLeft: spacing.md, paddingRight: spacing.lg },
+  close:   { width: TOUCH, height: TOUCH, borderRadius: TOUCH / 2, alignItems: 'center', justifyContent: 'center' },
+  track:   { flex: 1, height: TRACK_H, borderRadius: TRACK_H / 2, overflow: 'hidden' },
+  bar:     { height: TRACK_H, borderRadius: TRACK_H / 2 },
+  counter: { minWidth: COUNTER_MIN_W, textAlign: 'right' },
+  msg:     { marginTop: spacing.s80 + spacing.s48 },
 });

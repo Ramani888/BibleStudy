@@ -18,6 +18,7 @@ export function useCardsForSets(setIds: string[]) {
       data: results.flatMap(r => r.data ?? []) as Card[],
       isLoading: results.some(r => r.isLoading),
       isError: results.some(r => r.isError),
+      refetch: () => Promise.all(results.map(r => r.refetch())),
     }),
   });
 }
