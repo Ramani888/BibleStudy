@@ -9,6 +9,7 @@ import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { Avatar, Typography, AnimatedPressable } from '../../components/ui';
+import { VerseCard } from '../../components/domain';
 import {
   AskIcon,
   BellQMIcon,
@@ -385,8 +386,9 @@ export function HomeScreen() {
     () => [...(sets ?? [])].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 4),
     [sets],
   );
-  // New user (nothing to review, no sets): just the Start card + quick actions.
-  const isNewUser = !(dueSummary && dueSummary.dueCount > 0) && !continueSet;
+  const hasDue = !!dueSummary && dueSummary.dueCount > 0;
+  // New user (nothing to review, no sets): just the verse, Start card + quick actions.
+  const isNewUser = !hasDue && !continueSet;
   const dateLabel = useMemo(
     () => new Date().toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }),
     [i18n.language],
@@ -418,6 +420,12 @@ export function HomeScreen() {
             </Typography>
           </Animated.View>
 
+          {!hasDue && (
+            <Animated.View entering={enter(1)} style={styles.gapBelow}>
+              <VerseCard />
+            </Animated.View>
+          )}
+
           <Animated.View entering={enter(1)}>
             <TodayCard
               due={dueSummary}
@@ -429,6 +437,13 @@ export function HomeScreen() {
               onCreate={nav.goCreate}
             />
           </Animated.View>
+
+          {/* Reviews due → the review card leads and the verse is a quiet second card. */}
+          {hasDue && (
+            <Animated.View entering={enter(2)} style={styles.gapSm}>
+              <VerseCard />
+            </Animated.View>
+          )}
 
           {showShareEvent && !isNewUser && (
             <Animated.View entering={enter(2)} style={styles.gapSm}>
@@ -502,6 +517,7 @@ const styles = StyleSheet.create({
   scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.huge },
   pressedDim: { opacity: 0.7 },
   gapSm: { marginTop: spacing.md },
+  gapBelow: { marginBottom: spacing.md },
 
   // Header
   header: { flexDirection: 'row', alignItems: 'center', gap: spacing.s10 },

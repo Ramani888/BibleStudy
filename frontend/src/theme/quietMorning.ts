@@ -34,6 +34,13 @@ export interface QMColors {
   btnShadow: string;
   /** Recent-set colour bars, cycled by index. */
   setColors: readonly string[];
+  /** Daily-verse card: soft 160° warm paper. */
+  verse: readonly [string, string, string];
+  verseInk: string;
+  verseLabel: string;
+  verseRef: string;
+  verseBtn: string;
+  verseShadow: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -65,6 +72,12 @@ export const qmLight: QMColors = {
   cardShadow: '0px 1px 2px rgba(34,30,51,0.05), 0px 8px 24px -18px rgba(34,30,51,0.3)',
   btnShadow: '0px 8px 18px -8px rgba(109,74,224,0.8)',
   setColors,
+  verse: ['#FCF6EE', '#FAF2EE', '#F6EFF8'],
+  verseInk: '#2A2238',
+  verseLabel: '#7A4E2A',
+  verseRef: '#6D4AE0',
+  verseBtn: 'rgba(255,255,255,0.72)',
+  verseShadow: '0px 18px 40px -22px rgba(109,74,224,0.35)',
 };
 
 export const qmDark: QMColors = {
@@ -94,6 +107,12 @@ export const qmDark: QMColors = {
   cardShadow: '0px 0px 0px 1px rgba(255,255,255,0.05)',
   btnShadow: '0px 8px 22px -10px rgba(124,92,240,0.7)',
   setColors,
+  verse: ['#241D2C', '#211B2B', '#221C33'],
+  verseInk: '#F4EDE6',
+  verseLabel: '#E7B48A',
+  verseRef: '#B3A0FA',
+  verseBtn: 'rgba(255,255,255,0.09)',
+  verseShadow: '0px 0px 0px 1px rgba(255,255,255,0.05)',
 };
 
 export const qmFont = {

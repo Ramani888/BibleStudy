@@ -589,3 +589,9 @@ export const FriendsIcon: IconComponent = ({ size, color = DEFAULT_COLOR, stroke
     <Path d="M16 19v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V19M9.5 10a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7M17 4a3.5 3.5 0 0 1 0 7" {...stroke(color, strokeWidth)} />
   </Outline>
 );
+
+export const ShareUpIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" {...stroke(color, strokeWidth)} />
+  </Outline>
+);

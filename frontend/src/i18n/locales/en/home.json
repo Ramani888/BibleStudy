@@ -112,5 +112,15 @@
     "cardCount_other": "{{count}} cards",
     "ownerCards": "{{name}} · {{count}} card",
     "ownerCards_other": "{{name}} · {{count}} cards"
+  },
+  "verse": {
+    "label": "Today’s verse",
+    "new": "NEW",
+    "memorize": "Memorize this",
+    "added": "Added to Daily verses",
+    "share": "Share verse",
+    "setTitle": "Daily verses",
+    "translation": "World English Bible",
+    "translationShort": "WEB"
   }
 }
