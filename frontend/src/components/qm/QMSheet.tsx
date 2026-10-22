@@ -51,7 +51,7 @@ interface QMSheetProps {
  * navigate or open another sheet.
  */
 export function QMSheet({ visible, onClose, title, sub, actions, note, children }: QMSheetProps) {
-  const { qm, name } = useTheme();
+  const { qm, name: themeName } = useTheme();
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const ref = useRef<BottomSheetModal>(null);
@@ -81,8 +81,8 @@ export function QMSheet({ visible, onClose, title, sub, actions, note, children 
   // Android back closes the sheet, not the screen behind it.
   useEffect(() => {
     if (!visible) return;
-    const sub = BackHandler.addEventListener('hardwareBackPress', () => { ref.current?.dismiss(); return true; });
-    return () => sub.remove();
+    const backSub = BackHandler.addEventListener('hardwareBackPress', () => { ref.current?.dismiss(); return true; });
+    return () => backSub.remove();
   }, [visible]);
 
   const run = useCallback((fn?: () => void) => {
@@ -92,9 +92,9 @@ export function QMSheet({ visible, onClose, title, sub, actions, note, children 
 
   const renderBackdrop = useCallback(
     (props: BottomSheetBackdropProps) => (
-      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" opacity={name === 'dark' ? 0.55 : 0.35} />
+      <BottomSheetBackdrop {...props} disappearsOnIndex={-1} appearsOnIndex={0} pressBehavior="close" opacity={themeName === 'dark' ? 0.55 : 0.35} />
     ),
-    [name],
+    [themeName],
   );
 
   return (

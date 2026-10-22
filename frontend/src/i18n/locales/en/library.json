@@ -323,6 +323,13 @@
     "name": "Name",
     "folderPlaceholder": "e.g. Gospels",
     "save": "Save",
-    "noColor": "No color"
+    "noColor": "No color",
+    "noSetsYet": "No sets yet",
+    "searchIn": "Search sets in {{name}}",
+    "folderFailedTitle": "This folder did not load",
+    "folderEmptyTitle": "This folder is empty",
+    "folderEmptyText": "Add a new set here, or move one in from your library with “Move to folder”.",
+    "noMatchIn": "Nothing called “{{query}}” in {{name}}.",
+    "folderOptions": "Folder options"
   }
 }

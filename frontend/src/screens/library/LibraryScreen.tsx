@@ -1,34 +1,31 @@
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { BottomSheetTextInput } from '@gorhom/bottom-sheet';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
 import type { FlatList } from 'react-native';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
-import { QuizModeSheet, SetActionSheet } from '../../components/domain';
+import { FolderFormSheet, MoveToFolderSheet, QuizModeSheet, SetActionSheet } from '../../components/domain';
 import {
-  QMAddButton, QMColorSwatches, QMConfirmDialog, QMEmpty, QMFolderTile, QMSearchField, QMSegmented, QMSetRow,
+  QMAddButton, QMConfirmDialog, QMEmpty, QMFolderTile, QMSearchField, QMSegmented, QMSetRow,
   QMSheet, QMSortChip, QMStickyBar, qmRowEnter, type QMSheetAction,
 } from '../../components/qm';
-import { AnimatedPressable, Typography } from '../../components/ui';
-import { PRESET_COLORS } from '../../components/ui/ColorPicker';
+import { Typography } from '../../components/ui';
 import {
-  CardsIcon, FolderIcon, FolderOffIcon, PencilIcon, PlusIcon, RefreshIcon, SearchIcon, TrashIcon,
+  CardsIcon, FolderIcon, PencilIcon, PlusIcon, RefreshIcon, SearchIcon, TrashIcon,
 } from '../../components/icons';
 import {
   useConfirmDialog,
   useFolders,
   useSets,
   useDeleteSet,
-  useUpdateSet,
   useDeleteFolder,
   useFolderModal,
   useManualRefresh,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
-import { useTheme, spacing, radius, textPresets, qmAccent } from '../../theme';
+import { useTheme, spacing } from '../../theme';
 import { formatDate } from '../../utils/formatters';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet, Folder } from '../../types';
@@ -38,15 +35,12 @@ type SortOrder = 'newest' | 'alpha' | 'count';
 type Row = StudySet | [Folder, Folder?];
 
 const SORTS: SortOrder[] = ['newest', 'alpha', 'count'];
-const FOLDER_FIELD_H = 52;
-const FORM_BTN_H = 52;
-const NAME_MAX = 200;
 
 const AnimatedFlatList = Animated.FlatList as unknown as typeof FlatList;
 
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const { t } = useTranslation(['library', 'common']);
-  const { qm, name: themeName } = useTheme();
+  const { qm } = useTheme();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatList<Row>>(null);
   const searchRef = useRef<TextInput>(null);
@@ -64,7 +58,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const { data: folders = [], isLoading: foldersLoading, refetch: refetchFolders, isError: foldersError } = useFolders();
   const { data: sets = [], isLoading: setsLoading, refetch: refetchSets, isError: setsError } = useSets();
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
-  const { mutate: updateSet } = useUpdateSet();
   const { mutateAsync: deleteFolderAsync } = useDeleteFolder();
   const { show, dialogProps } = useConfirmDialog();
   const folderModal = useFolderModal();
@@ -154,34 +147,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     });
   }, [show, deleteFolderAsync, t]);
 
-  const handleAssignFolder = useCallback((folderId: string | null) => {
-    if (!assignTarget) return;
-    updateSet(
-      { id: assignTarget.id, payload: { folderId } },
-      {
-        onSuccess: () => Toast.show({
-          type: 'success',
-          text1: folderId
-            ? t('library:qm.movedTo', { name: folderById.get(folderId)?.name ?? '', defaultValue: 'Moved to folder' })
-            : t('library:folders.removedFromFolder', 'Removed from folder'),
-        }),
-        onError: err => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(err) }),
-      },
-    );
-  }, [assignTarget, updateSet, folderById, t]);
-
-  const moveActions = useMemo<QMSheetAction[]>(() => {
-    if (!assignTarget) return [];
-    const cur = assignTarget.folderId ?? null;
-    const dark = themeName === 'dark';
-    return [
-      { label: t('library:folders.noFolder', 'No folder'), icon: FolderOffIcon, iconColor: qm.muted, tick: !cur, onPress: () => handleAssignFolder(null) },
-      ...folders.map(f => ({
-        label: f.name, icon: FolderIcon, iconColor: f.color ? qmAccent(qm, dark, f.color)[1] : qm.link,
-        tick: cur === f.id, onPress: () => handleAssignFolder(f.id),
-      })),
-    ];
-  }, [assignTarget, folders, handleAssignFolder, qm, themeName, t]);
 
   const folderActions = useMemo<QMSheetAction[]>(() => {
     const f = selectedFolder;
@@ -322,19 +287,6 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
     </Typography>
   );
 
-  // Folder form: one sheet for both create and edit (state lives in useFolderModal).
-  const formMode = folderModal.newFolderModalOpen ? 'new' : folderModal.editFolderModalOpen ? 'edit' : null;
-  const formName = formMode === 'edit' ? folderModal.editFolderName : folderModal.newFolderName;
-  const setFormName = formMode === 'edit' ? folderModal.setEditFolderName : folderModal.setNewFolderName;
-  const formColor = formMode === 'edit' ? folderModal.editFolderColor : folderModal.selectedColor;
-  const setFormColor = formMode === 'edit' ? folderModal.setEditFolderColor : folderModal.setSelectedColor;
-  const formBusy = formMode === 'edit' ? folderModal.updatingFolder : folderModal.creatingFolder;
-  const formSave = formMode === 'edit' ? folderModal.handleEditFolder : folderModal.handleCreateFolder;
-  const formOk = formName.trim().length > 0;
-  const closeForm = useCallback(() => {
-    if (folderModal.newFolderModalOpen) folderModal.closeCreateModal();
-    if (folderModal.editFolderModalOpen) { folderModal.closeEditModal(); setSelectedFolder(null); }
-  }, [folderModal]);
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
@@ -386,61 +338,17 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         onStart={(mode, ids, titles) => navigation.navigate('Quiz', { setIds: ids, setTitles: titles, mode })}
       />
 
-      <QMSheet
-        visible={!!assignTarget}
-        onClose={() => setAssignTarget(null)}
-        title={t('library:qm.moveToFolder', 'Move to folder')}
-        sub={assignTarget?.title}
-        actions={moveActions}
-      />
+      <MoveToFolderSheet set={assignTarget} onClose={() => setAssignTarget(null)} />
 
       <QMSheet
-        visible={!!selectedFolder && !formMode}
+        visible={!!selectedFolder && !folderModal.editFolderModalOpen}
         onClose={() => setSelectedFolder(null)}
         title={selectedFolder?.name}
         sub={selectedFolder ? t('library:folders.setsCount', { count: folderSetCounts[selectedFolder.id] ?? 0 }) : undefined}
         actions={folderActions}
       />
 
-      <QMSheet
-        visible={!!formMode}
-        onClose={closeForm}
-        title={formMode === 'edit' ? t('library:qm.editFolder', 'Edit folder') : t('library:qm.newFolder', 'New folder')}
-      >
-        <View style={styles.form}>
-          <View style={styles.labelRow}>
-            <Typography preset="qmFieldLabel" color={qm.ink}>{t('library:qm.name', 'Name')}</Typography>
-            <Typography preset="qmBody" color={qm.muted}>{formName.length} / {NAME_MAX}</Typography>
-          </View>
-          <BottomSheetTextInput
-            value={formName}
-            onChangeText={setFormName}
-            maxLength={NAME_MAX}
-            placeholder={t('library:qm.folderPlaceholder', 'e.g. Gospels')}
-            placeholderTextColor={qm.muted}
-            autoCapitalize="words"
-            returnKeyType="done"
-            onSubmitEditing={formSave}
-            editable={!formBusy}
-            accessibilityLabel={t('library:folders.folderName', 'Folder name')}
-            style={[styles.field, { backgroundColor: qm.bg, borderColor: qm.line, color: qm.ink }]}
-          />
-          <Typography preset="qmFieldLabel" color={qm.ink} style={styles.colorLabel}>{t('library:folders.color', 'Color')}</Typography>
-          <QMColorSwatches value={formColor} onChange={setFormColor} presets={PRESET_COLORS} />
-          <AnimatedPressable
-            scaleTo={0.97}
-            onPress={formSave}
-            disabled={!formOk || formBusy}
-            style={[styles.formBtn, formOk ? { backgroundColor: qm.violet, boxShadow: qm.btnShadow } : { backgroundColor: qm.field }]}
-            accessibilityRole="button"
-            accessibilityState={{ disabled: !formOk, busy: formBusy }}
-          >
-            {formBusy
-              ? <ActivityIndicator size="small" color={qm.onViolet} />
-              : <Typography preset="qmButtonLg" color={formOk ? qm.onViolet : qm.muted}>{t('library:qm.save', 'Save')}</Typography>}
-          </AnimatedPressable>
-        </View>
-      </QMSheet>
+      <FolderFormSheet modal={folderModal} onClosed={() => setSelectedFolder(null)} />
 
       <QMConfirmDialog {...dialogProps} />
     </View>
@@ -464,15 +372,4 @@ const styles = StyleSheet.create({
   emptyGap: { marginTop: spacing.s48 + spacing.sm },
   exploreGap: { marginTop: spacing.s22 },
   exploreGapEmpty: { marginTop: spacing.huge },
-  form: { paddingHorizontal: spacing.md, paddingTop: spacing.xs },
-  labelRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.s6 },
-  field: {
-    height: FOLDER_FIELD_H, paddingHorizontal: spacing.s14, borderRadius: radius.r12 + 2, borderWidth: 1,
-    ...textPresets.qmInput,
-  },
-  colorLabel: { marginTop: spacing.s18, marginBottom: spacing.sm },
-  formBtn: {
-    marginTop: spacing.xxl, height: FORM_BTN_H, borderRadius: radius.md,
-    alignItems: 'center', justifyContent: 'center',
-  },
 });
