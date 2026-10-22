@@ -43,8 +43,8 @@ function Bar({ earned, used, max, on, index, usedColor, label, a11y, onPress }: 
   const down = useAnimatedStyle(() => ({ height: Math.round((used / max) * DOWN_H) * p.value }));
   return (
     <Pressable onPress={onPress} style={styles.barCol} accessibilityRole="button" accessibilityLabel={a11y} accessibilityState={{ selected: on }}>
-      <Animated.View style={[styles.barUp, { backgroundColor: qm.leaf, opacity: on ? 1 : 0.55 }, up]} />
-      <Animated.View style={[styles.barDown, { backgroundColor: usedColor, opacity: on ? 1 : 0.55 }, down]} />
+      <Animated.View style={[styles.barUp, !on && styles.barOff, { backgroundColor: qm.leaf }, up]} />
+      <Animated.View style={[styles.barDown, !on && styles.barOff, { backgroundColor: usedColor }, down]} />
       <Typography preset={on ? 'qmTag' : 'qmCaption'} color={on ? qm.ink : qm.muted} numberOfLines={1} style={styles.barLabel}>{label}</Typography>
     </Pressable>
   );
@@ -249,7 +249,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
         refreshControl={
           <RefreshControl
             refreshing={isFetching && !isFetchingNextPage && !isLoading}
-            onRefresh={() => { void Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits'] })]); }}
+            onRefresh={() => { Promise.all([refetch(), qc.invalidateQueries({ queryKey: ['credits'] })]).catch(() => {}); }}
             tintColor={qm.violet}
             progressViewOffset={insets.top}
           />
@@ -282,6 +282,7 @@ const styles = StyleSheet.create({
   barCol: { flex: 1, alignItems: 'center' },
   barUp: { position: 'absolute', left: '18%', right: '18%', bottom: CHART_H - AXIS, borderTopLeftRadius: radius.r6, borderTopRightRadius: radius.r6, borderBottomLeftRadius: radius.r2, borderBottomRightRadius: radius.r2 },
   barDown: { position: 'absolute', left: '18%', right: '18%', top: AXIS + 1, borderBottomLeftRadius: radius.r6, borderBottomRightRadius: radius.r6, borderTopLeftRadius: radius.r2, borderTopRightRadius: radius.r2 },
+  barOff: { opacity: 0.55 },
   barLabel: { position: 'absolute', bottom: 0 },
   activityFoot: { flexDirection: 'row', justifyContent: 'space-between', marginTop: spacing.md, paddingTop: spacing.md, borderTopWidth: StyleSheet.hairlineWidth },
   section: { marginTop: spacing.xxl, marginBottom: spacing.sm, marginHorizontal: spacing.xs },

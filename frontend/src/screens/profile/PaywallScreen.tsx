@@ -56,8 +56,8 @@ function PlanCard({ tier, period, prices, selected, current, badge, onPress }: {
   const ring = useAnimatedStyle(() => ({ borderColor: withTiming(selected ? qm.violet : qm.hair, { duration: 250 }) }), [selected, qm]);
   return (
     <AnimatedPressable scaleTo={0.98} onPress={onPress} accessibilityRole="radio" accessibilityState={{ selected }}>
-      <Animated.View style={[styles.plan, { backgroundColor: qm.surface, boxShadow: qm.cardShadow, borderWidth: selected ? 2 : 1 }, ring]}>
-        <View style={[styles.radio, selected ? { borderWidth: RADIO_ON, borderColor: qm.violet, backgroundColor: qm.surface } : { borderWidth: 2, borderColor: qm.off }]} />
+      <Animated.View style={[styles.plan, selected ? styles.planOn : styles.planOff, { backgroundColor: qm.surface, boxShadow: qm.cardShadow }, ring]}>
+        <View style={[styles.radio, selected ? [styles.radioOn, { borderColor: qm.violet, backgroundColor: qm.surface }] : [styles.radioOff, { borderColor: qm.off }]]} />
         <View style={styles.flex}>
           <View style={styles.planName}>
             <Typography preset="qmSection" color={qm.ink}>{tier.name}</Typography>
@@ -244,6 +244,10 @@ const styles = StyleSheet.create({
   body: { paddingHorizontal: spacing.xl, paddingTop: spacing.xs },
   plans: { gap: spacing.s10, marginTop: spacing.s14 },
   plan: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.s14, padding: spacing.lg, borderRadius: radius.r20 },
+  planOn: { borderWidth: 2 },
+  planOff: { borderWidth: 1 },
+  radioOn: { borderWidth: RADIO_ON },
+  radioOff: { borderWidth: 2 },
   radio: { width: RADIO, height: RADIO, borderRadius: RADIO / 2, marginTop: spacing.s2 },
   planName: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: spacing.sm },
   planSub: { marginTop: spacing.s3 },
