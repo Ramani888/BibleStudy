@@ -1,7 +1,7 @@
 ---
 tags: [frontend, design, redesign, canvas]
 updated: 2026-10-17
-status: implementing (Home, Tab bar, Sign-in, Library, Quiz done)
+status: implementing (Home, Tab bar, Sign-in, Library, Quiz, Ask done)
 ---
 
 # Redesign — "Quiet Morning" (design canvas)
@@ -129,3 +129,5 @@ Every module checked against the real code: [[Redesign Audit 2026-10-17]]. Struc
 Related: [[Brand & Assets]] · [[Design Language (Calm Serene)]] · [[Theme & Components]] · [[Screen Map]] · [[Sheet & Modal Components]]
 - 2026-10-22: implementation under way, module by module. Done: Home (e7840d4, b12c018), floating tab bar (247e98b), Sign-in (a2df7ca), **Library** (3ddb933 → 3321ca3: Library root, FolderDetail, SetDetail, set + card forms, study plans, Explore / Friends' sets). Shared kit in `frontend/src/components/qm/` (sheet, confirm dialog, segmented switch, search field, empty state, set row, folder tile, colour swatches, sticky bar, modal-form shell). Open owner question: canvas "Copy card to another set" needs a backend route; app keeps "Duplicate card". Next: Quiz.
 - 2026-10-22: **Quiz** done (3e2c917 → 849eac6): hub, quiz details, setup (topic / sets / document), play (all 7 modes + feedback sheet + leave dialog — fixes "iOS can't quit a running quiz"), results, every-answer summary. New shared bits: `QMScoreRing`, `QMButton` icon + badge, full-screen "Making your quiz…" overlay. Behaviour changes from canvas decisions: no visible quiz clock (timeSecs still recorded), results never auto-close, re-quiz confirm shows the credit balance. Next: Ask.
+- 2026-10-22: **Ask** done (4f7a4f1, 22a1a5d): AI consent, chat, past conversations. Bugs fixed with it: SetDetail "Ask AI about this card" skipped consent (now via AIConsent, which forwards the question); AI consent and attachment content-policy shared one flag (now separate keys); composer always said 1 credit (now 2 when the draft asks for cards); literal `
+` in the content-policy text (dialog uses the canvas copy); "Save as a card" failed on answers over 1000 chars (trimmed to card limits). New: failed answers stay inline with Try again, custom conversation topics (max 5), follow-ups only under the newest answer. Not built (deferred decision): the consent screen's "turn AI off in Settings" line was dropped — no AI toggle exists yet. Next: Profile.
