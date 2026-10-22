@@ -13,13 +13,13 @@ import { useSystemBars } from '../hooks';
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();
 
-export function AuthNavigator() {
-  const { colors } = useTheme();
-  useSystemBars(colors.background);
+export function AuthNavigator({ initialRouteName = 'Login' }: { initialRouteName?: 'Login' | 'Register' }) {
+  const { qm } = useTheme();
+  useSystemBars(qm.bg);
   return (
     <Stack.Navigator
-      initialRouteName="Login"
-      screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: colors.background } }}
+      initialRouteName={initialRouteName}
+      screenOptions={{ headerShown: false, animation: 'slide_from_right', contentStyle: { backgroundColor: qm.bg } }}
     >
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />

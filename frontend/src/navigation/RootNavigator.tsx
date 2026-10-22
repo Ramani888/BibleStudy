@@ -16,7 +16,7 @@ import {
 import { storage } from '../utils/storage';
 import { crashLog } from '../lib/crashlytics';
 import type { RootStackParamList } from './types';
-import { OnboardingScreen } from '../screens/onboarding/OnboardingScreen';
+import { OnboardingScreen, type OnboardingExit } from '../screens/onboarding/OnboardingScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { AppNavigator } from './AppNavigator';
 import { QuizScreen } from '../screens/quiz/QuizScreen';
@@ -25,11 +25,11 @@ import { QuizSummaryScreen } from '../screens/quiz/QuizSummaryScreen';
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 
 function SplashScreen() {
-  const { colors } = useTheme();
-  useSystemBars(colors.background);
+  const { qm } = useTheme();
+  useSystemBars(qm.bg);
   return (
-    <View style={[styles.splash, { backgroundColor: colors.background }]}>
-      <ActivityIndicator size="large" color={colors.accent} />
+    <View style={[styles.splash, { backgroundColor: qm.bg }]}>
+      <ActivityIndicator size="large" color={qm.violet} />
     </View>
   );
 }
@@ -47,6 +47,8 @@ export function RootNavigator() {
   }, [name, colors.background]);
 
   const [hasOnboarded, setHasOnboarded] = useState(false);
+  // Onboarding's last step decides where auth opens: "Create my account" → Register.
+  const [authStart, setAuthStart] = useState<OnboardingExit>('Login');
   const [onboardingChecked, setOnboardingChecked] = useState(false);
   const notificationsSetUp = useRef(false);
   const navigationRef = useRef<NavigationContainerRef<RootStackParamList>>(null);
@@ -107,7 +109,7 @@ export function RootNavigator() {
   // First-time user: show onboarding before auth
   if (!hasOnboarded) {
     return (
-      <OnboardingScreen onComplete={() => setHasOnboarded(true)} />
+      <OnboardingScreen onComplete={exit => { setAuthStart(exit); setHasOnboarded(true); }} />
     );
   }
 
@@ -124,7 +126,7 @@ export function RootNavigator() {
           <RootStack.Screen name="QuizSummary" component={QuizSummaryScreen} />
         </RootStack.Navigator>
       ) : (
-        <AuthNavigator />
+        <AuthNavigator initialRouteName={authStart} />
       )}
     </NavigationContainer>
   );

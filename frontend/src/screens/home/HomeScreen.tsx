@@ -5,11 +5,11 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import LinearGradient from 'react-native-linear-gradient';
-import Svg, { Defs, RadialGradient, Rect, Stop } from 'react-native-svg';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { Avatar, Typography, AnimatedPressable } from '../../components/ui';
 import { VerseCard } from '../../components/domain';
+import { QMFog } from '../../components/qm';
 import {
   AskIcon,
   BellQMIcon,
@@ -63,26 +63,6 @@ function tintFor(qm: QMColors, tint: QuickTint): [string, string] {
   if (tint === 'gold') return [qm.goldBg, qm.goldText];
   return [qm.lilac, qm.link];
 }
-
-// ─── Page-top fog (soft lilac top-left + warm top-right) ───────────────────────
-const TopFog = React.memo(function TopFog({ qm }: { qm: QMColors }) {
-  return (
-    <Svg pointerEvents="none" style={styles.fog} width="100%" height={FOG_HEIGHT}>
-      <Defs>
-        <RadialGradient id="fogL" cx="0%" cy="0%" fx="0%" fy="0%" rx="120%" ry="60%">
-          <Stop offset="0" stopColor={qm.fogLilac[0]} stopOpacity={qm.fogLilac[1]} />
-          <Stop offset="0.6" stopColor={qm.fogLilac[0]} stopOpacity={0} />
-        </RadialGradient>
-        <RadialGradient id="fogW" cx="100%" cy="0%" fx="100%" fy="0%" rx="90%" ry="50%">
-          <Stop offset="0" stopColor={qm.fogWarm[0]} stopOpacity={qm.fogWarm[1]} />
-          <Stop offset="0.6" stopColor={qm.fogWarm[0]} stopOpacity={0} />
-        </RadialGradient>
-      </Defs>
-      <Rect width="100%" height="100%" fill="url(#fogL)" />
-      <Rect width="100%" height="100%" fill="url(#fogW)" />
-    </Svg>
-  );
-});
 
 // ─── Header ────────────────────────────────────────────────────────────────────
 const Header = React.memo(function Header({ dateLabel, name, avatarUri, unread, onAI, onBell, onAvatar }: {
@@ -402,7 +382,7 @@ export function HomeScreen() {
 
   return (
     <View style={[styles.root, { backgroundColor: qm.bg }]}>
-      <TopFog qm={qm} />
+      <QMFog height={FOG_HEIGHT} />
       <SafeAreaView style={styles.flex1} edges={['top']}>
         <ScrollView style={styles.flex1} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
           <Header
@@ -513,7 +493,6 @@ export function HomeScreen() {
 const styles = StyleSheet.create({
   root: { flex: 1 },
   flex1: { flex: 1 },
-  fog: { position: 'absolute', top: 0, left: 0, right: 0 },
   scroll: { paddingHorizontal: spacing.xl, paddingTop: spacing.md, paddingBottom: spacing.huge },
   pressedDim: { opacity: 0.7 },
   gapSm: { marginTop: spacing.md },

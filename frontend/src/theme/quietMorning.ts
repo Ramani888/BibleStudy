@@ -24,6 +24,8 @@ export interface QMColors {
   heroInk: string;
   heroMuted: string;
   onViolet: string;
+  /** Brand tile (logo, splash) — identical in light and dark. */
+  brand: string;
   /** Soft 140° hero-card fog (violet → warm). */
   hero: readonly [string, string, string];
   /** Page-top fog [hex, opacity]: lilac top-left, warm top-right. (svg stops ignore rgba alpha) */
@@ -47,6 +49,25 @@ export interface QMColors {
   tabIdle: string;
   tabOn: string;
   tabPill: string;
+  /** Forms (auth + every later form). */
+  line: string;
+  focusRing: string;
+  error: string;
+  errorBg: string;
+  off: string;
+  btnOff: string;
+  btnOffInk: string;
+  /** Brand-mandated social buttons (Apple HIG / Google identity guidelines). */
+  appleBg: string;
+  appleInk: string;
+  googleBg: string;
+  googleInk: string;
+  googleLine: string;
+  /** Onboarding scenes. */
+  dot: string;
+  fan1: string;
+  fan3: string;
+  liftShadow: string;
 }
 
 const setColors = ['#F2B8A0', '#B9A6F2', '#F0CF8E', '#A6C8EE', '#9FCBA8'] as const;
@@ -72,6 +93,7 @@ export const qmLight: QMColors = {
   heroInk: '#3A2A4A',
   heroMuted: '#6E5A72',
   onViolet: '#FFFFFF',
+  brand: '#6D4AE0',
   hero: ['#EEE7FC', '#F3ECF8', '#FBF1EA'],
   fogLilac: ['#C4B2FA', 0.32],
   fogWarm: ['#FFCEAA', 0.26],
@@ -89,6 +111,22 @@ export const qmLight: QMColors = {
   tabIdle: '#6B6580',
   tabOn: '#6D4AE0',
   tabPill: '#EEE9FB',
+  line: 'rgba(34,30,51,0.13)',
+  focusRing: '0px 0px 0px 4px rgba(124,92,240,0.18)',
+  error: '#B4442F',
+  errorBg: '#FBEDEA',
+  off: '#B9B3C4',
+  btnOff: '#D9D3E6',
+  btnOffInk: '#7C7690',
+  appleBg: '#000000',
+  appleInk: '#FFFFFF',
+  googleBg: '#FFFFFF',
+  googleInk: '#1F1F1F',
+  googleLine: '#747775',
+  dot: '#D6CFE6',
+  fan1: '#F6E3E1',
+  fan3: '#E1EAF6',
+  liftShadow: '0px 18px 40px -22px rgba(34,30,51,0.35)',
 };
 
 export const qmDark: QMColors = {
@@ -112,6 +150,7 @@ export const qmDark: QMColors = {
   heroInk: '#F4ECF6',
   heroMuted: '#C7B8CF',
   onViolet: '#FFFFFF',
+  brand: '#6D4AE0',
   hero: ['#2A2140', '#231C33', '#2A1F2E'],
   fogLilac: ['#7C5CF0', 0.16],
   fogWarm: ['#FF965A', 0.06],
@@ -129,6 +168,22 @@ export const qmDark: QMColors = {
   tabIdle: '#A69FB6',
   tabOn: '#C9BBFF',
   tabPill: '#2E2647',
+  line: 'rgba(255,255,255,0.13)',
+  focusRing: '0px 0px 0px 4px rgba(124,92,240,0.18)',
+  error: '#F08C78',
+  errorBg: '#33201D',
+  off: '#5C5468',
+  btnOff: '#2A2535',
+  btnOffInk: '#8A8398',
+  appleBg: '#FFFFFF',
+  appleInk: '#000000',
+  googleBg: '#131314',
+  googleInk: '#E3E3E3',
+  googleLine: '#8E918F',
+  dot: '#3A3348',
+  fan1: '#3A2426',
+  fan3: '#1E2A3D',
+  liftShadow: '0px 0px 0px 1px rgba(255,255,255,0.06)',
 };
 
 export const qmFont = {
@@ -154,6 +209,12 @@ export const qmPresets = {
   qmLabel:     { fontFamily: qmFont.semibold,    fontSize: 13, lineHeight: 18, letterSpacing: 0.3 },
   qmLink:      { fontFamily: qmFont.semibold,    fontSize: 14, lineHeight: 20 },
   qmButton:    { fontFamily: qmFont.semibold,    fontSize: 15, lineHeight: 20 },
+  qmButtonLg:  { fontFamily: qmFont.semibold,    fontSize: 16, lineHeight: 20 },
+  qmInput:     { fontFamily: qmFont.regular,     fontSize: 16 },
+  qmLead:      { fontFamily: qmFont.regular,     fontSize: 16, lineHeight: 24 },
+  qmFieldLabel:{ fontFamily: qmFont.semibold,    fontSize: 14, lineHeight: 18 },
+  qmError:     { fontFamily: qmFont.medium,      fontSize: 13, lineHeight: 18 },
+  qmFine:      { fontFamily: qmFont.regular,     fontSize: 12, lineHeight: 18 },
   qmMeta:      { fontFamily: qmFont.regular,     fontSize: 13, lineHeight: 18 },
   qmCaption:   { fontFamily: qmFont.medium,      fontSize: 12, lineHeight: 15 },
   qmTag:       { fontFamily: qmFont.bold,        fontSize: 11, lineHeight: 14 },

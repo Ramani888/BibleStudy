@@ -1,31 +1,37 @@
 import React, { useCallback, useRef, useState } from 'react';
-import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
+import Animated, { FadeInUp } from 'react-native-reanimated';
 
 import { AuthLayout } from './components/AuthLayout';
-import { FormField } from '../../components/forms';
-import { Button, Typography } from '../../components/ui';
+import { Typography } from '../../components/ui';
+import {
+  QMBanner, QMButton, QMDivider, QMFormField, QMLogoLockup, QMSocialButtons,
+} from '../../components/qm';
 import { useAuthStore } from '../../store';
-import { getErrorMessage } from '../../api';
+import { authApi, getErrorMessage } from '../../api';
 import { loginSchema, type LoginFormData } from '../../utils/validators';
-import { layout, spacing, useTheme, palette } from '../../theme';
+import { spacing, useTheme } from '../../theme';
 import { googleStatusCodes } from '../../utils/socialAuth';
 import { storage } from '../../utils/storage';
 import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
+type Banner = 'wrongPw' | 'unverified' | 'socialOnly' | 'failed' | null;
+const enter = (i: number) => FadeInUp.duration(320).delay(i * 50);
+
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   const { t } = useTranslation('auth');
-  const { colors } = useTheme();
-  const login          = useAuthStore(s => s.login);
+  const { qm } = useTheme();
+  const login           = useAuthStore(s => s.login);
   const loginWithGoogle = useAuthStore(s => s.loginWithGoogle);
   const loginWithApple  = useAuthStore(s => s.loginWithApple);
-  const passwordRef    = useRef<TextInput>(null);
+  const passwordRef     = useRef<TextInput>(null);
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
-  const [socialOnly, setSocialOnly] = useState(false);
+  const [banner, setBanner] = useState<Banner>(null);
 
   const { control, handleSubmit, getValues, formState: { isSubmitting } } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -33,24 +39,23 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    setSocialOnly(false);
+    setBanner(null);
     try {
       await login(data);
       await storage.setTosAccepted();
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const code = err.response?.data?.error?.code;
+      if (axios.isAxiosError(err) && err.response) {
+        const code = err.response.data?.error?.code;
         if (code === 'EMAIL_NOT_VERIFIED') {
-          Toast.show({ type: 'info', text1: t('emailNotVerified'), text2: t('redirectingVerify') });
-          navigation.navigate('VerifyEmail', { email: getValues('email') });
+          // The banner promises a fresh code, so send one; the 30s resend cooldown lives on VerifyEmail.
+          authApi.resendVerification({ email: data.email }).catch(() => {});
+          setBanner('unverified');
           return;
         }
-        if (code === 'SOCIAL_LOGIN_ONLY') {
-          setSocialOnly(true);
-          return;
-        }
+        if (code === 'SOCIAL_LOGIN_ONLY') { setBanner('socialOnly'); return; }
+        if (err.response.status === 401) { setBanner('wrongPw'); return; }
       }
-      Toast.show({ type: 'error', text1: t('loginFailed'), text2: getErrorMessage(err) });
+      setBanner('failed');
     }
   };
 
@@ -59,8 +64,8 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     try {
       await loginWithGoogle();
       await storage.setTosAccepted();
-    } catch (err: any) {
-      if (err?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
+    } catch (err: unknown) {
+      if ((err as { code?: string })?.code !== googleStatusCodes.SIGN_IN_CANCELLED) {
         Toast.show({ type: 'error', text1: t('googleFailed'), text2: getErrorMessage(err) });
       }
     } finally {
@@ -80,75 +85,120 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     }
   }, [loginWithApple, t]);
 
+  const bannerText: Record<Exclude<Banner, null>, string> = {
+    wrongPw: t('bannerWrongPw'),
+    unverified: t('bannerUnverified'),
+    socialOnly: t('bannerSocialOnly'),
+    failed: t('bannerFailed'),
+  };
+
   return (
-    <AuthLayout
-      title={t('welcomeBack')}
-      subtitle={t('welcomeBackSubtitle')}
-      onGoogle={handleGoogle}
-      onApple={handleApple}
-      socialLoading={socialLoading}
-      footer={
-        <>
-          <Button label={t('signIn')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} fullWidth />
-          <Pressable onPress={() => navigation.navigate('Register')} style={({ pressed }) => pressed && styles.linkPressed}>
-            <Typography preset="bodySm" color={colors.textSecondary} align="center">
-              {t('dontHaveAccount')}{' '}
-              <Typography preset="bodySm" color={colors.accent}>{t('register')}</Typography>
-            </Typography>
-          </Pressable>
-          <Typography preset="caption" color={colors.textSecondary} align="center">
-            {t('termsAgreement')}{' '}
-            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('TermsOfService')}>{t('termsOfService')}</Typography>
-            {' '}{t('and')}{' '}
-            <Typography preset="caption" color={colors.accent} onPress={() => navigation.navigate('PrivacyPolicy')}>{t('privacyPolicy')}</Typography>
-          </Typography>
-        </>
-      }
-    >
-      <View>
-        {socialOnly && (
-          <View style={[styles.socialBanner, { backgroundColor: colors.accentSoft }]}>
-            <Typography preset="bodySm" color={palette.indigo800} align="center">
-              {t('socialOnlyNotice')}
-            </Typography>
-          </View>
-        )}
-        <FormField
+    <AuthLayout>
+      <Animated.View entering={enter(0)}><QMLogoLockup /></Animated.View>
+
+      <Animated.View entering={enter(1)}>
+        <Typography preset="qmDisplay" color={qm.ink} style={styles.title}>{t('welcomeBack')}</Typography>
+        <Typography preset="qmLead" color={qm.muted}>{t('welcomeBackSubtitle')}</Typography>
+      </Animated.View>
+
+      {banner && (
+        <QMBanner key={banner} tone={banner === 'wrongPw' || banner === 'failed' ? 'error' : 'info'} style={styles.banner}>
+          {bannerText[banner]}
+          {banner === 'unverified' && (
+            <>
+              {' '}
+              <Typography
+                preset="qmLink"
+                color={qm.link}
+                style={styles.underline}
+                onPress={() => navigation.navigate('VerifyEmail', { email: getValues('email'), from: 'login' })}
+              >
+                {t('enterCode')}
+              </Typography>
+            </>
+          )}
+        </QMBanner>
+      )}
+
+      <Animated.View entering={enter(2)} style={styles.social}>
+        <QMSocialButtons onGoogle={handleGoogle} onApple={handleApple} loading={socialLoading} />
+      </Animated.View>
+
+      <Animated.View entering={enter(3)} style={styles.divider}>
+        <QMDivider label={t('orUseEmail')} />
+      </Animated.View>
+
+      <Animated.View entering={enter(4)} style={styles.fields}>
+        <QMFormField
           name="email"
           control={control}
           label={t('email')}
           placeholder={t('emailPlaceholder')}
           keyboardType="email-address"
+          autoComplete="email"
           returnKeyType="next"
           onSubmitEditing={() => passwordRef.current?.focus()}
         />
-      </View>
-      <View>
-        <FormField
+        <QMFormField
           name="password"
           control={control}
           label={t('password')}
           placeholder={t('passwordPlaceholder')}
           isPassword
+          autoComplete="current-password"
           inputRef={passwordRef}
           returnKeyType="done"
           onSubmitEditing={handleSubmit(onSubmit)}
         />
-        <Pressable onPress={() => navigation.navigate('ForgotPassword')} style={({ pressed }) => pressed && styles.linkPressed}>
-          <Typography preset="label" color={colors.accent} align="right">
-            {t('forgotPassword')}
-          </Typography>
+        <Pressable
+          onPress={() => navigation.navigate('ForgotPassword')}
+          style={({ pressed }) => [styles.forgot, pressed && styles.dim]}
+          accessibilityRole="link"
+        >
+          <Typography preset="qmLink" color={qm.link}>{t('forgotPassword')}</Typography>
         </Pressable>
-      </View>
+      </Animated.View>
+
+      <Animated.View entering={enter(5)}>
+        <QMButton
+          label={t('signIn')}
+          loadingLabel={t('signingIn')}
+          loading={isSubmitting}
+          onPress={handleSubmit(onSubmit)}
+          style={styles.cta}
+        />
+        <Typography preset="qmLead" color={qm.muted} align="center" style={styles.switch}>
+          {t('newToVerdance')}{' '}
+          <Typography preset="qmLink" color={qm.link} style={styles.switchLink} onPress={() => navigation.navigate('Register')}>
+            {t('createAnAccount')}
+          </Typography>
+        </Typography>
+      </Animated.View>
+
+      <View style={styles.flexSpacer} />
+
+      <Typography preset="qmFine" color={qm.muted} align="center" style={styles.legal}>
+        {t('termsAgreementWith', { names: Platform.OS === 'ios' ? t('socialNamesIos') : t('socialNamesAndroid') })}{' '}
+        <Typography preset="qmFine" color={qm.link} style={styles.underline} onPress={() => navigation.navigate('TermsOfService')}>{t('termsOfService')}</Typography>
+        {' '}{t('and')}{' '}
+        <Typography preset="qmFine" color={qm.link} style={styles.underline} onPress={() => navigation.navigate('PrivacyPolicy')}>{t('privacyPolicy')}</Typography>.
+      </Typography>
     </AuthLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  socialBanner: {
-    borderRadius: layout.cardRadius,
-    padding: spacing.md,
-    marginBottom: spacing.sm,
-  },
-  linkPressed: { opacity: 0.7 },
+  dim: { opacity: 0.6 },
+  underline: { textDecorationLine: 'underline' },
+  title: { marginTop: spacing.s38 - 2, marginBottom: spacing.sm },
+  banner: { marginTop: spacing.xl },
+  social: { marginTop: spacing.s28 },
+  divider: { marginVertical: spacing.xxl },
+  fields: { gap: spacing.s14 },
+  forgot: { alignSelf: 'flex-end', paddingVertical: spacing.xs },
+  cta: { marginTop: spacing.xl },
+  switch: { marginTop: spacing.s22, fontSize: 15 },
+  switchLink: { fontSize: 15 },
+  flexSpacer: { flex: 1, minHeight: spacing.s28 },
+  legal: { marginHorizontal: spacing.sm },
 });

@@ -642,3 +642,10 @@ export const TabProfileIcon: React.FC<TabIconProps> = ({ size, color = DEFAULT_C
     <Path d={filled ? 'M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6z' : 'M5 20c.8-3.6 3.6-5.6 7-5.6s6.2 2 7 5.6'} fill={filled ? color : 'none'} {...stroke(color, 1.8)} />
   </Outline>
 );
+
+/** Plain chevron back (canvas "back arrow"). */
+export const ChevronLeftIcon: IconComponent = ({ size, color = DEFAULT_COLOR, strokeWidth = 1.8 }) => (
+  <Outline size={size}>
+    <Path d="M15 5l-7 7 7 7" {...stroke(color, strokeWidth)} />
+  </Outline>
+);

@@ -17,7 +17,7 @@ export type RootStackParamList = {
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
-  VerifyEmail: { email: string };
+  VerifyEmail: { email: string; from?: 'register' | 'login' };
   ForgotPassword: undefined;
   ResetPassword: { email: string };
   PrivacyPolicy: undefined;
