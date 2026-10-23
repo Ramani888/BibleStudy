@@ -22,7 +22,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 10. Quiz — playing & results | 16 | 0 | 13 | 0 | 3 | 0 |
 | 11. Ask (AI) | 31 | 0 | 22 | 0 | 8 | 1 |
 | 12. Profile & Settings | 50 | 0 | 33 | 0 | 7 | 10 |
-| 13. Friends | 31 | 29 | 0 | 0 | 0 | 2 |
+| 13. Friends | 31 | 0 | 25 | 0 | 4 | 2 |
 | 14. Notes | 15 | 14 | 0 | 0 | 0 | 1 |
 | 15. Media | 12 | 9 | 0 | 0 | 0 | 3 |
 | 16. Whole app | 7 | 6 | 0 | 0 | 0 | 1 |
@@ -448,47 +448,47 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 13. Friends
 
 **Find friends**
-- ⬜ 🔍 **Search people** — **name**, needs 2+ letters, box opens focused
-- ⬜ **Add** → "Request sent to X"
-- ⬜ Person who asked you → **Accept**
-- ⬜ "Requested" / "Friends" labels
-- ⬜ Blocked people never show
-- ⬜ No match → invite button
+- 🔧 🔍 **Search people** — **name**, needs 2+ letters, box opens focused
+- ✅ **Add** → "Request sent to X"
+- ✅ Person who asked you → **Accept**
+- ✅ "Requested" / "Friends" labels
+- ✅ Blocked people never show
+- ✅ No match → invite button
 
 **Friends list**
-- ⬜ Requests icon (count) + leaderboard icon
-- ⬜ Banner "A and B want to study with you" → Requests
-- ⬜ Rows show streak; tap → profile
-- ⬜ ⋮: View profile · Remove friend (confirm) · Block (confirm)
-- ⬜ Empty → **Search for friends** + invite
-- ⬜ 📄 Pull to refresh · no internet
+- ✅ Requests icon (count) + leaderboard icon
+- ✅ Banner "A and B want to study with you" → Requests
+- ✅ Rows show streak; tap → profile
+- ✅ ⋮: View profile · Remove friend (confirm) · Block (confirm)
+- ✅ Empty → **Search for friends** + invite
+- 🔧 📄 Pull to refresh · no internet
 
 **Friend requests**
-- ⬜ **For you · N**: **Accept** ("You're now friends") / **Decline**
-- ⬜ **You sent**: **Cancel request**
-- ⬜ Tap person → profile
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ **For you · N**: **Accept** ("You're now friends") / **Decline**
+- ✅ **You sent**: **Cancel request**
+- ✅ Tap person → profile
+- ✅ 📄 Pull to refresh · empty · no internet
 
 **Someone's profile**
-- ⬜ Mutual friends, member since
-- ⬜ Button by status: Add friend · Requested·Cancel · Accept/Decline · Friends (→ Remove / Block)
-- ⬜ ⋯ → **Report**: 5 reasons + note (500) → **Send report** → "Report sent" → Done / Block
+- ✅ Mutual friends, member since
+- ✅ Button by status: Add friend · Requested·Cancel · Accept/Decline · Friends (→ Remove / Block)
+- ✅ ⋯ → **Report**: 5 reasons + note (500) → **Send report** → "Report sent" → Done / Block
 - 👤 Report email arrives
-- ⬜ ⋯ → **Block**
-- ⬜ Their sets → open read-only
-- ⬜ 📄 Pull to refresh · no internet
+- ✅ ⋯ → **Block**
+- 🔧 Their sets → open read-only
+- ✅ 📄 Pull to refresh · no internet
 
 **Blocked people**
-- ⬜ **Unblock** → "Unblocked X" → they show in search again
-- ⬜ Empty state
+- 🔧 **Unblock** → "Unblocked X" → they show in search again
+- ✅ Empty state
 
 **Invite friends**
-- ⬜ "+N for you and +N for your friend"
-- ⬜ Code → **Copy** → "Copied" (2 sec)
+- ✅ "+N for you and +N for your friend"
+- ✅ Code → **Copy** → "Copied" (2 sec)
 - 👤 **Send on WhatsApp** / **More ways to share**
-- ⬜ "N friends joined", cap "up to N friends"
-- ⬜ Enter friend's code (max 16) → **Apply** → +credits → then shows "You used a friend's code"
-- ⬜ Wrong code → error
+- ✅ "N friends joined", cap "up to N friends"
+- ✅ Enter friend's code (max 16) → **Apply** → +credits → then shows "You used a friend's code"
+- ✅ Wrong code → error
 
 ## 14. Notes
 
