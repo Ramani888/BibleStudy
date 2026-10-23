@@ -1,6 +1,6 @@
 import React from 'react';
-import { StyleSheet, ViewStyle } from 'react-native';
-import Animated, { FadeInUp } from 'react-native-reanimated';
+import { StyleSheet, View, ViewStyle } from 'react-native';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { Typography } from '../ui';
 import { useTheme, spacing, radius } from '../../theme';
 
@@ -10,13 +10,16 @@ export function QMBanner({ tone = 'info', children, style }: { tone?: 'info' | '
   const bg = tone === 'error' ? qm.errorBg : qm.lilac;
   const ink = tone === 'error' ? qm.error : qm.lilacInk;
   return (
-    <Animated.View
-      entering={FadeInUp.duration(300)}
-      style={[styles.banner, { backgroundColor: bg }, style]}
-      accessibilityRole={tone === 'error' ? 'alert' : 'text'}
-      accessibilityLiveRegion="polite"
-    >
-      <Typography preset="qmBody" color={ink}>{children}</Typography>
+    // Fade on a bare wrapper: an entering animation on the coloured, rounded view itself
+    // left the banner invisible on Android Fabric.
+    <Animated.View entering={FadeIn.duration(250)} style={style}>
+      <View
+        style={[styles.banner, { backgroundColor: bg }]}
+        accessibilityRole={tone === 'error' ? 'alert' : 'text'}
+        accessibilityLiveRegion="polite"
+      >
+        <Typography preset="qmBody" color={ink}>{children}</Typography>
+      </View>
     </Animated.View>
   );
 }
