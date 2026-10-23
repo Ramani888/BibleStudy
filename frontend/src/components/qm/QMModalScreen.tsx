@@ -24,7 +24,7 @@ export function QMModalScreen({ title, sub, onCancel, footer, children }: {
   // Modal presentation on iOS sits below the status bar already; Android is full-screen.
   const top = Platform.OS === 'ios' ? spacing.s14 : insets.top + spacing.s10;
   return (
-    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
       <View style={[styles.header, { paddingTop: top, backgroundColor: qm.glass, borderBottomColor: qm.hair }]}>
         <View style={[styles.handle, { backgroundColor: qm.line }]} />
         <View style={styles.row}>

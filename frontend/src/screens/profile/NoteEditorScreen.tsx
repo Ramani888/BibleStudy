@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
@@ -160,7 +160,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   const statusText = t(`profile:qmNoteEditor.${status === 'error' ? 'failed' : status}`);
 
   return (
-    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.surface }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.surface }]} behavior="padding">
       <View style={[styles.bar, { paddingTop: insets.top + spacing.sm }]}>
         <Pressable
           onPress={status === 'error' ? () => save() : undefined}

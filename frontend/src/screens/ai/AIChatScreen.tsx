@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { FlatList, KeyboardAvoidingView, Platform, Pressable, Share, StyleSheet, View } from 'react-native';
+import { FlatList, KeyboardAvoidingView, Pressable, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import Animated, { FadeInUp } from 'react-native-reanimated';
@@ -419,7 +419,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
 
   return (
-    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
       <View style={[styles.header, { paddingTop: insets.top + spacing.md }]}>
         <View style={styles.flex}>
           <Typography preset="qmDisplay" color={qm.ink} accessibilityRole="header">{t('ai:qm.chat.title', 'Ask')}</Typography>

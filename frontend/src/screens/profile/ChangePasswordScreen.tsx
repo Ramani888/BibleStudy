@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { FadeIn } from 'react-native-reanimated';
 import { useForm } from 'react-hook-form';
@@ -48,7 +48,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   };
 
   return (
-    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+    <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
       <ScrollView
         contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
         keyboardShouldPersistTaps="handled"
