@@ -15,7 +15,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 3. Library — My sets | 24 | 0 | 22 | 0 | 2 | 0 |
 | 4. Library — Folders | 12 | 0 | 11 | 0 | 1 | 0 |
 | 5. Library — Inside a set (Set detail) | 15 | 0 | 10 | 0 | 4 | 1 |
-| 6. Library — Cards | 11 | 11 | 0 | 0 | 0 | 0 |
+| 6. Library — Cards | 11 | 0 | 9 | 0 | 2 | 0 |
 | 7. Library — Explore & Friends' sets | 12 | 12 | 0 | 0 | 0 | 0 |
 | 8. Library — Study plans | 14 | 13 | 0 | 0 | 0 | 1 |
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 28 | 0 | 0 | 0 | 1 |
@@ -217,17 +217,17 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 6. Library — Cards
 
-- ⬜ **Q&A card**: question (2–300), answer (2–1000, counter), **Add a hint** (max 500, Remove)
-- ⬜ **Story card**: reference (max 100), passage (2–2000), **Add a note** (max 500)
-- ⬜ Too short / empty → can't save
-- ⬜ Tap preview → flips
-- ⬜ **Add card** → closes, card in set
-- ⬜ **Add & next** → stays, form clears, same type
-- ⬜ **Edit card** → **Save**; card type is locked
-- ⬜ Card ⋮ → **Duplicate card** → copy appears
-- ⬜ Card ⋮ → **Move to another set** → card moves (off when you have only 1 set)
-- ⬜ Card ⋮ → **Ask AI about this card** → chat opens and asks it
-- ⬜ Card ⋮ → **Delete card** → confirm → gone
+- ✅ **Q&A card**: question (2–300), answer (2–1000, counter), **Add a hint** (max 500, Remove)
+- 🔧 **Story card**: reference (max 100), passage (2–2000), **Add a note** (max 500)
+- 🔧 Too short / empty → can't save
+- ✅ Tap preview → flips
+- ✅ **Add card** → closes, card in set
+- ✅ **Add & next** → stays, form clears, same type
+- ✅ **Edit card** → **Save**; card type is locked
+- ✅ Card ⋮ → **Duplicate card** → copy appears
+- ✅ Card ⋮ → **Move to another set** → card moves (off when you have only 1 set)
+- ✅ Card ⋮ → **Ask AI about this card** → chat opens and asks it
+- ✅ Card ⋮ → **Delete card** → confirm → gone
 
 ## 7. Library — Explore & Friends' sets
 
