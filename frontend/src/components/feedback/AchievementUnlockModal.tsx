@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal, Pressable, StyleSheet, View } from 'react-native';
-import Animated, { Easing, FadeIn, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { AnimatedPressable } from '../ui/AnimatedPressable';
@@ -50,13 +50,13 @@ export function AchievementUnlockModal({ achievement: a, onDismiss }: Achievemen
       <Pressable style={[styles.scrim, { backgroundColor: qm.scrim }]} onPress={done} accessibilityLabel={t('qmAch.continue')} />
       <View style={styles.center} pointerEvents="box-none">
         <Animated.View
-          entering={ZoomIn.duration(600).springify().damping(14)}
+          entering={FadeIn.duration(600)}
           style={[styles.card, { backgroundColor: qm.surface }]}
           accessibilityRole="alert"
           accessibilityLabel={`${t('qmAch.eyebrow')}. ${a.title}`}
         >
           <View style={[styles.tile, { backgroundColor: qm.leafBg }]}>
-            <Animated.View entering={ZoomIn.delay(300).duration(1000).easing(Easing.bezier(0.3, 1.6, 0.5, 1))}>
+            <Animated.View entering={FadeIn.delay(300).duration(400)}>
               <Icon size={64} color={qm.leaf} strokeWidth={1.4} />
             </Animated.View>
           </View>
@@ -64,7 +64,7 @@ export function AchievementUnlockModal({ achievement: a, onDismiss }: Achievemen
           <Typography preset="qmTitle" color={qm.ink} align="center" style={styles.title}>{a.title}</Typography>
           <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.desc}>{a.description}</Typography>
           {a.reward > 0 && (
-            <Animated.View entering={FadeIn.delay(500)} style={[styles.chip, { backgroundColor: qm.leafBg }]}>
+            <Animated.View entering={FadeIn.delay(500).duration(300)} style={[styles.chip, { backgroundColor: qm.leafBg }]}>
               <Typography preset="qmFieldLabel" color={qm.leafText}>{t('qmAch.added', { count: a.reward })}</Typography>
             </Animated.View>
           )}

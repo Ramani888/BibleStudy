@@ -37,7 +37,7 @@ function Bar({ earned, used, max, on, index, usedColor, label, a11y, onPress }: 
   const p = useSharedValue(0);
   useEffect(() => {
     p.value = 0;
-    p.value = withDelay(index * 50, withTiming(1, { duration: 700, easing: Easing.bezier(0.3, 1.2, 0.5, 1), reduceMotion: ReduceMotion.System }));
+    p.value = withDelay(index * 50, withTiming(1, { duration: 700, easing: Easing.bezier(0.3, 0.9, 0.3, 1), reduceMotion: ReduceMotion.System }));
   }, [p, index, earned, used]);
   const up = useAnimatedStyle(() => ({ height: Math.round((earned / max) * UP_H) * p.value }));
   const down = useAnimatedStyle(() => ({ height: Math.round((used / max) * DOWN_H) * p.value }));

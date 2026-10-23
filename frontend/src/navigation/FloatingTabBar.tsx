@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { AnimatedPressable, Typography } from '../components/ui';
 import {
@@ -72,7 +72,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
                   gains a background after mount drops a radius it was mounted with. */}
               <View style={[styles.pill, focused && { backgroundColor: qm.tabPill, borderRadius: PILL_RADIUS }]}>
                 {focused ? (
-                  <Animated.View key="on" entering={ZoomIn.springify().damping(12)}>
+                  <Animated.View key="on" entering={FadeIn.duration(250)}>
                     <Icon size={24} color={color} filled cutout={qm.tabPill} />
                   </Animated.View>
                 ) : (

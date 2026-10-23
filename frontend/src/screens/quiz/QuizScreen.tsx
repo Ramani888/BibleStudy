@@ -3,7 +3,7 @@ import { ActivityIndicator, BackHandler, Pressable, StatusBar, StyleSheet, View 
 import { useFocusEffect, useNavigation, useRoute, type RouteProp } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import Animated, { useAnimatedStyle, withSpring } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import { Typography } from '../../components/ui';
 import { QMConfirmDialog, QMEmpty } from '../../components/qm';
@@ -199,7 +199,7 @@ export function QuizScreen() {
 function ProgressBar({ progress, step, total }: { progress: number; step: number; total: number }) {
   const { qm } = useTheme();
   const [w, setW] = useState(0);
-  const anim = useAnimatedStyle(() => ({ width: withSpring(w * progress, { damping: 16, stiffness: 140 }) }), [w, progress]);
+  const anim = useAnimatedStyle(() => ({ width: withTiming(w * progress, { duration: 300 }) }), [w, progress]);
   return (
     <View
       onLayout={e => setW(e.nativeEvent.layout.width)}

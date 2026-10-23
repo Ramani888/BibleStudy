@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
-import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
 import { useNavigation } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
@@ -121,7 +121,7 @@ export function QuizResultScreen({
               a11yLabel={scored ? t('quiz:qm.ringA11y', { pct: scorePct }) : undefined}
             />
             {perfect && (
-              <Animated.View entering={ZoomIn.delay(1100).springify().damping(9)} style={styles.leaf}>
+              <Animated.View entering={FadeIn.delay(1100).duration(300)} style={styles.leaf}>
                 <LeafIcon size={46} color={qm.leaf} strokeWidth={1.6} />
               </Animated.View>
             )}
@@ -150,7 +150,7 @@ export function QuizResultScreen({
               </View>
             )}
             {isNewBest && (
-              <Animated.View entering={ZoomIn.delay(200).springify().damping(9)} style={[styles.chip, { backgroundColor: qm.goldBg }]}>
+              <Animated.View entering={FadeIn.delay(200).duration(300)} style={[styles.chip, { backgroundColor: qm.goldBg }]}>
                 <Typography preset="qmLabel" color={qm.goldText}>{t('quiz:qm.newBest', 'New best')}</Typography>
               </Animated.View>
             )}

@@ -1,6 +1,6 @@
 import React, { forwardRef, useState } from 'react';
 import { LayoutChangeEvent, Pressable, StyleSheet, TextInput, TextInputProps, View } from 'react-native';
-import Animated, { FadeInUp, SharedValue, runOnJS, useAnimatedReaction, useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { FadeInUp, SharedValue, runOnJS, useAnimatedReaction, useAnimatedStyle, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -37,7 +37,7 @@ export function QMSegmented<K extends string>({ options, value, onChange, label 
   const segW = w ? (w - SEG_PAD * 2) / options.length : 0;
   const pill = useAnimatedStyle(() => ({
     width: segW,
-    transform: [{ translateX: withSpring(idx * segW, { damping: 16, stiffness: 180 }) }],
+    transform: [{ translateX: withTiming(idx * segW, { duration: 220 }) }],
   }), [idx, segW]);
   return (
     <View

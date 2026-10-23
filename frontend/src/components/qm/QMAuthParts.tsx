@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 import { Typography } from '../ui';
 import { useTheme, spacing, radius } from '../../theme';
@@ -12,7 +12,7 @@ const SEAL = 84; // canvas icon tile
 export function QMIconSeal({ children }: { children: React.ReactNode }) {
   const { qm } = useTheme();
   return (
-    <Animated.View entering={ZoomIn.springify().damping(14)} style={[styles.seal, { backgroundColor: qm.lilac }]}>
+    <Animated.View entering={FadeIn.duration(250)} style={[styles.seal, { backgroundColor: qm.lilac }]}>
       {children}
     </Animated.View>
   );
@@ -34,7 +34,7 @@ export function QMPasswordRules({ password, failed }: { password: string; failed
         return (
           <View key={r.label} style={styles.rule}>
             {r.ok ? (
-              <Animated.View key="ok" entering={ZoomIn.springify().damping(10)}>
+              <Animated.View key="ok" entering={FadeIn.duration(250)}>
                 <Svg width={16} height={16} viewBox="0 0 24 24">
                   <Circle cx={12} cy={12} r={10} fill={qm.leaf} />
                   <Path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke={qm.onViolet} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />

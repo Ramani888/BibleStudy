@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { Animated as RNAnimated, StatusBar, StyleSheet, View } from 'react-native';
-import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import Svg, { Defs, Path, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 
@@ -69,7 +69,7 @@ export function SplashScreen({ isReady, onFinish }: SplashScreenProps) {
       </Animated.View>
 
       <View style={styles.center}>
-        <Animated.View entering={ZoomIn.delay(250).duration(900).springify().damping(12)} style={styles.tile}>
+        <Animated.View entering={FadeIn.delay(250).duration(900)} style={styles.tile}>
           <Svg width={TILE} height={TILE} viewBox="0 0 44 44">
             <Path d="M15.5 16l6.5 13.65 6.5-13.65" fill="none" stroke={WHITE} strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
             <Path d="M22 29.65c-2.58-5.33-2.58-10.23 0-15.21 2.58 4.98 2.58 9.88 0 15.21z" fill={WHITE} />

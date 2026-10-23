@@ -51,7 +51,7 @@ export const ChatMessageItem = React.memo(function ChatMessageItem({
   if (item.role === 'user') {
     const isImage = item.attachmentType === 'IMAGE' && !!item.attachmentLocalUri;
     return (
-      <Animated.View entering={FadeInDown.duration(320).springify().damping(18)} style={styles.userCol}>
+      <Animated.View entering={FadeInDown.duration(320)} style={styles.userCol}>
         {isImage && <Image source={{ uri: item.attachmentLocalUri }} style={styles.thumb} resizeMode="cover" />}
         <Pressable onLongPress={() => onMore(item)} style={[styles.userBubble, { backgroundColor: qm.violet }]}>
           {!isImage && item.attachmentName ? (

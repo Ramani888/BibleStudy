@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, type NavigationProp } from '@react-navigation/native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
@@ -84,7 +84,7 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
                 : t('library:qm.addToLibraryA11y', { title: item.title, defaultValue: `Add ${item.title} to your library` })}
             >
               {adding === item.id ? <ActivityIndicator size="small" color={qm.lilacInk} />
-                : done ? <Animated.View entering={ZoomIn.springify().damping(10)}><CheckIcon size={15} color={qm.leafText} strokeWidth={3} /></Animated.View>
+                : done ? <Animated.View entering={FadeIn.duration(250)}><CheckIcon size={15} color={qm.leafText} strokeWidth={3} /></Animated.View>
                 : <PlusIcon size={15} color={qm.lilacInk} strokeWidth={2.6} />}
               <Typography preset="qmLabel" color={done ? qm.leafText : qm.lilacInk} style={styles.addText}>
                 {done ? t('library:qm.added', 'Added') : t('library:qm.add', 'Add')}

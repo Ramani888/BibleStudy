@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import Animated, {
-  useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, ZoomIn,
+  useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, FadeIn,
 } from 'react-native-reanimated';
 import { Typography } from '../ui';
 import { useTheme, spacing, textPresets } from '../../theme';
@@ -58,7 +58,7 @@ export function QMCodeInput({ value, onChange, status = 'idle', size = 'lg', lab
               ]}
             >
               {d ? (
-                <Animated.View entering={ZoomIn.springify().damping(12)}>
+                <Animated.View entering={FadeIn.duration(250)}>
                   <Typography preset="qmTitle" color={status === 'ok' ? qm.leaf : qm.ink} style={{ fontSize: dims.font, lineHeight: dims.font + 6 }}>{d}</Typography>
                 </Animated.View>
               ) : active ? <Caret color={qm.violet} /> : null}

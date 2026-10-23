@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ActivityIndicator, KeyboardAvoidingView, Platform, ScrollView, Share, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, { Easing, ReduceMotion, ZoomIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, ReduceMotion, FadeIn, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import Clipboard from '@react-native-clipboard/clipboard';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
@@ -112,7 +112,7 @@ export function InviteFriendsScreen({ navigation }: ProfileScreenProps<'InviteFr
           <AnimatedPressable scaleTo={0.98} onPress={onCopy} style={[styles.code, { backgroundColor: qm.lilac }]} accessibilityRole="button" accessibilityLabel={t('profile:qmInvite.copyA11y')}>
             <Typography style={[styles.codeText, { color: qm.lilacInk }]}>{code}</Typography>
             {copied ? (
-              <Animated.View key="done" entering={ZoomIn.springify().damping(12)} style={styles.copy}>
+              <Animated.View key="done" entering={FadeIn.duration(250)} style={styles.copy}>
                 <CheckIcon size={16} color={qm.leafText} strokeWidth={2.4} />
                 <Typography preset="qmLink" color={qm.leafText}>{t('profile:qmInvite.copied')}</Typography>
               </Animated.View>

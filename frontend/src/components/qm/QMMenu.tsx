@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, View, type ViewStyle } from 'react-native';
-import Animated, { useAnimatedStyle, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 import { AnimatedPressable, Typography } from '../ui';
 import { ChevronRightIcon, type IconComponent } from '../icons';
@@ -61,7 +61,7 @@ export function QMMenuRow({ label, value, icon: Icon, tint, onPress, first, dang
 export function QMSwitch({ value, onChange, label }: { value: boolean; onChange: (v: boolean) => void; label: string }) {
   const { qm } = useTheme();
   const knob = useAnimatedStyle(() => ({
-    transform: [{ translateX: withSpring(value ? SW_W - KNOB - SW_PAD * 2 : 0, { damping: 15, stiffness: 220 }) }],
+    transform: [{ translateX: withTiming(value ? SW_W - KNOB - SW_PAD * 2 : 0, { duration: 200 }) }],
   }), [value]);
   const track = useAnimatedStyle(() => ({ backgroundColor: withTiming(value ? qm.violet : qm.off, { duration: 250 }) }), [value, qm]);
   return (

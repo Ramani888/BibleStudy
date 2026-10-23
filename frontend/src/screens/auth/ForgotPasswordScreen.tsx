@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Svg, { Circle, Path } from 'react-native-svg';
-import Animated, { FadeInUp, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
 
 import { AuthLayout } from './components/AuthLayout';
 import { Typography } from '../../components/ui';
@@ -43,7 +43,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
 
       <View style={styles.seal}>
         <QMIconSeal>
-          <Animated.View entering={ZoomIn.delay(200).springify().damping(9)}>
+          <Animated.View entering={FadeIn.delay(200).duration(300)}>
             <Svg width={42} height={42} viewBox="0 0 24 24" fill="none">
               <Circle cx={8} cy={15} r={4.5} stroke={qm.link} strokeWidth={1.7} />
               <Path d="M11.2 11.8L20 3M16.5 6.5l2.5 2.5M14 9l2 2" stroke={qm.link} strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round" />

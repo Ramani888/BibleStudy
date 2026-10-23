@@ -2,7 +2,7 @@ import React from 'react';
 import { Linking, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -41,7 +41,7 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmAbout.back')} />
 
         <View style={styles.brand}>
-          <Animated.View entering={ZoomIn.duration(500).springify().damping(14)} style={[styles.logo, { backgroundColor: qm.brand, boxShadow: qm.btnShadow }]}>
+          <Animated.View entering={FadeIn.duration(500)} style={[styles.logo, { backgroundColor: qm.brand, boxShadow: qm.btnShadow }]}>
             <VerdanceLogo size={LOGO * 0.45} color={qm.onViolet} />
           </Animated.View>
           <Typography preset="qmPageTitle" color={qm.ink} style={styles.name}>{t('common:appName', 'Verdance')}</Typography>

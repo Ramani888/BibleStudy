@@ -1,7 +1,7 @@
 import React from 'react';
 import { ActivityIndicator, Platform, Pressable, StyleSheet, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { AnimatedPressable, Typography, VerdanceLogo } from '../ui';
@@ -54,7 +54,7 @@ export function QMCheckbox({ value, onChange, invalid, label }: { value: boolean
       ]}
     >
       {value && (
-        <Animated.View entering={ZoomIn.springify().damping(10)}>
+        <Animated.View entering={FadeIn.duration(250)}>
           <CheckIcon size={14} color={qm.onViolet} strokeWidth={3} />
         </Animated.View>
       )}

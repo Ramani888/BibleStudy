@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
@@ -77,7 +77,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
           </View>
         </AnimatedPressable>
         {done ? (
-          <Animated.View entering={ZoomIn.springify().damping(12)} style={[styles.friends, { backgroundColor: qm.leafBg }]}>
+          <Animated.View entering={FadeIn.duration(250)} style={[styles.friends, { backgroundColor: qm.leafBg }]}>
             <LeafIcon size={16} color={qm.leaf} filled />
             <Typography preset="qmFieldLabel" color={qm.leafText}>{t('profile:qmRequests.nowFriends')}</Typography>
           </Animated.View>

@@ -1,7 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { ActivityIndicator, Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -83,7 +83,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmEdit.title')}</Typography>
 
         <View style={styles.photoWrap}>
-          <Animated.View entering={ZoomIn.duration(600).springify().damping(14)}>
+          <Animated.View entering={FadeIn.duration(600)}>
             <AnimatedPressable
               scaleTo={0.97}
               onPress={() => setPhotoSheet(true)}

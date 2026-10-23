@@ -1,6 +1,6 @@
 import React from 'react';
 import { ActivityIndicator, Modal, Pressable, StyleSheet, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { AnimatedPressable, Typography } from '../ui';
@@ -31,7 +31,7 @@ export function QMConfirmDialog({
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent onRequestClose={onCancel}>
       <Pressable style={[styles.scrim, { backgroundColor: qm.scrim }]} onPress={loading ? undefined : onCancel} accessibilityLabel={cancelLabel ?? t('actions.cancel')} />
       <View style={styles.center} pointerEvents="box-none">
-        <Animated.View entering={ZoomIn.duration(280).springify().damping(16)} style={[styles.card, { backgroundColor: qm.sheet }]} accessibilityRole="alert">
+        <Animated.View entering={FadeIn.duration(280)} style={[styles.card, { backgroundColor: qm.sheet }]} accessibilityRole="alert">
           <Typography preset="qmSheetTitle" color={qm.ink} align="center">{title}</Typography>
           <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.msg}>{message}</Typography>
           <View style={styles.btnRow}>

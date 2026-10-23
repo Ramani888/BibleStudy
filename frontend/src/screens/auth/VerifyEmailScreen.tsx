@@ -3,7 +3,7 @@ import { StyleSheet, View } from 'react-native';
 import axios from 'axios';
 import Toast from 'react-native-toast-message';
 import Svg, { Path } from 'react-native-svg';
-import Animated, { FadeIn, ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { AuthLayout } from './components/AuthLayout';
 import { Typography } from '../../components/ui';
@@ -70,7 +70,7 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
             <Path d="M5.5 5.5h13A2.5 2.5 0 0 1 21 8v8a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 16V8a2.5 2.5 0 0 1 2.5-2.5zM3.5 7l8.5 6.5L20.5 7" stroke={qm.link} strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>
         </QMIconSeal>
-        <Animated.View entering={ZoomIn.delay(500).springify().damping(10)} style={styles.leaf}>
+        <Animated.View entering={FadeIn.delay(500).duration(300)} style={styles.leaf}>
           <Svg width={26} height={26} viewBox="0 0 24 24">
             <Path d="M5 19c0-8 6-14 14-14 0 8-6 14-14 14zM5 19l7-7" fill={qm.leafBg} stroke={qm.leaf} strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" />
           </Svg>

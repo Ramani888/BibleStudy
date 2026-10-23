@@ -11,7 +11,7 @@ export function QMBanner({ tone = 'info', children, style }: { tone?: 'info' | '
   const ink = tone === 'error' ? qm.error : qm.lilacInk;
   return (
     <Animated.View
-      entering={FadeInUp.springify().damping(14)}
+      entering={FadeInUp.duration(300)}
       style={[styles.banner, { backgroundColor: bg }, style]}
       accessibilityRole={tone === 'error' ? 'alert' : 'text'}
       accessibilityLiveRegion="polite"

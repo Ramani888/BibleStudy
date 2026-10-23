@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
@@ -121,7 +121,7 @@ export function CreatePlanScreen({ navigation }: LibraryScreenProps<'CreatePlan'
                 >
                   <View style={[styles.badge, on ? { backgroundColor: qm.violet } : [styles.badgeOff, { borderColor: qm.line }]]}>
                     {on && (
-                      <Animated.View key={idx} entering={ZoomIn.springify().damping(10)}>
+                      <Animated.View key={idx} entering={FadeIn.duration(250)}>
                         <Typography preset="qmLabel" color={qm.onViolet}>{idx + 1}</Typography>
                       </Animated.View>
                     )}

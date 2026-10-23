@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
 import Animated, {
-  FadeIn, FadeInRight, SlideInDown, ZoomIn, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming,
+  FadeIn, FadeInRight, SlideInDown, useAnimatedStyle, useSharedValue, withSequence, withTiming,
 } from 'react-native-reanimated';
 import LinearGradient from 'react-native-linear-gradient';
 import { useTranslation } from 'react-i18next';
@@ -173,12 +173,12 @@ export function QuizItemView({
       {/* Feedback sheet — after submit for scored modes */}
       {submitted && scored && (
         <Animated.View
-          entering={SlideInDown.springify().damping(18).stiffness(160)}
+          entering={SlideInDown.duration(260)}
           style={[styles.sheet, { backgroundColor: isCorrect ? qm.okSheet : qm.noSheet, boxShadow: qm.sheetShadow, paddingBottom: Math.max(bottomInset, spacing.lg) + spacing.lg }]}
           accessibilityLiveRegion="polite"
         >
           <View style={styles.sheetHead}>
-            <Animated.View entering={ZoomIn.delay(120).springify().damping(10)}>
+            <Animated.View entering={FadeIn.delay(120).duration(300)}>
               {isCorrect
                 ? <LeafIcon size={24} color={qm.okInk} filled />
                 : <View style={[styles.noBadge, { backgroundColor: qm.noInk }]}><CloseIcon size={14} color={qm.noSheet} strokeWidth={3} /></View>}
@@ -271,14 +271,12 @@ function Option({ letter, text, serif, state, onPress }: {
   letter: string; text: string; serif: boolean; state: 'idle' | 'right' | 'wrong' | 'dim'; onPress: () => void;
 }) {
   const { qm } = useTheme();
-  // Right answer pops, a wrong pick nudges sideways (canvas okpop / nudge).
-  const scale = useSharedValue(1);
+  // A wrong pick nudges sideways (canvas nudge); the right answer just tints, no pop.
   const x = useSharedValue(0);
   useEffect(() => {
-    if (state === 'right') scale.value = withSequence(withTiming(1.03, { duration: 160 }), withSpring(1, { damping: 10 }));
     if (state === 'wrong') x.value = withSequence(withTiming(-4, { duration: 90 }), withTiming(4, { duration: 90 }), withTiming(0, { duration: 90 }));
-  }, [state, scale, x]);
-  const anim = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }, { translateX: x.value }] }));
+  }, [state, x]);
+  const anim = useAnimatedStyle(() => ({ transform: [{ translateX: x.value }] }));
 
   const ring = state === 'right' ? `inset 0px 0px 0px 2px ${qm.leaf}` : state === 'wrong' ? `inset 0px 0px 0px 2px ${qm.warm}` : qm.optLine;
   const bg = state === 'right' ? qm.leafBg : state === 'wrong' ? qm.errorBg : qm.surface;

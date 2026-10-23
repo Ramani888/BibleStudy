@@ -4,7 +4,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { FadeInUp, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
 import { PlusIcon } from '../../../components/icons';
@@ -84,8 +84,8 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   // Flip preview
   const flip = useSharedValue(0);
   const [flipped, setFlipped] = useState(false);
-  const toggleFlip = () => { flip.value = withSpring(flipped ? 0 : 180, { damping: 14, stiffness: 120 }); setFlipped(f => !f); };
-  const unflip = () => { if (flipped) { flip.value = withSpring(0, { damping: 14, stiffness: 120 }); setFlipped(false); } };
+  const toggleFlip = () => { flip.value = withTiming(flipped ? 0 : 180, { duration: 400 }); setFlipped(f => !f); };
+  const unflip = () => { if (flipped) { flip.value = withTiming(0, { duration: 400 }); setFlipped(false); } };
   const frontStyle = useAnimatedStyle(() => ({ transform: [{ perspective: 900 }, { rotateY: `${flip.value}deg` }] }));
   const backStyle = useAnimatedStyle(() => ({ transform: [{ perspective: 900 }, { rotateY: `${flip.value + 180}deg` }] }));
 

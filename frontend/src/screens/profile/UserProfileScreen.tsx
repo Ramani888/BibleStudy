@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
@@ -277,7 +277,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
             <QMButton label={t('profile:qmPerson.send')} onPress={sendReport} loading={report.isPending} style={styles.send} />
           </View>
         ) : (
-          <Animated.View entering={ZoomIn.springify().damping(14)} style={styles.thanks}>
+          <Animated.View entering={FadeIn.duration(250)} style={styles.thanks}>
             <LeafIcon size={48} color={qm.leaf} strokeWidth={1.4} />
             <Typography preset="qmSheetTitle" color={qm.ink} align="center" style={styles.thanksTitle}>{t('profile:qmPerson.thanksTitle')}</Typography>
             <Typography preset="qmBodyMd" color={qm.muted} align="center">{t('profile:qmPerson.thanksText')}</Typography>

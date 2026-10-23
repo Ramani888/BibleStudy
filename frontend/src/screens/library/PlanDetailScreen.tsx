@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, ScrollView, Share, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import LinearGradient from 'react-native-linear-gradient';
-import Animated, { ZoomIn } from 'react-native-reanimated';
+import Animated, { FadeIn } from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 
@@ -123,7 +123,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
 
         <View style={styles.body}>
           {complete && (
-            <Animated.View entering={ZoomIn.springify().damping(14)} style={[styles.party, { backgroundColor: qm.leafBg }]}>
+            <Animated.View entering={FadeIn.duration(250)} style={[styles.party, { backgroundColor: qm.leafBg }]}>
               <LeafIcon size={28} color={qm.leaf} filled />
               <View style={styles.flex}>
                 <Typography preset="qmSheetTitle" color={qm.leafText}>{t('library:qm.planComplete', 'Plan complete')}</Typography>
@@ -162,7 +162,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
                     accessibilityLabel={t('library:qm.markStep', { n: i + 1, defaultValue: `Mark step ${i + 1} as done` })}
                   >
                     {done
-                      ? <Animated.View entering={ZoomIn.springify().damping(10)}><CheckIcon size={16} color={qm.onViolet} strokeWidth={3} /></Animated.View>
+                      ? <Animated.View entering={FadeIn.duration(250)}><CheckIcon size={16} color={qm.onViolet} strokeWidth={3} /></Animated.View>
                       : <Typography preset="qmTag" color={isNext ? qm.link : qm.muted} style={styles.stepN}>{i + 1}</Typography>}
                   </Pressable>
                   <AnimatedPressable
