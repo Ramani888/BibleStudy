@@ -14,7 +14,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 2. Home | 28 | 0 | 20 | 0 | 6 | 2 |
 | 3. Library — My sets | 24 | 0 | 22 | 0 | 2 | 0 |
 | 4. Library — Folders | 12 | 0 | 11 | 0 | 1 | 0 |
-| 5. Library — Inside a set (Set detail) | 15 | 14 | 0 | 0 | 0 | 1 |
+| 5. Library — Inside a set (Set detail) | 15 | 0 | 10 | 0 | 4 | 1 |
 | 6. Library — Cards | 11 | 11 | 0 | 0 | 0 | 0 |
 | 7. Library — Explore & Friends' sets | 12 | 12 | 0 | 0 | 0 | 0 |
 | 8. Library — Study plans | 14 | 13 | 0 | 0 | 0 | 1 |
@@ -197,23 +197,23 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 5. Library — Inside a set (Set detail)
 
 **Your own set**
-- ⬜ Shows "N cards · Private/Friends/Public"
-- ⬜ "X of Y learned" bar + ⓘ explains "learned"
-- ⬜ **Start a quiz** → mode picker
-- ⬜ **+** → Add card
-- ⬜ 🔍 **Search cards** — searches **question AND answer**, shows "N matches", Cancel
+- ✅ Shows "N cards · Private/Friends/Public"
+- ✅ "X of Y learned" bar + ⓘ explains "learned"
+- ✅ **Start a quiz** → mode picker
+- ✅ **+** → Add card
+- 🔧 🔍 **Search cards** — searches **question AND answer**, shows "N matches", Cancel
 - 👤 **Share** (only when set has cards) → WhatsApp / More ways
-- ⬜ ⋮ Set options: Add a card · Edit set · Hide all answers / Show all answers · Reorder cards (2+ cards)
-- ⬜ **Reorder**: hold + drag → **Save** → "Order saved"; **Cancel** → old order. Quiz uses new order.
-- ⬜ **List / Grid** switch
-- ⬜ Eye icon → hide / show one answer
-- ⬜ Note icon → private note (max 500) → **Save note**; note shows again later
-- ⬜ 📄 Pull to refresh · empty ("Add cards") · no internet
+- ✅ ⋮ Set options: Add a card · Edit set · Hide all answers / Show all answers · Reorder cards (2+ cards)
+- 🔧 **Reorder**: hold + drag → **Save** → "Order saved"; **Cancel** → old order. (Quiz shuffles on purpose — hint no longer promises quiz order.)
+- ✅ **List / Grid** switch
+- ✅ Eye icon → hide / show one answer
+- ✅ Note icon → private note (max 500) → **Save note**; note shows again later
+- 🔧 📄 Pull to refresh · empty ("Add cards") · no internet
 
 **Someone else's set**
-- ⬜ Shows "by Name" + description
-- ⬜ No edit buttons
-- ⬜ **Save a copy** → "Saved to your library" → appears in your Library
+- 🔧 Shows "by Name" + description
+- ✅ No edit buttons
+- ✅ **Save a copy** → "Saved to your library" → appears in your Library
 
 ## 6. Library — Cards
 
