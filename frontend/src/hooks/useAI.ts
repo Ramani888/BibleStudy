@@ -47,6 +47,7 @@ export function useDeleteSession() {
     mutationFn: (sessionId: string) => aiApi.deleteSession(sessionId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['ai-history'] });
+      qc.invalidateQueries({ queryKey: ['ai-bookmarks'] }); // its bookmarks go with it
     },
   });
 }
