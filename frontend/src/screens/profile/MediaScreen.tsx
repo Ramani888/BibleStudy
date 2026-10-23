@@ -11,6 +11,7 @@ import { useMediaUpload } from '../../hooks/useMediaUpload';
 import { useMediaActions } from '../../hooks/useMediaActions';
 import { useAuthStore } from '../../store';
 import { formatRelativeShort } from '../../utils/formatters';
+import { loadFailed } from '../../utils/queryState';
 import {
   QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMInput, QMSearchField, QMSegmented, QMSheet, qmRowEnter, type QMSheetAction,
 } from '../../components/qm';
@@ -79,8 +80,10 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
   const [addOpen, setAddOpen] = useState(false);
   const [viewer, setViewer] = useState<number | null>(null);
 
-  const { data: allFiles = [], isLoading, isFetching, isError, refetch } = useMediaFiles();
-  const { data: storage } = useStorageUsage();
+  const filesQuery = useMediaFiles();
+  const { data: allFiles = [], isLoading, isFetching, refetch } = filesQuery;
+  const isError = loadFailed(filesQuery); // offline with nothing cached → "did not load", not "Photos · 0"
+  const { data: storage, refetch: refetchStorage } = useStorageUsage();
   const upload = useMediaUpload();
   const actions = useMediaActions();
 
@@ -216,7 +219,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         </Animated.View>
       )}
 
-      <View style={styles.tools}>
+      {!isError && <View style={styles.tools}>
         <View style={styles.flex}>
           <QMSegmented<MediaFileType>
             label={t('profile:qmMedia.tabs')}
@@ -234,7 +237,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         <AnimatedPressable scaleTo={0.95} onPress={() => setSort(s => SORT_NEXT[s])} style={[styles.touch, { backgroundColor: qm.field }]} accessibilityRole="button" accessibilityLabel={t(`profile:qmMedia.sortA11y_${sort}`)}>
           <SortI size={18} color={qm.ink} />
         </AnimatedPressable>
-      </View>
+      </View>}
       {searchOpen && <View style={styles.searchWrap}><QMSearchField value={search} onChangeText={setSearch} placeholder={t('profile:qmMedia.search')} autoFocus /></View>}
       <View style={styles.listGap} />
     </View>
@@ -285,7 +288,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         ItemSeparatorComponent={tab === 'PDF' ? Separator : GridSeparator}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={() => { refetch(); refetchStorage(); }}tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
 
       {upload.uploadMedia.isPending && (
