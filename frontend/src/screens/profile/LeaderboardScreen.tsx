@@ -13,6 +13,7 @@ import { QMAvatar, QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { FriendsIcon, InfoIcon, LeafIcon, PlusIcon } from '../../components/icons';
 import { useLeaderboard } from '../../hooks';
+import { loadFailed } from '../../utils/queryState';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 
 const AVATAR = 42;
@@ -43,7 +44,9 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: rows = [], isLoading, isFetching, isError, refetch } = useLeaderboard();
+  const leaderQuery = useLeaderboard();
+  const { data: rows = [], isLoading, isFetching, refetch } = leaderQuery;
+  const isError = loadFailed(leaderQuery); // offline with nothing cached → error, not "No one to walk with"
   const myRank = rows.findIndex(r => r.isMe) + 1;
 
   const renderItem = useCallback(({ item, index }: { item: LeaderboardEntry; index: number }) => {

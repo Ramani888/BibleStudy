@@ -10,6 +10,7 @@ import { QMBackButton, QMEmpty, QMSegmented, qmRowEnter } from '../../components
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { ArrowUpIcon, CreditIcon, InfoIcon } from '../../components/icons';
 import { useAchievements, useCreditBalance, useCreditTransactions, useReferral, useWeeklyChart, type SimplePeriod } from '../../hooks';
+import { loadFailed } from '../../utils/queryState';
 import { formatDateWithTime } from '../../utils/formatters';
 import { TIERS } from '../../types';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
@@ -122,7 +123,9 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const { data: balance } = useCreditBalance();
   const { data: achievements } = useAchievements();
   const { data: referral } = useReferral();
-  const { data, isLoading, isError, refetch, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } = useCreditTransactions();
+  const txQuery = useCreditTransactions();
+  const { data, isLoading, refetch, isFetching, fetchNextPage, hasNextPage, isFetchingNextPage } = txQuery;
+  const isError = loadFailed(txQuery); // offline with nothing cached → error, not an empty history
   const transactions = useMemo(() => data?.pages.flatMap(p => p.transactions) ?? [], [data]);
 
   const earn: [string, number, string, (() => void) | null][] = [

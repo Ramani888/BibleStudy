@@ -15,6 +15,7 @@ import { InfoIcon, LeafIcon, MegaphoneIcon, PersonCheckIcon, PersonPlusIcon, Tra
 import {
   useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead, useDeleteNotification, useNotificationPrefs, TYPE_TO_PREF,
 } from '../../hooks';
+import { loadFailed } from '../../utils/queryState';
 import type { Notification } from '../../types/notification.types';
 
 type Props = ProfileScreenProps<'Notifications'>;
@@ -50,7 +51,9 @@ export function NotificationsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data, isLoading, isFetching, isError, refetch } = useNotifications();
+  const notifQuery = useNotifications();
+  const { data, isLoading, isFetching, refetch } = notifQuery;
+  const isError = loadFailed(notifQuery); // offline with nothing cached → error, not "All quiet"
   const markRead = useMarkNotificationRead();
   const markAllRead = useMarkAllNotificationsRead();
   const deleteNotification = useDeleteNotification();
