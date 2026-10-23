@@ -118,6 +118,7 @@ export function useUnblockUser() {
     onSuccess: (_data, userId) => {
       qc.invalidateQueries({ queryKey: ['friends', 'blocked'] });
       qc.invalidateQueries({ queryKey: ['users', userId] });
+      qc.invalidateQueries({ queryKey: ['users', 'search'] }); // cached searches still hide them otherwise
     },
   });
 }
