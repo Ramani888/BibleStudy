@@ -10,7 +10,10 @@ import {
 import { NotFoundError, ValidationError } from '../../utils/errors';
 import { fsrs, createEmptyCard, Rating, State } from 'ts-fsrs';
 
-const fsrsScheduler = fsrs();
+// Long-term only: ts-fsrs defaults to 1m/10m learning steps, which made cards "due"
+// again minutes after a quiz that told the user they come back tomorrow. Days only,
+// same as SM-2 (a miss = +1 day).
+const fsrsScheduler = fsrs({ enable_short_term: false });
 
 /**
  * Spaced-repetition summary for the Home "TODAY" card: how many of the user's
