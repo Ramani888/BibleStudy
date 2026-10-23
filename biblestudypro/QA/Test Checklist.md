@@ -16,7 +16,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 4. Library — Folders | 12 | 0 | 11 | 0 | 1 | 0 |
 | 5. Library — Inside a set (Set detail) | 15 | 0 | 10 | 0 | 4 | 1 |
 | 6. Library — Cards | 11 | 0 | 9 | 0 | 2 | 0 |
-| 7. Library — Explore & Friends' sets | 12 | 12 | 0 | 0 | 0 | 0 |
+| 7. Library — Explore & Friends' sets | 12 | 0 | 10 | 0 | 2 | 0 |
 | 8. Library — Study plans | 14 | 13 | 0 | 0 | 0 | 1 |
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 28 | 0 | 0 | 0 | 1 |
 | 10. Quiz — playing & results | 16 | 16 | 0 | 0 | 0 | 0 |
@@ -232,20 +232,20 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 7. Library — Explore & Friends' sets
 
 **Explore (public sets)**
-- ⬜ "N public sets from the community"
-- ⬜ 🔍 **Search** (server search — wait a moment after typing) — set **name**
-- ⬜ Scroll down → loads more
-- ⬜ Tap → read-only set
-- ⬜ **+ Add** → "Added ✓" + toast → in your Library
-- ⬜ Your own public sets: no Add button
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ "N public sets from the community"
+- ✅ 🔍 **Search** (server search — wait a moment after typing) — set **name**
+- ✅ Scroll down → loads more
+- ✅ Tap → read-only set
+- ✅ **+ Add** → "Added ✓" + toast → in your Library
+- ✅ Your own public sets: no Add button
+- 🔧 📄 Pull to refresh · empty · no internet
 
 **Friends' sets**
-- ⬜ "N sets shared by your friends"
-- ⬜ 🔍 **Search** — set **name**
-- ⬜ **+ Add**, open read-only
-- ⬜ No friends → **Find friends** → Friends screen
-- ⬜ 📄 Pull to refresh · no internet
+- ✅ "N sets shared by your friends"
+- ✅ 🔍 **Search** — set **name**
+- ✅ **+ Add**, open read-only
+- ✅ No friends → **Find friends** → Friends screen _(screen only opens from Home when friends have sets — this state is unreachable today)_
+- 🔧 📄 Pull to refresh · no internet
 
 ## 8. Library — Study plans
 
