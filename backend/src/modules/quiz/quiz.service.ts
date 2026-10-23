@@ -102,8 +102,9 @@ export async function recordAttempt(userId: string, dto: RecordAttemptDtoType) {
   // cards not rescheduled — it self-corrects on the next quiz. Not worth threading
   // a tx through the shared applyReviews path pre-launch.
   await applySpacedRepetition(userId, dto, setIds);
-  // "Best" is per-set — only meaningful for real single-set quizzes, not set-less AI ones.
-  const best = primarySetId ? await getBestForSet(userId, primarySetId) : null;
+  // "Best" is per-set — only meaningful for real single-set quizzes, not set-less AI ones
+  // or multi-set mixes (those were compared to the first set's solo best → false "New best").
+  const best = setIds.length === 1 ? await getBestForSet(userId, setIds[0]) : null;
   return { attempt, best };
 }
 
@@ -125,7 +126,7 @@ export async function updateAttempt(userId: string, attemptId: string, dto: Reco
     data: { total, correct, scorePct, timeSecs: dto.timeSecs ?? null, ...(dto.responses ? { responses: dto.responses } : {}) },
   });
   await applySpacedRepetition(userId, dto, setIds);
-  const best = setIds[0] ? await getBestForSet(userId, setIds[0]) : null;
+  const best = setIds.length === 1 ? await getBestForSet(userId, setIds[0]) : null;
   return { best };
 }
 
