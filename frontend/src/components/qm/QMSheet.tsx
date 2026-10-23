@@ -1,10 +1,12 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { BackHandler, Keyboard, StyleSheet, View, useWindowDimensions } from 'react-native';
 import {
   BottomSheetBackdrop,
+  BottomSheetFooter,
   BottomSheetModal,
   BottomSheetScrollView,
   type BottomSheetBackdropProps,
+  type BottomSheetFooterProps,
 } from '@gorhom/bottom-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -45,6 +47,8 @@ interface QMSheetProps {
   note?: string;
   /** Custom body (forms) rendered after the rows. */
   children?: React.ReactNode;
+  /** Pinned under the scrolling body (primary button) so a long list can't push it off-screen. */
+  footer?: React.ReactNode;
 }
 
 /**
@@ -52,13 +56,14 @@ interface QMSheetProps {
  * A row's `onPress` runs after the sheet has finished closing, so it can safely
  * navigate or open another sheet.
  */
-export function QMSheet({ visible, onClose, title, sub, actions, note, children }: QMSheetProps) {
+export function QMSheet({ visible, onClose, title, sub, actions, note, children, footer }: QMSheetProps) {
   const { qm, name: themeName } = useTheme();
   const { height } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const ref = useRef<BottomSheetModal>(null);
   const isOpen = useRef(false);
   const pending = useRef<(() => void) | null>(null);
+  const [footerH, setFooterH] = useState(0);
 
   // isOpen guards against a double dismiss (swipe-close fires onDismiss before
   // visible flips), which breaks BottomSheetModal's later present() calls.
@@ -99,6 +104,20 @@ export function QMSheet({ visible, onClose, title, sub, actions, note, children 
     [themeName],
   );
 
+  const renderFooter = useCallback(
+    (props: BottomSheetFooterProps) => (
+      <BottomSheetFooter {...props}>
+        <View
+          onLayout={e => setFooterH(e.nativeEvent.layout.height)}
+          style={[styles.footer, { backgroundColor: qm.sheet, paddingBottom: insets.bottom + spacing.md }]}
+        >
+          {footer}
+        </View>
+      </BottomSheetFooter>
+    ),
+    [footer, qm.sheet, insets.bottom],
+  );
+
   return (
     <BottomSheetModal
       ref={ref}
@@ -110,8 +129,9 @@ export function QMSheet({ visible, onClose, title, sub, actions, note, children 
       android_keyboardInputMode="adjustResize"
       handleIndicatorStyle={[styles.handle, { backgroundColor: qm.line }]}
       backgroundStyle={[styles.bg, { backgroundColor: qm.sheet }]}
+      footerComponent={footer ? renderFooter : undefined}
     >
-      <BottomSheetScrollView contentContainerStyle={[styles.content, { paddingBottom: insets.bottom + spacing.xxl }]} keyboardShouldPersistTaps="handled">
+      <BottomSheetScrollView contentContainerStyle={[styles.content, { paddingBottom: footer ? footerH + spacing.sm : insets.bottom + spacing.xxl }]} keyboardShouldPersistTaps="handled">
         {title ? <Typography preset="qmSheetTitle" color={qm.ink} style={styles.title} numberOfLines={2}>{title}</Typography> : null}
         {sub ? <Typography preset="qmBody" color={qm.muted} style={styles.sub} numberOfLines={1}>{sub}</Typography> : null}
         <View style={styles.gap} />
@@ -171,4 +191,5 @@ const styles = StyleSheet.create({
   flex: { flex: 1, minWidth: 0 },
   rowSub: { marginTop: spacing.s2 },
   note: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
+  footer: { paddingHorizontal: spacing.xxl, paddingTop: spacing.md },
 });

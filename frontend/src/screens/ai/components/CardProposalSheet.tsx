@@ -81,6 +81,24 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
     <QMSheet
       visible={visible}
       onClose={handleClose}
+      footer={
+        <AnimatedPressable
+          scaleTo={0.97}
+          onPress={handleSave}
+          disabled={!canSave}
+          style={[styles.save, canSave ? { backgroundColor: qm.violet, boxShadow: qm.btnShadow } : { backgroundColor: qm.field }]}
+          accessibilityRole="button"
+          accessibilityState={{ disabled: !canSave, busy: isSaving }}
+        >
+          {isSaving
+            ? <ActivityIndicator size="small" color={qm.onViolet} />
+            : (
+              <Typography preset="qmButtonLg" color={canSave ? qm.onViolet : qm.muted}>
+                {t('ai:qm.cards.save', { count: cards.length, defaultValue: one ? 'Save 1 card' : `Save ${cards.length} cards` })}
+              </Typography>
+            )}
+        </AnimatedPressable>
+      }
       title={one ? t('ai:qm.cards.oneTitle', 'Save as 1 card') : t('ai:qm.cards.title', 'Save to a set')}
       sub={one
         ? t('ai:qm.cards.oneSub', 'Your question on the front, the answer on the back.')
@@ -168,22 +186,6 @@ export const CardProposalSheet = React.memo(function CardProposalSheet({ visible
           </View>
         )}
 
-        <AnimatedPressable
-          scaleTo={0.97}
-          onPress={handleSave}
-          disabled={!canSave}
-          style={[styles.save, canSave ? { backgroundColor: qm.violet, boxShadow: qm.btnShadow } : { backgroundColor: qm.field }]}
-          accessibilityRole="button"
-          accessibilityState={{ disabled: !canSave, busy: isSaving }}
-        >
-          {isSaving
-            ? <ActivityIndicator size="small" color={qm.onViolet} />
-            : (
-              <Typography preset="qmButtonLg" color={canSave ? qm.onViolet : qm.muted}>
-                {t('ai:qm.cards.save', { count: cards.length, defaultValue: one ? 'Save 1 card' : `Save ${cards.length} cards` })}
-              </Typography>
-            )}
-        </AnimatedPressable>
       </View>
     </QMSheet>
   );
@@ -208,5 +210,5 @@ const styles = StyleSheet.create({
   swatch: { width: SWATCH, height: SWATCH, borderRadius: SWATCH / 2 },
   radio: { width: RADIO, height: RADIO, borderRadius: RADIO / 2, alignItems: 'center', justifyContent: 'center' },
   radioOff: { borderWidth: 2 },
-  save: { marginTop: spacing.lg, height: BTN_H, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  save: { height: BTN_H, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
 });
