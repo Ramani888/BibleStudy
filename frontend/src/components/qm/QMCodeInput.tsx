@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
+import { useNavigation, type ParamListBase } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import Animated, {
   useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming, FadeIn,
 } from 'react-native-reanimated';
@@ -30,6 +32,17 @@ export function QMCodeInput({ value, onChange, status = 'idle', size = 'lg', lab
   const [focused, setFocused] = useState(false);
   const shake = useSharedValue(0);
   const dims = SIZES[size];
+  const navigation = useNavigation<NativeStackNavigationProp<ParamListBase>>();
+
+  // Focus once the screen has finished sliding in. A TextInput `autoFocus` that opens the
+  // keyboard mid-push froze the native-stack transition on Android until the next touch
+  // (Register → Verify looked stuck after a successful sign-up).
+  useEffect(() => {
+    if (!autoFocus) return;
+    return navigation.addListener('transitionEnd', e => {
+      if (!e.data.closing) ref.current?.focus();
+    });
+  }, [autoFocus, navigation]);
 
   useEffect(() => {
     if (status !== 'bad') return;
@@ -76,7 +89,6 @@ export function QMCodeInput({ value, onChange, status = 'idle', size = 'lg', lab
         textContentType="oneTimeCode"
         autoComplete="one-time-code"
         maxLength={LEN}
-        autoFocus={autoFocus}
         caretHidden
         style={styles.hidden}
         accessibilityLabel={label}
