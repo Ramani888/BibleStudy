@@ -173,7 +173,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
             // Out of credits / over quota (402) → surface an upgrade prompt in context.
             const status = (err as { response?: { status?: number } })?.response?.status;
             if (status === 402) {
-              setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing`));
+              // Nothing was sent or charged — drop the question too, so it isn't left unanswered.
+              setMessages(prev => prev.filter(m => m.id !== `${userMsgId}_typing` && m.id !== userMsgId));
               Toast.show({ type: 'error', text1: t('ai:chat.outOfCredits', 'Out of credits'), text2: t('ai:chat.upgradeToKeepGoing', 'Upgrade to keep using AI chat.') });
               goPaywall();
               return;

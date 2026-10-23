@@ -9,11 +9,13 @@ export function useAIChat() {
     mutationFn: (payload: AIChatPayload) => aiApi.chat(payload),
     onSuccess: data => {
       qc.invalidateQueries({ queryKey: ['ai-history'] });
-      qc.invalidateQueries({ queryKey: ['credits'] });
       if (data.suggestedCards?.length) {
         track('cards_generated', { count: data.suggestedCards.length });
       }
     },
+    // Errors too: a 402 means the balance we show is stale (spent elsewhere) —
+    // refetching it is what flips the composer to "No credits left".
+    onSettled: () => qc.invalidateQueries({ queryKey: ['credits'] }),
   });
 }
 
