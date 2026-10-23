@@ -23,7 +23,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 11. Ask (AI) | 31 | 0 | 22 | 0 | 8 | 1 |
 | 12. Profile & Settings | 50 | 0 | 33 | 0 | 7 | 10 |
 | 13. Friends | 31 | 0 | 25 | 0 | 4 | 2 |
-| 14. Notes | 15 | 14 | 0 | 0 | 0 | 1 |
+| 14. Notes | 15 | 0 | 10 | 0 | 4 | 1 |
 | 15. Media | 12 | 9 | 0 | 0 | 0 | 3 |
 | 16. Whole app | 7 | 6 | 0 | 0 | 0 | 1 |
 
@@ -493,23 +493,23 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 14. Notes
 
 **My notes**
-- ⬜ 🔍 **Search** — note **title AND text**
-- ⬜ Sort: Recent → A to Z → Oldest
-- ⬜ Topic chips: All · Theology · Old Testament · New Testament · Prayer · History · Devotional · Prophecy
-- ⬜ Swipe left → Delete → "Keep it" / Delete
-- ⬜ **Write a note**
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ 🔍 **Search** — note **title AND text**
+- ✅ Sort: Recent → A to Z → Oldest
+- ✅ Topic chips: All · Theology · Old Testament · New Testament · Prayer · History · Devotional · Prophecy
+- ✅ Swipe left → Delete → "Keep it" / Delete
+- ✅ **Write a note**
+- 🔧 📄 Pull to refresh · empty · no internet
 
 **Note editor**
-- ⬜ Title (max 500) + text
-- ⬜ Saves by itself → "Saving…" → "Saved"
-- ⬜ Only title or only text → "Add a title and a few words to save"
-- ⬜ Wi-Fi off → "Couldn't save · Tap to retry"
-- ⬜ Back / swipe back also saves
-- ⬜ Topics → tick tags → Done → list filter finds it
+- ✅ Title (max 500) + text
+- ✅ Saves by itself → "Saving…" → "Saved"
+- 🔧 Only title or only text → "Add a title and a few words to save"
+- 🔧 Wi-Fi off → "Couldn't save · Tap to retry"
+- 🔧 Back / swipe back also saves
+- ✅ Topics → tick tags → Done → list filter finds it
 - 👤 **Share** note
-- ⬜ **Delete** note (confirm); unsaved new note → just closes
-- ⬜ **Done** saves + closes
+- ✅ **Delete** note (confirm); unsaved new note → just closes
+- ✅ **Done** saves + closes
 
 ## 15. Media
 
