@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { randomUUID } from 'crypto';
 import { env } from '../config/env';
 
 export interface TokenPayload {
@@ -12,8 +13,10 @@ export function generateAccessToken(userId: string): string {
 }
 
 export function generateRefreshToken(userId: string): string {
+  // jwtid: two sign-ins in the same second produced byte-identical tokens → unique-key 500.
   return jwt.sign({ userId }, env.JWT_REFRESH_SECRET, {
     expiresIn: env.JWT_REFRESH_EXPIRES as string,
+    jwtid: randomUUID(),
   } as jwt.SignOptions);
 }
 
