@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import type { User } from '../types';
 
 const KEYS = {
   ACCESS_TOKEN: '@bsp/access_token',
@@ -9,6 +10,8 @@ const KEYS = {
   TOS_ACCEPTED: '@bsp/tos_accepted',
   ONBOARDING_SEEN: '@bsp/onboarding_seen',
   LANGUAGE_CODE: '@bsp/language_code',
+  // Last signed-in profile — lets an offline cold start open the app instead of Sign-in.
+  USER: '@bsp/user',
 } as const;
 
 export const storage = {
@@ -35,7 +38,17 @@ export const storage = {
     await Promise.all([
       AsyncStorage.removeItem(KEYS.ACCESS_TOKEN),
       AsyncStorage.removeItem(KEYS.REFRESH_TOKEN),
+      AsyncStorage.removeItem(KEYS.USER),
     ]);
+  },
+
+  async getUser(): Promise<User | null> {
+    const raw = await AsyncStorage.getItem(KEYS.USER);
+    try { return raw ? (JSON.parse(raw) as User) : null; } catch { return null; }
+  },
+
+  async setUser(user: User): Promise<void> {
+    await AsyncStorage.setItem(KEYS.USER, JSON.stringify(user));
   },
 
   async getAiPolicyAccepted(): Promise<boolean> {

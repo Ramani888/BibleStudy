@@ -55,14 +55,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       // Token exists — fetch current user to confirm it is still valid
       const user = await authApi.me();
+      storage.setUser(user).catch(() => {});
       set({ user, isAuthenticated: true, isInitialized: true });
     } catch (error) {
       // Only clear tokens on 401 — network/server errors must NOT log the user out
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         await storage.clearTokens();
         queryClient.clear();
+        set({ isInitialized: true });
+        return;
       }
-      set({ isInitialized: true });
+      // Offline / server down: open the app with the last known profile so cached
+      // sets stay usable. A real 401 later still signs out via the client interceptor.
+      // ponytail: profile stays the cached copy until the next sign-in/edit/cold start.
+      const cached = await storage.getUser().catch(() => null);
+      set(cached ? { user: cached, isAuthenticated: true, isInitialized: true } : { isInitialized: true });
     }
   },
 
@@ -75,6 +82,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const result = await authApi.verifyEmail(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
     queryClient.clear();
+    storage.setUser(result.user).catch(() => {});
     set({ user: result.user, isAuthenticated: true });
   },
 
@@ -82,6 +90,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const result = await authApi.login(payload);
     await storage.setTokens(result.accessToken, result.refreshToken);
     queryClient.clear();
+    storage.setUser(result.user).catch(() => {});
     set({ user: result.user, isAuthenticated: true });
   },
 
@@ -90,6 +99,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const result  = await authApi.googleSignIn({ idToken });
     await storage.setTokens(result.accessToken, result.refreshToken);
     queryClient.clear();
+    storage.setUser(result.user).catch(() => {});
     set({ user: result.user, isAuthenticated: true });
   },
 
@@ -98,6 +108,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const result      = await authApi.appleSignIn(credentials);
     await storage.setTokens(result.accessToken, result.refreshToken);
     queryClient.clear();
+    storage.setUser(result.user).catch(() => {});
     set({ user: result.user, isAuthenticated: true });
   },
 
@@ -129,7 +140,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     await authApi.resetPassword(payload);
   },
 
-  updateUser: (user: User) => set({ user }),
+  updateUser: (user: User) => { storage.setUser(user).catch(() => {}); set({ user }); },
 
   reset: () => {
     queryClient.clear();
