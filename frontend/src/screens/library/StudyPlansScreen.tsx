@@ -10,6 +10,7 @@ import { AnimatedPressable, Typography } from '../../components/ui';
 import { ChevronLeftIcon, LeafIcon, PlanIcon, RefreshIcon, SearchIcon } from '../../components/icons';
 import { usePlans, useManualRefresh } from '../../hooks';
 import { useTheme, spacing, radius } from '../../theme';
+import { loadFailed } from '../../utils/queryState';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { PlanListItem } from '../../types';
 
@@ -23,7 +24,9 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   const { t } = useTranslation(['library', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: plans = [], isLoading, error, refetch } = usePlans();
+  const plansQuery = usePlans();
+  const { data: plans = [], isLoading, refetch } = plansQuery;
+  const failed = loadFailed(plansQuery);
   const { refreshing, onRefresh } = useManualRefresh(refetch);
   const [search, setSearch] = useState('');
 
@@ -94,7 +97,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
 
   let empty: React.ReactElement | null = null;
   if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
-  else if (error) {
+  else if (failed) {
     empty = (
       <QMEmpty style={styles.emptyGap} icon={RefreshIcon}
         title={t('library:qm.plansFailedTitle', 'Your plans did not load')}
@@ -120,7 +123,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={isLoading || error ? [] : filtered}
+        data={isLoading || failed ? [] : filtered}
         keyExtractor={p => p.id}
         renderItem={renderItem}
         ListHeaderComponent={header}
