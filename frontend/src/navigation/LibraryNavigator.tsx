@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import type { LibraryStackParamList } from './types';
+import { returnHomeListeners } from './returnHome';
 import { LibraryScreen } from '../screens/library/LibraryScreen';
 import { FolderDetailScreen } from '../screens/library/FolderDetailScreen';
 import { SetDetailScreen } from '../screens/library/SetDetailScreen';
@@ -40,7 +41,7 @@ export function LibraryNavigator() {
   }, [navigation]);
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }} screenListeners={returnHomeListeners}>
       <Stack.Screen name="Library" component={LibraryScreen} />
       <Stack.Screen name="FolderDetail" component={FolderDetailScreen} />
       <Stack.Screen name="SetDetail" component={SetDetailScreen} />

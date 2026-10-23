@@ -2,6 +2,7 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useTheme } from '../theme';
 import type { ProfileStackParamList } from './types';
+import { returnHomeListeners } from './returnHome';
 import { ProfileScreen } from '../screens/profile/ProfileScreen';
 import { EditProfileScreen } from '../screens/profile/EditProfileScreen';
 import { ChangePasswordScreen } from '../screens/profile/ChangePasswordScreen';
@@ -30,7 +31,7 @@ const Stack = createNativeStackNavigator<ProfileStackParamList>();
 export function ProfileNavigator() {
   const { qm } = useTheme();
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }}>
+    <Stack.Navigator screenOptions={{ headerShown: false, contentStyle: { backgroundColor: qm.bg } }} screenListeners={returnHomeListeners}>
       <Stack.Screen name="Profile"         component={ProfileScreen}         />
       <Stack.Screen name="EditProfile"     component={EditProfileScreen}     />
       <Stack.Screen name="ChangePassword"  component={ChangePasswordScreen}  />

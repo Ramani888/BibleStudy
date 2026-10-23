@@ -1,10 +1,9 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { ActivityIndicator, BackHandler, Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, Pressable, RefreshControl, SectionList, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 import Animated from 'react-native-reanimated';
 import Toast from 'react-native-toast-message';
-import { useFocusEffect } from '@react-navigation/native';
 import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -47,7 +46,7 @@ function groupByDate(list: Notification[]): Section[] {
   return out.filter(s => s.data.length > 0);
 }
 
-export function NotificationsScreen({ navigation, route }: Props) {
+export function NotificationsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
@@ -66,21 +65,7 @@ export function NotificationsScreen({ navigation, route }: Props) {
 
   const openSwipeable = useRef<Swipeable | null>(null);
 
-  const goBack = useCallback(() => {
-    if (route.params?.from === 'Home') {
-      navigation.reset({ index: 0, routes: [{ name: 'Profile' }] });
-      navigation.getParent()?.navigate('HomeTab');
-    } else {
-      navigation.goBack();
-    }
-  }, [navigation, route.params?.from]);
-
-  // Android system back must also return to Home, not pop to the Profile root.
-  useFocusEffect(useCallback(() => {
-    if (route.params?.from !== 'Home') return;
-    const sub = BackHandler.addEventListener('hardwareBackPress', () => { goBack(); return true; });
-    return () => sub.remove();
-  }, [goBack, route.params?.from]));
+  const goBack = navigation.goBack; // from Home → back to Home (navigation/returnHome.ts)
 
   const remove = useCallback((id: string) => {
     deleteNotification.mutate(id, {

@@ -2,6 +2,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
 import type { Card, QuizSelectableMode } from '../types';
+import type { FromHome } from './returnHome';
 
 /** An LLM-generated, ephemeral quiz card (never persisted to the DB). */
 export type GeneratedQuizCard = { question: string; answer: string };
@@ -28,14 +29,14 @@ export type AuthStackParamList = {
 export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
-  SetDetail: { setId: string; setTitle: string; isOwner?: boolean };
-  CreateSet: { folderId?: string };
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean; from?: 'Home' };
+  CreateSet: { folderId?: string; from?: 'Home' };
   EditSet: { setId: string };
   CreateCard: { setId: string };
   EditCard: { cardId: string; setId: string };
-  PublicSets: undefined;
-  FriendsSets: undefined;
-  StudyPlans: undefined;
+  PublicSets: FromHome;
+  FriendsSets: FromHome;
+  StudyPlans: FromHome;
   PlanDetail: { planId: string };
   CreatePlan: undefined;
   Quiz: { setIds: string[]; setTitles: string[]; mode?: QuizSelectableMode };
@@ -66,24 +67,24 @@ export type ProfileStackParamList = {
   ChangePassword: undefined;
   Credits: undefined;
   Paywall: undefined;
-  Achievements: undefined;
+  Achievements: FromHome;
   Settings: undefined;
   InviteFriends: undefined;
   // Friends
-  Friends: undefined;
-  Leaderboard: undefined;
+  Friends: FromHome;
+  Leaderboard: FromHome;
   FriendRequests: undefined;
   SearchUsers: undefined;
   UserProfile: { userId: string };
   BlockedUsers: undefined;
   // Notifications
-  Notifications: { from?: 'Home' } | undefined;
+  Notifications: FromHome;
   NotificationSettings: undefined;
   // Notes
-  Notes: undefined;
+  Notes: FromHome;
   NoteEditor: { noteId?: string };
   // Media
-  Media: undefined;
+  Media: FromHome;
   MediaPDFViewer: { url: string; name: string };
   AboutUs: undefined;
   PrivacyPolicy: undefined;
