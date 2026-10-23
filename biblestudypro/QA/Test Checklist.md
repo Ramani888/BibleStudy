@@ -18,7 +18,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 6. Library — Cards | 11 | 0 | 9 | 0 | 2 | 0 |
 | 7. Library — Explore & Friends' sets | 12 | 0 | 10 | 0 | 2 | 0 |
 | 8. Library — Study plans | 14 | 0 | 12 | 0 | 1 | 1 |
-| 9. Quiz — mode picker, hub, details, new quiz | 29 | 28 | 0 | 0 | 0 | 1 |
+| 9. Quiz — mode picker, hub, details, new quiz | 29 | 0 | 20 | 0 | 8 | 1 |
 | 10. Quiz — playing & results | 16 | 16 | 0 | 0 | 0 | 0 |
 | 11. Ask (AI) | 31 | 30 | 0 | 0 | 0 | 1 |
 | 12. Profile & Settings | 50 | 40 | 0 | 0 | 0 | 10 |
@@ -269,43 +269,43 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 9. Quiz — mode picker, hub, details, new quiz
 
 **Mode picker (from any set)**
-- ⬜ Mix (top)
-- ⬜ Q&A cards: Type the answer · Multiple choice
-- ⬜ Story cards: Fill in the blanks · Type it out · Order the pieces · Read & memorize · Match the verse
-- ⬜ Under 4 cards → Multiple choice / Match the verse greyed ("Needs 4+")
-- ⬜ Empty set → "Add cards to this set to start quizzing"
+- ✅ Mix (top)
+- ✅ Q&A cards: Type the answer · Multiple choice
+- ✅ Story cards: Fill in the blanks · Type it out · Order the pieces · Read & memorize · Match the verse
+- ✅ Under 4 cards → Multiple choice / Match the verse greyed ("Needs 4+")
+- ✅ Empty set → "Add cards to this set to start quizzing" _(from the Library row menu; Set detail hides Start a quiz and says "Add a question or a verse, and this set is ready to quiz")_
 
 **Quiz hub**
-- ⬜ "N cards are ready" → **Start** (hidden while searching)
-- ⬜ 🔍 **Search** — quiz **name AND set title**
-- ⬜ Recent quizzes (last 20): score, name, source, mode, date
-- ⬜ Tap row → Details
-- ⬜ Row ⋮: Details · See every answer · Quiz me again · Delete from history ("Keep it" / Delete)
-- ⬜ **Start a new quiz** → Setup
-- ⬜ 📄 Pull to refresh · empty ("No quizzes yet") · no internet
+- ✅ "N cards are ready" → **Start** (hidden while searching)
+- 🔧 🔍 **Search** — quiz **name AND set title** _(only the 1st set's title was searched; search stayed filled after leaving the tab — fixed)_
+- ✅ Recent quizzes (last 20): score, name, source, mode, date
+- ✅ Tap row → Details
+- ✅ Row ⋮: Details · See every answer · Quiz me again · Delete from history ("Keep it" / Delete)
+- ✅ **Start a new quiz** → Setup
+- 🔧 📄 Pull to refresh · empty ("No quizzes yet") · no internet _(offline with nothing loaded said "No quizzes yet" — fixed)_
 
 **Quiz details**
-- ⬜ Score ring, mode, source, right count, time, date (+ "First try" date after retake)
-- ⬜ **See every answer** ("including the N you missed")
-- ⬜ Trash → confirm → gone
-- ⬜ **Quiz me again**: card quiz → "Free to retake"; AI quiz → "New questions · 2 credits"
+- ✅ Score ring, mode, source, right count, time, date (+ "First try" date after retake)
+- ✅ **See every answer** ("including the N you missed")
+- ✅ Trash → confirm → gone
+- ✅ **Quiz me again**: card quiz → "Free to retake"; AI quiz → "New questions · 2 credits"
 
 **Quiz me again (AI quiz)**
-- ⬜ "Make a new quiz on the same topic?" → **Use 2 credits**
-- ⬜ AI switched off in Settings → consent text inside this dialog
-- ⬜ Not enough credits → "Out of credits" → Plans screen
+- ✅ "Make a new quiz on the same topic?" → **Use 2 credits** _(an AI 502 refunds and shows a toast)_
+- ✅ AI switched off in Settings → consent text inside this dialog
+- 🔧 Not enough credits → "Out of credits" → Plans screen _(closing Plans dropped you on Home — now returns to Quiz)_
 
 **New quiz (AI makes 8 questions)**
-- ⬜ **A topic**: 2–100 letters, keyboard Done works
-- ⬜ **My sets** → Choose sets: 🔍 **search** (set name), sort (Recent / A to Z / Most cards), tick many → **Done, N sets** (off at 0)
-- ⬜ Sets with under 4 cards total → warning, button off
-- 👤 **A document** → first time content rules dialog → choose: My Media / Photo Library / Take Photo / Choose PDF
-- ⬜ Upload progress + file name; cost "Photo · 3" / "PDF · 5"; **Remove**
-- ⬜ Quiz name (optional, max 80) — empty → uses topic / set / file name
-- ⬜ "You have N credits"; short → "Not enough credits… **Get credits**"
-- ⬜ First AI use → consent → **I agree** / **Not now**
-- ⬜ "Making your quiz…" → quiz opens
-- ⬜ Credits go down the right amount (topic/sets 2, photo 3, PDF 5)
+- 🔧 **A topic**: 2–80 letters, keyboard Done works _(field allowed 100 but the server takes 80 → nothing happened for 81–100; limit is now 80)_
+- 🔧 **My sets** → Choose sets: 🔍 **search** (set name), sort (Recent / A to Z / Most cards), tick many → **Done, N sets** (off at 0) _(no Clear search on Android — added)_
+- 🔧 Sets with under 4 cards total → warning, button off _(said "These sets have 1 cards" — reworded)_
+- 👤 **A document** → first time content rules dialog → choose: My Media / Photo Library / Take Photo / Choose PDF _(dialog + My Media tested ✅; device photo/PDF pickers and a real document quiz need a funded Claude account)_
+- ✅ Upload progress + file name; cost "Photo · 3" / "PDF · 5"; **Remove**
+- 🔧 Quiz name (optional, max 80) — empty → uses topic / set / file name _(a long set title/file name made the finished quiz fail to save — clipped; hint said "after the topic" on every source)_
+- ✅ "You have N credits"; short → "Not enough credits… **Get credits**"
+- ✅ First AI use → consent → **I agree** / **Not now**
+- ✅ "Making your quiz…" → quiz opens
+- 🔧 Credits go down the right amount (topic/sets 2, photo 3, PDF 5) _(server right; app balance stayed stale after a quiz or reward — fixed)_
 
 ## 10. Quiz — playing & results
 
