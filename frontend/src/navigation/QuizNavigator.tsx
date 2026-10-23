@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 import { useTheme } from '../theme';
 import type { QuizStackParamList } from './types';
+import type { FromHome } from './returnHome';
 import { QuizHubScreen } from '../screens/quiz/QuizHubScreen';
 import { QuizDetailScreen } from '../screens/quiz/QuizDetailScreen';
 import { QuizSetupScreen } from '../screens/quiz/QuizSetupScreen';
@@ -22,6 +23,11 @@ export function QuizNavigator() {
       const tabState = navigation.getState();
       const selectedRoute = tabState?.routes?.[tabState.index ?? 0];
       if (selectedRoute?.name === 'QuizTab') return; // root overlay, not a tab switch
+      // Paywall opened from Quiz (out of credits) returns here — keep the New quiz form.
+      // The target tab's stack may not be mounted yet, so its screen params can still sit on the tab route.
+      const shown = selectedRoute?.state ? selectedRoute.state.routes[selectedRoute.state.index ?? 0] : undefined;
+      const from = ((shown?.params ?? (selectedRoute?.params as { params?: object } | undefined)?.params) as FromHome)?.from;
+      if (from === 'QuizTab') return;
       const route = tabState?.routes?.find(r => r.name === 'QuizTab');
       const stackState = route?.state;
       if (stackState && (stackState.index ?? 0) > 0) {

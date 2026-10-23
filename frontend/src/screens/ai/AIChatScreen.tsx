@@ -107,7 +107,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
   );
   const hasExportableMessages = messages.some(m => !isPlaceholder(m.text));
 
-  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall', params: { from: 'AITab' }, initial: false }), [navigation]);
   const goCredits = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Credits' }), [navigation]);
   const goMedia   = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Media' }), [navigation]);
 

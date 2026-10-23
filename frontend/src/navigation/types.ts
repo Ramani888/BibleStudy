@@ -67,7 +67,7 @@ export type ProfileStackParamList = {
   EditProfile: undefined;
   ChangePassword: undefined;
   Credits: undefined;
-  Paywall: undefined;
+  Paywall: FromHome;
   Achievements: FromHome;
   Settings: undefined;
   InviteFriends: undefined;

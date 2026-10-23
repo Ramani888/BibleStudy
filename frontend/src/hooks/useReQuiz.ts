@@ -41,7 +41,7 @@ export function useReQuiz() {
 
   const goPaywall = useCallback(() => {
     Toast.show({ type: 'error', text1: t('quiz:setup.outOfCredits', 'Out of credits'), text2: t('quiz:setup.upgradeToGenerate', 'Upgrade to generate AI quizzes.') });
-    navigation.navigate('ProfileTab', { screen: 'Paywall' });
+    navigation.navigate('ProfileTab', { screen: 'Paywall', params: { from: 'QuizTab' }, initial: false });
   }, [navigation, t]);
 
   const regenerate = useCallback((attempt: ReQuizAttempt, source: { topic?: string; setIds?: string[] }) => {
