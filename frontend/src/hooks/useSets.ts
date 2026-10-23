@@ -9,11 +9,11 @@ export function useSets(folderId?: string) {
   });
 }
 
-export function useSet(id: string) {
+export function useSet(id: string, enabled = true) {
   return useQuery({
     queryKey: ['sets', id],
     queryFn: () => setsApi.getById(id),
-    enabled: !!id,
+    enabled: !!id && enabled,
   });
 }
 

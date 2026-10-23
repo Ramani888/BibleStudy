@@ -60,7 +60,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [saved, setSaved] = useState(false);
 
   const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
-  const { data: setData } = useSet(setId);
+  const { data: setData } = useSet(setId, isOwner); // owner-only endpoint — 404s for a friend's set
   const { data: allSets = [] } = useSets();
   const { data: masteryRows } = useMastery();
   const { refreshing, onRefresh } = useManualRefresh(refetch);
@@ -93,7 +93,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const allBlurred = cards.length > 0 && cards.every(c => c.isBlurred);
   const visibilityLabel = set?.visibility === 'PUBLIC' ? t('library:sets.visibilityPublic', 'Public')
     : set?.visibility === 'FRIENDS' ? t('library:sets.visibilityFriends', 'Friends') : t('library:sets.private', 'Private');
-  const setMeta = `${cards.length ? t('library:cards.cardCount', { count: cards.length }) : t('library:qm.noCardsYet', 'No cards yet')} · ${visibilityLabel}`;
+  const countLabel = cards.length ? t('library:cards.cardCount', { count: cards.length }) : t('library:qm.noCardsYet', 'No cards yet');
+  // Visibility is only known (and only meaningful) for your own set.
+  const setMeta = isOwner ? `${countLabel} · ${visibilityLabel}` : countLabel;
   const otherSets = useMemo(() => allSets.filter(s => s.id !== setId), [allSets, setId]);
 
   const err = useCallback((e: unknown) => Toast.show({ type: 'error', text1: t('common:status.error', 'Oops!'), text2: getErrorMessage(e) }), [t]);
