@@ -14,6 +14,7 @@ import { LoadingOverlay } from '../../components/feedback';
 import { useAIChatHistory, useBookmarks, useManualRefresh } from '../../hooks';
 import { useChatHistoryActions } from '../../hooks/useChatHistoryActions';
 import { useAIChatStore } from '../../store';
+import { loadFailed } from '../../utils/queryState';
 import { useTheme, spacing, radius, textPresets } from '../../theme';
 import type { BookmarkedChat, ChatSession } from '../../types';
 import type { AIScreenProps } from '../../navigation/types';
@@ -46,8 +47,12 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const { data, isLoading, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = useAIChatHistory();
-  const { data: bookmarksData, isLoading: isBookmarksLoading, refetch: refetchBookmarks } = useBookmarks();
+  const historyQuery = useAIChatHistory();
+  const { data, isLoading, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = historyQuery;
+  const isError = loadFailed(historyQuery); // offline with nothing cached → error, not "No conversations yet"
+  const bookmarksQuery = useBookmarks();
+  const { data: bookmarksData, isLoading: isBookmarksLoading, refetch: refetchBookmarks } = bookmarksQuery;
+  const bookmarksFailed = loadFailed(bookmarksQuery);
   const { refreshing, onRefresh } = useManualRefresh(() => Promise.all([refetch(), refetchBookmarks()]));
 
   const [viewMode, setViewMode] = useState<'all' | 'bookmarked'>('all');
@@ -229,6 +234,16 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
           ListHeaderComponent={<View style={styles.markHead}>{header}</View>}
           ListEmptyComponent={isBookmarksLoading
             ? <ActivityIndicator color={qm.violet} style={styles.loading} />
+            : bookmarksFailed
+            ? (
+              <QMEmpty
+                style={styles.empty}
+                icon={InfoIcon}
+                title={t('ai:qm.history.errorTitle', 'Couldn’t load your conversations')}
+                text={t('ai:qm.history.errorText', 'Check your connection and try again. Nothing was lost.')}
+                action={{ label: t('ai:qm.chat.tryAgain', 'Try again'), onPress: () => refetchBookmarks() }}
+              />
+            )
             : <QMEmpty style={styles.empty} icon={BookmarkIcon} title={t('ai:history.noBookmarks', 'No bookmarks yet')} text={t('ai:qm.history.noBookmarksText', 'Tap ··· on any answer and choose Bookmark to keep it here.')} />}
           ItemSeparatorComponent={Separator}
           contentContainerStyle={contentStyle}
