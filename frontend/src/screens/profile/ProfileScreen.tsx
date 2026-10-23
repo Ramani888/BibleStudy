@@ -27,8 +27,10 @@ const BAR_H = 8;
 const MB = 1048576;
 const GB = MB * 1024;
 
-/** Canvas sizes: whole MB below a gigabyte, one decimal above ("120 MB", "2 GB"). */
+/** Canvas sizes: whole MB below a gigabyte, one decimal above ("120 MB", "2 GB").
+ *  Under 1 MB shows KB — a few small files used to read "0 MB" while My media said "57 KB". */
 function fmtSize(bytes: number): string {
+  if (bytes > 0 && bytes < MB) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return bytes >= GB ? `${+(bytes / GB).toFixed(1)} GB` : `${Math.round(bytes / MB)} MB`;
 }
 
