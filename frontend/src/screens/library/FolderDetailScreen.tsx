@@ -43,7 +43,9 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const [assignTarget, setAssignTarget] = useState<StudySet | null>(null);
   const [folderMenu, setFolderMenu] = useState(false);
 
-  const { data: sets = [], isLoading, isError, refetch } = useSets(folderId);
+  const { data: sets = [], isLoading, isError, isPending, fetchStatus, refetch } = useSets(folderId);
+  // Offline with nothing saved: the query is paused, not loading — show the error, not "empty".
+  const failed = isError || (isPending && fetchStatus === 'paused');
   const { data: folders = [] } = useFolders();
   const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
@@ -62,7 +64,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const q = search.trim().toLowerCase();
   const filtered = useMemo(() => sets.filter(s => !q || s.title.toLowerCase().includes(q)), [sets, q]);
   const cardsTotal = useMemo(() => sets.reduce((a, s) => a + (s._count?.cards ?? 0), 0), [sets]);
-  const folderMeta = sets.length
+  const folderMeta = failed ? '' : sets.length
     ? `${t('library:folders.setsCount', { count: sets.length })}, ${t('library:cards.cardCount', { count: cardsTotal })}`
     : t('library:qm.noSetsYet', 'No sets yet');
 
@@ -151,7 +153,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   let empty: React.ReactElement | null = null;
   if (isLoading) {
     empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
-  } else if (isError) {
+  } else if (failed) {
     empty = (
       <QMEmpty
         style={styles.emptyGap}
@@ -185,7 +187,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={isLoading || isError ? [] : filtered}
+        data={isLoading || failed ? [] : filtered}
         keyExtractor={item => item.id}
         renderItem={renderItem}
         ListHeaderComponent={header}
