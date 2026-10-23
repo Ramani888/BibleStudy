@@ -42,7 +42,8 @@ export function formatRelativeShort(dateStr: string | Date): string {
   if (hrs < 24) return i18n.t('common:time.hoursAgo', { count: hrs, defaultValue: `${hrs}h ago` });
   const days = Math.floor(hrs / 24);
   if (days < 7) return i18n.t('common:time.daysAgoShort', { count: days, defaultValue: `${days}d ago` });
-  return date.toLocaleDateString(i18n.language || 'en-US');
+  const otherYear = date.getFullYear() !== new Date().getFullYear();
+  return date.toLocaleDateString(i18n.language || 'en-US', { month: 'short', day: 'numeric', ...(otherYear && { year: 'numeric' }) });
 }
 
 /**
