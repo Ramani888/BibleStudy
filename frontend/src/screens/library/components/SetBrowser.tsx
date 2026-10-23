@@ -13,6 +13,7 @@ import { useCloneSet, useDebouncedValue, useFriendsSets, usePublicSets } from '.
 import { useAuthStore } from '../../../store';
 import { getErrorMessage } from '../../../api';
 import { useTheme, spacing, radius } from '../../../theme';
+import { loadFailed } from '../../../utils/queryState';
 import type { AppTabParamList, LibraryStackParamList } from '../../../navigation/types';
 import type { StudySet } from '../../../types';
 
@@ -39,7 +40,8 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
   const publicQuery = usePublicSets(friends ? undefined : debounced || undefined);
   const friendsQuery = useFriendsSets();
   const query = friends ? friendsQuery : publicQuery;
-  const { data, isLoading, isRefetching, isError, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = query;
+  const { data, isLoading, isRefetching, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = query;
+  const failed = loadFailed(query);
 
   const all = useMemo(() => data?.pages.flatMap(p => p.sets) ?? [], [data]);
   const total = data?.pages[0]?.pagination.total ?? 0;
@@ -123,7 +125,7 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
 
   let empty: React.ReactElement | null = null;
   if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
-  else if (isError) {
+  else if (failed) {
     empty = (
       <QMEmpty style={styles.emptyGap} icon={RefreshIcon}
         title={t('library:qm.browseFailedTitle', 'These sets did not load')}
@@ -155,7 +157,7 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <FlatList
-        data={isLoading || isError ? [] : sets}
+        data={isLoading || failed ? [] : sets}
         keyExtractor={s => s.id}
         renderItem={renderItem}
         ListHeaderComponent={header}

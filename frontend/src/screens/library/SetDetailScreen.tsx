@@ -21,6 +21,7 @@ import {
 import { getErrorMessage } from '../../api';
 import { buildSetShareLink, shareToWhatsApp } from '../../utils';
 import { useTheme, spacing, radius, textPresets, mixHex, qmAccent } from '../../theme';
+import { loadFailed } from '../../utils/queryState';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { Card as CardType } from '../../types';
 
@@ -59,9 +60,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [masteryInfo, setMasteryInfo] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { data: cards = [], isLoading, isError, isPending, fetchStatus, refetch } = useCards(setId);
-  // Offline with nothing saved: the query is paused, not loading — show the error, not "no cards".
-  const loadFailed = isError || (isPending && fetchStatus === 'paused');
+  const cardsQuery = useCards(setId);
+  const { data: cards = [], isLoading, isPending, refetch } = cardsQuery;
+  const cardsFailed = loadFailed(cardsQuery);
   const { data: setData } = useSet(setId, isOwner); // owner-only endpoint — 404s for a friend's set
   const { data: allSets = [] } = useSets();
   const { data: masteryRows } = useMastery();
@@ -96,7 +97,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const visibilityLabel = set?.visibility === 'PUBLIC' ? t('library:sets.visibilityPublic', 'Public')
     : set?.visibility === 'FRIENDS' ? t('library:sets.visibilityFriends', 'Friends') : t('library:sets.private', 'Private');
   // While cards load, use the list's known count — not a 'No cards yet' flash.
-  const cardCount = isPending || loadFailed ? (set?._count?.cards ?? 0) : cards.length;
+  const cardCount = isPending || cardsFailed ? (set?._count?.cards ?? 0) : cards.length;
   const countLabel = cardCount ? t('library:cards.cardCount', { count: cardCount }) : t('library:qm.noCardsYet', 'No cards yet');
   // Visibility is only known (and only meaningful) for your own set.
   const setMeta = isOwner ? `${countLabel} · ${visibilityLabel}` : countLabel;
@@ -360,7 +361,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   let empty: React.ReactElement | null = null;
   if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
-  else if (loadFailed) {
+  else if (cardsFailed) {
     empty = (
       <QMEmpty style={styles.emptyGap} icon={RefreshIcon}
         title={t('library:qm.cardsFailedTitle', 'The cards did not load')}
@@ -405,7 +406,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       ) : (
         <Animated.FlatList
           key={cardLayout}
-          data={isLoading || loadFailed ? [] : shownCards}
+          data={isLoading || cardsFailed ? [] : shownCards}
           keyExtractor={item => item.id}
           numColumns={grid ? 2 : 1}
           columnWrapperStyle={grid ? styles.gridRow : undefined}

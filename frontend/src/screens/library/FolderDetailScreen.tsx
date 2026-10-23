@@ -19,6 +19,7 @@ import {
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useTheme, spacing, radius, mixHex, qmAccent } from '../../theme';
+import { loadFailed } from '../../utils/queryState';
 import { formatDate } from '../../utils/formatters';
 import type { LibraryScreenProps } from '../../navigation/types';
 import type { StudySet } from '../../types';
@@ -43,9 +44,9 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
   const [assignTarget, setAssignTarget] = useState<StudySet | null>(null);
   const [folderMenu, setFolderMenu] = useState(false);
 
-  const { data: sets = [], isLoading, isError, isPending, fetchStatus, refetch } = useSets(folderId);
-  // Offline with nothing saved: the query is paused, not loading — show the error, not "empty".
-  const failed = isError || (isPending && fetchStatus === 'paused');
+  const setsQuery = useSets(folderId);
+  const { data: sets = [], isLoading, refetch } = setsQuery;
+  const failed = loadFailed(setsQuery);
   const { data: folders = [] } = useFolders();
   const { refreshing, onRefresh } = useManualRefresh(refetch);
   const { mutateAsync: deleteSetAsync } = useDeleteSet();
