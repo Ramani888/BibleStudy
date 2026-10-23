@@ -122,7 +122,10 @@ export function PaywallScreen({ navigation }: ProfileScreenProps<'Paywall'>) {
     : null;
 
   const perks = [
-    t('profile:qmPlans.perkCredits', { count: selected.credits }),
+    // Yearly grants 12× up front, once (config/plans.ts) — not "every month".
+    yearly
+      ? t('profile:qmPlans.creditsYear', { count: (selected.credits * 12).toLocaleString() })
+      : t('profile:qmPlans.perkCredits', { count: selected.credits }),
     t('profile:qmPlans.perkStorage', { size: selected.storage }),
     ...(selected.plan === 'PRO' ? [t('profile:qmPlans.perkRate', { count: selected.aiPerHour })] : []),
     t('profile:qmPlans.perkKeep'),
