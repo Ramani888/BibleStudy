@@ -25,7 +25,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 13. Friends | 31 | 0 | 25 | 0 | 4 | 2 |
 | 14. Notes | 15 | 0 | 10 | 0 | 4 | 1 |
 | 15. Media | 12 | 0 | 7 | 0 | 3 | 2 |
-| 16. Whole app | 7 | 6 | 0 | 0 | 0 | 1 |
+| 16. Whole app | 7 | 0 | 5 | 0 | 1 | 1 |
 
 ---
 
@@ -530,13 +530,13 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 16. Whole app
 
-- ⬜ Every screen in **dark mode**
-- ⬜ Wi-Fi off → offline banner
-- ⬜ Tab bar hidden on: new/edit set, new/edit card, new plan, Plans, note editor, PDF
-- ⬜ Switching tabs → Library / Quiz / Ask open at start page; Profile goes back to Profile
+- ✅ Every screen in **dark mode**
+- ✅ Wi-Fi off → offline banner
+- ✅ Tab bar hidden on: new/edit set, new/edit card, new plan, Plans, note editor, PDF
+- ✅ Switching tabs → Library / Quiz / Ask open at start page; Profile goes back to Profile
 - 👤 Push notification tap → right screen (real phone)
-- ⬜ Achievement unlocked → celebration card pops on any screen
-- ⬜ Switch language → check Home, Library, Quiz, Profile
+- ✅ Achievement unlocked → celebration card pops on any screen
+- 🔧 Switch language → check Home, Library, Quiz, Profile
 
 ---
 
