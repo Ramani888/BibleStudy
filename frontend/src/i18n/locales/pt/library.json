@@ -342,7 +342,7 @@
     "showAllAnswers": "Mostrar todas as respostas",
     "hideAllAnswers": "Ocultar todas as respostas",
     "reorderCards": "Reordenar cartões",
-    "reorderHint": "Toque e segure um cartão, depois arraste. Os quizzes seguem esta ordem.",
+    "reorderHint": "Toque e segure um cartão, depois arraste.",
     "dragCard": "Arraste para mover o cartão {{n}}",
     "deleteCardTitle": "Excluir este cartão?",
     "deleteCardMessage": "Ele será removido deste conjunto de vez.",

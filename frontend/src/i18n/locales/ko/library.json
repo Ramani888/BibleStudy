@@ -342,7 +342,7 @@
     "showAllAnswers": "모든 답 보기",
     "hideAllAnswers": "모든 답 숨기기",
     "reorderCards": "카드 순서 변경",
-    "reorderHint": "카드를 길게 누른 뒤 끌어서 옮기세요. 퀴즈도 이 순서를 따라요.",
+    "reorderHint": "카드를 길게 누른 뒤 끌어서 옮기세요.",
     "dragCard": "끌어서 카드 {{n}} 옮기기",
     "deleteCardTitle": "이 카드를 삭제할까요?",
     "deleteCardMessage": "이 세트에서 영구히 삭제돼요.",

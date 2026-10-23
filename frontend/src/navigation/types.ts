@@ -1,7 +1,7 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { BottomTabScreenProps } from '@react-navigation/bottom-tabs';
 import type { CompositeScreenProps, NavigatorScreenParams } from '@react-navigation/native';
-import type { Card, QuizSelectableMode } from '../types';
+import type { Card, QuizSelectableMode, StudySet } from '../types';
 import type { FromHome } from './returnHome';
 
 /** An LLM-generated, ephemeral quiz card (never persisted to the DB). */
@@ -29,7 +29,8 @@ export type AuthStackParamList = {
 export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
-  SetDetail: { setId: string; setTitle: string; isOwner?: boolean; from?: 'Home' };
+  // preview: the list item a non-owner tapped (owner name, description, colour) — they can't fetch the set itself.
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean; from?: 'Home'; preview?: StudySet };
   CreateSet: { folderId?: string; from?: 'Home' };
   EditSet: { setId: string };
   CreateCard: { setId: string };

@@ -342,7 +342,7 @@
     "showAllAnswers": "Ipakita lahat ng sagot",
     "hideAllAnswers": "Itago lahat ng sagot",
     "reorderCards": "Ayusin ang cards",
-    "reorderHint": "Pindutin nang matagal ang card, saka i-drag. Susundin ng quizzes ang ayos na ito.",
+    "reorderHint": "Pindutin nang matagal ang card, saka i-drag.",
     "dragCard": "I-drag para ilipat ang card {{n}}",
     "deleteCardTitle": "Burahin ang card na ito?",
     "deleteCardMessage": "Tuluyan itong mawawala sa set na ito.",

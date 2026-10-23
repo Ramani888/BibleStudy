@@ -6,6 +6,7 @@ import {
   type IconComponent,
 } from '../components/icons';
 import type { AppTabParamList } from '../navigation/types';
+import { useAuthStore } from '../store/auth.store';
 import type { StudySet } from '../types';
 
 type HomeNav = BottomTabNavigationProp<AppTabParamList>;
@@ -15,6 +16,7 @@ export type QuickTint = 'lilac' | 'leaf' | 'gold';
 
 export function useHomeNavigation(navigation: HomeNav) {
   const { t } = useTranslation('home');
+  const myId = useAuthStore(st => st.user?.id);
   const goContinue = useCallback((s: StudySet) =>
     navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, from: 'Home' }, initial: false }),
   [navigation]);
@@ -47,8 +49,8 @@ export function useHomeNavigation(navigation: HomeNav) {
   const goLeaderboard  = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Leaderboard', params: { from: 'Home' },  initial: false }),                       [navigation]);
 
   const goViewSet = useCallback((s: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: false, from: 'Home' }, initial: false }),
-  [navigation]);
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: s.id, setTitle: s.title, isOwner: s.userId === myId, from: 'Home', preview: s }, initial: false }),
+  [navigation, myId]);
 
   const quickActions = useMemo<Array<{ label: string; Icon: IconComponent; tint: QuickTint; onPress: () => void }>>(() => [
     { label: t('home:quickActions.createSet', 'New set'),         Icon: PlusIcon,        tint: 'lilac', onPress: goCreate },

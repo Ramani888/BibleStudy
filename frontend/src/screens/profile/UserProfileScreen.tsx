@@ -117,7 +117,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   ];
 
   const openSet = (set: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: set.id, setTitle: set.title, isOwner: false } });
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: set.id, setTitle: set.title, isOwner: false, preview: { ...set, user: set.user ?? { id: user.id, name: user.name } } } });
 
   const since = new Date(user.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' });
   const dark = themeName === 'dark';

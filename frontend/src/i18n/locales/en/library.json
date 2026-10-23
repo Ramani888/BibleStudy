@@ -343,7 +343,7 @@
     "showAllAnswers": "Show all answers",
     "hideAllAnswers": "Hide all answers",
     "reorderCards": "Reorder cards",
-    "reorderHint": "Press and hold a card, then drag it. Quizzes follow this order.",
+    "reorderHint": "Press and hold a card, then drag it.",
     "dragCard": "Drag to move card {{n}}",
     "deleteCardTitle": "Delete this card?",
     "deleteCardMessage": "It will be gone from this set for good.",

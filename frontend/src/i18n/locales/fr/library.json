@@ -342,7 +342,7 @@
     "showAllAnswers": "Afficher toutes les réponses",
     "hideAllAnswers": "Masquer toutes les réponses",
     "reorderCards": "Réorganiser les cartes",
-    "reorderHint": "Appuyez longuement sur une carte, puis faites-la glisser. Les quiz suivent cet ordre.",
+    "reorderHint": "Appuyez longuement sur une carte, puis faites-la glisser.",
     "dragCard": "Faire glisser pour déplacer la carte {{n}}",
     "deleteCardTitle": "Supprimer cette carte ?",
     "deleteCardMessage": "Elle sera définitivement retirée de cette série.",

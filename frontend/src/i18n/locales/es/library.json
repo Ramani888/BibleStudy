@@ -342,7 +342,7 @@
     "showAllAnswers": "Mostrar todas las respuestas",
     "hideAllAnswers": "Ocultar todas las respuestas",
     "reorderCards": "Reordenar tarjetas",
-    "reorderHint": "Mantén presionada una tarjeta y arrástrala. Los cuestionarios siguen este orden.",
+    "reorderHint": "Mantén presionada una tarjeta y arrástrala.",
     "dragCard": "Arrastra para mover la tarjeta {{n}}",
     "deleteCardTitle": "¿Eliminar esta tarjeta?",
     "deleteCardMessage": "Se eliminará de este set para siempre.",

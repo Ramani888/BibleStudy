@@ -71,7 +71,7 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
           title={item.title}
           color={item.color}
           meta={meta}
-          onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: false })}
+          onPress={() => navigation.navigate('SetDetail', { setId: item.id, setTitle: item.title, isOwner: item.userId === myId, preview: item })}
           right={item.userId === myId ? undefined : (
             <AnimatedPressable
               scaleTo={0.92}

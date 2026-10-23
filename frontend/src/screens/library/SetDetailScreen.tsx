@@ -44,7 +44,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { qm, name: themeName } = useTheme();
   const dark = themeName === 'dark';
   const insets = useSafeAreaInsets();
-  const { setId, setTitle, isOwner = true } = route.params;
+  const { setId, setTitle, isOwner = true, preview } = route.params;
 
   const [sheet, setSheet] = useState<Sheet>(null);
   const [target, setTarget] = useState<CardType | null>(null);
@@ -59,7 +59,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const [masteryInfo, setMasteryInfo] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  const { data: cards = [], isLoading, isError, refetch } = useCards(setId);
+  const { data: cards = [], isLoading, isError, isPending, fetchStatus, refetch } = useCards(setId);
+  // Offline with nothing saved: the query is paused, not loading — show the error, not "no cards".
+  const loadFailed = isError || (isPending && fetchStatus === 'paused');
   const { data: setData } = useSet(setId, isOwner); // owner-only endpoint — 404s for a friend's set
   const { data: allSets = [] } = useSets();
   const { data: masteryRows } = useMastery();
@@ -72,7 +74,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const { mutate: cloneSet, isPending: cloning } = useCloneSet();
   const { show, dialogProps } = useConfirmDialog();
 
-  const set = setData ?? allSets.find(s => s.id === setId);
+  const set = setData ?? preview ?? allSets.find(s => s.id === setId);
   const title = set?.title ?? setTitle;
   const mastery = masteryRows?.find(m => m.setId === setId);
   const [coverBg, coverInk] = useMemo(() => {
@@ -94,7 +96,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const visibilityLabel = set?.visibility === 'PUBLIC' ? t('library:sets.visibilityPublic', 'Public')
     : set?.visibility === 'FRIENDS' ? t('library:sets.visibilityFriends', 'Friends') : t('library:sets.private', 'Private');
   // While cards load, use the list's known count — not a 'No cards yet' flash.
-  const cardCount = isLoading ? (set?._count?.cards ?? 0) : cards.length;
+  const cardCount = isPending || loadFailed ? (set?._count?.cards ?? 0) : cards.length;
   const countLabel = cardCount ? t('library:cards.cardCount', { count: cardCount }) : t('library:qm.noCardsYet', 'No cards yet');
   // Visibility is only known (and only meaningful) for your own set.
   const setMeta = isOwner ? `${countLabel} · ${visibilityLabel}` : countLabel;
@@ -358,7 +360,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
 
   let empty: React.ReactElement | null = null;
   if (isLoading) empty = <ActivityIndicator color={qm.violet} style={styles.loading} />;
-  else if (isError) {
+  else if (loadFailed) {
     empty = (
       <QMEmpty style={styles.emptyGap} icon={RefreshIcon}
         title={t('library:qm.cardsFailedTitle', 'The cards did not load')}
@@ -376,7 +378,8 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
     empty = (
       <QMEmpty style={styles.emptyGap} icon={SearchIcon}
         title={t('library:qm.noCardsMatch', 'No cards match')}
-        text={t('library:qm.noCardsMatchText', { query: search.trim(), defaultValue: `Nothing with “${search.trim()}”. Try another word, or check the spelling.` })} />
+        text={t('library:qm.noCardsMatchText', { query: search.trim(), defaultValue: `Nothing with “${search.trim()}”. Try another word, or check the spelling.` })}
+        action={{ label: t('library:qm.clearSearch', 'Clear search'), onPress: () => setSearch('') }} />
     );
   }
 
@@ -392,7 +395,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           renderItem={renderReorder}
           ListHeaderComponent={
             <Typography preset="qmBody" color={qm.muted} style={[styles.reorderHint, { paddingTop: topPad + spacing.md }]}>
-              {t('library:qm.reorderHint', 'Press and hold a card, then drag it. Quizzes follow this order.')}
+              {t('library:qm.reorderHint', 'Press and hold a card, then drag it.')}
             </Typography>
           }
           contentContainerStyle={styles.reorderList}
@@ -402,7 +405,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
       ) : (
         <Animated.FlatList
           key={cardLayout}
-          data={isLoading || isError ? [] : shownCards}
+          data={isLoading || loadFailed ? [] : shownCards}
           keyExtractor={item => item.id}
           numColumns={grid ? 2 : 1}
           columnWrapperStyle={grid ? styles.gridRow : undefined}
