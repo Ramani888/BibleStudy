@@ -34,8 +34,8 @@ export function useMediaActions() {
 
   const handleBulkDelete = useCallback((size: number) => {
     showConfirm({
-      title: t('profile:media.deleteSelectedTitle', 'Delete Selected'),
-      message: t('profile:media.deleteSelectedMessage', { count: size, defaultValue: `Delete ${size} file(s)? This cannot be undone.` }),
+      title: t('profile:media.deleteSelectedTitle', { count: size }),
+      message: t('profile:media.deleteSelectedMessage', { count: size }),
       confirmLabel: t('common:actions.delete', 'Delete'), variant: 'danger',
       onConfirm: async () => {
         try {
@@ -43,7 +43,7 @@ export function useMediaActions() {
           const failed = results.filter(r => r.status === 'rejected').length;
           const ok = results.length - failed;
           Toast.show(failed === 0
-            ? { type: 'success', text1: t('profile:media.filesDeleted', { count: ok, defaultValue: `${ok} file(s) deleted` }) }
+            ? { type: 'success', text1: t('profile:media.filesDeleted', { count: ok }) }
             : { type: 'error', text1: t('profile:media.deletePartial', { ok, failed, defaultValue: `${ok} deleted, ${failed} failed` }) });
           exitSelectionMode();
         } catch (e) {
@@ -64,8 +64,8 @@ export function useMediaActions() {
 
   const handleDelete = useCallback((file: MediaFile) => {
     showConfirm({
-      title: t('profile:media.deleteFileTitle', { type: file.type === 'IMAGE' ? t('profile:media.image', 'Image') : t('profile:media.pdf', 'PDF'), defaultValue: `Delete ${file.type === 'IMAGE' ? 'Image' : 'PDF'}` }),
-      message: t('profile:media.deleteFileMessage', { name: file.name, defaultValue: `Delete "${file.name}"? This cannot be undone.` }),
+      title: t('profile:media.deleteFileTitle'),
+      message: t('profile:media.deleteFileMessage', { name: file.name }),
       confirmLabel: t('common:actions.delete', 'Delete'), variant: 'danger',
       onConfirm: async () => {
         try {
