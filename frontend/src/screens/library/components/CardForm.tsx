@@ -67,7 +67,7 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
   const answerRef = useRef<TextInput>(null);
   const [noteExpanded, setNoteExpanded] = useState(!!defaultValues?.note);
 
-  const { control, handleSubmit, watch, setValue, reset, formState: { isSubmitting } } = useForm<CardFormData>({
+  const { control, handleSubmit, watch, setValue, reset, trigger, formState: { isSubmitting, isSubmitted } } = useForm<CardFormData>({
     resolver: zodResolver(schema),
     defaultValues: {
       type: defaultValues?.type ?? 'QA',
@@ -116,7 +116,8 @@ export const CardForm = forwardRef<CardFormHandle, CardFormProps>(function CardF
           <QMSegmented
             label={t('library:qm.cardType', 'Card type')}
             value={type}
-            onChange={v => { setValue('type', v); unflip(); }}
+            // Re-check after a failed save so Q&A errors don't linger on a Story card (and vice versa).
+            onChange={v => { setValue('type', v); if (isSubmitted) trigger(); unflip(); }}
             options={[
               { key: 'QA', label: t('library:qm.qaCard', 'Q&A card') },
               { key: 'STORY', label: t('library:qm.storyCardType', 'Story card') },
