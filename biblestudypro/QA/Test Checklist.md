@@ -12,7 +12,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 |---|---|---|---|---|---|---|
 | 1. First open & Sign-in | 36 | 0 | 28 | 0 | 4 | 4 |
 | 2. Home | 28 | 0 | 20 | 0 | 6 | 2 |
-| 3. Library — My sets | 24 | 24 | 0 | 0 | 0 | 0 |
+| 3. Library — My sets | 24 | 0 | 22 | 0 | 2 | 0 |
 | 4. Library — Folders | 12 | 12 | 0 | 0 | 0 | 0 |
 | 5. Library — Inside a set (Set detail) | 15 | 14 | 0 | 0 | 0 | 1 |
 | 6. Library — Cards | 11 | 11 | 0 | 0 | 0 | 0 |
@@ -148,34 +148,34 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 3. Library — My sets
 
-- ⬜ **My sets / Folders** switch (switching clears search)
-- ⬜ 🔍 **Search sets** — searches set **name**
-- ⬜ Scroll down → small search icon at top → tap → scrolls up + opens search
-- ⬜ **Sort** chip: Recent → A to Z → Most cards (order really changes)
-- ⬜ 📄 Pull to refresh · empty ("Create a set") · no internet
-- ⬜ Set row shows Public / Friends chip
-- ⬜ Tap row → Set detail
-- ⬜ "Looking for more? **Explore public sets**" link at bottom
+- ✅ **My sets / Folders** switch (switching clears search)
+- 🔧 🔍 **Search sets** — searches set **name**
+- ✅ Scroll down → small search icon at top → tap → scrolls up + opens search
+- ✅ **Sort** chip: Recent → A to Z → Most cards (order really changes)
+- ✅ 📄 Pull to refresh · empty ("Create a set") · no internet
+- ✅ Set row shows Public / Friends chip
+- ✅ Tap row → Set detail
+- ✅ "Looking for more? **Explore public sets**" link at bottom
 
 **Create / edit a set**
-- ⬜ **+** → Create set screen (tab bar hidden)
-- ⬜ Cover preview changes as you type title / pick colour
-- ⬜ Title required (empty → can't save), max 200
-- ⬜ Description (optional, max 1000)
-- ⬜ Folder picker: "No folder" or a folder
-- ⬜ Colour swatches
-- ⬜ Who can see it: **Private / Friends / Public** (check a friend sees Friends sets, everyone sees Public)
-- ⬜ **Cancel** closes
-- ⬜ **Create set** → appears in list
-- ⬜ **Edit set** → change → **Save changes** → list updated
-- ⬜ **Delete this set** (Edit screen) → confirm → gone
+- ✅ **+** → Create set screen (tab bar hidden)
+- ✅ Cover preview changes as you type title / pick colour
+- ✅ Title required (empty → can't save), max 200
+- ✅ Description (optional, max 1000)
+- ✅ Folder picker: "No folder" or a folder
+- ✅ Colour swatches
+- ✅ Who can see it: **Private / Friends / Public** (check a friend sees Friends sets, everyone sees Public)
+- ✅ **Cancel** closes
+- ✅ **Create set** → appears in list
+- ✅ **Edit set** → change → **Save changes** → list updated
+- ✅ **Delete this set** (Edit screen) → confirm → gone
 
 **Set ⋮ menu**
-- ⬜ Start a quiz → mode picker
-- ⬜ Add a card
-- ⬜ Move to folder → "Moved to folder"; "No folder" → "Removed from folder"; current folder has tick
-- ⬜ Edit set
-- ⬜ Delete set → "Delete this set? … and its N cards" → gone
+- ✅ Start a quiz → mode picker
+- ✅ Add a card
+- ✅ Move to folder → "Moved to folder"; "No folder" → "Removed from folder"; current folder has tick
+- ✅ Edit set
+- 🔧 Delete set → "Delete this set? … and its N cards" → gone
 
 ## 4. Library — Folders
 
