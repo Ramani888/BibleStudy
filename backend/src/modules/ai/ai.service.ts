@@ -65,7 +65,15 @@ async function generateAnswer(system: string, messages: ChatMessage[], media?: M
       await new Promise(r => setTimeout(r, 1000 * attempt)); // 1s, then 2s
     }
 
-    throw new AppError(`AI provider error (${lastStatus}). No credit was charged. ${lastDetail.slice(0, 200)}`, 502, 'AI_PROVIDER_ERROR');
+    // Raw provider JSON goes to the log, not the user's chat bubble.
+    console.error(`OpenRouter error: ${lastStatus} ${lastDetail.slice(0, 500)}`);
+    throw new AppError(
+      lastStatus === 429
+        ? 'The AI is busy right now. Please try again in a moment. No credit was charged.'
+        : `AI provider error (${lastStatus}). No credit was charged.`,
+      502,
+      'AI_PROVIDER_ERROR',
+    );
   }
 
   // Anthropic Claude (default provider, or forced by media).
