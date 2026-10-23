@@ -184,8 +184,11 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
         style={styles.empty}
         icon={SearchIcon}
         title={t('ai:qm.history.noMatch', 'No conversations match')}
-        text={t('ai:qm.history.noMatchText', { query: search.trim(), defaultValue: `Nothing called “${search.trim()}”. Try a different word.` })}
-        action={{ label: t('quiz:qm.clearSearch', 'Clear search'), onPress: () => setSearch('') }}
+        // With a topic on, the word may well exist — just not under that topic.
+        text={activeTag
+          ? t('ai:qm.history.noTopicText', 'Try another topic, or tap All.')
+          : t('ai:qm.history.noMatchText', { query: search.trim(), defaultValue: `Nothing called “${search.trim()}”. Try a different word.` })}
+        action={{ label: t('quiz:qm.clearSearch', 'Clear search'), onPress: () => { setSearch(''); setActiveTag(null); } }}
       />
     );
   } else {
