@@ -35,7 +35,10 @@ interface Props {
   onShare: (file: MediaFile) => void;
 }
 
-function PinchableImage({ url, onTap }: { url: string; onTap: () => void }) {
+function PinchableImage({ url, onTap, onZoom }: { url: string; onTap: () => void; onZoom: (zoomed: boolean) => void }) {
+  // Pan only while zoomed in — an always-on pan swallowed the sideways swipe to the next photo.
+  const [zoomed, setZoomed] = useState(false);
+  const report = useCallback((z: boolean) => { setZoomed(z); onZoom(z); }, [onZoom]);
   const scale = useSharedValue(1);
   const savedScale = useSharedValue(1);
   const tx = useSharedValue(0);
@@ -51,9 +54,11 @@ function PinchableImage({ url, onTap }: { url: string; onTap: () => void }) {
         scale.value = withTiming(1); tx.value = withTiming(0); ty.value = withTiming(0);
         savedScale.value = 1; savedTx.value = 0; savedTy.value = 0;
       }
+      runOnJS(report)(savedScale.value > 1);
     });
 
   const pan = Gesture.Pan()
+    .enabled(zoomed)
     .onUpdate(e => {
       if (scale.value <= 1) return;
       tx.value = savedTx.value + e.translationX;
@@ -83,6 +88,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
   const flatRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [chrome, setChrome] = useState(true);
+  const [zoomed, setZoomed] = useState(false); // a zoomed photo pans instead of paging
   const toggle = useCallback(() => setChrome(c => !c), []);
 
   const onMomentumEnd = useCallback((e: { nativeEvent: { contentOffset: { x: number } } }) => {
@@ -99,12 +105,12 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
 
   const renderImageItem = useCallback(({ item }: { item: MediaFile }) => (
     <View style={styles.page}>
-      <PinchableImage url={item.url} onTap={toggle} />
+      <PinchableImage url={item.url} onTap={toggle} onZoom={setZoomed} />
     </View>
   ), [toggle]);
 
   return (
-    <Modal visible={visible} statusBarTranslucent animationType="fade" onRequestClose={onClose} onShow={() => { setCurrentIndex(initialIndex); setChrome(true); }}>
+    <Modal visible={visible} statusBarTranslucent animationType="fade" onRequestClose={onClose} onShow={() => { setCurrentIndex(initialIndex); setChrome(true); setZoomed(false); }}>
       <GestureHandlerRootView style={styles.root}>
         <FlatList
           ref={flatRef}
@@ -113,6 +119,7 @@ export function MediaImageViewer({ visible, images, initialIndex, onClose, onSha
           renderItem={renderImageItem}
           horizontal
           pagingEnabled
+          scrollEnabled={!zoomed}
           showsHorizontalScrollIndicator={false}
           initialScrollIndex={initialIndex}
           getItemLayout={(_, i) => ({ length: W, offset: W * i, index: i })}
