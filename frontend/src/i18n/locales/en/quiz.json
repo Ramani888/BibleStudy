@@ -273,7 +273,7 @@
     "tapToPick": "Tap to pick one or more",
     "cardsToAsk": "{{count}} card to ask from",
     "cardsToAsk_other": "{{count}} cards to ask from",
-    "tooFew": "These sets have {{count}} cards. Pick sets with at least {{min}} cards in total.",
+    "tooFew": "Pick sets with at least {{min}} cards in total. Right now: {{count}}.",
     "pdfOrPhoto": "A PDF or photo",
     "addDoc": "Add a PDF or photo",
     "docSub": "Verdance reads it and asks about it",

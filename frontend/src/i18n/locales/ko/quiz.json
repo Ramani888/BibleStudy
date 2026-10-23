@@ -273,7 +273,7 @@
     "tapToPick": "눌러서 하나 이상 선택",
     "cardsToAsk": "출제할 카드 {{count}}장",
     "cardsToAsk_other": "출제할 카드 {{count}}장",
-    "tooFew": "이 세트들에는 카드가 {{count}}장 있어요. 합쳐서 {{min}}장 이상인 세트를 골라 주세요.",
+    "tooFew": "합쳐서 카드가 {{min}}장 이상인 세트를 골라 주세요. 지금: {{count}}장.",
     "pdfOrPhoto": "PDF 또는 사진",
     "addDoc": "PDF 또는 사진 추가",
     "docSub": "Verdance가 읽고 문제를 만들어요",

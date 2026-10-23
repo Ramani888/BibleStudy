@@ -32,7 +32,7 @@ export function useGenerateQuiz() {
   return useMutation({
     mutationFn: (body: { topic?: string; setIds?: string[]; mediaIds?: string[]; count?: number }) =>
       quizApi.generateQuiz(body),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['credits'] }),
+    onSettled: () => qc.invalidateQueries({ queryKey: ['credits'] }), // a 402 also means our balance was stale
   });
 }
 

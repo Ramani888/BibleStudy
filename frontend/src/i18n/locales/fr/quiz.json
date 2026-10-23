@@ -273,7 +273,7 @@
     "tapToPick": "Touchez pour en choisir une ou plusieurs",
     "cardsToAsk": "{{count}} carte pour les questions",
     "cardsToAsk_other": "{{count}} cartes pour les questions",
-    "tooFew": "Ces séries ont {{count}} cartes. Choisissez des séries avec au moins {{min}} cartes au total.",
+    "tooFew": "Choisissez des séries avec au moins {{min}} cartes au total. Pour l'instant : {{count}}.",
     "pdfOrPhoto": "Un PDF ou une photo",
     "addDoc": "Ajouter un PDF ou une photo",
     "docSub": "Verdance le lit et pose des questions dessus",

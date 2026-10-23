@@ -273,7 +273,7 @@
     "tapToPick": "I-tap para pumili ng isa o higit pa",
     "cardsToAsk": "{{count}} card na pagtatanungan",
     "cardsToAsk_other": "{{count}} card na pagtatanungan",
-    "tooFew": "May {{count}} card ang mga set na ito. Pumili ng sets na may hindi bababa sa {{min}} card sa kabuuan.",
+    "tooFew": "Pumili ng mga set na may kabuuang {{min}} card man lang. Sa ngayon: {{count}}.",
     "pdfOrPhoto": "Isang PDF o larawan",
     "addDoc": "Magdagdag ng PDF o larawan",
     "docSub": "Babasahin ito ng Verdance at magtatanong tungkol dito",

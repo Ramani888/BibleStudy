@@ -58,7 +58,7 @@ export function QuizSetupScreen() {
 
   // Reuse the AI-chat attachment machinery (device pick + upload, My Media picker,
   // credit gating, one-time content-policy gate) for the "A document" source.
-  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall' }), [navigation]);
+  const goPaywall = useCallback(() => navigation.navigate('ProfileTab', { screen: 'Paywall', params: { from: 'QuizTab' }, initial: false }), [navigation]);
   const att = useAIChatAttachment(balance ?? 0, goPaywall);
 
   const [source, setSource] = useState<Source>('topic');
@@ -242,7 +242,7 @@ export function QuizSetupScreen() {
                 <View style={[styles.warn, { backgroundColor: qm.errorBg }]} accessibilityRole="alert">
                   <InfoIcon size={18} color={qm.warm} strokeWidth={2} />
                   <Typography preset="qmBody" color={qm.warm} style={styles.flex}>
-                    {t('quiz:qm.tooFew', { count: selectedCardCount, min: MIN_SET_CARDS, defaultValue: `These sets have ${selectedCardCount} cards. Pick sets with at least ${MIN_SET_CARDS} cards in total.` })}
+                    {t('quiz:qm.tooFew', { count: selectedCardCount, min: MIN_SET_CARDS, defaultValue: `Pick sets with at least ${MIN_SET_CARDS} cards in total. Right now: ${selectedCardCount}.` })}
                   </Typography>
                 </View>
               )}
@@ -324,9 +324,16 @@ export function QuizSetupScreen() {
         {isLoading ? (
           <ActivityIndicator color={qm.violet} style={styles.pickLoading} />
         ) : pickList.length === 0 ? (
-          <Typography preset="qmBodyMd" color={qm.muted} align="center" style={styles.pickLoading}>
-            {sets.length === 0 ? t('quiz:setup.noSetsSub', 'Create a set with cards to start quizzing') : t('quiz:qm.noSetsMatch', 'No sets match')}
-          </Typography>
+          <View style={styles.pickLoading}>
+            <Typography preset="qmBodyMd" color={qm.muted} align="center">
+              {sets.length === 0 ? t('quiz:setup.noSetsSub', 'Create a set with cards to start quizzing') : t('quiz:qm.noSetsMatch', 'No sets match')}
+            </Typography>
+            {sets.length > 0 && (
+              <Typography preset="qmLink" color={qm.link} align="center" onPress={() => setSearch('')} accessibilityRole="button" style={styles.pickClear}>
+                {t('quiz:qm.clearSearch', 'Clear search')}
+              </Typography>
+            )}
+          </View>
         ) : pickList.map(s => {
           const on = selectedSetIds.includes(s.id);
           const count = s._count?.cards ?? 0;
@@ -448,6 +455,7 @@ const styles = StyleSheet.create({
   pickHead: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   pickSearch: { marginTop: spacing.md, marginBottom: spacing.sm },
   pickLoading: { marginVertical: spacing.xxl },
+  pickClear: { marginTop: spacing.md, paddingVertical: spacing.sm },
   pickRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.s14, minHeight: PICK_ROW_H, borderBottomWidth: StyleSheet.hairlineWidth },
   pickBar: { width: PICK_BAR_W, height: PICK_BAR_H, borderRadius: radius.r6 },
   pickMeta: { marginTop: spacing.s2 },

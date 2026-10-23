@@ -273,7 +273,7 @@
     "tapToPick": "Toque para escolher um ou mais",
     "cardsToAsk": "{{count}} cartão para perguntar",
     "cardsToAsk_other": "{{count}} cartões para perguntar",
-    "tooFew": "Estes conjuntos têm {{count}} cartões. Escolha conjuntos com pelo menos {{min}} cartões no total.",
+    "tooFew": "Escolha conjuntos com pelo menos {{min}} cartões no total. Agora: {{count}}.",
     "pdfOrPhoto": "Um PDF ou foto",
     "addDoc": "Adicionar um PDF ou foto",
     "docSub": "O Verdance lê e faz perguntas sobre ele",

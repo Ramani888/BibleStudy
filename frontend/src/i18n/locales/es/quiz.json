@@ -273,7 +273,7 @@
     "tapToPick": "Toca para elegir uno o más",
     "cardsToAsk": "{{count}} tarjeta para preguntar",
     "cardsToAsk_other": "{{count}} tarjetas para preguntar",
-    "tooFew": "Estos sets tienen {{count}} tarjetas. Elige sets con al menos {{min}} tarjetas en total.",
+    "tooFew": "Elige sets con al menos {{min}} tarjetas en total. Ahora: {{count}}.",
     "pdfOrPhoto": "Un PDF o una foto",
     "addDoc": "Agregar un PDF o foto",
     "docSub": "Verdance lo lee y pregunta sobre él",
