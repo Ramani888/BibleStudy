@@ -10,6 +10,7 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
 import { useNotes, useDeleteNote, useConfirmDialog } from '../../hooks';
 import { formatRelativeShort } from '../../utils/formatters';
+import { loadFailed } from '../../utils/queryState';
 import { QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { DocIcon, InfoIcon, PencilIcon, SearchIcon, SortIcon, TrashIcon } from '../../components/icons';
@@ -32,7 +33,9 @@ export function NotesScreen({ navigation }: Props) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [activeTag, setActiveTag] = useState<string | null>(null);
 
-  const { data: notes = [], isLoading, isFetching, isError, refetch } = useNotes();
+  const notesQuery = useNotes();
+  const { data: notes = [], isLoading, isFetching, refetch } = notesQuery;
+  const isError = loadFailed(notesQuery); // offline with nothing cached → "did not load", not the empty state
   const deleteNote = useDeleteNote();
   const { show, dialogProps } = useConfirmDialog();
   const openRow = useRef<Swipeable | null>(null);

@@ -896,6 +896,10 @@
     "tryAgain": "다시 시도"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "최근 내용이 저장되지 않았어요",
+    "unsavedText": "오프라인 상태인 것 같아요. 지금 나가면 최근 변경 내용이 사라져요.",
+    "leave": "그래도 나가기",
+    "stay": "머물기",
     "titlePh": "제목",
     "bodyPh": "이 본문이 가르쳐 주는 것을 적어 보세요…",
     "saving": "저장 중…",

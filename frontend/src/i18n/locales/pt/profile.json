@@ -896,6 +896,10 @@
     "tryAgain": "Tentar de novo"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "Suas últimas palavras não foram salvas",
+    "unsavedText": "Parece que você está sem internet. Se sair agora, as alterações mais recentes serão perdidas.",
+    "leave": "Sair mesmo assim",
+    "stay": "Ficar",
     "titlePh": "Título",
     "bodyPh": "Escreva o que esta passagem está ensinando a você…",
     "saving": "Salvando…",

@@ -12,6 +12,7 @@ import { QMButton, QMConfirmDialog, QMEmpty, QMSheet } from '../../components/qm
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { InfoIcon, ShareUpIcon, TagIcon, TrashIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api/client';
+import { loadFailed } from '../../utils/queryState';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'NoteEditor'>;
@@ -38,7 +39,9 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
   const routeId = route.params?.noteId;
 
-  const { data: existing, isLoading, isError, refetch } = useNote(routeId ?? '');
+  const noteQuery = useNote(routeId ?? '');
+  const { data: existing, isLoading, refetch } = noteQuery;
+  const isError = loadFailed(noteQuery); // offline with nothing cached → "did not load", not a blank screen
   // The note's id once it exists — a new note gets one on its first autosave. A ref, so a queued
   // save always sees the id the previous save just created.
   const idRef = useRef<string | undefined>(routeId);
@@ -57,6 +60,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const inFlight = useRef<Promise<void> | null>(null);
   const discarded = useRef(false);
+  const leaving = useRef(false);
 
   useEffect(() => {
     if (existing && !initialized.current) {
@@ -106,17 +110,30 @@ export function NoteEditorScreen({ navigation, route }: Props) {
     return () => { if (timer.current) clearTimeout(timer.current); };
   }, [snapshot, savable, save]);
 
-  // Leaving by back gesture still keeps the last words.
-  useEffect(() => navigation.addListener('beforeRemove', () => {
+  // Every way out (Done, back, swipe) waits for the last words to save. If they can't be saved
+  // (offline), ask before leaving — closing used to drop them silently.
+  useEffect(() => navigation.addListener('beforeRemove', e => {
     if (timer.current) clearTimeout(timer.current);
-    save();
-  }), [navigation, save]);
+    const unsaved = () => !discarded.current && latest.current.savable && latest.current.snapshot !== lastSaved.current;
+    if (!unsaved()) return;
+    e.preventDefault();
+    if (leaving.current) return; // a second tap while the first is still saving
+    leaving.current = true;
+    save().then(() => {
+      leaving.current = false;
+      if (!unsaved()) { navigation.dispatch(e.data.action); return; }
+      show({
+        title: t('profile:qmNoteEditor.unsavedTitle'),
+        message: t('profile:qmNoteEditor.unsavedText'),
+        confirmLabel: t('profile:qmNoteEditor.leave'),
+        cancelLabel: t('profile:qmNoteEditor.stay'),
+        variant: 'danger',
+        onConfirm: () => { discarded.current = true; navigation.dispatch(e.data.action); },
+      });
+    });
+  }), [navigation, save, show, t]);
 
-  const done = async () => {
-    if (timer.current) clearTimeout(timer.current);
-    await save();
-    navigation.goBack();
-  };
+  const done = () => navigation.goBack();
 
   const askDelete = () => {
     const noteId = idRef.current;
@@ -170,7 +187,7 @@ export function NoteEditorScreen({ navigation, route }: Props) {
           accessibilityLiveRegion="polite"
         >
           <StatusDot pulse={status === 'saving'} color={statusInk} />
-          <Typography preset="qmChip" color={statusInk} numberOfLines={1} style={styles.flex}>{statusText}</Typography>
+          <Typography preset="qmChip" color={statusInk} numberOfLines={2} style={styles.flex}>{statusText}</Typography>
         </Pressable>
         <Pressable onPress={() => setTopicsOpen(true)} hitSlop={2} style={({ pressed }) => [styles.icon, pressed && styles.dim]} accessibilityRole="button" accessibilityLabel={t('profile:qmNoteEditor.topicsA11y')}>
           <TagIcon size={20} color={tags.length ? qm.link : qm.ink} />

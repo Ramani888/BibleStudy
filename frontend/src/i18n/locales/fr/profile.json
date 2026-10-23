@@ -896,6 +896,10 @@
     "tryAgain": "Réessayer"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "Vos derniers mots ne sont pas enregistrés",
+    "unsavedText": "Vous semblez hors ligne. Si vous partez maintenant, les dernières modifications seront perdues.",
+    "leave": "Partir quand même",
+    "stay": "Rester",
     "titlePh": "Titre",
     "bodyPh": "Écrivez ce que ce passage vous enseigne…",
     "saving": "Enregistrement…",

@@ -896,6 +896,10 @@
     "tryAgain": "Subukang muli"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "Hindi pa nai-save ang huling mga salita mo",
+    "unsavedText": "Mukhang offline ka. Kapag umalis ka ngayon, mawawala ang pinakabagong pagbabago.",
+    "leave": "Umalis pa rin",
+    "stay": "Manatili",
     "titlePh": "Pamagat",
     "bodyPh": "Isulat ang itinuturo sa iyo ng talatang ito…",
     "saving": "Sine-save…",

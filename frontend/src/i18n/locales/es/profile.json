@@ -896,6 +896,10 @@
     "tryAgain": "Reintentar"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "Tus últimas palabras no se guardaron",
+    "unsavedText": "Parece que no tienes conexión. Si sales ahora, se perderán los cambios más recientes.",
+    "leave": "Salir igual",
+    "stay": "Quedarme",
     "titlePh": "Título",
     "bodyPh": "Escribe lo que este pasaje te enseña…",
     "saving": "Guardando…",

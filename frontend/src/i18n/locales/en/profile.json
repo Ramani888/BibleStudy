@@ -896,6 +896,10 @@
     "tryAgain": "Try again"
   },
   "qmNoteEditor": {
+    "unsavedTitle": "Your latest words aren’t saved",
+    "unsavedText": "You seem to be offline. If you leave now, the newest changes will be lost.",
+    "leave": "Leave anyway",
+    "stay": "Stay",
     "titlePh": "Title",
     "bodyPh": "Write what this passage is teaching you…",
     "saving": "Saving…",
