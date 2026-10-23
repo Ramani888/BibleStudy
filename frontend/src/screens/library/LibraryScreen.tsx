@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, RefreshControl, StyleSheet, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, { useAnimatedScrollHandler, useSharedValue } from 'react-native-reanimated';
@@ -102,6 +102,8 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const shown = isSets ? sortedSets.length : sortedFolders.length;
 
   const switchTab = useCallback((tab: Tab) => { setActiveTab(tab); setSearch(''); }, []);
+  // Leaving the Library tab clears the search; opening a set and coming back keeps it.
+  useEffect(() => navigation.getParent()?.addListener('blur', () => setSearch('')), [navigation]);
   const cycleSort = useCallback(() => setSortOrder(s => SORTS[(SORTS.indexOf(s) + 1) % SORTS.length]), []);
   const sortLabel = sortOrder === 'newest' ? t('common:sort.recent', 'Recent')
     : sortOrder === 'alpha' ? t('library:qm.sortAZ', 'A to Z')
