@@ -208,7 +208,7 @@ export const qmDark: QMColors = {
   verseBtn: 'rgba(255,255,255,0.09)',
   verseShadow: '0px 0px 0px 1px rgba(255,255,255,0.05)',
   tabBg: '#201B2A',
-  tabShadow: '0px 12px 32px -12px rgba(0,0,0,0.6), 0px 0px 0px 1px rgba(255,255,255,0.08)',
+  tabShadow: '0px 0px 0px 1px rgba(255,255,255,0.08)',
   tabIdle: '#A69FB6',
   tabOn: '#C9BBFF',
   tabPill: '#2E2647',
