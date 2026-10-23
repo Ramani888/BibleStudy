@@ -20,7 +20,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 8. Library — Study plans | 14 | 0 | 12 | 0 | 1 | 1 |
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 0 | 20 | 0 | 8 | 1 |
 | 10. Quiz — playing & results | 16 | 0 | 13 | 0 | 3 | 0 |
-| 11. Ask (AI) | 31 | 30 | 0 | 0 | 0 | 1 |
+| 11. Ask (AI) | 31 | 0 | 22 | 0 | 8 | 1 |
 | 12. Profile & Settings | 50 | 40 | 0 | 0 | 0 | 10 |
 | 13. Friends | 31 | 29 | 0 | 0 | 0 | 2 |
 | 14. Notes | 15 | 14 | 0 | 0 | 0 | 1 |
@@ -331,41 +331,41 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 11. Ask (AI)
 
 **Consent**
-- ⬜ First time → 3 info rows, "More about your data" opens
-- ⬜ **I agree, let's start** → chat; **Not now** → Home
-- ⬜ Terms / Privacy links open
+- ✅ First time → 3 info rows, "More about your data" opens
+- ✅ **I agree, let's start** → chat; **Not now** → Home
+- ✅ Terms / Privacy links open
 
 **Chat**
-- ⬜ Welcome: 4 starter questions (flashcard one shows "2 credits")
-- ⬜ Ask → answer; "Costs 1 credit · N left" goes down
-- ⬜ Ask for flashcards → 2 credits → "N cards ready" → **Save to a set**
-- ⬜ Save sheet: pick set, or new set name (max 80) → **Create** → **Save N cards**
+- ✅ Welcome: 4 starter questions (flashcard one shows "2 credits")
+- 🔧 Ask → answer; "Costs 1 credit · N left" goes down _(a free-model 429 put raw OpenRouter JSON in the chat bubble — fixed: plain "AI is busy" line)_
+- ✅ Ask for flashcards → 2 credits → "N cards ready" → **Save to a set**
+- 🔧 Save sheet: pick set, or new set name (max 80) → **Create** → **Save N cards** _(Save button sat below the set list, off-screen with 8+ sets — now pinned at the bottom)_
 - 👤 📎 Attach: first time rules dialog → My Media / Photo Library (3) / Take Photo (3) / Choose PDF (5)
-- ⬜ My Media picker: shows files + cost; no files → **Open My Media**
-- ⬜ Attachment chip + ✕ remove
-- ⬜ File with no text → asks "What are the main points of this file?"
-- ⬜ Text max 1000, warning near 900
-- ⬜ Send off when empty / busy / 0 credits
-- ⬜ 0 credits → "No credits left… **Upgrade**"
-- ⬜ Answer ⋯ (or hold): Copy · Share · Bookmark / Remove bookmark · Save as a card · Ask again
-- ⬜ Your message ⋯: Copy · Share
-- ⬜ "Keep going" follow-up chips send a question
-- ⬜ Wi-Fi off → "Couldn't get an answer" → **Try again**
-- ⬜ **+** → "Start a new chat?" (only shows when chat has messages)
-- ⬜ ⋯ → **Share this conversation** (off when empty)
-- ⬜ ⋯ → **Past conversations**
+- ✅ My Media picker: shows files + cost; no files → **Open My Media**
+- ✅ Attachment chip + ✕ remove
+- ✅ File with no text → asks "What are the main points of this file?" _(answer needs the funded Claude account — errors cleanly, no charge)_
+- 🔧 Text max 1000, warning near 900 _(Android 15+: keyboard covered the message box — fixed app-wide in 7 screens)_
+- ✅ Send off when empty / busy / 0 credits
+- 🔧 0 credits → "No credits left… **Upgrade**" _(after a refused question the balance stayed stale and the question hung unanswered; offline/unknown balance wrongly said "No credits left" — fixed)_
+- ✅ Answer ⋯ (or hold): Copy · Share · Bookmark / Remove bookmark · Save as a card · Ask again
+- ✅ Your message ⋯: Copy · Share
+- ✅ "Keep going" follow-up chips send a question
+- 🔧 Wi-Fi off → "Couldn't get an answer" → **Try again** _(offline the question waited forever, then sent + charged on reconnect — every save did this; also an offline app start showed Sign-in — both fixed)_
+- ✅ **+** → "Start a new chat?" (only shows when chat has messages)
+- ✅ ⋯ → **Share this conversation** (off when empty)
+- ✅ ⋯ → **Past conversations**
 
 **Past conversations**
-- ⬜ **All / Bookmarked** switch
-- ⬜ 🔍 **Search** conversations
-- ⬜ Topic chips filter
-- ⬜ Today / Yesterday / Earlier groups; scroll → "Loading more…"
-- ⬜ Tap → opens; shows "N questions · N credits"
-- ⬜ **Continue this conversation**
-- ⬜ ⋯: **Rename** (max 200) · **Edit topics** (up to 5, custom max 50) · **Delete** ("cards you saved stay")
-- ⬜ Trash → **Clear all** history
-- ⬜ Bookmarked tab: "Bookmarked on <date>"
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ **All / Bookmarked** switch
+- 🔧 🔍 **Search** conversations _(with a topic chip on, "no match" said the word didn't exist — fixed)_
+- ✅ Topic chips filter
+- ✅ Today / Yesterday / Earlier groups; scroll → "Loading more…"
+- ✅ Tap → opens; shows "N questions · N credits"
+- ✅ **Continue this conversation**
+- 🔧 ⋯: **Rename** (max 200) · **Edit topics** (up to 5, custom max 50) · **Delete** ("cards you saved stay") _(deleted chat stayed under Bookmarked — fixed)_
+- ✅ Trash → **Clear all** history
+- ✅ Bookmarked tab: "Bookmarked on <date>"
+- 🔧 📄 Pull to refresh · empty · no internet _(offline said "No conversations yet" — fixed)_
 
 ---
 
