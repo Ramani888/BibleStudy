@@ -126,7 +126,8 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
     (question: string, media: Media | null) => {
       if (isBalanceLoading) return;
 
-      if (creditBalance <= 0) {
+      // Unknown balance (offline / failed load) → let the server decide; a 402 is handled below.
+      if (creditData && creditBalance <= 0) {
         Toast.show({ type: 'error', text1: t('ai:chat.noCredits', 'No credits'), text2: t('ai:chat.noCreditsSub', 'Claim your daily credit from the Home screen.') });
         return;
       }
@@ -187,7 +188,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         },
       );
     },
-    [creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, goPaywall, t],
+    [creditData, creditBalance, isBalanceLoading, messages, sendMessage, updateTags, sessionId, tags, setTags, setMessages, goPaywall, t],
   );
 
   const handleSend = useCallback((question: string) => {
@@ -459,7 +460,7 @@ export function AIChatScreen({ navigation, route }: AIScreenProps<'AIChat'>) {
         onSend={handleSend}
         working={isPending}
         disabled={isPending || isBalanceLoading}
-        creditBalance={isBalanceLoading ? undefined : creditBalance}
+        creditBalance={creditData ? creditBalance : undefined}
         attachmentName={att.attachment?.name ?? null}
         attachmentType={att.attachment?.type ?? (att.pendingLocalUri ? 'IMAGE' : 'PDF')}
         attachmentLocalUri={att.pendingLocalUri ?? att.attachment?.localUri ?? null}
