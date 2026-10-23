@@ -25,6 +25,10 @@ export const queryClient = new QueryClient({
       staleTime: 1000 * 60 * 5, // 5 min — data considered fresh, no refetch
       gcTime: 1000 * 60 * 60 * 24, // 24 hr — must outlive the persisted cache so restored data isn't GC'd on launch
     },
+    // Offline writes fail now (screens show their error) instead of pausing: a paused
+    // mutation spun forever, then fired unseen on reconnect (e.g. an AI question
+    // charged minutes later). Nothing queues mutations for offline replay.
+    mutations: { networkMode: 'always' },
   },
 });
 
