@@ -21,6 +21,7 @@ import { formatDateWithTime } from '../../utils/formatters';
 import type { QuizStackParamList } from '../../navigation/types';
 import type { QuizAttemptWithSet } from '../../types';
 import { qmModeName, qmScoreTone, reQuizSource } from './quizUi';
+import { loadFailed } from '../../utils/queryState';
 
 const TOUCH = 44;
 const SCORE_TILE = 52;
@@ -33,7 +34,9 @@ export function QuizHubScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
 
-  const { data: attempts = [], isLoading, isError, refetch } = useRecentQuizAttempts(20);
+  const attemptsQuery = useRecentQuizAttempts(20);
+  const { data: attempts = [], isLoading, refetch } = attemptsQuery;
+  const isError = loadFailed(attemptsQuery);
   const { data: dueSummary, refetch: refetchDue } = useDueSummary();
   const due = useDueCards();
   const dueCount = dueSummary?.dueCount ?? 0;
