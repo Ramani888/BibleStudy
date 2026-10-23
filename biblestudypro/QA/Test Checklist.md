@@ -13,7 +13,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 1. First open & Sign-in | 36 | 0 | 28 | 0 | 4 | 4 |
 | 2. Home | 28 | 0 | 20 | 0 | 6 | 2 |
 | 3. Library — My sets | 24 | 0 | 22 | 0 | 2 | 0 |
-| 4. Library — Folders | 12 | 12 | 0 | 0 | 0 | 0 |
+| 4. Library — Folders | 12 | 0 | 11 | 0 | 1 | 0 |
 | 5. Library — Inside a set (Set detail) | 15 | 14 | 0 | 0 | 0 | 1 |
 | 6. Library — Cards | 11 | 11 | 0 | 0 | 0 | 0 |
 | 7. Library — Explore & Friends' sets | 12 | 12 | 0 | 0 | 0 | 0 |
@@ -179,20 +179,20 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 4. Library — Folders
 
-- ⬜ 🔍 **Search folders** — searches folder **name**
-- ⬜ **Sort** chip: Recent → A to Z → Most sets
-- ⬜ 📄 Pull to refresh · empty ("New folder") · no internet
-- ⬜ **+** → New folder: name (max 200, "n / 200" counter), colour → **Save** (off when name empty)
-- ⬜ Folder ⋮: New set in this folder · Edit folder · Delete folder
-- ⬜ Delete folder → its sets stay in My sets
+- ✅ 🔍 **Search folders** — searches folder **name**
+- ✅ **Sort** chip: Recent → A to Z → Most sets
+- ✅ 📄 Pull to refresh · empty ("New folder") · no internet
+- ✅ **+** → New folder: name (max 200, "n / 200" counter), colour → **Save** (off when name empty)
+- ✅ Folder ⋮: New set in this folder · Edit folder · Delete folder
+- ✅ Delete folder → its sets stay in My sets
 
 **Inside a folder**
-- ⬜ Shows set count + card count
-- ⬜ 🔍 **Search sets in this folder** — set **name**
-- ⬜ ⋮ Folder options: Edit / Delete (→ goes back)
-- ⬜ Set ⋮ menu works same as in My sets
-- ⬜ **New set in this folder** → folder already picked
-- ⬜ 📄 Pull to refresh · empty folder · no internet
+- ✅ Shows set count + card count
+- ✅ 🔍 **Search sets in this folder** — set **name**
+- ✅ ⋮ Folder options: Edit / Delete (→ goes back)
+- ✅ Set ⋮ menu works same as in My sets
+- ✅ **New set in this folder** → folder already picked
+- 🔧 📄 Pull to refresh · empty folder · no internet
 
 ## 5. Library — Inside a set (Set detail)
 
