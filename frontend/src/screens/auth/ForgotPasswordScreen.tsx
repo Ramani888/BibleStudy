@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import Svg, { Circle, Path } from 'react-native-svg';
 import Animated, { FadeInUp, FadeIn } from 'react-native-reanimated';
 
@@ -20,7 +21,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
   const { t } = useTranslation('auth');
   const { qm } = useTheme();
   const forgotPassword = useAuthStore(s => s.forgotPassword);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<'sendFailed' | 'tooManyTries' | null>(null);
 
   const { control, handleSubmit, formState: { isSubmitting } } = useForm<ForgotPasswordFormData>({
     resolver: zodResolver(forgotPasswordSchema),
@@ -28,12 +29,12 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
   });
 
   const onSubmit = async (data: ForgotPasswordFormData) => {
-    setFailed(false);
+    setFailed(null);
     try {
       await forgotPassword(data);
       navigation.navigate('ResetPassword', { email: data.email });
-    } catch {
-      setFailed(true);
+    } catch (err) {
+      setFailed(axios.isAxiosError(err) && err.response?.status === 429 ? 'tooManyTries' : 'sendFailed');
     }
   };
 
@@ -69,7 +70,7 @@ export function ForgotPasswordScreen({ navigation }: AuthScreenProps<'ForgotPass
           onSubmitEditing={handleSubmit(onSubmit)}
         />
       </Animated.View>
-      {failed && <QMBanner tone="error" style={styles.banner}>{t('sendFailed')}</QMBanner>}
+      {failed && <QMBanner tone="error" style={styles.banner}>{t(failed)}</QMBanner>}
 
       <View style={styles.flex} />
 

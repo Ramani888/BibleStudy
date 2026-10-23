@@ -43,6 +43,7 @@ export function ResetPasswordScreen({ route, navigation }: AuthScreenProps<'Rese
       Toast.show({ type: 'success', text1: t('passwordResetSuccess'), text2: t('canSignInNow') });
       navigation.navigate('Login');
     } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 429) { Toast.show({ type: 'error', text1: t('tooManyTries') }); return; }
       if (axios.isAxiosError(err) && err.response && err.response.status < 500) { setCodeBad(true); return; }
       Toast.show({ type: 'error', text1: t('resetFailed'), text2: getErrorMessage(err) });
     }

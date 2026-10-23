@@ -20,7 +20,7 @@ import { storage } from '../../utils/storage';
 import { useTranslation } from 'react-i18next';
 import type { AuthScreenProps } from '../../navigation/types';
 
-type Banner = 'wrongPw' | 'unverified' | 'socialOnly' | 'failed' | null;
+type Banner = 'wrongPw' | 'unverified' | 'socialOnly' | 'tooMany' | 'failed' | null;
 const enter = (i: number) => FadeInUp.duration(320).delay(i * 50);
 
 export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
@@ -53,6 +53,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
           return;
         }
         if (code === 'SOCIAL_LOGIN_ONLY') { setBanner('socialOnly'); return; }
+        if (err.response.status === 429) { setBanner('tooMany'); return; }
         if (err.response.status === 401) { setBanner('wrongPw'); return; }
       }
       setBanner('failed');
@@ -89,6 +90,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
     wrongPw: t('bannerWrongPw'),
     unverified: t('bannerUnverified'),
     socialOnly: t('bannerSocialOnly'),
+    tooMany: t('tooManyTries'),
     failed: t('bannerFailed'),
   };
 
@@ -102,7 +104,7 @@ export function LoginScreen({ navigation }: AuthScreenProps<'Login'>) {
       </Animated.View>
 
       {banner && (
-        <QMBanner key={banner} tone={banner === 'wrongPw' || banner === 'failed' ? 'error' : 'info'} style={styles.banner}>
+        <QMBanner key={banner} tone={banner === 'wrongPw' || banner === 'tooMany' || banner === 'failed' ? 'error' : 'info'} style={styles.banner}>
           {bannerText[banner]}
           {banner === 'unverified' && (
             <>

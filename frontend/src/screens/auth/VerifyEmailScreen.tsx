@@ -33,7 +33,8 @@ export function VerifyEmailScreen({ route, navigation }: AuthScreenProps<'Verify
       await verifyEmail({ email, otp });
       setStatus('ok'); // auth state flips → RootNavigator swaps to the app
     } catch (err) {
-      if (axios.isAxiosError(err) && err.response && err.response.status < 500) setStatus('bad');
+      if (axios.isAxiosError(err) && err.response?.status === 429) Toast.show({ type: 'error', text1: t('tooManyTries') });
+      else if (axios.isAxiosError(err) && err.response && err.response.status < 500) setStatus('bad');
       else Toast.show({ type: 'error', text1: t('verificationFailed'), text2: getErrorMessage(err) });
     } finally {
       setChecking(false);
