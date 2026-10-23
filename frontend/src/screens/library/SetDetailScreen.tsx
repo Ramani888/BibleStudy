@@ -93,7 +93,9 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
   const allBlurred = cards.length > 0 && cards.every(c => c.isBlurred);
   const visibilityLabel = set?.visibility === 'PUBLIC' ? t('library:sets.visibilityPublic', 'Public')
     : set?.visibility === 'FRIENDS' ? t('library:sets.visibilityFriends', 'Friends') : t('library:sets.private', 'Private');
-  const countLabel = cards.length ? t('library:cards.cardCount', { count: cards.length }) : t('library:qm.noCardsYet', 'No cards yet');
+  // While cards load, use the list's known count — not a 'No cards yet' flash.
+  const cardCount = isLoading ? (set?._count?.cards ?? 0) : cards.length;
+  const countLabel = cardCount ? t('library:cards.cardCount', { count: cardCount }) : t('library:qm.noCardsYet', 'No cards yet');
   // Visibility is only known (and only meaningful) for your own set.
   const setMeta = isOwner ? `${countLabel} · ${visibilityLabel}` : countLabel;
   const otherSets = useMemo(() => allSets.filter(s => s.id !== setId), [allSets, setId]);
