@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "Máximo 80 caracteres",
     "topicMin": "Introduce al menos 2 caracteres",
-    "topicMax": "Máximo 100 caracteres"
+    "topicMax": "Máximo 80 caracteres"
   },
   "qm": {
     "title": "Cuestionario",
@@ -267,7 +267,7 @@
     "makeFrom": "Crearlo a partir de",
     "topic": "Tema",
     "topicPlaceholder": "p. ej. Evangelio de Juan",
-    "topicHelp": "Un libro, una persona, un tema. De 2 a 100 caracteres.",
+    "topicHelp": "Un libro, una persona, un tema. De 2 a 80 caracteres.",
     "yourSets": "Tus sets",
     "setsChosen": "{{count}} sets elegidos",
     "tapToPick": "Toca para elegir uno o más",
@@ -281,7 +281,7 @@
     "photoCost": "Foto · 3 créditos",
     "quizName": "Nombre del cuestionario",
     "namePlaceholder": "p. ej. Repaso de la semana 3",
-    "nameHelp": "Déjalo vacío y le pondremos el nombre del tema.",
+    "nameHelp": "Déjalo vacío y le pondremos un nombre por ti.",
     "makeMyQuiz": "Crear mi cuestionario",
     "costRange": "De 3 a 5 créditos",
     "threeToFive": "3 a 5",

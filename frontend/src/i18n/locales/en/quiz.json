@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "Max 80 characters",
     "topicMin": "Enter at least 2 characters",
-    "topicMax": "Max 100 characters"
+    "topicMax": "Max 80 characters"
   },
   "qm": {
     "title": "Quiz",
@@ -267,7 +267,7 @@
     "makeFrom": "Make it from",
     "topic": "Topic",
     "topicPlaceholder": "e.g. Gospel of John",
-    "topicHelp": "A book, a person, a theme. 2 to 100 characters.",
+    "topicHelp": "A book, a person, a theme. 2 to 80 characters.",
     "yourSets": "Your sets",
     "setsChosen": "{{count}} sets chosen",
     "tapToPick": "Tap to pick one or more",
@@ -281,7 +281,7 @@
     "photoCost": "Photo · 3 credits",
     "quizName": "Quiz name",
     "namePlaceholder": "e.g. Week 3 review",
-    "nameHelp": "Leave it empty and we will name it after the topic.",
+    "nameHelp": "Leave it empty and we will name it for you.",
     "makeMyQuiz": "Make my quiz",
     "costRange": "3 to 5 credits",
     "threeToFive": "3 to 5",

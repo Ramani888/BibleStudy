@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "Máximo de 80 caracteres",
     "topicMin": "Digite pelo menos 2 caracteres",
-    "topicMax": "Máximo de 100 caracteres"
+    "topicMax": "Máximo de 80 caracteres"
   },
   "qm": {
     "title": "Quiz",
@@ -267,7 +267,7 @@
     "makeFrom": "Criar a partir de",
     "topic": "Tema",
     "topicPlaceholder": "ex. Evangelho de João",
-    "topicHelp": "Um livro, uma pessoa, um tema. De 2 a 100 caracteres.",
+    "topicHelp": "Um livro, uma pessoa, um tema. De 2 a 80 caracteres.",
     "yourSets": "Seus conjuntos",
     "setsChosen": "{{count}} conjuntos escolhidos",
     "tapToPick": "Toque para escolher um ou mais",
@@ -281,7 +281,7 @@
     "photoCost": "Foto · 3 créditos",
     "quizName": "Nome do quiz",
     "namePlaceholder": "ex. Revisão da semana 3",
-    "nameHelp": "Deixe em branco e usaremos o nome do tema.",
+    "nameHelp": "Deixe em branco e daremos um nome para você.",
     "makeMyQuiz": "Criar meu quiz",
     "costRange": "3 a 5 créditos",
     "threeToFive": "3 a 5",

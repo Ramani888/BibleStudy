@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "최대 80자",
     "topicMin": "2자 이상 입력하세요",
-    "topicMax": "최대 100자"
+    "topicMax": "최대 80자"
   },
   "qm": {
     "title": "퀴즈",
@@ -267,7 +267,7 @@
     "makeFrom": "만들 재료",
     "topic": "주제",
     "topicPlaceholder": "예: 요한복음",
-    "topicHelp": "성경 책, 인물, 주제 등. 2~100자.",
+    "topicHelp": "성경 책, 인물, 주제 등. 2~80자.",
     "yourSets": "내 세트",
     "setsChosen": "세트 {{count}}개 선택됨",
     "tapToPick": "눌러서 하나 이상 선택",
@@ -281,7 +281,7 @@
     "photoCost": "사진 · 3 크레딧",
     "quizName": "퀴즈 이름",
     "namePlaceholder": "예: 3주차 복습",
-    "nameHelp": "비워 두면 주제 이름으로 정해 드려요.",
+    "nameHelp": "비워 두면 이름을 대신 정해 드려요.",
     "makeMyQuiz": "퀴즈 만들기",
     "costRange": "3~5 크레딧",
     "threeToFive": "3~5",

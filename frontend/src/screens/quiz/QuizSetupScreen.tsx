@@ -221,9 +221,9 @@ export function QuizSetupScreen() {
                 autoCapitalize="sentences"
                 returnKeyType="done"
                 onSubmitEditing={generateFromTopic}
-                maxLength={100}
+                maxLength={80}
               />
-              <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.topicHelp', 'A book, a person, a theme. 2 to 100 characters.')}</Typography>
+              <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.topicHelp', 'A book, a person, a theme. 2 to 80 characters.')}</Typography>
             </View>
           )}
 
@@ -286,7 +286,7 @@ export function QuizSetupScreen() {
             returnKeyType="done"
             maxLength={80}
           />
-          <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.nameHelp', 'Leave it empty and we will name it after the topic.')}</Typography>
+          <Typography preset="qmMeta" color={qm.muted} style={styles.help}>{t('quiz:qm.nameHelp', 'Leave it empty and we will name it for you.')}</Typography>
         </View>
       </ScrollView>
 

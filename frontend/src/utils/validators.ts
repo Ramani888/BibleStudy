@@ -73,6 +73,6 @@ export const quizSetupSchema = z.object({
     .string()
     .trim()
     .min(2, i18n.t('quiz:validation.topicMin', 'Enter at least 2 characters'))
-    .max(100, i18n.t('quiz:validation.topicMax', 'Max 100 characters')),
+    .max(80, i18n.t('quiz:validation.topicMax', 'Max 80 characters')),
 });
 export type QuizSetupFormData = z.infer<typeof quizSetupSchema>;

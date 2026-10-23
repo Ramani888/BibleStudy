@@ -80,7 +80,8 @@ export function QuizResultScreen({
   useEffect(() => {
     if (saved.current || total === 0 || ephemeral) return;
     saved.current = true;
-    save({ setIds, total, correct, mode, quizName, topic, timeSecs, responses: summaryItems })
+    // The name can fall back to a set title (≤200) or a file name — clip to the server's 100 cap so the save can't 400.
+    save({ setIds, total, correct, mode, quizName: quizName?.slice(0, 100), topic, timeSecs, responses: summaryItems })
       .then(res => { setBest(res.best ?? null); if (scorePct >= 80) requestReviewOnce('quiz_high_score'); })
       .catch(() => {});
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -187,7 +188,7 @@ export function QuizResultScreen({
           </Typography>
         )}
         <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.meta}>
-          {topic ? `${setTitle} · ${topic}` : setTitle}
+          {topic && topic !== setTitle ? `${setTitle} · ${topic}` : setTitle}
         </Typography>
       </ScrollView>
 

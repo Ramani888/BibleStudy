@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "80 caractères maximum",
     "topicMin": "Saisissez au moins 2 caractères",
-    "topicMax": "100 caractères maximum"
+    "topicMax": "80 caractères maximum"
   },
   "qm": {
     "title": "Quiz",
@@ -267,7 +267,7 @@
     "makeFrom": "À partir de",
     "topic": "Sujet",
     "topicPlaceholder": "ex. Évangile de Jean",
-    "topicHelp": "Un livre, un personnage, un thème. De 2 à 100 caractères.",
+    "topicHelp": "Un livre, un personnage, un thème. De 2 à 80 caractères.",
     "yourSets": "Vos séries",
     "setsChosen": "{{count}} séries choisies",
     "tapToPick": "Touchez pour en choisir une ou plusieurs",
@@ -281,7 +281,7 @@
     "photoCost": "Photo · 3 crédits",
     "quizName": "Nom du quiz",
     "namePlaceholder": "ex. Révision semaine 3",
-    "nameHelp": "Laissez vide et nous le nommerons d'après le sujet.",
+    "nameHelp": "Laissez vide et nous le nommerons pour vous.",
     "makeMyQuiz": "Créer mon quiz",
     "costRange": "3 à 5 crédits",
     "threeToFive": "3 à 5",

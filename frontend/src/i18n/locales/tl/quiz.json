@@ -219,7 +219,7 @@
   "validation": {
     "nameMax": "Hanggang 80 karakter",
     "topicMin": "Maglagay ng hindi bababa sa 2 karakter",
-    "topicMax": "Hanggang 100 karakter"
+    "topicMax": "Hanggang 80 karakter"
   },
   "qm": {
     "title": "Quiz",
@@ -267,7 +267,7 @@
     "makeFrom": "Gawin mula sa",
     "topic": "Paksa",
     "topicPlaceholder": "hal. Ebanghelyo ni Juan",
-    "topicHelp": "Isang aklat, tao, o tema. 2 hanggang 100 character.",
+    "topicHelp": "Isang aklat, tao, o tema. 2 hanggang 80 character.",
     "yourSets": "Iyong mga set",
     "setsChosen": "{{count}} set ang napili",
     "tapToPick": "I-tap para pumili ng isa o higit pa",
@@ -281,7 +281,7 @@
     "photoCost": "Larawan · 3 credits",
     "quizName": "Pangalan ng quiz",
     "namePlaceholder": "hal. Review sa Linggo 3",
-    "nameHelp": "Iwanang blangko at papangalanan namin ito ayon sa paksa.",
+    "nameHelp": "Iwanang blangko at kami na ang magpapangalan dito.",
     "makeMyQuiz": "Gawin ang quiz ko",
     "costRange": "3 hanggang 5 credits",
     "threeToFive": "3 hanggang 5",
