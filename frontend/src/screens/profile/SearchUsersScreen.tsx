@@ -9,10 +9,11 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import type { UserProfile } from '../../types/friends.types';
 import { QMAvatar, QMBackButton, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
-import { CheckIcon, ClockIcon, PlusIcon, SearchIcon, type IconComponent } from '../../components/icons';
+import { CheckIcon, ClockIcon, InfoIcon, PlusIcon, SearchIcon, type IconComponent } from '../../components/icons';
 import { useAcceptFriendRequest, useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
 import { useDebouncedValue, useReferral } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
+import { loadFailed } from '../../utils/queryState';
 import { radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'SearchUsers'>;
@@ -30,7 +31,8 @@ export function SearchUsersScreen({ navigation }: Props) {
   const q = useDebouncedValue(query.trim(), 300);
   // Local overrides so a tap shows its result before the search refetches.
   const [local, setLocal] = useState<Record<string, Status>>({});
-  const { data: users = [], isFetching } = useSearchUsers(q);
+  const searchQuery = useSearchUsers(q);
+  const { data: users = [], isFetching, refetch } = searchQuery;
   const sendRequest = useSendFriendRequest();
   const accept = useAcceptFriendRequest();
   const { data: referral } = useReferral();
@@ -100,7 +102,7 @@ export function SearchUsersScreen({ navigation }: Props) {
       <QMBackButton onPress={navigation.goBack} label={t('profile:qmSearch.back')} />
       <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmSearch.title')}</Typography>
       <QMSearchField value={query} onChangeText={setQuery} placeholder={t('profile:qmSearch.placeholder')} autoFocus />
-      <Typography preset="qmMeta" color={qm.muted} style={styles.hint}>{t('profile:qmSearch.hint')}</Typography>
+      {q.length < MIN_CHARS && <Typography preset="qmMeta" color={qm.muted} style={styles.hint}>{t('profile:qmSearch.hint')}</Typography>}
       {isFetching && q.length >= MIN_CHARS && <ActivityIndicator size="small" color={qm.violet} style={styles.spinner} />}
       <View style={styles.listGap} />
     </View>
@@ -115,8 +117,10 @@ export function SearchUsersScreen({ navigation }: Props) {
         renderItem={renderItem}
         extraData={local}
         ListHeaderComponent={header}
-        ListEmptyComponent={searched && !isFetching
-          ? <QMEmpty icon={SearchIcon} title={t('profile:qmSearch.noMatchTitle')} text={t('profile:qmSearch.noMatchText')} action={{ label: t('profile:qmFriends.invite', { count: referral?.rewardPerReferral ?? 5 }), onPress: () => navigation.navigate('InviteFriends') }} />
+        ListEmptyComponent={searched && loadFailed(searchQuery) // offline → "did not load", not "No one by that name"
+          ? <QMEmpty icon={InfoIcon} title={t('profile:qmSearch.searchFailed')} action={{ label: t('profile:qmFriends.tryAgain'), onPress: () => refetch() }} />
+          : searched && !isFetching
+          ?<QMEmpty icon={SearchIcon} title={t('profile:qmSearch.noMatchTitle')} text={t('profile:qmSearch.noMatchText')} action={{ label: t('profile:qmFriends.invite', { count: referral?.rewardPerReferral ?? 5 }), onPress: () => navigation.navigate('InviteFriends') }} />
           : null}
         ListFooterComponent={searched && users.length > 0
           ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.privacy}>{t('profile:qmSearch.privacy')}</Typography>

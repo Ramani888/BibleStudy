@@ -776,6 +776,7 @@
     "back": "Voltar",
     "placeholder": "Buscar pelo nome",
     "hint": "Digite pelo menos 2 letras do nome.",
+    "searchFailed": "Não foi possível pesquisar agora",
     "friends": "Amigos",
     "accept": "Aceitar",
     "requested": "Pedido enviado",

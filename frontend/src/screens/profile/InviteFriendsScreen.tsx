@@ -14,6 +14,7 @@ import { AskIcon, CheckIcon, CopyIcon, GiftIcon, InfoIcon, LeafIcon, ShareUpIcon
 import { useReferral, useRedeemReferral } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { shareToWhatsApp } from '../../utils';
+import { loadFailed } from '../../utils/queryState';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 
 // ponytail: mirrors backend credits.service REFERRER_CAP — expose it on /credits/referral if it ever changes.
@@ -43,7 +44,9 @@ export function InviteFriendsScreen({ navigation }: ProfileScreenProps<'InviteFr
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: referral, isLoading, isError, refetch } = useReferral();
+  const referralQuery = useReferral();
+  const { data: referral, isLoading, refetch } = referralQuery;
+  const isError = loadFailed(referralQuery); // offline with nothing cached → "did not load", not a code-less invite page
   const redeem = useRedeemReferral();
   const [codeInput, setCodeInput] = useState('');
   const [copied, setCopied] = useState(false);

@@ -14,6 +14,7 @@ import { useBlockedUsers, useUnblockUser } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import { initialsOf } from '../../components/qm/QMAvatar';
 import { formatDateOnly } from '../../utils/formatters';
+import { loadFailed } from '../../utils/queryState';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'BlockedUsers'>;
@@ -25,7 +26,9 @@ export function BlockedUsersScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: blocked = [], isLoading, isFetching, isError, refetch } = useBlockedUsers();
+  const blockedQuery = useBlockedUsers();
+  const { data: blocked = [], isLoading, isFetching, refetch } = blockedQuery;
+  const isError = loadFailed(blockedQuery); // offline with nothing cached → "did not load", not the empty state
   const unblock = useUnblockUser();
 
   const handleUnblock = useCallback((item: BlockedUser) => {

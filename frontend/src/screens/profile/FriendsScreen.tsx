@@ -16,6 +16,7 @@ import {
 import { useBlockUser, useFriendRequests, useFriends, useRemoveFriend } from '../../hooks/useFriends';
 import { useConfirmDialog, useLeaderboard, useReferral } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
+import { loadFailed } from '../../utils/queryState';
 import { radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'Friends'>;
@@ -29,7 +30,9 @@ export function FriendsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
-  const { data: friends = [], isLoading, isFetching, isError, refetch } = useFriends();
+  const friendsQuery = useFriends();
+  const { data: friends = [], isLoading, isFetching, refetch } = friendsQuery;
+  const isError = loadFailed(friendsQuery); // offline with nothing cached → "did not load", not the empty state
   const { data: incoming = [] } = useFriendRequests('incoming');
   const { data: leaderboard = [] } = useLeaderboard();
   const { data: referral } = useReferral();

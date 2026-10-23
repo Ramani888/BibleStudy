@@ -13,6 +13,7 @@ import { InfoIcon, LeafIcon } from '../../components/icons';
 import { useAcceptFriendRequest, useCancelFriendRequest, useFriendRequests, useRejectFriendRequest } from '../../hooks/useFriends';
 import { getErrorMessage } from '../../api/client';
 import { formatRelativeShort } from '../../utils/formatters';
+import { loadFailed } from '../../utils/queryState';
 import { radius, spacing, useTheme } from '../../theme';
 
 type Props = ProfileScreenProps<'FriendRequests'>;
@@ -30,7 +31,9 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
 
   const { data: incoming = [] } = useFriendRequests('incoming');
-  const { data: requests = [], isLoading, isFetching, isError, refetch } = useFriendRequests(tab);
+  const requestsQuery = useFriendRequests(tab);
+  const { data: requests = [], isLoading, isFetching, refetch } = requestsQuery;
+  const isError = loadFailed(requestsQuery); // offline with nothing cached → "did not load", not "No requests"
   const accept = useAcceptFriendRequest();
   const reject = useRejectFriendRequest();
   const cancel = useCancelFriendRequest();

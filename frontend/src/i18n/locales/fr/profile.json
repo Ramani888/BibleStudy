@@ -776,6 +776,7 @@
     "back": "Retour",
     "placeholder": "Rechercher par nom",
     "hint": "Saisissez au moins 2 lettres de son nom.",
+    "searchFailed": "Recherche impossible pour le moment",
     "friends": "Amis",
     "accept": "Accepter",
     "requested": "Demandé",

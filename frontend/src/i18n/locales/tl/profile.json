@@ -776,6 +776,7 @@
     "back": "Bumalik",
     "placeholder": "Maghanap ayon sa pangalan",
     "hint": "Mag-type ng hindi bababa sa 2 letra ng pangalan.",
+    "searchFailed": "Hindi makapaghanap ngayon",
     "friends": "Mga Kaibigan",
     "accept": "Tanggapin",
     "requested": "Na-request",

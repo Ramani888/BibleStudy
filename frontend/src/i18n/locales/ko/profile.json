@@ -776,6 +776,7 @@
     "back": "뒤로",
     "placeholder": "이름으로 검색",
     "hint": "이름을 2글자 이상 입력하세요.",
+    "searchFailed": "지금은 검색할 수 없어요",
     "friends": "친구",
     "accept": "수락",
     "requested": "요청함",
