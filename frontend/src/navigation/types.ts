@@ -30,7 +30,7 @@ export type LibraryStackParamList = {
   Library: undefined;
   FolderDetail: { folderId: string; folderName: string; folderColor?: string | null };
   // preview: the list item a non-owner tapped (owner name, description, colour) — they can't fetch the set itself.
-  SetDetail: { setId: string; setTitle: string; isOwner?: boolean; from?: 'Home'; preview?: StudySet };
+  SetDetail: { setId: string; setTitle: string; isOwner?: boolean; preview?: StudySet } & FromHome;
   CreateSet: { folderId?: string; from?: 'Home' };
   EditSet: { setId: string };
   CreateCard: { setId: string };

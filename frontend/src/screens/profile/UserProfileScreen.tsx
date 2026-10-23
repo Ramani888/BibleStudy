@@ -40,7 +40,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, isError, refetch } = useUser(userId);
-  const { data: sets = [] } = useUserSets(userId);
+  const { data: sets = [], refetch: refetchSets } = useUserSets(userId);
   const sendRequest = useSendFriendRequest();
   const cancelRequest = useCancelFriendRequest();
   const acceptRequest = useAcceptFriendRequest();
@@ -117,7 +117,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   ];
 
   const openSet = (set: StudySet) =>
-    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: set.id, setTitle: set.title, isOwner: false, preview: { ...set, user: set.user ?? { id: user.id, name: user.name } } } });
+    navigation.navigate('LibraryTab', { screen: 'SetDetail', params: { setId: set.id, setTitle: set.title, isOwner: false, preview: { ...set, user: set.user ?? { id: user.id, name: user.name } }, from: 'ProfileTab', back: { screen: 'UserProfile', params: { userId } } }, initial: false });
 
   const since = new Date(user.createdAt).toLocaleDateString(i18n.language, { month: 'long', year: 'numeric' });
   const dark = themeName === 'dark';
@@ -127,7 +127,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
       <ScrollView
         contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
+        refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={() => { refetch(); refetchSets(); }}tintColor={qm.violet} progressViewOffset={insets.top} />}
       >
         <View style={styles.topRow}>
           <QMBackButton onPress={navigation.goBack} label={t('profile:qmPerson.back')} />
