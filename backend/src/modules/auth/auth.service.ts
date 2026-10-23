@@ -298,7 +298,7 @@ function toUserOut<T extends { password: string | null }>(user: T) {
   return { ...rest, hasPassword: password !== null };
 }
 
-async function issueSocialSession(userId: string) {
+export async function issueSocialSession(userId: string) {
   const accessToken  = generateAccessToken(userId);
   const refreshToken = generateRefreshToken(userId);
   const expiresAt    = new Date(Date.now() + parseDuration(env.JWT_REFRESH_EXPIRES));

@@ -3,6 +3,7 @@ import { prisma } from '../../config/db';
 import { UpdateProfileDtoType, ChangePasswordDtoType } from './users.dto';
 import { NotFoundError, UnauthorizedError } from '../../utils/errors';
 import { deleteUserFilesFromDisk } from '../media/media.service';
+import { issueSocialSession } from '../auth/auth.service';
 
 const PROFILE_SELECT = {
   id: true, name: true, email: true, password: true, profileImage: true,
@@ -59,7 +60,10 @@ export async function changePassword(userId: string, dto: ChangePasswordDtoType)
     prisma.refreshToken.deleteMany({ where: { userId } }),
   ]);
 
-  return { message: 'Password changed successfully' };
+  // Other devices stay signed out; this one gets a fresh session — otherwise it was
+  // silently signed out ~15 min later when its access token expired and refresh 401'd.
+  const session = await issueSocialSession(userId);
+  return { message: 'Password changed successfully', ...session };
 }
 
 export async function deleteAccount(userId: string) {

@@ -8,7 +8,7 @@ export const usersApi = {
     apiPut<User>('/users/profile', payload),
 
   changePassword: (payload: ChangePasswordPayload) =>
-    apiPut<{ message: string }>('/users/change-password', payload),
+    apiPut<{ message: string; accessToken: string; refreshToken: string }>('/users/change-password', payload),
 
   deleteAccount: () =>
     apiDelete('/users/account'),
