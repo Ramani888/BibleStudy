@@ -19,7 +19,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 7. Library — Explore & Friends' sets | 12 | 0 | 10 | 0 | 2 | 0 |
 | 8. Library — Study plans | 14 | 0 | 12 | 0 | 1 | 1 |
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 0 | 20 | 0 | 8 | 1 |
-| 10. Quiz — playing & results | 16 | 16 | 0 | 0 | 0 | 0 |
+| 10. Quiz — playing & results | 16 | 0 | 13 | 0 | 3 | 0 |
 | 11. Ask (AI) | 31 | 30 | 0 | 0 | 0 | 1 |
 | 12. Profile & Settings | 50 | 40 | 0 | 0 | 0 | 10 |
 | 13. Friends | 31 | 29 | 0 | 0 | 0 | 2 |
@@ -309,22 +309,22 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 10. Quiz — playing & results
 
-- ⬜ Full screen, no tab bar; swipe-back off
-- ⬜ Progress bar + "N of M", mode + difficulty chips
-- ⬜ **Multiple choice / Match the verse**: tap → right green, wrong shakes
-- ⬜ **Type the answer / Type it out**: type → **Check**; capitals / punctuation / accents don't matter, spelling does
-- ⬜ **Fill in the blanks**: tap words into gaps, tap gap to empty, **Check**
-- ⬜ **Order the pieces**: tap in order, **Undo last**, **Check**
-- ⬜ **Read & memorize**: reveal line by line, Continue after all shown, not scored
-- ⬜ **Mix**: different types in one quiz
-- ⬜ "Correct" / "Not quite" + right answer; real cards say "comes back tomorrow" → **Continue**
-- ⬜ ✕ or phone back → "Leave this quiz?" → **Leave** / **Keep going**
-- ⬜ **Results**: score ring, title by score, streak, "New best" / "Best: N%", time
-- ⬜ Results stay until **Done**
-- ⬜ **Practice the N you missed** → new run, "Practice · not saved"
-- ⬜ **See every answer**: All / Right / Missed filter; share score
-- ⬜ Quiz shows in Recent quizzes
-- ⬜ After a review quiz → Home "cards ready" number goes down
+- 🔧 Full screen, no tab bar; swipe-back off _(phone status bar came back during "Practice missed" — fixed)_
+- ✅ Progress bar + "N of M", mode + difficulty chips
+- ✅ **Multiple choice / Match the verse**: tap → right green, wrong shakes
+- ✅ **Type the answer / Type it out**: type → **Check**; capitals / punctuation / accents don't matter, spelling does
+- ✅ **Fill in the blanks**: tap words into gaps, tap gap to empty, **Check**
+- ✅ **Order the pieces**: tap in order, **Undo last**, **Check**
+- ✅ **Read & memorize**: reveal line by line, Continue after all shown, not scored
+- ✅ **Mix**: different types in one quiz
+- 🔧 "Correct" / "Not quite" + right answer; real cards say "comes back tomorrow" → **Continue** _(with smarter scheduling (FSRS) on, cards actually came back in 1–10 minutes — fixed: misses now +1 day)_
+- ✅ ✕ or phone back → "Leave this quiz?" → **Leave** / **Keep going**
+- 🔧 **Results**: score ring, title by score, streak, "New best" / "Best: N%", time _(a multi-set quiz said "New best" by comparing with one set's solo best — fixed: best only for single-set quizzes)_
+- ✅ Results stay until **Done** _(phone back acts like Done)_
+- ✅ **Practice the N you missed** → new run, "Practice · not saved"
+- ✅ **See every answer**: All / Right / Missed filter; share score _(share opens WhatsApp — by design)_
+- ✅ Quiz shows in Recent quizzes
+- ✅ After a review quiz → Home "cards ready" number goes down
 
 ---
 

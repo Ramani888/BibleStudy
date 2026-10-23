@@ -40,8 +40,13 @@ export function QuizScreen() {
 
   useFocusEffect(useCallback(() => {
     StatusBar.setHidden(true, 'fade');
-    return () => StatusBar.setHidden(false, 'fade');
-  }, []));
+    return () => {
+      // "Practice missed" pushes another Quiz: its focus runs before this blur
+      // cleanup, so un-hiding here would bring the status bar back mid-quiz.
+      const state = navigation.getState();
+      if (state?.routes[state.index]?.name !== 'Quiz') StatusBar.setHidden(false, 'fade');
+    };
+  }, [navigation]));
 
   // Two "cards passed via params" cases (both skip the per-set fetch):
   //  • generatedCards → AI quiz (real card ids absent → SM-2 not fed, but the
