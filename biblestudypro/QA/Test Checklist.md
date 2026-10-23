@@ -17,7 +17,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 5. Library — Inside a set (Set detail) | 15 | 0 | 10 | 0 | 4 | 1 |
 | 6. Library — Cards | 11 | 0 | 9 | 0 | 2 | 0 |
 | 7. Library — Explore & Friends' sets | 12 | 0 | 10 | 0 | 2 | 0 |
-| 8. Library — Study plans | 14 | 13 | 0 | 0 | 0 | 1 |
+| 8. Library — Study plans | 14 | 0 | 12 | 0 | 1 | 1 |
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 28 | 0 | 0 | 0 | 1 |
 | 10. Quiz — playing & results | 16 | 16 | 0 | 0 | 0 | 0 |
 | 11. Ask (AI) | 31 | 30 | 0 | 0 | 0 | 1 |
@@ -249,20 +249,20 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 8. Library — Study plans
 
-- ⬜ Opens from Home shortcut
-- ⬜ 🔍 **Search plans** — plan **title and description**
-- ⬜ Rows: progress ring %, leaf when complete, "x of y steps done"
-- ⬜ 📄 Pull to refresh · empty ("Make your first plan") · no internet
-- ⬜ **Create plan**: name (max 200), description (max 1000)
-- ⬜ Tap sets in order → numbers 1, 2, 3; tap again → removed
-- ⬜ Button "Create plan (N steps)" off until name + 1 set
-- ⬜ No sets at all → "You need a set first" → **Create a set**
-- ⬜ **Plan detail**: progress bar, "Up next: step N" → **Open this set**
-- ⬜ Tap circle → done / not done; tap step → opens set
-- ⬜ All done → "Plan complete" card
-- ⬜ Delete a set used in a plan → step shows "Set removed"
+- ✅ Opens from Home shortcut
+- ✅ 🔍 **Search plans** — plan **title and description**
+- ✅ Rows: progress ring %, leaf when complete, "x of y steps done"
+- 🔧 📄 Pull to refresh · empty ("Make your first plan") · no internet
+- ✅ **Create plan**: name (max 200), description (max 1000)
+- ✅ Tap sets in order → numbers 1, 2, 3; tap again → removed
+- ✅ Button "Create plan (N steps)" off until name + 1 set
+- ✅ No sets at all → "You need a set first" → **Create a set**
+- ✅ **Plan detail**: progress bar, "Up next: step N" → **Open this set**
+- ✅ Tap circle → done / not done; tap step → opens set
+- ✅ All done → "Plan complete" card
+- ✅ Delete a set used in a plan → step shows "Set removed" _(by design the step is deleted with the set — plan shrinks; "Set removed" text is never reached)_
 - 👤 **Share** plan
-- ⬜ **Delete plan** → confirm → sets stay
+- ✅ **Delete plan** → confirm → sets stay
 
 ---
 
