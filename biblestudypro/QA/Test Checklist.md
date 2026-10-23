@@ -11,7 +11,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | Group | Tests | ⬜ To test | ✅ Works | ❌ Broken | 🔧 Fixed | 👤 Needs you |
 |---|---|---|---|---|---|---|
 | 1. First open & Sign-in | 36 | 0 | 28 | 0 | 4 | 4 |
-| 2. Home | 28 | 26 | 0 | 0 | 0 | 2 |
+| 2. Home | 28 | 0 | 20 | 0 | 6 | 2 |
 | 3. Library — My sets | 24 | 24 | 0 | 0 | 0 | 0 |
 | 4. Library — Folders | 12 | 12 | 0 | 0 | 0 | 0 |
 | 5. Library — Inside a set (Set detail) | 15 | 14 | 0 | 0 | 0 | 1 |
@@ -103,46 +103,46 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 2. Home
 
 **Top**
-- ⬜ Date + greeting by time (Good morning / afternoon / evening) + first name
-- ⬜ Avatar → Profile
-- ⬜ Ask icon → AI consent (first time) or chat
-- ⬜ Bell → Notifications; red number shows (max "9+")
+- 🔧 Date + greeting by time (Good morning / afternoon / evening) + first name
+- ✅ Avatar → Profile
+- ✅ Ask icon → AI consent (first time) or chat
+- 🔧 Bell → Notifications; red number shows (max "9+")
 
 **Today card (3 different states)**
-- ⬜ Cards due → "N cards are ready" + streak → **Start review** starts a quiz of due cards
-- ⬜ Nothing due → "Pick up where you left off" → **Open set**
-- ⬜ New user, no sets → "Start here" → **Create a set**
+- 🔧 Cards due → "N cards are ready" + streak → **Start review** starts a quiz of due cards
+- ✅ Nothing due → "Pick up where you left off" → **Open set**
+- ✅ New user, no sets → "Start here" → **Create a set**
 
 **Today's verse**
-- ⬜ New verse each day, works with no internet
-- ⬜ NEW tag until you tap Memorize or Share
-- ⬜ **Memorize this** → "Added to Daily verses", button turns off for today
-- ⬜ Check Library → "Daily verses" set has the verse as a card
+- 🔧 New verse each day, works with no internet
+- 🔧 NEW tag until you tap Memorize or Share
+- ✅ **Memorize this** → "Added to Daily verses", button turns off for today
+- ✅ Check Library → "Daily verses" set has the verse as a card
 - 👤 **Share** → phone share sheet
 
 **Sunday card (Sundays only)**
 - 👤 **Share on WhatsApp**
-- ⬜ ✕ hides it for today
+- ✅ ✕ hides it for today
 
 **Shortcuts — each opens the right screen**
-- ⬜ New set
-- ⬜ Study plans
-- ⬜ Achievements
-- ⬜ Leaderboard
-- ⬜ Notes
-- ⬜ Media
-- ⬜ Explore
-- ⬜ Friends
+- ✅ New set
+- ✅ Study plans
+- ✅ Achievements
+- ✅ Leaderboard
+- ✅ Notes
+- ✅ Media
+- ✅ Explore
+- ✅ Friends
 
 **Lists (not shown for brand-new users)**
-- ⬜ Recent sets (4) with DUE tag + **See all** → Library
-- ⬜ Friends' sets row → opens read-only set; **See all**
-- ⬜ "What friends are doing" (up to 5)
-- ⬜ "From the community" row + **See all** → Explore
+- ✅ Recent sets (4) with DUE tag + **See all** → Library
+- 🔧 Friends' sets row → opens read-only set; **See all**
+- ✅ "What friends are doing" (up to 5)
+- ✅ "From the community" row + **See all** → Explore
 
 **Automatic**
-- ⬜ "+1 credit claimed" message once a day (open app / come back to app)
-- ⬜ Credits number goes up by 1 (check Credits screen)
+- ✅ "+1 credit claimed" message once a day (open app / come back to app)
+- ✅ Credits number goes up by 1 (check Credits screen)
 
 ---
 
