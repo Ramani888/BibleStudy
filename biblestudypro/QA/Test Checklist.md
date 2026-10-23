@@ -10,7 +10,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 | Group | Tests | ⬜ To test | ✅ Works | ❌ Broken | 🔧 Fixed | 👤 Needs you |
 |---|---|---|---|---|---|---|
-| 1. First open & Sign-in | 36 | 29 | 0 | 0 | 0 | 7 |
+| 1. First open & Sign-in | 36 | 0 | 28 | 0 | 4 | 4 |
 | 2. Home | 28 | 26 | 0 | 0 | 0 | 2 |
 | 3. Library — My sets | 24 | 24 | 0 | 0 | 0 | 0 |
 | 4. Library — Folders | 12 | 12 | 0 | 0 | 0 | 0 |
@@ -52,50 +52,50 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 **Onboarding (first time only — clear app data to see it again)**
 - ✅ 3 slides, "1 of 3" counter moves with **Next**
-- ⬜ **Skip** (slides 1–2) → Sign in
+- ✅ **Skip** (slides 1–2) → Sign in
 - ✅ Last slide: **Create my account** → Register
-- ⬜ Last slide: **Sign in** → Login
-- 👤 Close and open app again → onboarding does not show again
+- ✅ Last slide: **Sign in** → Login
+- ✅ Close and open app again → onboarding does not show again
 
 **Login**
-- ⬜ Sign in with email + password
-- ⬜ Keyboard **Next** jumps to password, **Done** signs in
+- ✅ Sign in with email + password
+- ✅ Keyboard **Next** jumps to password, **Done** signs in
 - ✅ Show / hide password eye
 - 🔧 Wrong password → "That email and password don't match"  — message was invisible (empty gap) — fixed 08f1927
-- ⬜ Not-verified email → new code sent + **Enter the code** link
-- 👤 Google/Apple-only account with email login → "use Apple or Google" message
-- ⬜ No internet → error message
+- ✅ Not-verified email → new code sent + **Enter the code** link
+- ✅ Google/Apple-only account with email login → "use Apple or Google" message
+- ✅ No internet → error message
 - 👤 **Continue with Google** works
 - 👤 Cancel Google → no error shown
 - 👤 **Continue with Apple** (iPhone only)
-- ⬜ **Forgot password?** link
+- ✅ **Forgot password?** link
 - ✅ **Create an account** link
-- ⬜ Terms / Privacy links open
+- ✅ Terms / Privacy links open
 
 **Register**
 - ✅ Name (2+ letters), email, password  — name + email errors show
 - ✅ Password rules turn green: 8+ letters, 1 capital, 1 number
 - ✅ Without ticking "I agree" → **Create account** shows error; Google/Apple say "Please agree"
 - 🔧 Email already used → **Sign in instead** link  — message was invisible — same fix 08f1927
-- ❌ Create account → Verify email screen  — sometimes hangs: server saves the account in 1s but the app never gets the answer, no error, no 15s timeout. Retry works. Under investigation — may be emulator network
+- 🔧 Create account → Verify email screen  — looked stuck until a touch: code box opened the keyboard mid-screen-change — fixed 50742ce
 - ✅ **Back to sign in**
 
 **Verify email**
-- ⬜ Type 6-digit code → logs in by itself ("Email verified. Taking you in…")
-- ⬜ **Verify email** button also works
+- ✅ Type 6-digit code → logs in by itself ("Email verified. Taking you in…")
+- ✅ **Verify email** button also works  — auto-submit on 6th digit
 - ✅ Wrong code → "That code didn't work"
-- ❌ **Resend code** + countdown timer  — tap did not send a new code; countdown not seen. Probably the same hang
-- ⬜ "Wrong email? **Change it**" (only when coming from Register)
+- ✅ **Resend code** + countdown timer  — was a mis-tap; works, new code sent, 0:30 countdown
+- ✅ "Wrong email? **Change it**" (only when coming from Register)
 
 **Forgot / Reset password**
-- ⬜ Enter email → **Send reset code**
-- ⬜ Enter code, new password (rules), confirm → "Passwords match" / "don't match yet"
-- ⬜ **Resend** code + timer
-- ⬜ Wrong / old code → error
-- ⬜ **Save new password** → message + back to Login, new password works, old one doesn't
+- ✅ Enter email → **Send reset code**
+- ✅ Enter code, new password (rules), confirm → "Passwords match" / "don't match yet"
+- ✅ **Resend** code + timer
+- 🔧 Wrong / old code → error  — correct code after limit showed "code didn't work" — now says "Too many tries" (9165308)
+- ✅ **Save new password** → message + back to Login, new password works, old one doesn't
 
 **Terms of Service (in app)**
-- ⬜ Sections open / close
+- ✅ Sections open / close
 - 👤 Contact email link opens mail app
 
 ---
