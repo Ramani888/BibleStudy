@@ -6,7 +6,8 @@ export const CreateCardDto = z
     type: z.enum(['QA', 'STORY']).optional(),
     // QA: question required (enforced below). STORY: question = reference, optional.
     question: z.string().trim().max(300, 'Max 300 characters').optional().default(''),
-    answer: z.string().trim().min(2, 'Answer is required').max(1000, 'Max 1000 characters'),
+    // Story passages may run to 2000; a QA answer stays at 1000 (enforced below).
+    answer: z.string().trim().min(2, 'Answer is required').max(2000, 'Max 2000 characters'),
     note: z.string().trim().max(500).optional(),
     imageId: z.string().uuid('Invalid image ID').optional(),
     order: z.number().int().min(0).optional(),
@@ -16,6 +17,10 @@ export const CreateCardDto = z
   .refine(d => d.type === 'STORY' || d.question.trim().length >= 2, {
     message: 'Question must be at least 2 characters',
     path: ['question'],
+  })
+  .refine(d => d.type === 'STORY' || d.answer.length <= 1000, {
+    message: 'Max 1000 characters',
+    path: ['answer'],
   });
 
 export const BulkCreateCardsDto = z.object({
@@ -39,7 +44,7 @@ export const BulkCreateCardsDto = z.object({
 export const UpdateCardDto = z.object({
   type: z.enum(['QA', 'STORY']).optional(),
   question: z.string().trim().max(300, 'Max 300 characters').optional(),
-  answer: z.string().trim().min(2).max(1000, 'Max 1000 characters').optional(),
+  answer: z.string().trim().min(2).max(2000, 'Max 2000 characters').optional(), // QA cap (1000) checked in updateCard
   note: z.string().trim().max(500).nullable().optional(),
   imageId: z.string().uuid('Invalid image ID').nullable().optional(),
   order: z.number().int().min(0).optional(),

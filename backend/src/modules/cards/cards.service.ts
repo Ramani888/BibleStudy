@@ -315,6 +315,9 @@ export async function updateCard(userId: string, cardId: string, dto: UpdateCard
   if (effectiveType === 'QA' && effectiveQuestion.trim().length < 2) {
     throw new ValidationError('Question must be at least 2 characters');
   }
+  if (effectiveType === 'QA' && (dto.answer ?? existing.answer).length > 1000) {
+    throw new ValidationError('Max 1000 characters'); // Story passages may be up to 2000
+  }
 
   const contentChanged = dto.question !== undefined || dto.answer !== undefined;
 
