@@ -25,13 +25,14 @@ export function useCardsForSets(setIds: string[]) {
 
 /**
  * Generate an ephemeral AI quiz from a document, the user's sets, or a topic.
- * Nothing is persisted — the returned cards are played once and discarded, so
- * there is no cache to invalidate.
+ * The cards are played once and discarded; only the credit balance changes.
  */
 export function useGenerateQuiz() {
+  const qc = useQueryClient();
   return useMutation({
     mutationFn: (body: { topic?: string; setIds?: string[]; mediaIds?: string[]; count?: number }) =>
       quizApi.generateQuiz(body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['credits'] }),
   });
 }
 
@@ -65,6 +66,8 @@ export function useQuizAttemptSave(retakeAttemptId?: string) {
     // achievements are unlocked server-side on each quiz save; re-fetch so
     // useNewAchievements can detect the transition.
     qc.invalidateQueries({ queryKey: ['achievements'] });
+    // an unlock can grant credits, and a quiz counts toward the streak
+    qc.invalidateQueries({ queryKey: ['credits'] });
     // quizzes feed SM-2, changing which cards are due / mastered — refresh both.
     qc.invalidateQueries({ queryKey: ['cards', 'due-summary'] });
     qc.invalidateQueries({ queryKey: ['cards', 'due'] });
