@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, RefreshControl, StyleSheet, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -43,7 +43,9 @@ export function QuizHubScreen() {
   const { mutate: deleteAttempt } = useDeleteQuizAttempt();
   const { reQuiz, dialogProps: reQuizDialog, isGenerating } = useReQuiz();
   const { show, dialogProps } = useConfirmDialog();
-  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch } = useSearchToggle();
+  const { query: search, setQuery: setSearch, visible: searchVisible, toggle: toggleSearch, clear: clearSearch } = useSearchToggle();
+  // Leaving the Quiz tab clears the search; opening a quiz and coming back keeps it.
+  useEffect(() => navigation.getParent()?.addListener('blur', clearSearch), [navigation, clearSearch]);
   const { refreshing, onRefresh } = useManualRefresh(() => Promise.all([refetch(), refetchDue()]));
   const [activeItem, setActiveItem] = useState<QuizAttemptWithSet | null>(null);
 
@@ -63,7 +65,7 @@ export function QuizHubScreen() {
 
   const q = search.trim().toLowerCase();
   const filtered = useMemo(() => !q ? attempts : attempts.filter(a =>
-    (a.quizName ?? '').toLowerCase().includes(q) || (a.setTitle ?? '').toLowerCase().includes(q),
+    (a.quizName ?? '').toLowerCase().includes(q) || a.setTitles.some(s => s.toLowerCase().includes(q)),
   ), [attempts, q]);
 
   // Where the quiz came from — a topic, some sets, or an AI quiz with neither.
