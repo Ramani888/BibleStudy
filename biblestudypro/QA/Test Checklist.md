@@ -21,7 +21,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 9. Quiz — mode picker, hub, details, new quiz | 29 | 0 | 20 | 0 | 8 | 1 |
 | 10. Quiz — playing & results | 16 | 0 | 13 | 0 | 3 | 0 |
 | 11. Ask (AI) | 31 | 0 | 22 | 0 | 8 | 1 |
-| 12. Profile & Settings | 50 | 40 | 0 | 0 | 0 | 10 |
+| 12. Profile & Settings | 50 | 0 | 33 | 0 | 7 | 10 |
 | 13. Friends | 31 | 29 | 0 | 0 | 0 | 2 |
 | 14. Notes | 15 | 14 | 0 | 0 | 0 | 1 |
 | 15. Media | 12 | 9 | 0 | 0 | 0 | 3 |
@@ -372,72 +372,72 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 ## 12. Profile & Settings
 
 **Profile page**
-- ⬜ Bell (count) → Notifications
-- ⬜ Photo, name, streak ring; **Edit profile**
-- ⬜ Tiles: Quizzes → Quiz hub · Sets → Library · Cards → Library · Notes → Notes
-- ⬜ Free plan card → **See plans**
-- ⬜ Storage "used of limit" → Media (over limit → Plans)
-- ⬜ Rows: Achievements · My notes · My media · Friends · Invite friends · Leaderboard · My credits · Upgrade/Manage plan · Change password · Settings
+- ✅ Bell (count) → Notifications
+- ✅ Photo, name, streak ring; **Edit profile**
+- ✅ Tiles: Quizzes → Quiz hub · Sets → Library · Cards → Library · Notes → Notes
+- ✅ Free plan card → **See plans**
+- 🔧 Storage "used of limit" → Media (over limit → Plans) _(said "0 MB" while My media said "57 KB" — fixed)_
+- ✅ Rows: Achievements · My notes · My media · Friends · Invite friends · Leaderboard · My credits · Upgrade/Manage plan · Change password · Settings
 
 **Edit profile**
 - 👤 Change photo: library / camera → spinner → new photo everywhere
-- ⬜ Name (2+), About (200), Church (100) → **Save changes** → "Profile updated"
-- ⬜ Email can't be changed
+- ✅ Name (2+), About (200), Church (100) → **Save changes** → "Profile updated"
+- ✅ Email can't be changed
 
 **Change password**
-- ⬜ Current + new (rules) + confirm → saved; new password works at login
+- 🔧 Current + new (rules) + confirm → saved; new password works at login _(you were signed out ~15 min after changing it; also two sign-ins in the same second gave a server error — both fixed, checked with a script)_
 - 👤 Google/Apple-only account → "Add a password" (no current field)
 
 **Settings**
-- ⬜ Theme: Light / Dark / Phone (Phone follows phone setting)
-- ⬜ Language: English · Español · Português · Filipino · 한국어 · Français
-- ⬜ Smart scheduling switch
-- ⬜ AI helper switch off → next Ask / AI quiz shows consent again
-- ⬜ Share usage data switch
-- ⬜ Notification choices · Blocked people · About · Privacy Policy · Terms
-- ⬜ **Sign out** → Stay / Sign out
+- ✅ Theme: Light / Dark / Phone (Phone follows phone setting)
+- 🔧 Language: English · Español · Português · Filipino · 한국어 · Français _(Upgrade row said "Free" in English in every language — fixed)_
+- ✅ Smart scheduling switch
+- ✅ AI helper switch off → next Ask / AI quiz shows consent again
+- ✅ Share usage data switch
+- ✅ Notification choices · Blocked people · About · Privacy Policy · Terms
+- ✅ **Sign out** → Stay / Sign out
 - 👤 **Delete account** → list of what is deleted → Keep / **Delete forever** (⚠ spare account only)
-- ⬜ Version line at bottom
+- ✅ Version line at bottom
 
 **Notification choices**
-- ⬜ 4 switches: Friend requests · Friend accepted · Achievements · News
+- ✅ 4 switches: Friend requests · Friend accepted · Achievements · News
 - 👤 Turning one on asks phone permission; phone notifications off → "Notifications are off" → tap opens phone Settings
 
 **Notifications list**
-- ⬜ Today / Yesterday / Earlier, unread dot
-- ⬜ Tap → marks read; friend → Friends, achievement → Achievements
-- ⬜ Swipe left → **Delete**
-- ⬜ **Mark all read**
-- ⬜ Back (opened from Home) → Home
-- ⬜ 📄 Pull to refresh · empty ("All quiet") · no internet
+- ✅ Today / Yesterday / Earlier, unread dot
+- ✅ Tap → marks read; friend → Friends, achievement → Achievements
+- ✅ Swipe left → **Delete**
+- ✅ **Mark all read**
+- ✅ Back (opened from Home) → Home
+- 🔧 📄 Pull to refresh · empty ("All quiet") · no internet _(offline said "All quiet" — fixed)_
 
 **Credits**
-- ⬜ "You have N credits"
-- ⬜ **Get more credits** → Plans
-- ⬜ Chart Week / Month / Year; tap a bar → earned vs used
-- ⬜ Ways to earn rows → Achievements / Invite / Plans
-- ⬜ What things cost: question 1, cards/quiz 2, photo 3, PDF 5
-- ⬜ History: Used / Reward / Plan / Bonus; scroll loads more
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ "You have N credits"
+- ✅ **Get more credits** → Plans
+- ✅ Chart Week / Month / Year; tap a bar → earned vs used
+- ✅ Ways to earn rows → Achievements / Invite / Plans
+- ✅ What things cost: question 1, cards/quiz 2, photo 3, PDF 5
+- ✅ History: Used / Reward / Plan / Bonus; scroll loads more
+- 🔧 📄 Pull to refresh · empty · no internet _(offline showed an empty history — fixed)_
 
 **Plans (Paywall)**
 - 👤 ✕ close, **Restore purchases**
-- ⬜ Monthly / Yearly, "save N%"
-- ⬜ Starter (100 credits, 2 GB) / Pro (500 credits, 10 GB); BEST VALUE / CURRENT PLAN
-- ⬜ Button: Subscribe / Switch to X / Your plan (off)
+- 🔧 Monthly / Yearly, "save N%" _(Yearly listed "100 AI credits every month"; yearly gives 1,200 up front — fixed)_
+- ✅ Starter (100 credits, 2 GB) / Pro (500 credits, 10 GB); BEST VALUE / CURRENT PLAN
+- ✅ Button: Subscribe / Switch to X / Your plan (off)
 - 👤 **Manage subscription** → store
-- ⬜ Terms / Privacy links
+- ✅ Terms / Privacy links
 - 👤 (Real buying only in a store test build)
 
 **Achievements**
-- ⬜ "N of M reached", groups, progress bars, "+N credits"
+- ✅ "N of M reached", groups, progress bars, "+N credits"
 - 👤 Tap unlocked → celebration card → **Share** / **Continue**
-- ⬜ Locked ones can't be tapped
+- ✅ Locked ones can't be tapped
 
 **Leaderboard**
-- ⬜ Friends by streak, "You're number N"
-- ⬜ **Find friends** → search
-- ⬜ 📄 Pull to refresh · empty · no internet
+- ✅ Friends by streak, "You're number N"
+- ✅ **Find friends** → search
+- 🔧 📄 Pull to refresh · empty · no internet _(offline said "No one to walk with yet" — fixed)_
 
 **About / Privacy**
 - 👤 About: version, **Email us**, **Report a concern** (mail app), Privacy, Terms
