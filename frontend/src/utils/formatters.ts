@@ -1,13 +1,17 @@
 import i18n from '../i18n';
 
+/** Whole calendar days between `date` and now (≥0 — a phone clock a few seconds behind the server isn't "-1 days"). */
+function calendarDaysAgo(date: Date): number {
+  const startOf = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  return Math.max(0, Math.round((startOf(new Date()) - startOf(date)) / (1000 * 60 * 60 * 24)));
+}
+
 /**
  * Format a date string to a human-readable relative time or date.
  */
 export function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const diffDays = calendarDaysAgo(date);
 
   if (diffDays === 0) return i18n.t('common:time.today', 'Today');
   if (diffDays === 1) return i18n.t('common:time.yesterday', 'Yesterday');
@@ -19,8 +23,7 @@ export function formatDate(dateStr: string): string {
 /** "Today · 3:45 PM", "Yesterday · 9:00 AM", "Aug 5 · 2:30 PM" */
 export function formatDateWithTime(dateStr: string): string {
   const date = new Date(dateStr);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+  const diffDays = calendarDaysAgo(date);
   const time = date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 
   if (diffDays === 0) return `${i18n.t('common:time.today', 'Today')} · ${time}`;

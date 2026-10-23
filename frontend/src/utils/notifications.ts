@@ -3,6 +3,7 @@ import messaging from '@react-native-firebase/messaging';
 import Toast from 'react-native-toast-message';
 import { apiPost } from '../api/client';
 import i18n from '../i18n';
+import { queryClient } from '../lib/queryClient';
 
 /**
  * Obtain the FCM device token and register it with the backend.
@@ -81,6 +82,8 @@ export function onTokenRefresh(): () => void {
 export function setupForegroundHandler(): () => void {
   return messaging().onMessage(async (remoteMessage) => {
     const { notification } = remoteMessage;
+    // Refresh the bell badge + list now, not when the 5-min cache goes stale.
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
     if (notification) {
       Toast.show({
         type: 'info',

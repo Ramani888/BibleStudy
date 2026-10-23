@@ -1,4 +1,5 @@
-import { QueryClient, onlineManager } from '@tanstack/react-query';
+import { AppState } from 'react-native';
+import { QueryClient, focusManager, onlineManager } from '@tanstack/react-query';
 import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client';
 import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,6 +10,13 @@ import NetInfo from '@react-native-community/netinfo';
 onlineManager.setEventListener(setOnline =>
   NetInfo.addEventListener(state => setOnline(!!state.isConnected)),
 );
+
+// Same for focus: RN has no window focus, so stale queries (Home's due count, the bell)
+// never refetched when the app came back to the foreground.
+focusManager.setEventListener(setFocused => {
+  const sub = AppState.addEventListener('change', s => setFocused(s === 'active'));
+  return () => sub.remove();
+});
 
 export const queryClient = new QueryClient({
   defaultOptions: {

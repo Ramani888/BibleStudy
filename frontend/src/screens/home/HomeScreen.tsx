@@ -32,6 +32,7 @@ import {
   useDueSummary,
   useDueCards,
   useUnreadCount,
+  useNow,
 } from '../../hooks';
 import { useTranslation } from 'react-i18next';
 import { useTheme, spacing, radius, type QMColors } from '../../theme';
@@ -49,8 +50,8 @@ const QUICK_TILE = 52;    // ponytail: canvas quick-action tile
 const HEADER_BTN = 44;    // canvas header button / avatar size
 const enter = (i: number) => FadeInUp.duration(320).delay(i * 40);
 
-function getGreeting(t: (key: string) => string): string {
-  const h = new Date().getHours();
+function getGreeting(t: (key: string) => string, now: Date): string {
+  const h = now.getHours();
   if (h < 12) return t('greeting.morning');
   if (h < 17) return t('greeting.afternoon');
   return t('greeting.evening');
@@ -315,8 +316,9 @@ export function HomeScreen() {
   const { data: friendsData } = useFriendsSets();
   const { data: activityData } = useFriendsActivityFeed();
   const { data: streakData } = useStreak();
-  const { data: dueSummary } = useDueSummary();
+  const { data: dueSummary, refetch: refetchDueSummary } = useDueSummary();
   const unread = useUnreadCount();
+  const now = useNow();
   useAutoDailyClaim();
 
   const nav = useHomeNavigation(navigation);
@@ -326,12 +328,12 @@ export function HomeScreen() {
   const handleReviewDue = useCallback(async () => {
     const res = await dueCards.refetch();
     const cards = res.data ?? [];
-    if (cards.length === 0) return;
+    if (cards.length === 0) { refetchDueSummary(); return; } // summary was stale — drop the dead card
     const setIds = [...new Set(cards.map(c => c.setId))];
     const title = t('quiz:hub.reviewDue', 'Review due cards');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Quiz is a root-stack route, outside the tab param list
     (navigation as any).navigate('Quiz', { setIds, setTitles: [title], reviewCards: cards, mode: 'mix', quizName: title });
-  }, [dueCards, navigation, t]);
+  }, [dueCards, navigation, t, refetchDueSummary]);
 
   const publicSets  = useMemo(() => (publicData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [publicData]);
   const friendsSets = useMemo(() => (friendsData?.pages.flatMap(p => p.sets) ?? []).slice(0, 8), [friendsData]);
@@ -350,9 +352,9 @@ export function HomeScreen() {
     return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
   }, []);
   useEffect(() => {
-    if (new Date().getDay() !== 0) return; // Sunday only
+    if (now.getDay() !== 0) { setShowShareEvent(false); return; } // Sunday only
     AsyncStorage.getItem('@bsp/share_event_dismissed').then(v => setShowShareEvent(v !== todayKey()));
-  }, [todayKey]);
+  }, [todayKey, now]);
   const dismissShareEvent = useCallback(() => {
     setShowShareEvent(false);
     AsyncStorage.setItem('@bsp/share_event_dismissed', todayKey()).catch(() => {});
@@ -368,8 +370,8 @@ export function HomeScreen() {
   // New user (nothing to review, no sets): just the verse, Start card + quick actions.
   const isNewUser = !hasDue && !continueSet;
   const dateLabel = useMemo(
-    () => new Date().toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }),
-    [i18n.language],
+    () => now.toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' }),
+    [i18n.language, now],
   );
   const colorAt = (i: number) => qm.setColors[i % qm.setColors.length];
 
@@ -389,7 +391,7 @@ export function HomeScreen() {
           />
           <Animated.View entering={enter(0)}>
             <Typography preset="qmDisplay" color={qm.ink} style={styles.greeting}>
-              {getGreeting(t)}, {firstName}
+              {getGreeting(t, now)}, {firstName}
             </Typography>
           </Animated.View>
 

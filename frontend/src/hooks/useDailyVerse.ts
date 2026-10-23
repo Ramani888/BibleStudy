@@ -5,11 +5,14 @@ import Toast from 'react-native-toast-message';
 import { useTranslation } from 'react-i18next';
 import { useSets, useCreateSet } from './useSets';
 import { useCreateCard } from './useCards';
+import { useNow } from './useNow';
 import { getErrorMessage } from '../api/client';
+import { useAuthStore } from '../store/auth.store';
 import verses from '../data/dailyVerses.json';
 
 export interface DailyVerse { ref: string; text: string }
 
+// Per user — a shared phone must not show the last user's verse as already added.
 const ADDED_KEY = '@bsp/daily_verse_added'; // ref memorized today
 const USED_KEY = '@bsp/daily_verse_used';   // any memorize/share yet → hides the NEW tag
 
@@ -25,10 +28,11 @@ function dayOfYear(d: Date): number {
  */
 export function useDailyVerse() {
   const { t } = useTranslation('home');
+  const day = dayOfYear(useNow());
   const verse = useMemo<DailyVerse>(() => {
     const list = verses as DailyVerse[];
-    return list[dayOfYear(new Date()) % list.length];
-  }, []);
+    return list[day % list.length];
+  }, [day]);
 
   const { data: sets } = useSets();
   const createSet = useCreateSet();
@@ -36,20 +40,24 @@ export function useDailyVerse() {
   const [added, setAdded] = useState(false);
   const [isNew, setIsNew] = useState(false);
   const [busy, setBusy] = useState(false);
+  const userId = useAuthStore(s => s.user?.id ?? '');
+  const addedKey = `${ADDED_KEY}:${userId}`;
+  const usedKey = `${USED_KEY}:${userId}`;
 
   useEffect(() => {
-    AsyncStorage.multiGet([ADDED_KEY, USED_KEY])
+    if (!userId) return; // no shared, user-less keys
+    AsyncStorage.multiGet([addedKey, usedKey])
       .then(([[, addedRef], [, used]]) => {
         setAdded(addedRef === verse.ref);
         setIsNew(!used);
       })
       .catch(() => {});
-  }, [verse.ref]);
+  }, [verse.ref, addedKey, usedKey, userId]);
 
   const markUsed = useCallback(() => {
     setIsNew(false);
-    AsyncStorage.setItem(USED_KEY, '1').catch(() => {});
-  }, []);
+    AsyncStorage.setItem(usedKey, '1').catch(() => {});
+  }, [usedKey]);
 
   const memorize = useCallback(async () => {
     if (added || busy) return;
@@ -61,13 +69,13 @@ export function useDailyVerse() {
       await createCard.mutateAsync({ setId, question: verse.ref, answer: verse.text, note: t('verse.translation') });
       setAdded(true);
       markUsed();
-      AsyncStorage.setItem(ADDED_KEY, verse.ref).catch(() => {});
+      AsyncStorage.setItem(addedKey, verse.ref).catch(() => {});
     } catch (e) {
       Toast.show({ type: 'error', text1: getErrorMessage(e) });
     } finally {
       setBusy(false);
     }
-  }, [added, busy, sets, createSet, createCard, verse, t, markUsed]);
+  }, [added, busy, sets, createSet, createCard, verse, t, markUsed, addedKey]);
 
   const share = useCallback(() => {
     markUsed();

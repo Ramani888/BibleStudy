@@ -1,4 +1,5 @@
 export { useDailyVerse } from './useDailyVerse';
+export { useNow } from './useNow';
 export {
   useAIChat,
   useAIChatHistory,
