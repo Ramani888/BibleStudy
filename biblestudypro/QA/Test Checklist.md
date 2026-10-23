@@ -24,7 +24,7 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 | 12. Profile & Settings | 50 | 0 | 33 | 0 | 7 | 10 |
 | 13. Friends | 31 | 0 | 25 | 0 | 4 | 2 |
 | 14. Notes | 15 | 0 | 10 | 0 | 4 | 1 |
-| 15. Media | 12 | 9 | 0 | 0 | 0 | 3 |
+| 15. Media | 12 | 0 | 7 | 0 | 3 | 2 |
 | 16. Whole app | 7 | 6 | 0 | 0 | 0 | 1 |
 
 ---
@@ -513,18 +513,18 @@ Test in **light AND dark mode**. Test account (emulator, local DB): `qa@verdance
 
 ## 15. Media
 
-- ⬜ "X of Y used" + **Get more room** → Plans
-- ⬜ Free plan banner "kept for 30 days" + ✕ hides it; each file "N days left"
-- ⬜ **Photos · N / PDFs · N** switch
-- ⬜ 🔍 **Search** — file **name**
-- ⬜ Sort: newest / oldest / A to Z
+- ✅ "X of Y used" + **Get more room** → Plans
+- ✅ Free plan banner "kept for 30 days" + ✕ hides it; each file "N days left"
+- ✅ **Photos · N / PDFs · N** switch
+- ✅ 🔍 **Search** — file **name**
+- ✅ Sort: newest / oldest / A to Z
 - 👤 **+** Add: Take a photo · Photo library · Choose a PDF → upload %
 - 👤 Camera / photos permission denied → message
-- ⬜ Tap photo → viewer: pinch zoom, swipe photos ("n of total"), tap hides controls, Share, Close
-- ⬜ Tap PDF → reader: "Page n of total", Share; broken PDF → "Open in browser"
-- 👤 Hold file → **Rename** (name selected, max 255) · **Share** · **Delete**
-- ⬜ **Select** → tick many → **Delete N files**; **Cancel**
-- ⬜ 📄 Pull to refresh · empty · no internet
+- 🔧 Tap photo → viewer: pinch zoom, swipe photos ("n of total"), tap hides controls, Share, Close
+- ✅ Tap PDF → reader: "Page n of total", Share; broken PDF → "Open in browser"
+- ✅ Hold file → **Rename** (name selected, max 255) · **Share** · **Delete**
+- 🔧 **Select** → tick many → **Delete N files**; **Cancel**
+- 🔧 📄 Pull to refresh · empty · no internet
 
 ---
 
