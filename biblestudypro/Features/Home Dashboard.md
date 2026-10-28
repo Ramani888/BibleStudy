@@ -80,7 +80,7 @@ Up to 8 public sets. Tap → LibraryTab → SetDetail (`isOwner: false`). "See a
 - Daily claim (side effect): `useAutoDailyClaim` → `POST /api/v1/credits/claim-daily`
 - Sets/content: `useSets`, `usePublicSets`, `useFriendsSets`, `useFriendsActivityFeed`, `useFriends`, `useFolders`, `useNotes`
 
-> **Removed**: `useDailyVerse` — the daily verse section was removed from Home in the 2026-08-11 redesign.
+> **Verse of the day (back since the Quiet-morning redesign)**: `useDailyVerse` picks `list[dayOfYear % 380]` from bundled `src/data/dailyVerses[.<lang>].json` — same passage for everyone on a date, in the app language (2026-10-28): WEB (en), Reina-Valera 1909 (es), Bíblia Livre (pt, CC BY 3.0 BR — credit kept in terms), Louis Segond 1910 (fr, Hebrew psalm numbering mapped), Korean 1961 (ko), Ang Dating Biblia 1905 (tl). Built from getbible.net; generator was a throwaway script (same order as `dailyVerses.json`, Ps 119 acrostic labels stripped). Label = `home:verse.translation(Short)`.
 
 ## Backend
 Home is a **read-only aggregator** — it owns no backend module.
