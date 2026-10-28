@@ -57,10 +57,14 @@ function AppBootstrap() {
         barStyle={name === 'dark' ? 'light-content' : 'dark-content'}
         backgroundColor={qm.bg}
       />
-      <CrashBoundary>
-        <RootNavigator />
-      </CrashBoundary>
+      {/* Banner sits in the layout (not over it) so it never covers screen headers. The inner
+          provider measures its own frame, so screens below see a 0 top inset while it shows. */}
       <OfflineBanner />
+      <SafeAreaProvider style={styles.root}>
+        <CrashBoundary>
+          <RootNavigator />
+        </CrashBoundary>
+      </SafeAreaProvider>
       {showSplash && (
         <SplashScreen
           isReady={isInitialized}

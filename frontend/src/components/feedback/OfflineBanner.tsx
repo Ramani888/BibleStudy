@@ -34,11 +34,6 @@ export function OfflineBanner() {
 
 const styles = StyleSheet.create({
   bar: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
     paddingBottom: spacing.xs,
     paddingHorizontal: spacing.md,
   },
