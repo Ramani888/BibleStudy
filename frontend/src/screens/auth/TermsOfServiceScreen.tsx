@@ -11,7 +11,7 @@ import { QMBackButton } from '../../components/qm';
 import { ChevronDownIcon, LeafIcon } from '../../components/icons';
 import { radius, spacing, useTheme } from '../../theme';
 
-const LAST_UPDATED = 'August 2026';
+const LAST_UPDATED = 'October 2026';
 const CONTACT = 'ddtechservices.work@gmail.com';
 const SECTIONS = 8;
 const NUM_BADGE = 28; // canvas section number tile
