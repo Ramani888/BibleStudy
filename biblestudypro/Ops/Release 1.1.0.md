@@ -8,6 +8,7 @@ Prepared 2026-10-28. Previous store release: 1.0.1 (tag `v1.0.1`).
 - Verse of the day in the app language (6 free Bibles), 24-hour clock where the language uses it.
 - Offline banner no longer covers screen headers. All 6 languages complete.
 - Terms: community rules (zero tolerance, report/block, 24 h review) for Apple 1.2.
+- Glass tab bar: floats over content (content scrolls behind); screens use `useTabBarSpace()` for bottom room (b279ca0). AAB/APK rebuilt after it.
 - AI: OpenRouter model failover (`AI_FALLBACK_MODELS`).
 - Website: privacy + terms rewritten to match the app; new screenshots; store screenshots regenerated
   (`branding/store-screenshots/framed` = Play 1290×2796, `framed-ios` = App Store 6.5"/6.7" 1284×2778).
