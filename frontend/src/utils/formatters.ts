@@ -24,7 +24,7 @@ export function formatDate(dateStr: string): string {
 export function formatDateWithTime(dateStr: string): string {
   const date = new Date(dateStr);
   const diffDays = calendarDaysAgo(date);
-  const time = date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+  const time = date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit' });
 
   if (diffDays === 0) return `${i18n.t('common:time.today', 'Today')} · ${time}`;
   if (diffDays === 1) return `${i18n.t('common:time.yesterday', 'Yesterday')} · ${time}`;
@@ -64,7 +64,7 @@ export function formatDateTime(dateString: string | Date): string {
   return (
     date.toLocaleDateString(i18n.language || 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }) +
     ` ${i18n.t('common:time.at', 'at')} ` +
-    date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+    date.toLocaleTimeString(i18n.language || 'en-US', { hour: 'numeric', minute: '2-digit' })
   );
 }
 
