@@ -13,6 +13,8 @@ Prepared 2026-10-28. Previous store release: 1.0.1 (tag `v1.0.1`).
   (`branding/store-screenshots/framed` = Play 1290×2796, `framed-ios` = App Store 6.5"/6.7" 1284×2778).
 
 ## Steps (in order)
+> ✅ 2026-10-28: steps 0–2 DONE by Claude (pushed ca80e92; backend deployed health=200/authMe=401; website live + verified; old site backed up at server `/root/site-backup-20261028.tgz`). Prod AI_MODEL = google/gemini-2.5-flash-lite, fallback default gpt-4o-mini applies.
+
 0. **Push**: `git push origin master` (Claude is blocked from pushing; the Mac needs it for the iOS build).
 1. **Backend** (owner runs, auto-mode blocks Claude): `dist/` is already built (rebuild with `cd backend && npx tsc` only if backend changed), then `! bash backend/scripts/deploy-prod.sh` → want `health=200 authMe=401`. No DB migration in this release.
    Optional prod `.env`: `AI_FALLBACK_MODELS=openai/gpt-4o-mini` (that is already the default).
