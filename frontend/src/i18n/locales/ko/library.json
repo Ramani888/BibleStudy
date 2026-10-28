@@ -300,6 +300,7 @@
     "movedTo": "{{name}}(으)로 이동했어요",
     "deleteSetTitle": "이 세트를 삭제할까요?",
     "deleteSetMessage": "“{{title}}”과(와) 카드 {{count}}장이 영구히 삭제돼요.",
+    "deleteSetMessage_other": "“{{title}}”과(와) 카드 {{count}}장이 영구히 삭제돼요.",
     "deleteFolderTitle": "이 폴더를 삭제할까요?",
     "deleteFolderMessage": "안에 있는 세트는 보관함에 남아요. 폴더만 삭제돼요.",
     "chooseQuiz": "퀴즈 선택",

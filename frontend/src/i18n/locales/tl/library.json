@@ -300,6 +300,7 @@
     "movedTo": "Nailipat sa {{name}}",
     "deleteSetTitle": "Burahin ang set na ito?",
     "deleteSetMessage": "Tuluyang mawawala ang “{{title}}” at ang {{count}} card nito.",
+    "deleteSetMessage_other": "Tuluyang mawawala ang “{{title}}” at ang {{count}} card nito.",
     "deleteFolderTitle": "Burahin ang folder na ito?",
     "deleteFolderMessage": "Mananatili sa iyong library ang mga set sa loob. Ang folder lang ang mawawala.",
     "chooseQuiz": "Pumili ng quiz",
