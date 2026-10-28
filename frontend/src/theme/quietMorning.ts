@@ -274,7 +274,7 @@ export const qmFont = {
 
 /** Text presets — merged into `textPresets` so `<Typography preset="qm…">` works. */
 export const qmPresets = {
-  qmDisplay:   { fontFamily: qmFont.serifDisplay, fontSize: 32, lineHeight: 37, letterSpacing: -0.3 },
+  qmDisplay:   { fontFamily: qmFont.serifDisplay, fontSize: 32, lineHeight: 42, letterSpacing: -0.3 },
   qmTitle:     { fontFamily: qmFont.serifDisplay, fontSize: 24, lineHeight: 30 },
   qmCardTitle: { fontFamily: qmFont.serifMedium, fontSize: 16, lineHeight: 21 },
   qmVerse:     { fontFamily: qmFont.serif,       fontSize: 19, lineHeight: 28 },
