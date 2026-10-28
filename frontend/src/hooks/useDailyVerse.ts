@@ -8,9 +8,18 @@ import { useCreateCard } from './useCards';
 import { useNow } from './useNow';
 import { getErrorMessage } from '../api/client';
 import { useAuthStore } from '../store/auth.store';
-import verses from '../data/dailyVerses.json';
+import en from '../data/dailyVerses.json';
+import es from '../data/dailyVerses.es.json';
+import pt from '../data/dailyVerses.pt.json';
+import fr from '../data/dailyVerses.fr.json';
+import ko from '../data/dailyVerses.ko.json';
+import tl from '../data/dailyVerses.tl.json';
 
 export interface DailyVerse { ref: string; text: string }
+
+// Same verse order in every file (built from public-domain / free Bibles via getbible.net),
+// so everyone sees the same passage on a given day, in their own language.
+const VERSES: Record<string, DailyVerse[]> = { en, es, pt, fr, ko, tl };
 
 // Per user — a shared phone must not show the last user's verse as already added.
 const ADDED_KEY = '@bsp/daily_verse_added'; // ref memorized today
@@ -22,17 +31,18 @@ function dayOfYear(d: Date): number {
 }
 
 /**
- * Today's verse from the bundled WEB list (offline, same verse for everyone on a
+ * Today's verse from the bundled per-language lists (offline, same verse for everyone on a
  * given date). "Memorize" files it as a card in the user's "Daily verses" set,
  * creating that set on first use.
  */
 export function useDailyVerse() {
-  const { t } = useTranslation('home');
+  const { t, i18n } = useTranslation('home');
   const day = dayOfYear(useNow());
+  const lang = i18n.language?.slice(0, 2);
   const verse = useMemo<DailyVerse>(() => {
-    const list = verses as DailyVerse[];
+    const list = VERSES[lang] ?? VERSES.en;
     return list[day % list.length];
-  }, [day]);
+  }, [day, lang]);
 
   const { data: sets } = useSets();
   const createSet = useCreateSet();
