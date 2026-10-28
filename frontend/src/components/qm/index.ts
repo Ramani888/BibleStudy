@@ -1,4 +1,5 @@
 export { QMFog } from './QMFog';
+export { QMStatusScrim } from './QMStatusScrim';
 export { QMInput } from './QMInput';
 export type { QMInputProps } from './QMInput';
 export { QMFormField } from './QMFormField';

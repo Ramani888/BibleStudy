@@ -5,7 +5,7 @@ import LinearGradient from 'react-native-linear-gradient';
 import Animated, { Easing, ReduceMotion, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated';
 import { useTranslation } from 'react-i18next';
 
-import { QMMenuGroup, QMMenuRow, QMScoreRing, qmRowEnter } from '../../components/qm';
+import { QMMenuGroup, QMMenuRow, QMScoreRing, QMStatusScrim, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import {
   BagIcon, BellQMIcon, CreditIcon, DocIcon, FriendsIcon, GiftIcon, ImageIcon, LeaderboardIcon, LeafIcon, LockIcon, SettingsIcon,
@@ -245,6 +245,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
           <QMMenuRow icon={SettingsIcon} label={t('profile:qm.settings')} onPress={() => navigation.navigate('Settings')} />
         </QMMenuGroup>
       </ScrollView>
+      <QMStatusScrim />
     </View>
   );
 }
