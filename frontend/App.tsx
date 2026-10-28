@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { StatusBar, StyleSheet, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { SafeAreaProvider, initialWindowMetrics } from 'react-native-safe-area-context';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import Toast from 'react-native-toast-message';
@@ -60,7 +60,7 @@ function AppBootstrap() {
       {/* Banner sits in the layout (not over it) so it never covers screen headers. The inner
           provider measures its own frame, so screens below see a 0 top inset while it shows. */}
       <OfflineBanner />
-      <SafeAreaProvider style={styles.root}>
+      <SafeAreaProvider style={styles.root} initialMetrics={initialWindowMetrics}>
         <CrashBoundary>
           <RootNavigator />
         </CrashBoundary>

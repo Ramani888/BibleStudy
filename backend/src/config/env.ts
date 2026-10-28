@@ -16,7 +16,8 @@ const envSchema = z.object({
   AI_PROVIDER: z.enum(['anthropic', 'openrouter']).default('anthropic'),
   AI_MODEL: z.string().optional().default(''),
   // OpenRouter tries these, in order, when AI_MODEL is rate-limited or down (comma-separated).
-  AI_FALLBACK_MODELS: z.string().optional().default('openai/gpt-4o-mini'),
+  AI_FALLBACK_MODELS: z.string().optional().default('openai/gpt-4o-mini')
+    .transform(s => s.split(',').map(m => m.trim()).filter(Boolean)),
   OPENROUTER_API_KEY: z.string().optional().default(''),
   VOYAGE_API_KEY: z.string().optional().default(''),
   CLOUDINARY_CLOUD_NAME: z.string().optional().default(''),

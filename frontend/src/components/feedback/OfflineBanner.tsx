@@ -10,16 +10,24 @@ import { Typography } from '../ui';
 // App-wide bar shown only while the device is offline. Cached sets/cards still
 // render underneath (see lib/queryClient persister); this just makes gaps read
 // as "offline" rather than "broken".
+const SHOW_DELAY_MS = 1500;
+
 export function OfflineBanner() {
   const { t } = useTranslation('common');
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
   const [offline, setOffline] = useState(false);
 
-  useEffect(
-    () => NetInfo.addEventListener(state => setOffline(state.isConnected === false)),
-    [],
-  );
+  // The banner takes layout space, so wait out short network blips before showing it.
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (timer) clearTimeout(timer);
+      if (state.isConnected === false) timer = setTimeout(() => setOffline(true), SHOW_DELAY_MS);
+      else setOffline(false);
+    });
+    return () => { if (timer) clearTimeout(timer); unsubscribe(); };
+  }, []);
 
   if (!offline) return null;
 

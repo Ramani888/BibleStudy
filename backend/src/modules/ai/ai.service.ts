@@ -49,7 +49,7 @@ async function generateAnswer(system: string, messages: ChatMessage[], media?: M
         body: JSON.stringify({
           model: env.AI_MODEL,
           // Upstream rate limits on one model (seen 2026-10-28) fail over to the next.
-          models: [env.AI_MODEL, ...env.AI_FALLBACK_MODELS.split(',').map(m => m.trim()).filter(Boolean)],
+          models: [...new Set([env.AI_MODEL, ...env.AI_FALLBACK_MODELS])],
           max_tokens: MAX_TOKENS,
           messages: [{ role: 'system', content: system }, ...messages],
         }),
