@@ -9,6 +9,7 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { QMBackButton, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography, VerdanceLogo } from '../../components/ui';
 import { ChevronRightIcon, DocIcon, FlagIcon, MailIcon, ShieldIcon, type IconComponent } from '../../components/icons';
+import { useTabBarSpace } from '../../hooks';
 import { APP_VERSION } from '../../constants';
 import { radius, spacing, useTheme } from '../../theme';
 
@@ -23,6 +24,7 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
 
   const violet: [string, string] = [qm.lilac, qm.link];
   const links: { label: string; sub: string; icon: IconComponent; tint: [string, string]; go: () => void }[] = [
@@ -37,7 +39,7 @@ export function AboutUsScreen({ navigation }: ProfileScreenProps<'AboutUs'>) {
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]} showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmAbout.back')} />
 
         <View style={styles.brand}>

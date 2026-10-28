@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { QMBackButton, QMEmpty, QMSegmented, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { ArrowUpIcon, CreditIcon, InfoIcon } from '../../components/icons';
-import { useAchievements, useCreditBalance, useCreditTransactions, useReferral, useWeeklyChart, type SimplePeriod } from '../../hooks';
+import { useAchievements, useCreditBalance, useCreditTransactions, useReferral, useWeeklyChart, type SimplePeriod, useTabBarSpace } from '../../hooks';
 import { loadFailed } from '../../utils/queryState';
 import { formatDateWithTime } from '../../utils/formatters';
 import { TIERS } from '../../types';
@@ -118,6 +118,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const qc = useQueryClient();
 
   const { data: balance } = useCreditBalance();
@@ -245,7 +246,7 @@ export function CreditsScreen({ navigation }: ProfileScreenProps<'Credits'>) {
         ListHeaderComponent={header}
         ListEmptyComponent={empty}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={qm.violet} style={styles.more} /> : null}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         onEndReached={() => hasNextPage && fetchNextPage()}
         onEndReachedThreshold={0.3}

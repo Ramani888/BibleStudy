@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import { AnimatedPressable, Typography } from '../../../components/ui';
 import { ArrowUpIcon, CloseIcon, DocIcon, ImageIcon, InfoIcon, PlusIcon } from '../../../components/icons';
+import { useTabBarSpace } from '../../../hooks';
 import { useTheme, spacing, radius, textPresets } from '../../../theme';
 import { wantsCards } from '../chatMarks';
 
@@ -38,6 +39,7 @@ export const ChatInput = React.memo(function ChatInput({
 }: ChatInputProps) {
   const { t } = useTranslation('ai');
   const { qm } = useTheme();
+  const tabSpace = useTabBarSpace();
   const [text, setText] = useState('');
 
   // attachmentType falls back to 'PDF' upstream even with nothing attached; only price
@@ -55,7 +57,7 @@ export const ChatInput = React.memo(function ChatInput({
   }, [canSend, text, onSend, t]);
 
   return (
-    <View style={[styles.wrap, { backgroundColor: qm.bg }]}>
+    <View style={[styles.wrap, { backgroundColor: qm.bg, paddingBottom: spacing.md + tabSpace }]}>
       {creditBalance !== undefined && !outOfCredits && (
         <Typography preset="qmFine" color={qm.muted} style={styles.cost}>
           {t('ai:qm.chat.costLine', { count: cost, balance: creditBalance, defaultValue: `Costs ${cost} ${cost === 1 ? 'credit' : 'credits'} · ${creditBalance} left` })}

@@ -33,6 +33,7 @@ import {
   useDueCards,
   useUnreadCount,
   useNow,
+  useTabBarSpace,
 } from '../../hooks';
 import { useTranslation } from 'react-i18next';
 import { useTheme, spacing, radius, type QMColors } from '../../theme';
@@ -306,6 +307,7 @@ const ActivityRow = React.memo(function ActivityRow({ activity, first }: { activ
 
 // ─── Main Screen ───────────────────────────────────────────────────────────────
 export function HomeScreen() {
+  const tabSpace = useTabBarSpace();
   const { t, i18n } = useTranslation(['home', 'common']);
   const user = useAuthStore(s => s.user);
   const navigation = useNavigation<HomeNav>();
@@ -379,7 +381,7 @@ export function HomeScreen() {
     <View style={[styles.root, { backgroundColor: qm.bg }]}>
       <QMFog height={FOG_HEIGHT} />
       <SafeAreaView style={styles.flex1} edges={['top']}>
-        <ScrollView style={styles.flex1} contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
+        <ScrollView style={styles.flex1} contentContainerStyle={[styles.scroll, { paddingBottom: spacing.huge + tabSpace }]} showsVerticalScrollIndicator={false}>
           <Header
             dateLabel={dateLabel}
             name={user?.name ?? firstName}

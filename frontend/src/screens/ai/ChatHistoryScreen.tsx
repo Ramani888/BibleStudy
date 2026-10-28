@@ -11,7 +11,7 @@ import {
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { AskIcon, BookmarkIcon, InfoIcon, SearchIcon, TagIcon, TrashIcon } from '../../components/icons';
 import { LoadingOverlay } from '../../components/feedback';
-import { useAIChatHistory, useBookmarks, useManualRefresh } from '../../hooks';
+import { useAIChatHistory, useBookmarks, useManualRefresh, useTabBarSpace } from '../../hooks';
 import { useChatHistoryActions } from '../../hooks/useChatHistoryActions';
 import { useAIChatStore } from '../../store';
 import { loadFailed } from '../../utils/queryState';
@@ -46,6 +46,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   const { t } = useTranslation(['ai', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
 
   const historyQuery = useAIChatHistory();
   const { data, isLoading, refetch, fetchNextPage, hasNextPage, isFetchingNextPage } = historyQuery;
@@ -201,7 +202,7 @@ export function ChatHistoryScreen({ navigation }: AIScreenProps<'ChatHistory'>) 
   }
 
   const refresh = <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />;
-  const contentStyle = [styles.content, { paddingTop: insets.top + spacing.xs }];
+  const contentStyle = [styles.content, { paddingTop: insets.top + spacing.xs, paddingBottom: spacing.xxl + tabSpace }];
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>

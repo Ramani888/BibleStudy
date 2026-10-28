@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { QMButton, QMConfirmDialog, QMEmpty, QMSheet, type QMSheetAction } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { AskIcon, CheckIcon, ChevronLeftIcon, LeafIcon, RefreshIcon, ShareUpIcon, TrashIcon } from '../../components/icons';
-import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog, useReferral, useManualRefresh } from '../../hooks';
+import { usePlan, useToggleStep, useDeletePlan, useConfirmDialog, useReferral, useManualRefresh, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { shareToWhatsApp, buildReferralLink } from '../../utils';
 import { useTheme, spacing, radius, mixHex } from '../../theme';
@@ -24,6 +24,7 @@ const FROST = { light: 'rgba(255,255,255,0.6)', dark: 'rgba(0,0,0,0.22)' } as co
 export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'PlanDetail'>) {
   const { t } = useTranslation(['library', 'common']);
   const { qm, name: themeName } = useTheme();
+  const tabSpace = useTabBarSpace();
   const dark = themeName === 'dark';
   const insets = useSafeAreaInsets();
   const { planId } = route.params;
@@ -95,7 +96,7 @@ export function PlanDetailScreen({ navigation, route }: LibraryScreenProps<'Plan
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <ScrollView
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />}
       >

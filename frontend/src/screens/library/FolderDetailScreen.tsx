@@ -15,7 +15,7 @@ import {
   ChevronLeftIcon, FolderIcon, MoreVerticalIcon, PencilIcon, PlusIcon, RefreshIcon, SearchIcon, TrashIcon,
 } from '../../components/icons';
 import {
-  useConfirmDialog, useDeleteFolder, useDeleteSet, useFolderModal, useFolders, useManualRefresh, useSets,
+  useConfirmDialog, useDeleteFolder, useDeleteSet, useFolderModal, useFolders, useManualRefresh, useSets, useTabBarSpace,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useTheme, spacing, radius, mixHex, qmAccent } from '../../theme';
@@ -34,6 +34,7 @@ const FROST = { light: 'rgba(255,255,255,0.6)', dark: 'rgba(0,0,0,0.2)' } as con
 export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'FolderDetail'>) {
   const { t } = useTranslation(['library', 'common']);
   const { qm, name: themeName } = useTheme();
+  const tabSpace = useTabBarSpace();
   const dark = themeName === 'dark';
   const insets = useSafeAreaInsets();
   const { folderId } = route.params;
@@ -209,7 +210,7 @@ export function FolderDetailScreen({ navigation, route }: LibraryScreenProps<'Fo
         </Pressable>
       </View>
 
-      <View style={[styles.ctaWrap, { backgroundColor: qm.bg }]}>
+      <View style={[styles.ctaWrap, { backgroundColor: qm.bg, paddingBottom: spacing.md + tabSpace }]}>
         <AnimatedPressable scaleTo={0.97} onPress={newSet} style={[styles.cta, { backgroundColor: qm.violet, boxShadow: qm.btnShadow }]} accessibilityRole="button">
           <PlusIcon size={18} color={qm.onViolet} strokeWidth={2} />
           <Typography preset="qmButtonLg" color={qm.onViolet}>{t('library:qm.newSetInFolder', 'New set in this folder')}</Typography>

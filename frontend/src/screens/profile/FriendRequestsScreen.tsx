@@ -11,6 +11,7 @@ import { QMAvatar, QMBackButton, QMEmpty, QMSegmented, qmRowEnter } from '../../
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { InfoIcon, LeafIcon } from '../../components/icons';
 import { useAcceptFriendRequest, useCancelFriendRequest, useFriendRequests, useRejectFriendRequest } from '../../hooks/useFriends';
+import { useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import { formatRelativeShort } from '../../utils/formatters';
 import { loadFailed } from '../../utils/queryState';
@@ -26,6 +27,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [tab, setTab] = useState<Tab>('incoming');
   // Accepted rows stay a moment with a "You're now friends" line before the list refetches them away.
   const [accepted, setAccepted] = useState<Set<string>>(new Set());
@@ -138,7 +140,7 @@ export function FriendRequestsScreen({ navigation }: Props) {
         ListHeaderComponent={header}
         ListEmptyComponent={empty}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />

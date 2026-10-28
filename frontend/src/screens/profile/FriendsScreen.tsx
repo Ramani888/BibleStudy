@@ -14,7 +14,7 @@ import {
   BlockIcon, ChevronRightIcon, GiftIcon, InboxIcon, InfoIcon, LeaderboardIcon, LeafIcon, MoreVerticalIcon, PersonPlusIcon, SearchIcon, UserIcon, UserMinusIcon,
 } from '../../components/icons';
 import { useBlockUser, useFriendRequests, useFriends, useRemoveFriend } from '../../hooks/useFriends';
-import { useConfirmDialog, useLeaderboard, useReferral } from '../../hooks';
+import { useConfirmDialog, useLeaderboard, useReferral, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import { loadFailed } from '../../utils/queryState';
 import { radius, spacing, useTheme } from '../../theme';
@@ -30,6 +30,7 @@ export function FriendsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const friendsQuery = useFriends();
   const { data: friends = [], isLoading, isFetching, refetch } = friendsQuery;
   const isError = loadFailed(friendsQuery); // offline with nothing cached → "did not load", not the empty state
@@ -215,7 +216,7 @@ export function FriendsScreen({ navigation }: Props) {
         ListEmptyComponent={empty}
         ListFooterComponent={footer}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />

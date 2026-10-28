@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useContext, useEffect } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import { BottomTabBarHeightCallbackContext, type BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import Animated, { FadeIn } from 'react-native-reanimated';
 
 import { AnimatedPressable, Typography } from '../components/ui';
@@ -28,22 +28,30 @@ const TAB_ICONS: Record<keyof AppTabParamList, typeof TabHomeIcon> = {
 };
 
 /**
- * Quiet-morning floating pill tab bar. Sits in normal layout (not absolute), so
- * no screen needs extra bottom padding; the strip around it is the page colour.
+ * Quiet-morning floating pill tab bar, drawn OVER the screens (content scrolls behind
+ * the translucent pill). It reports its height to the tab navigator, and tab-hosted
+ * screens leave that much room at the bottom via useTabBarSpace().
  */
 const FULL_SCREEN = new Set(['CreateSet', 'EditSet', 'CreateCard', 'EditCard', 'CreatePlan', 'Paywall', 'NoteEditor', 'MediaPDFViewer']);
 
 export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const setHeight = useContext(BottomTabBarHeightCallbackContext);
 
-  // Full-screen modal forms (canvas rule) hide the bar.
+  // Full-screen modal forms (canvas rule) hide the bar — and then screens need no room for it.
   const nested = getFocusedRouteNameFromRoute(state.routes[state.index]);
-  if (nested && FULL_SCREEN.has(nested)) return null;
+  const hidden = !!nested && FULL_SCREEN.has(nested);
+  useEffect(() => { if (hidden) setHeight?.(0); }, [hidden, setHeight]);
+  if (hidden) return null;
 
   return (
-    <View style={[styles.wrap, { backgroundColor: qm.bg, paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
-      <View style={[styles.bar, { backgroundColor: qm.tabBg, boxShadow: qm.tabShadow }]} accessibilityRole="tablist">
+    <View
+      pointerEvents="box-none"
+      onLayout={e => setHeight?.(e.nativeEvent.layout.height)}
+      style={[styles.wrap, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}
+    >
+      <View style={[styles.bar, { backgroundColor: qm.tabGlass, boxShadow: qm.tabShadow }]} accessibilityRole="tablist">
         {state.routes.map((route, index) => {
           const focused = state.index === index;
           const { options } = descriptors[route.key];
@@ -89,7 +97,7 @@ export function FloatingTabBar({ state, descriptors, navigation }: BottomTabBarP
 }
 
 const styles = StyleSheet.create({
-  wrap: { paddingHorizontal: spacing.md, paddingTop: spacing.s6 },
+  wrap: { position: 'absolute', left: 0, right: 0, bottom: 0, paddingHorizontal: spacing.md, paddingTop: spacing.s6 },
   bar: {
     height: BAR_H, borderRadius: BAR_H / 2,
     flexDirection: 'row', alignItems: 'center',

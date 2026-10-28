@@ -13,7 +13,7 @@ import { QMBackButton, QMButton, QMFormField, QMSheet } from '../../components/q
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { CameraIcon, ImageIcon, LockIcon } from '../../components/icons';
 import { useAuthStore } from '../../store';
-import { useUpdateProfile, usePickMedia } from '../../hooks';
+import { useUpdateProfile, usePickMedia, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 import i18n from '../../i18n';
@@ -39,6 +39,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const user = useAuthStore(s => s.user);
   const { mutateAsync: updateProfile } = useUpdateProfile();
   const { pickImage, takePhoto, isUploading } = usePickMedia();
@@ -75,7 +76,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
   return (
     <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -154,7 +155,7 @@ export function EditProfileScreen({ navigation }: ProfileScreenProps<'EditProfil
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: qm.glass, borderTopColor: qm.hair }]}>
+      <View style={[styles.footer, { marginBottom: tabSpace, backgroundColor: qm.glass, borderTopColor: qm.hair }]}>
         <QMButton label={t('profile:qmEdit.save')} onPress={handleSubmit(onSubmit)} loading={isSubmitting} />
       </View>
 

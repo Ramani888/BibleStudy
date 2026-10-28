@@ -46,6 +46,8 @@ export interface QMColors {
   verseShadow: string;
   /** Floating tab bar. */
   tabBg: string;
+  /** Translucent tab bar surface — content scrolls behind it. */
+  tabGlass: string;
   tabShadow: string;
   tabIdle: string;
   tabOn: string;
@@ -132,6 +134,7 @@ export const qmLight: QMColors = {
   verseBtn: 'rgba(255,255,255,0.72)',
   verseShadow: '0px 18px 40px -22px rgba(109,74,224,0.35)',
   tabBg: '#FFFFFF',
+  tabGlass: 'rgba(255,255,255,0.93)',
   tabShadow: '0px 10px 30px -12px rgba(34,30,51,0.28), 0px 0px 0px 1px rgba(34,30,51,0.04)',
   tabIdle: '#6B6580',
   tabOn: '#6D4AE0',
@@ -208,6 +211,7 @@ export const qmDark: QMColors = {
   verseBtn: 'rgba(255,255,255,0.09)',
   verseShadow: '0px 0px 0px 1px rgba(255,255,255,0.05)',
   tabBg: '#201B2A',
+  tabGlass: 'rgba(32,27,42,0.93)',
   tabShadow: '0px 0px 0px 1px rgba(255,255,255,0.08)',
   tabIdle: '#A69FB6',
   tabOn: '#C9BBFF',

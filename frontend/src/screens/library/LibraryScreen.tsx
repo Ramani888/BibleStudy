@@ -23,6 +23,7 @@ import {
   useDeleteFolder,
   useFolderModal,
   useManualRefresh,
+  useTabBarSpace,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useTheme, spacing } from '../../theme';
@@ -41,6 +42,7 @@ const AnimatedFlatList = Animated.FlatList as unknown as typeof FlatList;
 export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
   const { t } = useTranslation(['library', 'common']);
   const { qm } = useTheme();
+  const tabSpace = useTabBarSpace();
   const insets = useSafeAreaInsets();
   const listRef = useRef<FlatList<Row>>(null);
   const searchRef = useRef<TextInput>(null);
@@ -301,7 +303,7 @@ export function LibraryScreen({ navigation }: LibraryScreenProps<'Library'>) {
         ListEmptyComponent={empty}
         ListFooterComponent={loading || failed ? null : footer}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         onScroll={onScroll}

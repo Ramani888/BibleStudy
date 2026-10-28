@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { Achievement, AchievementCategory } from '../../types';
-import { useAchievements } from '../../hooks';
+import { useAchievements, useTabBarSpace } from '../../hooks';
 import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { InfoIcon, LockIcon } from '../../components/icons';
@@ -45,6 +45,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const { data: achievements = [], isLoading, isError, refetch } = useAchievements();
   const [celebrate, setCelebrate] = useState<Achievement | null>(null);
 
@@ -67,7 +68,7 @@ export function AchievementsScreen({ navigation }: ProfileScreenProps<'Achieveme
   let row = 0;
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]} showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmAch.back')} />
         <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmAch.title')}</Typography>
 

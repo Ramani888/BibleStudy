@@ -14,6 +14,7 @@ import { AnimatedPressable, Typography } from '../../components/ui';
 import { InfoIcon, LeafIcon, MegaphoneIcon, PersonCheckIcon, PersonPlusIcon, TrashIcon, type IconComponent } from '../../components/icons';
 import {
   useNotifications, useMarkNotificationRead, useMarkAllNotificationsRead, useDeleteNotification, useNotificationPrefs, TYPE_TO_PREF,
+  useTabBarSpace,
 } from '../../hooks';
 import { loadFailed } from '../../utils/queryState';
 import type { Notification } from '../../types/notification.types';
@@ -51,6 +52,7 @@ export function NotificationsScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const notifQuery = useNotifications();
   const { data, isLoading, isFetching, refetch } = notifQuery;
   const isError = loadFailed(notifQuery); // offline with nothing cached → error, not "All quiet"
@@ -164,7 +166,7 @@ export function NotificationsScreen({ navigation }: Props) {
           <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.hint}>{t('profile:qmNotifList.swipeHint')}</Typography>
         ) : null}
         stickySectionHeadersEnabled={false}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />

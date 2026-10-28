@@ -13,6 +13,7 @@ import {
 import { useAuthStore } from '../../store';
 import {
   useAchievements, useCreditBalance, useNoteStats, useQuizCount, useReferral, useSetStats, useStorageUsage, useStreak, useUnreadCount,
+  useTabBarSpace,
 } from '../../hooks';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 import { TIERS } from '../../types/subscription.types';
@@ -58,6 +59,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
 
   const user = useAuthStore(s => s.user);
   const unread = useUnreadCount();
@@ -99,7 +101,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps<'Profile'>) {
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.s18 }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.s18, paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.titleRow}>

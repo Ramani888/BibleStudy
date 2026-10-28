@@ -16,7 +16,7 @@ import {
 } from '../../components/icons';
 import {
   useCards, useCloneSet, useConfirmDialog, useCopyCard, useDeleteCard, useManualRefresh, useMastery, useMoveCard,
-  useReorderCards, useSet, useSets, useUpdateCard,
+  useReorderCards, useSet, useSets, useTabBarSpace, useUpdateCard,
 } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { buildSetShareLink, shareToWhatsApp } from '../../utils';
@@ -43,6 +43,7 @@ type Sheet = 'set' | 'share' | 'card' | 'move' | 'note' | null;
 export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDetail'>) {
   const { t } = useTranslation(['library', 'common']);
   const { qm, name: themeName } = useTheme();
+  const tabSpace = useTabBarSpace();
   const dark = themeName === 'dark';
   const insets = useSafeAreaInsets();
   const { setId, setTitle, isOwner = true, preview } = route.params;
@@ -399,7 +400,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
               {t('library:qm.reorderHint', 'Press and hold a card, then drag it.')}
             </Typography>
           }
-          contentContainerStyle={styles.reorderList}
+          contentContainerStyle={[styles.reorderList, { paddingBottom: spacing.xxxl + tabSpace }]}
           containerStyle={styles.flex}
           showsVerticalScrollIndicator={false}
         />
@@ -413,7 +414,7 @@ export function SetDetailScreen({ navigation, route }: LibraryScreenProps<'SetDe
           renderItem={renderCard}
           ListHeaderComponent={<>{searching ? <View style={{ height: topPad + spacing.md }} /> : hero}{head}</>}
           ListEmptyComponent={empty}
-          contentContainerStyle={styles.content}
+          contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
           onScroll={onScroll}

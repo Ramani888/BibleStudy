@@ -11,7 +11,7 @@ import type { ProfileScreenProps } from '../../navigation/types';
 import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { AskIcon, CheckIcon, CopyIcon, GiftIcon, InfoIcon, LeafIcon, ShareUpIcon } from '../../components/icons';
-import { useReferral, useRedeemReferral } from '../../hooks';
+import { useReferral, useRedeemReferral, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { shareToWhatsApp } from '../../utils';
 import { loadFailed } from '../../utils/queryState';
@@ -44,6 +44,7 @@ export function InviteFriendsScreen({ navigation }: ProfileScreenProps<'InviteFr
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const referralQuery = useReferral();
   const { data: referral, isLoading, refetch } = referralQuery;
   const isError = loadFailed(referralQuery); // offline with nothing cached → "did not load", not a code-less invite page
@@ -99,7 +100,7 @@ export function InviteFriendsScreen({ navigation }: ProfileScreenProps<'InviteFr
 
   return (
     <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmInvite.back')} />
 
         <Animated.View entering={qmRowEnter(0)}>

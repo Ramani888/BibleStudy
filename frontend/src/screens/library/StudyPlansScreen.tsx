@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { QMAddButton, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { ChevronLeftIcon, LeafIcon, PlanIcon, RefreshIcon, SearchIcon } from '../../components/icons';
-import { usePlans, useManualRefresh } from '../../hooks';
+import { usePlans, useManualRefresh, useTabBarSpace } from '../../hooks';
 import { useTheme, spacing, radius } from '../../theme';
 import { loadFailed } from '../../utils/queryState';
 import type { LibraryScreenProps } from '../../navigation/types';
@@ -23,6 +23,7 @@ const RING_LEN = 2 * Math.PI * RING_R;
 export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'>) {
   const { t } = useTranslation(['library', 'common']);
   const { qm } = useTheme();
+  const tabSpace = useTabBarSpace();
   const insets = useSafeAreaInsets();
   const plansQuery = usePlans();
   const { data: plans = [], isLoading, refetch } = plansQuery;
@@ -129,7 +130,7 @@ export function StudyPlansScreen({ navigation }: LibraryScreenProps<'StudyPlans'
         ListHeaderComponent={header}
         ListEmptyComponent={empty}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={qm.violet} progressViewOffset={insets.top} />}

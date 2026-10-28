@@ -14,7 +14,7 @@ import {
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { CardsIcon, CheckIcon, ChevronRightIcon, DocIcon, InfoIcon, SparklesIcon } from '../../components/icons';
 import { getErrorMessage } from '../../api';
-import { useCreditBalance, useGenerateQuiz, useSets } from '../../hooks';
+import { useCreditBalance, useGenerateQuiz, useSets, useTabBarSpace } from '../../hooks';
 import { useAIChatAttachment } from '../../hooks/useAIChatAttachment';
 import { GeneratingQuizModal } from './components';
 import { storage } from '../../utils/storage';
@@ -45,6 +45,7 @@ export function QuizSetupScreen() {
   const { qm, name: themeName } = useTheme();
   const dark = themeName === 'dark';
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- cross-tab Paywall + root-stack Quiz routes
   const navigation = useNavigation<any>();
 
@@ -290,7 +291,7 @@ export function QuizSetupScreen() {
         </View>
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair }]}>
+      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair, paddingBottom: spacing.s14 + tabSpace }]}>
         <QMButton
           icon={SparklesIcon}
           label={t('quiz:qm.makeMyQuiz', 'Make my quiz')}

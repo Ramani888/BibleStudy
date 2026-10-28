@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { QMBackButton, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { ChevronDownIcon, LeafIcon } from '../../components/icons';
+import { useTabBarSpace } from '../../hooks';
 import { radius, spacing, useTheme } from '../../theme';
 
 // Bump with every change to the policy text below (and the website's privacy.html).
@@ -29,13 +30,14 @@ export function PrivacyPolicyScreen() {
   const { t, i18n } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const navigation = useNavigation();
   const [open, setOpen] = useState<number>(2);
   const updated = LAST_UPDATED.toLocaleDateString(i18n.language, { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: insets.bottom + spacing.xxxl }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: Math.max(insets.bottom, tabSpace) + spacing.xxxl }]} showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmPrivacy.back')} />
         <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmPrivacy.title')}</Typography>
         <Typography preset="qmBody" color={qm.muted}>{t('profile:qmPrivacy.updated', { date: updated })}</Typography>

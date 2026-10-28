@@ -14,6 +14,7 @@ import {
 } from '../../components/icons';
 import {
   useConfirmDialog, useDeleteQuizAttempt, useDueCards, useDueSummary, useManualRefresh, useReQuiz, useRecentQuizAttempts, useSearchToggle,
+  useTabBarSpace,
 } from '../../hooks';
 import { GeneratingQuizModal } from './components';
 import { useTheme, spacing, radius } from '../../theme';
@@ -32,6 +33,7 @@ export function QuizHubScreen() {
   const { t } = useTranslation(['quiz', 'home', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const navigation = useNavigation<Nav>();
 
   const attemptsQuery = useRecentQuizAttempts(20);
@@ -264,7 +266,7 @@ export function QuizHubScreen() {
       />
 
       {!isLoading && !isError && (
-        <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+        <View style={[styles.footer, { backgroundColor: qm.bg, paddingBottom: spacing.md + tabSpace }]}>
           <QMButton icon={PlusIcon} label={t('quiz:qm.startNew', 'Start a new quiz')} onPress={() => navigation.navigate('QuizSetup', undefined)} />
         </View>
       )}

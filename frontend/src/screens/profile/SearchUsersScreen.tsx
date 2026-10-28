@@ -11,7 +11,7 @@ import { QMAvatar, QMBackButton, QMEmpty, QMSearchField, qmRowEnter } from '../.
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { CheckIcon, ClockIcon, InfoIcon, PlusIcon, SearchIcon, type IconComponent } from '../../components/icons';
 import { useAcceptFriendRequest, useSearchUsers, useSendFriendRequest } from '../../hooks/useFriends';
-import { useDebouncedValue, useReferral } from '../../hooks';
+import { useDebouncedValue, useReferral, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import { loadFailed } from '../../utils/queryState';
 import { radius, spacing, useTheme } from '../../theme';
@@ -27,6 +27,7 @@ export function SearchUsersScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [query, setQuery] = useState('');
   const q = useDebouncedValue(query.trim(), 300);
   // Local overrides so a tap shows its result before the search refetches.
@@ -126,7 +127,7 @@ export function SearchUsersScreen({ navigation }: Props) {
           ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.privacy}>{t('profile:qmSearch.privacy')}</Typography>
           : null}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       />

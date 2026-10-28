@@ -12,7 +12,7 @@ import type { LeaderboardEntry } from '../../types/friends.types';
 import { QMAvatar, QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { FriendsIcon, InfoIcon, LeafIcon, PlusIcon } from '../../components/icons';
-import { useLeaderboard } from '../../hooks';
+import { useLeaderboard, useTabBarSpace } from '../../hooks';
 import { loadFailed } from '../../utils/queryState';
 import { qmFont, radius, spacing, useTheme } from '../../theme';
 
@@ -44,6 +44,7 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const leaderQuery = useLeaderboard();
   const { data: rows = [], isLoading, isFetching, refetch } = leaderQuery;
   const isError = loadFailed(leaderQuery); // offline with nothing cached → error, not "No one to walk with"
@@ -112,11 +113,11 @@ export function LeaderboardScreen({ navigation }: ProfileScreenProps<'Leaderboar
         ListEmptyComponent={empty}
         ListFooterComponent={rows.length > 0 ? <Typography preset="qmMeta" color={qm.muted} align="center" style={styles.private}>{t('profile:qmLeader.private')}</Typography> : null}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
-      <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+      <View style={[styles.footer, { marginBottom: tabSpace, backgroundColor: qm.bg }]}>
         <AnimatedPressable
           scaleTo={0.97}
           onPress={() => navigation.navigate('SearchUsers')}

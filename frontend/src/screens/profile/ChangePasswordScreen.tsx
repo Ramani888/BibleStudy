@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import type { ProfileScreenProps } from '../../navigation/types';
 import { QMBackButton, QMButton, QMFormField, QMPasswordRules, qmRowEnter } from '../../components/qm';
 import { Typography } from '../../components/ui';
-import { useChangePassword } from '../../hooks';
+import { useChangePassword, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { useAuthStore } from '../../store';
 import { makeChangePasswordSchema, type ChangePasswordFormData } from '../../utils/validators';
@@ -20,6 +20,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const hasPassword = useAuthStore(s => s.user?.hasPassword ?? true);
   const updateUser = useAuthStore(s => s.updateUser);
   const user = useAuthStore(s => s.user);
@@ -50,7 +51,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
   return (
     <KeyboardAvoidingView style={[styles.flex, { backgroundColor: qm.bg }]} behavior="padding">
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
@@ -110,7 +111,7 @@ export function ChangePasswordScreen({ navigation }: ProfileScreenProps<'ChangeP
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: qm.glass, borderTopColor: qm.hair }]}>
+      <View style={[styles.footer, { marginBottom: tabSpace, backgroundColor: qm.glass, borderTopColor: qm.hair }]}>
         <QMButton
           label={hasPassword ? t('profile:qmPw.save') : t('profile:qmPw.add')}
           onPress={handleSubmit(onSubmit)}

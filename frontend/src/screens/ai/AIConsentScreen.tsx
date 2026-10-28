@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { QMButton, QMFog } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { BookIcon, ChevronDownIcon, ChevronUpIcon, GlobeIcon, SendIcon, type IconComponent } from '../../components/icons';
+import { useTabBarSpace } from '../../hooks';
 import { spacing, radius, qmFont, useTheme } from '../../theme';
 import { storage } from '../../utils/storage';
 import type { AIScreenProps } from '../../navigation/types';
@@ -27,6 +28,7 @@ export function AIConsentScreen({ navigation, route }: AIScreenProps<'AIConsent'
   const { t } = useTranslation(['ai', 'common', 'profile']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [checking, setChecking] = useState(true);
   const [open, setOpen] = useState(false);
   // A question handed over from another screen (e.g. "Ask AI about this card").
@@ -130,7 +132,7 @@ export function AIConsentScreen({ navigation, route }: AIScreenProps<'AIConsent'
         </Animated.View>
       </ScrollView>
 
-      <View style={[styles.bar, { backgroundColor: qm.glass, borderTopColor: qm.hair }]}>
+      <View style={[styles.bar, { backgroundColor: qm.glass, borderTopColor: qm.hair, paddingBottom: spacing.s14 + tabSpace }]}>
         <QMButton label={t('ai:qm.consent.agree', 'I agree, let’s start')} onPress={handleAccept} />
         <AnimatedPressable scaleTo={0.97} onPress={handleDecline} style={styles.notNow} accessibilityRole="button">
           <Typography preset="qmButton" color={qm.muted}>{t('ai:qm.consent.notNow', 'Not now')}</Typography>

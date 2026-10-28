@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import { type Note, NOTE_PREDEFINED_TAGS } from '../../types';
-import { useNotes, useDeleteNote, useConfirmDialog } from '../../hooks';
+import { useNotes, useDeleteNote, useConfirmDialog, useTabBarSpace } from '../../hooks';
 import { formatRelativeShort } from '../../utils/formatters';
 import { loadFailed } from '../../utils/queryState';
 import { QMBackButton, QMButton, QMConfirmDialog, QMEmpty, QMSearchField, qmRowEnter } from '../../components/qm';
@@ -29,6 +29,7 @@ export function NotesScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [search, setSearch] = useState('');
   const [sortOrder, setSortOrder] = useState<SortOrder>('newest');
   const [activeTag, setActiveTag] = useState<string | null>(null);
@@ -192,7 +193,7 @@ export function NotesScreen({ navigation }: Props) {
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
       {!isLoading && !isError && (
-        <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+        <View style={[styles.footer, { backgroundColor: qm.bg, paddingBottom: spacing.md + tabSpace }]}>
           <QMButton icon={PencilIcon} label={t('profile:qmNotes.write')} onPress={() => navigation.navigate('NoteEditor', {})} />
         </View>
       )}

@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { QMEmpty, QMSearchField, QMSetRow, qmRowEnter } from '../../../components/qm';
 import { AnimatedPressable, Typography } from '../../../components/ui';
 import { CheckIcon, ChevronLeftIcon, FriendsIcon, PlusIcon, RefreshIcon, SearchIcon } from '../../../components/icons';
-import { useCloneSet, useDebouncedValue, useFriendsSets, usePublicSets } from '../../../hooks';
+import { useCloneSet, useDebouncedValue, useFriendsSets, usePublicSets, useTabBarSpace } from '../../../hooks';
 import { useAuthStore } from '../../../store';
 import { getErrorMessage } from '../../../api';
 import { useTheme, spacing, radius } from '../../../theme';
@@ -26,6 +26,7 @@ type Nav = NavigationProp<LibraryStackParamList & AppTabParamList>;
 export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
   const { t } = useTranslation(['library', 'common']);
   const { qm } = useTheme();
+  const tabSpace = useTabBarSpace();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<Nav>();
   const friends = kind === 'friends';
@@ -164,7 +165,7 @@ export function SetBrowser({ kind }: { kind: 'explore' | 'friends' }) {
         ListEmptyComponent={empty}
         ListFooterComponent={isFetchingNextPage ? <ActivityIndicator color={qm.violet} style={styles.more} /> : null}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
         onEndReached={() => { if (hasNextPage && !isFetchingNextPage) fetchNextPage(); }}

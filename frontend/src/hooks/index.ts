@@ -1,5 +1,6 @@
 export { useDailyVerse } from './useDailyVerse';
 export { useNow } from './useNow';
+export { useTabBarSpace } from './useTabBarSpace';
 export {
   useAIChat,
   useAIChatHistory,

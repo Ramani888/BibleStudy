@@ -10,6 +10,7 @@ import { AnimatedPressable, Typography } from '../../components/ui';
 import { CheckIcon, ChevronRightIcon, ClockIcon, ListIcon, RefreshIcon, TrashIcon } from '../../components/icons';
 import {
   useConfirmDialog, useCreditBalance, useDeleteQuizAttempt, useQuizAttemptResponses, useReQuiz, useRecentQuizAttempts,
+  useTabBarSpace,
 } from '../../hooks';
 import { GeneratingQuizModal } from './components';
 import { useTheme, spacing, radius } from '../../theme';
@@ -32,6 +33,7 @@ export function QuizDetailScreen() {
   const { t } = useTranslation(['quiz', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- QuizSummary is a root-stack route, outside the Quiz stack
   const navigation = useNavigation<any>();
   const { params } = useRoute<RouteProp<{ QuizDetail: Params }, 'QuizDetail'>>();
@@ -193,7 +195,7 @@ export function QuizDetailScreen() {
         )}
       </ScrollView>
 
-      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair }]}>
+      <View style={[styles.footer, { backgroundColor: qm.bg, borderTopColor: qm.hair, paddingBottom: spacing.s14 + tabSpace }]}>
         <QMButton icon={RefreshIcon} label={t('quiz:qm.quizAgain', 'Quiz me again')} onPress={handleReQuiz} />
         <Typography preset="qmMeta" color={lacking ? qm.warm : qm.muted} align="center" style={styles.hint}>{hint}</Typography>
       </View>

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { QMBackButton, QMMenuGroup, QMSwitchRow } from '../../components/qm';
 import { Typography } from '../../components/ui';
 import { LeafIcon, MegaphoneIcon, PersonCheckIcon, PersonPlusIcon, type IconComponent } from '../../components/icons';
-import { NOTIF_DEFAULTS, NOTIF_PREFS_KEY, type NotificationPrefs } from '../../hooks';
+import { NOTIF_DEFAULTS, NOTIF_PREFS_KEY, type NotificationPrefs, useTabBarSpace } from '../../hooks';
 import { registerDeviceToken } from '../../utils/notifications';
 import { spacing, useTheme } from '../../theme';
 import type { ProfileScreenProps } from '../../navigation/types';
@@ -24,6 +24,7 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [prefs, setPrefs] = useState<NotificationPrefs>(NOTIF_DEFAULTS);
 
   useEffect(() => {
@@ -53,7 +54,7 @@ export function NotificationSettingsScreen({ navigation }: ProfileScreenProps<'N
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]} showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmSettings.back')} />
         <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmNotif.title')}</Typography>
         <Typography preset="qmBodyMd" color={qm.muted}>{t('profile:qmNotif.sub')}</Typography>

@@ -11,7 +11,7 @@ import {
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { GlobeIcon, InfoIcon, LeafIcon, MoonIcon, PhoneIcon, SunIcon } from '../../components/icons';
 import { useAuthStore, useAnalyticsStore } from '../../store';
-import { useBlockedUsers, useUpdateProfile } from '../../hooks';
+import { useBlockedUsers, useUpdateProfile, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api';
 import { storage } from '../../utils/storage';
 import { APP_VERSION } from '../../constants';
@@ -29,6 +29,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const [sheet, setSheet] = useState<Sheet>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -86,7 +87,7 @@ export function SettingsScreen({ navigation }: ProfileScreenProps<'Settings'>) {
 
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
-      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]} showsVerticalScrollIndicator={false}>
+      <ScrollView contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]} showsVerticalScrollIndicator={false}>
         <QMBackButton onPress={navigation.goBack} label={t('profile:qmSettings.back')} />
         <Typography preset="qmPageTitle" color={qm.ink} style={styles.h1}>{t('profile:qmSettings.title')}</Typography>
 

@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 
 import type { ProfileScreenProps } from '../../navigation/types';
 import type { MediaFile, MediaFileType } from '../../types';
-import { useMediaFiles, useStorageUsage } from '../../hooks';
+import { useMediaFiles, useStorageUsage, useTabBarSpace } from '../../hooks';
 import { useMediaUpload } from '../../hooks/useMediaUpload';
 import { useMediaActions } from '../../hooks/useMediaActions';
 import { useAuthStore } from '../../store';
@@ -68,6 +68,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const { width } = useWindowDimensions();
   const cell = (width - spacing.xl * 2 - GRID_GAP * (COLS - 1)) / COLS;
 
@@ -292,7 +293,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
       />
 
       {upload.uploadMedia.isPending && (
-        <Animated.View entering={FadeIn} style={[styles.uploading, { backgroundColor: qm.surface, boxShadow: qm.liftShadow }]}>
+        <Animated.View entering={FadeIn} style={[styles.uploading, { backgroundColor: qm.surface, boxShadow: qm.liftShadow, bottom: spacing.s80 + spacing.sm + tabSpace }]}>
           <View style={styles.uploadHead}>
             <ActivityIndicator size="small" color={qm.violet} />
             <Typography preset="qmFieldLabel" color={qm.ink} numberOfLines={1} style={styles.flex}>{t('profile:qmMedia.uploading', { pct: upload.uploadProgress })}</Typography>
@@ -303,7 +304,7 @@ export function MediaScreen({ navigation }: ProfileScreenProps<'Media'>) {
         </Animated.View>
       )}
 
-      <View style={[styles.footer, { backgroundColor: qm.bg }]}>
+      <View style={[styles.footer, { backgroundColor: qm.bg, paddingBottom: spacing.md + tabSpace }]}>
         {selecting ? (
           <QMButton
             icon={TrashIcon}

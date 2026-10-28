@@ -17,7 +17,7 @@ import { useUserSets } from '../../hooks/useSets';
 import {
   useAcceptFriendRequest, useBlockUser, useCancelFriendRequest, useRejectFriendRequest, useRemoveFriend, useSendFriendRequest,
 } from '../../hooks/useFriends';
-import { useConfirmDialog, useReportUser } from '../../hooks';
+import { useConfirmDialog, useReportUser, useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import { qmAccent, radius, spacing, useTheme } from '../../theme';
 
@@ -37,6 +37,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   const { t, i18n } = useTranslation(['profile', 'common']);
   const { qm, name: themeName } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const { userId } = route.params;
 
   const { data: user, isLoading, isFetching, isError, refetch } = useUser(userId);
@@ -125,7 +126,7 @@ export function UserProfileScreen({ route, navigation }: Props) {
   return (
     <View style={[styles.flex, { backgroundColor: qm.bg }]}>
       <ScrollView
-        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm }]}
+        contentContainerStyle={[styles.content, { paddingTop: insets.top + spacing.sm, paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={() => { refetch(); refetchSets(); }}tintColor={qm.violet} progressViewOffset={insets.top} />}
       >

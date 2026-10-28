@@ -11,6 +11,7 @@ import { QMBackButton, QMEmpty, qmRowEnter } from '../../components/qm';
 import { AnimatedPressable, Typography } from '../../components/ui';
 import { InfoIcon, LeafIcon } from '../../components/icons';
 import { useBlockedUsers, useUnblockUser } from '../../hooks/useFriends';
+import { useTabBarSpace } from '../../hooks';
 import { getErrorMessage } from '../../api/client';
 import { initialsOf } from '../../components/qm/QMAvatar';
 import { formatDateOnly } from '../../utils/formatters';
@@ -26,6 +27,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
   const { t } = useTranslation(['profile', 'common']);
   const { qm } = useTheme();
   const insets = useSafeAreaInsets();
+  const tabSpace = useTabBarSpace();
   const blockedQuery = useBlockedUsers();
   const { data: blocked = [], isLoading, isFetching, refetch } = blockedQuery;
   const isError = loadFailed(blockedQuery); // offline with nothing cached → "did not load", not the empty state
@@ -84,7 +86,7 @@ export function BlockedUsersScreen({ navigation }: Props) {
         ListHeaderComponent={header}
         ListEmptyComponent={empty}
         ItemSeparatorComponent={Separator}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[styles.content, { paddingBottom: spacing.xxxl + tabSpace }]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={isFetching && !isLoading} onRefresh={refetch} tintColor={qm.violet} progressViewOffset={insets.top} />}
       />
