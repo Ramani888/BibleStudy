@@ -1,16 +1,16 @@
-# Graph Report - BibleStudy  (2026-10-22)
+# Graph Report - BibleStudy  (2026-10-28)
 
 ## Corpus Check
-- 793 files · ~472,571 words
+- 1009 files · ~740,120 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 15587 nodes · 19168 edges · 976 communities (958 shown, 18 thin omitted)
-- Extraction: 96% EXTRACTED · 4% INFERRED · 0% AMBIGUOUS · INFERRED: 789 edges (avg confidence: 0.8)
+- 21302 nodes · 25722 edges · 1147 communities (1127 shown, 20 thin omitted)
+- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 836 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `38a512cf`
+- Built from commit: `35385a56`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -173,6 +173,7 @@
 - [[_COMMUNITY_Community 162|Community 162]]
 - [[_COMMUNITY_Community 163|Community 163]]
 - [[_COMMUNITY_Community 164|Community 164]]
+- [[_COMMUNITY_Community 165|Community 165]]
 - [[_COMMUNITY_Community 166|Community 166]]
 - [[_COMMUNITY_Community 167|Community 167]]
 - [[_COMMUNITY_Community 168|Community 168]]
@@ -955,18 +956,179 @@
 - [[_COMMUNITY_Community 954|Community 954]]
 - [[_COMMUNITY_Community 955|Community 955]]
 - [[_COMMUNITY_Community 956|Community 956]]
+- [[_COMMUNITY_Community 976|Community 976]]
+- [[_COMMUNITY_Community 977|Community 977]]
+- [[_COMMUNITY_Community 978|Community 978]]
+- [[_COMMUNITY_Community 979|Community 979]]
+- [[_COMMUNITY_Community 980|Community 980]]
+- [[_COMMUNITY_Community 981|Community 981]]
+- [[_COMMUNITY_Community 982|Community 982]]
+- [[_COMMUNITY_Community 983|Community 983]]
+- [[_COMMUNITY_Community 984|Community 984]]
+- [[_COMMUNITY_Community 985|Community 985]]
+- [[_COMMUNITY_Community 986|Community 986]]
+- [[_COMMUNITY_Community 987|Community 987]]
+- [[_COMMUNITY_Community 988|Community 988]]
+- [[_COMMUNITY_Community 989|Community 989]]
+- [[_COMMUNITY_Community 990|Community 990]]
+- [[_COMMUNITY_Community 991|Community 991]]
+- [[_COMMUNITY_Community 992|Community 992]]
+- [[_COMMUNITY_Community 993|Community 993]]
+- [[_COMMUNITY_Community 994|Community 994]]
+- [[_COMMUNITY_Community 995|Community 995]]
+- [[_COMMUNITY_Community 996|Community 996]]
+- [[_COMMUNITY_Community 997|Community 997]]
+- [[_COMMUNITY_Community 998|Community 998]]
+- [[_COMMUNITY_Community 999|Community 999]]
+- [[_COMMUNITY_Community 1000|Community 1000]]
+- [[_COMMUNITY_Community 1001|Community 1001]]
+- [[_COMMUNITY_Community 1002|Community 1002]]
+- [[_COMMUNITY_Community 1003|Community 1003]]
+- [[_COMMUNITY_Community 1004|Community 1004]]
+- [[_COMMUNITY_Community 1005|Community 1005]]
+- [[_COMMUNITY_Community 1006|Community 1006]]
+- [[_COMMUNITY_Community 1007|Community 1007]]
+- [[_COMMUNITY_Community 1008|Community 1008]]
+- [[_COMMUNITY_Community 1009|Community 1009]]
+- [[_COMMUNITY_Community 1010|Community 1010]]
+- [[_COMMUNITY_Community 1011|Community 1011]]
+- [[_COMMUNITY_Community 1012|Community 1012]]
+- [[_COMMUNITY_Community 1013|Community 1013]]
+- [[_COMMUNITY_Community 1014|Community 1014]]
+- [[_COMMUNITY_Community 1015|Community 1015]]
+- [[_COMMUNITY_Community 1016|Community 1016]]
+- [[_COMMUNITY_Community 1017|Community 1017]]
+- [[_COMMUNITY_Community 1018|Community 1018]]
+- [[_COMMUNITY_Community 1019|Community 1019]]
+- [[_COMMUNITY_Community 1020|Community 1020]]
+- [[_COMMUNITY_Community 1021|Community 1021]]
+- [[_COMMUNITY_Community 1022|Community 1022]]
+- [[_COMMUNITY_Community 1023|Community 1023]]
+- [[_COMMUNITY_Community 1024|Community 1024]]
+- [[_COMMUNITY_Community 1025|Community 1025]]
+- [[_COMMUNITY_Community 1026|Community 1026]]
+- [[_COMMUNITY_Community 1027|Community 1027]]
+- [[_COMMUNITY_Community 1028|Community 1028]]
+- [[_COMMUNITY_Community 1029|Community 1029]]
+- [[_COMMUNITY_Community 1030|Community 1030]]
+- [[_COMMUNITY_Community 1031|Community 1031]]
+- [[_COMMUNITY_Community 1032|Community 1032]]
+- [[_COMMUNITY_Community 1033|Community 1033]]
+- [[_COMMUNITY_Community 1034|Community 1034]]
+- [[_COMMUNITY_Community 1035|Community 1035]]
+- [[_COMMUNITY_Community 1036|Community 1036]]
+- [[_COMMUNITY_Community 1037|Community 1037]]
+- [[_COMMUNITY_Community 1038|Community 1038]]
+- [[_COMMUNITY_Community 1039|Community 1039]]
+- [[_COMMUNITY_Community 1040|Community 1040]]
+- [[_COMMUNITY_Community 1041|Community 1041]]
+- [[_COMMUNITY_Community 1042|Community 1042]]
+- [[_COMMUNITY_Community 1043|Community 1043]]
+- [[_COMMUNITY_Community 1044|Community 1044]]
+- [[_COMMUNITY_Community 1045|Community 1045]]
+- [[_COMMUNITY_Community 1046|Community 1046]]
+- [[_COMMUNITY_Community 1047|Community 1047]]
+- [[_COMMUNITY_Community 1048|Community 1048]]
+- [[_COMMUNITY_Community 1049|Community 1049]]
+- [[_COMMUNITY_Community 1050|Community 1050]]
+- [[_COMMUNITY_Community 1051|Community 1051]]
+- [[_COMMUNITY_Community 1052|Community 1052]]
+- [[_COMMUNITY_Community 1053|Community 1053]]
+- [[_COMMUNITY_Community 1054|Community 1054]]
+- [[_COMMUNITY_Community 1055|Community 1055]]
+- [[_COMMUNITY_Community 1056|Community 1056]]
+- [[_COMMUNITY_Community 1057|Community 1057]]
+- [[_COMMUNITY_Community 1058|Community 1058]]
+- [[_COMMUNITY_Community 1059|Community 1059]]
+- [[_COMMUNITY_Community 1060|Community 1060]]
+- [[_COMMUNITY_Community 1061|Community 1061]]
+- [[_COMMUNITY_Community 1062|Community 1062]]
+- [[_COMMUNITY_Community 1063|Community 1063]]
+- [[_COMMUNITY_Community 1064|Community 1064]]
+- [[_COMMUNITY_Community 1065|Community 1065]]
+- [[_COMMUNITY_Community 1066|Community 1066]]
+- [[_COMMUNITY_Community 1067|Community 1067]]
+- [[_COMMUNITY_Community 1068|Community 1068]]
+- [[_COMMUNITY_Community 1069|Community 1069]]
+- [[_COMMUNITY_Community 1070|Community 1070]]
+- [[_COMMUNITY_Community 1071|Community 1071]]
+- [[_COMMUNITY_Community 1072|Community 1072]]
+- [[_COMMUNITY_Community 1073|Community 1073]]
+- [[_COMMUNITY_Community 1074|Community 1074]]
+- [[_COMMUNITY_Community 1075|Community 1075]]
+- [[_COMMUNITY_Community 1076|Community 1076]]
+- [[_COMMUNITY_Community 1077|Community 1077]]
+- [[_COMMUNITY_Community 1078|Community 1078]]
+- [[_COMMUNITY_Community 1079|Community 1079]]
+- [[_COMMUNITY_Community 1080|Community 1080]]
+- [[_COMMUNITY_Community 1081|Community 1081]]
+- [[_COMMUNITY_Community 1082|Community 1082]]
+- [[_COMMUNITY_Community 1083|Community 1083]]
+- [[_COMMUNITY_Community 1084|Community 1084]]
+- [[_COMMUNITY_Community 1085|Community 1085]]
+- [[_COMMUNITY_Community 1086|Community 1086]]
+- [[_COMMUNITY_Community 1087|Community 1087]]
+- [[_COMMUNITY_Community 1088|Community 1088]]
+- [[_COMMUNITY_Community 1089|Community 1089]]
+- [[_COMMUNITY_Community 1090|Community 1090]]
+- [[_COMMUNITY_Community 1091|Community 1091]]
+- [[_COMMUNITY_Community 1092|Community 1092]]
+- [[_COMMUNITY_Community 1093|Community 1093]]
+- [[_COMMUNITY_Community 1094|Community 1094]]
+- [[_COMMUNITY_Community 1095|Community 1095]]
+- [[_COMMUNITY_Community 1096|Community 1096]]
+- [[_COMMUNITY_Community 1097|Community 1097]]
+- [[_COMMUNITY_Community 1098|Community 1098]]
+- [[_COMMUNITY_Community 1099|Community 1099]]
+- [[_COMMUNITY_Community 1100|Community 1100]]
+- [[_COMMUNITY_Community 1101|Community 1101]]
+- [[_COMMUNITY_Community 1102|Community 1102]]
+- [[_COMMUNITY_Community 1103|Community 1103]]
+- [[_COMMUNITY_Community 1104|Community 1104]]
+- [[_COMMUNITY_Community 1105|Community 1105]]
+- [[_COMMUNITY_Community 1106|Community 1106]]
+- [[_COMMUNITY_Community 1107|Community 1107]]
+- [[_COMMUNITY_Community 1108|Community 1108]]
+- [[_COMMUNITY_Community 1109|Community 1109]]
+- [[_COMMUNITY_Community 1110|Community 1110]]
+- [[_COMMUNITY_Community 1111|Community 1111]]
+- [[_COMMUNITY_Community 1112|Community 1112]]
+- [[_COMMUNITY_Community 1113|Community 1113]]
+- [[_COMMUNITY_Community 1114|Community 1114]]
+- [[_COMMUNITY_Community 1115|Community 1115]]
+- [[_COMMUNITY_Community 1116|Community 1116]]
+- [[_COMMUNITY_Community 1117|Community 1117]]
+- [[_COMMUNITY_Community 1118|Community 1118]]
+- [[_COMMUNITY_Community 1119|Community 1119]]
+- [[_COMMUNITY_Community 1120|Community 1120]]
+- [[_COMMUNITY_Community 1121|Community 1121]]
+- [[_COMMUNITY_Community 1122|Community 1122]]
+- [[_COMMUNITY_Community 1123|Community 1123]]
+- [[_COMMUNITY_Community 1124|Community 1124]]
+- [[_COMMUNITY_Community 1125|Community 1125]]
+- [[_COMMUNITY_Community 1126|Community 1126]]
+- [[_COMMUNITY_Community 1127|Community 1127]]
+- [[_COMMUNITY_Community 1128|Community 1128]]
+- [[_COMMUNITY_Community 1129|Community 1129]]
+- [[_COMMUNITY_Community 1130|Community 1130]]
+- [[_COMMUNITY_Community 1131|Community 1131]]
+- [[_COMMUNITY_Community 1132|Community 1132]]
+- [[_COMMUNITY_Community 1133|Community 1133]]
+- [[_COMMUNITY_Community 1134|Community 1134]]
+- [[_COMMUNITY_Community 1135|Community 1135]]
+- [[_COMMUNITY_Community 1136|Community 1136]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `qm` - 204 edges
-2. `useTheme()` - 152 edges
-3. `qm` - 135 edges
-4. `sendSuccess()` - 129 edges
-5. `sendSuccess()` - 113 edges
-6. `handleControllerError()` - 111 edges
-7. `handleControllerError()` - 97 edges
-8. `cards` - 92 edges
-9. `cards` - 91 edges
-10. `cards` - 91 edges
+1. `qm` - 205 edges
+2. `qm` - 205 edges
+3. `qm` - 205 edges
+4. `qm` - 205 edges
+5. `qm` - 205 edges
+6. `qm` - 205 edges
+7. `useTheme()` - 165 edges
+8. `qm` - 136 edges
+9. `qm` - 135 edges
+10. `qm` - 135 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `handleChange()` --calls--> `join()`  [INFERRED]
@@ -980,23 +1142,23 @@
 - `async()` --calls--> `createCard()`  [INFERRED]
   frontend/src/screens/library/CreateCardScreen.tsx → backend/src/modules/cards/cards.controller.ts
 
-## Communities (976 total, 18 thin omitted)
+## Communities (1147 total, 20 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.03
-Nodes (187): getAchievements(), getAchievements(), getFriendsFeed(), getMyFeed(), getFriendsFeed(), getMyFeed(), addBookmark(), askQuestion() (+179 more)
+Cohesion: 0.02
+Nodes (234): getAchievements(), getAchievements(), getFriendsFeed(), getMyFeed(), getFriendsFeed(), getMyFeed(), addBookmark(), askQuestion() (+226 more)
 
 ### Community 1 - "Community 1"
-Cohesion: 0.04
-Nodes (47): AccentIcon(), StatusBadge(), AuthNavigator(), Card(), PressableCard(), GeneratingQuizModal(), styles, Divider() (+39 more)
+Cohesion: 0.02
+Nodes (85): AccentIcon(), StatusBadge(), AuthNavigator(), Badge(), makeVariantMap(), Card(), PressableCard(), Divider() (+77 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.04
-Nodes (37): userSelect, getFriendsFeed(), getMyFeed(), anthropic, askQuestion(), ChatMessage, CREDIT_COST, fetchDailyVerse() (+29 more)
+Nodes (39): userSelect, getFriendsFeed(), getMyFeed(), anthropic, askQuestion(), ChatMessage, CREDIT_COST, fetchDailyVerse() (+31 more)
 
 ### Community 3 - "Community 3"
-Cohesion: 0.09
-Nodes (30): cardCopy(), CardPreview(), ListSeparator(), t(), getErrorMessage(), CardPreview(), CardPreviewProps, styles (+22 more)
+Cohesion: 0.06
+Nodes (44): CardPreview(), ListSeparator(), t(), getErrorMessage(), CardPreview(), CardPreviewProps, styles, GeneratingQuizModal() (+36 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.05
@@ -1007,16 +1169,16 @@ Cohesion: 0.13
 Nodes (19): buildItem(), buildItems(), cardModes(), formatCorrectAnswer(), gradeItem(), MODE_META, normalize(), shuffle() (+11 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.06
-Nodes (68): AppleAuthDto, AppleAuthDtoType, ForgotPasswordDto, ForgotPasswordDtoType, GoogleAuthDto, GoogleAuthDtoType, LoginDto, LoginDtoType (+60 more)
+Cohesion: 0.05
+Nodes (77): AppleAuthDto, AppleAuthDtoType, ForgotPasswordDto, ForgotPasswordDtoType, GoogleAuthDto, GoogleAuthDtoType, LoginDto, LoginDtoType (+69 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.03
-Nodes (59): logActivity(), CardRow, embed(), NoteRow, retrieveContext(), storeCardEmbedding(), storeNoteEmbedding(), vectorToSql() (+51 more)
+Nodes (67): logActivity(), CardRow, embed(), NoteRow, retrieveContext(), storeCardEmbedding(), storeNoteEmbedding(), vectorToSql() (+59 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.05
-Nodes (47): Action, ActionSheet(), ActionSheetProps, styles, useAIChatAttachment(), useBulkDeleteMedia(), useDeleteMedia(), useMediaFiles() (+39 more)
+Cohesion: 0.04
+Nodes (49): Action, ActionSheet(), ActionSheetProps, styles, useAIChatAttachment(), useBulkDeleteMedia(), useDeleteMedia(), useMediaFiles() (+41 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.06
@@ -1072,7 +1234,7 @@ Nodes (19): 2 card types, Backend, code:block1 (QuizScreen → useQuizSession (c
 
 ### Community 22 - "Community 22"
 Cohesion: 0.08
-Nodes (33): getReferral(), agg(), claimDailyLogin(), DAY_LABELS, getReferralInfo(), getStats(), getStreak(), groupByDays() (+25 more)
+Nodes (34): getReferral(), agg(), claimDailyLogin(), DAY_LABELS, getReferralInfo(), getStats(), getStreak(), groupByDays() (+26 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.11
@@ -1108,11 +1270,11 @@ Nodes (15): 1. One hero per screen, 2. Whitespace rhythm, 3. Verse / scripture t
 
 ### Community 31 - "Community 31"
 Cohesion: 0.03
-Nodes (61): SetBrowser(), CreateCardScreen(), CreatePlanScreen(), CreateSetScreen(), MoveToFolderSheet(), QuizModeSheet(), styles, VerseCard() (+53 more)
+Nodes (61): SetBrowser(), CreateCardScreen(), CreatePlanScreen(), MoveToFolderSheet(), QuizModeSheet(), styles, VerseCard(), EditSetScreen() (+53 more)
 
 ### Community 32 - "Community 32"
-Cohesion: 0.05
-Nodes (19): AppError, ConflictError, ForbiddenError, NotFoundError, PaymentRequiredError, UnauthorizedError, ValidationError, createFolder() (+11 more)
+Cohesion: 0.08
+Nodes (13): CreateFolderDto, CreateFolderDtoType, UpdateFolderDto, UpdateFolderDtoType, createFolder(), deleteFolder(), updateFolder(), withHierarchyLock() (+5 more)
 
 ### Community 33 - "Community 33"
 Cohesion: 0.14
@@ -1136,7 +1298,7 @@ Nodes (13): Auth & Account, Backend, Data flow, Data model, DTOs (zod), Edge cas
 
 ### Community 38 - "Community 38"
 Cohesion: 0.02
-Nodes (156): getErrorMessage(), friendsApi, Badge(), makeVariantMap(), WeeklyChart(), DEFAULT_ANIMATION, EmptyState(), EmptyStateProps (+148 more)
+Nodes (119): getErrorMessage(), friendsApi, CrashBoundary, CrashBoundaryProps, CrashBoundaryState, CrashFallback(), styles, DEFAULT_ANIMATION (+111 more)
 
 ### Community 39 - "Community 39"
 Cohesion: 0.15
@@ -1159,8 +1321,8 @@ Cohesion: 0.09
 Nodes (25): Checking for schema drift (`migrate diff`), code:bash (docker run -d --name bsp-db --restart unless-stopped -p 5434), code:bash (cd backend && npm run dev        # local DB on 5434), code:bash (cd backend  && npm install), code:bash (docker exec bsp-db psql -U biblestudypro -d biblestudypro \), code:bash (cd backend), code:sql (CREATE DATABASE shadow_drift;), code:bash (cd frontend && npx react-native start          # Metro) (+17 more)
 
 ### Community 44 - "Community 44"
-Cohesion: 0.08
-Nodes (20): configureAnalytics(), identify(), track(), onShare(), AnalyticsEvent, configureAnalytics(), identify(), resetAnalytics() (+12 more)
+Cohesion: 0.13
+Nodes (11): track(), onShare(), track(), shareToWhatsApp(), Pagination, Visibility, CardLayout, CreateSetPayload (+3 more)
 
 ### Community 45 - "Community 45"
 Cohesion: 0.18
@@ -1176,11 +1338,11 @@ Nodes (12): ai/, auth/, home/, library/  (study core), map/  ~~(gatherings)~~ �
 
 ### Community 48 - "Community 48"
 Cohesion: 0.02
-Nodes (151): Media, Sheet, styles, AIConsentScreen(), nbsp(), rise(), styles, PREDEFINED_TAGS (+143 more)
+Nodes (152): MenuItem(), MenuItemProps, styles, MenuSection(), MenuSectionProps, styles, MODE_ICON, QuizModeSheetProps (+144 more)
 
 ### Community 49 - "Community 49"
-Cohesion: 0.04
-Nodes (47): envSchema, parsed, BillingPeriod, creditsForPurchase(), getProduct(), PLAN_BENEFITS, PlanBenefits, ProductDef (+39 more)
+Cohesion: 0.05
+Nodes (41): BillingPeriod, creditsForPurchase(), getProduct(), PLAN_BENEFITS, PlanBenefits, ProductDef, PRODUCTS, deleteExpiredMedia() (+33 more)
 
 ### Community 50 - "Community 50"
 Cohesion: 0.24
@@ -1224,11 +1386,11 @@ Nodes (8): 2 Feature-Specific Icons, 35 Shared Icons (ready to copy), code:ts (i
 
 ### Community 60 - "Community 60"
 Cohesion: 0.01
-Nodes (204): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+196 more)
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.04
-Nodes (59): quizApi, useDueSummary(), ConfirmDialogOptions, EMPTY_OPTIONS, useConfirmDialog(), UseConfirmDialogResult, useCreditBalance(), useStreak() (+51 more)
+Cohesion: 0.03
+Nodes (74): BodyProps, Chunks(), getCanCheck(), LETTERS, MCItem, NO_OFFSET, Option(), Props (+66 more)
 
 ### Community 62 - "Community 62"
 Cohesion: 0.25
@@ -1284,7 +1446,7 @@ Nodes (6): Component library (`components/`), `layout` constants (spacing.ts), R
 
 ### Community 75 - "Community 75"
 Cohesion: 0.03
-Nodes (74): AchievementGate(), FolderFormSheet(), useAchievements(), useReferral(), useNewAchievements(), useSystemBars(), AchievementGate(), AppNavigator() (+66 more)
+Nodes (98): WeeklyChart(), FolderFormSheet(), AppBootstrap(), useReferral(), useChangePassword(), useUpdateProfile(), useIapSubscriptions(), useSubscriptionSync() (+90 more)
 
 ### Community 76 - "Community 76"
 Cohesion: 0.47
@@ -1311,8 +1473,8 @@ Cohesion: 0.33
 Nodes (5): Current server, Deploy loop, Deployment (Hetzner), Phases, See also
 
 ### Community 83 - "Community 83"
-Cohesion: 0.12
-Nodes (12): notificationsApi, DEFAULTS, NotificationPrefs, TYPE_TO_PREF, useNotificationPrefs(), useDeleteNotification(), useMarkAllNotificationsRead(), useMarkNotificationRead() (+4 more)
+Cohesion: 0.01
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
 
 ### Community 84 - "Community 84"
 Cohesion: 0.4
@@ -1328,15 +1490,15 @@ Nodes (12): alpha(), buf(), FG, jobs, LN, NOTIF, opaque(), sharp (+4 more)
 
 ### Community 89 - "Community 89"
 Cohesion: 0.01
-Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
+Nodes (136): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+128 more)
 
 ### Community 90 - "Community 90"
-Cohesion: 0.05
-Nodes (35): getQuoteKey(), Props, QuizResultScreen(), QUOTE_TIERS, rise(), styles, AchievementUnlockModal(), AchievementUnlockModalProps (+27 more)
+Cohesion: 0.04
+Nodes (53): activitiesApi, notificationsApi, AchievementGate(), getQuoteKey(), Props, QuizResultScreen(), QUOTE_TIERS, rise() (+45 more)
 
 ### Community 91 - "Community 91"
-Cohesion: 0.11
-Nodes (19): logout(), apiKey(), configureRevenueCat(), getPackages(), getStorePrices(), identifyUser(), openManageSubscriptions(), purchaseByProductId() (+11 more)
+Cohesion: 0.1
+Nodes (21): logout(), useSubscriptionStatus(), apiKey(), configureRevenueCat(), getPackages(), getStorePrices(), identifyUser(), logoutRevenueCat() (+13 more)
 
 ### Community 92 - "Community 92"
 Cohesion: 0.17
@@ -1348,75 +1510,75 @@ Nodes (10): ANDROID_RES, fgSvg, FOREGROUND, fullSvg, IOS_SET, LEGACY, png, ROOT 
 
 ### Community 95 - "Community 95"
 Cohesion: 0.02
-Nodes (119): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+111 more)
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 96 - "Community 96"
 Cohesion: 0.02
 Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 97 - "Community 97"
-Cohesion: 0.08
-Nodes (23): Colors, DivergingBarChart(), s, threeLabels(), useAutoDailyClaim(), CreditInterval, CreditStatsPeriod, DayStat (+15 more)
+Cohesion: 0.12
+Nodes (15): useAutoDailyClaim(), CreditInterval, CreditStatsPeriod, useClaimDailyLogin(), useCreditStats(), useCreditTransactions(), useRedeemReferral(), DEFAULT_INTERVAL (+7 more)
 
 ### Community 98 - "Community 98"
 Cohesion: 0.02
-Nodes (91): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+83 more)
+Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 99 - "Community 99"
-Cohesion: 0.12
-Nodes (13): ConfirmDialog(), ConfirmDialogProps, styles, AppModal(), AppModalProps, styles, SelectOption, SelectSheet() (+5 more)
+Cohesion: 0.11
+Nodes (17): ConfirmDialog(), ConfirmDialogProps, styles, AppModal(), AppModalProps, styles, SelectOption, SelectSheet() (+9 more)
 
 ### Community 101 - "Community 101"
-Cohesion: 0.05
-Nodes (59): enter(), ForgotPasswordScreen(), styles, Banner, enter(), LoginScreen(), styles, enter() (+51 more)
+Cohesion: 0.19
+Nodes (10): configureAnalytics(), identify(), AnalyticsEvent, configureAnalytics(), identify(), resetAnalytics(), setAnalyticsEnabled(), setCrashReportingEnabled() (+2 more)
 
 ### Community 102 - "Community 102"
-Cohesion: 0.08
-Nodes (25): AIChatScreen(), ChatHistoryScreen(), useAddBookmark(), useAIChat(), useAIChatHistory(), useBookmarks(), useClearHistory(), useDeleteSession() (+17 more)
+Cohesion: 0.03
+Nodes (64): AIChatScreen(), Media, Sheet, styles, AIConsentScreen(), nbsp(), rise(), styles (+56 more)
 
 ### Community 103 - "Community 103"
-Cohesion: 0.04
-Nodes (63): ColorPicker(), CardForm, CardFormData, CardFormHandle, CardFormProps, CardValues, schema, styles (+55 more)
+Cohesion: 0.03
+Nodes (114): enter(), ForgotPasswordScreen(), styles, Banner, enter(), LoginScreen(), styles, enter() (+106 more)
 
 ### Community 104 - "Community 104"
 Cohesion: 0.02
-Nodes (91): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+83 more)
+Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 105 - "Community 105"
 Cohesion: 0.02
-Nodes (91): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+83 more)
+Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 106 - "Community 106"
 Cohesion: 0.02
-Nodes (91): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+83 more)
+Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 107 - "Community 107"
 Cohesion: 0.02
-Nodes (91): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+83 more)
+Nodes (92): cards, addCard, addCards, addCardsToStudy, addNotePlaceholder, addStudyNote, allCardsBlurred, allCardsUnblurred (+84 more)
 
 ### Community 108 - "Community 108"
-Cohesion: 0.03
-Nodes (65): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, backTo, canSignInNow (+57 more)
+Cohesion: 0.02
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 109 - "Community 109"
-Cohesion: 0.16
-Nodes (9): MoreVerticalIcon(), AnimatedPressable(), AnimatedPressableProps, ReanimatedPressable, ListCard(), ListCardProps, styles, OPTIONS (+1 more)
+Cohesion: 0.01
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
 
 ### Community 110 - "Community 110"
-Cohesion: 0.03
-Nodes (65): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, backTo, canSignInNow (+57 more)
+Cohesion: 0.02
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 112 - "Community 112"
-Cohesion: 0.03
-Nodes (65): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, backTo, canSignInNow (+57 more)
+Cohesion: 0.02
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 113 - "Community 113"
-Cohesion: 0.03
-Nodes (65): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, backTo, canSignInNow (+57 more)
+Cohesion: 0.02
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 114 - "Community 114"
-Cohesion: 0.03
-Nodes (65): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, backTo, canSignInNow (+57 more)
+Cohesion: 0.02
+Nodes (120): accountCreated, agreeToTerms, aiConsent, alreadyHaveAccount, and, appleFailed, back, backTo (+112 more)
 
 ### Community 115 - "Community 115"
 Cohesion: 0.04
@@ -1462,6 +1624,10 @@ Nodes (52): setup, addCardsToQuiz, aiCost, aiCostMedia, aiCostWithBalance, aiSou
 Cohesion: 0.04
 Nodes (52): setup, addCardsToQuiz, aiCost, aiCostMedia, aiCostWithBalance, aiSourceLabel, aiTopicPlaceholder, allCards (+44 more)
 
+### Community 128 - "Community 128"
+Cohesion: 0.01
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
+
 ### Community 129 - "Community 129"
 Cohesion: 0.04
 Nodes (49): dependencies, axios, @gorhom/bottom-sheet, @hookform/resolvers, i18next, @invertase/react-native-apple-authentication, lottie-react-native, posthog-react-native (+41 more)
@@ -1475,8 +1641,8 @@ Cohesion: 0.04
 Nodes (46): chat, aiResponse, attachFile, bookmark, bookmarked, bookmarkedAt, bookmarkRemoved, cardsReady (+38 more)
 
 ### Community 132 - "Community 132"
-Cohesion: 0.13
-Nodes (13): usersApi, ALL_PRODUCT_IDS, BillingPeriod, FREE_TIER, FreeTierDef, SubscriptionStatus, TierDef, TIERS (+5 more)
+Cohesion: 0.15
+Nodes (12): ALL_PRODUCT_IDS, BillingPeriod, FREE_TIER, FreeTierDef, SubscriptionStatus, TierDef, TIERS, ChangePasswordPayload (+4 more)
 
 ### Community 133 - "Community 133"
 Cohesion: 0.04
@@ -1491,12 +1657,8 @@ Cohesion: 0.04
 Nodes (46): chat, aiResponse, attachFile, bookmark, bookmarked, bookmarkedAt, bookmarkRemoved, cardsReady (+38 more)
 
 ### Community 136 - "Community 136"
-Cohesion: 0.04
-Nodes (55): router, router, AskQuestionDto, AskQuestionDtoType, BookmarkDto, BookmarkDtoType, ChatMessageSchema, RenameSessionDto (+47 more)
-
-### Community 138 - "Community 138"
-Cohesion: 0.11
-Nodes (16): authApi, displayName, name, styles, logoutRevenueCat(), OFFLINE_KEYS, persistOptions, queryClient (+8 more)
+Cohesion: 0.05
+Nodes (54): router, router, AskQuestionDto, AskQuestionDtoType, BookmarkDto, BookmarkDtoType, ChatMessageSchema, RenameSessionDto (+46 more)
 
 ### Community 140 - "Community 140"
 Cohesion: 0.04
@@ -1515,8 +1677,8 @@ Cohesion: 0.04
 Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 145 - "Community 145"
-Cohesion: 0.08
-Nodes (41): appleAuth(), forgotPassword(), getMe(), googleAuth(), login(), logout(), refreshToken(), register() (+33 more)
+Cohesion: 0.01
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
 
 ### Community 147 - "Community 147"
 Cohesion: 0.4
@@ -1531,8 +1693,8 @@ Cohesion: 0.1
 Nodes (19): BulkCreateCardPayload, Card, CardDifficulty, CardType, CreateCardPayload, DueSummary, MoveCardPayload, ReorderCardsPayload (+11 more)
 
 ### Community 150 - "Community 150"
-Cohesion: 0.05
-Nodes (41): history, all, bookmarked, cannotManage, clearAll, clearAllMessage, clearAllTitle, continue (+33 more)
+Cohesion: 0.06
+Nodes (36): history, all, bookmarked, cannotManage, clearAllMessage, clearAllTitle, conversation, conversationActions (+28 more)
 
 ### Community 152 - "Community 152"
 Cohesion: 0.5
@@ -1551,20 +1713,20 @@ Cohesion: 0.22
 Nodes (8): AuthTokens, ForgotPasswordPayload, LoginPayload, RefreshPayload, RegisterPayload, ResendVerificationPayload, ResetPasswordPayload, VerifyEmailPayload
 
 ### Community 156 - "Community 156"
-Cohesion: 0.05
-Nodes (41): history, all, bookmarked, cannotManage, clearAll, clearAllMessage, clearAllTitle, continue (+33 more)
+Cohesion: 0.06
+Nodes (36): history, all, bookmarked, cannotManage, clearAllMessage, clearAllTitle, conversation, conversationActions (+28 more)
 
 ### Community 157 - "Community 157"
 Cohesion: 0.05
 Nodes (41): actions, accept, agree, apply, back, cancel, clear, clearAll (+33 more)
 
 ### Community 158 - "Community 158"
-Cohesion: 0.05
-Nodes (40): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, claim (+32 more)
+Cohesion: 0.04
+Nodes (52): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+44 more)
 
 ### Community 159 - "Community 159"
-Cohesion: 0.05
-Nodes (41): history, all, bookmarked, cannotManage, clearAll, clearAllMessage, clearAllTitle, continue (+33 more)
+Cohesion: 0.06
+Nodes (36): history, all, bookmarked, cannotManage, clearAllMessage, clearAllTitle, conversation, conversationActions (+28 more)
 
 ### Community 160 - "Community 160"
 Cohesion: 0.33
@@ -1580,19 +1742,23 @@ Nodes (41): actions, accept, agree, apply, back, cancel, clear, clearAll (+33 mo
 
 ### Community 164 - "Community 164"
 Cohesion: 0.09
-Nodes (31): layout, Colors, darkColors, lightColors, ThemeColors, palette, QMColors, qmDark (+23 more)
+Nodes (29): layout, Colors, darkColors, lightColors, ThemeColors, palette, QMColors, qmDark (+21 more)
+
+### Community 165 - "Community 165"
+Cohesion: 0.01
+Nodes (205): qm, add, addAndNext, addCard, addCardCta, addCards, added, addedToLibrary (+197 more)
 
 ### Community 166 - "Community 166"
-Cohesion: 0.05
-Nodes (41): history, all, bookmarked, cannotManage, clearAll, clearAllMessage, clearAllTitle, continue (+33 more)
+Cohesion: 0.06
+Nodes (36): history, all, bookmarked, cannotManage, clearAllMessage, clearAllTitle, conversation, conversationActions (+28 more)
 
 ### Community 167 - "Community 167"
 Cohesion: 0.05
 Nodes (41): actions, accept, agree, apply, back, cancel, clear, clearAll (+33 more)
 
 ### Community 168 - "Community 168"
-Cohesion: 0.05
-Nodes (41): history, all, bookmarked, cannotManage, clearAll, clearAllMessage, clearAllTitle, continue (+33 more)
+Cohesion: 0.06
+Nodes (36): history, all, bookmarked, cannotManage, clearAllMessage, clearAllTitle, conversation, conversationActions (+28 more)
 
 ### Community 169 - "Community 169"
 Cohesion: 0.05
@@ -1603,48 +1769,48 @@ Cohesion: 0.05
 Nodes (40): actions, accept, agree, apply, back, cancel, clear, clearAll (+32 more)
 
 ### Community 172 - "Community 172"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 173 - "Community 173"
 Cohesion: 0.05
 Nodes (40): setup, addCardsToQuiz, aiCost, aiCostMedia, aiCostWithBalance, aiSourceLabel, aiTopicPlaceholder, allSets (+32 more)
 
 ### Community 174 - "Community 174"
-Cohesion: 0.05
-Nodes (39): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+31 more)
+Cohesion: 0.04
+Nodes (47): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+39 more)
 
 ### Community 175 - "Community 175"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 176 - "Community 176"
-Cohesion: 0.05
-Nodes (39): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+31 more)
+Cohesion: 0.04
+Nodes (52): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+44 more)
 
 ### Community 177 - "Community 177"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 178 - "Community 178"
-Cohesion: 0.05
-Nodes (39): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+31 more)
+Cohesion: 0.04
+Nodes (52): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+44 more)
 
 ### Community 179 - "Community 179"
-Cohesion: 0.05
-Nodes (39): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+31 more)
+Cohesion: 0.04
+Nodes (47): account, memberSince, bestStreak, blockedUsers, unblock, unblockedSuccess, cardsStudied, chart (+39 more)
 
 ### Community 180 - "Community 180"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 181 - "Community 181"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 182 - "Community 182"
-Cohesion: 0.05
-Nodes (40): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+32 more)
+Cohesion: 0.04
+Nodes (46): media, addImage, cameraPermissionDenied, cancel, couldNotCapturePhoto, couldNotLoad, couldNotReadImage, deleteFileMessage (+38 more)
 
 ### Community 183 - "Community 183"
 Cohesion: 0.05
@@ -1727,8 +1893,8 @@ Cohesion: 0.06
 Nodes (34): folders, assignFolder, chooseFolder, color, createFolder, deleteFolderTitle, editFolder, emptyDesc (+26 more)
 
 ### Community 205 - "Community 205"
-Cohesion: 0.1
-Nodes (20): apiPost(), AppDelegate, ReactNativeDelegate, apiPost(), AppDelegate, ReactNativeDelegate, MessagingDelegate, onTokenRefresh() (+12 more)
+Cohesion: 0.12
+Nodes (14): AppDelegate, ReactNativeDelegate, apiPost(), AppDelegate, ReactNativeDelegate, MessagingDelegate, onTokenRefresh(), registerDeviceToken() (+6 more)
 
 ### Community 206 - "Community 206"
 Cohesion: 0.06
@@ -1755,16 +1921,16 @@ Cohesion: 0.06
 Nodes (31): audio-recorder, backlink, bases, bookmarks, canvas, command-palette, daily-notes, editor-status (+23 more)
 
 ### Community 212 - "Community 212"
-Cohesion: 0.06
-Nodes (31): difficulty, easy, hard, medium, item, typeAnswerPlaceholder, modes, blanks (+23 more)
+Cohesion: 0.09
+Nodes (21): difficulty, easy, hard, medium, item, typeAnswerPlaceholder, play, tapToRevealProgress (+13 more)
 
 ### Community 213 - "Community 213"
-Cohesion: 0.06
-Nodes (32): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+24 more)
+Cohesion: 0.07
+Nodes (30): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+22 more)
 
 ### Community 214 - "Community 214"
-Cohesion: 0.06
-Nodes (32): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+24 more)
+Cohesion: 0.07
+Nodes (30): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+22 more)
 
 ### Community 215 - "Community 215"
 Cohesion: 0.07
@@ -1783,20 +1949,20 @@ Cohesion: 0.07
 Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 219 - "Community 219"
-Cohesion: 0.06
-Nodes (32): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+24 more)
+Cohesion: 0.07
+Nodes (30): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+22 more)
 
 ### Community 220 - "Community 220"
-Cohesion: 0.06
-Nodes (32): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+24 more)
+Cohesion: 0.07
+Nodes (30): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+22 more)
 
 ### Community 221 - "Community 221"
-Cohesion: 0.06
-Nodes (32): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+24 more)
+Cohesion: 0.07
+Nodes (30): consent, accept, accuracy, agreement, blurb, consentDeclined, consentRecorded, couldNotSaveConsent (+22 more)
 
 ### Community 222 - "Community 222"
-Cohesion: 0.07
-Nodes (17): BodyProps, Chunks(), getCanCheck(), LETTERS, MCItem, NO_OFFSET, Option(), Props (+9 more)
+Cohesion: 0.01
+Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
 
 ### Community 223 - "Community 223"
 Cohesion: 0.06
@@ -1807,8 +1973,8 @@ Cohesion: 0.06
 Nodes (31): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+23 more)
 
 ### Community 225 - "Community 225"
-Cohesion: 0.08
-Nodes (22): achievementsApi, aiApi, ChatHistoryParams, PaginatedBookmarks, PaginatedSessions, cardsApi, apiClient, apiDelete() (+14 more)
+Cohesion: 0.04
+Nodes (59): achievementsApi, aiApi, ChatHistoryParams, PaginatedBookmarks, PaginatedSessions, authApi, cardsApi, apiClient (+51 more)
 
 ### Community 226 - "Community 226"
 Cohesion: 0.07
@@ -1819,44 +1985,44 @@ Cohesion: 0.07
 Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
 
 ### Community 228 - "Community 228"
-Cohesion: 0.07
-Nodes (29): account, memberSince, blockedUsers, unblock, unblockedSuccess, chart, day, month (+21 more)
+Cohesion: 0.05
+Nodes (43): account, memberSince, blockedUsers, unblock, unblockedSuccess, changePassword, confirmPassword, confirmPasswordPlaceholder (+35 more)
 
 ### Community 229 - "Community 229"
-Cohesion: 0.07
-Nodes (30): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+22 more)
+Cohesion: 0.06
+Nodes (31): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+23 more)
 
 ### Community 230 - "Community 230"
-Cohesion: 0.07
-Nodes (30): sub, text, sub, text, sub, text, sub, text (+22 more)
+Cohesion: 0.12
+Nodes (17): result, accuracy, backToLibrary, bestScore, correctCount, greatJob, keepPracticing, needsReview (+9 more)
 
 ### Community 231 - "Community 231"
-Cohesion: 0.33
-Nodes (5): creditsApi, DailyLoginResult, PaginatedTransactions, StatPoint, TransactionParams
+Cohesion: 0.01
+Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
 
 ### Community 232 - "Community 232"
-Cohesion: 0.07
-Nodes (30): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+22 more)
+Cohesion: 0.06
+Nodes (31): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+23 more)
 
 ### Community 233 - "Community 233"
-Cohesion: 0.07
-Nodes (30): sub, text, sub, text, sub, text, sub, text (+22 more)
+Cohesion: 0.12
+Nodes (17): result, accuracy, backToLibrary, bestScore, correctCount, greatJob, keepPracticing, needsReview (+9 more)
 
 ### Community 234 - "Community 234"
-Cohesion: 0.07
-Nodes (30): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+22 more)
+Cohesion: 0.06
+Nodes (31): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+23 more)
 
 ### Community 235 - "Community 235"
-Cohesion: 0.07
-Nodes (30): sub, text, sub, text, sub, text, sub, text (+22 more)
+Cohesion: 0.12
+Nodes (17): result, accuracy, backToLibrary, bestScore, correctCount, greatJob, keepPracticing, needsReview (+9 more)
 
 ### Community 236 - "Community 236"
 Cohesion: 0.07
 Nodes (30): sub, text, sub, text, sub, text, sub, text (+22 more)
 
 ### Community 237 - "Community 237"
-Cohesion: 0.07
-Nodes (30): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+22 more)
+Cohesion: 0.06
+Nodes (31): plans, couldNotCreatePlan, createPlan, deletePlanMessage, deletePlanTitle, descPlaceholder, emptySub, emptyTitle (+23 more)
 
 ### Community 238 - "Community 238"
 Cohesion: 0.07
@@ -1875,8 +2041,8 @@ Cohesion: 0.08
 Nodes (25): banners, correct, finishQuiz, incorrect, nextQuestion, timeUp, difficulty, easy (+17 more)
 
 ### Community 242 - "Community 242"
-Cohesion: 0.08
-Nodes (25): banners, correct, finishQuiz, incorrect, nextQuestion, timeUp, difficulty, easy (+17 more)
+Cohesion: 0.05
+Nodes (38): banners, correct, finishQuiz, incorrect, nextQuestion, timeUp, difficulty, easy (+30 more)
 
 ### Community 243 - "Community 243"
 Cohesion: 0.08
@@ -1947,8 +2113,8 @@ Cohesion: 0.09
 Nodes (22): Accepted ceilings (cost of ephemeral), AI Quiz Generation, `ai.service.generateQuizCards(userId, { topic, count })`, Backend — logic, Build sequence, code:mermaid (flowchart TD), code:block2 (BACKEND  backend/src/modules/), code:block3 (WHAT to quiz on         → user picks set [manual]  |  LLM fr) (+14 more)
 
 ### Community 263 - "Community 263"
-Cohesion: 0.09
-Nodes (23): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+15 more)
+Cohesion: 0.08
+Nodes (26): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+18 more)
 
 ### Community 265 - "Community 265"
 Cohesion: 0.09
@@ -1979,8 +2145,8 @@ Cohesion: 0.09
 Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
 
 ### Community 272 - "Community 272"
-Cohesion: 0.08
-Nodes (22): deleteUserFilesFromDisk(), deleteUserFilesFromDisk(), deleteAccount(), getProfile(), toProfileOut(), updateProfile(), ChangePasswordDto, ChangePasswordDtoType (+14 more)
+Cohesion: 0.11
+Nodes (13): deleteUserFilesFromDisk(), deleteUserFilesFromDisk(), deleteAccount(), getProfile(), toProfileOut(), updateProfile(), changePassword(), deleteAccount() (+5 more)
 
 ### Community 273 - "Community 273"
 Cohesion: 0.09
@@ -2059,32 +2225,32 @@ Cohesion: 0.09
 Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
 
 ### Community 295 - "Community 295"
-Cohesion: 0.1
-Nodes (19): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+11 more)
+Cohesion: 0.08
+Nodes (25): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+17 more)
 
 ### Community 296 - "Community 296"
-Cohesion: 0.1
-Nodes (20): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+12 more)
+Cohesion: 0.09
+Nodes (23): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+15 more)
 
 ### Community 297 - "Community 297"
-Cohesion: 0.1
-Nodes (20): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+12 more)
+Cohesion: 0.09
+Nodes (23): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+15 more)
 
 ### Community 298 - "Community 298"
-Cohesion: 0.1
-Nodes (20): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+12 more)
+Cohesion: 0.09
+Nodes (23): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+15 more)
 
 ### Community 299 - "Community 299"
-Cohesion: 0.1
-Nodes (20): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+12 more)
+Cohesion: 0.09
+Nodes (23): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+15 more)
 
 ### Community 300 - "Community 300"
-Cohesion: 0.1
-Nodes (20): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+12 more)
+Cohesion: 0.09
+Nodes (23): settings, aboutUs, account, accountDeleted, appearance, appInfo, darkMode, deleteAccount (+15 more)
 
 ### Community 301 - "Community 301"
-Cohesion: 0.18
-Nodes (12): applyReviews(), applyReviews(), applySpacedRepetition(), deriveScore(), getBestForSet(), recordAttempt(), updateAttempt(), applySpacedRepetition() (+4 more)
+Cohesion: 0.12
+Nodes (17): applyReviews(), applyReviews(), GenerateQuizDto, GenerateQuizDtoType, RecordAttemptDto, RecordAttemptDtoType, SummaryItemDto, applySpacedRepetition() (+9 more)
 
 ### Community 302 - "Community 302"
 Cohesion: 0.11
@@ -2107,12 +2273,12 @@ Cohesion: 0.11
 Nodes (19): legal, lastUpdated, termsTitle, tosSec1Body, tosSec1Title, tosSec2Body, tosSec2Title, tosSec3Body (+11 more)
 
 ### Community 307 - "Community 307"
-Cohesion: 0.11
-Nodes (18): brand, tagline, dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges, filter (+10 more)
+Cohesion: 0.2
+Nodes (9): appName, brand, tagline, filter, all, notification, validation, max100 (+1 more)
 
 ### Community 308 - "Community 308"
-Cohesion: 0.11
-Nodes (18): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, studyPlans, activePlans (+10 more)
+Cohesion: 0.08
+Nodes (25): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+17 more)
 
 ### Community 309 - "Community 309"
 Cohesion: 0.11
@@ -2131,12 +2297,12 @@ Cohesion: 0.11
 Nodes (19): legal, lastUpdated, termsTitle, tosSec1Body, tosSec1Title, tosSec2Body, tosSec2Title, tosSec3Body (+11 more)
 
 ### Community 313 - "Community 313"
-Cohesion: 0.11
-Nodes (18): brand, tagline, dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges, filter (+10 more)
+Cohesion: 0.2
+Nodes (9): appName, brand, tagline, filter, all, notification, validation, max100 (+1 more)
 
 ### Community 314 - "Community 314"
-Cohesion: 0.11
-Nodes (18): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, studyPlans, activePlans (+10 more)
+Cohesion: 0.08
+Nodes (25): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+17 more)
 
 ### Community 315 - "Community 315"
 Cohesion: 0.11
@@ -2151,8 +2317,8 @@ Cohesion: 0.11
 Nodes (19): results, accuracy, backToHub, bestScore, goodJob, needsPractice, newBest, perfectScore (+11 more)
 
 ### Community 318 - "Community 318"
-Cohesion: 0.11
-Nodes (18): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, publicSets, copiedSuccess (+10 more)
+Cohesion: 0.17
+Nodes (12): publicSets, copiedSuccess, copyToLibrary, emptySubtitle, emptyTitle, noSets, noSetsMatch, noSetsSub (+4 more)
 
 ### Community 319 - "Community 319"
 Cohesion: 0.11
@@ -2163,8 +2329,8 @@ Cohesion: 0.11
 Nodes (18): headers, aiChat, credits, home, library, media, notes, notifications (+10 more)
 
 ### Community 321 - "Community 321"
-Cohesion: 0.11
-Nodes (18): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, publicSets, copiedSuccess (+10 more)
+Cohesion: 0.17
+Nodes (12): publicSets, copiedSuccess, copyToLibrary, emptySubtitle, emptyTitle, noSets, noSetsMatch, noSetsSub (+4 more)
 
 ### Community 322 - "Community 322"
 Cohesion: 0.11
@@ -2219,8 +2385,8 @@ Cohesion: 0.11
 Nodes (18): notes, addTags, bodyPlaceholder, couldNotLoadNote, couldNotLoadNotes, deleteNoteMessage, deleteNoteTitle, editNote (+10 more)
 
 ### Community 335 - "Community 335"
-Cohesion: 0.11
-Nodes (18): tos, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title, sec4Body (+10 more)
+Cohesion: 0.08
+Nodes (25): tos, questions, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+17 more)
 
 ### Community 336 - "Community 336"
 Cohesion: 0.11
@@ -2231,8 +2397,8 @@ Cohesion: 0.11
 Nodes (18): notes, addTags, bodyPlaceholder, couldNotLoadNote, couldNotLoadNotes, deleteNoteMessage, deleteNoteTitle, editNote (+10 more)
 
 ### Community 338 - "Community 338"
-Cohesion: 0.11
-Nodes (18): tos, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title, sec4Body (+10 more)
+Cohesion: 0.08
+Nodes (25): tos, questions, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+17 more)
 
 ### Community 339 - "Community 339"
 Cohesion: 0.11
@@ -2311,16 +2477,16 @@ Cohesion: 0.23
 Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
 
 ### Community 358 - "Community 358"
-Cohesion: 0.11
-Nodes (17): empty, headline, subtitle, suggestionsTitle, export, ai, header, you (+9 more)
+Cohesion: 0.07
+Nodes (27): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder, empty, headline (+19 more)
 
 ### Community 359 - "Community 359"
 Cohesion: 0.11
 Nodes (17): compilerOptions, baseUrl, paths, types, exclude, extends, include, @api/* (+9 more)
 
 ### Community 360 - "Community 360"
-Cohesion: 0.11
-Nodes (18): tos, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title, sec4Body (+10 more)
+Cohesion: 0.08
+Nodes (25): tos, questions, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+17 more)
 
 ### Community 361 - "Community 361"
 Cohesion: 0.11
@@ -2331,8 +2497,8 @@ Cohesion: 0.11
 Nodes (18): notes, addTags, bodyPlaceholder, couldNotLoadNote, couldNotLoadNotes, deleteNoteMessage, deleteNoteTitle, editNote (+10 more)
 
 ### Community 363 - "Community 363"
-Cohesion: 0.11
-Nodes (18): tos, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title, sec4Body (+10 more)
+Cohesion: 0.08
+Nodes (25): tos, questions, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+17 more)
 
 ### Community 364 - "Community 364"
 Cohesion: 0.11
@@ -2343,8 +2509,8 @@ Cohesion: 0.11
 Nodes (18): notes, addTags, bodyPlaceholder, couldNotLoadNote, couldNotLoadNotes, deleteNoteMessage, deleteNoteTitle, editNote (+10 more)
 
 ### Community 366 - "Community 366"
-Cohesion: 0.11
-Nodes (18): tos, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title, sec4Body (+10 more)
+Cohesion: 0.08
+Nodes (25): tos, questions, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+17 more)
 
 ### Community 367 - "Community 367"
 Cohesion: 0.11
@@ -2367,8 +2533,8 @@ Cohesion: 0.12
 Nodes (17): menu, achievements, blockedUsers, changePassword, editProfile, friendRequests, friends, inviteFriends (+9 more)
 
 ### Community 372 - "Community 372"
-Cohesion: 0.12
-Nodes (16): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder, empty, headline (+8 more)
+Cohesion: 0.09
+Nodes (22): empty, headline, subtitle, suggestionsTitle, export, ai, header, you (+14 more)
 
 ### Community 373 - "Community 373"
 Cohesion: 0.12
@@ -2379,8 +2545,8 @@ Cohesion: 0.12
 Nodes (17): privacy, lastUpdated, sec1Body, sec1Title, sec2Body, sec2Title, sec3Body, sec3Title (+9 more)
 
 ### Community 375 - "Community 375"
-Cohesion: 0.12
-Nodes (16): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder, empty, headline (+8 more)
+Cohesion: 0.09
+Nodes (22): empty, headline, subtitle, suggestionsTitle, export, ai, header, you (+14 more)
 
 ### Community 376 - "Community 376"
 Cohesion: 0.12
@@ -2395,12 +2561,12 @@ Cohesion: 0.18
 Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
 
 ### Community 379 - "Community 379"
-Cohesion: 0.12
-Nodes (16): cards, ready, ready_other, saved, saveToSet, saving, empty, headline (+8 more)
+Cohesion: 0.07
+Nodes (27): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder, empty, headline (+19 more)
 
 ### Community 380 - "Community 380"
-Cohesion: 0.12
-Nodes (16): cards, ready, ready_other, saved, saveToSet, saving, empty, headline (+8 more)
+Cohesion: 0.07
+Nodes (27): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder, empty, headline (+19 more)
 
 ### Community 381 - "Community 381"
 Cohesion: 0.12
@@ -2444,7 +2610,7 @@ Nodes (16): detail, correctCount, correctLabel, deleteMessage, deleteTitle, firs
 
 ### Community 391 - "Community 391"
 Cohesion: 0.12
-Nodes (16): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+8 more)
+Nodes (17): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+9 more)
 
 ### Community 392 - "Community 392"
 Cohesion: 0.12
@@ -2456,7 +2622,7 @@ Nodes (16): detail, correctCount, correctLabel, deleteMessage, deleteTitle, firs
 
 ### Community 394 - "Community 394"
 Cohesion: 0.12
-Nodes (16): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+8 more)
+Nodes (17): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+9 more)
 
 ### Community 395 - "Community 395"
 Cohesion: 0.12
@@ -2544,7 +2710,7 @@ Nodes (16): detail, correctCount, correctLabel, deleteMessage, deleteTitle, firs
 
 ### Community 416 - "Community 416"
 Cohesion: 0.12
-Nodes (16): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+8 more)
+Nodes (17): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+9 more)
 
 ### Community 417 - "Community 417"
 Cohesion: 0.12
@@ -2564,7 +2730,7 @@ Nodes (16): detail, correctCount, correctLabel, deleteMessage, deleteTitle, firs
 
 ### Community 421 - "Community 421"
 Cohesion: 0.12
-Nodes (16): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+8 more)
+Nodes (17): summary, all, allQuestions, correct, correctAnswer, correctTab, done, incorrect (+9 more)
 
 ### Community 422 - "Community 422"
 Cohesion: 0.13
@@ -2659,8 +2825,8 @@ Cohesion: 0.14
 Nodes (14): sub, text, sub, text, sub, text, sub, text (+6 more)
 
 ### Community 445 - "Community 445"
-Cohesion: 0.14
-Nodes (14): subtitle, title, subtitle, title, onboarding, getStarted, next, skip (+6 more)
+Cohesion: 0.11
+Nodes (18): subtitle, title, subtitle, title, onboarding, createMyAccount, getStarted, haveAccount (+10 more)
 
 ### Community 446 - "Community 446"
 Cohesion: 0.14
@@ -2675,12 +2841,12 @@ Cohesion: 0.14
 Nodes (14): user, accept, acceptFriendRequest, blockUser, cancelFriendRequest, cancelRequest, couldNotLoadProfile, decline (+6 more)
 
 ### Community 449 - "Community 449"
-Cohesion: 0.16
-Nodes (9): CrashBoundary, CrashBoundaryProps, CrashBoundaryState, CrashFallback(), styles, crashLog(), crashlytics, recordError() (+1 more)
+Cohesion: 0.01
+Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
 
 ### Community 450 - "Community 450"
-Cohesion: 0.14
-Nodes (14): subtitle, title, subtitle, title, onboarding, getStarted, next, skip (+6 more)
+Cohesion: 0.11
+Nodes (18): subtitle, title, subtitle, title, onboarding, createMyAccount, getStarted, haveAccount (+10 more)
 
 ### Community 451 - "Community 451"
 Cohesion: 0.14
@@ -2695,8 +2861,8 @@ Cohesion: 0.14
 Nodes (14): user, accept, acceptFriendRequest, blockUser, cancelFriendRequest, cancelRequest, couldNotLoadProfile, decline (+6 more)
 
 ### Community 454 - "Community 454"
-Cohesion: 0.14
-Nodes (14): subtitle, title, subtitle, title, onboarding, getStarted, next, skip (+6 more)
+Cohesion: 0.11
+Nodes (18): subtitle, title, subtitle, title, onboarding, createMyAccount, getStarted, haveAccount (+10 more)
 
 ### Community 455 - "Community 455"
 Cohesion: 0.14
@@ -2711,8 +2877,8 @@ Cohesion: 0.14
 Nodes (14): user, accept, acceptFriendRequest, blockUser, cancelFriendRequest, cancelRequest, couldNotLoadProfile, decline (+6 more)
 
 ### Community 458 - "Community 458"
-Cohesion: 0.14
-Nodes (14): subtitle, title, subtitle, title, onboarding, getStarted, next, skip (+6 more)
+Cohesion: 0.11
+Nodes (18): subtitle, title, subtitle, title, onboarding, createMyAccount, getStarted, haveAccount (+10 more)
 
 ### Community 459 - "Community 459"
 Cohesion: 0.14
@@ -2727,8 +2893,8 @@ Cohesion: 0.14
 Nodes (14): user, accept, acceptFriendRequest, blockUser, cancelFriendRequest, cancelRequest, couldNotLoadProfile, decline (+6 more)
 
 ### Community 462 - "Community 462"
-Cohesion: 0.14
-Nodes (14): subtitle, title, subtitle, title, onboarding, getStarted, next, skip (+6 more)
+Cohesion: 0.11
+Nodes (18): subtitle, title, subtitle, title, onboarding, createMyAccount, getStarted, haveAccount (+10 more)
 
 ### Community 463 - "Community 463"
 Cohesion: 0.14
@@ -2951,8 +3117,8 @@ Cohesion: 0.18
 Nodes (11): stats, cards, cardsCount, cardsLearned, credits, dueToday, folders, notes (+3 more)
 
 ### Community 518 - "Community 518"
-Cohesion: 0.18
-Nodes (11): achievements, categories, locked, remaining, unlocked, unlockedBanner, ai, quiz (+3 more)
+Cohesion: 0.17
+Nodes (12): achievements, categories, locked, remaining, shareMessage, unlocked, unlockedBanner, ai (+4 more)
 
 ### Community 519 - "Community 519"
 Cohesion: 0.18
@@ -2967,16 +3133,16 @@ Cohesion: 0.18
 Nodes (11): stats, cards, cardsCount, cardsLearned, credits, dueToday, folders, notes (+3 more)
 
 ### Community 522 - "Community 522"
-Cohesion: 0.18
-Nodes (11): achievements, categories, locked, remaining, unlocked, unlockedBanner, ai, quiz (+3 more)
+Cohesion: 0.17
+Nodes (12): achievements, categories, locked, remaining, shareMessage, unlocked, unlockedBanner, ai (+4 more)
 
 ### Community 523 - "Community 523"
 Cohesion: 0.18
-Nodes (10): a11y, aiChat, goToProfile, notifications, openSet, empty, noActivity, noCommunitySets (+2 more)
+Nodes (10): a11y, aiChat, goToProfile, notifications, openSet, shareEvent, cta, message (+2 more)
 
 ### Community 524 - "Community 524"
 Cohesion: 0.18
-Nodes (10): a11y, aiChat, goToProfile, notifications, openSet, shareEvent, cta, message (+2 more)
+Nodes (10): a11y, aiChat, goToProfile, notifications, openSet, empty, noActivity, noCommunitySets (+2 more)
 
 ### Community 525 - "Community 525"
 Cohesion: 0.18
@@ -2991,8 +3157,8 @@ Cohesion: 0.18
 Nodes (11): stats, cards, cardsCount, cardsLearned, credits, dueToday, folders, notes (+3 more)
 
 ### Community 528 - "Community 528"
-Cohesion: 0.18
-Nodes (11): achievements, categories, locked, remaining, unlocked, unlockedBanner, ai, quiz (+3 more)
+Cohesion: 0.17
+Nodes (12): achievements, categories, locked, remaining, shareMessage, unlocked, unlockedBanner, ai (+4 more)
 
 ### Community 529 - "Community 529"
 Cohesion: 0.18
@@ -3015,15 +3181,15 @@ Cohesion: 0.18
 Nodes (11): stats, cards, cardsCount, cardsLearned, credits, dueToday, folders, notes (+3 more)
 
 ### Community 534 - "Community 534"
-Cohesion: 0.18
-Nodes (11): achievements, categories, locked, remaining, unlocked, unlockedBanner, ai, quiz (+3 more)
+Cohesion: 0.17
+Nodes (12): achievements, categories, locked, remaining, shareMessage, unlocked, unlockedBanner, ai (+4 more)
 
 ### Community 535 - "Community 535"
-Cohesion: 0.2
+Cohesion: 0.27
 Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
 
 ### Community 536 - "Community 536"
-Cohesion: 0.2
+Cohesion: 0.27
 Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
 
 ### Community 537 - "Community 537"
@@ -3031,8 +3197,8 @@ Cohesion: 0.2
 Nodes (9): appName, brand, tagline, filter, all, notification, validation, max100 (+1 more)
 
 ### Community 538 - "Community 538"
-Cohesion: 0.2
-Nodes (10): changePassword, confirmPassword, confirmPasswordPlaceholder, currentPassword, currentPasswordPlaceholder, newPassword, newPasswordPlaceholder, passwordAdded (+2 more)
+Cohesion: 0.01
+Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
 
 ### Community 539 - "Community 539"
 Cohesion: 0.2
@@ -3055,11 +3221,11 @@ Cohesion: 0.2
 Nodes (10): modes, blanks, chunks, mc, mixDesc, mixMode, read, story_mc (+2 more)
 
 ### Community 544 - "Community 544"
-Cohesion: 0.2
+Cohesion: 0.27
 Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
 
 ### Community 545 - "Community 545"
-Cohesion: 0.2
+Cohesion: 0.27
 Nodes (9): buildFiles, buildTargetsCommandComponents, cFileExtensions, cleanCommandsComponents, cppFileExtensions, cCompilerExecutable, cppCompilerExecutable, toolchains (+1 more)
 
 ### Community 546 - "Community 546"
@@ -3091,12 +3257,12 @@ Cohesion: 0.2
 Nodes (10): modes, blanks, chunks, mc, mixDesc, mixMode, read, story_mc (+2 more)
 
 ### Community 553 - "Community 553"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_rnclipboard::@6385240493dfcaf22ab7, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Cohesion: 0.5
+Nodes (4): react_codegen_rnclipboard::@6385240493dfcaf22ab7, abi, artifactName, toolchain
 
 ### Community 554 - "Community 554"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Cohesion: 0.5
+Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
 
 ### Community 555 - "Community 555"
 Cohesion: 0.22
@@ -3191,16 +3357,16 @@ Cohesion: 0.22
 Nodes (8): configurations, kind, paths, build, source, version, major, minor
 
 ### Community 578 - "Community 578"
-Cohesion: 0.22
-Nodes (8): brand, tagline, filter, all, notification, validation, max100, max200
+Cohesion: 0.2
+Nodes (9): appName, brand, tagline, filter, all, notification, validation, max100 (+1 more)
 
 ### Community 579 - "Community 579"
-Cohesion: 0.22
-Nodes (8): brand, tagline, filter, all, notification, validation, max100, max200
+Cohesion: 0.2
+Nodes (9): appName, brand, tagline, filter, all, notification, validation, max100 (+1 more)
 
 ### Community 580 - "Community 580"
-Cohesion: 0.22
-Nodes (8): brand, tagline, filter, all, notification, validation, max100, max200
+Cohesion: 0.1
+Nodes (20): appName, brand, tagline, dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges (+12 more)
 
 ### Community 581 - "Community 581"
 Cohesion: 0.22
@@ -3267,12 +3433,12 @@ Cohesion: 0.22
 Nodes (9): fillInBlank, fillInBlankDesc, multipleChoice, multipleChoiceDesc, trueFalse, trueFalseDesc, typeIn, typeInDesc (+1 more)
 
 ### Community 597 - "Community 597"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb, react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Cohesion: 0.5
+Nodes (4): react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb, abi, artifactName, toolchain
 
 ### Community 598 - "Community 598"
-Cohesion: 0.22
-Nodes (9): libraries, react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb, react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain, abi, artifactName (+1 more)
+Cohesion: 0.5
+Nodes (4): react_codegen_lottiereactnative::@0fa4dc904d7e359a99fb, abi, artifactName, toolchain
 
 ### Community 599 - "Community 599"
 Cohesion: 0.25
@@ -3327,8 +3493,8 @@ Cohesion: 0.25
 Nodes (8): attach, chooseMyMedia, choosePdf, mediaCost, noFiles, photoLibrary, takePhoto, upgrade
 
 ### Community 612 - "Community 612"
-Cohesion: 0.25
-Nodes (8): tags, devotional, history, newTestament, oldTestament, prayer, prophecy, theology
+Cohesion: 0.01
+Nodes (135): qm, addDoc, agree, allShown, answeredRight, attachNote, balance, balance_other (+127 more)
 
 ### Community 613 - "Community 613"
 Cohesion: 0.25
@@ -3355,8 +3521,8 @@ Cohesion: 0.25
 Nodes (8): attach, chooseMyMedia, choosePdf, mediaCost, noFiles, photoLibrary, takePhoto, upgrade
 
 ### Community 619 - "Community 619"
-Cohesion: 0.25
-Nodes (8): tags, devotional, history, newTestament, oldTestament, prayer, prophecy, theology
+Cohesion: 0.04
+Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 620 - "Community 620"
 Cohesion: 0.25
@@ -3407,8 +3573,8 @@ Cohesion: 0.25
 Nodes (8): hud, questionOf, quit, quitConfirmAction, quitConfirmMessage, quitConfirmTitle, resumeAction, score
 
 ### Community 632 - "Community 632"
-Cohesion: 0.25
-Nodes (8): modeHeaders, blanks, chunks, mc, read, story_mc, type_answer, type_verbatim
+Cohesion: 0.04
+Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 633 - "Community 633"
 Cohesion: 0.25
@@ -3507,8 +3673,8 @@ Cohesion: 0.29
 Nodes (7): streak, day, days, flameDays, flameDays_other, keepGoing, streakLost
 
 ### Community 657 - "Community 657"
-Cohesion: 0.29
-Nodes (7): friendsSets, noSets, noSetsMatch, noSetsSub, searchPlaceholder, sharedCount, title
+Cohesion: 0.04
+Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 658 - "Community 658"
 Cohesion: 0.29
@@ -3523,8 +3689,8 @@ Cohesion: 0.29
 Nodes (7): streak, day, days, flameDays, flameDays_other, keepGoing, streakLost
 
 ### Community 661 - "Community 661"
-Cohesion: 0.29
-Nodes (7): friendsSets, noSets, noSetsMatch, noSetsSub, searchPlaceholder, sharedCount, title
+Cohesion: 0.04
+Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 662 - "Community 662"
 Cohesion: 0.29
@@ -3543,12 +3709,12 @@ Cohesion: 0.29
 Nodes (7): streak, day, days, flameDays, flameDays_other, keepGoing, streakLost
 
 ### Community 666 - "Community 666"
-Cohesion: 0.29
-Nodes (7): friendsSets, noSets, noSetsMatch, noSetsSub, searchPlaceholder, sharedCount, title
+Cohesion: 0.08
+Nodes (25): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+17 more)
 
 ### Community 667 - "Community 667"
-Cohesion: 0.29
-Nodes (7): media, attach, chooseMedia, choosePdf, mediaCosts, photoLibrary, takePhoto
+Cohesion: 0.04
+Nodes (45): answer, answerOptions, askAgain, attachA11y, attachSub, cardsSaved_one, cardsSaved_other, cardsSavedTo_one (+37 more)
 
 ### Community 668 - "Community 668"
 Cohesion: 0.29
@@ -3559,8 +3725,8 @@ Cohesion: 0.29
 Nodes (7): streak, day, days, flameDays, flameDays_other, keepGoing, streakLost
 
 ### Community 670 - "Community 670"
-Cohesion: 0.29
-Nodes (7): media, attach, chooseMedia, choosePdf, mediaCosts, photoLibrary, takePhoto
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 671 - "Community 671"
 Cohesion: 0.29
@@ -3571,8 +3737,8 @@ Cohesion: 0.29
 Nodes (7): streak, day, days, flameDays, flameDays_other, keepGoing, streakLost
 
 ### Community 673 - "Community 673"
-Cohesion: 0.29
-Nodes (7): friendsSets, noSets, noSetsMatch, noSetsSub, searchPlaceholder, sharedCount, title
+Cohesion: 0.08
+Nodes (25): cardsCount_other, dialogs, deleteFolderMessage, deleteFolderTitle, deleteSetMessage, deleteSetTitle, friendsSets, noSets (+17 more)
 
 ### Community 674 - "Community 674"
 Cohesion: 0.33
@@ -3643,8 +3809,8 @@ Cohesion: 0.33
 Nodes (6): stats, cards, credits, folders, notes, sets
 
 ### Community 691 - "Community 691"
-Cohesion: 0.33
-Nodes (6): studyPlans, activePlans, completedPlans, dayOfTotal, startPlan, title
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 692 - "Community 692"
 Cohesion: 0.33
@@ -3683,32 +3849,32 @@ Cohesion: 0.33
 Nodes (6): cards, ready, ready_other, saved, saveToSet, saving
 
 ### Community 701 - "Community 701"
-Cohesion: 0.33
-Nodes (6): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 702 - "Community 702"
-Cohesion: 0.33
-Nodes (6): studyPlans, activePlans, completedPlans, dayOfTotal, startPlan, title
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 703 - "Community 703"
-Cohesion: 0.33
-Nodes (6): tabs, explore, folders, mySets, plans, study
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 704 - "Community 704"
-Cohesion: 0.33
-Nodes (6): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder
+Cohesion: 0.05
+Nodes (42): qmSettings, about, aboutVerdance, aiHelper, aiOffHint, aiOnHint, appearance, back (+34 more)
 
 ### Community 705 - "Community 705"
-Cohesion: 0.33
-Nodes (6): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 706 - "Community 706"
-Cohesion: 0.33
-Nodes (6): studyPlans, activePlans, completedPlans, dayOfTotal, startPlan, title
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 707 - "Community 707"
-Cohesion: 0.33
-Nodes (6): tabs, explore, folders, mySets, plans, study
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 708 - "Community 708"
 Cohesion: 0.33
@@ -3751,8 +3917,8 @@ Cohesion: 0.4
 Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
 
 ### Community 718 - "Community 718"
-Cohesion: 0.4
-Nodes (5): libraries, react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
+Cohesion: 0.5
+Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
 
 ### Community 719 - "Community 719"
 Cohesion: 0.4
@@ -3771,8 +3937,8 @@ Cohesion: 0.4
 Nodes (5): abi, artifactName, output, runtimeFiles, appmodules::@6890427a1f51a3e7e1df
 
 ### Community 723 - "Community 723"
-Cohesion: 0.4
-Nodes (5): libraries, react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
+Cohesion: 0.5
+Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, runtimeFiles
 
 ### Community 724 - "Community 724"
 Cohesion: 0.4
@@ -3815,19 +3981,19 @@ Cohesion: 0.4
 Nodes (5): shareEvent, cta, message, subtitle, title
 
 ### Community 736 - "Community 736"
-Cohesion: 0.4
-Nodes (5): notifications, couldNotLoadNotifications, emptySubtitle, emptyTitle, title
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 737 - "Community 737"
 Cohesion: 0.4
 Nodes (5): prompts, thisPassage, typePassage, typeRef, whichPassage
 
 ### Community 740 - "Community 740"
-Cohesion: 0.4
+Cohesion: 0.53
 Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
 
 ### Community 741 - "Community 741"
-Cohesion: 0.4
+Cohesion: 0.53
 Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
 
 ### Community 742 - "Community 742"
@@ -3839,20 +4005,20 @@ Cohesion: 0.4
 Nodes (5): dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges
 
 ### Community 744 - "Community 744"
-Cohesion: 0.4
-Nodes (5): sort, cards, oldest, recent, sets
+Cohesion: 0.33
+Nodes (6): sort, alpha, cards, oldest, recent, sets
 
 ### Community 745 - "Community 745"
-Cohesion: 0.4
-Nodes (5): shareEvent, cta, message, subtitle, title
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 746 - "Community 746"
-Cohesion: 0.4
-Nodes (5): notifications, couldNotLoadNotifications, emptySubtitle, emptyTitle, title
+Cohesion: 0.05
+Nodes (38): qmPlans, aboutMonthly, aMonth, aYear, bestValue, billing, close, creditsMonth (+30 more)
 
 ### Community 747 - "Community 747"
-Cohesion: 0.4
-Nodes (5): prompts, thisPassage, typePassage, typeRef, whichPassage
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 748 - "Community 748"
 Cohesion: 0.4
@@ -3863,20 +4029,20 @@ Cohesion: 0.4
 Nodes (5): dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges
 
 ### Community 750 - "Community 750"
-Cohesion: 0.4
-Nodes (5): sort, cards, oldest, recent, sets
+Cohesion: 0.33
+Nodes (6): sort, alpha, cards, oldest, recent, sets
 
 ### Community 751 - "Community 751"
-Cohesion: 0.4
-Nodes (5): empty, noActivity, noCommunitySets, noFriendsSets, noRecentSets
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 752 - "Community 752"
-Cohesion: 0.4
-Nodes (5): dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 753 - "Community 753"
-Cohesion: 0.4
-Nodes (5): sort, cards, oldest, recent, sets
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 754 - "Community 754"
 Cohesion: 0.4
@@ -3939,8 +4105,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNCNetInfoSpec::@c36c96bfd5b5770618a5, abi, artifactName, toolchain
 
 ### Community 769 - "Community 769"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, toolchain
+Cohesion: 0.22
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_RNGoogleSignInCGen::@337b7b353bd94a4215c0, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 770 - "Community 770"
 Cohesion: 0.5
@@ -3951,8 +4117,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
 
 ### Community 772 - "Community 772"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNGoogleSignInCGen::@337b7b353bd94a4215c0, abi, artifactName, toolchain
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 773 - "Community 773"
 Cohesion: 0.5
@@ -3983,8 +4149,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_SystemNavigationBarSpec::@f2328110b57d49b53c8c, abi, artifactName, toolchain
 
 ### Community 780 - "Community 780"
-Cohesion: 0.5
-Nodes (3): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents
+Cohesion: 0.53
+Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
 
 ### Community 781 - "Community 781"
 Cohesion: 0.5
@@ -4055,7 +4221,7 @@ Cohesion: 0.5
 Nodes (4): react_codegen_SystemNavigationBarSpec::@f2328110b57d49b53c8c, abi, artifactName, runtimeFiles
 
 ### Community 798 - "Community 798"
-Cohesion: 0.5
+Cohesion: 0.6
 Nodes (3): enabled, packages, prefabPath
 
 ### Community 799 - "Community 799"
@@ -4083,8 +4249,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNCNetInfoSpec::@c36c96bfd5b5770618a5, abi, artifactName, toolchain
 
 ### Community 805 - "Community 805"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, toolchain
+Cohesion: 0.22
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_RNGoogleSignInCGen::@337b7b353bd94a4215c0, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 806 - "Community 806"
 Cohesion: 0.5
@@ -4095,8 +4261,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
 
 ### Community 808 - "Community 808"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNGoogleSignInCGen::@337b7b353bd94a4215c0, abi, artifactName, toolchain
+Cohesion: 0.05
+Nodes (37): qm, achievements, achievementsValue, changePassword, editProfile, friends, inviteFriends, inviteValue (+29 more)
 
 ### Community 809 - "Community 809"
 Cohesion: 0.5
@@ -4123,8 +4289,8 @@ Cohesion: 0.5
 Nodes (4): react_codegen_SystemNavigationBarSpec::@f2328110b57d49b53c8c, abi, artifactName, toolchain
 
 ### Community 815 - "Community 815"
-Cohesion: 0.5
-Nodes (3): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents
+Cohesion: 0.53
+Nodes (4): buildFiles, buildTargetsCommandComponents, cleanCommandsComponents, libraries
 
 ### Community 816 - "Community 816"
 Cohesion: 0.5
@@ -4195,7 +4361,7 @@ Cohesion: 0.5
 Nodes (4): react_codegen_SystemNavigationBarSpec::@f2328110b57d49b53c8c, abi, artifactName, runtimeFiles
 
 ### Community 833 - "Community 833"
-Cohesion: 0.5
+Cohesion: 0.6
 Nodes (3): enabled, packages, prefabPath
 
 ### Community 834 - "Community 834"
@@ -4231,16 +4397,16 @@ Cohesion: 0.5
 Nodes (4): errors, appleNoToken, googleNoToken, signInCancelled
 
 ### Community 842 - "Community 842"
-Cohesion: 0.5
-Nodes (4): social, apple, google, or
+Cohesion: 0.33
+Nodes (6): social, apple, appleContinue, google, googleContinue, or
 
 ### Community 843 - "Community 843"
 Cohesion: 0.5
 Nodes (4): tosGate, disclaimer, subtitle, title
 
 ### Community 844 - "Community 844"
-Cohesion: 0.5
-Nodes (4): notificationSettings, hint, permissionNeededBody, permissionNeededTitle
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 845 - "Community 845"
 Cohesion: 0.5
@@ -4259,16 +4425,16 @@ Cohesion: 0.5
 Nodes (4): errors, appleNoToken, googleNoToken, signInCancelled
 
 ### Community 849 - "Community 849"
-Cohesion: 0.5
-Nodes (4): social, apple, google, or
+Cohesion: 0.33
+Nodes (6): social, apple, appleContinue, google, googleContinue, or
 
 ### Community 850 - "Community 850"
 Cohesion: 0.5
 Nodes (4): tosGate, disclaimer, subtitle, title
 
 ### Community 851 - "Community 851"
-Cohesion: 0.5
-Nodes (4): notificationSettings, hint, permissionNeededBody, permissionNeededTitle
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 852 - "Community 852"
 Cohesion: 0.5
@@ -4283,11 +4449,11 @@ Cohesion: 0.5
 Nodes (4): sort, alpha, cards, newest
 
 ### Community 855 - "Community 855"
-Cohesion: 0.5
+Cohesion: 0.6
 Nodes (3): enabled, packages, prefabPath
 
 ### Community 856 - "Community 856"
-Cohesion: 0.5
+Cohesion: 0.6
 Nodes (3): enabled, packages, prefabPath
 
 ### Community 857 - "Community 857"
@@ -4299,16 +4465,16 @@ Cohesion: 0.5
 Nodes (4): errors, appleNoToken, googleNoToken, signInCancelled
 
 ### Community 859 - "Community 859"
-Cohesion: 0.5
-Nodes (4): social, apple, google, or
+Cohesion: 0.33
+Nodes (6): social, apple, appleContinue, google, googleContinue, or
 
 ### Community 860 - "Community 860"
 Cohesion: 0.5
 Nodes (4): tosGate, disclaimer, subtitle, title
 
 ### Community 861 - "Community 861"
-Cohesion: 0.5
-Nodes (4): notificationSettings, hint, permissionNeededBody, permissionNeededTitle
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 862 - "Community 862"
 Cohesion: 0.5
@@ -4327,20 +4493,20 @@ Cohesion: 0.5
 Nodes (4): errors, appleNoToken, googleNoToken, signInCancelled
 
 ### Community 866 - "Community 866"
-Cohesion: 0.5
-Nodes (4): social, apple, google, or
+Cohesion: 0.33
+Nodes (6): social, apple, appleContinue, google, googleContinue, or
 
 ### Community 867 - "Community 867"
 Cohesion: 0.5
 Nodes (4): tosGate, disclaimer, subtitle, title
 
 ### Community 868 - "Community 868"
-Cohesion: 0.5
-Nodes (4): chart, day, month, week
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 869 - "Community 869"
-Cohesion: 0.5
-Nodes (4): storage, overLimit, title, usage
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 870 - "Community 870"
 Cohesion: 0.5
@@ -4367,16 +4533,16 @@ Cohesion: 0.5
 Nodes (4): errors, appleNoToken, googleNoToken, signInCancelled
 
 ### Community 876 - "Community 876"
-Cohesion: 0.5
-Nodes (4): social, apple, google, or
+Cohesion: 0.33
+Nodes (6): social, apple, appleContinue, google, googleContinue, or
 
 ### Community 877 - "Community 877"
 Cohesion: 0.5
 Nodes (4): tosGate, disclaimer, subtitle, title
 
 ### Community 878 - "Community 878"
-Cohesion: 0.5
-Nodes (4): notificationSettings, hint, permissionNeededBody, permissionNeededTitle
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 879 - "Community 879"
 Cohesion: 0.5
@@ -4419,16 +4585,16 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNCNetInfoSpec::@c36c96bfd5b5770618a5, abi, artifactName, toolchain
 
 ### Community 889 - "Community 889"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, toolchain
+Cohesion: 0.22
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 890 - "Community 890"
 Cohesion: 0.5
 Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
 
 ### Community 891 - "Community 891"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 892 - "Community 892"
 Cohesion: 0.5
@@ -4555,16 +4721,16 @@ Cohesion: 0.5
 Nodes (4): react_codegen_RNCNetInfoSpec::@c36c96bfd5b5770618a5, abi, artifactName, toolchain
 
 ### Community 923 - "Community 923"
-Cohesion: 0.5
-Nodes (4): react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, abi, artifactName, toolchain
+Cohesion: 0.22
+Nodes (9): libraries, react_codegen_RNCWebViewSpec::@eb48929f9f7453740a6c, react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain, abi, artifactName (+1 more)
 
 ### Community 924 - "Community 924"
 Cohesion: 0.5
 Nodes (4): react_codegen_RNDateTimePickerCGen::@59b70ddc31ba2f8ef1d2, abi, artifactName, toolchain
 
 ### Community 925 - "Community 925"
-Cohesion: 0.5
-Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
+Cohesion: 0.07
+Nodes (31): jsonFile, kind, version, cache-v2, cmakeFiles-v1, codemodel-v2, cmake, generator (+23 more)
 
 ### Community 926 - "Community 926"
 Cohesion: 0.5
@@ -4670,25 +4836,661 @@ Nodes (4): react_codegen_rnworklets::@68f58d84d4754f193387, abi, artifactName, r
 Cohesion: 0.5
 Nodes (4): react_codegen_SystemNavigationBarSpec::@f2328110b57d49b53c8c, abi, artifactName, runtimeFiles
 
+### Community 976 - "Community 976"
+Cohesion: 0.07
+Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
+
+### Community 977 - "Community 977"
+Cohesion: 0.07
+Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
+
+### Community 978 - "Community 978"
+Cohesion: 0.07
+Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
+
+### Community 979 - "Community 979"
+Cohesion: 0.07
+Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
+
+### Community 980 - "Community 980"
+Cohesion: 0.07
+Nodes (30): add, addTopic, clearAll, clearText, clearTitle, continue, deleteText, deleteTitle (+22 more)
+
+### Community 981 - "Community 981"
+Cohesion: 0.08
+Nodes (24): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+16 more)
+
+### Community 982 - "Community 982"
+Cohesion: 0.08
+Nodes (24): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+16 more)
+
+### Community 983 - "Community 983"
+Cohesion: 0.08
+Nodes (24): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+16 more)
+
+### Community 984 - "Community 984"
+Cohesion: 0.08
+Nodes (24): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+16 more)
+
+### Community 985 - "Community 985"
+Cohesion: 0.08
+Nodes (24): today, cardCount, cardCount_other, continueBtn, continueLabel, continueSub, continueSub_other, due (+16 more)
+
+### Community 986 - "Community 986"
+Cohesion: 0.09
+Nodes (22): 0. How to test — the same tests for every screen, 10. Quiz — playing & results, 11. Ask (AI), 12. Profile & Settings, 13. Friends, 14. Notes, 15. Media, 16. Whole app (+14 more)
+
+### Community 987 - "Community 987"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 988 - "Community 988"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 989 - "Community 989"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 990 - "Community 990"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 991 - "Community 991"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 992 - "Community 992"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 993 - "Community 993"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 994 - "Community 994"
+Cohesion: 0.09
+Nodes (22): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, dependencies (+14 more)
+
+### Community 995 - "Community 995"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 996 - "Community 996"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 997 - "Community 997"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 998 - "Community 998"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 999 - "Community 999"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1000 - "Community 1000"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1001 - "Community 1001"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1002 - "Community 1002"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1003 - "Community 1003"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1004 - "Community 1004"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1005 - "Community 1005"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1006 - "Community 1006"
+Cohesion: 0.09
+Nodes (21): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+13 more)
+
+### Community 1007 - "Community 1007"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1008 - "Community 1008"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1009 - "Community 1009"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1010 - "Community 1010"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1011 - "Community 1011"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1012 - "Community 1012"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1013 - "Community 1013"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1014 - "Community 1014"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1015 - "Community 1015"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1016 - "Community 1016"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1017 - "Community 1017"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1018 - "Community 1018"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1019 - "Community 1019"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1020 - "Community 1020"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1021 - "Community 1021"
+Cohesion: 0.23
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1022 - "Community 1022"
+Cohesion: 0.12
+Nodes (17): choose, empty, noSets, oneSub, oneTitle, save_one, save_other, sub_one (+9 more)
+
+### Community 1023 - "Community 1023"
+Cohesion: 0.12
+Nodes (17): agree, checkText, checkTitle, lead, legal, legalAnd, more, moreText (+9 more)
+
+### Community 1024 - "Community 1024"
+Cohesion: 0.12
+Nodes (17): choose, empty, noSets, oneSub, oneTitle, save_one, save_other, sub_one (+9 more)
+
+### Community 1025 - "Community 1025"
+Cohesion: 0.12
+Nodes (17): agree, checkText, checkTitle, lead, legal, legalAnd, more, moreText (+9 more)
+
+### Community 1026 - "Community 1026"
+Cohesion: 0.18
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1027 - "Community 1027"
+Cohesion: 0.18
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1028 - "Community 1028"
+Cohesion: 0.12
+Nodes (17): choose, empty, noSets, oneSub, oneTitle, save_one, save_other, sub_one (+9 more)
+
+### Community 1029 - "Community 1029"
+Cohesion: 0.12
+Nodes (17): agree, checkText, checkTitle, lead, legal, legalAnd, more, moreText (+9 more)
+
+### Community 1030 - "Community 1030"
+Cohesion: 0.12
+Nodes (17): choose, empty, noSets, oneSub, oneTitle, save_one, save_other, sub_one (+9 more)
+
+### Community 1031 - "Community 1031"
+Cohesion: 0.12
+Nodes (17): agree, checkText, checkTitle, lead, legal, legalAnd, more, moreText (+9 more)
+
+### Community 1032 - "Community 1032"
+Cohesion: 0.12
+Nodes (17): choose, empty, noSets, oneSub, oneTitle, save_one, save_other, sub_one (+9 more)
+
+### Community 1033 - "Community 1033"
+Cohesion: 0.12
+Nodes (17): agree, checkText, checkTitle, lead, legal, legalAnd, more, moreText (+9 more)
+
+### Community 1034 - "Community 1034"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1035 - "Community 1035"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1036 - "Community 1036"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1037 - "Community 1037"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1038 - "Community 1038"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1039 - "Community 1039"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1040 - "Community 1040"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1041 - "Community 1041"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1042 - "Community 1042"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1043 - "Community 1043"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1044 - "Community 1044"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1045 - "Community 1045"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1046 - "Community 1046"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1047 - "Community 1047"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1048 - "Community 1048"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1049 - "Community 1049"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1050 - "Community 1050"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1051 - "Community 1051"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1052 - "Community 1052"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1053 - "Community 1053"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1054 - "Community 1054"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1055 - "Community 1055"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1056 - "Community 1056"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1057 - "Community 1057"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1058 - "Community 1058"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1059 - "Community 1059"
+Cohesion: 0.12
+Nodes (15): artifacts, backtrace, backtraceGraph, commands, files, nodes, compileGroups, id (+7 more)
+
+### Community 1060 - "Community 1060"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1061 - "Community 1061"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1062 - "Community 1062"
+Cohesion: 0.12
+Nodes (16): qmNotif, achievements, achievementsHint, footer, friendAccepted, friendAcceptedHint, friendRequests, friendRequestsHint (+8 more)
+
+### Community 1063 - "Community 1063"
+Cohesion: 0.13
+Nodes (15): invite, applyCode, copied, enterCode, gotCode, gotCodeHint, headline, joinedCount (+7 more)
+
+### Community 1064 - "Community 1064"
+Cohesion: 0.13
+Nodes (15): invite, applyCode, copied, enterCode, gotCode, gotCodeHint, headline, joinedCount (+7 more)
+
+### Community 1065 - "Community 1065"
+Cohesion: 0.13
+Nodes (15): invite, applyCode, copied, enterCode, gotCode, gotCodeHint, headline, joinedCount (+7 more)
+
+### Community 1066 - "Community 1066"
+Cohesion: 0.13
+Nodes (15): invite, applyCode, copied, enterCode, gotCode, gotCodeHint, headline, joinedCount (+7 more)
+
+### Community 1067 - "Community 1067"
+Cohesion: 0.15
+Nodes (7): Colors, DivergingBarChart(), s, threeLabels(), DayStat, PERIOD_OPTIONS, SimplePeriod
+
+### Community 1068 - "Community 1068"
+Cohesion: 0.15
+Nodes (13): scene, askAi, askUser, backCard, chipGrace, chipPdf, chipPsalm, chipQuiz (+5 more)
+
+### Community 1069 - "Community 1069"
+Cohesion: 0.15
+Nodes (13): sub, text, sub, text, sub, text, sub, text (+5 more)
+
+### Community 1070 - "Community 1070"
+Cohesion: 0.15
+Nodes (13): scene, askAi, askUser, backCard, chipGrace, chipPdf, chipPsalm, chipQuiz (+5 more)
+
+### Community 1071 - "Community 1071"
+Cohesion: 0.15
+Nodes (13): sub, text, sub, text, sub, text, sub, text (+5 more)
+
+### Community 1072 - "Community 1072"
+Cohesion: 0.15
+Nodes (13): scene, askAi, askUser, backCard, chipGrace, chipPdf, chipPsalm, chipQuiz (+5 more)
+
+### Community 1073 - "Community 1073"
+Cohesion: 0.15
+Nodes (13): sub, text, sub, text, sub, text, sub, text (+5 more)
+
+### Community 1074 - "Community 1074"
+Cohesion: 0.15
+Nodes (13): scene, askAi, askUser, backCard, chipGrace, chipPdf, chipPsalm, chipQuiz (+5 more)
+
+### Community 1075 - "Community 1075"
+Cohesion: 0.15
+Nodes (13): scene, askAi, askUser, backCard, chipGrace, chipPdf, chipPsalm, chipQuiz (+5 more)
+
+### Community 1076 - "Community 1076"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1077 - "Community 1077"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1078 - "Community 1078"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1079 - "Community 1079"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1080 - "Community 1080"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1081 - "Community 1081"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1082 - "Community 1082"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1083 - "Community 1083"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1084 - "Community 1084"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1085 - "Community 1085"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1086 - "Community 1086"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1087 - "Community 1087"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1088 - "Community 1088"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1089 - "Community 1089"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1090 - "Community 1090"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1091 - "Community 1091"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1092 - "Community 1092"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1093 - "Community 1093"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1094 - "Community 1094"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1095 - "Community 1095"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1096 - "Community 1096"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1097 - "Community 1097"
+Cohesion: 0.26
+Nodes (8): backtraceGraph, commands, files, nodes, installers, paths, build, source
+
+### Community 1098 - "Community 1098"
+Cohesion: 0.2
+Nodes (10): modes, blanks, chunks, mc, mixDesc, mixMode, read, story_mc (+2 more)
+
+### Community 1099 - "Community 1099"
+Cohesion: 0.22
+Nodes (9): verse, added, label, memorize, new, setTitle, share, translation (+1 more)
+
+### Community 1100 - "Community 1100"
+Cohesion: 0.22
+Nodes (9): verse, added, label, memorize, new, setTitle, share, translation (+1 more)
+
+### Community 1101 - "Community 1101"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1102 - "Community 1102"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1103 - "Community 1103"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1104 - "Community 1104"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1105 - "Community 1105"
+Cohesion: 0.22
+Nodes (8): inputs, kind, paths, build, source, version, major, minor
+
+### Community 1106 - "Community 1106"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1107 - "Community 1107"
+Cohesion: 0.22
+Nodes (8): inputs, kind, paths, build, source, version, major, minor
+
+### Community 1108 - "Community 1108"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1109 - "Community 1109"
+Cohesion: 0.22
+Nodes (8): inputs, kind, paths, build, source, version, major, minor
+
+### Community 1110 - "Community 1110"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1111 - "Community 1111"
+Cohesion: 0.22
+Nodes (8): inputs, kind, paths, build, source, version, major, minor
+
+### Community 1112 - "Community 1112"
+Cohesion: 0.22
+Nodes (8): configurations, kind, paths, build, source, version, major, minor
+
+### Community 1113 - "Community 1113"
+Cohesion: 0.22
+Nodes (9): verse, added, label, memorize, new, setTitle, share, translation (+1 more)
+
+### Community 1114 - "Community 1114"
+Cohesion: 0.22
+Nodes (9): verse, added, label, memorize, new, setTitle, share, translation (+1 more)
+
+### Community 1115 - "Community 1115"
+Cohesion: 0.22
+Nodes (9): verse, added, label, memorize, new, setTitle, share, translation (+1 more)
+
+### Community 1116 - "Community 1116"
+Cohesion: 0.33
+Nodes (6): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder
+
+### Community 1117 - "Community 1117"
+Cohesion: 0.33
+Nodes (6): sort, alpha, cards, oldest, recent, sets
+
+### Community 1118 - "Community 1118"
+Cohesion: 0.33
+Nodes (6): composer, charCount, claimDaily, creditsRemaining, noCredits, placeholder
+
+### Community 1119 - "Community 1119"
+Cohesion: 0.33
+Nodes (6): sort, alpha, cards, oldest, recent, sets
+
+### Community 1120 - "Community 1120"
+Cohesion: 0.33
+Nodes (5): entries, kind, version, major, minor
+
+### Community 1121 - "Community 1121"
+Cohesion: 0.33
+Nodes (5): entries, kind, version, major, minor
+
+### Community 1122 - "Community 1122"
+Cohesion: 0.33
+Nodes (5): entries, kind, version, major, minor
+
+### Community 1123 - "Community 1123"
+Cohesion: 0.33
+Nodes (5): entries, kind, version, major, minor
+
+### Community 1124 - "Community 1124"
+Cohesion: 0.33
+Nodes (6): cards, ready, ready_other, saved, saveToSet, saving
+
+### Community 1125 - "Community 1125"
+Cohesion: 0.33
+Nodes (6): cards, ready, ready_other, saved, saveToSet, saving
+
+### Community 1126 - "Community 1126"
+Cohesion: 0.4
+Nodes (4): Release 1.1.0 (Android versionCode 9 · iOS build 5), Steps (in order), Store "What's new" text, What's in it
+
+### Community 1127 - "Community 1127"
+Cohesion: 0.4
+Nodes (5): dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges
+
+### Community 1128 - "Community 1128"
+Cohesion: 0.4
+Nodes (5): dialogs, confirmTitle, deleteConfirmTitle, discard, unsavedChanges
+
+### Community 1129 - "Community 1129"
+Cohesion: 0.4
+Nodes (5): empty, noActivity, noCommunitySets, noFriendsSets, noRecentSets
+
+### Community 1130 - "Community 1130"
+Cohesion: 0.4
+Nodes (5): shareEvent, cta, message, subtitle, title
+
+### Community 1131 - "Community 1131"
+Cohesion: 0.5
+Nodes (4): react_codegen_rngesturehandler_codegen::@39f233abcd2c728bc6ec, abi, artifactName, toolchain
+
+### Community 1132 - "Community 1132"
+Cohesion: 0.5
+Nodes (4): react_codegen_RNVectorIconsSpec::@479809fae146501fd34d, abi, artifactName, toolchain
+
+### Community 1134 - "Community 1134"
+Cohesion: 0.5
+Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
+
+### Community 1135 - "Community 1135"
+Cohesion: 0.5
+Nodes (4): react_codegen_rndocumentpicker::@1e246c1f1267e461f98b, abi, artifactName, toolchain
+
 ## Knowledge Gaps
-- **11460 isolated node(s):** `command`, `args`, `type`, `command`, `args` (+11455 more)
+- **16129 isolated node(s):** `command`, `args`, `type`, `command`, `args` (+16124 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **18 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **20 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `join()` connect `Community 2` to `Community 0`, `Community 5`, `Community 38`, `Community 6`, `Community 7`, `Community 138`, `Community 49`?**
-  _High betweenness centrality (0.043) - this node is a cross-community bridge._
-- **Why does `updateProfile()` connect `Community 145` to `Community 0`, `Community 3`?**
-  _High betweenness centrality (0.026) - this node is a cross-community bridge._
-- **Why does `sets` connect `Community 120` to `Community 321`?**
-  _High betweenness centrality (0.017) - this node is a cross-community bridge._
-- **Are the 150 inferred relationships involving `useTheme()` (e.g. with `AppBootstrap()` and `FolderFormSheet()`) actually correct?**
-  _`useTheme()` has 150 INFERRED edges - model-reasoned connections that need verification._
-- **Are the 112 inferred relationships involving `sendSuccess()` (e.g. with `join()` and `count()`) actually correct?**
-  _`sendSuccess()` has 112 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `join()` connect `Community 2` to `Community 0`, `Community 225`, `Community 1`, `Community 5`, `Community 6`, `Community 7`, `Community 49`?**
+  _High betweenness centrality (0.041) - this node is a cross-community bridge._
+- **Why does `qm` connect `Community 128` to `Community 666`?**
+  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+- **Why does `hub` connect `Community 206` to `Community 240`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **What connects `command`, `args`, `type` to the rest of the system?**
-  _11460 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _16129 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
-  _Cohesion score 0.03 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.02 - nodes in this community are weakly interconnected._
+- **Should `Community 1` be split into smaller, more focused modules?**
+  _Cohesion score 0.02 - nodes in this community are weakly interconnected._
+- **Should `Community 2` be split into smaller, more focused modules?**
+  _Cohesion score 0.04 - nodes in this community are weakly interconnected._
